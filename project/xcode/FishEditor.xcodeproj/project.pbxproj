@@ -1,0 +1,406 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
+		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
+		BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */; };
+		BFDC75191D8EE0330082A6DC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75121D8EE0330082A6DC /* main.cpp */; };
+		BFDC751A1D8EE0330082A6DC /* Selection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75141D8EE0330082A6DC /* Selection.cpp */; };
+		BFDC75201D8EE0D60082A6DC /* imgui_demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC751C1D8EE0D60082A6DC /* imgui_demo.cpp */; };
+		BFDC75211D8EE0D60082A6DC /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC751D1D8EE0D60082A6DC /* imgui_draw.cpp */; };
+		BFDC75221D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC751E1D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp */; };
+		BFDC75231D8EE0D60082A6DC /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC751F1D8EE0D60082A6DC /* imgui.cpp */; };
+		BFDC75241D8EE0F10082A6DC /* libFishEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75091D8EE0040082A6DC /* libFishEngine.a */; };
+		BFDC75281D8EE1250082A6DC /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75251D8EE1250082A6DC /* libassimp.a */; };
+		BFDC75291D8EE1250082A6DC /* libGLEW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75261D8EE1250082A6DC /* libGLEW.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		BFDC752A1D8EE1250082A6DC /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75271D8EE1250082A6DC /* libglfw3.a */; };
+		BFDC752E1D8EE28A0082A6DC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC752D1D8EE28A0082A6DC /* OpenGL.framework */; };
+		BFDC75301D8EE2970082A6DC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC752F1D8EE2970082A6DC /* Cocoa.framework */; };
+		BFDC75331D8EE3D00082A6DC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75321D8EE3D00082A6DC /* IOKit.framework */; };
+		BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */; };
+		BFDC75381D8EE4110082A6DC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75371D8EE4110082A6DC /* libz.tbd */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BFDC75081D8EE0040082A6DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BFDC741C1D8EDD6C0082A6DC;
+			remoteInfo = FishEngine;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BFDC74F21D8EDEEC0082A6DC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
+		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
+		BFDC750C1D8EE0330082A6DC /* EditorGUI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = EditorGUI.hpp; path = ../../source/FishEditor/EditorGUI.hpp; sourceTree = "<group>"; };
+		BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorRenderSystem.cpp; path = ../../source/FishEditor/EditorRenderSystem.cpp; sourceTree = "<group>"; };
+		BFDC750E1D8EE0330082A6DC /* EditorRenderSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = EditorRenderSystem.hpp; path = ../../source/FishEditor/EditorRenderSystem.hpp; sourceTree = "<group>"; };
+		BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FishEditor.hpp; path = ../../source/FishEditor/FishEditor.hpp; sourceTree = "<group>"; };
+		BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FishEditorWindow.cpp; path = ../../source/FishEditor/FishEditorWindow.cpp; sourceTree = "<group>"; };
+		BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FishEditorWindow.hpp; path = ../../source/FishEditor/FishEditorWindow.hpp; sourceTree = "<group>"; };
+		BFDC75121D8EE0330082A6DC /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../source/FishEditor/main.cpp; sourceTree = "<group>"; };
+		BFDC75131D8EE0330082A6DC /* SceneView.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SceneView.hpp; path = ../../source/FishEditor/SceneView.hpp; sourceTree = "<group>"; };
+		BFDC75141D8EE0330082A6DC /* Selection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Selection.cpp; path = ../../source/FishEditor/Selection.cpp; sourceTree = "<group>"; };
+		BFDC75151D8EE0330082A6DC /* Selection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Selection.hpp; path = ../../source/FishEditor/Selection.hpp; sourceTree = "<group>"; };
+		BFDC751C1D8EE0D60082A6DC /* imgui_demo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_demo.cpp; path = ../../external/imgui/imgui_demo.cpp; sourceTree = "<group>"; };
+		BFDC751D1D8EE0D60082A6DC /* imgui_draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_draw.cpp; path = ../../external/imgui/imgui_draw.cpp; sourceTree = "<group>"; };
+		BFDC751E1D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_impl_glfw_gl3.cpp; path = ../../external/imgui/imgui_impl_glfw_gl3.cpp; sourceTree = "<group>"; };
+		BFDC751F1D8EE0D60082A6DC /* imgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui.cpp; path = ../../external/imgui/imgui.cpp; sourceTree = "<group>"; };
+		BFDC75251D8EE1250082A6DC /* libassimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libassimp.a; path = ../../external/libs/osx/libassimp.a; sourceTree = "<group>"; };
+		BFDC75261D8EE1250082A6DC /* libGLEW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGLEW.a; path = ../../external/libs/osx/libGLEW.a; sourceTree = "<group>"; };
+		BFDC75271D8EE1250082A6DC /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = ../../external/libs/osx/libglfw3.a; sourceTree = "<group>"; };
+		BFDC752D1D8EE28A0082A6DC /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		BFDC752F1D8EE2970082A6DC /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		BFDC75321D8EE3D00082A6DC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		BFDC75371D8EE4110082A6DC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BFDC74F11D8EDEEC0082A6DC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFDC75381D8EE4110082A6DC /* libz.tbd in Frameworks */,
+				BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */,
+				BFDC75331D8EE3D00082A6DC /* IOKit.framework in Frameworks */,
+				BFDC75301D8EE2970082A6DC /* Cocoa.framework in Frameworks */,
+				BFDC752E1D8EE28A0082A6DC /* OpenGL.framework in Frameworks */,
+				BFDC75241D8EE0F10082A6DC /* libFishEngine.a in Frameworks */,
+				BFDC75291D8EE1250082A6DC /* libGLEW.a in Frameworks */,
+				BFDC75281D8EE1250082A6DC /* libassimp.a in Frameworks */,
+				BFDC752A1D8EE1250082A6DC /* libglfw3.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BFDC74EB1D8EDEEC0082A6DC = {
+			isa = PBXGroup;
+			children = (
+				BFDC751B1D8EE0B90082A6DC /* ImGui */,
+				BFDC750A1D8EE01B0082A6DC /* FishEditor */,
+				BFDC752B1D8EE1330082A6DC /* lib */,
+				BFDC74F51D8EDEEC0082A6DC /* Products */,
+				BFDC752C1D8EE28A0082A6DC /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		BFDC74F51D8EDEEC0082A6DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC74F41D8EDEEC0082A6DC /* FishEditor */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BFDC75051D8EE0040082A6DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC75091D8EE0040082A6DC /* libFishEngine.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BFDC750A1D8EE01B0082A6DC /* FishEditor */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */,
+				BFDC750C1D8EE0330082A6DC /* EditorGUI.hpp */,
+				BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */,
+				BFDC750E1D8EE0330082A6DC /* EditorRenderSystem.hpp */,
+				BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */,
+				BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */,
+				BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */,
+				BFDC75121D8EE0330082A6DC /* main.cpp */,
+				BFDC75131D8EE0330082A6DC /* SceneView.hpp */,
+				BFDC75141D8EE0330082A6DC /* Selection.cpp */,
+				BFDC75151D8EE0330082A6DC /* Selection.hpp */,
+			);
+			name = FishEditor;
+			sourceTree = "<group>";
+		};
+		BFDC751B1D8EE0B90082A6DC /* ImGui */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC751C1D8EE0D60082A6DC /* imgui_demo.cpp */,
+				BFDC751D1D8EE0D60082A6DC /* imgui_draw.cpp */,
+				BFDC751E1D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp */,
+				BFDC751F1D8EE0D60082A6DC /* imgui.cpp */,
+			);
+			name = ImGui;
+			sourceTree = "<group>";
+		};
+		BFDC752B1D8EE1330082A6DC /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */,
+				BFDC75251D8EE1250082A6DC /* libassimp.a */,
+				BFDC75261D8EE1250082A6DC /* libGLEW.a */,
+				BFDC75271D8EE1250082A6DC /* libglfw3.a */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+		BFDC752C1D8EE28A0082A6DC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC75371D8EE4110082A6DC /* libz.tbd */,
+				BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */,
+				BFDC75321D8EE3D00082A6DC /* IOKit.framework */,
+				BFDC752F1D8EE2970082A6DC /* Cocoa.framework */,
+				BFDC752D1D8EE28A0082A6DC /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BFDC74F31D8EDEEC0082A6DC /* FishEditor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BFDC74FB1D8EDEEC0082A6DC /* Build configuration list for PBXNativeTarget "FishEditor" */;
+			buildPhases = (
+				BFDC74F01D8EDEEC0082A6DC /* Sources */,
+				BFDC74F11D8EDEEC0082A6DC /* Frameworks */,
+				BFDC74F21D8EDEEC0082A6DC /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FishEditor;
+			productName = FishEditor;
+			productReference = BFDC74F41D8EDEEC0082A6DC /* FishEditor */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDC74EC1D8EDEEC0082A6DC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0800;
+				ORGANIZATIONNAME = yushroom;
+				TargetAttributes = {
+					BFDC74F31D8EDEEC0082A6DC = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = BFDC74EF1D8EDEEC0082A6DC /* Build configuration list for PBXProject "FishEditor" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BFDC74EB1D8EDEEC0082A6DC;
+			productRefGroup = BFDC74F51D8EDEEC0082A6DC /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BFDC75051D8EE0040082A6DC /* Products */;
+					ProjectRef = BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				BFDC74F31D8EDEEC0082A6DC /* FishEditor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		BFDC75091D8EE0040082A6DC /* libFishEngine.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFishEngine.a;
+			remoteRef = BFDC75081D8EE0040082A6DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BFDC74F01D8EDEEC0082A6DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFDC75221D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp in Sources */,
+				BFDC751A1D8EE0330082A6DC /* Selection.cpp in Sources */,
+				BFDC75211D8EE0D60082A6DC /* imgui_draw.cpp in Sources */,
+				BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */,
+				BFDC75201D8EE0D60082A6DC /* imgui_demo.cpp in Sources */,
+				BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */,
+				BFDC75191D8EE0330082A6DC /* main.cpp in Sources */,
+				BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */,
+				BFDC75231D8EE0D60082A6DC /* imgui.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BFDC74F91D8EDEEC0082A6DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BFDC74FA1D8EDEEC0082A6DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		BFDC74FC1D8EDEEC0082A6DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				HEADER_SEARCH_PATHS = (
+					../../source/,
+					../../external/,
+					../../external/glew,
+				);
+				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BFDC74FD1D8EDEEC0082A6DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				HEADER_SEARCH_PATHS = (
+					../../source/,
+					../../external/,
+					../../external/glew,
+				);
+				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BFDC74EF1D8EDEEC0082A6DC /* Build configuration list for PBXProject "FishEditor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFDC74F91D8EDEEC0082A6DC /* Debug */,
+				BFDC74FA1D8EDEEC0082A6DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BFDC74FB1D8EDEEC0082A6DC /* Build configuration list for PBXNativeTarget "FishEditor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFDC74FC1D8EDEEC0082A6DC /* Debug */,
+				BFDC74FD1D8EDEEC0082A6DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDC74EC1D8EDEEC0082A6DC /* Project object */;
+}

@@ -2,6 +2,7 @@
 #define Behaviour_hpp
 
 #include "Component.hpp"
+#include "Debug.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -9,6 +10,8 @@ NAMESPACE_FISHENGINE_BEGIN
 class Behaviour : public Component
 {
 public:
+
+    virtual ~Behaviour() = default;
 
     // Enabled Behaviours are Updated, disabled Behaviours are not.
     bool enabled() const { return m_enabled; }
@@ -21,29 +24,6 @@ private:
     bool m_enabled = true;
 };
 
-
-// Script is the base class every script derives from.
-// http://docs.unity3d.com/ScriptReference/MonoBehaviour.html
-// http://docs.unity3d.com/Manual/ExecutionOrder.html
-class Script : public Behaviour
-{
-public:
-    //InjectClassName(Script);
-    //virtual onEnable();
-
-    // Awake is called when the script instance is being loaded.
-    virtual void Awake() {}
-
-    virtual void Start() {};
-    
-    virtual void FixedUpdate() {};
-    
-    virtual void Update() {};
-    
-    virtual void LateUpdate() {};
-    
-    //virtual void OnGUI() {};
-};
 
 NAMESPACE_FISHENGINE_END
 

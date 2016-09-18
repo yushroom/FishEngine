@@ -57,7 +57,7 @@ public:
     
     void Update();
     
-    void OnEditorGUI();
+    void OnInspectorGUI();
     
     //========== Static Region ==========
     

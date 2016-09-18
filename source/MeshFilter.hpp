@@ -24,7 +24,7 @@ public:
         m_mesh = mesh;
     }
     
-    virtual void OnEditorGUI() override;
+    virtual void OnInspectorGUI() override;
     
 private:
     std::shared_ptr<Mesh> m_mesh = nullptr;

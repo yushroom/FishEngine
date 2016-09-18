@@ -21,7 +21,7 @@ FishEngine::Matrix4x4 FishEngine::Camera::projectionMatrix() const
     return m_projectMatrix;
 }
 
-void FishEngine::Camera::OnEditorGUI()
+void FishEngine::Camera::OnInspectorGUI()
 {
     if (ImGui::SliderFloat("Field of View", &m_fov, 1, 179)) {
         m_isDirty = true;
@@ -37,7 +37,7 @@ void FishEngine::Camera::OnEditorGUI()
 
 FishEngine::Matrix4x4 FishEngine::Camera::worldToCameraMatrix() const
 {
-    return m_gameObject->transform()->worldToLocalMatrix();
+    return gameObject()->transform()->worldToLocalMatrix();
 }
 
 std::shared_ptr<Camera> Camera::main()

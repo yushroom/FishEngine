@@ -12,8 +12,11 @@
 #include "Common.hpp"
 #include "Debug.hpp"
 #include "RenderSettings.hpp"
+#include "Selection.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
+using namespace FishEngine;
+
+NAMESPACE_FISHEDITOR_BEGIN
 
 int EditorGUI::m_idCount = 0;
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
@@ -38,15 +41,15 @@ void EditorGUI::Init()
 
 void EditorGUI::Update()
 {
+    // Inspector Editor
     ImGui::Begin("Inspector");
-    
-    auto go = Scene::m_activeGameObject;
+    auto go = Selection::activeGameObject();
     if (go != nullptr) {
         ImGui::PushID("Inspector.selected.active");
         ImGui::Checkbox("", &go->m_activeSelf);
         ImGui::PopID();
         char name[32] = {0};
-        memcpy(name, go->m_name.c_str(), go->m_name.size());
+        memcpy(name, go->name().c_str(), go->name().size());
         name[go->m_name.size()] = 0;
         ImGui::SameLine();
         ImGui::PushID("Inspector.selected.name");
@@ -60,21 +63,29 @@ void EditorGUI::Update()
         ImGui::LabelText("Layer", "Layer %d", go->m_layer);
         
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-            go->m_transform.OnEditorGUI();
+            go->m_transform->OnInspectorGUI();
         }
         
         for (auto& c : go->m_components) {
-            if (ImGui::CollapsingHeader(camelCaseToReadable(c->ClassName()).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
-                c->OnEditorGUI();
+            bool is_open = true;
+            if (ImGui::CollapsingHeader(camelCaseToReadable(c->ClassName()).c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+                c->OnInspectorGUI();
+            if (!is_open) {
+                Object::Destroy(c);
+            }
         }
         for (auto& s : go->m_scripts) {
-            if (ImGui::CollapsingHeader(camelCaseToReadable(s->ClassName()).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
-                s->OnEditorGUI();
+            bool is_open = true;
+            if (ImGui::CollapsingHeader(camelCaseToReadable(s->ClassName()).c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+                s->OnInspectorGUI();
+            if (!is_open) {
+                Object::Destroy(s);
+            }
         }
     }
     
     ImGui::Button("Add Component");
-    ImGui::End(); // Inspector
+    ImGui::End(); // Inspector Editor
     
     glClear(GL_DEPTH_BUFFER_BIT);
     DrawSceneGizmo();
@@ -101,14 +112,14 @@ void EditorGUI::Update()
         ImGui::SameLine();
         if (ImGui::Button("Destroy")) {
             Object::Destroy(go);
-            Scene::m_activeGameObject = nullptr;
+            //Selection::setActiveGameObject(nullptr);
         }
     }
     m_idCount = 0;
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
     for (auto go : Scene::m_gameObjects) {
         if (go->transform()->parent() == nullptr) {
-            HierarchyItem(go.get());
+            HierarchyItem(go);
         }
     }
     ImGui::PopStyleVar();
@@ -184,8 +195,8 @@ void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> c
 }
 
 
-void EditorGUI::HierarchyItem(GameObject* gameObject) {
-    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ((gameObject == Scene::m_activeGameObject)? ImGuiTreeNodeFlags_Selected : 0);
+void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject) {
+    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ((gameObject == Selection::activeGameObject())? ImGuiTreeNodeFlags_Selected : 0);
     
     bool is_leaf = (gameObject->transform()->childCount() == 0);
     if (is_leaf) {// no child
@@ -197,13 +208,13 @@ void EditorGUI::HierarchyItem(GameObject* gameObject) {
     bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
 
     if (ImGui::IsItemClicked()) {
-        Scene::SelectGameObject(gameObject);
+        Selection::setActiveGameObject(gameObject);
     }
     // child node
     if (!is_leaf) {
         if (node_open) {
             for (auto t : gameObject->transform()->m_children)
-                HierarchyItem(t->gameObject());
+                HierarchyItem(t.lock()->gameObject());
             ImGui::TreePop();
         }
     }
@@ -266,9 +277,9 @@ void EditorGUI::DrawSceneGizmo()
     
     shader->PostRender();
     
-    auto v = camera->m_viewport;
+    auto v = camera->viewport();
     glViewport(w*v.x, h*v.y, w*v.z, h*v.w);
 }
 
 
-NAMESPACE_FISHENGINE_END
+NAMESPACE_FISHEDITOR_END

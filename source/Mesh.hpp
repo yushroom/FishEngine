@@ -60,7 +60,7 @@ public:
 
     
 private:
-    friend class EditorGUI;
+    friend class FishEditor::EditorGUI;
     std::vector<float>      m_positionBuffer;
     std::vector<float>      m_normalBuffer;
     std::vector<float>      m_uvBuffer;

@@ -3,12 +3,14 @@
 #include "Debug.hpp"
 #include <imgui/imgui.h>
 
-FishEngine::Transform::Transform() : m_localPosition(0, 0, 0), m_localScale(1, 1, 1), m_localRotation(1, 0, 0, 0)
+NAMESPACE_FISHENGINE_BEGIN
+
+Transform::Transform() : m_localPosition(0, 0, 0), m_localScale(1, 1, 1), m_localRotation(1, 0, 0, 0)
 {
 
 }
 
-FishEngine::Transform::~Transform()
+Transform::~Transform()
 {
     Debug::Log("~Transform");
     SetParent(nullptr);
@@ -17,7 +19,7 @@ FishEngine::Transform::~Transform()
     }
 }
 
-void FishEngine::Transform::OnEditorGUI()
+void Transform::OnInspectorGUI()
 {
     if (ImGui::InputFloat3("Position", glm::value_ptr(m_localPosition))) {
         //m_isDirty = true;
@@ -31,18 +33,17 @@ void FishEngine::Transform::OnEditorGUI()
     }
 }
 
-void FishEngine::Transform::Update() const
+void Transform::Update() const
 {
-    //        if (!m_isDirty)
-    //            return;
     m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
     m_localToWorldMatrix = glm::scale(glm::translate(glm::mat4(1.0f), m_localPosition) * glm::mat4_cast(m_localRotation), m_localScale);
-    if (m_parent != nullptr)
-        m_localToWorldMatrix = m_parent->localToWorldMatrix() * m_localToWorldMatrix;
+    auto p = m_parent.lock();
+    if (p != nullptr)
+        m_localToWorldMatrix = p->localToWorldMatrix() * m_localToWorldMatrix;
     m_worldToLocalMatrix = glm::inverse(m_localToWorldMatrix);
 }
 
-void FishEngine::Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
+void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
 {
     m_worldToLocalMatrix = glm::lookAt(m_localPosition, target, worldUp);
     m_localToWorldMatrix = glm::inverse(m_worldToLocalMatrix);
@@ -50,12 +51,12 @@ void FishEngine::Transform::LookAt(const Vector3& target, const Vector3& worldUp
     //m_isDirty = true;
 }
 
-FishEngine::Vector3 FishEngine::Transform::TransformDirection(const Vector3& direction) const
+Vector3 Transform::TransformDirection(const Vector3& direction) const
 {
     return m_localToWorldMatrix * Vector4(direction, 0);
 }
 
-void FishEngine::Transform::Translate(const Vector3& translation, Space relativeTo /*= Space::Self*/)
+void Transform::Translate(const Vector3& translation, Space relativeTo /*= Space::Self*/)
 {
     if (relativeTo == Space::World)
         m_localPosition += translation;
@@ -64,7 +65,7 @@ void FishEngine::Transform::Translate(const Vector3& translation, Space relative
     //m_isDirty = true;
 }
 
-void FishEngine::Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Space::Self*/)
+void Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Space::Self*/)
 {
     Update();
     Quaternion lhs(glm::radians(eulerAngles));
@@ -78,34 +79,36 @@ void FishEngine::Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Spa
     //        m_isDirty = true;
 }
 
-void FishEngine::Transform::RotateAround(const Vector3& point, const Vector3& axis, float angle)
+void Transform::RotateAround(const Vector3& point, const Vector3& axis, float angle)
 {
     auto rotation = angleAxis(angle, axis);
     m_localPosition = point + rotation * (m_localPosition - point);
     LookAt(point);
 }
 
-void FishEngine::Transform::SetParent(Transform* parent)
+void Transform::SetParent(std::shared_ptr<Transform> parent)
 {
-    if (parent == m_parent) {
+    auto p = m_parent.lock();
+    if (parent == p) {
         return;
     }
     // remove from old parent
-    if (m_parent != nullptr) {
-        m_parent->m_children.remove(this);
+    if (p != nullptr) {
+        //p->m_children.remove(this);
+        p->m_children.remove_if([this](std::weak_ptr<Transform> c) {
+            return c.lock().get() == this;
+        });
     }
 
     m_parent = parent;
     if (parent == nullptr) {
         return;
     }
-    m_parent->m_children.push_back(this);
+    parent->m_children.push_back(m_gameObject.lock()->transform());
     //m_isDirty = true;
 }
 
-NAMESPACE_FISHENGINE_BEGIN
-
-Transform* Transform::GetChild(const int index) {
+std::shared_ptr<Transform> Transform::GetChild(const int index) {
     if (index < -0 || index >= m_children.size()) {
         Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
         return nullptr;
@@ -115,7 +118,7 @@ Transform* Transform::GetChild(const int index) {
     for (int i = 0; i < index; ++i) {
         p++;
     }
-    return *p;
+    return (*p).lock();
 }
 
 NAMESPACE_FISHENGINE_END

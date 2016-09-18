@@ -1,9 +1,12 @@
 ## Engine
 
-- [ ] 动态添加/删除Component
+- [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 - [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离
 - [ ] 数学库换成左手系（要不要自己实现？）
 - [ ] glm四元数的-0问题
+- [ ] GameObject构造函数改成非public的
+- [ ] 将Scene里面的Script和Component合并到一起去
+- [ ] 不依赖代码生成和外部工具的（自动）反射可行吗？
 
 ## Editor
 
@@ -13,7 +16,7 @@
 
 - [ ] 相机旋转时的万向锁的问题
 
-- [ ] AxisIndicator：遮挡问题（clear depth buffer解决），鼠标hover事件，点击后旋转相机
+- [ ] SceneGizmo：遮挡问题（clear depth buffer解决），鼠标hover事件，点击后旋转相机
 
 - [ ] GUI样式美化
 
@@ -25,9 +28,11 @@
 
 - [ ] 鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）
 
-- [ ] Inspector窗口中的Headers的缩进，一行显示不全的问题
+- [ ] Inspector窗口中的Headers的缩进（OK，用imgui::indent()），一行显示不全的问题
 
 - [ ] Editor的帧率改到30
+
+- [ ] 相机旋转时transform反应不正常，会越退越远
 
       ​
 

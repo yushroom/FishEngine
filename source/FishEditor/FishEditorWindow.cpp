@@ -1,9 +1,9 @@
-#include "GameLoop.hpp"
+#include "FishEditorWindow.hpp"
 
 #include <thread>
 
 #include "Debug.hpp"
-#include "RenderSystem.hpp"
+#include "EditorRenderSystem.hpp"
 #include "Input.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
@@ -13,20 +13,24 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include "App.hpp"
 
+#include "EditorRenderSystem.hpp"
+
 const uint32_t WIDTH = 800, HEIGHT = 600;
 
-NAMESPACE_FISHENGINE_BEGIN
+using namespace FishEngine;
 
-GLFWwindow* GameLoop::m_window = nullptr;
-std::vector<std::shared_ptr<App>> GameLoop::m_apps;
-float GameLoop::m_fixedFrameRate = 30;
+NAMESPACE_FISHEDITOR_BEGIN
+
+GLFWwindow* FishEditorWindow::m_window = nullptr;
+std::vector<std::shared_ptr<App>> FishEditorWindow::m_apps;
+float FishEditorWindow::m_fixedFrameRate = 30;
 
 static void GlfwErrorCallback(int error, const char* description)
 {
     Debug::LogError("Error %d: %s\n", error, description);
 }
 
-void GameLoop::Init()
+void FishEditorWindow::Init()
 {
     Debug::Init();
     Input::Init();
@@ -46,26 +50,25 @@ void GameLoop::Init()
     glfwMakeContextCurrent(m_window);
     
     // Set the required callback functions
-    glfwSetKeyCallback(m_window, GameLoop::KeyCallBack);
-    glfwSetCursorPosCallback(m_window, GameLoop::MouseCallback);
-    glfwSetScrollCallback(m_window, GameLoop::MouseScrollCallback);
-    glfwSetCharCallback(m_window, GameLoop::CharacterCallback);
-    glfwSetWindowSizeCallback(m_window, GameLoop::WindowSizeCallback);
-    glfwSetMouseButtonCallback(m_window, GameLoop::MouseButtonCallback);
+    glfwSetKeyCallback(m_window, FishEditorWindow::KeyCallBack);
+    glfwSetCursorPosCallback(m_window, FishEditorWindow::MouseCallback);
+    glfwSetScrollCallback(m_window, FishEditorWindow::MouseScrollCallback);
+    glfwSetCharCallback(m_window, FishEditorWindow::CharacterCallback);
+    glfwSetWindowSizeCallback(m_window, FishEditorWindow::WindowSizeCallback);
+    glfwSetMouseButtonCallback(m_window, FishEditorWindow::MouseButtonCallback);
     
-    RenderSystem::Init();
-    
-    Time::m_time = (float)glfwGetTime();
+    EditorRenderSystem::Init();
     
     for (auto& r : m_apps) {
         r->Init();
     }
 }
 
-void GameLoop::Run()
+void FishEditorWindow::Run()
 {
     Scene::Start();
     float fixed_delta_time = 1.0f / m_fixedFrameRate;
+    float old_time = 0;
     
     // Game loop
     while (!glfwWindowShouldClose(m_window))
@@ -76,40 +79,39 @@ void GameLoop::Run()
         glfwPollEvents();
         double xpos, ypos;
         glfwGetCursorPos(m_window, &xpos, &ypos);
-        int w = RenderSystem::width();
-        int h = RenderSystem::height();
+        int w = EditorRenderSystem::width();
+        int h = EditorRenderSystem::height();
         Input::UpdateMousePosition(float(xpos)/w, float(ypos)/h);
         
         Scene::Update();
         
-        RenderSystem::Render();
+        EditorRenderSystem::Render();
         
         double new_t = glfwGetTime();
-        float interval = float(new_t) - Time::m_time;
+        float interval = float(new_t) - old_time;
         if (interval < fixed_delta_time) {
-            std::chrono::milliseconds sleep_time((long long)((fixed_delta_time-interval)*1000));
+            std::chrono::milliseconds sleep_time((long long)((fixed_delta_time - interval) * 1000));
             std::this_thread::sleep_for(sleep_time);
         }
-        
-        Time::m_deltaTime = float(glfwGetTime() - Time::m_time);
-        Time::m_time = new_t;
+
+        old_time = glfwGetTime();
     }
 }
 
-void GameLoop::Clean()
+void FishEditorWindow::Clean()
 {
 //    for (auto& r : m_apps) {
 //        r->Clean();
 //    }
     
-    RenderSystem::Clean();
+    EditorRenderSystem::Clean();
     
     // Terminate GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();
 }
 
 
-void GameLoop::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
+void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
@@ -123,7 +125,7 @@ void GameLoop::KeyCallBack(GLFWwindow* window, int key, int scancode, int action
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
 }
 
-void GameLoop::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     //    bool handled = GUI::OnMouseScroll(yoffset);
     //    if (handled)
@@ -138,7 +140,7 @@ void GameLoop::MouseScrollCallback(GLFWwindow* window, double xoffset, double yo
 //GLfloat lastX = 400, lastY = 300;
 //bool firstMouse = true;
 
-void GameLoop::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     //    if (GUI::OnMouseButton(button, action))
     //        return;
@@ -146,21 +148,21 @@ void GameLoop::MouseButtonCallback(GLFWwindow* window, int button, int action, i
     Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? Input::MouseButtonState_Down : Input::MouseButtonState_Up);
 }
 
-void GameLoop::WindowSizeCallback(GLFWwindow* window, int width, int height)
+void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
     //glViewport(0, 0, width, height);
     //GUI::OnWindowSizeChanged(width, height);
 }
 
-void GameLoop::MouseCallback(GLFWwindow* window, double xpos, double ypos)
+void FishEditorWindow::MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
     //GUI::OnMouse(xpos, ypos);
 }
 
-void GameLoop::CharacterCallback(GLFWwindow* window, unsigned int codepoint)
+void FishEditorWindow::CharacterCallback(GLFWwindow* window, unsigned int codepoint)
 {
     ImGui_ImplGlfwGL3_CharCallback(window, codepoint);
 }
 
 
-NAMESPACE_FISHENGINE_END
+NAMESPACE_FISHEDITOR_END

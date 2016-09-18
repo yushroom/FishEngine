@@ -20,7 +20,7 @@ public:
     {
     }
     
-    virtual void OnEditorGUI() override {
+    virtual void OnInspectorGUI() override {
         ImGui::Checkbox("rotate camera", &m_isRotating);
         ImGui::Checkbox("lookat mode", &m_lookAtMode);
         if (ImGui::Button("reset")) {
@@ -33,7 +33,7 @@ public:
     virtual void Update() override
     {
         if (m_isRotating) {
-            m_gameObject->transform()->RotateAround(Vector3(0, 0, 0), Vector3(0, 1, 0), 1);
+            gameObject()->transform()->RotateAround(Vector3(0, 0, 0), Vector3(0, 1, 0), 1);
         }
         
         if (Input::GetMouseButton(1)) {

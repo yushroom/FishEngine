@@ -37,7 +37,7 @@ public:
     ~Transform();
 
     
-    virtual void OnEditorGUI() override;
+    virtual void OnInspectorGUI() override;
 
     uint32_t childCount() const {
         return (uint32_t)m_children.size();
@@ -53,8 +53,9 @@ public:
 
     // The global scale of the object(Read Only).
     Vector3 lossyScale() const {
-        if (m_parent != nullptr)
-            return m_localScale * m_parent->lossyScale();
+        auto p = m_parent.lock();
+        if (p != nullptr)
+            return m_localScale * p->lossyScale();
         return m_localScale;
     }
 
@@ -62,8 +63,9 @@ public:
     Quaternion rotation() const {
 //        if (m_isDirty)
 //            Update();
-        if (m_parent != nullptr)
-            return m_localRotation * m_parent->rotation();
+        auto p = m_parent.lock();
+        if (p != nullptr)
+            return m_localRotation * p->rotation();
         return m_localRotation;
     }
 
@@ -201,11 +203,11 @@ public:
     void RotateAround(const Vector3& point, const Vector3& axis, float angle);
 
     // The parent of the transform.
-    Transform* parent() const {
-        return m_parent;
+    std::shared_ptr<Transform> parent() const {
+        return m_parent.lock();
     }
 
-    void SetParent(Transform* parent);
+    void SetParent(std::shared_ptr<Transform> parent);
     
     //========== Public Functions ==========//
     
@@ -218,22 +220,18 @@ public:
      * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
      * @return: Transform Transform child by index.
      */
-    Transform* GetChild(const int index);
+    std::shared_ptr<Transform> GetChild(const int index);
     
 private:
-    friend class EditorGUI;
-    //mutable Vector3 m_position;
-    //mutable Vector3 m_scale;
-    //mutable Quaternion m_rotation;
-    //mutable Vector3 m_eulerAngles;
-
+    friend class FishEditor::EditorGUI;
+    friend class Scene;
     Vector3 m_localPosition;
     Vector3 m_localScale;
     Quaternion m_localRotation;
     mutable Vector3 m_localEulerAngles;
 
-    Transform* m_parent = nullptr;
-    std::list<Transform*> m_children;
+    std::weak_ptr<Transform> m_parent;
+    std::list<std::weak_ptr<Transform>> m_children;
 
     //mutable bool m_isDirty = true;
     //mutable Vector3 m_right;	// (1, 0, 0) in local space

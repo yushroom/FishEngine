@@ -95,6 +95,8 @@ public:
 
     typedef std::shared_ptr<Shader> PShader;
 
+    static void Init();
+
     static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str);
     
     static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
@@ -166,7 +168,7 @@ private:
     bool m_ZWrite = true;
     
     friend class RenderSystem;
-    static void Init();
+    
     static std::map<std::string, PShader> m_builtinShaders;
 };
 

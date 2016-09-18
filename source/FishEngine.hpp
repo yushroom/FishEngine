@@ -25,6 +25,7 @@ class Camera;
 class Component;
 class MeshFilter;
 class MeshRenderer;
+class Script;
 class Renderer;
 class Transform;
 class Debug;
@@ -40,5 +41,10 @@ class Time;
 class App;
 
 NAMESPACE_FISHENGINE_END
+
+// hack: inject FishEditor namespace
+namespace FishEditor {
+    class EditorGUI;
+}
 
 #endif /* FishEngine_h */

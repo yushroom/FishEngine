@@ -25,7 +25,7 @@ void FishEngine::Material::Update()
     m_shader->BindTextures(m_textures);
 }
 
-void Material::OnEditorGUI() {
+void Material::OnInspectorGUI() {
     //ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize());
     ImGui::Indent();
     if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {

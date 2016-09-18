@@ -30,7 +30,7 @@ public:
         return m_materials;
     }
     
-    virtual void OnEditorGUI() override;
+    virtual void OnInspectorGUI() override;
     
 protected:
     virtual void Render() const = 0;

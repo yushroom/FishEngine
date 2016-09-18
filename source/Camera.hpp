@@ -1,7 +1,7 @@
 #ifndef Camera_hpp
 #define Camera_hpp
 
-#include "Behaviour.hpp"
+#include "Script.hpp"
 #include "GLEnvironment.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
@@ -35,7 +35,11 @@ public:
     // projection matrix.
     Matrix4x4 projectionMatrix() const;
 
-    virtual void OnEditorGUI() override;
+    const Vector4& viewport() const {
+        return m_viewport;
+    }
+
+    virtual void OnInspectorGUI() override;
     
     // TODO
     // The first enabled camera tagged "MainCamera" (Read Only).

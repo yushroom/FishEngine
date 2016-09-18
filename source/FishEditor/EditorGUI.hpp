@@ -1,10 +1,10 @@
 #ifndef EditorGUI_hpp
 #define EditorGUI_hpp
 
-#include "FishEngine.hpp"
+#include "FishEditor.hpp"
 #include <functional>
 
-NAMESPACE_FISHENGINE_BEGIN
+NAMESPACE_FISHEDITOR_BEGIN
 
 enum class AssetType {
     Model,
@@ -27,16 +27,16 @@ public:
 
     static void Clean();
     
-    static void SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> callback);
+    static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
     
 private:
     static int m_idCount;
-    static void HierarchyItem(GameObject* gameObject);
+    static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
     static void DrawSceneGizmo();
     
     static bool m_showAssectSelectionDialogBox;
 };
 
-NAMESPACE_FISHENGINE_END
+NAMESPACE_FISHEDITOR_END
 
 #endif // EditorGUI_hpp

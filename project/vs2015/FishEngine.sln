@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FishEditor", "FishEditor.vcxproj", "{483ADE95-78F0-4479-9135-9D72FAAF0A2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71} = {42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FishEngine", "FishEngine.vcxproj", "{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}"
 EndProject
 Global
@@ -13,6 +18,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Debug|x64.ActiveCfg = Debug|x64
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Debug|x64.Build.0 = Debug|x64
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Debug|x86.ActiveCfg = Debug|Win32
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Debug|x86.Build.0 = Debug|Win32
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Release|x64.ActiveCfg = Release|x64
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Release|x64.Build.0 = Release|x64
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Release|x86.ActiveCfg = Release|Win32
+		{483ADE95-78F0-4479-9135-9D72FAAF0A2E}.Release|x86.Build.0 = Release|Win32
 		{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}.Debug|x64.ActiveCfg = Debug|x64
 		{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}.Debug|x64.Build.0 = Debug|x64
 		{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}.Debug|x86.ActiveCfg = Debug|Win32

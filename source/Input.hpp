@@ -68,9 +68,16 @@ public:
     // button values are 0 for left button, 1 for right button, 2 for the middle button.
     static bool GetMouseButtonUp(int button);
 
+    static void Init();
+    static void Update();
+
+    static void UpdateMousePosition(float xpos, float ypos);
+    static void UpdateKeyState(KeyCode key, KeyState state);
+    static void UpdateMouseButtonState(int button, MouseButtonState state);
+
 private:
     friend class GameLoop;
-    
+
     static KeyState m_keyStates[1024];
 
     // button values are 0 for left button, 1 for right button, 2 for the middle button.
@@ -78,13 +85,6 @@ private:
     static float m_mousePositionX;
     static float m_mousePositionY;
     static float m_axis[4];
-
-    static void Init();
-    static void Update();
-
-    static void UpdateMousePosition(float xpos, float ypos);
-    static void UpdateKeyState(KeyCode key, KeyState state);
-    static void UpdateMouseButtonState(int button, MouseButtonState state);
 };
 
 NAMESPACE_FISHENGINE_END

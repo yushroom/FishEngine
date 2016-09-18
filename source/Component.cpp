@@ -1,20 +1,30 @@
 #include "Component.hpp"
 #include "GameObject.hpp"
 
+#include "Debug.hpp"
+
 NAMESPACE_FISHENGINE_BEGIN
+
+//Component::~Component()
+//{
+//    Debug::Log("~Component");
+//    //if (m_gameObject != nullptr) {
+//    //    m_gameObject->
+//    //}
+//}
 
 std::string Component::tag() const
 {
-    if (m_gameObject == nullptr)
+    if (m_gameObject.expired())
         return "";
-    return m_gameObject->tag();
+    return gameObject()->tag();
 }
 
-Transform* Component::transform() const
+std::shared_ptr<Transform> Component::transform() const
 {
-    if (m_gameObject == nullptr)
+    if (m_gameObject.expired())
         return nullptr;
-    return m_gameObject->transform();
+    return gameObject()->transform();
 }
 
 NAMESPACE_FISHENGINE_END

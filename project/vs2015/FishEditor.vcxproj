@@ -19,19 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{42BC9EE5-C0FC-4EDC-8C89-3489E4792A71}</ProjectGuid>
-    <RootNamespace>FishEngine</RootNamespace>
+    <ProjectGuid>{483ADE95-78F0-4479-9135-9D72FAAF0A2E}</ProjectGuid>
+    <RootNamespace>FishEditor</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -69,12 +69,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;$(IncludePath)</IncludePath>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;D:\program\FishEngine\external\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;$(IncludePath)</IncludePath>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Release;D:\program\FishEngine\external\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,7 +86,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FishEngine.lib;opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,7 +108,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FishEngine.lib;opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -123,60 +125,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\App.hpp" />
-    <ClInclude Include="..\..\source\Behaviour.hpp" />
-    <ClInclude Include="..\..\source\Camera.hpp" />
-    <ClInclude Include="..\..\source\CameraController.hpp" />
-    <ClInclude Include="..\..\source\Common.hpp" />
-    <ClInclude Include="..\..\source\Component.hpp" />
-    <ClInclude Include="..\..\source\Debug.hpp" />
-    <ClInclude Include="..\..\source\FishEngine.hpp" />
-    <ClInclude Include="..\..\source\GameLoop.hpp" />
-    <ClInclude Include="..\..\source\GameObject.hpp" />
-    <ClInclude Include="..\..\source\GLEnvironment.hpp" />
-    <ClInclude Include="..\..\source\Input.hpp" />
-    <ClInclude Include="..\..\source\Material.hpp" />
-    <ClInclude Include="..\..\source\Mesh.hpp" />
-    <ClInclude Include="..\..\source\MeshFilter.hpp" />
-    <ClInclude Include="..\..\source\MeshRenderer.hpp" />
-    <ClInclude Include="..\..\source\Object.hpp" />
-    <ClInclude Include="..\..\source\Renderer.hpp" />
-    <ClInclude Include="..\..\source\RenderSettings.hpp" />
-    <ClInclude Include="..\..\source\RenderSystem.hpp" />
-    <ClInclude Include="..\..\source\Scene.hpp" />
-    <ClInclude Include="..\..\source\Script.hpp" />
-    <ClInclude Include="..\..\source\Shader.hpp" />
-    <ClInclude Include="..\..\source\Texture.hpp" />
-    <ClInclude Include="..\..\source\Time.hpp" />
-    <ClInclude Include="..\..\source\Transform.hpp" />
+    <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp" />
+    <ClCompile Include="..\..\source\FishEditor\EditorRenderSystem.cpp" />
+    <ClCompile Include="..\..\source\FishEditor\FishEditorWindow.cpp" />
+    <ClCompile Include="..\..\source\FishEditor\main.cpp" />
+    <ClCompile Include="..\..\source\FishEditor\Selection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\external\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\external\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\external\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\external\imgui\imgui_impl_glfw_gl3.cpp" />
-    <ClCompile Include="..\..\source\App.cpp" />
-    <ClCompile Include="..\..\source\Behaviour.cpp" />
-    <ClCompile Include="..\..\source\Camera.cpp" />
-    <ClCompile Include="..\..\source\Common.cpp" />
-    <ClCompile Include="..\..\source\Component.cpp" />
-    <ClCompile Include="..\..\source\Debug.cpp" />
-    <ClCompile Include="..\..\source\GameLoop.cpp" />
-    <ClCompile Include="..\..\source\GameObject.cpp" />
-    <ClCompile Include="..\..\source\GLEnvironment.cpp" />
-    <ClCompile Include="..\..\source\Input.cpp" />
-    <ClCompile Include="..\..\source\Material.cpp" />
-    <ClCompile Include="..\..\source\Mesh.cpp" />
-    <ClCompile Include="..\..\source\MeshFilter.cpp" />
-    <ClCompile Include="..\..\source\MeshRenderer.cpp" />
-    <ClCompile Include="..\..\source\Object.cpp" />
-    <ClCompile Include="..\..\source\Renderer.cpp" />
-    <ClCompile Include="..\..\source\RenderSystem.cpp" />
-    <ClCompile Include="..\..\source\Scene.cpp" />
-    <ClCompile Include="..\..\source\Shader.cpp" />
-    <ClCompile Include="..\..\source\Texture.cpp" />
-    <ClCompile Include="..\..\source\Time.cpp" />
-    <ClCompile Include="..\..\source\Transform.cpp" />
+    <ClInclude Include="..\..\source\FishEditor\EditorGUI.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\EditorRenderSystem.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\FishEditor.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\FishEditorWindow.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\SceneView.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\Selection.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

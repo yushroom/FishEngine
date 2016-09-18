@@ -1,7 +1,7 @@
 #ifndef RenderSettings_hpp
 #define RenderSettings_hpp
 
-#include "Behaviour.hpp"
+#include "Script.hpp"
 #include "RenderSystem.hpp"
 #include <imgui/imgui.h>
 
@@ -15,7 +15,7 @@ public:
     bool m_isWireFrameMode      = false;
     bool m_useGammaCorrection   = true;
     
-    virtual void OnEditorGUI() override {
+    virtual void OnInspectorGUI() override {
         if (ImGui::Checkbox("Wire Frame", &m_isWireFrameMode)) {
             RenderSystem::setWireFrameMode(m_isWireFrameMode);
         }

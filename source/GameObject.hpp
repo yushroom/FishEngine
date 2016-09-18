@@ -2,7 +2,7 @@
 #define GameObject_hpp
 
 #include "Transform.hpp"
-#include "Behaviour.hpp"
+#include "Script.hpp"
 #include "Object.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
@@ -54,8 +54,8 @@ public:
     }
 
     // The Transform attached to this GameObject.
-    Transform* transform() {
-        return &m_transform;
+    std::shared_ptr<Transform> transform() const {
+        return m_transform;
     }
 
     //========== Public Functions ==========//
@@ -73,13 +73,21 @@ public:
 
     // Adds a component class named className to the game object.
     void AddComponent(std::shared_ptr<Component> component) {
-        component->m_gameObject = this;
+        component->m_gameObject = m_transform->gameObject();
         m_components.push_back(component);
     }
     
     void AddScript(std::shared_ptr<Script> script) {
-        script->m_gameObject = this;
+        script->m_gameObject = m_transform->gameObject();
         m_scripts.push_back(script);
+    }
+
+    void RemoveComponent(std::shared_ptr<Component> component) {
+        m_components.remove(component);
+    }
+
+    void RemoveScript(std::shared_ptr<Script> script) {
+        m_scripts.remove(script);
     }
 
     // Activates/Deactivates the GameObject (activeSelf).
@@ -98,21 +106,18 @@ protected:
     void Start();
 
     void Update();
-    
-    const Transform* transform() const {
-        return &m_transform;
-    }
 
 private:
-    friend class EditorGUI;
-    std::vector<std::shared_ptr<Component>> m_components;
-    std::vector<std::shared_ptr<Script>> m_scripts;
+    friend class FishEditor::EditorGUI;
+    std::list<std::shared_ptr<Component>> m_components;
+    std::list<std::shared_ptr<Script>> m_scripts;
     
     bool m_activeSelf = true;
     int m_layer = 0;
 
     std::string m_tag;
-    Transform m_transform;
+    //Transform m_transform;
+    std::shared_ptr<Transform> m_transform;
     
     //static GameObject m_root;
     static std::shared_ptr<GameObject> m_root;

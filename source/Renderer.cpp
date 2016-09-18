@@ -3,10 +3,10 @@
 NAMESPACE_FISHENGINE_BEGIN
 
 
-void Renderer::OnEditorGUI()
+void Renderer::OnInspectorGUI()
 {
     for (auto& m : m_materials) {
-        m->OnEditorGUI();
+        m->OnInspectorGUI();
     }
 }
 

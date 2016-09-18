@@ -2,11 +2,9 @@
 #define Camera_hpp
 
 #include "Behaviour.hpp"
-#include "GameObject.hpp"
+#include "GLEnvironment.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
-
-class Scene;
 
 enum class CameraType {
     Game,
@@ -19,9 +17,7 @@ class Camera : public Behaviour
 public:
     InjectClassName(Camera)
 
-    Camera(float fov, float aspect, float zNear, float zFar) 
-        : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar) {
-    }
+    Camera(float fov, float aspect, float zNear, float zFar);
 
     // The aspect ratio (width divided by height).
     float aspect() const {
@@ -34,32 +30,12 @@ public:
     }
 
     // Matrix that transforms from world to camera space (i.e. view matrix).
-    Matrix4x4 worldToCameraMatrix() const {
-        return m_gameObject->transform()->worldToLocalMatrix();
-    }
+    Matrix4x4 worldToCameraMatrix() const;
 
     // projection matrix.
-    Matrix4x4 projectionMatrix() const {
-        //return glm::perspective(glm::radians(m_fov), m_aspect, m_zNear, m_zFar);
-        if (m_isDirty) {
-            m_projectMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_zNear, m_zFar);
-            m_isDirty = false;
-        }
-        return m_projectMatrix;
-    }
+    Matrix4x4 projectionMatrix() const;
 
-    virtual void OnEditorGUI() override {
-        if (ImGui::SliderFloat("Field of View", &m_fov, 1, 179)) {
-            m_isDirty = true;
-        }
-        if (ImGui::InputFloat("Clipping Planes(Near)", &m_zNear)) {
-            m_isDirty = true;
-        }
-        if (ImGui::InputFloat("Clipping Planes(Far)", &m_zFar)) {
-            m_isDirty = true;
-        }
-        ImGui::InputFloat4("Viewport Rect", glm::value_ptr(m_viewport));
-    }
+    virtual void OnEditorGUI() override;
     
     // TODO
     // The first enabled camera tagged "MainCamera" (Read Only).

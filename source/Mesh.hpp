@@ -42,12 +42,7 @@ public:
     
     typedef std::shared_ptr<Mesh> PMesh;
 
-    static PMesh CreateFromObjFile(const std::string path, int vertexUsage = VertexUsagePNUT, MeshLoadFlags flags = 0) {
-        auto m = std::make_shared<Mesh>();
-        m->FromObjFile(path, vertexUsage, flags);
-        m_meshes.push_back(m);
-        return m;
-    }
+    static PMesh CreateFromObjFile(const std::string path, int vertexUsage = VertexUsagePNUT, MeshLoadFlags flags = 0);
 
     void FromObjFile(const std::string path, int vertexUsage = VertexUsagePNUT, MeshLoadFlags flags = 0);
 

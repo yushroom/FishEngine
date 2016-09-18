@@ -6,6 +6,7 @@
 
 #include "Texture.hpp"
 #include "Common.hpp"
+#include "Debug.hpp"
 
 using namespace std;
 
@@ -16,6 +17,34 @@ std::map<std::string, Shader::PShader> Shader::m_builtinShaders;
 Shader::Shader(Shader&& s)
 {
     m_program = s.m_program;
+}
+
+FishEngine::Shader::PShader FishEngine::Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
+{
+    auto s = std::make_shared<Shader>();
+    s->FromString(vs_str, fs_str, gs_str);
+    return s;
+}
+
+FishEngine::Shader::PShader FishEngine::Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
+{
+    auto s = std::make_shared<Shader>();
+    s->FromString(vs_str, fs_str);
+    return s;
+}
+
+FishEngine::Shader::PShader FishEngine::Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
+{
+    auto s = std::make_shared<Shader>();
+    s->FromFile(vs_path, fs_path);
+    return s;
+}
+
+FishEngine::Shader::PShader FishEngine::Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
+{
+    auto s = std::make_shared<Shader>();
+    s->FromFile(vs_path, fs_path, gs_path);
+    return s;
 }
 
 void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
@@ -367,10 +396,14 @@ GLint Shader::GetUniformLocation(const char* name) const {
 //========== Static Region ==========
 
 void Shader::Init() {
-    std::string root = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
-    m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root+"VisualizeNormal.vert", root+"VisualizeNormal.frag", root+"VisualizeNormal.geom");
+#if FISHENGINE_PLATFORM_WINDOWS
+    const std::string root_dir = "../../assets/shaders/";
+#else
+    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
+#endif
+    m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
     for (auto& n : std::vector<std::string>{"PBR", "VertexLit", "SkyBox", "NormalMap"}) {
-        m_builtinShaders[n] = Shader::CreateFromFile(root+n+".vert", root+n+".frag");
+        m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }
 }
 

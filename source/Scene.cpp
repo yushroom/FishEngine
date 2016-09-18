@@ -13,6 +13,13 @@ std::shared_ptr<Camera> Scene::m_mainCamera = nullptr;
 //std::shared_ptr<GameObject> Scene::m_activeGameObject = nullptr;
 GameObject* Scene::m_activeGameObject = nullptr;
 
+std::shared_ptr<GameObject> FishEngine::Scene::CreateGameObject(const std::string& name)
+{
+    auto go = std::make_shared<GameObject>(name);
+    m_gameObjects.push_back(go);
+    return go;
+}
+
 void Scene::Init() {
     int width = RenderSystem::width();
     int height = RenderSystem::height();
@@ -62,5 +69,16 @@ void Scene::Render()
     }
 }
 
+GameObject::PGameObject FishEngine::Scene::Find(const std::string& name)
+{
+    for (auto& go : m_gameObjects) {
+        if (go->name() == name) {
+            return go;
+        }
+    }
+    return nullptr;
+}
+
 
 NAMESPACE_FISHENGINE_END
+

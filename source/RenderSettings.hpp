@@ -3,6 +3,7 @@
 
 #include "Behaviour.hpp"
 #include "RenderSystem.hpp"
+#include <imgui/imgui.h>
 
 NAMESPACE_FISHENGINE_BEGIN
 

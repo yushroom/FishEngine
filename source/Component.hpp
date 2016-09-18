@@ -1,14 +1,9 @@
 #ifndef Component_hpp
 #define Component_hpp
 
-#include "GLEnvironment.hpp"
 #include "Object.hpp"
-#include "EditorGUI.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
-
-class GameObject;
-class Transform;
 
 // Base class for everything attached to GameObjects.
 class Component : public Object

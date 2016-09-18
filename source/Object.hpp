@@ -1,8 +1,7 @@
 #ifndef Object_hpp
 #define Object_hpp
 
-#include "GLEnvironment.hpp"
-#include <string>
+#include "FishEngine.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -23,7 +22,6 @@ public:
         
     //}
 
-    
 protected:
     std::string m_name;
 };

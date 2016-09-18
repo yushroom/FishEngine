@@ -8,6 +8,10 @@
 #include "Material.hpp"
 #include "MeshFilter.hpp"
 #include "MeshRenderer.hpp"
+#include "Mesh.hpp"
+#include "Common.hpp"
+#include "Debug.hpp"
+#include "RenderSettings.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -20,15 +24,15 @@ Mesh::PMesh coneMesh;
 
 void EditorGUI::Init()
 {
-#if defined(_WIN32)
-    const std::string root_dir = "../";
+#if FISHENGINE_PLATFORM_WINDOWS
+    const std::string root_dir = "../../assets/";
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/RFGL/";
 #endif
     const std::string models_dir = root_dir + "models/";
  
     axisIndicatorMaterial = Material::builtinMaterial("VertexLit");
-    cubeMesh = Mesh::CreateFromObjFile(models_dir+"box.obj");
+    cubeMesh = Mesh::CreateFromObjFile(models_dir+"cube.obj");
     coneMesh = Mesh::CreateFromObjFile(models_dir+"cone.obj");
 }
 
@@ -245,7 +249,7 @@ void EditorGUI::DrawSceneGizmo()
          0,  1,  0,  180, 0,   0,
          0,  0,  1,  -90, 0,   0,
     };
-    Transform t;
+    static Transform t;
     for (int i = 0; i < 6; ++i) {
         int j = i*6;
         t.setLocalPosition(f[j], f[j+1], f[j+2]);

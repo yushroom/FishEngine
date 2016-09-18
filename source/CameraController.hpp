@@ -2,6 +2,7 @@
 #define CameraController_hpp
 
 #include "Input.hpp"
+#include <imgui/imgui.h>
 
 NAMESPACE_FISHENGINE_BEGIN
 

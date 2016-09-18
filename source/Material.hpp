@@ -18,16 +18,7 @@ public:
         SetShader(shader);
     }
     
-    void SetShader(std::shared_ptr<Shader> shader) {
-        m_shader = shader;
-        for (auto& u : m_shader->uniforms()) {
-            if (u.type == GL_FLOAT) {
-                m_uniforms.floats[u.name] = 0.5f;
-            } else if (u.type == GL_FLOAT_VEC3) {
-                //m_uniforms.vec3s[u.name] = Vector3(1, 1, 1);
-            }
-        }
-    }
+    void SetShader(std::shared_ptr<Shader> shader);
     
     typedef std::shared_ptr<Material> PMaterial;
     
@@ -64,36 +55,19 @@ public:
 //        return m_uniforms;
 //    }
     
-    void Update() {
-        m_shader->BindUniforms(m_uniforms);
-        m_shader->BindTextures(m_textures);
-    }
+    void Update();
     
     void OnEditorGUI();
     
     //========== Static Region ==========
     
-    static void Init() {
-        for (auto& s : std::vector<std::string>{"SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit"})
-        {
-            auto material = std::make_shared<Material>();
-            material->SetShader(Shader::builtinShader(s));
-            m_builtinMaterial[s] = material;
-        }
-    }
+    static void Init();
     
     static PMaterial CreateMaterial() {
         return std::make_shared<Material>();
     }
     
-    static PMaterial builtinMaterial(const std::string& name) {
-        auto it = m_builtinMaterial.find(name);
-        if (it != m_builtinMaterial.end()) {
-            return it->second;
-        }
-        Debug::LogWarning("No built-in material called %d", name.c_str());
-        return nullptr;
-    }
+    static PMaterial builtinMaterial(const std::string& name);
 
 private:
     std::shared_ptr<Shader> m_shader = nullptr;

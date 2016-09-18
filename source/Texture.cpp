@@ -211,6 +211,13 @@ GLuint CreateTexture(const std::string& path) {
     return t;
 }
 
+FishEngine::Texture::PTexture FishEngine::Texture::CreateFromFile(const std::string& path)
+{
+    auto t = std::make_shared<Texture>();
+    t->FromFile(path);
+    return t;
+}
+
 void Texture::FromFile(const std::string& path)
 {
     auto pos = path.find_last_of('.');

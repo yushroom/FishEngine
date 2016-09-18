@@ -2,7 +2,6 @@
 #define Texture_hpp
 
 #include "GLEnvironment.hpp"
-#include <string>
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -20,11 +19,7 @@ public:
     
     //static Texture& GetSimpleTexutreCubeMap();
 
-    static PTexture CreateFromFile(const std::string& path) {
-        auto t = std::make_shared<Texture>();
-        t->FromFile(path);
-        return t;
-    }
+    static PTexture CreateFromFile(const std::string& path);
 
     void FromFile(const std::string& path);
     

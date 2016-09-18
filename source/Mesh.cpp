@@ -79,6 +79,14 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &m_indexVBO);
 }
 
+FishEngine::Mesh::PMesh FishEngine::Mesh::CreateFromObjFile(const std::string path, int vertexUsage /*= VertexUsagePNUT*/, MeshLoadFlags flags /*= 0*/)
+{
+    auto m = std::make_shared<Mesh>();
+    m->FromObjFile(path, vertexUsage, flags);
+    m_meshes.push_back(m);
+    return m;
+}
+
 void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags flags)
 {
     Assimp::Importer importer;

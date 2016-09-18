@@ -2,6 +2,7 @@
 #include <map>
 #include <sstream>
 
+#include "GameObject.hpp"
 #include "RenderSystem.hpp"
 #include "Debug.hpp"
 
@@ -10,10 +11,12 @@
 #include "EditorGUI.hpp"
 #include "Camera.hpp"
 #include "Time.hpp"
+#include "Mesh.hpp"
 #include "MeshFilter.hpp"
 #include "MeshRenderer.hpp"
 #include "RenderSettings.hpp"
 #include "GameLoop.hpp"
+#include "Scene.hpp"
 
 using namespace std;
 using namespace FishEngine;
@@ -125,8 +128,8 @@ public:
 
     virtual void Init() override {
         glCheckError();
-#if defined(_WIN32)
-        const std::string root_dir = "../assets";
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "../../assets/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif

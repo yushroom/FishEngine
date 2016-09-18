@@ -2,7 +2,6 @@
 #define EditorGUI_hpp
 
 #include "FishEngine.hpp"
-#include <string>
 #include <functional>
 
 NAMESPACE_FISHENGINE_BEGIN

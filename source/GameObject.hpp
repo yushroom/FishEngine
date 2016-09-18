@@ -4,8 +4,6 @@
 #include "Transform.hpp"
 #include "Behaviour.hpp"
 #include "Object.hpp"
-#include "Common.hpp"
-#include "Debug.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -15,10 +13,7 @@ class GameObject : public Object
 {
 public:
 //private:
-    GameObject(const std::string& name) : m_tag("Untagged") {
-        m_transform.m_gameObject = this;
-        m_name = name;
-    }
+    GameObject(const std::string& name);
     
 public:
     ~GameObject() = default;
@@ -33,12 +28,7 @@ public:
     //========== Variables ==========//
 
     // Is the GameObject active in the scene ?
-    bool activeInHierarchy() const {
-        if (m_activeSelf && m_transform.parent() != nullptr) {
-            return m_transform.parent()->gameObject()->activeInHierarchy();
-        }
-        return m_activeSelf;
-    }
+    bool activeInHierarchy() const;
 
     // The local active state of this GameObject. (Read Only)
     bool activeSelf() const {
@@ -105,21 +95,9 @@ public:
 
 protected:
     friend class Scene;
-    void Start() {
-//        for (auto& c : m_components) {
-//            c->init();
-//        }
-        for (auto& s : m_scripts) {
-            s->Start();
-        }
-    }
+    void Start();
 
-    void Update() {
-        m_transform.Update();
-        for (auto& s : m_scripts){
-            s->Update();
-        }
-    }
+    void Update();
     
     const Transform* transform() const {
         return &m_transform;

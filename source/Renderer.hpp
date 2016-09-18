@@ -3,7 +3,6 @@
 
 #include "Component.hpp"
 #include "Material.hpp"
-#include "imgui/imgui.h"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -14,7 +13,7 @@ public:
     
     Renderer() = default;
     
-    Renderer(Material::PMaterial material)
+    Renderer(std::shared_ptr<Material> material)
     {
         m_materials.push_back(material);
     }
@@ -23,25 +22,19 @@ public:
         m_materials.push_back(material);
     }
     
-    Material::PMaterial material() const {
-        if (m_materials.size() > 0)
-            return m_materials[0];
-        return nullptr;
+    std::shared_ptr<Material> material() const {
+        return m_materials.size() > 0 ? m_materials[0] : nullptr;
     }
     
-    std::vector<Material::PMaterial>& materials() {
+    std::vector<std::shared_ptr<Material>>& materials() {
         return m_materials;
     }
     
-    virtual void OnEditorGUI() override {
-        for (auto& m : m_materials) {
-            m->OnEditorGUI();
-        }
-    }
+    virtual void OnEditorGUI() override;
     
 protected:
     virtual void Render() const = 0;
-    std::vector<Material::PMaterial> m_materials;
+    std::vector<std::shared_ptr<Material>> m_materials;
 };
 
 NAMESPACE_FISHENGINE_END

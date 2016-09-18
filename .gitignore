@@ -1,13 +1,14 @@
 # Visual Studio
-/vs2015/.vs
-/vs2015/Debug
-/vs2015/Release
-/vs2015/*.db
-/vs2015/*.user
-*.opensdf
-*.sdf
-*.suo
-*.vcxproj.user
+/project/vs2015/.vs
+/project/vs2015/*.db
+/project/vs2015/*.opendb
+/project/vs2015/*.user
+/project/vs2015/*.opensdf
+/project/vs2015/*.sdf
+/project/vs2015/*.suo
+/project/vs2015/*.vcxproj.user
+/project/vs2015/Debug/
+/project/vs2015/Release/
 
 # Xcode
 *.pbxuser

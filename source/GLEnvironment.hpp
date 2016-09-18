@@ -32,7 +32,7 @@ typedef glm::quat Quaternion;
 NAMESPACE_FISHENGINE_END
 
 #ifdef _DEBUG
-#define glCheckError() _check_gl_error(__FILE__,__LINE__)
+#define glCheckError() _checkOpenGLError(__FILE__,__LINE__)
 #else
 #define glCheckError()
 #endif

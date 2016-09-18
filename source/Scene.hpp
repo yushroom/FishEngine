@@ -13,11 +13,7 @@ public:
         return m_mainCamera;
     }
     
-    static std::shared_ptr<GameObject> CreateGameObject(const std::string& name) {
-        auto go = std::make_shared<GameObject>(name);
-        m_gameObjects.push_back(go);
-        return go;
-    }
+    static std::shared_ptr<GameObject> CreateGameObject(const std::string& name);
     
     static void Init();
     static void Start();
@@ -32,14 +28,7 @@ public:
         m_activeGameObject = gameObject;
     }
     
-    static GameObject::PGameObject Find(const std::string& name) {
-        for (auto& go : m_gameObjects) {
-            if (go->name() == name) {
-                return go;
-            }
-        }
-        return nullptr;
-    }
+    static GameObject::PGameObject Find(const std::string& name);
     
     static void Destroy(GameObject* obj, const float t = 0.0f) {
         m_gameObjectsToBeDestroyed.push_back(obj);

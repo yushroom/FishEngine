@@ -2,11 +2,7 @@
 #define Shader_hpp
 
 #include "GLEnvironment.hpp"
-#include <string>
 #include <set>
-
-#include "Debug.hpp"
-
 
 #define PositionIndex 0
 #define NormalIndex 1
@@ -99,29 +95,13 @@ public:
 
     typedef std::shared_ptr<Shader> PShader;
 
-    static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str) {
-        auto s = std::make_shared<Shader>();
-        s->FromString(vs_str, fs_str);
-        return s;
-    }
+    static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str);
     
-    static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str) {
-        auto s = std::make_shared<Shader>();
-        s->FromString(vs_str, fs_str, gs_str);
-        return s;
-    }
+    static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
     
-    static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path) {
-        auto s = std::make_shared<Shader>();
-        s->FromFile(vs_path, fs_path);
-        return s;
-    }
+    static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path);
     
-    static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path) {
-        auto s = std::make_shared<Shader>();
-        s->FromFile(vs_path, fs_path, gs_path);
-        return s;
-    }
+    static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
 
     void FromString(const std::string& vs_str, const std::string& fs_str);
     void FromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);

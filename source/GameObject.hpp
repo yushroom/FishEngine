@@ -14,13 +14,13 @@ class GameObject : public Object
 public:
 //private:
     GameObject(const std::string& name);
+    GameObject(const GameObject&) = delete;
+    GameObject& operator=(const GameObject&) = delete;
     
 public:
     ~GameObject() = default;
     // {
     //     Debug::Log("~GameObject()");
-    //     m_components.clear();
-    //     m_scripts.clear();
     // }
 
     typedef std::shared_ptr<GameObject> PGameObject;
@@ -120,7 +120,7 @@ private:
     std::shared_ptr<Transform> m_transform;
     
     //static GameObject m_root;
-    static std::shared_ptr<GameObject> m_root;
+    //static std::shared_ptr<GameObject> m_root;
 };
 
 NAMESPACE_FISHENGINE_END

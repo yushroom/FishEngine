@@ -13,7 +13,7 @@ Transform::Transform() : m_localPosition(0, 0, 0), m_localScale(1, 1, 1), m_loca
 Transform::~Transform()
 {
     Debug::Log("~Transform");
-    SetParent(nullptr);
+    SetParent(nullptr); // remove from parent
     for (auto child : m_children) {
         //Scene::des
     }
@@ -109,7 +109,7 @@ void Transform::SetParent(std::shared_ptr<Transform> parent)
 }
 
 std::shared_ptr<Transform> Transform::GetChild(const int index) {
-    if (index < -0 || index >= m_children.size()) {
+    if (index < 0 || index >= m_children.size()) {
         Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
         return nullptr;
     }
@@ -118,7 +118,7 @@ std::shared_ptr<Transform> Transform::GetChild(const int index) {
     for (int i = 0; i < index; ++i) {
         p++;
     }
-    return (*p).lock();
+    return p->lock();
 }
 
 NAMESPACE_FISHENGINE_END

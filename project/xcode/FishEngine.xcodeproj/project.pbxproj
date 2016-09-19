@@ -120,6 +120,56 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BF3211F61D8EE55F00FA80E6 /* Component */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC74B21D8EDDF50082A6DC /* Script.hpp */,
+				BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */,
+				BFDC748E1D8EDDF50082A6DC /* Behaviour.hpp */,
+				BFDC748F1D8EDDF50082A6DC /* Camera.cpp */,
+				BFDC74901D8EDDF50082A6DC /* Camera.hpp */,
+				BFDC74941D8EDDF50082A6DC /* Component.cpp */,
+				BFDC74951D8EDDF50082A6DC /* Component.hpp */,
+				BFDC74A51D8EDDF50082A6DC /* MeshFilter.cpp */,
+				BFDC74A61D8EDDF50082A6DC /* MeshFilter.hpp */,
+				BFDC74A71D8EDDF50082A6DC /* MeshRenderer.cpp */,
+				BFDC74A81D8EDDF50082A6DC /* MeshRenderer.hpp */,
+				BFDC74AB1D8EDDF50082A6DC /* Renderer.cpp */,
+				BFDC74AC1D8EDDF50082A6DC /* Renderer.hpp */,
+				BFDC74B91D8EDDF50082A6DC /* Transform.cpp */,
+				BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */,
+			);
+			name = Component;
+			sourceTree = "<group>";
+		};
+		BF3211F71D8EE59500FA80E6 /* Render */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC74A31D8EDDF50082A6DC /* Mesh.cpp */,
+				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
+				BFDC749D1D8EDDF50082A6DC /* GLEnvironment.cpp */,
+				BFDC749E1D8EDDF50082A6DC /* GLEnvironment.hpp */,
+				BFDC74A11D8EDDF50082A6DC /* Material.cpp */,
+				BFDC74A21D8EDDF50082A6DC /* Material.hpp */,
+				BFDC74AE1D8EDDF50082A6DC /* RenderSystem.cpp */,
+				BFDC74AF1D8EDDF50082A6DC /* RenderSystem.hpp */,
+				BFDC74B31D8EDDF50082A6DC /* Shader.cpp */,
+				BFDC74B41D8EDDF50082A6DC /* Shader.hpp */,
+				BFDC74B51D8EDDF50082A6DC /* Texture.cpp */,
+				BFDC74B61D8EDDF50082A6DC /* Texture.hpp */,
+			);
+			name = Render;
+			sourceTree = "<group>";
+		};
+		BF3211F81D8EE68B00FA80E6 /* Script */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC74AD1D8EDDF50082A6DC /* RenderSettings.hpp */,
+				BFDC74911D8EDDF50082A6DC /* CameraController.hpp */,
+			);
+			name = Script;
+			sourceTree = "<group>";
+		};
 		BFDC74131D8EDD6C0082A6DC = {
 			isa = PBXGroup;
 			children = (
@@ -139,17 +189,13 @@
 		BFDC748A1D8EDDD80082A6DC /* FishEngine */ = {
 			isa = PBXGroup;
 			children = (
+				BF3211F81D8EE68B00FA80E6 /* Script */,
+				BF3211F71D8EE59500FA80E6 /* Render */,
+				BF3211F61D8EE55F00FA80E6 /* Component */,
 				BFDC748B1D8EDDF50082A6DC /* App.cpp */,
 				BFDC748C1D8EDDF50082A6DC /* App.hpp */,
-				BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */,
-				BFDC748E1D8EDDF50082A6DC /* Behaviour.hpp */,
-				BFDC748F1D8EDDF50082A6DC /* Camera.cpp */,
-				BFDC74901D8EDDF50082A6DC /* Camera.hpp */,
-				BFDC74911D8EDDF50082A6DC /* CameraController.hpp */,
 				BFDC74921D8EDDF50082A6DC /* Common.cpp */,
 				BFDC74931D8EDDF50082A6DC /* Common.hpp */,
-				BFDC74941D8EDDF50082A6DC /* Component.cpp */,
-				BFDC74951D8EDDF50082A6DC /* Component.hpp */,
 				BFDC74961D8EDDF50082A6DC /* Debug.cpp */,
 				BFDC74971D8EDDF50082A6DC /* Debug.hpp */,
 				BFDC74981D8EDDF50082A6DC /* FishEngine.hpp */,
@@ -157,36 +203,14 @@
 				BFDC749A1D8EDDF50082A6DC /* GameLoop.hpp */,
 				BFDC749B1D8EDDF50082A6DC /* GameObject.cpp */,
 				BFDC749C1D8EDDF50082A6DC /* GameObject.hpp */,
-				BFDC749D1D8EDDF50082A6DC /* GLEnvironment.cpp */,
-				BFDC749E1D8EDDF50082A6DC /* GLEnvironment.hpp */,
 				BFDC749F1D8EDDF50082A6DC /* Input.cpp */,
 				BFDC74A01D8EDDF50082A6DC /* Input.hpp */,
-				BFDC74A11D8EDDF50082A6DC /* Material.cpp */,
-				BFDC74A21D8EDDF50082A6DC /* Material.hpp */,
-				BFDC74A31D8EDDF50082A6DC /* Mesh.cpp */,
-				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
-				BFDC74A51D8EDDF50082A6DC /* MeshFilter.cpp */,
-				BFDC74A61D8EDDF50082A6DC /* MeshFilter.hpp */,
-				BFDC74A71D8EDDF50082A6DC /* MeshRenderer.cpp */,
-				BFDC74A81D8EDDF50082A6DC /* MeshRenderer.hpp */,
 				BFDC74A91D8EDDF50082A6DC /* Object.cpp */,
 				BFDC74AA1D8EDDF50082A6DC /* Object.hpp */,
-				BFDC74AB1D8EDDF50082A6DC /* Renderer.cpp */,
-				BFDC74AC1D8EDDF50082A6DC /* Renderer.hpp */,
-				BFDC74AD1D8EDDF50082A6DC /* RenderSettings.hpp */,
-				BFDC74AE1D8EDDF50082A6DC /* RenderSystem.cpp */,
-				BFDC74AF1D8EDDF50082A6DC /* RenderSystem.hpp */,
 				BFDC74B01D8EDDF50082A6DC /* Scene.cpp */,
 				BFDC74B11D8EDDF50082A6DC /* Scene.hpp */,
-				BFDC74B21D8EDDF50082A6DC /* Script.hpp */,
-				BFDC74B31D8EDDF50082A6DC /* Shader.cpp */,
-				BFDC74B41D8EDDF50082A6DC /* Shader.hpp */,
-				BFDC74B51D8EDDF50082A6DC /* Texture.cpp */,
-				BFDC74B61D8EDDF50082A6DC /* Texture.hpp */,
 				BFDC74B71D8EDDF50082A6DC /* Time.cpp */,
 				BFDC74B81D8EDDF50082A6DC /* Time.hpp */,
-				BFDC74B91D8EDDF50082A6DC /* Transform.cpp */,
-				BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */,
 			);
 			name = FishEngine;
 			sourceTree = "<group>";

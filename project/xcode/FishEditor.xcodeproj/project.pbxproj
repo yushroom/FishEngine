@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF3211FF1D8EFB1E00FA80E6 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */; };
 		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
 		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
 		BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */; };
@@ -50,6 +51,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Editor.cpp; path = ../../source/FishEditor/Editor.cpp; sourceTree = "<group>"; };
+		BF3211FE1D8EFB1E00FA80E6 /* Editor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Editor.hpp; path = ../../source/FishEditor/Editor.hpp; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
 		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
@@ -127,6 +130,8 @@
 		BFDC750A1D8EE01B0082A6DC /* FishEditor */ = {
 			isa = PBXGroup;
 			children = (
+				BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */,
+				BF3211FE1D8EFB1E00FA80E6 /* Editor.hpp */,
 				BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */,
 				BFDC750C1D8EE0330082A6DC /* EditorGUI.hpp */,
 				BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */,
@@ -257,6 +262,7 @@
 				BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */,
 				BFDC75191D8EE0330082A6DC /* main.cpp in Sources */,
 				BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */,
+				BF3211FF1D8EFB1E00FA80E6 /* Editor.cpp in Sources */,
 				BFDC75231D8EE0D60082A6DC /* imgui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

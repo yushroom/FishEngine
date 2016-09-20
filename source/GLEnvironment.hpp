@@ -10,7 +10,7 @@
 #include <glfw/glfw3.h>
 
 // glm
-//#define GLM_FORCE_LEFT_HANDED
+#define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>                 // glm::vec3
 #include <glm/vec4.hpp>                 // glm::vec4

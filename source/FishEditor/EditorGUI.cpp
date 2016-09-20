@@ -12,8 +12,9 @@
 #include "Mesh.hpp"
 #include "Common.hpp"
 #include "Debug.hpp"
-#include "RenderSettings.hpp"
+//#include "RenderSettings.hpp"
 #include "Selection.hpp"
+#include "EditorRenderSystem.hpp"
 
 using namespace FishEngine;
 
@@ -22,7 +23,7 @@ NAMESPACE_FISHEDITOR_BEGIN
 int EditorGUI::m_idCount = 0;
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
 
-Material::PMaterial axisIndicatorMaterial;
+Material::PMaterial sceneGizmoMaterial;
 Mesh::PMesh cubeMesh;
 Mesh::PMesh coneMesh;
 
@@ -49,7 +50,7 @@ void EditorGUI::Init()
     //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
     style.WindowMinSize = ImVec2(256, 256);
     
-    axisIndicatorMaterial = Material::builtinMaterial("VertexLit");
+    sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
     cubeMesh = Mesh::CreateFromObjFile(models_dir+"cube.obj");
     coneMesh = Mesh::CreateFromObjFile(models_dir+"cone.obj");
 }
@@ -77,13 +78,13 @@ void EditorGUI::Update()
         //ImGui::SameLine();
         ImGui::LabelText("Layer", "Layer %d", go->m_layer);
         
-        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
             go->m_transform->OnInspectorGUI();
         }
         
         for (auto& c : go->m_components) {
             bool is_open = true;
-            if (ImGui::CollapsingHeader(camelCaseToReadable(c->ClassName()).c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
                 c->OnInspectorGUI();
             if (!is_open) {
                 Object::Destroy(c);
@@ -91,7 +92,7 @@ void EditorGUI::Update()
         }
         for (auto& s : go->m_scripts) {
             bool is_open = true;
-            if (ImGui::CollapsingHeader(camelCaseToReadable(s->ClassName()).c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
                 s->OnInspectorGUI();
             if (!is_open) {
                 Object::Destroy(s);
@@ -242,26 +243,32 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject) {
 
 void EditorGUI::DrawSceneGizmo()
 {
-    int w = RenderSystem::width();
-    int h = RenderSystem::height();
+    int w = EditorRenderSystem::width();
+    int h = EditorRenderSystem::height();
     glViewport(0, 0, w*0.1f, h*0.1f);
     
-    auto shader = axisIndicatorMaterial->shader();
+    auto shader = sceneGizmoMaterial->shader();
     shader->Use();
-    axisIndicatorMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, 1));
+    
+#ifdef GLM_FORCE_LEFT_HANDED
+    auto camera_pos = Vector3(0, 0, -5);
+#else
+    auto camera_pos = Vector3(0, 0, 5);
+#endif
+    sceneGizmoMaterial->SetVector3("unity_LightPosition", glm::normalize(camera_pos));
     auto camera = Scene::mainCamera();
     //auto view = camera->worldToCameraMatrix();
-    auto view = glm::lookAt(Vector3(0, 0, 5), Vector3(0, 0, 0), Vector3(0, 1, 0));
+    auto view = glm::lookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
     auto proj = camera->projectionMatrix();
     auto vp = proj * view;
     auto model = glm::mat4(glm::inverse(camera->transform()->rotation()));
     
     ShaderUniforms uniforms;
-    axisIndicatorMaterial->SetMatrix("MATRIX_MVP", vp*model);
-    axisIndicatorMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-    axisIndicatorMaterial->SetVector3("_Color", Vector3(1, 1, 1));
+    sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+    sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+    sceneGizmoMaterial->SetVector3("_Color", Vector3(1, 1, 1));
     shader->PreRender();
-    axisIndicatorMaterial->Update();
+    sceneGizmoMaterial->Update();
     shader->CheckStatus();
     cubeMesh->Render();
 
@@ -282,11 +289,11 @@ void EditorGUI::DrawSceneGizmo()
         t.setLocalEulerAngles(f[j+3], f[j+4], f[j+5]);
         //t.Update();
         auto modelMat = model * t.localToWorldMatrix() * s;
-        axisIndicatorMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
-        axisIndicatorMaterial->SetMatrix("MATRIX_IT_MV", glm::inverse(glm::transpose(view*modelMat)));
+        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
+        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", glm::inverse(glm::transpose(view*modelMat)));
         if (i >= 3)
-            axisIndicatorMaterial->SetVector3("_Color", Vector3(f[j], f[j+1], f[j+2]));
-        axisIndicatorMaterial->Update();
+            sceneGizmoMaterial->SetVector3("_Color", Vector3(f[j], f[j+1], f[j+2]));
+        sceneGizmoMaterial->Update();
         coneMesh->Render();
     }
     

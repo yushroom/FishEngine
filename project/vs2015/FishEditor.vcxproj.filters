@@ -24,10 +24,10 @@
     <ClCompile Include="..\..\source\FishEditor\FishEditorWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\FishEditor\Selection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

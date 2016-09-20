@@ -93,7 +93,7 @@ public:
     }
     
     virtual void OnInspectorGUI() override {
-        ImGui::Checkbox("Visualize Normal", &m_visualizeNormal);
+        ImGui::Checkbox("Visualize Normal##checkbox", &m_visualizeNormal);
     }
     
     virtual void Update() override {
@@ -145,6 +145,7 @@ public:
         //auto headModel = Mesh::CreateFromObjFile(models_dir + "/head/head_combined.obj", VertexUsagePNUT, MeshLoadFlag_RegenerateNormal);
         
         auto sphere = Mesh::CreateFromObjFile(models_dir+"sphere.obj", VertexUsagePNUT);
+        auto cone = Mesh::CreateFromObjFile(models_dir + "cone.obj", VertexUsagePNUT);
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
@@ -179,13 +180,14 @@ public:
         textures["AmbientCubemap"] = sky_texture;
         auto go = Scene::CreateGameObject("Sphere");
         //go->transform()->setScale(20, 20, 20);
-        meshFilter = make_shared<MeshFilter>(sphere);
+        meshFilter = make_shared<MeshFilter>(cone);
         material = Material::builtinMaterial("PBR");
         material->SetVector3("albedo", Vector3(0.8f, 0.6f, 0.6f));
         material->BindTextures(textures);
         meshRenderer = make_shared<MeshRenderer>(material);
         go->AddComponent(meshFilter);
         go->AddComponent(meshRenderer);
+        go->AddScript(make_shared<VisualizeNormal>());
         //go->AddScript(make_shared<DeactiveSelf>());
         //go->SetActive(false);
         //Scene::SelectGameObject(go.get());

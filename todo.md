@@ -7,6 +7,7 @@
 - [ ] GameObject构造函数改成非public的(需要解决make_shared调用非public ctor，貌似没有特别优雅的解决方案，http://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const)
 - [ ] 将Scene里面的Script和Component合并到一起去
 - [ ] 不依赖代码生成和外部工具的（自动）反射可行吗？
+- [ ] 把不该开放的API隐藏掉（尤其是FishEngine）
 
 ## Editor
 
@@ -30,7 +31,7 @@
 
 - [ ] Inspector窗口中的Headers的缩进（OK，用imgui::indent()），一行显示不全的问题
 
-- [x] Editor的帧率改到30
+- [ ] Editor的帧率改到30
 
 - [ ] 相机旋转时transform反应不正常，会越退越远
 

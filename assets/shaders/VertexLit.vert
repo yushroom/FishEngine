@@ -13,7 +13,7 @@ out VS_OUT {
 void main()
 {
     gl_Position = MATRIX_MVP * vec4(position, 1);
-    float c = dot(mat3(MATRIX_IT_MV) * normal, normalize(unity_LightPosition));
+    float c = dot(normalize(mat3(MATRIX_IT_MV) * normal), normalize(unity_LightPosition));
     c = clamp(c, 0, 1);
     vs_out.color = _Color * c;
 }

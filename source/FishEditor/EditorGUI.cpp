@@ -2,6 +2,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include <imgui/imgui_internal.h>
 
 #include "GameObject.hpp"
 #include "Scene.hpp"
@@ -30,10 +31,24 @@ void EditorGUI::Init()
 #if FISHENGINE_PLATFORM_WINDOWS
     const std::string root_dir = "../../assets/";
 #else
-    const std::string root_dir = "/Users/yushroom/program/graphics/RFGL/";
+    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
     const std::string models_dir = root_dir + "models/";
  
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF((root_dir+"fonts/SourceCodePro-Regular.ttf").c_str(), 16.0f);
+    
+    ImGuiContext& g = *GImGui;
+    ImGuiStyle& style = g.Style;
+    style.FrameRounding = 4.f;
+    style.WindowRounding = 0.f;
+    style.Colors[ImGuiCol_Text] = ImVec4(0, 0, 0, 1);
+    style.Colors[ImGuiCol_Button] = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
+    //style.Colors[ImGuiCol_WindowBg] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+    //style.GrabRounding = 0.f;
+    //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
+    style.WindowMinSize = ImVec2(256, 256);
+    
     axisIndicatorMaterial = Material::builtinMaterial("VertexLit");
     cubeMesh = Mesh::CreateFromObjFile(models_dir+"cube.obj");
     coneMesh = Mesh::CreateFromObjFile(models_dir+"cone.obj");
@@ -42,7 +57,7 @@ void EditorGUI::Init()
 void EditorGUI::Update()
 {
     // Inspector Editor
-    ImGui::Begin("Inspector");
+    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_ShowBorders);
     auto go = Selection::activeGameObject();
     if (go != nullptr) {
         ImGui::PushID("Inspector.selected.active");

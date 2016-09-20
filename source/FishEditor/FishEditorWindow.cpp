@@ -43,7 +43,7 @@ void FishEditorWindow::Init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    //glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     
     // Create a GLFWwindow object that we can use for GLFW's functions
     m_window = glfwCreateWindow(WIDTH, HEIGHT, "FishEngine", nullptr, nullptr);
@@ -150,6 +150,9 @@ void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int a
 
 void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
+    int w, h;
+    glfwGetFramebufferSize(window, &w, &h);
+    EditorRenderSystem::OnWindowSizeChanged(w, h);
     //glViewport(0, 0, width, height);
     //GUI::OnWindowSizeChanged(width, height);
 }

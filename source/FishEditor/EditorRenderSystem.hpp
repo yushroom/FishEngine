@@ -36,11 +36,14 @@ public:
     static void SaveScreenShot(const std::string& path);
 
 private:
+    friend class FishEditorWindow;
     static int m_width;
     static int m_height;
 
     static bool m_isWireFrameMode;
     static bool m_useGammaCorrection;
+    
+    static void OnWindowSizeChanged(const int width, const int height);
 };
 
 NAMESPACE_FISHEDITOR_END

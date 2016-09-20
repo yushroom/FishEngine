@@ -15,4 +15,5 @@
 *.xcuserstate
 project.xcworkspace/
 xcuserdata/
+/project/xcode/build/
 

@@ -53,6 +53,10 @@
 /* Begin PBXFileReference section */
 		BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Editor.cpp; path = ../../source/FishEditor/Editor.cpp; sourceTree = "<group>"; };
 		BF3211FE1D8EFB1E00FA80E6 /* Editor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Editor.hpp; path = ../../source/FishEditor/Editor.hpp; sourceTree = "<group>"; };
+		BF3212021D90468100FA80E6 /* imconfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imconfig.h; path = ../../external/imgui/imconfig.h; sourceTree = "<group>"; };
+		BF3212031D90468100FA80E6 /* imgui_impl_glfw_gl3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_impl_glfw_gl3.h; path = ../../external/imgui/imgui_impl_glfw_gl3.h; sourceTree = "<group>"; };
+		BF3212041D90468100FA80E6 /* imgui_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_internal.h; path = ../../external/imgui/imgui_internal.h; sourceTree = "<group>"; };
+		BF3212051D90468100FA80E6 /* imgui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui.h; path = ../../external/imgui/imgui.h; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
 		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
@@ -150,10 +154,14 @@
 		BFDC751B1D8EE0B90082A6DC /* ImGui */ = {
 			isa = PBXGroup;
 			children = (
+				BF3212021D90468100FA80E6 /* imconfig.h */,
 				BFDC751C1D8EE0D60082A6DC /* imgui_demo.cpp */,
 				BFDC751D1D8EE0D60082A6DC /* imgui_draw.cpp */,
 				BFDC751E1D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp */,
+				BF3212031D90468100FA80E6 /* imgui_impl_glfw_gl3.h */,
+				BF3212041D90468100FA80E6 /* imgui_internal.h */,
 				BFDC751F1D8EE0D60082A6DC /* imgui.cpp */,
+				BF3212051D90468100FA80E6 /* imgui.h */,
 			);
 			name = ImGui;
 			sourceTree = "<group>";

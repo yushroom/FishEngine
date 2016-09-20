@@ -39,7 +39,7 @@ void EditorRenderSystem::Init()
     glViewport(0, 0, m_width, m_height);
 
     ImGui_ImplGlfwGL3_Init(window, false);
-
+    
     Shader::Init();
     Material::Init();
     EditorGUI::Init();
@@ -108,6 +108,15 @@ void EditorRenderSystem::SaveScreenShot(const std::string& path)
     stbi_write_png(path.c_str(), m_width, m_height, 3, pixels, 0);
     delete[] pixels;
 }
+
+void EditorRenderSystem::OnWindowSizeChanged(const int width, const int height) {
+    //glfwGetFramebufferSize(window, &m_width, &m_height);
+    m_width = width;
+    m_height = height;
+    glViewport(0, 0, m_width, m_height);
+    Scene::mainCamera()->setAspect(float(m_width)/m_height);
+}
+
 
 
 NAMESPACE_FISHEDITOR_END

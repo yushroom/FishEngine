@@ -84,8 +84,8 @@ void Input::Update()
 
 void Input::UpdateMousePosition(float xpos, float ypos)
 {
-    m_axis[Axis_MouseX] = xpos - m_mousePositionX;
-    m_axis[Axis_MouseY] = -(ypos - m_mousePositionY);
+    m_axis[(int)Axis::MouseX] = xpos - m_mousePositionX;
+    m_axis[(int)Axis::MouseY] = -(ypos - m_mousePositionY);
     m_mousePositionX = xpos;
     m_mousePositionY = ypos;
 }

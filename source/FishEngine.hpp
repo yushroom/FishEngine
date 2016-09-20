@@ -45,6 +45,7 @@ NAMESPACE_FISHENGINE_END
 // hack: inject FishEditor namespace
 namespace FishEditor {
     class EditorGUI;
+    class EditorRenderSystem;
 }
 
 #endif /* FishEngine_h */

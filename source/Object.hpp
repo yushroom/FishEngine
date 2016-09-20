@@ -2,6 +2,7 @@
 #define Object_hpp
 
 #include "FishEngine.hpp"
+#include <string>
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -13,6 +14,8 @@ public:
     void setName(const std::string& name) { m_name = name; }
 
     virtual ~Object() = 0;
+
+    //virtual std::string ToString() const;
 
     // Removes a gameobject.
     static void Destroy(std::shared_ptr<GameObject> obj, const float t = 0.0f);

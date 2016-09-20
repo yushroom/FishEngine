@@ -20,7 +20,7 @@ using namespace FishEditor;
 #include "MeshRenderer.hpp"
 #include "RenderSettings.hpp"
 #include "Scene.hpp"
-
+#include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
 
 using namespace std;
@@ -146,6 +146,7 @@ public:
         
         auto sphere = Mesh::CreateFromObjFile(models_dir+"sphere.obj", VertexUsagePNUT);
         auto cone = Mesh::CreateFromObjFile(models_dir + "cone.obj", VertexUsagePNUT);
+        auto cube = Mesh::CreateFromObjFile(models_dir + "cube.obj", VertexUsagePNUT);
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
@@ -178,9 +179,9 @@ public:
 //        headGO->AddScript(make_shared<VisualizeNormal>());
 //        //headGO->AddScript(make_shared<DeactiveSelf>());
         textures["AmbientCubemap"] = sky_texture;
-        auto go = Scene::CreateGameObject("Sphere");
+        auto go = Scene::CreateGameObject("Cube");
         //go->transform()->setScale(20, 20, 20);
-        meshFilter = make_shared<MeshFilter>(cone);
+        meshFilter = make_shared<MeshFilter>(cube);
         material = Material::builtinMaterial("PBR");
         material->SetVector3("albedo", Vector3(0.8f, 0.6f, 0.6f));
         material->BindTextures(textures);
@@ -191,17 +192,39 @@ public:
         //go->AddScript(make_shared<DeactiveSelf>());
         //go->SetActive(false);
         //Scene::SelectGameObject(go.get());
+
+        auto create_cube = [&cube, &material](std::shared_ptr<GameObject>& parent) {
+            auto go = Scene::CreateGameObject("Cube");
+            go->transform()->SetParent(parent->transform());
+            go->transform()->setLocalPosition(0, 0, 2);
+            //go->transform()->setPosition(0, 0, 2);
+            go->transform()->setLocalEulerAngles(0, 30, 0);
+            auto meshFilter = make_shared<MeshFilter>(cube);
+            auto meshRenderer = make_shared<MeshRenderer>(material);
+            go->AddComponent(meshFilter);
+            go->AddComponent(meshRenderer);
+            //go->transform()->SetParent(parent->transform());
+            return go;
+        };
+
+        auto child0 = create_cube(go);
+        auto child1 = create_cube(child0);
+        auto child2 = create_cube(child1);
         
-        Scene::mainCamera()->gameObject()->AddScript(make_shared<ShowFPS>());
-        Scene::mainCamera()->gameObject()->AddScript(make_shared<TakeScreenShot>());
-        Scene::mainCamera()->gameObject()->AddScript(make_shared<RenderSettings>());
+        auto cameraGO = Scene::mainCamera()->gameObject();
+        cameraGO->transform()->setPosition(5, 5, 5);
+        cameraGO->transform()->LookAt(0, 0, 0);
+        cameraGO->AddScript(make_shared<ShowFPS>());
+        cameraGO->AddScript(make_shared<TakeScreenShot>());
+        cameraGO->AddScript(make_shared<RenderSettings>());
+        Selection::setActiveGameObject(cameraGO);
         
-        auto child0 = Scene::CreateGameObject("child0");
-        child0->transform()->SetParent(go->transform());
-        auto child1 = Scene::CreateGameObject("child1");
-        child1->transform()->SetParent(go->transform());
-        auto child3 = Scene::CreateGameObject("child3");
-        child3->transform()->SetParent(child0->transform());
+        //auto child0 = Scene::CreateGameObject("child0");
+        //child0->transform()->SetParent(go->transform());
+        //auto child1 = Scene::CreateGameObject("child1");
+        //child1->transform()->SetParent(go->transform());
+        //auto child3 = Scene::CreateGameObject("child3");
+        //child3->transform()->SetParent(child0->transform());
     }
 };
 

@@ -33,18 +33,18 @@ public:
         MouseButtonState_Up = 3,
     };
 
-    enum Axis {
-        Axis_Vertical = 0,
-        Axis_Horizontal,
-        Axis_MouseX,
-        Axis_MouseY,
+    enum class Axis {
+        Vertical = 0,
+        Horizontal,
+        MouseX,
+        MouseY,
     };
 
     Input() = delete;
 
     // Returns the value of the virtual axis identified by axisName.
     static float GetAxis(Axis axis) {
-        return m_axis[axis];
+        return m_axis[(int)axis];
     }
 
     // Returns true while the user holds down the key identified by name. Think auto fire.

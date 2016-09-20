@@ -19,6 +19,9 @@
     <Filter Include="Component">
       <UniqueIdentifier>{ab725883-c151-467c-8522-2e082486a51b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{6399ac90-997b-4934-891b-6a1009314d4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\RenderSettings.hpp">
@@ -99,6 +102,18 @@
     <ClInclude Include="..\..\source\Script.hpp">
       <Filter>Component</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Matrix4x4.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Quaternion.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Vector3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Mathf.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -178,6 +193,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\MeshFilter.cpp">
       <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Matrix4x4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Vector3.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

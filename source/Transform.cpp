@@ -22,69 +22,91 @@ Transform::~Transform()
 void Transform::OnInspectorGUI()
 {
     if (ImGui::InputFloat3("Position", glm::value_ptr(m_localPosition))) {
-        //m_isDirty = true;
+        MakeDirty();
     }
     if (ImGui::InputFloat3("Rotation", glm::value_ptr(m_localEulerAngles))) {
         m_localRotation = glm::quat(glm::radians((m_localEulerAngles)));
-        //m_isDirty = true;
+        MakeDirty();
     }
     if (ImGui::InputFloat3("Scale", glm::value_ptr(m_localScale))) {
-        //m_isDirty = true;
+        MakeDirty();
     }
 }
 
 void Transform::Update() const
 {
+    if (!dirtyInHierarchy())
+        return;
     m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
     m_localToWorldMatrix = glm::scale(glm::translate(glm::mat4(1.0f), m_localPosition) * glm::mat4_cast(m_localRotation), m_localScale);
-    auto p = m_parent.lock();
-    if (p != nullptr)
-        m_localToWorldMatrix = p->localToWorldMatrix() * m_localToWorldMatrix;
+    if (!m_parent.expired())
+        m_localToWorldMatrix = m_parent.lock()->localToWorldMatrix() * m_localToWorldMatrix;
     m_worldToLocalMatrix = glm::inverse(m_localToWorldMatrix);
+    m_rotation = glm::quat_cast(m_localToWorldMatrix);
+    m_isDirty = false;
 }
 
 void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
 {
-    m_worldToLocalMatrix = glm::lookAt(m_localPosition, target, worldUp);
-    m_localToWorldMatrix = glm::inverse(m_worldToLocalMatrix);
-    m_localRotation = glm::quat_cast(m_localToWorldMatrix);
-    //m_isDirty = true;
+    auto m = glm::lookAt(m_localPosition, target, worldUp);
+    m_localRotation = glm::quat_cast(glm::inverse(m));
+    MakeDirty();
 }
 
 Vector3 Transform::TransformDirection(const Vector3& direction) const
 {
+    Update();
     return m_localToWorldMatrix * Vector4(direction, 0);
+}
+
+Vector3 FishEngine::Transform::InverseTransformDirection(const Vector3& direction) const
+{
+    Update();
+    return m_worldToLocalMatrix * Vector4(direction, 0);
 }
 
 void Transform::Translate(const Vector3& translation, Space relativeTo /*= Space::Self*/)
 {
-    if (relativeTo == Space::World)
-        m_localPosition += translation;
-    else
-        m_localPosition += TransformDirection(translation);
-    //m_isDirty = true;
-}
-
-void Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Space::Self*/)
-{
-    Update();
-    Quaternion lhs(glm::radians(eulerAngles));
-    if (Space::Self == relativeTo) {
-        auto r = this->rotation();
-        m_localRotation = glm::inverse(r) * lhs * r * m_localRotation;
+    if (relativeTo == Space::World) {
+        setPosition(position() + translation);
     }
     else {
-        m_localRotation = lhs * m_localRotation;
+        setPosition(position() + TransformDirection(translation));
     }
-    //        m_isDirty = true;
+    MakeDirty();
 }
+
+//void Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Space::Self*/)
+//{
+//    Quaternion lhs(glm::radians(eulerAngles));
+//    if (Space::Self == relativeTo) {
+//        //auto r = this->rotation();
+//        //m_localRotation = glm::inverse(r) * lhs * r * m_localRotation;
+//        m_localRotation = lhs * m_localRotation;
+//    }
+//    else {
+//        //m_localRotation = lhs * m_localRotation;
+//        lhs * rotation();
+//        // TODO
+//    }
+//}
 
 void Transform::RotateAround(const Vector3& point, const Vector3& axis, float angle)
 {
+    // step1: update position
+    auto vector = this->position();
     auto rotation = angleAxis(angle, axis);
-    m_localPosition = point + rotation * (m_localPosition - point);
-    LookAt(point);
+    Vector3 vector2 = vector - point;
+    vector2 = rotation * vector2;
+    vector = point + vector2;
+    setPosition(vector);
+
+    // step2: update rotation
+    m_localRotation = rotation * m_localRotation;
+    //RotateAroundInternal(axis, angle);
+    MakeDirty();
 }
+
 
 void Transform::SetParent(std::shared_ptr<Transform> parent)
 {
@@ -104,8 +126,8 @@ void Transform::SetParent(std::shared_ptr<Transform> parent)
     if (parent == nullptr) {
         return;
     }
-    parent->m_children.push_back(m_gameObject.lock()->transform());
-    //m_isDirty = true;
+    parent->m_children.push_back(gameObject()->transform());
+    MakeDirty();
 }
 
 std::shared_ptr<Transform> Transform::GetChild(const int index) {
@@ -120,5 +142,26 @@ std::shared_ptr<Transform> Transform::GetChild(const int index) {
     }
     return p->lock();
 }
+
+
+bool Transform::dirtyInHierarchy() const
+{
+    if (!m_isDirty && !m_parent.expired()) { // not dirty and has a parent
+        return m_parent.lock()->dirtyInHierarchy();
+    }
+    return m_isDirty;
+}
+
+
+void FishEngine::Transform::MakeDirty() const
+{
+    if (!m_isDirty) {
+        for (auto& c : m_children) {
+            c.lock()->MakeDirty();
+        }
+    }
+    m_isDirty = true;
+}
+
 
 NAMESPACE_FISHENGINE_END

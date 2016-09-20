@@ -37,6 +37,7 @@ public:
     static void SaveScreenShot(const std::string& path);
 
 private:
+    friend class FishEditor::EditorRenderSystem;
     static int m_width;
     static int m_height;
     

@@ -13,6 +13,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include "FishEditorWindow.hpp"
+#include <RenderSystem.hpp>
 
 using namespace FishEngine;
 
@@ -37,6 +38,8 @@ void EditorRenderSystem::Init()
     // Define the view port dimensions
     glfwGetFramebufferSize(window, &m_width, &m_height);
     glViewport(0, 0, m_width, m_height);
+    RenderSystem::m_width = m_width;
+    RenderSystem::m_height = m_height;
 
     ImGui_ImplGlfwGL3_Init(window, false);
     

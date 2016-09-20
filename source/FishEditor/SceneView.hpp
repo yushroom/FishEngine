@@ -1,7 +1,7 @@
 #ifndef SceneView_hpp
 #define SceneView_hpp
 
-#include "FishEdtor.hpp"
+#include "FishEditor.hpp"
 #include "Camera.hpp"
 
 NAMESPACE_FISHEDITOR_BEGIN

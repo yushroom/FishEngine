@@ -5,7 +5,7 @@
 #include "Component.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
-    
+
 // Creates a rotation which rotates angle degrees around axis.
 static Quaternion angleAxis(float angle, Vector3 axis)
 {
@@ -45,8 +45,6 @@ public:
     
     // The position of the transform in world space.
     Vector3 position() const {
-//        if (m_isDirty)
-//            Update();
         Update();
         return m_localToWorldMatrix * Vector4(0, 0, 0, 1);
     }
@@ -61,18 +59,12 @@ public:
 
     // The rotation of the transform in world space stored as a Quaternion.
     Quaternion rotation() const {
-//        if (m_isDirty)
-//            Update();
-        auto p = m_parent.lock();
-        if (p != nullptr)
-            return m_localRotation * p->rotation();
-        return m_localRotation;
+        Update();
+        return m_rotation;
     }
 
     // The rotation as Euler angles in degrees.
     Vector3 eulerAngles() const {
-//        if (m_isDirty)
-//            Update();
         return glm::eulerAngles(rotation());
     }
 
@@ -81,79 +73,68 @@ public:
         return m_localPosition;
     }
 
+    // The scale of the transform relative to the parent.
+    Vector3 localScale() const {
+        return m_localScale;
+    }
+
     void setLocalPosition(const Vector3& position) {
         m_localPosition = position;
-        //m_isDirty = true;
     }
 
     void setLocalPosition(const float x, const float y, const float z) {
         m_localPosition.x = x;
         m_localPosition.y = y;
         m_localPosition.z = z;
-        //m_isDirty = true;
-    }
-
-    // The scale of the transform relative to the parent.
-    Vector3 localScale() const {
-        return m_localScale;
     }
 
     void setLocalScale(const Vector3& scale) {
         m_localScale = scale;
-        //m_isDirty = true;
     }
 
     void setLocalScale(const float x, const float y, const float z) {
         m_localScale.x = x;
         m_localScale.y = y;
         m_localScale.z = z;
-        //m_isDirty = true;
     }
 
     // The rotation of the transform relative to the parent transform's rotation.
     Quaternion localRotation() const {
-        return glm::eulerAngles(m_localRotation);
-        //return m_localRotation;
+        return m_localRotation;
     }
 
     // The rotation as Euler angles in degrees relative to the parent transform's rotation.
     Vector3 localEulerAngles() const {
-        //if (m_isDirty)
-            m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
+        m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
         return m_localEulerAngles;
     }
 
     void setLocalEulerAngles(const Vector3& eulerAngles) {
-        //m_localEulerAngles = eulerAngles;
         m_localRotation = glm::quat(glm::radians(eulerAngles));
-        //m_isDirty = true;
+        MakeDirty();
     }
     
     void setLocalEulerAngles(const float x, const float y, const float z) {
         setLocalEulerAngles(Vector3(x, y , z));
     }
 
-//    void setPosition(const Vector3& position) {
-//        //if (m_isDirty)
-//        //    Update();
-//        m_localToWorldMatrix = glm::scale(glm::translate(glm::mat4(1.0f), m_localPosition) * glm::mat4_cast(m_localRotation), m_localScale);
-//        m_worldToLocalMatrix = glm::inverse(m_localToWorldMatrix);
-//        if (m_parent == nullptr) {
-//            m_localPosition = m_worldToLocalMatrix * Vector4(position, 1);
-//        } else {
-//            m_localPosition = m_worldToLocalMatrix * m_parent->worldToLocalMatrix() * Vector4(position, 1) ;
-//        }
-//        //m_isDirty = true;
-//    }
-//
-//    void setPosition(const float x, const float y, const float z) {
-//        setPosition(Vector3(x, y, z));
-//    }
+    // position is in world space
+    void setPosition(const Vector3& position) {
+        if (!m_parent.expired()) {
+            m_localPosition = parent()->worldToLocalMatrix() * Vector4(position, 1);
+        } else {
+            m_localPosition = position;
+        }
+        MakeDirty();
+    }
 
-    //void setEulerAngles(const Vector3& eulerAngles) {
-    //    m_localRotation = glm::quat(eulerAngles);
-    //    m_isDirty = true;
-    //}
+    void setPosition(const float x, const float y, const float z) {
+        setPosition(Vector3(x, y, z));
+    }
+
+    void setRotation(const Quaternion& new_rotation);
+
+    void setEulerAngles(const Vector3& eulerAngles);
 
     // Matrix that transforms a point from local space into world space (Read Only).
     Matrix4x4 localToWorldMatrix() const {
@@ -166,9 +147,20 @@ public:
         return m_worldToLocalMatrix;
     }
 
+
+    // direction (1, 0, 0) in world space.
+    Vector3 right() const {
+        return rotation() * Vector3(1, 0, 0);
+    }
+
+    // direction (0, 1, 0) in world space
+    Vector3 up() const {
+        return rotation() * Vector3(0, 1, 0);
+    }
+
+    // direction (0, 0, 1) in world space.
     Vector3 forward() const {
-        Update();
-        return rotation() * Vector3(0, 0, -1);
+        return rotation() * Vector3(0, 0, 1);
     }
 
     //void setForward(const Vector3& forward) {
@@ -182,8 +174,15 @@ public:
     // Rotates the transform so the forward vector points at /target/'s current position.
     void LookAt(const Vector3& target, const Vector3& worldUp = Vector3(0, 1, 0));
 
+    void LookAt(float x, float y, float z) {
+        LookAt(Vector3(x, y, z));
+    }
+
     // Transforms direction from local space to world space.
     Vector3 TransformDirection(const Vector3& direction) const;
+
+    // Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
+    Vector3 InverseTransformDirection(const Vector3& direction) const;
 
     void Translate(const Vector3& translation, Space relativeTo = Space::Self);
 
@@ -212,9 +211,7 @@ public:
     //========== Public Functions ==========//
     
     // Unparents all children.
-    void DetachChildren() {
-        
-    }
+    void DetachChildren();
     
     /* Returns a transform child by index.
      * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
@@ -225,20 +222,22 @@ public:
 private:
     friend class FishEditor::EditorGUI;
     friend class Scene;
-    Vector3 m_localPosition;
-    Vector3 m_localScale;
-    Quaternion m_localRotation;
-    mutable Vector3 m_localEulerAngles;
 
-    std::weak_ptr<Transform> m_parent;
+    Vector3         m_localPosition;
+    Vector3         m_localScale;
+    Quaternion      m_localRotation;
+    mutable Quaternion  m_rotation; // cache, do not use its value directly, use rotation() instead.
+    mutable Vector3     m_localEulerAngles;
+    mutable bool        m_isDirty;
+
+    std::weak_ptr<Transform>            m_parent;
     std::list<std::weak_ptr<Transform>> m_children;
-
-    //mutable bool m_isDirty = true;
-    //mutable Vector3 m_right;	// (1, 0, 0) in local space
-    //mutable Vector3 m_forward;	// (0, 0, -1) in local space
     
     mutable Matrix4x4 m_localToWorldMatrix; // localToWorld
     mutable Matrix4x4 m_worldToLocalMatrix; // worldToLocal
+
+    bool dirtyInHierarchy() const;
+    void MakeDirty() const;
 };
 
 NAMESPACE_FISHENGINE_END

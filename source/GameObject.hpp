@@ -116,7 +116,6 @@ private:
     int m_layer = 0;
 
     std::string m_tag;
-    //Transform m_transform;
     std::shared_ptr<Transform> m_transform;
     
     //static GameObject m_root;

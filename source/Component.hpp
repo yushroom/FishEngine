@@ -26,9 +26,10 @@ public:
     
     friend class GameObject;
     
-protected:
+//protected:
+private:
+    friend class Scene;
     std::weak_ptr<GameObject> m_gameObject;
-    //std::shared_ptr<GameObject> m_gameObject = nullptr;
 };
 
 NAMESPACE_FISHENGINE_END

@@ -15,6 +15,10 @@
 //#include "RenderSettings.hpp"
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
+#include <Time.hpp>
+#include <sstream>
+
+#include <imgui/imgui_dock.h>
 
 using namespace FishEngine;
 
@@ -37,14 +41,14 @@ void EditorGUI::Init()
     const std::string models_dir = root_dir + "models/";
  
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF((root_dir+"fonts/SourceCodePro-Regular.ttf").c_str(), 16.0f);
+    io.Fonts->AddFontFromFileTTF((root_dir+"fonts/DroidSans.ttf").c_str(), 14.0f);
     
     ImGuiContext& g = *GImGui;
     ImGuiStyle& style = g.Style;
     style.FrameRounding = 4.f;
     style.WindowRounding = 0.f;
-    style.Colors[ImGuiCol_Text] = ImVec4(0, 0, 0, 1);
-    style.Colors[ImGuiCol_Button] = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
+    //style.Colors[ImGuiCol_Text] = ImVec4(0, 0, 0, 1);
+    //style.Colors[ImGuiCol_Button] = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
     //style.Colors[ImGuiCol_WindowBg] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
     //style.GrabRounding = 0.f;
     //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
@@ -57,8 +61,16 @@ void EditorGUI::Init()
 
 void EditorGUI::Update()
 {
+    static double time_stamp = glfwGetTime();
+    ImGuiContext& g = *GImGui;
+    ImGuiStyle& style = g.Style;
+    
+    ImGui::BeginDock("Dock");
+    ImGui::EndDock();
+    
     // Inspector Editor
-    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_ShowBorders);
+    ImGui::BeginDock("Inspector", nullptr);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
     auto go = Selection::activeGameObject();
     if (go != nullptr) {
         ImGui::PushID("Inspector.selected.active");
@@ -73,10 +85,17 @@ void EditorGUI::Update()
             go->m_name = name;
         }
         ImGui::PopID();
-        
-        ImGui::LabelText("Tag", "%s", go->tag().c_str());
-        //ImGui::SameLine();
-        ImGui::LabelText("Layer", "Layer %d", go->m_layer);
+
+        ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
+        //ImGui::LabelText("", "Tag");
+        ImGui::Text("Tag");
+        ImGui::SameLine();
+        ImGui::LabelText("##Tag", "%s", go->tag().c_str());
+        ImGui::SameLine();
+        ImGui::Text("Layer");
+        ImGui::SameLine();
+        ImGui::LabelText("##Layer", "Layer %d", go->m_layer);
+        ImGui::PopItemWidth();
         
         if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
             go->m_transform->OnInspectorGUI();
@@ -100,26 +119,36 @@ void EditorGUI::Update()
         }
     }
     
-    ImGui::Button("Add Component");
-    ImGui::End(); // Inspector Editor
+    EditorGUI::Button("Add Component");
+    ImGui::EndDock(); // Inspector Editor
     
     glClear(GL_DEPTH_BUFFER_BIT);
     DrawSceneGizmo();
     
     // Main menu bar
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            ImGui::MenuItem("New Scene", "Ctrl+N");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit")) {
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
+//    if (ImGui::BeginMainMenuBar()) {
+//        if (ImGui::BeginMenu("File")) {
+//            ImGui::MenuItem("New Scene", "Ctrl+N");
+//            ImGui::EndMenu();
+//        }
+//        if (ImGui::BeginMenu("Edit")) {
+//            ImGui::EndMenu();
+//        }
+//        
+//        double new_time = glfwGetTime();
+//        int fps = (int)roundf(1.f / (new_time - time_stamp));
+//        time_stamp = new_time;
+//        std::ostringstream sout;
+//        sout << "FPS: " << fps;
+//        const char* s = sout.str().c_str();
+//        auto fps_stats_size = ImGui::CalcTextSize(s);
+//        ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
+//        ImGui::Text("%s", s);
+//        ImGui::EndMainMenuBar();
+//    }
     
     // Hierarchy view
-    ImGui::Begin("Hierarchy");
+    ImGui::BeginDock("Hierarchy");
     if (ImGui::Button("Create")) {
         auto go = Scene::CreateGameObject("GameObject");
     }
@@ -139,12 +168,12 @@ void EditorGUI::Update()
         }
     }
     ImGui::PopStyleVar();
-    ImGui::End();
+    ImGui::EndDock();
     
     
     // Project view
-    ImGui::Begin("Project");
-    ImGui::End();
+    ImGui::BeginDock("Project");
+    ImGui::EndDock();
     
 //    if (m_showAssectSelectionDialogBox) {
 //        ImGui::OpenPopup("Select ...");
@@ -191,6 +220,13 @@ void EditorGUI::Clean()
 //    return false;
 //}
 
+bool EditorGUI::Button(const char* text)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiStyle& style = g.Style;
+    float w = ImGui::GetWindowWidth() - style.WindowPadding.x * 2.f;
+    return ImGui::Button(text, ImVec2(w, 0));
+}
 
 void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> callback)
 {

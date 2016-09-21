@@ -118,10 +118,10 @@ public:
     InjectClassName(TakeScreenShot);
     
     virtual void OnInspectorGUI() override {
-        if (ImGui::Button("Screen shot")) {
+        if (EditorGUI::Button("Screen shot")) {
             auto tm = time(nullptr);
             ostringstream ss;
-            ss << int(tm) << ".png";
+            ss << "./" << int(tm) << ".png";
             EditorRenderSystem::SaveScreenShot(ss.str());
             Debug::Log("Screen shot saved to %s", ss.str().c_str());
         }

@@ -131,10 +131,7 @@ void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, d
     //    if (handled)
     //        return;
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-    //auto& t = m_mainCamera->gameObject->transform;
-    auto t = Scene::mainCamera()->transform();
-    t->setLocalPosition(t->position() + 0.2f*float(yoffset)*t->forward());
-    
+    Input::UpdateAxis(Input::Axis::MouseScrollWheel, yoffset);
 }
 
 //GLfloat lastX = 400, lastY = 300;

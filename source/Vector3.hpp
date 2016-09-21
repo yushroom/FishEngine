@@ -333,7 +333,7 @@ public:
     float magnitude() const
     {
         //return Mathf.Sqrt(Vector4.Dot(this, this));
-        ::std::sqrtf(x*x + y*y + z*z + w*w);
+        return ::std::sqrtf(x*x + y*y + z*z + w*w);
     }
 
     float sqrMagnitude() const

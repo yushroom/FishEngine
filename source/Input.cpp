@@ -10,7 +10,7 @@ Input::MouseButtonState Input::m_mouseButtonStates[3] = {Input::MouseButtonState
 
 float Input::m_mousePositionX = 0;
 float Input::m_mousePositionY = 0;
-float Input::m_axis[4] = {0, 0, 0, 0};
+float Input::m_axis[(int)Axis::AxisCount] = {0.0f};
 
 void Input::Init()
 {
@@ -18,6 +18,10 @@ void Input::Init()
         s = KeyState_None;
     for (auto& b : m_mouseButtonStates)
         b = MouseButtonState_None;
+    
+    for (auto& a : m_axis) {
+        a = 0.f;
+    }
 }
 
 bool Input::GetKey(KeyCode key)
@@ -70,7 +74,6 @@ bool Input::GetMouseButtonUp(int button)
 
 void Input::Update()
 {
-    //memset(m_keyStates, 0, 1024 * sizeof(KeyState));
     for (auto& s : m_keyStates) {
         if (s == KeyState_Up || s == KeyState_Down)
             s = KeyState_None;
@@ -80,6 +83,16 @@ void Input::Update()
         if (b == MouseButtonState_Down) b = MouseButtonState_Held;
         else if (b == MouseButtonState_Up) b = MouseButtonState_None;
     }
+    
+    for (auto& a : m_axis) {
+        a = 0.f;
+    }
+    //m_axis[(int)Axis::MouseScrollWheel] = 1.0f;
+}
+
+void Input::UpdateAxis(Axis axis, float value)
+{
+    m_axis[(int)axis] = value;
 }
 
 void Input::UpdateMousePosition(float xpos, float ypos)

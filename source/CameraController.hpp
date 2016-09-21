@@ -49,6 +49,11 @@ public:
             float y = m_dragSpeed * Input::GetAxis(Input::Axis::MouseY);
             transform()->Translate(-x, -y, 0);
         }
+        
+        float s = Input::GetAxis(Input::Axis::MouseScrollWheel);
+        //if (Input::GetAxis(<#FishEngine::Input::Axis axis#>))
+        auto t = Camera::main()->transform();
+        t->setLocalPosition(t->position() + 0.2f*s*t->forward());
     }
 };
 

@@ -34,10 +34,18 @@ public:
     };
 
     enum class Axis {
-        Vertical = 0,
+        Vertical = 0,   // w, a, s, d and arrow keys
         Horizontal,
-        MouseX,
+        Fire1,          // Control
+        Fire2,          // Option(Alt)
+        Fire3,          // Command
+        Jump,
+        MouseX,         // delta of mouse movement
         MouseY,
+        MouseScrollWheel,
+        WindowShakeX,   // movement of the window
+        WindwoShakeY,
+        AxisCount,
     };
 
     Input() = delete;
@@ -71,6 +79,7 @@ public:
     static void Init();
     static void Update();
 
+    static void UpdateAxis(Axis axis, float value);
     static void UpdateMousePosition(float xpos, float ypos);
     static void UpdateKeyState(KeyCode key, KeyState state);
     static void UpdateMouseButtonState(int button, MouseButtonState state);
@@ -84,7 +93,7 @@ private:
     static MouseButtonState m_mouseButtonStates[3];
     static float m_mousePositionX;
     static float m_mousePositionY;
-    static float m_axis[4];
+    static float m_axis[(int)Axis::AxisCount];
 };
 
 NAMESPACE_FISHENGINE_END

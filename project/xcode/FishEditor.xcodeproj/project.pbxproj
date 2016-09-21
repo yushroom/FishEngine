@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BF3211FF1D8EFB1E00FA80E6 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */; };
+		BF6E19EB1D919FA100C9D2E8 /* imgui_dock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */; };
 		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
 		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
 		BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */; };
@@ -57,6 +58,8 @@
 		BF3212031D90468100FA80E6 /* imgui_impl_glfw_gl3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_impl_glfw_gl3.h; path = ../../external/imgui/imgui_impl_glfw_gl3.h; sourceTree = "<group>"; };
 		BF3212041D90468100FA80E6 /* imgui_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_internal.h; path = ../../external/imgui/imgui_internal.h; sourceTree = "<group>"; };
 		BF3212051D90468100FA80E6 /* imgui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui.h; path = ../../external/imgui/imgui.h; sourceTree = "<group>"; };
+		BF6E19E81D919F4E00C9D2E8 /* imgui_dock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_dock.h; path = ../../external/imgui/imgui_dock.h; sourceTree = "<group>"; };
+		BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_dock.cpp; path = ../../external/imgui/imgui_dock.cpp; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
 		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
@@ -154,6 +157,8 @@
 		BFDC751B1D8EE0B90082A6DC /* ImGui */ = {
 			isa = PBXGroup;
 			children = (
+				BF6E19E81D919F4E00C9D2E8 /* imgui_dock.h */,
+				BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */,
 				BF3212021D90468100FA80E6 /* imconfig.h */,
 				BFDC751C1D8EE0D60082A6DC /* imgui_demo.cpp */,
 				BFDC751D1D8EE0D60082A6DC /* imgui_draw.cpp */,
@@ -264,6 +269,7 @@
 			files = (
 				BFDC75221D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp in Sources */,
 				BFDC751A1D8EE0330082A6DC /* Selection.cpp in Sources */,
+				BF6E19EB1D919FA100C9D2E8 /* imgui_dock.cpp in Sources */,
 				BFDC75211D8EE0D60082A6DC /* imgui_draw.cpp in Sources */,
 				BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */,
 				BFDC75201D8EE0D60082A6DC /* imgui_demo.cpp in Sources */,

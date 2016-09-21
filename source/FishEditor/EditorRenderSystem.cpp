@@ -65,7 +65,7 @@ void EditorRenderSystem::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     auto v = Scene::mainCamera()->viewport();
-    glViewport(v.x*m_width, v.y*m_height, v.z*m_width, v.z*m_height);
+    glViewport(v.x*m_width, v.y*m_height, v.z*m_width, v.w*m_height);
 
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

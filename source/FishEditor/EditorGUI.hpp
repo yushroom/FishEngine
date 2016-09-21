@@ -27,6 +27,8 @@ public:
 
     static void Clean();
     
+    static bool Button(const char* text);
+    
     static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
     
 private:

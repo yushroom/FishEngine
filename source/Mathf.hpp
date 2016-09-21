@@ -28,7 +28,7 @@ public:
     }
 
     static int Abs(int value) {
-        return ::std::abs(value);
+        return ::std::fabsf(value);
     }
 
     static float Sign(float f)

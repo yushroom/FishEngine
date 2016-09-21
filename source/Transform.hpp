@@ -80,22 +80,26 @@ public:
 
     void setLocalPosition(const Vector3& position) {
         m_localPosition = position;
+        MakeDirty();
     }
 
     void setLocalPosition(const float x, const float y, const float z) {
         m_localPosition.x = x;
         m_localPosition.y = y;
         m_localPosition.z = z;
+        MakeDirty();
     }
 
     void setLocalScale(const Vector3& scale) {
         m_localScale = scale;
+        MakeDirty();
     }
 
     void setLocalScale(const float x, const float y, const float z) {
         m_localScale.x = x;
         m_localScale.y = y;
         m_localScale.z = z;
+        MakeDirty();
     }
 
     // The rotation of the transform relative to the parent transform's rotation.

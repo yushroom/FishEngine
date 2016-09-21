@@ -37,7 +37,7 @@ void Material::OnInspectorGUI() {
             if (u.type == GL_FLOAT) {
                 ImGui::SliderFloat(u.name.c_str(), &m_uniforms.floats[u.name], 0, 1);
             } else if (u.type == GL_FLOAT_VEC3) {
-                ImGui::InputFloat3(u.name.c_str(), glm::value_ptr(m_uniforms.vec3s[u.name]));
+                ImGui::InputFloat3(u.name.c_str(), m_uniforms.vec3s[u.name].data());
             }
         }
     }

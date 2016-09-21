@@ -3,14 +3,10 @@
 
 #include "Vector3.hpp"
 #define GLM_FORCE_LEFT_HANDED
-//#include <glm/glm.hpp>
-//#include <glm/vec3.hpp>                 // glm::vec3
-//#include <glm/vec4.hpp>                 // glm::vec4
-//#include <glm/mat4x4.hpp>               // glm::mat4
-//#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-//#include <glm/gtc/constants.hpp>        // glm::pi
 #include <glm/gtx/quaternion.hpp>       // glm::quat
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+
+namespace FishEngine {
 
 class Quaternion
 {
@@ -34,7 +30,7 @@ public:
     Vector3 eulerAngles() const
     {
     	//return Vector3(pitch(), yaw(), roll());
-        return glm::eulerAngles(glm::quat(w, x, y, z));
+        return glm::degrees(glm::eulerAngles(glm::quat(w, x, y, z)));
     }
 
     float roll() const {
@@ -77,23 +73,24 @@ public:
 
     friend Vector3 operator *(Quaternion rotation, Vector3 point)
     {
-        float num = rotation.x * 2.f;
-        float num2 = rotation.y * 2.f;
-        float num3 = rotation.z * 2.f;
-        float num4 = rotation.x * num;
-        float num5 = rotation.y * num2;
-        float num6 = rotation.z * num3;
-        float num7 = rotation.x * num2;
-        float num8 = rotation.x * num3;
-        float num9 = rotation.y * num3;
-        float num10 = rotation.w * num;
-        float num11 = rotation.w * num2;
-        float num12 = rotation.w * num3;
-        Vector3 result;
-        result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
-        result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
-        result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
-        return result;
+        return glm::quat(rotation) * glm::vec3(point);
+    //    float num = rotation.x * 2.f;
+    //    float num2 = rotation.y * 2.f;
+    //    float num3 = rotation.z * 2.f;
+    //    float num4 = rotation.x * num;
+    //    float num5 = rotation.y * num2;
+    //    float num6 = rotation.z * num3;
+    //    float num7 = rotation.x * num2;
+    //    float num8 = rotation.x * num3;
+    //    float num9 = rotation.y * num3;
+    //    float num10 = rotation.w * num;
+    //    float num11 = rotation.w * num2;
+    //    float num12 = rotation.w * num3;
+    //    Vector3 result;
+    //    result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
+    //    result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
+    //    result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
+    //    return result;
     }
 
 
@@ -131,7 +128,7 @@ public:
 
     static Quaternion Euler(const Vector3& euler)
     {
-        return glm::quat(euler);
+        return glm::quat(glm::radians((glm::vec3)euler));
         //Quaternion result;
         //auto rad = euler * (Mathf::Deg2Rad * 0.5f);
         //auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
@@ -154,7 +151,7 @@ public:
     static Quaternion Inverse(const Quaternion& rotation)
     {
         float num = 1.0f / Dot(rotation, rotation);
-        return Quaternion(-rotation.x * num, -rotation.y * num, -rotation.z*num, -rotation.w*num);
+        return Quaternion(-rotation.x * num, -rotation.y * num, -rotation.z*num, rotation.w*num);
     }
 
     static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
@@ -189,10 +186,9 @@ public:
         return Quaternion::SlerpUnclamped(from, to, t);
     }
 
-
-
-
     static const Quaternion identity;
 };
+
+}
 
 #endif // Quaternion_hpp

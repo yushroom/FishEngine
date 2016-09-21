@@ -22,7 +22,7 @@ std::string camelCaseToReadable(const std::string& str)
     std::string ret;
     ret.reserve(str.size()*2); // at most: ceil(str.size()/2)*3
     ret.push_back(str[0]);
-    for (int i = 1; i < str.size(); ++i) {
+    for (size_t i = 1; i < str.size(); ++i) {
         char c = str[i];
         if (isupper(c) && !isupper(str[i-1]))
             ret.push_back(' ');

@@ -5,23 +5,22 @@
 
 NAMESPACE_FISHENGINE_BEGIN
 
-FishEngine::Camera::Camera(float fov, float aspect, float zNear, float zFar) : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar)
+Camera::Camera(float fov, float aspect, float zNear, float zFar) : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar)
 {
 
 }
 
 
-FishEngine::Matrix4x4 FishEngine::Camera::projectionMatrix() const
+Matrix4x4 Camera::projectionMatrix() const
 {
-    //return glm::perspective(glm::radians(m_fov), m_aspect, m_zNear, m_zFar);
     if (m_isDirty) {
-        m_projectMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_zNear, m_zFar);
+        m_projectMatrix = Matrix4x4::Perspective(m_fov, m_aspect, m_zNear, m_zFar);
         m_isDirty = false;
     }
     return m_projectMatrix;
 }
 
-void FishEngine::Camera::OnInspectorGUI()
+void Camera::OnInspectorGUI()
 {
     if (ImGui::SliderFloat("Field of View", &m_fov, 1, 179)) {
         m_isDirty = true;
@@ -32,10 +31,10 @@ void FishEngine::Camera::OnInspectorGUI()
     if (ImGui::InputFloat("Clipping Planes(Far)", &m_zFar)) {
         m_isDirty = true;
     }
-    ImGui::InputFloat4("Viewport Rect", glm::value_ptr(m_viewport));
+    ImGui::InputFloat4("Viewport Rect", m_viewport.data());
 }
 
-FishEngine::Matrix4x4 FishEngine::Camera::worldToCameraMatrix() const
+Matrix4x4 Camera::worldToCameraMatrix() const
 {
     return gameObject()->transform()->worldToLocalMatrix();
 }

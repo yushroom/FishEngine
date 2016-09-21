@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\external\imgui\imgui_dock.h" />
     <ClInclude Include="..\..\source\App.hpp" />
     <ClInclude Include="..\..\source\Behaviour.hpp" />
     <ClInclude Include="..\..\source\Camera.hpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\external\imgui\imgui.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\external\imgui\imgui_dock.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="..\..\source\App.cpp" />

@@ -6,6 +6,8 @@
 #include <limits>
 #include <algorithm>
 
+namespace FishEngine {
+
 class Mathf {
 
 public:
@@ -28,7 +30,7 @@ public:
     }
 
     static int Abs(int value) {
-        return ::std::fabsf(value);
+        return ::std::abs(value);
     }
 
     static float Sign(float f)
@@ -278,5 +280,6 @@ public:
 
 }; // namespace Mathf
 
+}
 
 #endif // Mathf_hpp

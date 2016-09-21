@@ -36,8 +36,8 @@ void MeshRenderer::Render() const
     uniforms.mat4s["MATRIX_VP"] = proj * view;
     uniforms.mat4s["MATRIX_MVP"] = mvp;
     uniforms.mat4s["MATRIX_MV"] = mv;
-    uniforms.mat4s["MATRIX_IT_M"] = glm::inverse(glm::transpose(model));
-    uniforms.mat4s["MATRIX_IT_MV"] = glm::inverse(glm::transpose(mv));
+    uniforms.mat4s["MATRIX_IT_M"] = model.transpose().inverse();
+    uniforms.mat4s["MATRIX_IT_MV"] = mv.transpose().inverse();
     //auto camera = Scene::getMainCamera();
     uniforms.vec3s["_WorldSpaceCameraPos"] = camera->transform()->position();
 

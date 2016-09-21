@@ -3,6 +3,8 @@
 
 #include "GLEnvironment.hpp"
 #include <set>
+#include "Vector3.hpp"
+#include "Matrix4x4.hpp"
 
 #define PositionIndex 0
 #define NormalIndex 1

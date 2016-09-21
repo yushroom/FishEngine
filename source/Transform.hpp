@@ -3,24 +3,10 @@
 
 #include "GLEnvironment.hpp"
 #include "Component.hpp"
+#include "Quaternion.hpp"
+#include "Matrix4x4.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
-
-// Creates a rotation which rotates angle degrees around axis.
-static Quaternion angleAxis(float angle, Vector3 axis)
-{
-    axis = glm::normalize(axis);
-    angle = glm::radians(angle);
-    return glm::angleAxis(angle, axis);
-}
-
-// Creates a rotation which rotates from fromDirection to toDirection.
-static Quaternion fromToRotation(const Vector3& fromDirection, const Vector3& toDirection)
-{
-    auto start = normalize(fromDirection);
-    auto dest = normalize(toDirection);
-    return glm::rotation(start, dest);
-}
 
 enum class Space {
     World,
@@ -46,7 +32,8 @@ public:
     // The position of the transform in world space.
     Vector3 position() const {
         Update();
-        return m_localToWorldMatrix * Vector4(0, 0, 0, 1);
+        //return m_localToWorldMatrix * Vector4(0, 0, 0, 1);
+        return m_localToWorldMatrix.MultiplyPoint(0, 0, 0);
     }
 
     // The global scale of the object(Read Only).
@@ -65,7 +52,7 @@ public:
 
     // The rotation as Euler angles in degrees.
     Vector3 eulerAngles() const {
-        return glm::eulerAngles(rotation());
+        return rotation().eulerAngles();
     }
 
     // Position of the transform relative to the parent transform.
@@ -109,12 +96,13 @@ public:
 
     // The rotation as Euler angles in degrees relative to the parent transform's rotation.
     Vector3 localEulerAngles() const {
-        m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
+        m_localEulerAngles = m_localRotation.eulerAngles();
         return m_localEulerAngles;
     }
 
     void setLocalEulerAngles(const Vector3& eulerAngles) {
-        m_localRotation = glm::quat(glm::radians(eulerAngles));
+        //m_localRotation = glm::quat(glm::radians((glm::vec3)eulerAngles));
+        m_localRotation.setEulerAngles(eulerAngles);
         MakeDirty();
     }
     
@@ -125,7 +113,7 @@ public:
     // position is in world space
     void setPosition(const Vector3& position) {
         if (!m_parent.expired()) {
-            m_localPosition = parent()->worldToLocalMatrix() * Vector4(position, 1);
+            m_localPosition = parent()->worldToLocalMatrix().MultiplyPoint(position);
         } else {
             m_localPosition = position;
         }
@@ -221,7 +209,7 @@ public:
      * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
      * @return: Transform Transform child by index.
      */
-    std::shared_ptr<Transform> GetChild(const int index);
+    std::shared_ptr<Transform> GetChild(const size_t index);
     
 private:
     friend class FishEditor::EditorGUI;

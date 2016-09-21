@@ -104,9 +104,9 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
         //| aiProcess_FlipUVs
         //| aiProcess_ConvertToLeftHanded
         ;
-#ifdef GLM_FORCE_LEFT_HANDED
+//#ifdef GLM_FORCE_LEFT_HANDED
     load_option |= aiProcess_ConvertToLeftHanded;
-#endif
+//#endif
     if (flags & MeshLoadFlag_RegenerateNormal) {
         importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
         load_option |= aiProcess_GenSmoothNormals;

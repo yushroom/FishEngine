@@ -45,7 +45,7 @@ void RenderSystem::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
     auto v = Scene::mainCamera()->m_viewport;
-    glViewport(v.x*m_width, v.y*m_height, v.z*m_width, v.z*m_height);
+    glViewport(GLint(v.x*m_width), GLint(v.y*m_height), GLsizei(v.z*m_width), GLsizei(v.z*m_height));
         
 //#ifdef GLM_FORCE_LEFT_HANDED
 //    glFrontFace(GL_CW);

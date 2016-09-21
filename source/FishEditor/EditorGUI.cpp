@@ -65,11 +65,12 @@ void EditorGUI::Update()
     ImGuiContext& g = *GImGui;
     ImGuiStyle& style = g.Style;
     
-    ImGui::BeginDock("Dock");
-    ImGui::EndDock();
+    //ImGui::BeginDock("Dock");
+    //ImGui::EndDock();
     
     // Inspector Editor
-    ImGui::BeginDock("Inspector", nullptr);
+    //ImGui::BeginDock("Inspector", nullptr);
+    ImGui::Begin("Inspector", nullptr);
     ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
     auto go = Selection::activeGameObject();
     if (go != nullptr) {
@@ -120,7 +121,8 @@ void EditorGUI::Update()
     }
     
     EditorGUI::Button("Add Component");
-    ImGui::EndDock(); // Inspector Editor
+    //ImGui::EndDock(); // Inspector Editor
+    ImGui::End();
     
     glClear(GL_DEPTH_BUFFER_BIT);
     DrawSceneGizmo();
@@ -148,7 +150,8 @@ void EditorGUI::Update()
 //    }
     
     // Hierarchy view
-    ImGui::BeginDock("Hierarchy");
+    //ImGui::BeginDock("Hierarchy");
+    ImGui::Begin("Hierarchy");
     if (ImGui::Button("Create")) {
         auto go = Scene::CreateGameObject("GameObject");
     }
@@ -168,12 +171,13 @@ void EditorGUI::Update()
         }
     }
     ImGui::PopStyleVar();
-    ImGui::EndDock();
+    //ImGui::EndDock();
+    ImGui::End();
     
     
     // Project view
-    ImGui::BeginDock("Project");
-    ImGui::EndDock();
+    //ImGui::BeginDock("Project");
+    //ImGui::EndDock();
     
 //    if (m_showAssectSelectionDialogBox) {
 //        ImGui::OpenPopup("Select ...");
@@ -281,23 +285,22 @@ void EditorGUI::DrawSceneGizmo()
 {
     int w = EditorRenderSystem::width();
     int h = EditorRenderSystem::height();
-    glViewport(0, 0, w*0.1f, h*0.1f);
+    glViewport(0, 0, GLsizei(w*0.1f), GLsizei(h*0.1f));
     
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
     
-#ifdef GLM_FORCE_LEFT_HANDED
+//#ifdef GLM_FORCE_LEFT_HANDED
     auto camera_pos = Vector3(0, 0, -5);
-#else
-    auto camera_pos = Vector3(0, 0, 5);
-#endif
-    sceneGizmoMaterial->SetVector3("unity_LightPosition", glm::normalize(camera_pos));
-    auto camera = Scene::mainCamera();
-    //auto view = camera->worldToCameraMatrix();
-    auto view = glm::lookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
+//#else
+//    auto camera_pos = Vector3(0, 0, 5);
+//#endif
+    sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
+    auto camera = Camera::main();
+    auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
     auto proj = camera->projectionMatrix();
     auto vp = proj * view;
-    auto model = glm::mat4(glm::inverse(camera->transform()->rotation()));
+    auto model = Matrix4x4(Quaternion::Inverse(camera->transform()->rotation()));
     
     ShaderUniforms uniforms;
     sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
@@ -308,7 +311,7 @@ void EditorGUI::DrawSceneGizmo()
     shader->CheckStatus();
     cubeMesh->Render();
 
-    auto s = glm::scale(glm::mat4(), Vector3(0.5f, 0.75f, 0.5f));
+    auto s = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
     
     float f[] = {
         -1,  0,  0,    0, 0, -90,
@@ -326,7 +329,7 @@ void EditorGUI::DrawSceneGizmo()
         //t.Update();
         auto modelMat = model * t.localToWorldMatrix() * s;
         sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
-        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", glm::inverse(glm::transpose(view*modelMat)));
+        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
         if (i >= 3)
             sceneGizmoMaterial->SetVector3("_Color", Vector3(f[j], f[j+1], f[j+2]));
         sceneGizmoMaterial->Update();
@@ -336,7 +339,7 @@ void EditorGUI::DrawSceneGizmo()
     shader->PostRender();
     
     auto v = camera->viewport();
-    glViewport(w*v.x, h*v.y, w*v.z, h*v.w);
+    glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
 }
 
 

@@ -2,14 +2,9 @@
 #define Vector3_hpp
 
 #include "Mathf.hpp"
-//#include <glm/glm.hpp>
+#define GLM_FORCE_LEFT_HANDED
 #include <glm/vec3.hpp>                 // glm::vec3
 #include <glm/vec4.hpp>                 // glm::vec4
-//#include <glm/mat4x4.hpp>               // glm::mat4
-//#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-//#include <glm/gtc/constants.hpp>        // glm::pi
-//#include <glm/gtx/quaternion.hpp>       // glm::quat
-//#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 
 #ifdef _DEBUG
@@ -19,6 +14,7 @@
 #define Assert(exp) void(0)
 #endif
 
+namespace FishEngine{
 
 class Vector3
 {
@@ -29,8 +25,8 @@ public:
     };
 
 
-    Vector3(const float xx, const float yy, const float zz)
-        : x(xx), y(yy), z(zz)
+    Vector3(const float x, const float y, const float z)
+        : x(x), y(y), z(z)
     {
         Assert(!hasNaNs());
     }
@@ -85,7 +81,7 @@ public:
     Vector3         operator-() const                   { return Vector3(-x, -y, -z); }
     Vector3         operator*(const float f) const      { Assert(!isnan(f)); return Vector3(x * f, y * f, z * f); }
     Vector3         operator*(const Vector3 v) const    { return Vector3(x*v.x, y*v.y, z*v.z); }
-    Vector3         operator/(const float f) const      { Assert(!isnan(f)); return Vector3(x / f, y / f, z / f); }
+    Vector3         operator/(const float f) const      { Assert(!isnan(f) && f!=0.f); return Vector3(x / f, y / f, z / f); }
     friend Vector3  operator*(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(v.x * f, v.y * f, v.z * f); }
     friend Vector3  operator/(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(v.x / f, v.y / f, v.z / f); }
     Vector3         operator+(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x + v.x, y + v.y, z + v.z); }
@@ -102,7 +98,7 @@ public: // Static
 
     static float Angle(const Vector3& from, const Vector3& to)
     {
-        return Mathf::Degrees(::std::acosf(Dot(Normalize(from), Normalize(to))));
+        return Mathf::Acos(Dot(Normalize(from), Normalize(to)));
     }
 
     static float Magnitude(const Vector3& a)
@@ -278,11 +274,16 @@ public:
         float m[4];
     };
 
-    Vector4(float xx, float yy, float zz, float ww) : x(xx), y(yy), z(zz), w(ww) {
+    Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {
         Assert(!hasNaNs());
     }
     Vector4() : Vector4(0, 0, 0, 0) {}
     Vector4(const Vector3& v3, float w) : Vector4(v3.x, v3.y, v3.z, w) {}
+
+    Vector4(const glm::vec4& glm_vec4) : Vector4(glm_vec4.x, glm_vec4.y, glm_vec4.z, glm_vec4.w) {}
+    operator glm::vec4() const {
+        return glm::vec4(x, y, z, w);
+    }
 
     const float* data() const {
         return m;
@@ -392,6 +393,10 @@ public:
         return Vector4(Mathf::Max(lhs.x, rhs.x), Mathf::Max(lhs.y, rhs.y), Mathf::Max(lhs.z, rhs.z), Mathf::Max(lhs.w, rhs.w));
     }
 
+    static float Dot(const Vector4& lhs, const Vector4& rhs)
+    {
+        return lhs.x*rhs.x + lhs.y*rhs.y + lhs.z*rhs.z + lhs.w*rhs.w;
+    }
 
 
     static const Vector4 one;
@@ -401,5 +406,7 @@ public:
 private:
     bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z) || isnan(w); }
 };
+
+}
 
 #endif // Vector3_hpp

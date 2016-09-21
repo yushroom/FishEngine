@@ -114,6 +114,9 @@
     <ClInclude Include="..\..\source\Mathf.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\external\imgui\imgui_dock.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Vector3.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\imgui\imgui_dock.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

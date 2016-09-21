@@ -84,8 +84,8 @@ void GameLoop::Run()
         
         RenderSystem::Render();
         
-        double new_t = glfwGetTime();
-        float interval = float(new_t) - Time::m_time;
+        float new_t = (float)glfwGetTime();
+        float interval = new_t - Time::m_time;
         if (interval < fixed_delta_time) {
             std::chrono::milliseconds sleep_time((long long)((fixed_delta_time-interval)*1000));
             std::this_thread::sleep_for(sleep_time);

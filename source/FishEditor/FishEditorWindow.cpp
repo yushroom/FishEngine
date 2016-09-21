@@ -15,7 +15,7 @@
 
 #include "EditorRenderSystem.hpp"
 
-const uint32_t WIDTH = 800, HEIGHT = 600;
+const uint32_t WIDTH = 1280, HEIGHT = 960;
 
 using namespace FishEngine;
 
@@ -87,14 +87,14 @@ void FishEditorWindow::Run()
         
         EditorRenderSystem::Render();
         
-        double new_t = glfwGetTime();
-        float interval = float(new_t) - old_time;
+        float new_t = (float)glfwGetTime();
+        float interval = new_t - old_time;
         if (interval < fixed_delta_time) {
             std::chrono::milliseconds sleep_time((long long)((fixed_delta_time - interval) * 1000));
             std::this_thread::sleep_for(sleep_time);
         }
 
-        old_time = glfwGetTime();
+        old_time = (float)glfwGetTime();
     }
 }
 
@@ -131,7 +131,7 @@ void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, d
     //    if (handled)
     //        return;
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-    Input::UpdateAxis(Input::Axis::MouseScrollWheel, yoffset);
+    Input::UpdateAxis(Input::Axis::MouseScrollWheel, (float)yoffset);
 }
 
 //GLfloat lastX = 400, lastY = 300;
@@ -149,7 +149,8 @@ void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int hei
 {
     int w, h;
     glfwGetFramebufferSize(window, &w, &h);
-    EditorRenderSystem::OnWindowSizeChanged(w, h);
+    if (w != 0 && h != 0)
+        EditorRenderSystem::OnWindowSizeChanged(w, h);
     //glViewport(0, 0, width, height);
     //GUI::OnWindowSizeChanged(width, height);
 }

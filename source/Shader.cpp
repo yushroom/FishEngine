@@ -304,7 +304,7 @@ void Shader::BindUniforms(const ShaderUniforms& uniforms)
         if (u.type == GL_FLOAT_MAT4) {
             auto it = uniforms.mat4s.find(u.name);
             if (it != uniforms.mat4s.end()) {
-                glUniformMatrix4fv(u.location, 1, GL_FALSE, glm::value_ptr(it->second));
+                glUniformMatrix4fv(u.location, 1, GL_TRUE, it->second.data());
                 u.binded = true;
             }
 //            else {
@@ -314,7 +314,7 @@ void Shader::BindUniforms(const ShaderUniforms& uniforms)
         else if (u.type == GL_FLOAT_VEC3) {
             auto it = uniforms.vec3s.find(u.name);
             if (it != uniforms.vec3s.end()) {
-                glUniform3fv(u.location, 1, glm::value_ptr(it->second));
+                glUniform3fv(u.location, 1, it->second.data());
                 u.binded = true;
             }
 //            else {

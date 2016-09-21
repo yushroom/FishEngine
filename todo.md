@@ -22,7 +22,9 @@
 
       ​	暂时的解决方案：节点变化（第一次变脏）时将所有子节点标记为脏。
 
-- [ ] 最小化窗口是aspect是变成nan，glm::perspective会abort掉
+- [x] 最小化窗口是aspect是变成nan，glm::perspective会abort掉
+
+- [ ] 改成左手系之后cubemap反了
 
 ## Editor
 
@@ -49,6 +51,8 @@
 - [x] Editor的帧率改到30
 
 - [x] 相机旋转时transform反应不正常，会越退越远
+
+- [ ] Docking GUI
 
       ​
 

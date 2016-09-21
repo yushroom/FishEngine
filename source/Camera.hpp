@@ -3,6 +3,7 @@
 
 #include "Script.hpp"
 #include "GLEnvironment.hpp"
+#include "Matrix4x4.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 

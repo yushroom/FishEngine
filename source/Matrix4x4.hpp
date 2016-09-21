@@ -4,17 +4,14 @@
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
 #define GLM_FORCE_LEFT_HANDED
-//#include <glm/glm.hpp>
-//#include <glm/vec3.hpp>                 // glm::vec3
-//#include <glm/vec4.hpp>                 // glm::vec4
-#include <glm/mat4x4.hpp>               // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-//#include <glm/gtc/constants.hpp>        // glm::pi
 #include <glm/gtx/quaternion.hpp>       // glm::quat
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 
-// Matrices are column major.
+namespace FishEngine {
+
+// Matrices are row major.
 class Matrix4x4
 {
 public:
@@ -52,14 +49,19 @@ public:
 
     }
 
+    Matrix4x4(const Quaternion& rotaton) : Matrix4x4(glm::mat4((glm::quat)rotaton))
+    {
+
+    }
+
     Matrix4x4(const glm::mat4& glm_mat4)
     {
-        memcpy(m, glm::value_ptr(glm_mat4), 16*sizeof(float));
+        memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
     }
 
     operator glm::mat4() const {
         glm::mat4 result;
-        memcpy(glm::value_ptr(result), m, 16 * sizeof(float));
+        memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
         return result;
     }
 
@@ -79,26 +81,36 @@ public:
     //    return rows[index];
     //}
 
-    //friend Matrix4x4 operator*(const Matrix4x4& lhs, Matrix4x4 rhs)
+    friend Matrix4x4 operator*(const Matrix4x4& lhs, Matrix4x4 rhs)
+    {
+        //return glm::mat4(lhs) * glm::mat4(rhs);
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result.m[i][j] = lhs.m[i][0] * rhs.m[0][j] + lhs.m[i][1] * rhs.m[1][j] + lhs.m[i][2] * rhs.m[2][j] + lhs.m[i][3] * rhs.m[3][j];
+            }
+        }
+        return result;
+    }
+
+    friend const Vector4 operator*(const Matrix4x4& lhs, const Vector4& rhs) {
+        ////return glm::mat4(lhs) * glm::vec4(rhs);
+        //Vector4 result;
+        //for (int i = 0; i < 4; i++) {
+        //    //result[i] = lhs.m[i][0] * rhs.x + lhs.m[i][1] * rhs.y + lhs.m[i][2] * rhs.z + lhs.m[i][3] * rhs.w;
+        //    result[i] = Vector4::Dot(lhs.rows[i], rhs);
+        //}
+        //return result;
+        return Vector4(
+            Vector4::Dot(lhs.rows[0], rhs), 
+            Vector4::Dot(lhs.rows[1], rhs), 
+            Vector4::Dot(lhs.rows[2], rhs), 
+            Vector4::Dot(lhs.rows[3], rhs));
+    }
+
+
+    void operator*=(const Matrix4x4& rhs);
     //{
-    //    Matrix4x4 result;
-    //    for (int i = 0; i < 4; i++) {
-    //        for (int j = 0; j < 4; j++) {
-    //            result.m[i][j] = lhs.m[i][0] * rhs.m[0][j] + lhs.m[i][1] * rhs.m[1][j] + lhs.m[i][2] * rhs.m[2][j] + lhs.m[i][3] * rhs.m[3][j];
-    //        }
-    //    }
-    //    return result;
-    //}
-
-    //friend const Vector3 operator*(const Matrix4x4& lhs, const Vector4& rhs) {
-    //    Vector3 result;
-    //    for (int i = 0; i < 3; i++) {
-    //        result[i] = lhs.m[i][0]*rhs.x + lhs.m[i][1]*rhs.y + lhs.m[i][2]*rhs.z + lhs.m[i][3] * rhs.w;
-    //    }
-    //    return result;
-    //}
-
-    //void operator*=(const Matrix4x4& rhs) {
     //    for (int i = 0; i < 4; i++) {
     //        float f[4];
     //        for (int j = 0; j < 4; j++) {
@@ -111,7 +123,7 @@ public:
     //    }
     //}
 
-    //friend Matrix4x4 operator*(const Matrix4x4& m, const float f)
+    friend Matrix4x4 operator*(const Matrix4x4& m, const float f);
     //{
     //    Matrix4x4 result(m);
     //    for (int i = 0; i < 4; ++i)
@@ -120,13 +132,14 @@ public:
     //    return result;
     //}
 
-    Vector3 MultiplyPoint(Vector3 v)
+    // Transforms a position by this matrix (generic).
+    Vector3 MultiplyPoint(float x, float y, float z)
     {
         Vector3 result;
-        result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
-        result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
-        result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
-        float num = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3];
+        result.x = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3];
+        result.y = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3];
+        result.z = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3];
+        float num = m[3][0] * x + m[3][1] * y + m[3][2] * z + m[3][3];
         num = 1.f / num;
         result.x *= num;
         result.y *= num;
@@ -134,13 +147,42 @@ public:
         return result;
     }
 
-    Vector3 MultiplyPoint3x4(Vector3 v)
+    // Transforms a position by this matrix (generic).
+    Vector3 MultiplyPoint(const Vector3& v)
+    {
+        return MultiplyPoint(v.x, v.y, v.z);
+    }
+
+    // Transforms a position by this matrix (fast).
+    Vector3 MultiplyPoint3x4(float x, float y, float z)
     {
         Vector3 result;
-        result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
-        result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
-        result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
+        result.x = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3];
+        result.y = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3];
+        result.z = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3];
         return result;
+    }
+
+    // Transforms a position by this matrix (fast).
+    Vector3 MultiplyPoint3x4(const Vector3& v)
+    {
+        return MultiplyPoint3x4(v.x, v.y, v.z);
+    }
+
+    // Transforms a direction by this matrix.
+    Vector3 MultiplyVector(float x, float y, float z)
+    {
+        Vector3 result;
+        result.x = m[0][0] * x + m[0][1] * y + m[0][2] * z;
+        result.y = m[1][0] * x + m[1][1] * y + m[1][2] * z;
+        result.z = m[2][0] * x + m[2][1] * y + m[2][2] * z;
+        return result;
+    }
+
+    // Transforms a direction by this matrix.
+    Vector3 MultiplyVector(const Vector3& v)
+    {
+        return MultiplyVector(v.x, v.y, v.z);
     }
 
     float determinant() const
@@ -218,29 +260,59 @@ public:
 
     bool isIdentity() const;
 
-    //Matrix4x4 transpose() const
-    //{
-    //    Matrix4x4 result;
-    //    for (int i = 0; i < 4; ++i) {
-    //        for (int j = 0; j < 4; ++j) {
-    //            result.m[i][j] = m[j][i];
-    //        }
-    //    }
-    //    return result;
-    //}
+    Matrix4x4 transpose() const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                result.m[i][j] = m[j][i];
+            }
+        }
+        return result;
+    }
 
 
-    //void SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
-    //{
-    //    *this = glm::scale(glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q), (glm::vec3)s);
-    //}
+    void SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
+    {
+        *this = glm::scale(glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q), (glm::vec3)s);
+    }
 
-    //static Matrix4x4 TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
-    //{
-    //    Matrix4x4 mat;
-    //    mat.SetTRS(pos, q, s);
-    //    return mat;
-    //}
+    static Matrix4x4 TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
+    {
+        Matrix4x4 mat;
+        mat.SetTRS(pos, q, s);
+        return mat;
+    }
+
+
+    static Matrix4x4 Scale(float x, float y, float z)
+    {
+        return Matrix4x4(
+            x, 0, 0, 0,
+            0, y, 0, 0,
+            0, 0, z, 0,
+            0, 0, 0, 1);
+    }
+
+    static Matrix4x4 Scale(const Vector3& scale)
+    {
+        return Scale(scale.x, scale.y, scale.z);
+    }
+
+    Quaternion ToRotation()
+    {
+        return glm::quat_cast((glm::mat4)*this);
+    }
+
+    static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar)
+    {
+        return glm::perspectiveLH(glm::radians(fov), aspect, zNear, zFar);
+    }
+
+    static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up)
+    {
+        return glm::lookAtLH(glm::vec3(eye), glm::vec3(center), glm::vec3(up));
+    }
 
     //static Matrix4x4 LookAtLH(const Vector3& eye, const Vector3& center, const Vector3 up)
     //{
@@ -268,5 +340,7 @@ public:
     static const Matrix4x4 identity;
     static const Matrix4x4 zero;
 };
+
+}
 
 #endif //Matrix4x4_hpp

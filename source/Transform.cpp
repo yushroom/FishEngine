@@ -21,14 +21,14 @@ Transform::~Transform()
 
 void Transform::OnInspectorGUI()
 {
-    if (ImGui::InputFloat3("Position", glm::value_ptr(m_localPosition))) {
+    if (ImGui::InputFloat3("Position", m_localPosition.data())) {
         MakeDirty();
     }
-    if (ImGui::InputFloat3("Rotation", glm::value_ptr(m_localEulerAngles))) {
-        m_localRotation = glm::quat(glm::radians((m_localEulerAngles)));
+    if (ImGui::InputFloat3("Rotation", m_localEulerAngles.data())) {
+        m_localRotation.setEulerAngles(m_localEulerAngles);
         MakeDirty();
     }
-    if (ImGui::InputFloat3("Scale", glm::value_ptr(m_localScale))) {
+    if (ImGui::InputFloat3("Scale", m_localScale.data())) {
         MakeDirty();
     }
 }
@@ -37,32 +37,32 @@ void Transform::Update() const
 {
     if (!dirtyInHierarchy())
         return;
-    m_localEulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
-    m_localToWorldMatrix = glm::scale(glm::translate(glm::mat4(1.0f), m_localPosition) * glm::mat4_cast(m_localRotation), m_localScale);
+    m_localEulerAngles = m_localRotation.eulerAngles();
+    m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
     if (!m_parent.expired())
         m_localToWorldMatrix = m_parent.lock()->localToWorldMatrix() * m_localToWorldMatrix;
-    m_worldToLocalMatrix = glm::inverse(m_localToWorldMatrix);
-    m_rotation = glm::quat_cast(m_localToWorldMatrix);
+    m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
+    m_rotation = m_localToWorldMatrix.ToRotation();
     m_isDirty = false;
 }
 
 void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
 {
-    auto m = glm::lookAt(m_localPosition, target, worldUp);
-    m_localRotation = glm::quat_cast(glm::inverse(m));
+    auto m = Matrix4x4::LookAt(m_localPosition, target, worldUp);
+    m_localRotation = m.inverse().ToRotation();
     MakeDirty();
 }
 
 Vector3 Transform::TransformDirection(const Vector3& direction) const
 {
     Update();
-    return m_localToWorldMatrix * Vector4(direction, 0);
+    return m_localToWorldMatrix.MultiplyVector(direction);
 }
 
 Vector3 FishEngine::Transform::InverseTransformDirection(const Vector3& direction) const
 {
     Update();
-    return m_worldToLocalMatrix * Vector4(direction, 0);
+    return m_worldToLocalMatrix.MultiplyVector(direction);
 }
 
 void Transform::Translate(const Vector3& translation, Space relativeTo /*= Space::Self*/)
@@ -95,7 +95,7 @@ void Transform::RotateAround(const Vector3& point, const Vector3& axis, float an
 {
     // step1: update position
     auto vector = this->position();
-    auto rotation = angleAxis(angle, axis);
+    auto rotation = Quaternion::AngleAxis(angle, axis);
     Vector3 vector2 = vector - point;
     vector2 = rotation * vector2;
     vector = point + vector2;
@@ -130,14 +130,14 @@ void Transform::SetParent(std::shared_ptr<Transform> parent)
     MakeDirty();
 }
 
-std::shared_ptr<Transform> Transform::GetChild(const int index) {
+std::shared_ptr<Transform> Transform::GetChild(const size_t index) {
     if (index < 0 || index >= m_children.size()) {
         Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
         return nullptr;
     }
     
     auto p = m_children.begin();
-    for (int i = 0; i < index; ++i) {
+    for (size_t i = 0; i < index; ++i) {
         p++;
     }
     return p->lock();

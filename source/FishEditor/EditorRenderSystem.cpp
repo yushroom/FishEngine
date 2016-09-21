@@ -47,9 +47,9 @@ void EditorRenderSystem::Init()
     Material::Init();
     EditorGUI::Init();
     Scene::Init();
-#ifdef GLM_FORCE_LEFT_HANDED
+//#ifdef GLM_FORCE_LEFT_HANDED
     glFrontFace(GL_CW);
-#endif
+//#endif
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -65,7 +65,7 @@ void EditorRenderSystem::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     auto v = Scene::mainCamera()->viewport();
-    glViewport(v.x*m_width, v.y*m_height, v.z*m_width, v.w*m_height);
+    glViewport(GLint(v.x*m_width), GLint(v.y*m_height), GLsizei(v.z*m_width), GLsizei(v.w*m_height));
 
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

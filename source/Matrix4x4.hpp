@@ -109,7 +109,7 @@ public:
     }
 
 
-    void operator*=(const Matrix4x4& rhs);
+    //void operator*=(const Matrix4x4& rhs)
     //{
     //    for (int i = 0; i < 4; i++) {
     //        float f[4];
@@ -201,62 +201,7 @@ public:
         return Matrix4x4::Inverse(*this);
     }
 
-    static Matrix4x4 Inverse(const Matrix4x4& m) {
-        return glm::inverse((glm::mat4)m);
-        //float Coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
-        //float Coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
-        //float Coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
-
-        //float Coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
-        //float Coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
-        //float Coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
-
-        //float Coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
-        //float Coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
-        //float Coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
-
-        //float Coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
-        //float Coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
-        //float Coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
-
-        //float Coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
-        //float Coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
-        //float Coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
-
-        //float Coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
-        //float Coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
-        //float Coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
-
-        //Vector4 Fac0(Coef00, Coef00, Coef02, Coef03);
-        //Vector4 Fac1(Coef04, Coef04, Coef06, Coef07);
-        //Vector4 Fac2(Coef08, Coef08, Coef10, Coef11);
-        //Vector4 Fac3(Coef12, Coef12, Coef14, Coef15);
-        //Vector4 Fac4(Coef16, Coef16, Coef18, Coef19);
-        //Vector4 Fac5(Coef20, Coef20, Coef22, Coef23);
-
-        //Vector4 Vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
-        //Vector4 Vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
-        //Vector4 Vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
-        //Vector4 Vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
-
-        //Vector4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
-        //Vector4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
-        //Vector4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
-        //Vector4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
-
-        //Vector4 SignA(+1, -1, +1, -1);
-        //Vector4 SignB(-1, +1, -1, +1);
-        //Matrix4x4 result(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
-
-        //Vector4 Row0(result[0][0], result[1][0], result[2][0], result[3][0]);
-
-        //Vector4 Dot0(m[0] * Row0);
-        //float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
-
-        //float OneOverDeterminant = 1.f / Dot1;
-
-        //return result * OneOverDeterminant;
-    }
+    static Matrix4x4 Inverse(const Matrix4x4& m);
 
     bool isIdentity() const;
 
@@ -272,10 +217,7 @@ public:
     }
 
 
-    void SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
-    {
-        *this = glm::scale(glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q), (glm::vec3)s);
-    }
+    void SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s);
 
     static Matrix4x4 TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
     {
@@ -283,6 +225,13 @@ public:
         mat.SetTRS(pos, q, s);
         return mat;
     }
+
+    static void TRS(
+        const Vector3&      pos, 
+        const Quaternion&   q, 
+        const Vector3&      s, 
+        Matrix4x4&          outLocalToWorld, 
+        Matrix4x4&          outWorldToLocal);
 
 
     static Matrix4x4 Scale(float x, float y, float z)
@@ -299,20 +248,11 @@ public:
         return Scale(scale.x, scale.y, scale.z);
     }
 
-    Quaternion ToRotation()
-    {
-        return glm::quat_cast((glm::mat4)*this);
-    }
+    Quaternion ToRotation();
 
-    static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar)
-    {
-        return glm::perspectiveLH(glm::radians(fov), aspect, zNear, zFar);
-    }
+    static Matrix4x4 Perspective(float fovy, float aspect, float zNear, float zFar);
 
-    static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up)
-    {
-        return glm::lookAtLH(glm::vec3(eye), glm::vec3(center), glm::vec3(up));
-    }
+    static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up);
 
     //static Matrix4x4 LookAtLH(const Vector3& eye, const Vector3& center, const Vector3 up)
     //{

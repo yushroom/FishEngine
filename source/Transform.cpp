@@ -39,8 +39,11 @@ void Transform::Update() const
         return;
     m_localEulerAngles = m_localRotation.eulerAngles();
     m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
-    if (!m_parent.expired())
+    Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale, m_localToWorldMatrix, m_worldToLocalMatrix);
+    if (!m_parent.expired()) {
         m_localToWorldMatrix = m_parent.lock()->localToWorldMatrix() * m_localToWorldMatrix;
+        //m_worldToLocalMatrix = m_worldToLocalMatrix * m_parent.lock()->worldToLocalMatrix();
+    }
     m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
     m_rotation = m_localToWorldMatrix.ToRotation();
     m_isDirty = false;

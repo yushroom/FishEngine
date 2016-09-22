@@ -36,7 +36,7 @@ void Camera::OnInspectorGUI()
 
 Matrix4x4 Camera::worldToCameraMatrix() const
 {
-    return gameObject()->transform()->worldToLocalMatrix();
+    return transform()->worldToLocalMatrix();
 }
 
 std::shared_ptr<Camera> Camera::main()

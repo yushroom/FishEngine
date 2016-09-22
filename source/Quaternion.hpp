@@ -2,9 +2,6 @@
 #define Quaternion_hpp
 
 #include "Vector3.hpp"
-#define GLM_FORCE_LEFT_HANDED
-#include <glm/gtx/quaternion.hpp>       // glm::quat
-#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 namespace FishEngine {
 
@@ -19,22 +16,13 @@ public:
     Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
     Quaternion() : Quaternion(0, 0, 0, 1) {}
 
-    Quaternion(const glm::quat& glm_quat) : x(glm_quat.x), y(glm_quat.y), z(glm_quat.z), w(glm_quat.w) {
-
-    }
-
-    operator glm::quat() const {
-        return glm::quat(w, x, y, z);
-    }
-
     Vector3 eulerAngles() const
     {
-    	//return Vector3(pitch(), yaw(), roll());
-        return glm::degrees(glm::eulerAngles(glm::quat(w, x, y, z)));
+    	return Vector3(pitch(), yaw(), roll());
     }
 
     float roll() const {
-    	return Mathf::Rad2Deg * ::std::atan2(2.0f * (z*y+w*z), w*w+x*x-y*y-z*z);
+    	return Mathf::Rad2Deg * ::std::atan2(2.0f * (x*y+w*z), w*w+x*x-y*y-z*z);
     }
 
     float pitch() const {
@@ -73,24 +61,24 @@ public:
 
     friend Vector3 operator *(Quaternion rotation, Vector3 point)
     {
-        return glm::quat(rotation) * glm::vec3(point);
-    //    float num = rotation.x * 2.f;
-    //    float num2 = rotation.y * 2.f;
-    //    float num3 = rotation.z * 2.f;
-    //    float num4 = rotation.x * num;
-    //    float num5 = rotation.y * num2;
-    //    float num6 = rotation.z * num3;
-    //    float num7 = rotation.x * num2;
-    //    float num8 = rotation.x * num3;
-    //    float num9 = rotation.y * num3;
-    //    float num10 = rotation.w * num;
-    //    float num11 = rotation.w * num2;
-    //    float num12 = rotation.w * num3;
-    //    Vector3 result;
-    //    result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
-    //    result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
-    //    result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
-    //    return result;
+        //return glm::quat(rotation) * glm::vec3(point);
+        float num = rotation.x * 2.f;
+        float num2 = rotation.y * 2.f;
+        float num3 = rotation.z * 2.f;
+        float num4 = rotation.x * num;
+        float num5 = rotation.y * num2;
+        float num6 = rotation.z * num3;
+        float num7 = rotation.x * num2;
+        float num8 = rotation.x * num3;
+        float num9 = rotation.y * num3;
+        float num10 = rotation.w * num;
+        float num11 = rotation.w * num2;
+        float num12 = rotation.w * num3;
+        Vector3 result;
+        result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
+        result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
+        result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
+        return result;
     }
 
 
@@ -102,16 +90,16 @@ public:
 
     static Quaternion AngleAxis(float angle, const Vector3& axis)
     {
-        return glm::angleAxis(Mathf::Radians(angle), (glm::vec3)axis.normalized());
-        //Quaternion Result;
+        //return glm::angleAxis(Mathf::Radians(angle), (glm::vec3)axis.normalized());
+        Quaternion Result;
 
-        //float s = ::std::sin(angle * 0.5f);
+        float s = Mathf::Sin(angle * 0.5f);
 
-        //Result.w = ::std::cos(angle * 0.5f);
-        //Result.x = axis.x * s;
-        //Result.y = axis.y * s;
-        //Result.z = axis.z * s;
-        //return Result;
+        Result.w = Mathf::Cos(angle * 0.5f);
+        Result.x = axis.x * s;
+        Result.y = axis.y * s;
+        Result.z = axis.z * s;
+        return Result;
     }
 
     void ToAngleAxis(float* angle, Vector3* axis);
@@ -128,16 +116,17 @@ public:
 
     static Quaternion Euler(const Vector3& euler)
     {
-        return glm::quat(glm::radians((glm::vec3)euler));
-        //Quaternion result;
-        //auto rad = euler * (Mathf::Deg2Rad * 0.5f);
-        //auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
-        //auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
-        //result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-        //result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-        //result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-        //result.z = c.x * c.y * s.z - s.x * s.y * c.z;
-        //return result;
+        //return glm::quat(glm::radians((glm::vec3)euler));
+        Quaternion result;
+        auto rad = euler
+        * (Mathf::Deg2Rad * 0.5f);
+        auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
+        auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
+        result.w = c.x * c.y * c.z + s.x * s.y * s.z;
+        result.x = s.x * c.y * c.z - c.x * s.y * s.z;
+        result.y = c.x * s.y * c.z + s.x * c.y * s.z;
+        result.z = c.x * c.y * s.z - s.x * s.y * c.z;
+        return result;
     }
 
     static Quaternion FromToRotation(const Vector3& fromDirection, const Vector3& toDirection);

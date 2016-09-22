@@ -5,7 +5,6 @@
 #include "Quaternion.hpp"
 #define GLM_FORCE_LEFT_HANDED
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtx/quaternion.hpp>       // glm::quat
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 
@@ -45,11 +44,6 @@ public:
 
     Matrix4x4(const Vector4& row0, const Vector4& row1, const Vector4& row2, const Vector4& row3)
         : rows{row0, row1, row2, row3}
-    {
-
-    }
-
-    Matrix4x4(const Quaternion& rotaton) : Matrix4x4(glm::mat4((glm::quat)rotaton))
     {
 
     }
@@ -226,10 +220,11 @@ public:
         return mat;
     }
 
+    // get concatenation of transforms and its inverse
     static void TRS(
-        const Vector3&      pos, 
-        const Quaternion&   q, 
-        const Vector3&      s, 
+        const Vector3&      translation,
+        const Quaternion&   rotation,
+        const Vector3&      scale,
         Matrix4x4&          outLocalToWorld, 
         Matrix4x4&          outWorldToLocal);
 
@@ -248,33 +243,12 @@ public:
         return Scale(scale.x, scale.y, scale.z);
     }
 
-    Quaternion ToRotation();
+    Quaternion ToRotation() const;
+    static Matrix4x4 FromRotation(const Quaternion& rotation);
 
     static Matrix4x4 Perspective(float fovy, float aspect, float zNear, float zFar);
 
     static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up);
-
-    //static Matrix4x4 LookAtLH(const Vector3& eye, const Vector3& center, const Vector3 up)
-    //{
-    //    Vector3 const f(Vector3::Normalize(center - eye));
-    //    Vector3 const s(Vector3::Normalize(Vector3::Cross(up, f)));
-    //    Vector3 const u(Vector3::Cross(f, s));
-
-    //    Matrix4x4 Result;
-    //    Result[0][0] = s.x;
-    //    Result[1][0] = s.y;
-    //    Result[2][0] = s.z;
-    //    Result[0][1] = u.x;
-    //    Result[1][1] = u.y;
-    //    Result[2][1] = u.z;
-    //    Result[0][2] = f.x;
-    //    Result[1][2] = f.y;
-    //    Result[2][2] = f.z;
-    //    Result[3][0] = -Vector3::Dot(s, eye);
-    //    Result[3][1] = -Vector3::Dot(u, eye);
-    //    Result[3][2] = -Vector3::Dot(f, eye);
-    //    return Result;
-    //}
 
 public:
     static const Matrix4x4 identity;

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <algorithm>
 
@@ -18,10 +19,10 @@ public:
     static constexpr float PositiveInfinity = std::numeric_limits<float>::infinity();
     static constexpr float Infinity = PositiveInfinity;
     static constexpr float NegativeInfinity = -PositiveInfinity;    // TODO
-    static constexpr float PI = 3.14159265358979323846f;
+    static constexpr float PI = static_cast<float>(3.1415926535897932384626);
     static constexpr float Epsilon = ::std::numeric_limits<float>::epsilon();   // TODO
-    static constexpr float Deg2Rad = PI / 180.f;
-    static constexpr float Rad2Deg = 180.0f / PI;
+    static constexpr float Deg2Rad = static_cast<float>(0.01745329251994329576923690768489);
+    static constexpr float Rad2Deg = static_cast<float>(57.295779513082320876798154814105);
 
     /********** **********/
 

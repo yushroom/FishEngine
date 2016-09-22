@@ -29,6 +29,8 @@ public:
     
     static bool Button(const char* text);
     
+    static void Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat);
+    
     static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
     
 private:

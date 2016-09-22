@@ -17,6 +17,7 @@
 #include "EditorRenderSystem.hpp"
 #include <Time.hpp>
 #include <sstream>
+#include <Matrix4x4.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -154,6 +155,9 @@ void EditorGUI::Update()
     ImGui::Begin("Hierarchy");
     if (ImGui::Button("Create")) {
         auto go = Scene::CreateGameObject("GameObject");
+        if (Selection::activeGameObject() != nullptr) {
+            go->transform()->SetParent(Selection::activeGameObject()->transform());
+        }
     }
     
     if (go != nullptr) {
@@ -232,6 +236,14 @@ bool EditorGUI::Button(const char* text)
     return ImGui::Button(text, ImVec2(w, 0));
 }
 
+void EditorGUI::Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat)
+{
+    ImGui::InputFloat4((label+"##row1").c_str(), mat.rows[0].data());
+    ImGui::InputFloat4((label+"##row2").c_str(), mat.rows[1].data());
+    ImGui::InputFloat4((label+"##row3").c_str(), mat.rows[2].data());
+    ImGui::InputFloat4((label+"##row4").c_str(), mat.rows[3].data());
+}
+
 void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> callback)
 {
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
@@ -300,7 +312,7 @@ void EditorGUI::DrawSceneGizmo()
     auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
     auto proj = camera->projectionMatrix();
     auto vp = proj * view;
-    auto model = Matrix4x4(Quaternion::Inverse(camera->transform()->rotation()));
+    auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
     
     ShaderUniforms uniforms;
     sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);

@@ -127,6 +127,26 @@ public:
         }
     }
 };
+            
+class DisplayMatrix : public Script {
+public:
+    InjectClassName(DisplayMatrix);
+    
+    Matrix4x4 localToWorld;
+    Matrix4x4 worldToLocal;
+    // Use this for initialization
+    
+    virtual void OnInspectorGUI() override {
+        EditorGUI::Matrix4x4("localToWorld", localToWorld);
+        EditorGUI::Matrix4x4("worldToLocal", worldToLocal);
+    }
+    
+    virtual void Start () override {
+        localToWorld = transform()->localToWorldMatrix();
+        worldToLocal = transform()->worldToLocalMatrix();
+    }
+};
+
 
 class ExampleApp1 : public App
 {
@@ -189,6 +209,7 @@ public:
         go->AddComponent(meshFilter);
         go->AddComponent(meshRenderer);
         go->AddScript(make_shared<VisualizeNormal>());
+        go->AddScript(make_shared<DisplayMatrix>());
         //go->AddScript(make_shared<DeactiveSelf>());
         //go->SetActive(false);
         //Scene::SelectGameObject(go.get());
@@ -203,6 +224,7 @@ public:
             auto meshRenderer = make_shared<MeshRenderer>(material);
             go->AddComponent(meshFilter);
             go->AddComponent(meshRenderer);
+            go->AddScript(make_shared<DisplayMatrix>());
             //go->transform()->SetParent(parent->transform());
             return go;
         };
@@ -217,6 +239,7 @@ public:
         cameraGO->AddScript(make_shared<ShowFPS>());
         cameraGO->AddScript(make_shared<TakeScreenShot>());
         cameraGO->AddScript(make_shared<RenderSettings>());
+        cameraGO->AddScript(make_shared<DisplayMatrix>());
         Selection::setActiveGameObject(cameraGO);
         
         //auto child0 = Scene::CreateGameObject("child0");

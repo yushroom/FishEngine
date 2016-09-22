@@ -2,12 +2,8 @@
 #define Vector3_hpp
 
 #include "Mathf.hpp"
-#define GLM_FORCE_LEFT_HANDED
-#include <glm/vec3.hpp>                 // glm::vec3
-#include <glm/vec4.hpp>                 // glm::vec4
 
-
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
 #include <cassert>
 #define Assert(exp) assert(exp)
 #else
@@ -33,14 +29,6 @@ public:
 
     Vector3() : Vector3(0, 0, 0) {
 
-    }
-
-    Vector3(const glm::vec3& glm_vec3) : Vector3(glm_vec3.x, glm_vec3.y, glm_vec3.z) {
-
-    }
-
-    operator glm::vec3() const {
-        return glm::vec3(x, y, z);
     }
 
     const float* data() const {
@@ -279,11 +267,6 @@ public:
     }
     Vector4() : Vector4(0, 0, 0, 0) {}
     Vector4(const Vector3& v3, float w) : Vector4(v3.x, v3.y, v3.z, w) {}
-
-    Vector4(const glm::vec4& glm_vec4) : Vector4(glm_vec4.x, glm_vec4.y, glm_vec4.z, glm_vec4.w) {}
-    operator glm::vec4() const {
-        return glm::vec4(x, y, z, w);
-    }
 
     const float* data() const {
         return m;

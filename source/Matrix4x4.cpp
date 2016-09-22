@@ -60,6 +60,23 @@ namespace FishEngine {
         //return inv * OneOverDeterminant;
     }
 
+    bool Zero(float f) {
+        return (f < 1e-4f) && (f > -1e-4f);
+    }
+    
+    bool One(float f) {
+        return (f-1 < 1e-4f) && (f-1 > -1e-4f);
+    }
+    
+    bool Matrix4x4::isIdentity() const
+    {
+        return
+        One(m[0][0]) && Zero(m[0][1]) && Zero(m[0][2]) && Zero(m[0][3]) &&
+        Zero(m[1][0]) && One(m[1][1]) && Zero(m[1][2]) && Zero(m[1][3]) &&
+        Zero(m[2][0]) && Zero(m[2][1]) && One(m[2][2]) && Zero(m[2][3]) &&
+        Zero(m[3][0]) && Zero(m[3][1]) && Zero(m[3][2]) && One(m[3][3]);
+    }
+    
     //Matrix4x4 translate(const Matrix4x4& m, float tx, float ty, float tz)
     //{
     //    Matrix4x4 result = m;
@@ -75,7 +92,8 @@ namespace FishEngine {
     {
         //*this = glm::scale(glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q), (glm::vec3)s);
         //*this = glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q) * glm::scale(glm::mat4(1.0f), (glm::vec3)s);
-        *this = glm::mat4_cast((glm::quat)q);
+        //*this = glm::mat4_cast((glm::quat)q);
+        *this = Matrix4x4::FromRotation(q);
 
         m[0][3] = pos.x;
         m[1][3] = pos.y;
@@ -93,16 +111,16 @@ namespace FishEngine {
     }
 
     void Matrix4x4::TRS(
-        const Vector3&      pos, 
-        const Quaternion&   q, 
-        const Vector3&      s,
+        const Vector3&      translation,
+        const Quaternion&   rotation,
+        const Vector3&      scale,
         Matrix4x4&          outLocalToWorld, 
         Matrix4x4&          outWorldToLocal)
     {
         // outLocalToWorld = TRS
         // outWorldToLocal = inverse(outLocalToWorld) = (S^-1)(R')(T^-1)
-
-        outLocalToWorld = glm::mat4_cast((glm::quat)q);
+        //outLocalToWorld = glm::mat4_cast((glm::quat)rotation);
+        outLocalToWorld = Matrix4x4::FromRotation(rotation);
         
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
@@ -110,11 +128,11 @@ namespace FishEngine {
             }
         }
 
-        outLocalToWorld.m[0][3] = pos.x;
-        outLocalToWorld.m[1][3] = pos.y;
-        outLocalToWorld.m[2][3] = pos.z;
+        outLocalToWorld.m[0][3] = translation.x;
+        outLocalToWorld.m[1][3] = translation.y;
+        outLocalToWorld.m[2][3] = translation.z;
         
-        Vector4 col3(-pos.x, -pos.y, -pos.z, 1);
+        Vector4 col3(-translation.x, -translation.y, -translation.z, 0); // use 0 instead 1, since we have not yet cleared the last column of outWorldToLocal.
         float m03 = Vector4::Dot(outWorldToLocal.rows[0], col3);
         float m13 = Vector4::Dot(outWorldToLocal.rows[1], col3);
         float m23 = Vector4::Dot(outWorldToLocal.rows[2], col3);
@@ -122,19 +140,19 @@ namespace FishEngine {
         outWorldToLocal.m[1][3] = m13;
         outWorldToLocal.m[2][3] = m23;
 
-        outLocalToWorld.m[0][0] *= s.x;
-        outLocalToWorld.m[0][1] *= s.y;
-        outLocalToWorld.m[0][2] *= s.z;
-        outLocalToWorld.m[1][0] *= s.x;
-        outLocalToWorld.m[1][1] *= s.y;
-        outLocalToWorld.m[1][2] *= s.z;
-        outLocalToWorld.m[2][0] *= s.x;
-        outLocalToWorld.m[2][1] *= s.y;
-        outLocalToWorld.m[2][2] *= s.z;
+        outLocalToWorld.m[0][0] *= scale.x;
+        outLocalToWorld.m[0][1] *= scale.y;
+        outLocalToWorld.m[0][2] *= scale.z;
+        outLocalToWorld.m[1][0] *= scale.x;
+        outLocalToWorld.m[1][1] *= scale.y;
+        outLocalToWorld.m[1][2] *= scale.z;
+        outLocalToWorld.m[2][0] *= scale.x;
+        outLocalToWorld.m[2][1] *= scale.y;
+        outLocalToWorld.m[2][2] *= scale.z;
 
-        float inv_sx = 1.0f / s.x;
-        float inv_sy = 1.0f / s.y;
-        float inv_sz = 1.0f / s.z;
+        float inv_sx = 1.0f / scale.x;
+        float inv_sy = 1.0f / scale.y;
+        float inv_sz = 1.0f / scale.z;
         outWorldToLocal.m[0][0] *= inv_sx;
         outWorldToLocal.m[0][1] *= inv_sx;
         outWorldToLocal.m[0][2] *= inv_sx;
@@ -148,11 +166,12 @@ namespace FishEngine {
         outLocalToWorld.m[3][3] = 1.f;
         outWorldToLocal.m[3][3] = 1.f;
 
-        auto test = outWorldToLocal * outLocalToWorld;
-        float x = 1;
+        // TODO: remove later
+        //auto test = outWorldToLocal * outLocalToWorld;
+        //Assert(test.isIdentity());
     }
 
-    Quaternion Matrix4x4::ToRotation()
+    Quaternion Matrix4x4::ToRotation() const
     {
         //return glm::quat_cast((glm::mat4)*this);
         float fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
@@ -213,6 +232,36 @@ namespace FishEngine {
             assert(false);
             break;
         }
+        return result;
+    }
+    
+    Matrix4x4 Matrix4x4::FromRotation(const Quaternion& rotation)
+    {
+        // Real-time rendering 3rd, p76
+        auto& q = rotation;
+        //return glm::mat4_cast(glm::quat(r.w, r.x, r.y, r.z));
+        Matrix4x4 result;
+        float qxx = q.x * q.x;
+        float qyy = q.y * q.y;
+        float qzz = q.z * q.z;
+        float qxz = q.x * q.z;
+        float qxy = q.x * q.y;
+        float qyz = q.y * q.z;
+        float qwx = q.w * q.x;
+        float qwy = q.w * q.y;
+        float qwz = q.w * q.z;
+        
+        result.m[0][0] = 1.f - 2.f * (qyy + qzz);
+        result.m[1][0] = 2.f * (qxy + qwz);
+        result.m[2][0] = 2.f * (qxz - qwy);
+        
+        result.m[0][1] = 2.f * (qxy - qwz);
+        result.m[1][1] = 1.f - 2.f * (qxx + qzz);
+        result.m[2][1] = 2.f * (qyz + qwx);
+        
+        result.m[0][2] = 2.f * (qxz + qwy);
+        result.m[1][2] = 2.f * (qyz - qwx);
+        result.m[2][2] = 1.f - 2.f * (qxx + qyy);
         return result;
     }
 

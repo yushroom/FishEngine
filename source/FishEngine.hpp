@@ -39,6 +39,12 @@ class Shader;
 class Texture;
 class Time;
 class App;
+class Mathf;
+class Vector2;
+class Vector3;
+class Vector4;
+class Quaternion;
+class Matrix4x4;
 
 NAMESPACE_FISHENGINE_END
 

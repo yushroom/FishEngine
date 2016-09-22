@@ -51,9 +51,10 @@ public:
         }
         
         float s = Input::GetAxis(Input::Axis::MouseScrollWheel);
-        //if (Input::GetAxis(<#FishEngine::Input::Axis axis#>))
-        auto t = Camera::main()->transform();
-        t->setLocalPosition(t->position() + 0.2f*s*t->forward());
+        if (s != 0.f) {
+            auto t = Camera::main()->transform();
+            t->setLocalPosition(t->position() + 0.2f*s*t->forward());
+        }
     }
 };
 

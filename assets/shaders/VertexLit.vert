@@ -2,7 +2,6 @@ layout (location = PositionIndex) in vec3 position;
 layout (location = NormalIndex) in vec3 normal;
 
 uniform vec3 _Color = vec3(1, 1, 1);
-uniform vec3 unity_LightPosition; // view space light position
 
 const vec3 dir = normalize(vec3(0, 0, 1));
 

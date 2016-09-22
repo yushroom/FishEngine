@@ -20,58 +20,11 @@ static std::set<std::string> builtinUniformNames{
     "_Object2World", "_WorldSpaceCameraPos"
 };
 
-const static std::string ShaderMacro = R"(#version 410 core
-#define PositionIndex 0
-#define NormalIndex 1
-#define UVIndex 2
-#define TangentIndex 3
-
-#define PI 3.141592653589793f
-#define INV_PI 0.3183098861837907f
-
-// Transformations
-uniform mat4 MATRIX_MVP;
-//uniform mat4 MATRIX_MV;
-uniform mat4 MATRIX_V;
-uniform mat4 MATRIX_P;
-uniform mat4 MATRIX_VP;
-//uniform mat4 MATRIX_T_MV;
-uniform mat4 MATRIX_IT_MV;
-uniform mat4 MATRIX_IT_M;   // new
-uniform mat4 _Object2World; // MATRIX_M
-//uniform mat4 _World2Object; // MATRIX_I_M
-
-// Camera and screen
-uniform vec3 _WorldSpaceCameraPos;
-//uniform vec4 _ProjectionParams;
-//uniform vec4 _ScreenParams;
-//uniform vec4 _ZBufferParams;
-//uniform vec4 OrthoParams;
-//uniform mat4 CameraProjection;
-//uniform mat4 CameraInvProjection;
-//uniform vec4 _CameraWorldClipPlanes[6];
-
-// Time
-//uniform vec4 _Time;
-//uniform vec4 _SinTime;
-//uniform vec4 _CosTime;
-//uniform vec4 _DeltaTime;
-
-// HLSL
-#define float2 vec2
-#define float3 vec3
-#define float4 vec4
-#define uint2 uvec2
-#define uint3 uvec3
-#define uint4 uvec4
-#define frac(x) fract(x)
-#define saturate(x) clamp(x, 0.0, 1.0)
-)";
-
 struct ShaderUniforms
 {
     std::map<std::string, Matrix4x4> mat4s;
     std::map<std::string, Vector3> vec3s;
+    std::map<std::string, Vector4> vec4s;
     std::map<std::string, float> floats;
 };
 
@@ -171,6 +124,7 @@ private:
     
     friend class RenderSystem;
     
+    static std::string m_shaderVariables;
     static std::map<std::string, PShader> m_builtinShaders;
 };
 

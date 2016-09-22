@@ -4,6 +4,7 @@
 #include "Scene.hpp"
 #include "MeshFilter.hpp"
 #include "Mesh.hpp"
+#include "Light.hpp"
 
 FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(material)
 {
@@ -40,6 +41,16 @@ void MeshRenderer::Render() const
     uniforms.mat4s["MATRIX_IT_MV"] = mv.transpose().inverse();
     //auto camera = Scene::getMainCamera();
     uniforms.vec3s["_WorldSpaceCameraPos"] = camera->transform()->position();
+
+    Vector4 lightPos(0, 0, 0, 0);
+    auto& lights = Light::lights();
+    if (lights.size() > 0) {
+        auto& l = lights.front();
+        if (l->transform() != nullptr) {
+            lightPos = Vector4(l->transform()->position(), 0);
+        }
+    }
+    uniforms.vec4s["_WorldSpaceLightPos0"] = lightPos;
 
     for (auto& m : m_materials) {
         auto shader = m->shader();

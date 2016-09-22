@@ -168,7 +168,9 @@ namespace FishEngine {
 
         // TODO: remove later
         //auto test = outWorldToLocal * outLocalToWorld;
-        //Assert(test.isIdentity());
+        //if (!test.isIdentity()) {
+        //    Assert(false);
+        //}
     }
 
     Quaternion Matrix4x4::ToRotation() const

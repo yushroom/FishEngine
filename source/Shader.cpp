@@ -12,6 +12,7 @@ using namespace std;
 
 NAMESPACE_FISHENGINE_BEGIN
 
+std::string Shader::m_shaderVariables;
 std::map<std::string, Shader::PShader> Shader::m_builtinShaders;
 
 Shader::Shader(Shader&& s)
@@ -165,17 +166,17 @@ void Shader::FromString(const std::string& vs_string,
     }
     m_ZWrite = settings["ZWrite"] == "On";
     
-    compileShader(vs, GL_VERTEX_SHADER, ShaderMacro + vs_string);
-    compileShader(ps, GL_FRAGMENT_SHADER, ShaderMacro + fs_string);
+    compileShader(vs, GL_VERTEX_SHADER, m_shaderVariables + vs_string);
+    compileShader(ps, GL_FRAGMENT_SHADER, m_shaderVariables + fs_string);
     
     // gs
     if (use_gs) {
-        compileShader(gs, GL_GEOMETRY_SHADER, ShaderMacro + gs_string);
+        compileShader(gs, GL_GEOMETRY_SHADER, m_shaderVariables + gs_string);
     }
     if (use_ts) {
         if (!tcs_string.empty())
-            compileShader(tcs, GL_TESS_CONTROL_SHADER, ShaderMacro + tcs_string);
-        compileShader(tes, GL_TESS_EVALUATION_SHADER, ShaderMacro + tes_string);
+            compileShader(tcs, GL_TESS_CONTROL_SHADER, m_shaderVariables + tcs_string);
+        compileShader(tes, GL_TESS_EVALUATION_SHADER, m_shaderVariables + tes_string);
     }
 
     m_program = glCreateProgram();
@@ -328,6 +329,13 @@ void Shader::BindUniforms(const ShaderUniforms& uniforms)
                 u.binded = true;
             }
         }
+        else if (u.type == GL_FLOAT_VEC4) {
+            auto it = uniforms.vec4s.find(u.name);
+            if (it != uniforms.vec4s.end()) {
+                glUniform4fv(u.location, 1, it->second.data());
+                u.binded = true;
+            }
+        }
     }
 }
 
@@ -401,10 +409,12 @@ void Shader::Init() {
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif
+    m_shaderVariables = readFile(root_dir + "ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
     for (auto& n : std::vector<std::string>{"PBR", "VertexLit", "SkyBox", "NormalMap"}) {
         m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }
+    m_builtinShaders["Diffuse"] = Shader::CreateFromFile(root_dir+"PBR.vert", root_dir + "Diffuse.frag");
 }
 
 NAMESPACE_FISHENGINE_END

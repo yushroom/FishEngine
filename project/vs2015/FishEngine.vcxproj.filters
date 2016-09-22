@@ -22,6 +22,9 @@
     <Filter Include="Math">
       <UniqueIdentifier>{6399ac90-997b-4934-891b-6a1009314d4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{b676749f-adb5-495a-b337-789a5813ffbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\RenderSettings.hpp">
@@ -31,12 +34,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Scene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Time.hpp">
@@ -60,16 +57,7 @@
     <ClInclude Include="..\..\source\GameObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\GLEnvironment.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Input.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Material.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Object.hpp">
@@ -117,18 +105,33 @@
     <ClInclude Include="..\..\external\imgui\imgui_dock.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Light.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GLEnvironment.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Mesh.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Material.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Shader.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Texture.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Color.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Time.cpp">
@@ -149,16 +152,7 @@
     <ClCompile Include="..\..\source\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\GLEnvironment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Object.cpp">
@@ -208,6 +202,27 @@
     </ClCompile>
     <ClCompile Include="..\..\external\imgui\imgui_dock.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Light.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Texture.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Shader.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Mesh.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Material.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\GLEnvironment.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Color.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -59,7 +59,7 @@ NAMESPACE_FISHENGINE_END
 
 void FishEngine::Material::Init()
 {
-    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit" })
+    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse"})
     {
         auto material = std::make_shared<Material>();
         material->SetShader(Shader::builtinShader(s));

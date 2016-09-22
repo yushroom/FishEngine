@@ -297,7 +297,7 @@ void EditorGUI::DrawSceneGizmo()
 {
     int w = EditorRenderSystem::width();
     int h = EditorRenderSystem::height();
-    glViewport(0, 0, GLsizei(w*0.1f), GLsizei(h*0.1f));
+    glViewport(0, 0, GLsizei(w*0.1f), GLsizei(w*0.1f));
     
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
@@ -310,7 +310,8 @@ void EditorGUI::DrawSceneGizmo()
     sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
     auto camera = Camera::main();
     auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-    auto proj = camera->projectionMatrix();
+    //auto proj = camera->projectionMatrix();
+    auto proj = Matrix4x4::Perspective(60.f, 1.f, 0.1f, 100.f);
     auto vp = proj * view;
     auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
     

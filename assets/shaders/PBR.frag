@@ -172,11 +172,12 @@ vec3 PRBLighting(vec3 l, vec3 v, vec3 n)
     return ambient + mix(diffuse, specular, metallic) * nDotl;
 }
 
-const vec3 light_pos = vec3(10, 10, 10);
-
 void main()
 {
-    vec3 l = normalize(light_pos - vs_out.position);
+    vec3 l = _WorldSpaceLightPos0.xyz;
+    if (_WorldSpaceLightPos0.w > 0.5f) {
+        l = normalize(_WorldSpaceLightPos0.xyz - vs_out.position);
+    }
     vec3 v = normalize(_WorldSpaceCameraPos - vs_out.position);
     vec3 n = normalize(vs_out.normal);
     color.rgb = PRBLighting(l, v, n);

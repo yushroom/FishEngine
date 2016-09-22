@@ -94,11 +94,9 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
         aiProcess_Triangulate
         | aiProcess_RemoveComponent
         //| aiProcess_SortByPType
-        //| aiProcess_GenNormals
         | aiProcess_CalcTangentSpace
-        //| aiProcess_GenSmoothNormals
         //| aiProcess_JoinIdenticalVertices
-        //| aiProcess_FixInfacingNormals
+        | aiProcess_FixInfacingNormals
         //| aiProcess_OptimizeGraph
         //| aiProcess_OptimizeMeshes
         //| aiProcess_FlipUVs

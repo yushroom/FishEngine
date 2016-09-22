@@ -128,6 +128,7 @@
     <ClInclude Include="..\..\source\Behaviour.hpp" />
     <ClInclude Include="..\..\source\Camera.hpp" />
     <ClInclude Include="..\..\source\CameraController.hpp" />
+    <ClInclude Include="..\..\source\Color.hpp" />
     <ClInclude Include="..\..\source\Common.hpp" />
     <ClInclude Include="..\..\source\Component.hpp" />
     <ClInclude Include="..\..\source\Debug.hpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="..\..\source\GameObject.hpp" />
     <ClInclude Include="..\..\source\GLEnvironment.hpp" />
     <ClInclude Include="..\..\source\Input.hpp" />
+    <ClInclude Include="..\..\source\Light.hpp" />
     <ClInclude Include="..\..\source\Material.hpp" />
     <ClInclude Include="..\..\source\Mathf.hpp" />
     <ClInclude Include="..\..\source\Matrix4x4.hpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="..\..\source\App.cpp" />
     <ClCompile Include="..\..\source\Behaviour.cpp" />
     <ClCompile Include="..\..\source\Camera.cpp" />
+    <ClCompile Include="..\..\source\Color.cpp" />
     <ClCompile Include="..\..\source\Common.cpp" />
     <ClCompile Include="..\..\source\Component.cpp" />
     <ClCompile Include="..\..\source\Debug.cpp" />
@@ -171,6 +174,7 @@
     <ClCompile Include="..\..\source\GameObject.cpp" />
     <ClCompile Include="..\..\source\GLEnvironment.cpp" />
     <ClCompile Include="..\..\source\Input.cpp" />
+    <ClCompile Include="..\..\source\Light.cpp" />
     <ClCompile Include="..\..\source\Material.cpp" />
     <ClCompile Include="..\..\source\Matrix4x4.cpp" />
     <ClCompile Include="..\..\source\Mesh.cpp" />

@@ -22,6 +22,7 @@ using namespace FishEditor;
 #include "Scene.hpp"
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
+#include "Light.hpp"
 
 using namespace std;
 using namespace FishEngine;
@@ -147,6 +148,24 @@ public:
     }
 };
 
+class EditorRenderSettings : public Script
+{
+public:
+    InjectClassName(EditorRenderSettings);
+
+    bool m_isWireFrameMode = false;
+    bool m_useGammaCorrection = true;
+
+    virtual void OnInspectorGUI() override {
+        if (ImGui::Checkbox("Wire Frame", &m_isWireFrameMode)) {
+            EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
+        }
+        if (ImGui::Checkbox("Gamma Correction", &m_useGammaCorrection)) {
+            EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
+        }
+    }
+};
+
 
 class ExampleApp1 : public App
 {
@@ -167,8 +186,10 @@ public:
         auto sphere = Mesh::CreateFromObjFile(models_dir+"sphere.obj", VertexUsagePNUT);
         auto cone = Mesh::CreateFromObjFile(models_dir + "cone.obj", VertexUsagePNUT);
         auto cube = Mesh::CreateFromObjFile(models_dir + "cube.obj", VertexUsagePNUT);
+        auto plane = Mesh::CreateFromObjFile(models_dir + "plane.obj", VertexUsagePNUT);
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
+        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
         //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
         //auto head_normalmap = Texture::CreateFromFile(models_dir + "head/NormalMap_RG16f_1024_mipmaps.dds");
         
@@ -232,15 +253,33 @@ public:
         auto child0 = create_cube(go);
         auto child1 = create_cube(child0);
         auto child2 = create_cube(child1);
+
+        go = Scene::CreateGameObject("Plane");
+        meshFilter = make_shared<MeshFilter>(plane);
+        material = Material::builtinMaterial("Diffuse");
+        textures.clear();
+        textures["diffuseMap"] = checkboard_texture;
+        material->BindTextures(textures);
+        meshRenderer = make_shared<MeshRenderer>(material);
+        go->AddComponent(meshFilter);
+        go->AddComponent(meshRenderer);
+        go->AddScript(make_shared<VisualizeNormal>());
+        go->AddScript(make_shared<DisplayMatrix>());
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setPosition(5, 5, 5);
         cameraGO->transform()->LookAt(0, 0, 0);
         cameraGO->AddScript(make_shared<ShowFPS>());
         cameraGO->AddScript(make_shared<TakeScreenShot>());
-        cameraGO->AddScript(make_shared<RenderSettings>());
+        //cameraGO->AddScript(make_shared<RenderSettings>());
         cameraGO->AddScript(make_shared<DisplayMatrix>());
+        cameraGO->AddScript(make_shared<EditorRenderSettings>());
         Selection::setActiveGameObject(cameraGO);
+
+        go = Scene::CreateGameObject("Directional Light");
+        go->transform()->setPosition(10, 10, 0);
+        go->AddComponent(Light::Create());
+        
         
         //auto child0 = Scene::CreateGameObject("child0");
         //child0->transform()->SetParent(go->transform());

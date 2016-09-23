@@ -270,7 +270,7 @@ namespace FishEngine {
     Matrix4x4 Matrix4x4::Perspective(float fovy, float aspect, float zNear, float zFar)
     {
         //return glm::perspectiveLH(glm::radians(fovy), aspect, zNear, zFar);
-        assert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
+        assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
 
         float const tanHalfFovy = tan(Mathf::Radians(fovy) / 2.f);
 

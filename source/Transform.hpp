@@ -93,6 +93,10 @@ public:
     Quaternion localRotation() const {
         return m_localRotation;
     }
+    
+    void setLocalRotation(const Quaternion& rotation) {
+        m_localRotation = rotation;
+    }
 
     // The rotation as Euler angles in degrees relative to the parent transform's rotation.
     Vector3 localEulerAngles() const {

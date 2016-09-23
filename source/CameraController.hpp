@@ -16,17 +16,27 @@ public:
     float m_rotateSpeed = 200;
     float m_dragSpeed = 10;
     
+    Vector3 m_originalPosition;
+    Quaternion m_originalRotation;
+    Vector3 m_originalScale;
+    
     virtual void Start() override
     {
+        m_originalPosition = transform()->localPosition();
+        m_originalRotation = transform()->localRotation();
+        m_originalScale = transform()->localScale();
     }
     
     virtual void OnInspectorGUI() override {
         ImGui::Checkbox("rotate camera", &m_isRotating);
         ImGui::Checkbox("lookat mode", &m_lookAtMode);
         if (ImGui::Button("reset")) {
-            transform()->setLocalPosition(0, 0, -5);
-            transform()->LookAt(Vector3(0, 0, 0));
+            //transform()->setLocalPosition(0, 0, -5);
+            //transform()->LookAt(Vector3(0, 0, 0));
             //transform()->setLocalEulerAngles(0, 0, 0);
+            transform()->setLocalPosition(m_originalPosition);
+            transform()->setLocalRotation(m_originalRotation);
+            transform()->setLocalScale(m_originalScale);
         }
     }
     

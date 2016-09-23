@@ -45,6 +45,9 @@ class Vector3;
 class Vector4;
 class Quaternion;
 class Matrix4x4;
+class Light;
+class Color;
+class RenderTexture;
 
 NAMESPACE_FISHENGINE_END
 

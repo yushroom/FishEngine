@@ -58,6 +58,8 @@ public:
     //static Model& getSphere();
     //static Model& getIcosahedron();
 
+    static void Init();
+    static PMesh builtinMesh(const std::string& name);
     
 private:
     friend class FishEditor::EditorGUI;
@@ -73,7 +75,7 @@ private:
     GLuint m_uvVBO;
     GLuint m_tangentVBO;
     
-    static std::vector<PMesh> m_meshes;
+    static std::map<std::string, PMesh> m_meshes;
     
     void GenerateBuffer(int vertexUsage);
     void BindBuffer(int vertexUsage);

@@ -39,7 +39,6 @@ void EditorGUI::Init()
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
-    const std::string models_dir = root_dir + "models/";
  
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF((root_dir+"fonts/DroidSans.ttf").c_str(), 14.0f);
@@ -56,8 +55,8 @@ void EditorGUI::Init()
     style.WindowMinSize = ImVec2(256, 256);
     
     sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
-    cubeMesh = Mesh::CreateFromObjFile(models_dir+"cube.obj");
-    coneMesh = Mesh::CreateFromObjFile(models_dir+"cone.obj");
+    cubeMesh = Mesh::builtinMesh("cube");
+    coneMesh = Mesh::builtinMesh("cone");
 }
 
 void EditorGUI::Update()
@@ -129,26 +128,26 @@ void EditorGUI::Update()
     DrawSceneGizmo();
     
     // Main menu bar
-//    if (ImGui::BeginMainMenuBar()) {
-//        if (ImGui::BeginMenu("File")) {
-//            ImGui::MenuItem("New Scene", "Ctrl+N");
-//            ImGui::EndMenu();
-//        }
-//        if (ImGui::BeginMenu("Edit")) {
-//            ImGui::EndMenu();
-//        }
-//        
-//        double new_time = glfwGetTime();
-//        int fps = (int)roundf(1.f / (new_time - time_stamp));
-//        time_stamp = new_time;
-//        std::ostringstream sout;
-//        sout << "FPS: " << fps;
-//        const char* s = sout.str().c_str();
-//        auto fps_stats_size = ImGui::CalcTextSize(s);
-//        ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
-//        ImGui::Text("%s", s);
-//        ImGui::EndMainMenuBar();
-//    }
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            ImGui::MenuItem("New Scene", "Ctrl+N");
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            ImGui::EndMenu();
+        }
+        
+        double new_time = glfwGetTime();
+        int fps = (int)roundf(1.f / (new_time - time_stamp));
+        time_stamp = new_time;
+        std::ostringstream sout;
+        sout << "FPS: " << fps;
+        const char* s = sout.str().c_str();
+        auto fps_stats_size = ImGui::CalcTextSize(s);
+        ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
+        ImGui::Text("%s", s);
+        ImGui::EndMainMenuBar();
+    }
     
     // Hierarchy view
     //ImGui::BeginDock("Hierarchy");
@@ -246,20 +245,20 @@ void EditorGUI::Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat)
 
 void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> callback)
 {
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
-    bool is_open = true;
-    if (ImGui::BeginPopupModal("Select ...", &is_open, window_flags)) {
-        for (auto m : Mesh::m_meshes) {
-            if (ImGui::Button(m->name().c_str())) {
-                Debug::Log("%s", m->name().c_str());
-                //SetMesh(m);
-                callback(m);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        ImGui::Separator();
-        ImGui::EndPopup();
-    }
+//    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+//    bool is_open = true;
+//    if (ImGui::BeginPopupModal("Select ...", &is_open, window_flags)) {
+//        for (auto m : Mesh::m_meshes) {
+//            if (ImGui::Button(m->name().c_str())) {
+//                Debug::Log("%s", m->name().c_str());
+//                //SetMesh(m);
+//                callback(m);
+//                ImGui::CloseCurrentPopup();
+//            }
+//        }
+//        ImGui::Separator();
+//        ImGui::EndPopup();
+//    }
 }
 
 

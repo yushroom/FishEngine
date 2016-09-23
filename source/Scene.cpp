@@ -2,6 +2,9 @@
 #include "RenderSystem.hpp"
 #include "MeshRenderer.hpp"
 #include "CameraController.hpp"
+#include "Light.hpp"
+#include "Mesh.hpp"
+#include "MeshFilter.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -76,6 +79,39 @@ void Scene::Update() {
         if (!go->activeInHierarchy()) continue;
         go->Update();
     }
+}
+
+void Scene::RenderShadow(std::shared_ptr<Light>& light)
+{
+    auto m = Material::builtinMaterial("ShadowMap");
+    auto shader = m->shader();
+    ShaderUniforms uniforms;
+    auto view = light->gameObject()->transform()->worldToLocalMatrix();
+    auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);
+    
+    auto shadowMap = light->m_shadowMap;
+    glViewport(0, 0, shadowMap->width(), shadowMap->height());
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->depthBufferFBO());
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    for (auto& go : m_gameObjects) {
+        if (!go->activeInHierarchy()) continue;
+        auto renderer = go->GetComponent<MeshRenderer>();
+        auto meshFilter = go->GetComponent<MeshFilter>();
+        if (renderer != nullptr && meshFilter != nullptr) {
+            //renderer->Render();
+            //auto shader = m->shader();
+            //shader->Use();
+            //shader->PreRender();
+            uniforms.mat4s["MATRIX_MVP"] = proj * view * go->transform()->localToWorldMatrix();
+            shader->BindUniforms(uniforms);
+            //m->Update();
+            shader->CheckStatus();
+            meshFilter->mesh()->Render();
+            //shader->PostRender();
+        }
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Scene::Render()

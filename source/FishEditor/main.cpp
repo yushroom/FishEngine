@@ -181,12 +181,10 @@ public:
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
 
-        //auto headModel = Mesh::CreateFromObjFile(models_dir + "/head/head_combined.obj", VertexUsagePNUT, MeshLoadFlag_RegenerateNormal);
-        
-        auto sphere = Mesh::CreateFromObjFile(models_dir+"sphere.obj", VertexUsagePNUT);
-        auto cone = Mesh::CreateFromObjFile(models_dir + "cone.obj", VertexUsagePNUT);
-        auto cube = Mesh::CreateFromObjFile(models_dir + "cube.obj", VertexUsagePNUT);
-        auto plane = Mesh::CreateFromObjFile(models_dir + "plane.obj", VertexUsagePNUT);
+        auto sphere = Mesh::builtinMesh("sphere");
+        auto cone = Mesh::builtinMesh("cone");
+        auto cube = Mesh::builtinMesh("cube");
+        auto plane = Mesh::builtinMesh("plane");
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
@@ -245,7 +243,7 @@ public:
             auto meshRenderer = make_shared<MeshRenderer>(material);
             go->AddComponent(meshFilter);
             go->AddComponent(meshRenderer);
-            go->AddScript(make_shared<DisplayMatrix>());
+            //go->AddScript(make_shared<DisplayMatrix>());
             //go->transform()->SetParent(parent->transform());
             return go;
         };
@@ -263,8 +261,8 @@ public:
         meshRenderer = make_shared<MeshRenderer>(material);
         go->AddComponent(meshFilter);
         go->AddComponent(meshRenderer);
-        go->AddScript(make_shared<VisualizeNormal>());
-        go->AddScript(make_shared<DisplayMatrix>());
+        //go->AddScript(make_shared<VisualizeNormal>());
+        //go->AddScript(make_shared<DisplayMatrix>());
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setPosition(5, 5, 5);
@@ -272,12 +270,13 @@ public:
         cameraGO->AddScript(make_shared<ShowFPS>());
         cameraGO->AddScript(make_shared<TakeScreenShot>());
         //cameraGO->AddScript(make_shared<RenderSettings>());
-        cameraGO->AddScript(make_shared<DisplayMatrix>());
+        //cameraGO->AddScript(make_shared<DisplayMatrix>());
         cameraGO->AddScript(make_shared<EditorRenderSettings>());
         Selection::setActiveGameObject(cameraGO);
 
         go = Scene::CreateGameObject("Directional Light");
         go->transform()->setPosition(10, 10, 0);
+        go->transform()->LookAt(0, 0, 0);
         go->AddComponent(Light::Create());
         
         

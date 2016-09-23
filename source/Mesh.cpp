@@ -17,7 +17,7 @@ using namespace std;
 
 NAMESPACE_FISHENGINE_BEGIN
 
-std::vector<Mesh::PMesh> Mesh::m_meshes;
+std::map<std::string, Mesh::PMesh> Mesh::m_meshes;
 
 Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices)
     :   m_positionBuffer(positions, positions+n_vertex*3),
@@ -83,7 +83,7 @@ FishEngine::Mesh::PMesh FishEngine::Mesh::CreateFromObjFile(const std::string pa
 {
     auto m = std::make_shared<Mesh>();
     m->FromObjFile(path, vertexUsage, flags);
-    m_meshes.push_back(m);
+    //m_meshes.push_back(m);
     return m;
 }
 
@@ -335,5 +335,27 @@ void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
 //    return m;
 //
 //}
+
+Mesh::PMesh Mesh::builtinMesh(const std::string& name)
+{
+    auto it = m_meshes.find(name);
+    if (it != m_meshes.end()) {
+        return it->second;
+    }
+    Debug::LogWarning("No built-in mesh called %d", name.c_str());
+    return nullptr;
+}
+
+void Mesh::Init()
+{
+#if FISHENGINE_PLATFORM_WINDOWS
+    const std::string root_dir = "../../assets/models/";
+#else
+    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
+#endif
+    for (auto& n : std::vector<std::string>{"cone", "cube", "plane", "quad", "sphere"}) {
+        m_meshes[n] = Mesh::CreateFromObjFile(root_dir+n+".obj");
+    }
+}
 
 NAMESPACE_FISHENGINE_END

@@ -44,7 +44,10 @@ public:
     }
     
     void BindTextures(const std::map<std::string, Texture::PTexture>& textures) {
-        m_textures = textures;
+        //m_textures = textures;
+        for (auto& pair : textures) {
+            m_textures[pair.first] = pair.second;
+        }
     }
 
 //    auto uniforms() const {

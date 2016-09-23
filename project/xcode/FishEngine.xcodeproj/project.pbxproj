@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF26B4E31D94001400237680 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF26B4DF1D94001400237680 /* Color.cpp */; };
+		BF26B4E41D94001400237680 /* Color.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF26B4E01D94001400237680 /* Color.hpp */; };
+		BF26B4E51D94001400237680 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF26B4E11D94001400237680 /* Light.cpp */; };
+		BF26B4E61D94001400237680 /* Light.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF26B4E21D94001400237680 /* Light.hpp */; };
+		BF26B4EA1D940F9A00237680 /* RenderTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF26B4E81D940F9A00237680 /* RenderTexture.cpp */; };
+		BF26B4EB1D940F9A00237680 /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF26B4E91D940F9A00237680 /* RenderTexture.hpp */; };
 		BF3212201D9173FF00FA80E6 /* Mathf.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3212191D9173FF00FA80E6 /* Mathf.hpp */; };
 		BF3212211D9173FF00FA80E6 /* Matrix4x4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF32121A1D9173FF00FA80E6 /* Matrix4x4.cpp */; };
 		BF3212221D9173FF00FA80E6 /* Matrix4x4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF32121B1D9173FF00FA80E6 /* Matrix4x4.hpp */; };
@@ -65,6 +71,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BF26B4DF1D94001400237680 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Color.cpp; path = ../../source/Color.cpp; sourceTree = "<group>"; };
+		BF26B4E01D94001400237680 /* Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Color.hpp; path = ../../source/Color.hpp; sourceTree = "<group>"; };
+		BF26B4E11D94001400237680 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Light.cpp; path = ../../source/Light.cpp; sourceTree = "<group>"; };
+		BF26B4E21D94001400237680 /* Light.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Light.hpp; path = ../../source/Light.hpp; sourceTree = "<group>"; };
+		BF26B4E81D940F9A00237680 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../source/RenderTexture.cpp; sourceTree = "<group>"; };
+		BF26B4E91D940F9A00237680 /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../source/RenderTexture.hpp; sourceTree = "<group>"; };
 		BF3212191D9173FF00FA80E6 /* Mathf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mathf.hpp; path = ../../source/Mathf.hpp; sourceTree = "<group>"; };
 		BF32121A1D9173FF00FA80E6 /* Matrix4x4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix4x4.cpp; path = ../../source/Matrix4x4.cpp; sourceTree = "<group>"; };
 		BF32121B1D9173FF00FA80E6 /* Matrix4x4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix4x4.hpp; path = ../../source/Matrix4x4.hpp; sourceTree = "<group>"; };
@@ -159,14 +171,20 @@
 		BF3211F71D8EE59500FA80E6 /* Render */ = {
 			isa = PBXGroup;
 			children = (
-				BFDC74A31D8EDDF50082A6DC /* Mesh.cpp */,
-				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
+				BF26B4DF1D94001400237680 /* Color.cpp */,
+				BF26B4E01D94001400237680 /* Color.hpp */,
 				BFDC749D1D8EDDF50082A6DC /* GLEnvironment.cpp */,
 				BFDC749E1D8EDDF50082A6DC /* GLEnvironment.hpp */,
+				BF26B4E11D94001400237680 /* Light.cpp */,
+				BF26B4E21D94001400237680 /* Light.hpp */,
 				BFDC74A11D8EDDF50082A6DC /* Material.cpp */,
 				BFDC74A21D8EDDF50082A6DC /* Material.hpp */,
+				BFDC74A31D8EDDF50082A6DC /* Mesh.cpp */,
+				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
 				BFDC74AE1D8EDDF50082A6DC /* RenderSystem.cpp */,
 				BFDC74AF1D8EDDF50082A6DC /* RenderSystem.hpp */,
+				BF26B4E81D940F9A00237680 /* RenderTexture.cpp */,
+				BF26B4E91D940F9A00237680 /* RenderTexture.hpp */,
 				BFDC74B31D8EDDF50082A6DC /* Shader.cpp */,
 				BFDC74B41D8EDDF50082A6DC /* Shader.hpp */,
 				BFDC74B51D8EDDF50082A6DC /* Texture.cpp */,
@@ -254,6 +272,7 @@
 				BF3212221D9173FF00FA80E6 /* Matrix4x4.hpp in Headers */,
 				BF3212261D9173FF00FA80E6 /* Vector3.hpp in Headers */,
 				BFDC74D21D8EDDF50082A6DC /* Material.hpp in Headers */,
+				BF26B4EB1D940F9A00237680 /* RenderTexture.hpp in Headers */,
 				BFDC74CA1D8EDDF50082A6DC /* GameLoop.hpp in Headers */,
 				BFDC74C71D8EDDF50082A6DC /* Debug.hpp in Headers */,
 				BFDC74BE1D8EDDF50082A6DC /* Behaviour.hpp in Headers */,
@@ -264,6 +283,7 @@
 				BFDC74E11D8EDDF50082A6DC /* Scene.hpp in Headers */,
 				BFDC74D41D8EDDF50082A6DC /* Mesh.hpp in Headers */,
 				BFDC74E81D8EDDF50082A6DC /* Time.hpp in Headers */,
+				BF26B4E41D94001400237680 /* Color.hpp in Headers */,
 				BFDC74DC1D8EDDF50082A6DC /* Renderer.hpp in Headers */,
 				BFDC74EA1D8EDDF50082A6DC /* Transform.hpp in Headers */,
 				BFDC74BC1D8EDDF50082A6DC /* App.hpp in Headers */,
@@ -273,6 +293,7 @@
 				BF3212201D9173FF00FA80E6 /* Mathf.hpp in Headers */,
 				BFDC74D81D8EDDF50082A6DC /* MeshRenderer.hpp in Headers */,
 				BFDC74C31D8EDDF50082A6DC /* Common.hpp in Headers */,
+				BF26B4E61D94001400237680 /* Light.hpp in Headers */,
 				BFDC74C51D8EDDF50082A6DC /* Component.hpp in Headers */,
 				BFDC74E41D8EDDF50082A6DC /* Shader.hpp in Headers */,
 				BFDC74E61D8EDDF50082A6DC /* Texture.hpp in Headers */,
@@ -341,7 +362,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF26B4E51D94001400237680 /* Light.cpp in Sources */,
 				BFDC74CB1D8EDDF50082A6DC /* GameObject.cpp in Sources */,
+				BF26B4E31D94001400237680 /* Color.cpp in Sources */,
 				BFDC74C21D8EDDF50082A6DC /* Common.cpp in Sources */,
 				BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */,
 				BFDC74C91D8EDDF50082A6DC /* GameLoop.cpp in Sources */,
@@ -354,6 +377,7 @@
 				BFDC74CF1D8EDDF50082A6DC /* Input.cpp in Sources */,
 				BF3212251D9173FF00FA80E6 /* Vector3.cpp in Sources */,
 				BF3212211D9173FF00FA80E6 /* Matrix4x4.cpp in Sources */,
+				BF26B4EA1D940F9A00237680 /* RenderTexture.cpp in Sources */,
 				BFDC74D31D8EDDF50082A6DC /* Mesh.cpp in Sources */,
 				BFDC74BF1D8EDDF50082A6DC /* Camera.cpp in Sources */,
 				BFDC74D91D8EDDF50082A6DC /* Object.cpp in Sources */,

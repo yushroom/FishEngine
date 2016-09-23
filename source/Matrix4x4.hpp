@@ -247,6 +247,10 @@ public:
     static Matrix4x4 FromRotation(const Quaternion& rotation);
 
     static Matrix4x4 Perspective(float fovy, float aspect, float zNear, float zFar);
+    
+    static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
+        return glm::orthoLH(left, right, bottom, top, zNear, zFar);
+    }
 
     static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up);
 

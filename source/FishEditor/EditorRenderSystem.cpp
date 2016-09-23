@@ -14,6 +14,8 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include "FishEditorWindow.hpp"
 #include <RenderSystem.hpp>
+#include <Light.hpp>
+#include <Mesh.hpp>
 
 using namespace FishEngine;
 
@@ -45,6 +47,7 @@ void EditorRenderSystem::Init()
     
     Shader::Init();
     Material::Init();
+    Mesh::Init();
     EditorGUI::Init();
     Scene::Init();
 //#ifdef GLM_FORCE_LEFT_HANDED
@@ -60,6 +63,13 @@ void EditorRenderSystem::Render()
 {
     ImGui_ImplGlfwGL3_NewFrame();
 
+    // Shadow
+    
+    auto lights = Light::lights();
+    for (auto& l : lights) {
+        Scene::RenderShadow(l);
+    }
+    
     // Render
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -82,6 +92,14 @@ void EditorRenderSystem::Render()
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    auto& l = Light::lights().front();
+    std::map<std::string, Texture::PTexture> textures;
+    textures["screenTexture"] = l->m_shadowMap;
+    glViewport(200, 200, 400, 400);
+    auto m = Material::builtinMaterial("ScreenTexture");
+    m->shader()->Use();
+    m->shader()->BindTextures(textures);
+    Mesh::builtinMesh("quad")->Render();
     EditorGUI::Update();
 
     // Swap the screen buffers

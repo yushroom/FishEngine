@@ -43,20 +43,29 @@ void MeshRenderer::Render() const
     uniforms.vec3s["_WorldSpaceCameraPos"] = camera->transform()->position();
 
     Vector4 lightPos(0, 0, 0, 0);
+    std::map<std::string, Texture::PTexture> textures;
+    Matrix4x4 lightVP;
     auto& lights = Light::lights();
     if (lights.size() > 0) {
         auto& l = lights.front();
         if (l->transform() != nullptr) {
             lightPos = Vector4(l->transform()->position(), 0);
+            auto view = l->gameObject()->transform()->worldToLocalMatrix();
+            auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
+            lightVP = proj * view;
+            textures["shadowMap"] = l->m_shadowMap;
         }
     }
     uniforms.vec4s["_WorldSpaceLightPos0"] = lightPos;
+    uniforms.mat4s["_LightMatrix0"] = lightVP;
 
     for (auto& m : m_materials) {
         auto shader = m->shader();
         shader->Use();
         shader->PreRender();
         shader->BindUniforms(uniforms);
+        m->BindTextures(textures);
+        //shader->BindTextures(textures);
         m->Update();
         shader->CheckStatus();
         meshFilter->mesh()->Render();

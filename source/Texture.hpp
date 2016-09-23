@@ -13,7 +13,7 @@ public:
     Texture(const std::string& path);
     Texture(const Texture&) = delete;
     void operator=(const Texture&) = delete;
-    ~Texture();
+    virtual ~Texture();
 
     typedef std::shared_ptr<Texture> PTexture;
     
@@ -27,7 +27,7 @@ public:
         return m_texture;
     }
     
-private:
+protected:
     GLuint m_texture = 0;
 };
 

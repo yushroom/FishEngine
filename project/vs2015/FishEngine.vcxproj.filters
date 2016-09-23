@@ -126,6 +126,9 @@
     <ClInclude Include="..\..\source\Color.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\RenderTexture.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -222,6 +225,9 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Color.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\RenderTexture.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>

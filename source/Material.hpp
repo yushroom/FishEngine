@@ -37,6 +37,10 @@ public:
         //m_shader->BindUniformVec3(name.c_str(), value);
         m_uniforms.vec3s[name] = value;
     }
+
+    void SetVector4(const std::string& name, const Vector4& value) {
+        m_uniforms.vec4s[name] = value;
+    }
     
     // Set a named matrix for the shader.
     void SetMatrix(const std::string& name, const Matrix4x4& value) {

@@ -155,7 +155,7 @@ public:
 
     bool m_isWireFrameMode = false;
     bool m_useGammaCorrection = true;
-    bool m_showShadowMap = true;
+    bool m_showShadowMap = false;
     
     virtual void Start() override {
         EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);

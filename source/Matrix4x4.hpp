@@ -3,10 +3,10 @@
 
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
-#define GLM_FORCE_LEFT_HANDED
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
-
+//#define GLM_FORCE_LEFT_HANDED
+//#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+//#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+//#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 namespace FishEngine {
 
@@ -48,16 +48,16 @@ public:
 
     }
 
-    Matrix4x4(const glm::mat4& glm_mat4)
-    {
-        memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
-    }
+    //Matrix4x4(const glm::mat4& glm_mat4)
+    //{
+    //    memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
+    //}
 
-    operator glm::mat4() const {
-        glm::mat4 result;
-        memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
-        return result;
-    }
+    //operator glm::mat4() const {
+    //    glm::mat4 result;
+    //    memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
+    //    return result;
+    //}
 
     const float* data() const {
         return m[0];
@@ -179,16 +179,16 @@ public:
         return MultiplyVector(v.x, v.y, v.z);
     }
 
-    float determinant() const
-    {
-        glm::mat4 m = *this;
-        return glm::determinant(m);
-    }
+    //float determinant() const
+    //{
+    //    glm::mat4 m = *this;
+    //    return glm::determinant(m);
+    //}
 
-    static float Determinant(const Matrix4x4& mat)
-    {
-        return mat.determinant();
-    }
+    //static float Determinant(const Matrix4x4& mat)
+    //{
+    //    return mat.determinant();
+    //}
 
     Matrix4x4 inverse() const
     {
@@ -248,9 +248,7 @@ public:
 
     static Matrix4x4 Perspective(float fovy, float aspect, float zNear, float zFar);
     
-    static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
-        return glm::orthoLH(left, right, bottom, top, zNear, zFar);
-    }
+    static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
 
     static Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3 up);
 

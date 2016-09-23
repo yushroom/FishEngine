@@ -52,6 +52,7 @@ FishEngine::Material::PMaterial FishEngine::Material::builtinMaterial(const std:
         return it->second;
     }
     Debug::LogWarning("No built-in material called %d", name.c_str());
+    abort();
     return nullptr;
 }
 
@@ -59,7 +60,7 @@ NAMESPACE_FISHENGINE_END
 
 void FishEngine::Material::Init()
 {
-    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse", "ShadowMap" , "ScreenTexture"})
+    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse", "ShadowMap" , "ScreenTexture", "SolidColor"})
     {
         auto material = std::make_shared<Material>();
         material->SetShader(Shader::builtinShader(s));

@@ -83,8 +83,10 @@ void Scene::Update() {
 
 void Scene::RenderShadow(std::shared_ptr<Light>& light)
 {
+    //glCullFace(GL_FRONT);
     auto m = Material::builtinMaterial("ShadowMap");
     auto shader = m->shader();
+    shader->Use();
     ShaderUniforms uniforms;
     auto view = light->gameObject()->transform()->worldToLocalMatrix();
     auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);

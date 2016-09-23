@@ -16,6 +16,8 @@
 #include <RenderSystem.hpp>
 #include <Light.hpp>
 #include <Mesh.hpp>
+#include <MeshFilter.hpp>
+#include "Selection.hpp"
 
 using namespace FishEngine;
 
@@ -70,6 +72,7 @@ void EditorRenderSystem::Render()
     for (auto& l : lights) {
         Scene::RenderShadow(l);
     }
+
     
     // Render
     
@@ -77,6 +80,32 @@ void EditorRenderSystem::Render()
 
     auto v = Scene::mainCamera()->viewport();
     glViewport(GLint(v.x*m_width), GLint(v.y*m_height), GLsizei(v.z*m_width), GLsizei(v.w*m_height));
+
+    // Selection
+
+    auto go = Selection::activeGameObject();
+    auto meshFilter = go->GetComponent<MeshFilter>();
+
+    if (meshFilter != nullptr) {
+        auto camera = Scene::mainCamera();
+        auto view = camera->worldToCameraMatrix();
+        auto proj = camera->projectionMatrix();
+        auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+        ShaderUniforms uniforms;
+        uniforms.mat4s["MATRIX_MVP"] = proj * view * model;
+        auto material = Material::builtinMaterial("SolidColor");
+        material->SetVector4("Color", Vector4(0, 1, 0, 1));
+        material->shader()->Use();
+        material->shader()->BindUniforms(uniforms);
+        material->Update();
+        glEnable(GL_POLYGON_OFFSET_LINE);
+        glPolygonOffset(-1.0, -1.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        material->shader()->CheckStatus();
+        meshFilter->mesh()->Render();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_POLYGON_OFFSET_LINE);
+    }
 
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

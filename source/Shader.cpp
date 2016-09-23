@@ -389,6 +389,7 @@ Shader::PShader Shader::builtinShader(const std::string& name)
         return it->second;
     }
     Debug::LogWarning("No built-in shader called %d", name.c_str());
+    abort();
     return nullptr;
 }
 
@@ -411,7 +412,7 @@ void Shader::Init() {
 #endif
     m_shaderVariables = readFile(root_dir + "ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
-    for (auto& n : std::vector<std::string>{"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture"}) {
+    for (auto& n : std::vector<std::string>{"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor"}) {
         m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }
     //m_builtinShaders["Diffuse"] = Shader::CreateFromFile(root_dir+"PBR.vert", root_dir + "Diffuse.frag");

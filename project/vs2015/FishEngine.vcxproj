@@ -149,6 +149,7 @@
     <ClInclude Include="..\..\source\Renderer.hpp" />
     <ClInclude Include="..\..\source\RenderSettings.hpp" />
     <ClInclude Include="..\..\source\RenderSystem.hpp" />
+    <ClInclude Include="..\..\source\RenderTexture.hpp" />
     <ClInclude Include="..\..\source\Scene.hpp" />
     <ClInclude Include="..\..\source\Script.hpp" />
     <ClInclude Include="..\..\source\Shader.hpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="..\..\source\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />
     <ClCompile Include="..\..\source\RenderSystem.cpp" />
+    <ClCompile Include="..\..\source\RenderTexture.cpp" />
     <ClCompile Include="..\..\source\Scene.cpp" />
     <ClCompile Include="..\..\source\Shader.cpp" />
     <ClCompile Include="..\..\source\Texture.cpp" />

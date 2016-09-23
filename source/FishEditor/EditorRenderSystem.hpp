@@ -32,6 +32,10 @@ public:
     static void setGammaCorrection(bool value) {
         m_useGammaCorrection = value;
     }
+    
+    static void setShowShadowMap(bool value) {
+        m_showShadowMap = value;
+    }
 
     static void SaveScreenShot(const std::string& path);
 
@@ -42,6 +46,7 @@ private:
 
     static bool m_isWireFrameMode;
     static bool m_useGammaCorrection;
+    static bool m_showShadowMap;
     
     static void OnWindowSizeChanged(const int width, const int height);
 };

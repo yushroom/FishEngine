@@ -155,6 +155,13 @@ public:
 
     bool m_isWireFrameMode = false;
     bool m_useGammaCorrection = true;
+    bool m_showShadowMap = true;
+    
+    virtual void Start() override {
+        EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
+        EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
+        EditorRenderSystem::setShowShadowMap(m_showShadowMap);
+    }
 
     virtual void OnInspectorGUI() override {
         if (ImGui::Checkbox("Wire Frame", &m_isWireFrameMode)) {
@@ -163,6 +170,26 @@ public:
         if (ImGui::Checkbox("Gamma Correction", &m_useGammaCorrection)) {
             EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
         }
+        if (ImGui::Checkbox("Show ShadowMap", &m_showShadowMap)) {
+            EditorRenderSystem::setShowShadowMap(m_showShadowMap);
+        }
+    }
+};
+            
+class Rotator : public Script {
+public:
+    InjectClassName(Rotator);
+    
+    bool rotating = false;
+    float step = 1;
+    
+    virtual void Update() override {
+        if (rotating)
+            transform()->RotateAround(Vector3(0, 0, 0), Vector3::up, step);
+    }
+    
+    virtual void OnInspectorGUI() override {
+        ImGui::Checkbox("Rotating", &rotating);
     }
 };
 
@@ -278,6 +305,7 @@ public:
         go->transform()->setPosition(10, 10, 0);
         go->transform()->LookAt(0, 0, 0);
         go->AddComponent(Light::Create());
+        go->AddScript(make_shared<Rotator>());
         
         
         //auto child0 = Scene::CreateGameObject("child0");

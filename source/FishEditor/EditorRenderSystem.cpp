@@ -26,6 +26,7 @@ int EditorRenderSystem::m_height = 600;
 
 bool EditorRenderSystem::m_isWireFrameMode = false;
 bool EditorRenderSystem::m_useGammaCorrection = true;
+bool EditorRenderSystem::m_showShadowMap = true;
 
 
 void EditorRenderSystem::Init()
@@ -92,14 +93,16 @@ void EditorRenderSystem::Render()
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    auto& l = Light::lights().front();
-    std::map<std::string, Texture::PTexture> textures;
-    textures["screenTexture"] = l->m_shadowMap;
-    glViewport(200, 200, 400, 400);
-    auto m = Material::builtinMaterial("ScreenTexture");
-    m->shader()->Use();
-    m->shader()->BindTextures(textures);
-    Mesh::builtinMesh("quad")->Render();
+    if (m_showShadowMap) {
+        auto& l = Light::lights().front();
+        std::map<std::string, Texture::PTexture> textures;
+        textures["screenTexture"] = l->m_shadowMap;
+        glViewport(200, 200, 400, 400);
+        auto m = Material::builtinMaterial("ScreenTexture");
+        m->shader()->Use();
+        m->shader()->BindTextures(textures);
+        Mesh::builtinMesh("quad")->Render();
+    }
     EditorGUI::Update();
 
     // Swap the screen buffers

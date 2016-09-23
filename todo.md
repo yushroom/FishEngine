@@ -4,7 +4,9 @@
 
 - [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离
 
-- [ ] 数学库换成左手系（暂时将glm变成左手系，自己实现的WIP）
+- [x] 数学库换成左手系
+
+- [ ] depth \in (-1, 1)，下次换成D3D的时候小心
 
 - [ ] glm四元数的-0问题，eulerangle的数字不太合适
 
@@ -46,7 +48,7 @@
 
 - [ ] 场景的序列化和反序列化（要依赖反射）
 
-- [ ] 鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）
+- [x] 鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）
 
 - [x] Inspector窗口中的Headers的缩进（OK，用imgui::indent()），一行显示不全的问题（暂时解决，Unity也没有解决label多长的问题）
 

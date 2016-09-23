@@ -214,6 +214,10 @@ public:
      * @return: Transform Transform child by index.
      */
     std::shared_ptr<Transform> GetChild(const size_t index);
+
+    const std::list<std::weak_ptr<Transform>>& children() const {
+        return m_children;
+    }
     
 private:
     friend class FishEditor::EditorGUI;

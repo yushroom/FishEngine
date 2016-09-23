@@ -116,13 +116,14 @@ void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, in
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     
-    if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-        Input::UpdateKeyState((KeyCode)key, (Input::KeyState)action);
-    }
-    
     //TwEventKeyGLFW(key, action);
     //GUI::OnKey(key, action);
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
+    if (ImGui::GetIO().WantCaptureKeyboard) 
+
+    if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
+        Input::UpdateKeyState((KeyCode)key, (Input::KeyState)action);
+    }
 }
 
 void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -131,7 +132,8 @@ void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, d
     //    if (handled)
     //        return;
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-    Input::UpdateAxis(Input::Axis::MouseScrollWheel, (float)yoffset);
+    if (!ImGui::GetIO().WantCaptureMouse)
+        Input::UpdateAxis(Input::Axis::MouseScrollWheel, (float)yoffset);
 }
 
 //GLfloat lastX = 400, lastY = 300;
@@ -142,7 +144,8 @@ void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int a
     //    if (GUI::OnMouseButton(button, action))
     //        return;
     ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-    Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? Input::MouseButtonState_Down : Input::MouseButtonState_Up);
+    if (!ImGui::GetIO().WantCaptureMouse)
+        Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? Input::MouseButtonState_Down : Input::MouseButtonState_Up);
 }
 
 void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)

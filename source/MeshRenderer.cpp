@@ -55,6 +55,7 @@ void MeshRenderer::Render() const
             lightVP = proj * view;
             textures["shadowMap"] = l->m_shadowMap;
         }
+        uniforms.vec4s["_LightColor0"] = l->m_color;
     }
     uniforms.vec4s["_WorldSpaceLightPos0"] = lightDir;
     uniforms.mat4s["_LightMatrix0"] = lightVP;

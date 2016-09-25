@@ -65,7 +65,7 @@ void RenderSystem::Render()
     else
         glDisable(GL_FRAMEBUFFER_SRGB);
 
-    Scene::Render();
+    //Scene::Render();
     
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

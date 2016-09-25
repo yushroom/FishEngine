@@ -69,12 +69,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;$(IncludePath)</IncludePath>
+    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;D:\program\FishEngine\external\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;$(IncludePath)</IncludePath>
+    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <LibraryPath>D:\program\FishEngine\project\vs2015\Release;D:\program\FishEngine\external\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>

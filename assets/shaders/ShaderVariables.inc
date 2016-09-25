@@ -54,6 +54,7 @@ uniform vec3 unity_LightPosition; // view space light position
 #define uint2 uvec2
 #define uint3 uvec3
 #define uint4 uvec4
+#define lerp(x, y, t) mix(x, y, t)
 #define frac(x) fract(x)
 #define saturate(x) clamp(x, 0.0, 1.0)
 

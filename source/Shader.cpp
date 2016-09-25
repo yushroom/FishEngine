@@ -133,7 +133,7 @@ void Shader::FromString(const std::string& vs_string,
         }
     };
     
-    map<string, string> settings= {{"Cull", "Back"},{"ZWrite", "On"}};
+    map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
     
     auto extractSettings = [&settings](const string& shader_str) -> void {
         auto lines = split(shader_str, "\n");
@@ -156,15 +156,17 @@ void Shader::FromString(const std::string& vs_string,
         }
     };
     
-    extractSettings(vs_string);
-    if (settings["Cull"] == "Back") {
-        m_cullface = Cullface::Back;
-    } else if ((settings["Cull"] == "Front")) {
-        m_cullface = Cullface::Front;
-    } else {
-        m_cullface = Cullface::Off;
-    }
+    extractSettings(vs_string+"\n"+fs_string);
+    m_cullface = ToEnum<Cullface>(settings["Cull"]);
+    //if (settings["Cull"] == "Back") {
+    //    m_cullface = Cullface::Back;
+    //} else if ((settings["Cull"] == "Front")) {
+    //    m_cullface = Cullface::Front;
+    //} else {
+    //    m_cullface = Cullface::Off;
+    //}
     m_ZWrite = settings["ZWrite"] == "On";
+    m_blend = settings["Blend"] == "On";
     
     compileShader(vs, GL_VERTEX_SHADER, m_shaderVariables + vs_string);
     compileShader(ps, GL_FRAGMENT_SHADER, m_shaderVariables + fs_string);
@@ -363,14 +365,27 @@ void Shader::BindTextures(const std::map<std::string, Texture::PTexture>& textur
 
 void Shader::PreRender() const
 {
-    glCullFace((GLenum)m_cullface);
+    if (m_cullface == Cullface::Off) {
+        glDisable(GL_CULL_FACE);
+    }
+    else {
+        glCullFace((GLenum)m_cullface);
+    }
     glDepthMask(m_ZWrite);
+    if (m_blend) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 }
 
 void Shader::PostRender() const
 {
     glDepthMask(GL_TRUE);
+    if (m_cullface == Cullface::Off)
+        glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    if (m_blend)
+        glDisable(GL_BLEND);
 }
 
 void Shader::CheckStatus() const
@@ -412,9 +427,16 @@ void Shader::Init() {
 #endif
     m_shaderVariables = readFile(root_dir + "ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
-    for (auto& n : std::vector<std::string>{"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor"}) {
+    for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline"}) {
+        Debug::Log("Compile shader: %s", n);
         m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }
+    Debug::Log("Compile shader: Texture");
+    m_builtinShaders["Texture"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Texture.frag");
+    Debug::Log("Compile shader: TextureDoubleSided");
+    m_builtinShaders["TextureDoubleSided"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "TextureDoubleSided.frag");
+    Debug::Log("Compile shader: Transparent");
+    m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
     //m_builtinShaders["Diffuse"] = Shader::CreateFromFile(root_dir+"PBR.vert", root_dir + "Diffuse.frag");
 }
 

@@ -16,6 +16,9 @@ std::string trim(const std::string& str);
 
 bool startsWith(const std::string& str, const std::string& str2);
 
+template<typename T>
+inline T ToEnum(const std::string& s);
+
 NAMESPACE_FISHENGINE_END
 
 #endif

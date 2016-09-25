@@ -193,12 +193,12 @@ GLuint create_texture(char const* Filename)
 
 GLuint CreateTexture(const std::string& path) {
     int width, height, n;
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 3);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 4);
     assert(data!=nullptr);
     GLuint t;
     glGenTextures(1, &t);
     glBindTexture(GL_TEXTURE_2D, t);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Parameters
@@ -226,7 +226,7 @@ void Texture::FromFile(const std::string& path)
     if (ext == "dds") {
         m_texture = create_texture(path.c_str());
     }
-    else if (ext == "bmp" || ext == "png" || ext == "jpg") {
+    else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga") {
         m_texture = CreateTexture(path);
     }
     else {

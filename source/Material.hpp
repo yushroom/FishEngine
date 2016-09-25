@@ -11,27 +11,27 @@ class Material : public Object
 {
 public:
     Material() {
-        
+
     }
-    
+
     Material(Shader::PShader shader) {
         SetShader(shader);
     }
-    
+
     void SetShader(std::shared_ptr<Shader> shader);
-    
+
     typedef std::shared_ptr<Material> PMaterial;
-    
+
     std::shared_ptr<Shader> shader() const {
         return m_shader;
     }
-    
+
     // Set a named float value.
     void SetFloat(const std::string& name, const float value) {
         //m_shader->BindUniformFloat(name.c_str(), value);
         m_uniforms.floats[name] = value;
     }
-    
+
     // Set a named Vector3 value.
     void SetVector3(const std::string& name, const Vector3& value) {
         //m_shader->BindUniformVec3(name.c_str(), value);
@@ -41,10 +41,15 @@ public:
     void SetVector4(const std::string& name, const Vector4& value) {
         m_uniforms.vec4s[name] = value;
     }
-    
+
     // Set a named matrix for the shader.
     void SetMatrix(const std::string& name, const Matrix4x4& value) {
         m_uniforms.mat4s[name] = value;
+    }
+
+    // Set a named texture
+    void SetTexture(const std::string& name, std::shared_ptr<Texture>& texture) {
+        m_textures[name] = texture;
     }
     
     void BindTextures(const std::map<std::string, Texture::PTexture>& textures) {

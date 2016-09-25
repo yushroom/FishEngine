@@ -1,5 +1,8 @@
 #include "Matrix4x4.hpp"
 #include <cassert>
+#define GLM_FORCE_LEFT_HANDED
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace FishEngine {
 
@@ -172,6 +175,29 @@ namespace FishEngine {
         //if (!test.isIdentity()) {
         //    Assert(false);
         //}
+    }
+
+    void Matrix4x4::Decompose(
+        const Matrix4x4&    transformation, 
+        Vector3*            outTranslation,
+        Quaternion*         outRotation, 
+        Vector3*            outScale)
+    {
+        glm::mat4 m;
+        memcpy(glm::value_ptr(m), transformation.transpose().m, 16 * sizeof(float));
+
+        glm::vec3 scale;
+        glm::quat rotation;
+        glm::vec3 translation;
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(m, scale, rotation, translation, skew, perspective);
+        if (outTranslation != nullptr) 
+            outTranslation->Set(translation.x, translation.y, translation.z);
+        if (outScale != nullptr)
+            outScale->Set(scale.x, scale.y, scale.z);
+        if (outRotation != nullptr)
+            *outRotation = Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
     }
 
     Quaternion Matrix4x4::ToRotation() const

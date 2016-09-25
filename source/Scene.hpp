@@ -19,7 +19,7 @@ public:
     static void Start();
     static void Update();
     static void RenderShadow(std::shared_ptr<Light>& light);
-    static void Render();
+    //static void Render();
     //static void OnInspectorGUI();
     
     //typedef std::weak_ptr<GameObject> WPGameObject;
@@ -46,6 +46,7 @@ public:
 private:
     friend class RenderSystem;
     friend class FishEditor::EditorGUI;
+    friend class FishEditor::EditorRenderSystem;
     static std::shared_ptr<Camera> m_mainCamera;
     static std::list<std::shared_ptr<GameObject>> m_gameObjects;
     static std::vector<std::shared_ptr<GameObject>> m_gameObjectsToBeDestroyed;

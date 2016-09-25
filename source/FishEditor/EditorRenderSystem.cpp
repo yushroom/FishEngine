@@ -134,7 +134,28 @@ void EditorRenderSystem::Render()
     else
         glDisable(GL_FRAMEBUFFER_SRGB);
 
-    Scene::Render();
+    //Scene::Render();
+    std::vector<std::shared_ptr<GameObject>> transparentQueue;
+    for (auto& go : Scene::m_gameObjects) {
+        if (!go->activeInHierarchy()) continue;
+        auto renderer = go->GetComponent<MeshRenderer>();
+        if (renderer == nullptr) {
+            continue;
+        }
+        bool isTransparent = renderer->material()->shader()->IsTransparent();
+        if (isTransparent) {
+            transparentQueue.push_back(go);
+            continue;
+        }
+        renderer->Render();
+    }
+
+    for (auto& go : transparentQueue) {
+        auto renderer = go->GetComponent<MeshRenderer>();
+        renderer->Render();
+    }
+
+    transparentQueue.clear();
 
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

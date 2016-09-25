@@ -9,37 +9,44 @@
 #include "Material.hpp"
 #include "MeshFilter.hpp"
 
+struct aiNode;
+struct aiMesh;
+
 namespace FishEngine {
+
+    struct ModelNode
+    {
+        typedef std::shared_ptr<ModelNode> PModelNode;
+        std::string     name;
+        ModelNode*      parent;
+        //uint32_t        numChildren;
+        //ModelNode*      children;
+        std::vector<PModelNode> children;
+        std::vector<uint32_t> meshes;
+    };
     
     class Model : public Object
     {
     public:
         Model() = default;
         
-        std::shared_ptr<GameObject> CreateGameObject() const {
-            auto go = Scene::CreateGameObject(m_name);
-            
-            for (auto& m : m_meshes) {
-                auto child = Scene::CreateGameObject(m->name());
-                child->transform()->SetParent(go->transform());
-                auto material = Material::builtinMaterial("PBR");
-                material->SetVector3("albedo", Vector3(1, 1, 1));
-                auto meshRenderer = std::make_shared<MeshRenderer>(material);
-                auto meshFilter = std::make_shared<MeshFilter>(m);
-                child->AddComponent(meshRenderer);
-                child->AddComponent(meshFilter);
-            }
-            
-            return go;
-        }
+        std::shared_ptr<GameObject> CreateGameObject() const;
         
     private:
         friend class ModelImporter;
-        void AddMesh(std::shared_ptr<Mesh>& mesh) {
+        //void AddNode(ModelNode::PModelNode& node) {
+        //    m_modelNodes.push_back(node);
+        //}
+
+        void AddMesh(Mesh::PMesh& mesh) {
             m_meshes.push_back(mesh);
         }
+
+        std::shared_ptr<GameObject> ResursivelyCreateGameObject(ModelNode::PModelNode& node) const;
         
         std::vector<std::shared_ptr<Mesh>> m_meshes;
+        //std::vector<ModelNode::PModelNode> m_modelNodes;
+        ModelNode::PModelNode m_rootNode;
     };
 
     
@@ -52,6 +59,9 @@ namespace FishEngine {
         LoadFromFile(const std::string path,
                      int vertexUsage = VertexUsagePNUT,
                      MeshLoadFlags flags = 0);
+    private:
+        static ModelNode::PModelNode buildModelTree(const aiNode* assimp_node);
+        static std::shared_ptr<Mesh> ParseMesh(const aiMesh* assimp_mesh, int vertexUsage, bool load_uv, bool load_tangent);
     };
 }
 

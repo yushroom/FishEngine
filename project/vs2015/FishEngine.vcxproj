@@ -69,11 +69,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -123,8 +123,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\external\imgui\imconfig.h" />
+    <ClInclude Include="..\..\external\imgui\imgui.h" />
     <ClInclude Include="..\..\external\imgui\imgui_dock.h" />
+    <ClInclude Include="..\..\external\imgui\imgui_impl_glfw_gl3.h" />
+    <ClInclude Include="..\..\external\imgui\imgui_internal.h" />
     <ClInclude Include="..\..\source\App.hpp" />
+    <ClInclude Include="..\..\source\AssetImporter.hpp" />
     <ClInclude Include="..\..\source\Behaviour.hpp" />
     <ClInclude Include="..\..\source\Camera.hpp" />
     <ClInclude Include="..\..\source\CameraController.hpp" />
@@ -144,6 +149,7 @@
     <ClInclude Include="..\..\source\Mesh.hpp" />
     <ClInclude Include="..\..\source\MeshFilter.hpp" />
     <ClInclude Include="..\..\source\MeshRenderer.hpp" />
+    <ClInclude Include="..\..\source\ModelImporter.hpp" />
     <ClInclude Include="..\..\source\Object.hpp" />
     <ClInclude Include="..\..\source\Quaternion.hpp" />
     <ClInclude Include="..\..\source\Renderer.hpp" />
@@ -165,6 +171,7 @@
     <ClCompile Include="..\..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="..\..\source\App.cpp" />
+    <ClCompile Include="..\..\source\AssetImporter.cpp" />
     <ClCompile Include="..\..\source\Behaviour.cpp" />
     <ClCompile Include="..\..\source\Camera.cpp" />
     <ClCompile Include="..\..\source\Color.cpp" />
@@ -181,6 +188,7 @@
     <ClCompile Include="..\..\source\Mesh.cpp" />
     <ClCompile Include="..\..\source\MeshFilter.cpp" />
     <ClCompile Include="..\..\source\MeshRenderer.cpp" />
+    <ClCompile Include="..\..\source\ModelImporter.cpp" />
     <ClCompile Include="..\..\source\Object.cpp" />
     <ClCompile Include="..\..\source\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />

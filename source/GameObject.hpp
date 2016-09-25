@@ -68,6 +68,11 @@ public:
                 return std::static_pointer_cast<T>(comp);
             }
         }
+        //for (auto& s : m_scripts) {
+        //    if (s->ClassName() == T::StaticClassName()) {
+        //        return std::static_pointer_cast<T>(s);
+        //    }
+        //}
         return nullptr;
     }
 

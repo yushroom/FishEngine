@@ -116,16 +116,16 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Scene::Render()
-{
-    for (auto& go : m_gameObjects) {
-        if (!go->activeInHierarchy()) continue;
-        auto renderer = go->GetComponent<MeshRenderer>();
-        if (renderer != nullptr) {
-            renderer->Render();
-        }
-    }
-}
+//void Scene::Render()
+//{
+//    for (auto& go : m_gameObjects) {
+//        if (!go->activeInHierarchy()) continue;
+//        auto renderer = go->GetComponent<MeshRenderer>();
+//        if (renderer != nullptr) {
+//            renderer->Render();
+//        }
+//    }
+//}
 
 GameObject::PGameObject FishEngine::Scene::Find(const std::string& name)
 {

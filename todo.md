@@ -1,3 +1,5 @@
+
+
 ## Engine
 
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
@@ -57,6 +59,8 @@
 - [x] 相机旋转时transform反应不正常，会越退越远
 
 - [ ] Docking GUI
+
+- [ ] hierarchy中的方向键的移动
 
       ​
 

@@ -35,36 +35,41 @@ struct Bone
     std::string name;
 };
 
+static constexpr int MaxBoneForEachVertex = 16;
+
 struct BoneWeight
 {
-    union {
-        struct {
-            int boneIndex0;
-            int boneIndex1;
-            int boneIndex2;
-            int boneIndex3;
-        };
-        int boneIndex[4];
-    };
-    union {
-        struct {
-            float weight0;
-            float weight1;
-            float weight2;
-            float weight3;
-        };
-        float weight[4];
-    };
+    //union {
+    //    struct {
+    //        int boneIndex0;
+    //        int boneIndex1;
+    //        int boneIndex2;
+    //        int boneIndex3;
+    //    };
+    //    int boneIndex[4];
+    //};
+    //union {
+    //    struct {
+    //        float weight0;
+    //        float weight1;
+    //        float weight2;
+    //        float weight3;
+    //    };
+    //    float weight[4];
+    //};
+
+    int boneIndex[MaxBoneForEachVertex];
+    float weight[MaxBoneForEachVertex];
     
     BoneWeight() {
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < MaxBoneForEachVertex; ++i) {
             boneIndex[i] = 0;
             weight[i] = 0.f;
         }
     }
     
     void AddBoneData(uint32_t boneIndex, float weight) {
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < MaxBoneForEachVertex; ++i) {
             if (this->weight[i] == 0.0f) {
                 this->boneIndex[i] = boneIndex;
                 this->weight[i] = weight;

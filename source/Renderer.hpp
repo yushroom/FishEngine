@@ -29,6 +29,11 @@ public:
     std::vector<std::shared_ptr<Material>>& materials() {
         return m_materials;
     }
+
+    void SetMaterial(std::shared_ptr<Material> material) {
+        m_materials.clear();
+        m_materials.push_back(material);
+    }
     
     virtual void OnInspectorGUI() override;
     

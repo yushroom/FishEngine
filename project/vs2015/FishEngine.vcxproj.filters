@@ -25,6 +25,9 @@
     <Filter Include="Render">
       <UniqueIdentifier>{b676749f-adb5-495a-b337-789a5813ffbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Importer">
+      <UniqueIdentifier>{3f37f387-42fe-463a-85f7-9bb6eec67685}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\RenderSettings.hpp">
@@ -129,6 +132,24 @@
     <ClInclude Include="..\..\source\RenderTexture.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\external\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\imgui\imgui_impl_glfw_gl3.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\AssetImporter.hpp">
+      <Filter>Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ModelImporter.hpp">
+      <Filter>Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -229,6 +250,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\RenderTexture.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\AssetImporter.cpp">
+      <Filter>Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ModelImporter.cpp">
+      <Filter>Importer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

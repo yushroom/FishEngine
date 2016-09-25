@@ -228,6 +228,11 @@ public:
         Matrix4x4&          outLocalToWorld, 
         Matrix4x4&          outWorldToLocal);
 
+    static void Decompose(
+        const Matrix4x4&    transformation,
+        Vector3*            outTranslation,
+        Quaternion*         outRotation,
+        Vector3*            outScale);
 
     static Matrix4x4 Scale(float x, float y, float z)
     {

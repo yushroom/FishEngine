@@ -29,7 +29,7 @@ int EditorRenderSystem::m_height = 600;
 bool EditorRenderSystem::m_isWireFrameMode = false;
 bool EditorRenderSystem::m_useGammaCorrection = true;
 bool EditorRenderSystem::m_showShadowMap = true;
-
+bool EditorRenderSystem::m_highlightSelections = true;
 
 void EditorRenderSystem::Init()
 {
@@ -83,26 +83,43 @@ void EditorRenderSystem::Render()
 
     // Selection
 
-    auto go = Selection::activeGameObject();
-    auto meshFilter = go->GetComponent<MeshFilter>();
-
-    if (meshFilter != nullptr) {
-        auto camera = Scene::mainCamera();
-        auto view = camera->worldToCameraMatrix();
-        auto proj = camera->projectionMatrix();
-        auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-        ShaderUniforms uniforms;
-        uniforms.mat4s["MATRIX_MVP"] = proj * view * model;
-        auto material = Material::builtinMaterial("SolidColor");
-        material->SetVector4("Color", Vector4(0, 1, 0, 1));
-        material->shader()->Use();
-        material->shader()->BindUniforms(uniforms);
-        material->Update();
-        glEnable(GL_POLYGON_OFFSET_LINE);
-        glPolygonOffset(-1.0, -1.0f);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        material->shader()->CheckStatus();
-        meshFilter->mesh()->Render();
+    auto camera = Scene::mainCamera();
+    auto view = camera->worldToCameraMatrix();
+    auto proj = camera->projectionMatrix();
+    auto vp = proj * view;
+    glEnable(GL_POLYGON_OFFSET_LINE);
+    glPolygonOffset(-1.0, -1.0f);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    ShaderUniforms uniforms;
+    auto material = Material::builtinMaterial("SolidColor");
+    material->SetVector4("Color", Vector4(0, 1, 0, 1));
+    material->shader()->Use();
+    
+    if (m_highlightSelections) {
+        std::list<std::shared_ptr<GameObject>> selections;
+        auto go = Selection::activeGameObject();
+        selections.push_back(go);
+        while (!selections.empty()) {
+            go = selections.front();
+            selections.pop_back();
+            if (go == nullptr) {
+                continue;
+            }
+            auto& children = go->transform()->children();
+            for (auto& c : children) {
+                selections.push_back(c.lock()->gameObject());
+            }
+            auto meshFilter = go->GetComponent<MeshFilter>();
+            if (meshFilter != nullptr) {
+                auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+                uniforms.mat4s["MATRIX_MVP"] = vp * model;
+                
+                material->shader()->BindUniforms(uniforms);
+                material->Update();
+                material->shader()->CheckStatus();
+                meshFilter->mesh()->Render();
+            }
+        }
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDisable(GL_POLYGON_OFFSET_LINE);
     }

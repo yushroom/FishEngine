@@ -18,3 +18,5 @@ project.xcworkspace/
 xcuserdata/
 /project/xcode/build/
 
+/external/boost*
+

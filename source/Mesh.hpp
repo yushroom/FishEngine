@@ -3,6 +3,7 @@
 
 #include "Object.hpp"
 #include "GLEnvironment.hpp"
+#include "Matrix4x4.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -23,6 +24,56 @@ enum MeslLoadFlag {
 };
 
 typedef int MeshLoadFlags;
+
+struct Bone
+{
+    //uint32_t index;
+    uint32_t parentIndex;
+    Matrix4x4 boneOffse;
+    Matrix4x4 finalTransformation;
+    std::vector<uint32_t> children;
+    std::string name;
+};
+
+struct BoneWeight
+{
+    union {
+        struct {
+            int boneIndex0;
+            int boneIndex1;
+            int boneIndex2;
+            int boneIndex3;
+        };
+        int boneIndex[4];
+    };
+    union {
+        struct {
+            float weight0;
+            float weight1;
+            float weight2;
+            float weight3;
+        };
+        float weight[4];
+    };
+    
+    BoneWeight() {
+        for (int i = 0; i < 4; ++i) {
+            boneIndex[i] = 0;
+            weight[i] = 0.f;
+        }
+    }
+    
+    void AddBoneData(uint32_t boneIndex, float weight) {
+        for (int i = 0; i < 4; ++i) {
+            if (this->weight[i] == 0.0f) {
+                this->boneIndex[i] = boneIndex;
+                this->weight[i] = weight;
+                return;
+            }
+        }
+        abort();
+    }
+};
 
 class Mesh : public Object
 {
@@ -63,11 +114,14 @@ public:
     
 private:
     friend class FishEditor::EditorGUI;
+    friend class ModelImporter;
     std::vector<float>      m_positionBuffer;
     std::vector<float>      m_normalBuffer;
     std::vector<float>      m_uvBuffer;
     std::vector<float>      m_tangentBuffer;
     std::vector<uint32_t>   m_indexBuffer;
+    std::vector<Bone>       m_bones;
+    std::vector<BoneWeight> m_boneWeights;
     GLuint m_VAO;
     GLuint m_indexVBO;
     GLuint m_positionVBO;

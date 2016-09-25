@@ -47,23 +47,29 @@ void Material::OnInspectorGUI() {
 
 FishEngine::Material::PMaterial FishEngine::Material::builtinMaterial(const std::string& name)
 {
-    auto it = m_builtinMaterial.find(name);
-    if (it != m_builtinMaterial.end()) {
-        return it->second;
-    }
-    Debug::LogWarning("No built-in material called %d", name.c_str());
-    abort();
-    return nullptr;
+    auto shader = Shader::builtinShader(name);
+    assert(shader!=nullptr);
+    auto material = CreateMaterial();
+    material->SetShader(shader);
+    return material;
+//    auto it = m_builtinMaterial.find(name);
+//    if (it != m_builtinMaterial.end()) {
+//        return it->second;
+//    }
+//    Debug::LogWarning("No built-in material called %d", name.c_str());
+//    abort();
+//    return nullptr;
 }
 
-NAMESPACE_FISHENGINE_END
 
 void FishEngine::Material::Init()
 {
-    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse", "ShadowMap" , "ScreenTexture", "SolidColor"})
-    {
-        auto material = std::make_shared<Material>();
-        material->SetShader(Shader::builtinShader(s));
-        m_builtinMaterial[s] = material;
-    }
+//    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse", "ShadowMap" , "ScreenTexture", "SolidColor"})
+//    {
+//        auto material = std::make_shared<Material>();
+//        material->SetShader(Shader::builtinShader(s));
+//        m_builtinMaterial[s] = material;
+//    }
 }
+
+NAMESPACE_FISHENGINE_END

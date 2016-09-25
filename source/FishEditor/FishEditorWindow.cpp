@@ -119,7 +119,8 @@ void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, in
     //TwEventKeyGLFW(key, action);
     //GUI::OnKey(key, action);
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
-    if (ImGui::GetIO().WantCaptureKeyboard) 
+    if (ImGui::GetIO().WantCaptureKeyboard)
+        return;
 
     if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
         Input::UpdateKeyState((KeyCode)key, (Input::KeyState)action);

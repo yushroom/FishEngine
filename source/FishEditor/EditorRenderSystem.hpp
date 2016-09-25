@@ -36,6 +36,10 @@ public:
     static void setShowShadowMap(bool value) {
         m_showShadowMap = value;
     }
+    
+    static void setHightlightSelections(bool value) {
+        m_highlightSelections = value;
+    }
 
     static void SaveScreenShot(const std::string& path);
 
@@ -47,6 +51,7 @@ private:
     static bool m_isWireFrameMode;
     static bool m_useGammaCorrection;
     static bool m_showShadowMap;
+    static bool m_highlightSelections;
     
     static void OnWindowSizeChanged(const int width, const int height);
 };

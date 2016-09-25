@@ -1,4 +1,5 @@
 #include "Matrix4x4.hpp"
+#include <cassert>
 
 namespace FishEngine {
 

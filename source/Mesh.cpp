@@ -92,11 +92,10 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
     Assimp::Importer importer;
     unsigned int load_option =
         aiProcess_Triangulate
-        | aiProcess_RemoveComponent
         //| aiProcess_SortByPType
         | aiProcess_CalcTangentSpace
         //| aiProcess_JoinIdenticalVertices
-        | aiProcess_FixInfacingNormals
+        //| aiProcess_FixInfacingNormals
         //| aiProcess_OptimizeGraph
         //| aiProcess_OptimizeMeshes
         //| aiProcess_FlipUVs
@@ -107,7 +106,7 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
 //#endif
     if (flags & MeshLoadFlag_RegenerateNormal) {
         importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
-        load_option |= aiProcess_GenSmoothNormals;
+        load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;
     } else {
         load_option |= aiProcess_GenNormals;
     }
@@ -124,11 +123,13 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
 
     int n_vertices = 0;
     int n_triangles = 0;
+    int n_bones = 0;
 
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
         aiMesh* mesh = scene->mMeshes[i];
         n_vertices += mesh->mNumVertices;
         n_triangles += mesh->mNumFaces;
+        n_bones += mesh->mNumBones;
     }
 
     m_positionBuffer.reserve(n_vertices * 3);
@@ -136,6 +137,8 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
     m_uvBuffer.reserve(n_vertices * 2);
     m_indexBuffer.reserve(n_triangles * 3);
     m_tangentBuffer.reserve(n_triangles * 3);
+    m_boneWeights.reserve(n_bones);
+    
     int idx = 0;
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[i];
@@ -175,7 +178,7 @@ void Mesh::FromObjFile(const std::string path, int vertexUsage, MeshLoadFlags fl
             for (int fi = 0; fi < 3; ++fi)
                 m_indexBuffer.push_back(face.mIndices[fi] + idx);
         }
-        idx += mesh->mNumFaces;
+        idx += mesh->mNumFaces*3;
     }
 
     GenerateBuffer(vertexUsage);

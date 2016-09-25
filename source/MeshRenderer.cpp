@@ -42,21 +42,21 @@ void MeshRenderer::Render() const
     //auto camera = Scene::getMainCamera();
     uniforms.vec3s["_WorldSpaceCameraPos"] = camera->transform()->position();
 
-    Vector4 lightPos(0, 0, 0, 0);
+    Vector4 lightDir(0, 0, 0, 0);
     std::map<std::string, Texture::PTexture> textures;
     Matrix4x4 lightVP;
     auto& lights = Light::lights();
     if (lights.size() > 0) {
         auto& l = lights.front();
         if (l->transform() != nullptr) {
-            lightPos = Vector4(l->transform()->position(), 0);
+            lightDir = Vector4(l->transform()->forward(), 0);
             auto view = l->gameObject()->transform()->worldToLocalMatrix();
             auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
             lightVP = proj * view;
             textures["shadowMap"] = l->m_shadowMap;
         }
     }
-    uniforms.vec4s["_WorldSpaceLightPos0"] = lightPos;
+    uniforms.vec4s["_WorldSpaceLightPos0"] = lightDir;
     uniforms.mat4s["_LightMatrix0"] = lightVP;
 
     for (auto& m : m_materials) {

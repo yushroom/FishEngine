@@ -379,6 +379,7 @@
 					../../source/,
 					../../external/,
 					../../external/glew,
+					../../external/boost_1_61_0,
 				);
 				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -393,6 +394,7 @@
 					../../source/,
 					../../external/,
 					../../external/glew,
+					../../external/boost_1_61_0,
 				);
 				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";

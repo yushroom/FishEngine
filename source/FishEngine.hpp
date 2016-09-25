@@ -48,6 +48,9 @@ class Matrix4x4;
 class Light;
 class Color;
 class RenderTexture;
+class AssetImporter;
+class Model;
+class ModelImporter;
 
 NAMESPACE_FISHENGINE_END
 

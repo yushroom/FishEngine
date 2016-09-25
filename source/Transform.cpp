@@ -12,7 +12,7 @@ Transform::Transform() : m_localPosition(0, 0, 0), m_localScale(1, 1, 1), m_loca
 
 Transform::~Transform()
 {
-    Debug::Log("~Transform");
+    //Debug::Log("~Transform");
     SetParent(nullptr); // remove from parent
     for (auto child : m_children) {
         //Scene::des

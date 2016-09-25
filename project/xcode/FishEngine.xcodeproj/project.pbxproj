@@ -20,6 +20,10 @@
 		BF3212241D9173FF00FA80E6 /* Quaternion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF32121D1D9173FF00FA80E6 /* Quaternion.hpp */; };
 		BF3212251D9173FF00FA80E6 /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF32121E1D9173FF00FA80E6 /* Vector3.cpp */; };
 		BF3212261D9173FF00FA80E6 /* Vector3.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF32121F1D9173FF00FA80E6 /* Vector3.hpp */; };
+		BF9499701D964E85001F65E4 /* AssetImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF94996E1D964E85001F65E4 /* AssetImporter.cpp */; };
+		BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF94996F1D964E85001F65E4 /* AssetImporter.hpp */; };
+		BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF9499771D96AB68001F65E4 /* ModelImporter.cpp */; };
+		BF94997A1D96AB68001F65E4 /* ModelImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF9499781D96AB68001F65E4 /* ModelImporter.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
 		BFDC74BC1D8EDDF50082A6DC /* App.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC748C1D8EDDF50082A6DC /* App.hpp */; };
 		BFDC74BD1D8EDDF50082A6DC /* Behaviour.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */; };
@@ -84,6 +88,10 @@
 		BF32121D1D9173FF00FA80E6 /* Quaternion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../../source/Quaternion.hpp; sourceTree = "<group>"; };
 		BF32121E1D9173FF00FA80E6 /* Vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Vector3.cpp; path = ../../source/Vector3.cpp; sourceTree = "<group>"; };
 		BF32121F1D9173FF00FA80E6 /* Vector3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vector3.hpp; path = ../../source/Vector3.hpp; sourceTree = "<group>"; };
+		BF94996E1D964E85001F65E4 /* AssetImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AssetImporter.cpp; path = ../../source/AssetImporter.cpp; sourceTree = "<group>"; };
+		BF94996F1D964E85001F65E4 /* AssetImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AssetImporter.hpp; path = ../../source/AssetImporter.hpp; sourceTree = "<group>"; };
+		BF9499771D96AB68001F65E4 /* ModelImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelImporter.cpp; path = ../../source/ModelImporter.cpp; sourceTree = "<group>"; };
+		BF9499781D96AB68001F65E4 /* ModelImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ModelImporter.hpp; path = ../../source/ModelImporter.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC748B1D8EDDF50082A6DC /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../../source/App.cpp; sourceTree = "<group>"; };
 		BFDC748C1D8EDDF50082A6DC /* App.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = App.hpp; path = ../../source/App.hpp; sourceTree = "<group>"; };
@@ -216,6 +224,17 @@
 			name = Math;
 			sourceTree = "<group>";
 		};
+		BF9499721D964E8D001F65E4 /* Importer */ = {
+			isa = PBXGroup;
+			children = (
+				BF9499771D96AB68001F65E4 /* ModelImporter.cpp */,
+				BF9499781D96AB68001F65E4 /* ModelImporter.hpp */,
+				BF94996E1D964E85001F65E4 /* AssetImporter.cpp */,
+				BF94996F1D964E85001F65E4 /* AssetImporter.hpp */,
+			);
+			name = Importer;
+			sourceTree = "<group>";
+		};
 		BFDC74131D8EDD6C0082A6DC = {
 			isa = PBXGroup;
 			children = (
@@ -235,6 +254,7 @@
 		BFDC748A1D8EDDD80082A6DC /* FishEngine */ = {
 			isa = PBXGroup;
 			children = (
+				BF9499721D964E8D001F65E4 /* Importer */,
 				BF3212181D9173F000FA80E6 /* Math */,
 				BF3211F81D8EE68B00FA80E6 /* Script */,
 				BF3211F71D8EE59500FA80E6 /* Render */,
@@ -282,6 +302,7 @@
 				BF3212241D9173FF00FA80E6 /* Quaternion.hpp in Headers */,
 				BFDC74E11D8EDDF50082A6DC /* Scene.hpp in Headers */,
 				BFDC74D41D8EDDF50082A6DC /* Mesh.hpp in Headers */,
+				BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */,
 				BFDC74E81D8EDDF50082A6DC /* Time.hpp in Headers */,
 				BF26B4E41D94001400237680 /* Color.hpp in Headers */,
 				BFDC74DC1D8EDDF50082A6DC /* Renderer.hpp in Headers */,
@@ -290,6 +311,7 @@
 				BFDC74D61D8EDDF50082A6DC /* MeshFilter.hpp in Headers */,
 				BFDC74C01D8EDDF50082A6DC /* Camera.hpp in Headers */,
 				BFDC74C81D8EDDF50082A6DC /* FishEngine.hpp in Headers */,
+				BF94997A1D96AB68001F65E4 /* ModelImporter.hpp in Headers */,
 				BF3212201D9173FF00FA80E6 /* Mathf.hpp in Headers */,
 				BFDC74D81D8EDDF50082A6DC /* MeshRenderer.hpp in Headers */,
 				BFDC74C31D8EDDF50082A6DC /* Common.hpp in Headers */,
@@ -367,6 +389,7 @@
 				BF26B4E31D94001400237680 /* Color.cpp in Sources */,
 				BFDC74C21D8EDDF50082A6DC /* Common.cpp in Sources */,
 				BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */,
+				BF9499701D964E85001F65E4 /* AssetImporter.cpp in Sources */,
 				BFDC74C91D8EDDF50082A6DC /* GameLoop.cpp in Sources */,
 				BFDC74DB1D8EDDF50082A6DC /* Renderer.cpp in Sources */,
 				BF3212231D9173FF00FA80E6 /* Quaternion.cpp in Sources */,
@@ -388,6 +411,7 @@
 				BFDC74D71D8EDDF50082A6DC /* MeshRenderer.cpp in Sources */,
 				BFDC74D51D8EDDF50082A6DC /* MeshFilter.cpp in Sources */,
 				BFDC74C61D8EDDF50082A6DC /* Debug.cpp in Sources */,
+				BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */,
 				BFDC74E31D8EDDF50082A6DC /* Shader.cpp in Sources */,
 				BFDC74DE1D8EDDF50082A6DC /* RenderSystem.cpp in Sources */,
 			);
@@ -492,6 +516,7 @@
 				HEADER_SEARCH_PATHS = (
 					../../external,
 					../../external/glew,
+					../../external/boost_1_61_0,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -506,6 +531,7 @@
 				HEADER_SEARCH_PATHS = (
 					../../external,
 					../../external/glew,
+					../../external/boost_1_61_0,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

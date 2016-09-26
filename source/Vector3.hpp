@@ -71,7 +71,7 @@ public:
     Vector3         operator*(const Vector3 v) const    { return Vector3(x*v.x, y*v.y, z*v.z); }
     Vector3         operator/(const float f) const      { Assert(!isnan(f) && f!=0.f); return Vector3(x / f, y / f, z / f); }
     friend Vector3  operator*(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(v.x * f, v.y * f, v.z * f); }
-    friend Vector3  operator/(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(v.x / f, v.y / f, v.z / f); }
+    friend Vector3  operator/(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(f/v.x, f/v.y, f/v.z); }
     Vector3         operator+(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x + v.x, y + v.y, z + v.z); }
     Vector3         operator-(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x - v.x, y - v.y, z - v.z); }
     void            operator+=(const Vector3& v)        { Assert(!v.hasNaNs()); x += v.x; y += v.y; z += v.z; }
@@ -259,6 +259,7 @@ public:
 
     union {
         struct { float x, y, z, w; };
+        //struct { Vector3 xyz; float w; };
         float m[4];
     };
 
@@ -267,6 +268,10 @@ public:
     }
     Vector4() : Vector4(0, 0, 0, 0) {}
     Vector4(const Vector3& v3, float w) : Vector4(v3.x, v3.y, v3.z, w) {}
+
+    operator Vector3() const {
+        return Vector3(x, y, z);
+    }
 
     const float* data() const {
         return m;

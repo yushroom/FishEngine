@@ -5,8 +5,8 @@
 
 NAMESPACE_FISHENGINE_BEGIN
 
-Input::KeyState Input::m_keyStates[1024] = { Input::KeyState_None };
-Input::MouseButtonState Input::m_mouseButtonStates[3] = {Input::MouseButtonState_None};
+KeyState Input::m_keyStates[1024] = { KeyState::None };
+MouseButtonState Input::m_mouseButtonStates[3] = {MouseButtonState::None};
 
 float Input::m_mousePositionX = 0;
 float Input::m_mousePositionY = 0;
@@ -15,9 +15,9 @@ float Input::m_axis[(int)Axis::AxisCount] = {0.0f};
 void Input::Init()
 {
     for (auto& s : m_keyStates)
-        s = KeyState_None;
+        s = KeyState::None;
     for (auto& b : m_mouseButtonStates)
-        b = MouseButtonState_None;
+        b = MouseButtonState::None;
     
     for (auto& a : m_axis) {
         a = 0.f;
@@ -26,23 +26,23 @@ void Input::Init()
 
 bool Input::GetKey(KeyCode key)
 {
-    return m_keyStates[(int)key] == KeyState_Held;
+    return m_keyStates[(int)key] == KeyState::Held;
 }
 
 bool Input::GetKeyDown(KeyCode key)
 {
-    return m_keyStates[(int)key] == KeyState_Down;
+    return m_keyStates[(int)key] == KeyState::Down;
 }
 
 bool Input::GetKeyUp(KeyCode key)
 {
-    return m_keyStates[(int)key] == KeyState_Up;
+    return m_keyStates[(int)key] == KeyState::Up;
 }
 
 bool Input::GetMouseButton(int button)
 {
     if (button >= 0 && button <= 3) {
-        return m_mouseButtonStates[button] == MouseButtonState_Held;
+        return m_mouseButtonStates[button] == MouseButtonState::Held;
     }
     else {
         Debug::LogWarning("invalid mouse button id: %d", button);
@@ -53,7 +53,7 @@ bool Input::GetMouseButton(int button)
 bool Input::GetMouseButtonDown(int button)
 {
     if (button >= 0 && button <= 3) {
-        return m_mouseButtonStates[button] == MouseButtonState_Down;
+        return m_mouseButtonStates[button] == MouseButtonState::Down;
     }
     else {
         Debug::LogWarning("invalid mouse button id: %d", button);
@@ -64,7 +64,7 @@ bool Input::GetMouseButtonDown(int button)
 bool Input::GetMouseButtonUp(int button)
 {
     if (button >= 0 && button <= 3) {
-        return m_mouseButtonStates[button] == MouseButtonState_Up;
+        return m_mouseButtonStates[button] == MouseButtonState::Up;
     }
     else {
         Debug::LogWarning("invalid mouse button id: %d", button);
@@ -75,13 +75,13 @@ bool Input::GetMouseButtonUp(int button)
 void Input::Update()
 {
     for (auto& s : m_keyStates) {
-        if (s == KeyState_Up || s == KeyState_Down)
-            s = KeyState_None;
+        if (s == KeyState::Up || s == KeyState::Down)
+            s = KeyState::None;
     }
 
     for (auto& b : m_mouseButtonStates) {
-        if (b == MouseButtonState_Down) b = MouseButtonState_Held;
-        else if (b == MouseButtonState_Up) b = MouseButtonState_None;
+        if (b == MouseButtonState::Down) b = MouseButtonState::Held;
+        else if (b == MouseButtonState::Up) b = MouseButtonState::None;
     }
     
     for (auto& a : m_axis) {
@@ -98,7 +98,7 @@ void Input::UpdateAxis(Axis axis, float value)
 void Input::UpdateMousePosition(float xpos, float ypos)
 {
     m_axis[(int)Axis::MouseX] = xpos - m_mousePositionX;
-    m_axis[(int)Axis::MouseY] = -(ypos - m_mousePositionY);
+    m_axis[(int)Axis::MouseY] = ypos - m_mousePositionY;
     m_mousePositionX = xpos;
     m_mousePositionY = ypos;
 }

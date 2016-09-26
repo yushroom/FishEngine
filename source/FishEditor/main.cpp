@@ -25,6 +25,7 @@ using namespace FishEditor;
 #include "Light.hpp"
 #include <ModelImporter.hpp>
 #include <CameraController.hpp>
+#include <Bounds.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -52,6 +53,11 @@ public:
         if (Input::GetKeyUp(KeyCode::A)) {
             Debug::Log("A released");
         }
+
+        //if (Input::GetMouseButtonDown(0)) {
+        //    auto mp = Input::mousePosition();
+        //    Debug::Log("Mouse Position: %lf, %lf, %lf", mp.x, mp.y, mp.z);
+        //}
     }
 };
 
@@ -158,7 +164,7 @@ public:
     bool m_isWireFrameMode = false;
     bool m_useGammaCorrection = true;
     bool m_showShadowMap = false;
-    bool m_highlightSelections = false;
+    bool m_highlightSelections = true;
     
     virtual void Start() override {
         EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
@@ -177,7 +183,7 @@ public:
         if (ImGui::Checkbox("Show ShadowMap", &m_showShadowMap)) {
             EditorRenderSystem::setShowShadowMap(m_showShadowMap);
         }
-        if (ImGui::Checkbox("Hightlight Selections", &m_highlightSelections)) {
+        if (ImGui::Checkbox("Highlight Selections", &m_highlightSelections)) {
             EditorRenderSystem::setHightlightSelections(m_highlightSelections);
         }
     }
@@ -218,6 +224,32 @@ public:
     
     virtual void OnInspectorGUI() override {
         ImGui::Checkbox("Draw", &draw);
+    }
+};
+
+class TestAABB : public Script
+{
+public:
+    InjectClassName(TestAABB);
+
+    Bounds aabb{Vector3(0, 0, 0), Vector3(1, 1, 1)};
+
+    virtual void Start() override
+    {
+
+    }
+
+    virtual void Update() override
+    {
+        if (Input::GetMouseButtonDown(0)) {
+            auto mp = Input::mousePosition();
+            //Debug::Log("Mouse Post ion: %lf, %lf, %lf", mp.x, mp.y, mp.z);
+            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            //Debug::Log("Ray dir: %lf, %lf, %lf", ray.direction.x, ray.direction.y, ray.direction.z);
+            if (aabb.IntersectRay(ray)) {
+                Debug::Log("hit aabb");
+            }
+        }
     }
 };
 
@@ -520,14 +552,6 @@ public:
             assert(child != nullptr);
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
         }
-
-        //textures["DiffuseMap"] = eyelineTexture;
-        //material = Material::builtinMaterial("Transparent");
-        //material->BindTextures(textures);
-        //for (auto idx : {1, 6, 7 }) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //}
         
         material = Material::builtinMaterial("Transparent");
         material->SetTexture("DiffuseMap", eyelineTexture);
@@ -552,6 +576,11 @@ public:
             assert(child != nullptr);
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
         }
+        
+        go = Scene::CreateGameObject("Cube");
+        go->AddComponent(make_shared<MeshFilter>(cube));
+        go->AddComponent(make_shared<MeshRenderer>(Material::builtinMaterial("PBR")));
+        go->AddScript(make_shared<TestAABB>());
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setPosition(0, 0, -7);

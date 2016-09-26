@@ -18,6 +18,7 @@
 #include <Time.hpp>
 #include <sstream>
 #include <Matrix4x4.hpp>
+#include <Bounds.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -25,12 +26,14 @@ using namespace FishEngine;
 
 NAMESPACE_FISHEDITOR_BEGIN
 
+TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
+int FishEditor::EditorGUI::m_selectedAxis = -1;
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
 
-Material::PMaterial sceneGizmoMaterial;
-Mesh::PMesh cubeMesh;
-Mesh::PMesh coneMesh;
+Material::PMaterial sceneGizmoMaterial = nullptr;
+Mesh::PMesh cubeMesh = nullptr;
+Mesh::PMesh coneMesh = nullptr;
 
 void EditorGUI::Init()
 {
@@ -61,8 +64,20 @@ void EditorGUI::Init()
 
 void EditorGUI::Update()
 {
+    auto selectedGO = Selection::activeGameObject();
+
     glClear(GL_DEPTH_BUFFER_BIT);
     DrawSceneGizmo();
+    if (selectedGO != nullptr)
+    {
+        if (m_transformToolType == TransformToolType::Translate)
+            DrawTranslateGizmo();
+        else if (m_transformToolType == TransformToolType::Rotate)
+            DrawRotateGizmo();
+        else if (m_transformToolType == TransformToolType::Scale)
+            DrawScaleGizmo();
+    }
+        
     
     static double time_stamp = glfwGetTime();
     //ImGuiContext& g = *GImGui;
@@ -75,18 +90,17 @@ void EditorGUI::Update()
     //ImGui::BeginDock("Inspector", nullptr);
     ImGui::Begin("Inspector", nullptr);
     ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
-    auto go = Selection::activeGameObject();
-    if (go != nullptr) {
+    if (selectedGO != nullptr) {
         ImGui::PushID("Inspector.selected.active");
-        ImGui::Checkbox("", &go->m_activeSelf);
+        ImGui::Checkbox("", &selectedGO->m_activeSelf);
         ImGui::PopID();
         char name[128] = {0};
-        memcpy(name, go->name().c_str(), go->name().size());
-        name[go->m_name.size()] = 0;
+        memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
+        name[selectedGO->m_name.size()] = 0;
         ImGui::SameLine();
         ImGui::PushID("Inspector.selected.name");
         if (ImGui::InputText("", name, 127)) {
-            go->m_name = name;
+            selectedGO->m_name = name;
         }
         ImGui::PopID();
 
@@ -94,18 +108,18 @@ void EditorGUI::Update()
         //ImGui::LabelText("", "Tag");
         ImGui::Text("Tag");
         ImGui::SameLine();
-        ImGui::LabelText("##Tag", "%s", go->tag().c_str());
+        ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
         ImGui::SameLine();
         ImGui::Text("Layer");
         ImGui::SameLine();
-        ImGui::LabelText("##Layer", "Layer %d", go->m_layer);
+        ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
         ImGui::PopItemWidth();
         
         if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
-            go->m_transform->OnInspectorGUI();
+            selectedGO->m_transform->OnInspectorGUI();
         }
         
-        for (auto& c : go->m_components) {
+        for (auto& c : selectedGO->m_components) {
             bool is_open = true;
             if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
                 c->OnInspectorGUI();
@@ -113,7 +127,7 @@ void EditorGUI::Update()
                 Object::Destroy(c);
             }
         }
-        for (auto& s : go->m_scripts) {
+        for (auto& s : selectedGO->m_scripts) {
             bool is_open = true;
             if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
                 s->OnInspectorGUI();
@@ -160,18 +174,18 @@ void EditorGUI::Update()
         }
     }
     
-    if (go != nullptr) {
+    if (selectedGO != nullptr) {
         ImGui::SameLine();
         if (ImGui::Button("Destroy")) {
-            Object::Destroy(go);
+            Object::Destroy(selectedGO);
             //Selection::setActiveGameObject(nullptr);
         }
     }
     m_idCount = 0;
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
-    for (auto& g : Scene::m_gameObjects) {
-        if (g->transform()->parent() == nullptr) {
-            HierarchyItem(g);
+    for (auto& go : Scene::m_gameObjects) {
+        if (go->transform()->parent() == nullptr) {
+            HierarchyItem(go);
         }
     }
     ImGui::PopStyleVar();
@@ -206,6 +220,7 @@ void EditorGUI::Clean()
     ImGui_ImplGlfwGL3_Shutdown();
 }
 
+
 //void GUI::OnKey(int key, int action)
 //{
 //}
@@ -217,12 +232,40 @@ void EditorGUI::Clean()
 //void GUI::OnMouse(double xpos, double ypos)
 //{
 //}
-//
-//bool GUI::OnMouseButton(int button, int action)
-//{
-//    return false;
-//}
-//
+
+bool EditorGUI::OnMouseButton(MouseButtonCode button, MouseButtonState action)
+{
+    if (button == MouseButtonCode::Left && action == MouseButtonState::Down) {
+        auto selectedGO = Selection::activeGameObject();
+        if (selectedGO == nullptr)
+            return false;
+        auto center = selectedGO->transform()->position();
+        constexpr float len = 1.f;
+        constexpr float len_h = len / 2.0f;
+        constexpr float d = 0.4f;
+        Bounds aabbx(center + Vector3(len_h, 0, 0), Vector3(len, d, d));
+        Bounds aabby(center + Vector3(0, len_h, 0), Vector3(d, len, d));
+        Bounds aabbz(center + Vector3(0, 0, len_h), Vector3(d, d, len));
+        auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+        if (aabbx.IntersectRay(ray)) {
+            Debug::Log("x axis");
+            m_selectedAxis = 0;
+        } else if (aabby.IntersectRay(ray)) {
+            Debug::Log("y axis");
+            m_selectedAxis = 1;
+        } else if (aabbz.IntersectRay(ray)) {
+            Debug::Log("z axis");
+            m_selectedAxis = 2;
+        } else {
+            m_selectedAxis = -1;
+            return false; // no intersection
+        }
+
+        return true;
+    }
+    return false;
+}
+
 //bool GUI::OnMouseScroll(double yoffset)
 //{
 //    return false;
@@ -262,7 +305,6 @@ void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> c
 //    }
 }
 
-
 void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
 {
     ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -296,6 +338,85 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
     }
 }
 
+void FishEditor::EditorGUI::DrawTranslateGizmo()
+{
+    auto selectedGO = Selection::activeGameObject();
+    if (selectedGO == nullptr)
+        return;
+    Vector3 center = selectedGO->transform()->position();
+
+    auto shader = sceneGizmoMaterial->shader();
+    shader->Use();
+    auto camera_pos = Vector3(0, 0, -5);
+    sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
+    auto camera = Camera::main();
+    auto view = camera->transform()->worldToLocalMatrix();
+    auto proj = camera->projectionMatrix();
+    auto vp = proj * view;
+
+    ShaderUniforms uniforms;
+
+    static Transform t;
+    t.setLocalScale(0.1f, 0.1f, 0.1f);
+
+    float f[] = {
+        1,  0,  0,   0, 0, -90,    // red axis, +x
+        0,  1,  0,   0, 0,   0,    // green axis, +y
+        0,  0,  1,  90, 0,   0,    // blue axis, +z
+    };
+
+    for (int i = 0; i < 3; ++i) {
+        int j = 6 * i;
+        t.setLocalEulerAngles(f[j+3], f[j+4], f[j+5]);
+        t.setLocalPosition(center.x + f[j], center.y + f[j+1],  center.z + f[j+2]);
+        auto model = t.localToWorldMatrix();
+        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+        Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f[j], f[j + 1], f[j + 2]);
+        sceneGizmoMaterial->SetVector3("_Color", color);
+        shader->PreRender();
+        sceneGizmoMaterial->Update();
+        shader->CheckStatus();
+        coneMesh->Render();
+    }
+
+    if (m_selectedAxis < 0)
+        return;
+
+    if (Input::GetMouseButton(0))
+    {
+        float m_dragSpeed = 10;
+        float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
+        float y = m_dragSpeed * Input::GetAxis(Axis::MouseY);
+        Vector3 dir(x, y, 0);
+        Vector3 axis_dir;
+        if (m_selectedAxis == 0) {
+            axis_dir.Set(1, 0, 0);
+        }
+        else if (m_selectedAxis == 1) {
+            axis_dir.Set(0, 1, 0);
+        }
+        else {
+            axis_dir.Set(0, 0, 1);
+        }
+        Vector3 axis_dir_view = vp * Vector4(axis_dir, 0);
+        float distance = Vector3::Dot(dir, axis_dir_view);
+        Debug::Log("distance: %lf", distance);
+        selectedGO->transform()->Translate(axis_dir * distance);
+    }
+}
+
+
+void FishEditor::EditorGUI::DrawRotateGizmo()
+{
+
+}
+
+
+void FishEditor::EditorGUI::DrawScaleGizmo()
+{
+
+}
 
 void EditorGUI::DrawSceneGizmo()
 {
@@ -306,15 +427,10 @@ void EditorGUI::DrawSceneGizmo()
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
     
-//#ifdef GLM_FORCE_LEFT_HANDED
     auto camera_pos = Vector3(0, 0, -5);
-//#else
-//    auto camera_pos = Vector3(0, 0, 5);
-//#endif
     sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
     auto camera = Camera::main();
     auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-    //auto proj = camera->projectionMatrix();
     auto proj = Matrix4x4::Perspective(60.f, 1.f, 0.1f, 100.f);
     auto vp = proj * view;
     auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));

@@ -2,6 +2,8 @@
 #define Input_hpp
 
 #include "GLEnvironment.hpp"
+#include "Vector3.hpp"
+#include "Screen.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -10,45 +12,55 @@ enum class KeyCode {
     A = GLFW_KEY_A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
 };
 
+enum class KeyState {
+    Up = GLFW_RELEASE, // 0
+    Down = GLFW_PRESS,  // 1
+    Held = GLFW_REPEAT, // 2
+    None = 3,
+};
+
+enum class MouseButtonState {
+    None = 0,
+    Down = 1,
+    Held = 2,
+    Up = 3,
+};
+
+enum class MouseButtonCode {
+    Left = 0,
+    Right = 1,
+    Middle = 2,
+};
+
+enum class Axis {
+    Vertical = 0,   // w, a, s, d and arrow keys
+    Horizontal,
+    Fire1,          // Control
+    Fire2,          // Option(Alt)
+    Fire3,          // Command
+    Jump,
+    MouseX,         // delta of mouse movement
+    MouseY,
+    MouseScrollWheel,
+    WindowShakeX,   // movement of the window
+    WindwoShakeY,
+    AxisCount,
+};
 
 class Input {
 public:
-    enum KeyState {
-        KeyState_Up   = GLFW_RELEASE, // 0
-        KeyState_Down = GLFW_PRESS,  // 1
-        KeyState_Held = GLFW_REPEAT, // 2
-        KeyState_None = 3,
-    };
-
-    enum MouseButtonCode {
-        MouseButtonCode_Left = 0,
-        MouseButtonCode_Right = 1,
-        MouseButtonCode_Middle = 2,
-    };
-
-    enum MouseButtonState {
-        MouseButtonState_None = 0,
-        MouseButtonState_Down = 1,
-        MouseButtonState_Held = 2,
-        MouseButtonState_Up = 3,
-    };
-
-    enum class Axis {
-        Vertical = 0,   // w, a, s, d and arrow keys
-        Horizontal,
-        Fire1,          // Control
-        Fire2,          // Option(Alt)
-        Fire3,          // Command
-        Jump,
-        MouseX,         // delta of mouse movement
-        MouseY,
-        MouseScrollWheel,
-        WindowShakeX,   // movement of the window
-        WindwoShakeY,
-        AxisCount,
-    };
-
     Input() = delete;
+
+    // The current mouse position in pixel coordinates. (Read Only)
+    // bottom-left of the screen <==> (0, 0)
+    // top-right of the screen <==> (Screen::width, Screen::height)
+    static Vector3 mousePosition() {
+        return Vector3(m_mousePositionX*Screen::width(), m_mousePositionY*Screen::height(), 0);
+    }
+
+    static Vector3 normalizedMousePosition() {
+        return Vector3(m_mousePositionX, m_mousePositionX, 0);
+    }
 
     // Returns the value of the virtual axis identified by axisName.
     static float GetAxis(Axis axis) {
@@ -91,8 +103,8 @@ private:
 
     // button values are 0 for left button, 1 for right button, 2 for the middle button.
     static MouseButtonState m_mouseButtonStates[3];
-    static float m_mousePositionX;
-    static float m_mousePositionY;
+    static float m_mousePositionX;  // normalized, (0, 1)
+    static float m_mousePositionY;  // normalized, (0, 1)
     static float m_axis[(int)Axis::AxisCount];
 };
 

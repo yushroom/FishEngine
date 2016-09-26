@@ -76,9 +76,9 @@ void GameLoop::Run()
         glfwPollEvents();
         double xpos, ypos;
         glfwGetCursorPos(m_window, &xpos, &ypos);
-        int w = RenderSystem::width();
-        int h = RenderSystem::height();
-        Input::UpdateMousePosition(float(xpos)/w, float(ypos)/h);
+        int w = Screen::width();
+        int h = Screen::height();
+        Input::UpdateMousePosition(float(xpos)/w, 1.f-float(ypos)/h);
         
         Scene::Update();
         
@@ -115,7 +115,7 @@ void GameLoop::KeyCallBack(GLFWwindow* window, int key, int scancode, int action
         glfwSetWindowShouldClose(window, GL_TRUE);
     
     if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-        Input::UpdateKeyState((KeyCode)key, (Input::KeyState)action);
+        Input::UpdateKeyState((KeyCode)key, (KeyState)action);
     }
     
     //TwEventKeyGLFW(key, action);
@@ -143,7 +143,7 @@ void GameLoop::MouseButtonCallback(GLFWwindow* window, int button, int action, i
     //    if (GUI::OnMouseButton(button, action))
     //        return;
     ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-    Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? Input::MouseButtonState_Down : Input::MouseButtonState_Up);
+    Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up);
 }
 
 void GameLoop::WindowSizeCallback(GLFWwindow* window, int width, int height)

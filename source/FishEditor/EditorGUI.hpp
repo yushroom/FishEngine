@@ -4,6 +4,8 @@
 #include "FishEditor.hpp"
 #include <functional>
 
+#include <Input.hpp>
+
 NAMESPACE_FISHEDITOR_BEGIN
 
 enum class AssetType {
@@ -14,6 +16,13 @@ enum class AssetType {
     Font,
     Script,
     Shader,
+};
+
+enum class TransformToolType {
+    None,
+    Translate,
+    Rotate,
+    Scale,
 };
 
 class EditorGUI
@@ -27,6 +36,8 @@ public:
 
     static void Clean();
     
+    static bool OnMouseButton(FishEngine::MouseButtonCode button, FishEngine::MouseButtonState action);
+
     static bool Button(const char* text);
     
     static void Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat);
@@ -34,8 +45,14 @@ public:
     static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
     
 private:
-    static int m_idCount;
+    static TransformToolType m_transformToolType;
+    static int m_idCount;   // temp
     static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
+
+    static int m_selectedAxis; // temp
+    static void DrawTranslateGizmo();
+    static void DrawRotateGizmo();
+    static void DrawScaleGizmo();
     static void DrawSceneGizmo();
     
     static bool m_showAssectSelectionDialogBox;

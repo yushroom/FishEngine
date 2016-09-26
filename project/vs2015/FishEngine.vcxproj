@@ -131,6 +131,7 @@
     <ClInclude Include="..\..\source\App.hpp" />
     <ClInclude Include="..\..\source\AssetImporter.hpp" />
     <ClInclude Include="..\..\source\Behaviour.hpp" />
+    <ClInclude Include="..\..\source\Bounds.hpp" />
     <ClInclude Include="..\..\source\Camera.hpp" />
     <ClInclude Include="..\..\source\CameraController.hpp" />
     <ClInclude Include="..\..\source\Color.hpp" />
@@ -152,11 +153,13 @@
     <ClInclude Include="..\..\source\ModelImporter.hpp" />
     <ClInclude Include="..\..\source\Object.hpp" />
     <ClInclude Include="..\..\source\Quaternion.hpp" />
+    <ClInclude Include="..\..\source\Ray.hpp" />
     <ClInclude Include="..\..\source\Renderer.hpp" />
     <ClInclude Include="..\..\source\RenderSettings.hpp" />
     <ClInclude Include="..\..\source\RenderSystem.hpp" />
     <ClInclude Include="..\..\source\RenderTexture.hpp" />
     <ClInclude Include="..\..\source\Scene.hpp" />
+    <ClInclude Include="..\..\source\Screen.hpp" />
     <ClInclude Include="..\..\source\Script.hpp" />
     <ClInclude Include="..\..\source\Shader.hpp" />
     <ClInclude Include="..\..\source\Texture.hpp" />
@@ -173,6 +176,7 @@
     <ClCompile Include="..\..\source\App.cpp" />
     <ClCompile Include="..\..\source\AssetImporter.cpp" />
     <ClCompile Include="..\..\source\Behaviour.cpp" />
+    <ClCompile Include="..\..\source\Bounds.cpp" />
     <ClCompile Include="..\..\source\Camera.cpp" />
     <ClCompile Include="..\..\source\Color.cpp" />
     <ClCompile Include="..\..\source\Common.cpp" />
@@ -191,10 +195,12 @@
     <ClCompile Include="..\..\source\ModelImporter.cpp" />
     <ClCompile Include="..\..\source\Object.cpp" />
     <ClCompile Include="..\..\source\Quaternion.cpp" />
+    <ClCompile Include="..\..\source\Ray.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />
     <ClCompile Include="..\..\source\RenderSystem.cpp" />
     <ClCompile Include="..\..\source\RenderTexture.cpp" />
     <ClCompile Include="..\..\source\Scene.cpp" />
+    <ClCompile Include="..\..\source\Screen.cpp" />
     <ClCompile Include="..\..\source\Shader.cpp" />
     <ClCompile Include="..\..\source\Texture.cpp" />
     <ClCompile Include="..\..\source\Time.cpp" />

@@ -133,16 +133,14 @@ namespace FishEngine {
         MeshLoadFlags flags)
     {
         Assimp::Importer importer;
-        unsigned int load_option =
-        aiProcess_Triangulate
-        //| aiProcess_SortByPType
-        | aiProcess_CalcTangentSpace
-        | aiProcess_LimitBoneWeights
-        //| aiProcess_JoinIdenticalVertices
-        | aiProcess_FixInfacingNormals
-        //| aiProcess_OptimizeGraph
-        | aiProcess_OptimizeMeshes
-        ;
+        unsigned int load_option = aiProcess_Triangulate;
+        load_option |= aiProcess_CalcTangentSpace;
+        load_option |= aiProcess_LimitBoneWeights;
+        load_option |= aiProcess_FixInfacingNormals;
+        load_option |= aiProcess_OptimizeMeshes;
+        //load_option |= aiProcess_SortByPType;
+        //load_option |= aiProcess_JoinIdenticalVertices;
+        //load_option |= aiProcess_OptimizeGraph;
         load_option |= aiProcess_ConvertToLeftHanded;
         if (flags & MeshLoadFlag_RegenerateNormal) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);

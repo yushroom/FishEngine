@@ -14,6 +14,7 @@
 #include "App.hpp"
 
 #include "EditorRenderSystem.hpp"
+#include "EditorGUI.hpp"
 
 const uint32_t WIDTH = 1280, HEIGHT = 960;
 
@@ -81,7 +82,7 @@ void FishEditorWindow::Run()
         glfwGetCursorPos(m_window, &xpos, &ypos);
         int w = EditorRenderSystem::width();
         int h = EditorRenderSystem::height();
-        Input::UpdateMousePosition(float(xpos)/w, float(ypos)/h);
+        Input::UpdateMousePosition(float(xpos)/w, 1.0f-float(ypos)/h);
         
         Scene::Update();
         
@@ -123,7 +124,7 @@ void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, in
         return;
 
     if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-        Input::UpdateKeyState((KeyCode)key, (Input::KeyState)action);
+        Input::UpdateKeyState((KeyCode)key, (KeyState)action);
     }
 }
 
@@ -134,7 +135,7 @@ void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, d
     //        return;
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
     if (!ImGui::GetIO().WantCaptureMouse)
-        Input::UpdateAxis(Input::Axis::MouseScrollWheel, (float)yoffset);
+        Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
 }
 
 //GLfloat lastX = 400, lastY = 300;
@@ -145,8 +146,12 @@ void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int a
     //    if (GUI::OnMouseButton(button, action))
     //        return;
     ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-    if (!ImGui::GetIO().WantCaptureMouse)
-        Input::UpdateMouseButtonState(button, action == GLFW_PRESS ? Input::MouseButtonState_Down : Input::MouseButtonState_Up);
+    if (!ImGui::GetIO().WantCaptureMouse) {
+        MouseButtonState s = action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up;
+        bool done = EditorGUI::OnMouseButton((MouseButtonCode)button, s);
+        //if (done) return;
+        Input::UpdateMouseButtonState(button, s);
+    }
 }
 
 void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)

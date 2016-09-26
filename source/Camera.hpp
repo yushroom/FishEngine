@@ -4,6 +4,7 @@
 #include "Script.hpp"
 #include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
+#include "Ray.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -41,6 +42,9 @@ public:
     }
 
     virtual void OnInspectorGUI() override;
+
+    // Returns a ray going from camera through a screen point.
+    Ray ScreenPointToRay(const Vector3& position);
     
     // TODO
     // The first enabled camera tagged "MainCamera" (Read Only).

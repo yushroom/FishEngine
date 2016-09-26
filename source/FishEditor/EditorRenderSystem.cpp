@@ -17,6 +17,7 @@
 #include <Light.hpp>
 #include <Mesh.hpp>
 #include <MeshFilter.hpp>
+#include <Screen.hpp>
 #include "Selection.hpp"
 
 using namespace FishEngine;
@@ -45,6 +46,8 @@ void EditorRenderSystem::Init()
     glViewport(0, 0, m_width, m_height);
     RenderSystem::m_width = m_width;
     RenderSystem::m_height = m_height;
+    Screen::m_width = m_width;
+    Screen::m_height = m_height;
 
     ImGui_ImplGlfwGL3_Init(window, false);
     
@@ -83,25 +86,25 @@ void EditorRenderSystem::Render()
 
     // Selection
 
-    auto camera = Scene::mainCamera();
-    auto view = camera->worldToCameraMatrix();
-    auto proj = camera->projectionMatrix();
-    auto vp = proj * view;
-    glEnable(GL_POLYGON_OFFSET_LINE);
-    glPolygonOffset(-1.0, -1.0f);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    ShaderUniforms uniforms;
-    auto material = Material::builtinMaterial("SolidColor");
-    material->SetVector4("Color", Vector4(0, 1, 0, 1));
-    material->shader()->Use();
-    
     if (m_highlightSelections) {
+        auto camera = Scene::mainCamera();
+        auto view = camera->worldToCameraMatrix();
+        auto proj = camera->projectionMatrix();
+        auto vp = proj * view;
+        glEnable(GL_POLYGON_OFFSET_LINE);
+        glPolygonOffset(-1.0, -1.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        ShaderUniforms uniforms;
+        auto material = Material::builtinMaterial("SolidColor");
+        material->SetVector4("Color", Vector4(0, 1, 0, 1));
+        material->shader()->Use();
+
         std::list<std::shared_ptr<GameObject>> selections;
         auto go = Selection::activeGameObject();
         selections.push_back(go);
         while (!selections.empty()) {
             go = selections.front();
-            selections.pop_back();
+            selections.pop_front();
             if (go == nullptr) {
                 continue;
             }

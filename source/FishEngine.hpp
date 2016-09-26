@@ -52,6 +52,8 @@ class RenderTexture;
 class AssetImporter;
 class Model;
 class ModelImporter;
+struct Ray;
+struct Bounds;
 
 NAMESPACE_FISHENGINE_END
 

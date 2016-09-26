@@ -27,6 +27,12 @@ public:
     }
   
 private:
+    
+    static int m_windowWidth;
+    static int m_windowHeight;
+//    static float m_pixelScaleX;
+//    static float m_pixelScaleY;
+    
     static GLFWwindow* m_window;
     static std::vector<std::shared_ptr<FishEngine::App>> m_apps;
     

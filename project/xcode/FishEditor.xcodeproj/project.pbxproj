@@ -110,6 +110,7 @@
 		BFDC74EB1D8EDEEC0082A6DC = {
 			isa = PBXGroup;
 			children = (
+				BFDC75121D8EE0330082A6DC /* main.cpp */,
 				BFDC751B1D8EE0B90082A6DC /* ImGui */,
 				BFDC750A1D8EE01B0082A6DC /* FishEditor */,
 				BFDC752B1D8EE1330082A6DC /* lib */,
@@ -146,7 +147,6 @@
 				BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */,
 				BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */,
 				BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */,
-				BFDC75121D8EE0330082A6DC /* main.cpp */,
 				BFDC75131D8EE0330082A6DC /* SceneView.hpp */,
 				BFDC75141D8EE0330082A6DC /* Selection.cpp */,
 				BFDC75151D8EE0330082A6DC /* Selection.hpp */,

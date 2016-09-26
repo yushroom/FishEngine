@@ -18,8 +18,12 @@ project.xcworkspace/
 xcuserdata/
 /project/xcode/build/
 
+# external libs
 /external/boost*
 
+# assets
 /assets/models/
 /assets/textures/
 
+# vscode
+/.vscode/

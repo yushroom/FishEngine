@@ -24,9 +24,6 @@ using namespace FishEngine;
 
 NAMESPACE_FISHEDITOR_BEGIN
 
-int EditorRenderSystem::m_width = 800;
-int EditorRenderSystem::m_height = 600;
-
 bool EditorRenderSystem::m_isWireFrameMode = false;
 bool EditorRenderSystem::m_useGammaCorrection = true;
 bool EditorRenderSystem::m_showShadowMap = true;
@@ -42,12 +39,7 @@ void EditorRenderSystem::Init()
 
     GLFWwindow* window = FishEditorWindow::window();
     // Define the view port dimensions
-    glfwGetFramebufferSize(window, &m_width, &m_height);
-    glViewport(0, 0, m_width, m_height);
-    RenderSystem::m_width = m_width;
-    RenderSystem::m_height = m_height;
-    Screen::m_width = m_width;
-    Screen::m_height = m_height;
+    
 
     ImGui_ImplGlfwGL3_Init(window, false);
     
@@ -82,7 +74,9 @@ void EditorRenderSystem::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     auto v = Scene::mainCamera()->viewport();
-    glViewport(GLint(v.x*m_width), GLint(v.y*m_height), GLsizei(v.z*m_width), GLsizei(v.w*m_height));
+    const int w = Screen::width();
+    const int h = Screen::height();
+    glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
 
     // Selection
 
@@ -186,28 +180,27 @@ void EditorRenderSystem::Clean()
 
 void EditorRenderSystem::SaveScreenShot(const std::string& path)
 {
-    auto pixels = new uint8_t[3 * m_width*m_height * 2];
+    const int w = Screen::width();
+    const int h = Screen::height();
+    auto pixels = new uint8_t[3 * w *h * 2];
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, pixels + m_width*m_height * 3);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels + w*h * 3);
     // horizontally flip
     auto line_a = pixels;
-    auto line_b = pixels + m_width*m_height * 3 * 2 - m_width * 3;
-    for (int l = 0; l < m_height; ++l)
+    auto line_b = pixels + w*h * 3 * 2 - w * 3;
+    for (int l = 0; l < h; ++l)
     {
-        memcpy(line_a, line_b, m_width * 3 * sizeof(uint8_t));
-        line_a += m_width * 3;
-        line_b -= m_width * 3;
+        memcpy(line_a, line_b, w * 3 * sizeof(uint8_t));
+        line_a += w * 3;
+        line_b -= w * 3;
     }
-    stbi_write_png(path.c_str(), m_width, m_height, 3, pixels, 0);
+    stbi_write_png(path.c_str(), w, h, 3, pixels, 0);
     delete[] pixels;
 }
 
 void EditorRenderSystem::OnWindowSizeChanged(const int width, const int height) {
-    //glfwGetFramebufferSize(window, &m_width, &m_height);
-    m_width = width;
-    m_height = height;
-    glViewport(0, 0, m_width, m_height);
-    Scene::mainCamera()->setAspect(float(m_width)/m_height);
+    //glViewport(0, 0, m_width, m_height);
+    Scene::mainCamera()->setAspect(float(width)/height);
 }
 
 

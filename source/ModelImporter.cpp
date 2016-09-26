@@ -136,7 +136,7 @@ namespace FishEngine {
         unsigned int load_option = aiProcess_Triangulate;
         load_option |= aiProcess_CalcTangentSpace;
         load_option |= aiProcess_LimitBoneWeights;
-        load_option |= aiProcess_FixInfacingNormals;
+        //load_option |= aiProcess_FixInfacingNormals;
         load_option |= aiProcess_OptimizeMeshes;
         //load_option |= aiProcess_SortByPType;
         //load_option |= aiProcess_JoinIdenticalVertices;

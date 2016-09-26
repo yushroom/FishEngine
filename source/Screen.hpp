@@ -22,7 +22,7 @@ namespace FishEngine
         static float dpi() { return m_dpi; }
 
     private:
-        friend class FishEditor::EditorRenderSystem;
+        friend class FishEditor::FishEditorWindow;
         static int m_width;
         static int m_height;
         static float m_dpi;

@@ -26,6 +26,8 @@ using namespace FishEngine;
 
 NAMESPACE_FISHEDITOR_BEGIN
 
+constexpr float translate_gizmo_length = 0.1f;
+
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
 int FishEditor::EditorGUI::m_selectedAxis = -1;
@@ -235,33 +237,37 @@ void EditorGUI::Clean()
 
 bool EditorGUI::OnMouseButton(MouseButtonCode button, MouseButtonState action)
 {
-    if (button == MouseButtonCode::Left && action == MouseButtonState::Down) {
+    if (button == MouseButtonCode::Left &&
+        action == MouseButtonState::Down)
+    {
         auto selectedGO = Selection::activeGameObject();
         if (selectedGO == nullptr)
             return false;
-        auto center = selectedGO->transform()->position();
-        constexpr float len = 1.f;
-        constexpr float len_h = len / 2.0f;
-        constexpr float d = 0.4f;
-        Bounds aabbx(center + Vector3(len_h, 0, 0), Vector3(len, d, d));
-        Bounds aabby(center + Vector3(0, len_h, 0), Vector3(d, len, d));
-        Bounds aabbz(center + Vector3(0, 0, len_h), Vector3(d, d, len));
-        auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-        if (aabbx.IntersectRay(ray)) {
-            Debug::Log("x axis");
-            m_selectedAxis = 0;
-        } else if (aabby.IntersectRay(ray)) {
-            Debug::Log("y axis");
-            m_selectedAxis = 1;
-        } else if (aabbz.IntersectRay(ray)) {
-            Debug::Log("z axis");
-            m_selectedAxis = 2;
-        } else {
-            m_selectedAxis = -1;
-            return false; // no intersection
+        
+        Vector3 center = selectedGO->transform()->position();
+        Vector3 camera_pos = Camera::main()->transform()->position();
+        center = Vector3::Normalize(center-camera_pos) + camera_pos;
+        
+        constexpr float d = 0.03f;
+        Bounds aabb[3];
+        for (int i = 0; i < 3; ++i) {
+            Vector3 v(0, 0, 0);
+            v[i] = translate_gizmo_length/2.f;
+            aabb[i].setCenter(center + v);
+            v.Set(d, d, d);
+            v[i] = translate_gizmo_length;
+            aabb[i].setSize(v);
         }
 
-        return true;
+        m_selectedAxis = -1;
+        auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+        for (int i = 0; i < 3; ++i) {
+            if (aabb[i].IntersectRay(ray)) {
+                Debug::Log("%c axis", "xyz"[i]);
+                m_selectedAxis = i;
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -343,21 +349,20 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
     auto selectedGO = Selection::activeGameObject();
     if (selectedGO == nullptr)
         return;
-    Vector3 center = selectedGO->transform()->position();
 
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
-    auto camera_pos = Vector3(0, 0, -5);
-    sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
+    //auto camera_pos = Vector3(0, 0, -5);
+    sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
     auto camera = Camera::main();
-    auto view = camera->transform()->worldToLocalMatrix();
+    auto view = camera->worldToCameraMatrix();
     auto proj = camera->projectionMatrix();
     auto vp = proj * view;
 
     ShaderUniforms uniforms;
 
     static Transform t;
-    t.setLocalScale(0.1f, 0.1f, 0.1f);
+    t.setLocalScale(Vector3(1, 1.5, 1) * 0.15f);
 
     float f[] = {
         1,  0,  0,   0, 0, -90,    // red axis, +x
@@ -365,19 +370,39 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
         0,  0,  1,  90, 0,   0,    // blue axis, +z
     };
 
+    Vector3 center = selectedGO->transform()->position();
+    Vector3 camera_pos = camera->transform()->position();
+    center = Vector3::Normalize(center-camera_pos) + camera_pos;
+    
     for (int i = 0; i < 3; ++i) {
         int j = 6 * i;
-        t.setLocalEulerAngles(f[j+3], f[j+4], f[j+5]);
-        t.setLocalPosition(center.x + f[j], center.y + f[j+1],  center.z + f[j+2]);
+        //t.setLocalScale(0.1f, 0.1f, 0.1f);
+        t.setLocalScale(Vector3(1, 1.5, 1) * 0.015f);
+        t.setLocalEulerAngles(f+j+3);
+        Vector3 pos = center + Vector3(f+j)*translate_gizmo_length;
+        t.setLocalPosition(pos);
         auto model = t.localToWorldMatrix();
         sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
         sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-        Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f[j], f[j + 1], f[j + 2]);
+        Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f+j);
         sceneGizmoMaterial->SetVector3("_Color", color);
         shader->PreRender();
         sceneGizmoMaterial->Update();
         shader->CheckStatus();
         coneMesh->Render();
+        
+        Vector3 trans = center;
+        trans[i] += translate_gizmo_length * 0.5f;
+        t.setLocalPosition(trans);
+        Vector3 scale = Vector3::one*0.002f;
+        scale[i] = translate_gizmo_length;
+        t.setLocalScale(scale);
+        t.setLocalEulerAngles(0, 0, 0);
+        model = t.localToWorldMatrix();
+        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+        sceneGizmoMaterial->Update();
+        cubeMesh->Render();
     }
 
     if (m_selectedAxis < 0)
@@ -420,8 +445,8 @@ void FishEditor::EditorGUI::DrawScaleGizmo()
 
 void EditorGUI::DrawSceneGizmo()
 {
-    int w = EditorRenderSystem::width();
-    int h = EditorRenderSystem::height();
+    int w = Screen::width();
+    int h = Screen::height();
     glViewport(0, 0, GLsizei(w*0.1f), GLsizei(w*0.1f));
     
     auto shader = sceneGizmoMaterial->shader();

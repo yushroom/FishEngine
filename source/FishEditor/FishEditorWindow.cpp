@@ -22,6 +22,9 @@ using namespace FishEngine;
 
 NAMESPACE_FISHEDITOR_BEGIN
 
+int FishEditorWindow::m_windowWidth = WIDTH;
+int FishEditorWindow::m_windowHeight = HEIGHT;
+
 GLFWwindow* FishEditorWindow::m_window = nullptr;
 std::vector<std::shared_ptr<App>> FishEditorWindow::m_apps;
 float FishEditorWindow::m_fixedFrameRate = 30;
@@ -58,6 +61,16 @@ void FishEditorWindow::Init()
     glfwSetWindowSizeCallback(m_window, FishEditorWindow::WindowSizeCallback);
     glfwSetMouseButtonCallback(m_window, FishEditorWindow::MouseButtonCallback);
     
+    glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
+    
+    int w, h;
+    glfwGetFramebufferSize(m_window, &w, &h);
+    //m_pixelScaleX = float(w) / m_windowWidth;
+    //m_pixelScaleY = float(h) / m_windowHeight;
+    //glViewport(0, 0, w, h);
+    Screen::m_width = w;
+    Screen::m_height = h;
+    
     EditorRenderSystem::Init();
     
     for (auto& r : m_apps) {
@@ -80,9 +93,7 @@ void FishEditorWindow::Run()
         glfwPollEvents();
         double xpos, ypos;
         glfwGetCursorPos(m_window, &xpos, &ypos);
-        int w = EditorRenderSystem::width();
-        int h = EditorRenderSystem::height();
-        Input::UpdateMousePosition(float(xpos)/w, 1.0f-float(ypos)/h);
+        Input::UpdateMousePosition(float(xpos)/m_windowWidth, 1.0f-float(ypos)/m_windowHeight);
         
         Scene::Update();
         
@@ -156,8 +167,12 @@ void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int a
 
 void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
+    m_windowWidth = width;
+    m_windowHeight = height;
     int w, h;
     glfwGetFramebufferSize(window, &w, &h);
+    Screen::m_width = w;
+    Screen::m_height = h;
     if (w != 0 && h != 0)
         EditorRenderSystem::OnWindowSizeChanged(w, h);
     //glViewport(0, 0, width, height);

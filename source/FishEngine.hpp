@@ -61,6 +61,7 @@ NAMESPACE_FISHENGINE_END
 namespace FishEditor {
     class EditorGUI;
     class EditorRenderSystem;
+    class FishEditorWindow;
 }
 
 #endif /* FishEngine_h */

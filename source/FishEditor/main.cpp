@@ -233,6 +233,7 @@ public:
     InjectClassName(TestAABB);
 
     Bounds aabb{Vector3(0, 0, 0), Vector3(1, 1, 1)};
+    //GameObject::PGameObject target;
 
     virtual void Start() override
     {
@@ -241,8 +242,14 @@ public:
 
     virtual void Update() override
     {
+//        auto center = transform()->position();
+//        auto cam_pos = Camera::main()->transform()->position();
+//        center = Vector3::Normalize(center - cam_pos)
+//        + cam_pos;
+//        target->transform()->setPosition(center);
+        
         if (Input::GetMouseButtonDown(0)) {
-            auto mp = Input::mousePosition();
+            //auto mp = Input::mousePosition();
             //Debug::Log("Mouse Post ion: %lf, %lf, %lf", mp.x, mp.y, mp.z);
             auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             //Debug::Log("Ray dir: %lf, %lf, %lf", ray.direction.x, ray.direction.y, ray.direction.z);
@@ -537,15 +544,16 @@ public:
             child->GetComponent<MeshRenderer>()->AddMaterial(material2);
         }
 
-        material = Material::builtinMaterial("Texture");
+        material = Material::builtinMaterial("Transparent");
         material->SetTexture("DiffuseMap", eyeirisLTexture);
         for (auto name : {"eye_L_old"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            //child->SetActive(false);
         }
         
-        material = Material::builtinMaterial("Texture");
+        material = Material::builtinMaterial("Transparent");
         material->SetTexture("DiffuseMap", eyeirisRTexture);
         for (auto name : {"eye_R_old"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -567,6 +575,7 @@ public:
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            //Selection::setActiveGameObject(child);
         }
 
         material = Material::builtinMaterial("Transparent");
@@ -577,10 +586,23 @@ public:
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
         }
         
+        auto sphereGO = Scene::CreateGameObject("Sphere");
+        sphereGO->transform()->setLocalScale(Vector3::one*0.1f);
+        sphereGO->AddComponent(make_shared<MeshFilter>(sphere));
+        material = Material::builtinMaterial("PBR");
+        material->SetVector3("albedo", Vector3(1, 1, 1));
+        sphereGO->AddComponent(make_shared<MeshRenderer>(material));
+        
         go = Scene::CreateGameObject("Cube");
         go->AddComponent(make_shared<MeshFilter>(cube));
-        go->AddComponent(make_shared<MeshRenderer>(Material::builtinMaterial("PBR")));
-        go->AddScript(make_shared<TestAABB>());
+        material = Material::builtinMaterial("PBR");
+        material->SetVector3("albedo", Vector3(1, 1, 1));
+        go->AddComponent(make_shared<MeshRenderer>(material));
+        //auto test_aabb = make_shared<TestAABB>();
+        //test_aabb->target = sphereGO;
+        //go->AddScript(test_aabb);
+        
+        //Selection::setActiveGameObject(go);
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setPosition(0, 0, -7);

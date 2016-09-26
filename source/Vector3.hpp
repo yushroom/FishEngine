@@ -26,6 +26,8 @@ public:
     {
         Assert(!hasNaNs());
     }
+    
+    Vector3(float* array) : x(array[0]), y(array[1]), z(array[2]) {}
 
     Vector3() : Vector3(0, 0, 0) {
 

@@ -27,8 +27,8 @@ std::shared_ptr<GameObject> FishEngine::Scene::CreateGameObject(const std::strin
 }
 
 void Scene::Init() {
-    int width = RenderSystem::width();
-    int height = RenderSystem::height();
+    int width = Screen::width();
+    int height = Screen::height();
     m_mainCamera = std::make_shared<Camera>(60.0f, float(width) / height, 0.3f, 1000.f);
     //auto camera_go = std::make_shared<GameObject>("MainCamera");
     auto camera_go = Scene::CreateGameObject("MainCamera");

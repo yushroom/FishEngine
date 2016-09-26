@@ -16,15 +16,6 @@ public:
 
     static void Clean();
 
-
-    static int width() {
-        return m_width;
-    }
-
-    static int height() {
-        return m_height;
-    }
-
     static void setWireFrameMode(bool value) {
         m_isWireFrameMode = value;
     }
@@ -45,9 +36,7 @@ public:
 
 private:
     friend class FishEditorWindow;
-    static int m_width;
-    static int m_height;
-
+    
     static bool m_isWireFrameMode;
     static bool m_useGammaCorrection;
     static bool m_showShadowMap;

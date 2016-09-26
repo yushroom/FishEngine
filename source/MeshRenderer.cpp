@@ -23,7 +23,7 @@ void MeshRenderer::Render() const
     }
 
     auto model = transform()->localToWorldMatrix();
-    auto camera = Scene::mainCamera();
+    auto camera = Camera::main();
     auto view = camera->worldToCameraMatrix();
     auto proj = camera->projectionMatrix();
     auto mv = view * model;

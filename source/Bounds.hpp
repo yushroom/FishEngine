@@ -30,6 +30,8 @@ namespace FishEngine
             m_center = min + m_extents;
         } 
 
+        Bounds() : m_center(0, 0, 0), m_extents(0, 0, 0) {}
+        
         Bounds(const Vector3& center, const Vector3& size) : m_center(center), m_extents(size*0.5f)
         {
         }

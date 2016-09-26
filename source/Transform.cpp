@@ -1,6 +1,7 @@
 #include "Transform.hpp"
 #include "GameObject.hpp"
 #include "Debug.hpp"
+#include "Common.hpp"
 #include <imgui/imgui.h>
 
 NAMESPACE_FISHENGINE_BEGIN
@@ -132,6 +133,31 @@ void Transform::SetParent(std::shared_ptr<Transform> parent)
     parent->m_children.push_back(gameObject()->transform());
     MakeDirty();
 }
+
+//std::shared_ptr<Transform>
+//Transform::Find(const std::string& name) const
+//{
+//    auto pos = name.find('/');
+//    if (pos == std::string::npos) {
+//        for (auto& c : m_children) {
+//            const auto& t = c.lock();
+//            if (t->name() == name) {
+//                return t;
+//            }
+//        }
+//        return nullptr;
+//    }
+//    
+//    auto t = gameObject()->transform();
+//    const auto& splits = split(name, "/");
+//    for (auto& n : splits) {
+//        t = t->Find(n);
+//        if (t == nullptr) {
+//            return nullptr;
+//        }
+//    }
+//    return nullptr;
+//}
 
 std::shared_ptr<Transform> Transform::GetChild(const size_t index) {
     if (index < 0 || index >= m_children.size()) {

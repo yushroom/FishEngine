@@ -10,7 +10,7 @@ class Object
 {
 public:
     // The name of the object.
-    std::string name() const {return m_name; }
+    virtual std::string name() const {return m_name; }
     void setName(const std::string& name) { m_name = name; }
 
     virtual ~Object() = 0;

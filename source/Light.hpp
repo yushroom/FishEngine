@@ -45,6 +45,7 @@ private:
     friend class Scene;
     friend class FishEditor::EditorRenderSystem;
     friend class MeshRenderer;
+    friend class SkinnedMeshRenderer;
     // The current type of light. Possible values are Directional, Point, Spot and Area
     LightType m_type;
 

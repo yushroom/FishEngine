@@ -35,7 +35,7 @@ struct Bone
     std::string name;
 };
 
-static constexpr int MaxBoneForEachVertex = 16;
+static constexpr int MaxBoneForEachVertex = 4;
 
 struct BoneWeight
 {

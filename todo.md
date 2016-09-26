@@ -4,7 +4,7 @@
 
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
-- [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离
+- [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离（Model已经分离，动画导入WIP）
 
 - [x] 数学库换成左手系
 
@@ -14,7 +14,7 @@
 
 - [ ] GameObject构造函数改成非public的(需要解决make_shared调用非public ctor，貌似没有特别优雅的解决方案，http://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const)
 
-- [ ] 将Scene里面的Script和Component合并到一起去
+- [ ] 将Scene里面的Script和Component合并到一起去（需要在运行时知道是不是某个类的子类）
 
 - [ ] 不依赖代码生成和外部工具的（自动）反射可行吗？
 
@@ -29,6 +29,32 @@
 - [x] 最小化窗口是aspect是变成nan，glm::perspective会abort掉
 
 - [x] 改成左手系之后cubemap反了
+
+- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点
+
+- [ ] eulerangles数值不自然
+
+- [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
+
+- [ ] quaternion*vector3
+
+- [ ] angleAxis
+
+- [ ] Transform::rotate
+
+- [ ] const的位置
+
+- [ ] class Graphics
+
+- [ ] 我需要一个动态的反射操作
+
+      1: "MeshFilter" ==> make_shared<MeshFilter>() 而且要运行期动态生成或者变成dll动态加载
+
+      2：classname="MeshFilter" mesh="..." -==> 
+
+      auto mf = make_shared<MeshFilter>();
+
+      mf->setMesh(...)
 
 ## Editor
 

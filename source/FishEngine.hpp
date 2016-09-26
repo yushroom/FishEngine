@@ -25,6 +25,7 @@ class Camera;
 class Component;
 class MeshFilter;
 class MeshRenderer;
+class SkinnedMeshRenderer;
 class Script;
 class Renderer;
 class Transform;

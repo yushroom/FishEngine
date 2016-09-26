@@ -24,6 +24,8 @@
 		BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF94996F1D964E85001F65E4 /* AssetImporter.hpp */; };
 		BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF9499771D96AB68001F65E4 /* ModelImporter.cpp */; };
 		BF94997A1D96AB68001F65E4 /* ModelImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF9499781D96AB68001F65E4 /* ModelImporter.hpp */; };
+		BFAF11D31D9838A100101DCD /* SkinnedMeshRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */; };
+		BFAF11D41D9838A100101DCD /* SkinnedMeshRenderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
 		BFDC74BC1D8EDDF50082A6DC /* App.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC748C1D8EDDF50082A6DC /* App.hpp */; };
 		BFDC74BD1D8EDDF50082A6DC /* Behaviour.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */; };
@@ -92,6 +94,8 @@
 		BF94996F1D964E85001F65E4 /* AssetImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AssetImporter.hpp; path = ../../source/AssetImporter.hpp; sourceTree = "<group>"; };
 		BF9499771D96AB68001F65E4 /* ModelImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelImporter.cpp; path = ../../source/ModelImporter.cpp; sourceTree = "<group>"; };
 		BF9499781D96AB68001F65E4 /* ModelImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ModelImporter.hpp; path = ../../source/ModelImporter.hpp; sourceTree = "<group>"; };
+		BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkinnedMeshRenderer.cpp; path = ../../source/SkinnedMeshRenderer.cpp; sourceTree = "<group>"; };
+		BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SkinnedMeshRenderer.hpp; path = ../../source/SkinnedMeshRenderer.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC748B1D8EDDF50082A6DC /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../../source/App.cpp; sourceTree = "<group>"; };
 		BFDC748C1D8EDDF50082A6DC /* App.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = App.hpp; path = ../../source/App.hpp; sourceTree = "<group>"; };
@@ -157,6 +161,8 @@
 		BF3211F61D8EE55F00FA80E6 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */,
+				BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */,
 				BFDC74B21D8EDDF50082A6DC /* Script.hpp */,
 				BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */,
 				BFDC748E1D8EDDF50082A6DC /* Behaviour.hpp */,
@@ -294,6 +300,7 @@
 				BFDC74D21D8EDDF50082A6DC /* Material.hpp in Headers */,
 				BF26B4EB1D940F9A00237680 /* RenderTexture.hpp in Headers */,
 				BFDC74CA1D8EDDF50082A6DC /* GameLoop.hpp in Headers */,
+				BFAF11D41D9838A100101DCD /* SkinnedMeshRenderer.hpp in Headers */,
 				BFDC74C71D8EDDF50082A6DC /* Debug.hpp in Headers */,
 				BFDC74BE1D8EDDF50082A6DC /* Behaviour.hpp in Headers */,
 				BFDC74D01D8EDDF50082A6DC /* Input.hpp in Headers */,
@@ -394,6 +401,7 @@
 				BFDC74DB1D8EDDF50082A6DC /* Renderer.cpp in Sources */,
 				BF3212231D9173FF00FA80E6 /* Quaternion.cpp in Sources */,
 				BFDC74E51D8EDDF50082A6DC /* Texture.cpp in Sources */,
+				BFAF11D31D9838A100101DCD /* SkinnedMeshRenderer.cpp in Sources */,
 				BFDC74E91D8EDDF50082A6DC /* Transform.cpp in Sources */,
 				BFDC74D11D8EDDF50082A6DC /* Material.cpp in Sources */,
 				BFDC74E01D8EDDF50082A6DC /* Scene.cpp in Sources */,

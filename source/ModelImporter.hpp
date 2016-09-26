@@ -42,7 +42,8 @@ namespace FishEngine {
             m_meshes.push_back(mesh);
         }
 
-        std::shared_ptr<GameObject> ResursivelyCreateGameObject(ModelNode::PModelNode& node) const;
+        std::shared_ptr<GameObject>
+        ResursivelyCreateGameObject(const ModelNode::PModelNode& node) const;
         
         std::vector<std::shared_ptr<Mesh>> m_meshes;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
@@ -60,8 +61,15 @@ namespace FishEngine {
                      int vertexUsage = VertexUsagePNUT,
                      MeshLoadFlags flags = 0);
     private:
-        static ModelNode::PModelNode buildModelTree(const aiNode* assimp_node);
-        static std::shared_ptr<Mesh> ParseMesh(const aiMesh* assimp_mesh, int vertexUsage, bool load_uv, bool load_tangent);
+        static ModelNode::PModelNode
+        buildModelTree(const aiNode* assimp_node);
+        
+        
+        static std::shared_ptr<Mesh>
+        ParseMesh(const aiMesh* assimp_mesh,
+                  int vertexUsage,
+                  bool load_uv,
+                  bool load_tangent);
     };
 }
 

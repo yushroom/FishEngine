@@ -13,6 +13,14 @@ NAMESPACE_FISHENGINE_BEGIN
 //    //}
 //}
 
+std::string Component::name() const
+{
+    const auto& go = gameObject();
+    if (go == nullptr)
+        return Object::name();
+    return gameObject()->name();
+}
+
 std::string Component::tag() const
 {
     if (m_gameObject.expired())

@@ -61,9 +61,12 @@ void EditorGUI::Init()
 
 void EditorGUI::Update()
 {
+    glClear(GL_DEPTH_BUFFER_BIT);
+    DrawSceneGizmo();
+    
     static double time_stamp = glfwGetTime();
-    ImGuiContext& g = *GImGui;
-    ImGuiStyle& style = g.Style;
+    //ImGuiContext& g = *GImGui;
+    //ImGuiStyle& style = g.Style;
     
     //ImGui::BeginDock("Dock");
     //ImGui::EndDock();
@@ -77,12 +80,12 @@ void EditorGUI::Update()
         ImGui::PushID("Inspector.selected.active");
         ImGui::Checkbox("", &go->m_activeSelf);
         ImGui::PopID();
-        char name[32] = {0};
+        char name[128] = {0};
         memcpy(name, go->name().c_str(), go->name().size());
         name[go->m_name.size()] = 0;
         ImGui::SameLine();
         ImGui::PushID("Inspector.selected.name");
-        if (ImGui::InputText("", name, 31)) {
+        if (ImGui::InputText("", name, 127)) {
             go->m_name = name;
         }
         ImGui::PopID();
@@ -124,8 +127,6 @@ void EditorGUI::Update()
     //ImGui::EndDock(); // Inspector Editor
     ImGui::End();
     
-    glClear(GL_DEPTH_BUFFER_BIT);
-    DrawSceneGizmo();
     
     // Main menu bar
     if (ImGui::BeginMainMenuBar()) {
@@ -168,9 +169,9 @@ void EditorGUI::Update()
     }
     m_idCount = 0;
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
-    for (auto go : Scene::m_gameObjects) {
-        if (go->transform()->parent() == nullptr) {
-            HierarchyItem(go);
+    for (auto& g : Scene::m_gameObjects) {
+        if (g->transform()->parent() == nullptr) {
+            HierarchyItem(g);
         }
     }
     ImGui::PopStyleVar();
@@ -262,11 +263,14 @@ void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> c
 }
 
 
-void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject) {
-    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ((gameObject == Selection::activeGameObject())? ImGuiTreeNodeFlags_Selected : 0);
+void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
+{
+    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
+    if (gameObject == Selection::activeGameObject())
+        node_flags |= ImGuiTreeNodeFlags_Selected;
     
     bool is_leaf = (gameObject->transform()->childCount() == 0);
-    if (is_leaf) {// no child
+    if (is_leaf) {// no children
         node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     }
     if (!gameObject->activeSelf()) {
@@ -275,6 +279,7 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject) {
     bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
 
     if (ImGui::IsItemClicked()) {
+        Debug::Log("select: %s", gameObject->name().c_str());
         Selection::setActiveGameObject(gameObject);
     }
     // child node

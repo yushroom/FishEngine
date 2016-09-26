@@ -199,6 +199,27 @@ public:
         ImGui::Checkbox("Rotating", &rotating);
     }
 };
+            
+            
+class DrawSkeleton : public Script {
+public:
+    InjectClassName(DrawSkeleton);
+    
+    bool draw = true;
+    
+    void DrawNode(std::shared_ptr<Transform>& node) {
+        if (node->gameObject()->GetComponent<MeshFilter>() != nullptr) {
+            return;
+        }
+    }
+    
+    virtual void Update() override {
+    }
+    
+    virtual void OnInspectorGUI() override {
+        ImGui::Checkbox("Draw", &draw);
+    }
+};
 
 
 class TestPBR : public App
@@ -360,6 +381,23 @@ class TestAnimation : public App
 {
 public:
 
+    std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & go, const std::string& name)
+    {
+        auto& children = go->transform()->children();
+        for (auto& c : children) {
+            const auto& g = c.lock();
+            //Debug::Log("Name: %s", g->name().c_str());
+            if (g->name() == name) {
+                return g->gameObject();
+            }
+            auto r = FindNamedChild(g->gameObject(), name);
+            if (r != nullptr) {
+                return r;
+            }
+        }
+        return nullptr;
+    }
+    
     virtual void Init() override {
         glCheckError();
 #if FISHENGINE_PLATFORM_WINDOWS
@@ -381,107 +419,107 @@ public:
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir + "TANGS_zou.FBX");
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir+"Archer_max/archer_attacking.max");
         
-        //auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
+        auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
-        //auto bodyTexture = Texture::CreateFromFile(chan_dir + "body_01.tga");
-        //auto skinTexture = Texture::CreateFromFile(chan_dir + "skin_01.tga");
-        //auto hairTexture = Texture::CreateFromFile(chan_dir + "hair_01.tga");
-        //auto faceTexture = Texture::CreateFromFile(chan_dir + "face_00.tga");
-        //auto eyelineTexture = Texture::CreateFromFile(chan_dir + "eyeline_00.tga");
-        //auto eyeirisLTexture = Texture::CreateFromFile(chan_dir + "eye_iris_L_00.tga");
-        //auto eyeirisRTexture = Texture::CreateFromFile(chan_dir + "eye_iris_R_00.tga");
-        //auto cheekTexture = Texture::CreateFromFile(chan_dir + "cheek_00.tga");
+        auto bodyTexture = Texture::CreateFromFile(chan_dir + "body_01.tga");
+        auto skinTexture = Texture::CreateFromFile(chan_dir + "skin_01.tga");
+        auto hairTexture = Texture::CreateFromFile(chan_dir + "hair_01.tga");
+        auto faceTexture = Texture::CreateFromFile(chan_dir + "face_00.tga");
+        auto eyelineTexture = Texture::CreateFromFile(chan_dir + "eyeline_00.tga");
+        auto eyeirisLTexture = Texture::CreateFromFile(chan_dir + "eye_iris_L_00.tga");
+        auto eyeirisRTexture = Texture::CreateFromFile(chan_dir + "eye_iris_R_00.tga");
+        auto cheekTexture = Texture::CreateFromFile(chan_dir + "cheek_00.tga");
 
-        //map<string, Texture::PTexture> textures;
+        map<string, Texture::PTexture> textures;
         //textures["skyTex"] = sky_texture;
-        //
-        //auto skyboxGO = Scene::CreateGameObject("SkyBox");
-        //skyboxGO->transform()->setLocalScale(20, 20, 20);
-        //auto meshFilter = make_shared<MeshFilter>(sphere);
-        //auto material = Material::builtinMaterial("SkyBox");
-        //material->BindTextures(textures);
-        //auto meshRenderer = make_shared<MeshRenderer>(material);
-        //skyboxGO->AddComponent(meshFilter);
-        //skyboxGO->AddComponent(meshRenderer);
+        
+        auto skyboxGO = Scene::CreateGameObject("SkyBox");
+        skyboxGO->transform()->setLocalScale(20, 20, 20);
+        auto meshFilter = make_shared<MeshFilter>(sphere);
+        auto material = Material::builtinMaterial("SkyBox");
+        material->SetTexture("skyTex", sky_texture);
+        auto meshRenderer = make_shared<MeshRenderer>(material);
+        skyboxGO->AddComponent(meshFilter);
+        skyboxGO->AddComponent(meshRenderer);
 
-        //textures["AmbientCubemap"] = sky_texture;
-        //
-        //auto go = model->CreateGameObject();
-        ////go->transform()->setLocalEulerAngles(90, 0, 0);
-        //go->transform()->setLocalScale(0.05f, 0.05f, 0.05f);
-        //go->transform()->setLocalPosition(0, -4, 0);
+        textures["AmbientCubemap"] = sky_texture;
+        
+        auto modelGO = model->CreateGameObject();
+        //go->transform()->setLocalEulerAngles(90, 0, 0);
+        modelGO->transform()->setLocalScale(0.05f, 0.05f, 0.05f);
+        modelGO->transform()->setLocalPosition(0, -4, 0);
+        
+        //auto go = FindNamedChild(modelGO, "button");
+        std::shared_ptr<GameObject> go;
 
-        //material = Material::builtinMaterial("TextureDoubleSided");
-        //textures["DiffuseMap"] = bodyTexture;
-        //auto material2 = Material::builtinMaterial("Outline");
-        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        //material2->SetTexture("_MainTex", skinTexture);
-        //material2->SetFloat("_EdgeThickness", 4.0f);
-        //material->BindTextures(textures);
-        //for (auto idx : {12, 14, 15, 16, 17, 18, 19, 20, 22}) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        //}
+        material = Material::builtinMaterial("TextureDoubleSided");
+        material->SetTexture("DiffuseMap", bodyTexture);
+        auto material2 = Material::builtinMaterial("Outline");
+        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        material2->SetTexture("_MainTex", bodyTexture);
+        material2->SetFloat("_EdgeThickness", 4.0f);
+        material->BindTextures(textures);
+        for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        }
 
-        //textures["DiffuseMap"] = skinTexture;
-        //material = Material::builtinMaterial("Texture");
-        //material->BindTextures(textures);
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", skinTexture);
+        material2 = Material::builtinMaterial("Outline");
+        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        material2->SetTexture("_MainTex", skinTexture);
+        material2->SetFloat("_EdgeThickness", 4.0f);
+        for (auto name : {"skin"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        }
 
-        //material2 = Material::builtinMaterial("Outline");
-        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        //material2->SetTexture("_MainTex", skinTexture);
-        //material2->SetFloat("_EdgeThickness", 4.0f);
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", faceTexture);
+        material2 = Material::builtinMaterial("Outline");
+        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        material2->SetTexture("_MainTex", faceTexture);
+        material2->SetFloat("_EdgeThickness", 4.0f);
+        for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        }
+        
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", hairTexture);
+        material2 = Material::builtinMaterial("Outline");
+        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        material2->SetTexture("_MainTex", hairTexture);
+        material2->SetFloat("_EdgeThickness", 4.0f);
+        for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        }
 
-        //for (auto idx : {0, 13}) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    material = Material::builtinMaterial("Texture");
-        //    material->SetTexture("DiffuseMap", skinTexture);
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        //}
-
-        //material2 = Material::builtinMaterial("Outline");
-        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        //material2->SetTexture("_MainTex", faceTexture);
-        //material2->SetFloat("_EdgeThickness", 4.0f);
-        //textures["DiffuseMap"] = faceTexture;
-        //material = Material::builtinMaterial("Texture");
-        //material->BindTextures(textures);
-        //for (auto idx : { 4, 5 }) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        //}
-
-        //material2 = Material::builtinMaterial("Outline");
-        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        //material2->SetTexture("_MainTex", hairTexture);
-        //material2->SetFloat("_EdgeThickness", 4.0f);
-        //textures["DiffuseMap"] = hairTexture;
-        //material = Material::builtinMaterial("TextureDoubleSided");
-        //material->BindTextures(textures);
-        //for (auto idx : { 8, 9, 10, 11}) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        //}
-
-        //textures["DiffuseMap"] = eyeirisLTexture;
-        //material = Material::builtinMaterial("Transparent");
-        //material->BindTextures(textures);
-        //for (auto idx : { 2 }) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //}
-
-        //textures["DiffuseMap"] = eyeirisRTexture;
-        //material = Material::builtinMaterial("Transparent");
-        //material->BindTextures(textures);
-        //for (auto idx : { 3 }) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //}
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", eyeirisLTexture);
+        for (auto name : {"eye_L_old"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        }
+        
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", eyeirisRTexture);
+        for (auto name : {"eye_R_old"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        }
 
         //textures["DiffuseMap"] = eyelineTexture;
         //material = Material::builtinMaterial("Transparent");
@@ -490,14 +528,30 @@ public:
         //    auto child = go->transform()->GetChild(idx)->gameObject();
         //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
         //}
+        
+        material = Material::builtinMaterial("Transparent");
+        material->SetTexture("DiffuseMap", eyelineTexture);
+        for (auto name : {"BLW_DEF", "EL_DEF"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        }
+        
+        material = Material::builtinMaterial("Texture");
+        material->SetTexture("DiffuseMap", eyelineTexture);
+        for (auto name : {"eye_base_old"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        }
 
-        //textures["DiffuseMap"] = cheekTexture;
-        //material = Material::builtinMaterial("Transparent");
-        //material->BindTextures(textures);
-        //for (auto idx : { 21 }) {
-        //    auto child = go->transform()->GetChild(idx)->gameObject();
-        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        //}
+        material = Material::builtinMaterial("Transparent");
+        material->SetTexture("DiffuseMap", cheekTexture);
+        for (auto name : {"cheek"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        }
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setPosition(0, 0, -7);
@@ -516,7 +570,7 @@ public:
 
         Selection::setActiveGameObject(cameraGO);
         
-        auto go = Scene::CreateGameObject("Directional Light");
+        go = Scene::CreateGameObject("Directional Light");
         go->transform()->setPosition(6, 5, -10);
         go->transform()->LookAt(0, 0, 0);
         //go->transform()->setPosition(6, 5, -10);

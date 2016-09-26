@@ -209,15 +209,25 @@ public:
     // Unparents all children.
     void DetachChildren();
     
+    // Finds a child by name and returns it.
+    std::shared_ptr<Transform> Find(const std::string& name) const;
+    
     /* Returns a transform child by index.
      * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
      * @return: Transform Transform child by index.
      */
     std::shared_ptr<Transform> GetChild(const size_t index);
 
+    
     const std::list<std::weak_ptr<Transform>>& children() const {
         return m_children;
     }
+    
+    // Returns the component of Type type if the game object has one attached, null if it doesn't.
+//    template<typename T>
+//    std::shared_ptr<T> GetComponent() const {
+//        return gameObject()->GetComponent<T>();
+//    }
     
 private:
     friend class FishEditor::EditorGUI;

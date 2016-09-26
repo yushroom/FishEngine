@@ -62,7 +62,7 @@ public:
 
     // Returns the component of Type type if the game object has one attached, null if it doesn't.
     template<typename T>
-    std::shared_ptr<T> GetComponent() {
+    std::shared_ptr<T> GetComponent() const {
         for (auto& comp : m_components) {
             if (comp->ClassName() == T::StaticClassName()) {
                 return std::static_pointer_cast<T>(comp);

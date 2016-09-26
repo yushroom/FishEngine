@@ -21,6 +21,9 @@ public:
     // The tag of this game object.
     std::string tag() const;
     
+    // The tag of this game object.
+    virtual std::string name() const override;
+    
     // The Transform attached to this GameObject (null if there is none attached).
     std::shared_ptr<Transform> transform() const;
     

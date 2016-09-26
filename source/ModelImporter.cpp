@@ -22,6 +22,7 @@ namespace FishEngine {
         //    Debug::Log("    CHILD: %s", assimp_node->mChildren[i]->mName.C_Str());
         //}
         auto node = std::make_shared<ModelNode>();
+        node->name = assimp_node->mName.C_Str();
         for (int i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshes.push_back(assimp_node->mMeshes[i]);
         }
@@ -136,10 +137,11 @@ namespace FishEngine {
         aiProcess_Triangulate
         //| aiProcess_SortByPType
         | aiProcess_CalcTangentSpace
+        | aiProcess_LimitBoneWeights
         //| aiProcess_JoinIdenticalVertices
-        //| aiProcess_FixInfacingNormals
+        | aiProcess_FixInfacingNormals
         //| aiProcess_OptimizeGraph
-        //| aiProcess_OptimizeMeshes
+        | aiProcess_OptimizeMeshes
         ;
         load_option |= aiProcess_ConvertToLeftHanded;
         if (flags & MeshLoadFlag_RegenerateNormal) {
@@ -177,26 +179,41 @@ namespace FishEngine {
 
     std::shared_ptr<GameObject> Model::CreateGameObject() const
     {
-        auto go = Scene::CreateGameObject(m_name);
-
-        //for (auto& m : m_meshes) {
-        //    auto child = Scene::CreateGameObject(m->name());
-        //    child->transform()->SetParent(go->transform());
-        //    auto material = Material::builtinMaterial("PBR");
-        //    material->SetVector3("albedo", Vector3(1, 1, 1));
-        //    auto meshRenderer = std::make_shared<MeshRenderer>(material);
-        //    auto meshFilter = std::make_shared<MeshFilter>(m);
-        //    child->AddComponent(meshRenderer);
-        //    child->AddComponent(meshFilter);
-        //}
-
-        return go;
+        return ResursivelyCreateGameObject(m_rootNode);
     }
 
-    std::shared_ptr<GameObject> Model::ResursivelyCreateGameObject(ModelNode::PModelNode & node) const
+    std::shared_ptr<GameObject> Model::ResursivelyCreateGameObject(const ModelNode::PModelNode & node) const
     {
-        auto go = Scene::CreateGameObject(m_name);
-
+        auto go = Scene::CreateGameObject(node->name);
         
+        if (node->meshes.size() == 1) {
+            //auto child = Scene::CreateGameObject(m->name());
+            //child->transform()->SetParent(go->transform());
+            auto material = Material::builtinMaterial("PBR");
+            material->SetVector3("albedo", Vector3(1, 1, 1));
+            auto meshRenderer = std::make_shared<MeshRenderer>(material);
+            auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
+            go->AddComponent(meshRenderer);
+            go->AddComponent(meshFilter);
+        } else if (node->meshes.size() > 1) {
+            for (auto& idx : node->meshes) {
+                auto& m = m_meshes[idx];
+                auto child = Scene::CreateGameObject(m->name());
+                child->transform()->SetParent(go->transform());
+                auto material = Material::builtinMaterial("PBR");
+                material->SetVector3("albedo", Vector3(1, 1, 1));
+                auto meshRenderer = std::make_shared<MeshRenderer>(material);
+                auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
+                child->AddComponent(meshRenderer);
+                child->AddComponent(meshFilter);
+            }
+        }
+        
+        for (auto& c : node->children) {
+            auto child = ResursivelyCreateGameObject(c);
+            child->transform()->SetParent(go->transform());
+        }
+        
+        return go;
     }
 }

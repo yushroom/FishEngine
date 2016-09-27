@@ -146,17 +146,17 @@ public:
 
     // direction (1, 0, 0) in world space.
     Vector3 right() const {
-        return rotation() * Vector3(1, 0, 0);
+        return Vector3::Normalize(rotation() * Vector3(1, 0, 0));
     }
 
     // direction (0, 1, 0) in world space
     Vector3 up() const {
-        return rotation() * Vector3(0, 1, 0);
+        return Vector3::Normalize(rotation() * Vector3(0, 1, 0));
     }
 
     // direction (0, 0, 1) in world space.
     Vector3 forward() const {
-        return rotation() * Vector3(0, 0, 1);
+        return Vector3::Normalize(rotation() * Vector3(0, 0, 1));
     }
 
     //void setForward(const Vector3& forward) {

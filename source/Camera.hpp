@@ -31,6 +31,14 @@ public:
         m_isDirty = true;
     }
 
+    float nearClipPlane() const {
+        return m_zNear;
+    }
+
+    float farClipPlane() const {
+        return m_zFar;
+    }
+
     // Matrix that transforms from world to camera space (i.e. view matrix).
     Matrix4x4 worldToCameraMatrix() const;
 
@@ -52,7 +60,7 @@ public:
 
 private:
     friend class RenderSystem;
-    friend class EditorGUI;
+    friend class FishEditor::EditorGUI;
     
     float m_fov;
     float m_aspect; // The aspect ratio (width divided by height).
@@ -64,6 +72,11 @@ private:
     CameraType m_cameraType = CameraType::Game;
 
     mutable Matrix4x4 m_projectMatrix;
+
+    // temp
+    // file:///D:/Program%20Files/Unity/Editor/Data/Documentation/en/Manual/SceneViewNavigation.html
+    mutable Vector3 m_focusPoint{0, 0, 0};
+    void FrameSelected(std::shared_ptr<GameObject>& selected);
 };
 
 NAMESPACE_FISHENGINE_END

@@ -31,6 +31,9 @@ constexpr float translate_gizmo_length = 0.1f;
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
 int EditorGUI::m_selectedAxis = -1;
+
+std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
+
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
 
 Material::PMaterial sceneGizmoMaterial = nullptr;
@@ -67,6 +70,10 @@ void EditorGUI::Init()
 void EditorGUI::Update()
 {
     auto selectedGO = Selection::activeGameObject();
+
+    if (Input::GetKeyDown(KeyCode::F)) {
+        Camera::main()->FrameSelected(selectedGO);
+    }
 
     glClear(GL_DEPTH_BUFFER_BIT);
     DrawSceneGizmo();
@@ -347,6 +354,10 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
 void FishEditor::EditorGUI::DrawTranslateGizmo()
 {
     auto selectedGO = Selection::activeGameObject();
+    if (m_lastSelectedGameObject.lock() != selectedGO) {
+        m_selectedAxis = -1;
+        m_lastSelectedGameObject = selectedGO;
+    }
     if (selectedGO == nullptr)
         return;
 
@@ -362,7 +373,7 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
     ShaderUniforms uniforms;
 
     static Transform t;
-    t.setLocalScale(Vector3(1, 1.5, 1) * 0.15f);
+    //t.setLocalScale(Vector3(1, 1.5, 1) * 0.15f);
 
     float f[] = {
         1,  0,  0,   0, 0, -90,    // red axis, +x
@@ -372,7 +383,9 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
 
     Vector3 center = selectedGO->transform()->position();
     Vector3 camera_pos = camera->transform()->position();
-    center = Vector3::Normalize(center-camera_pos) + camera_pos;
+    Vector3 dir = center - camera_pos;
+    float distance = dir.magnitude();
+    center = dir.normalized() + camera_pos;
     
     for (int i = 0; i < 3; ++i) {
         int j = 6 * i;
@@ -410,24 +423,15 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
 
     if (Input::GetMouseButton(0))
     {
-        float m_dragSpeed = 10;
+        float m_dragSpeed = distance / Camera::main()->nearClipPlane() * 0.5f;
         float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
         float y = m_dragSpeed * Input::GetAxis(Axis::MouseY);
-        Vector3 dir(x, y, 0);
-        Vector3 axis_dir;
-        if (m_selectedAxis == 0) {
-            axis_dir.Set(1, 0, 0);
-        }
-        else if (m_selectedAxis == 1) {
-            axis_dir.Set(0, 1, 0);
-        }
-        else {
-            axis_dir.Set(0, 0, 1);
-        }
-        Vector3 axis_dir_view = vp * Vector4(axis_dir, 0);
-        float distance = Vector3::Dot(dir, axis_dir_view);
-        Debug::Log("distance: %lf", distance);
-        selectedGO->transform()->Translate(axis_dir * distance, Space::World);
+        Vector3 mouse_movement(x, y, 0);
+        Vector3 axis_base(0, 0, 0);
+        axis_base[m_selectedAxis] = 1.f;
+        Vector3 axis_base_view = vp * Vector4(axis_base, 0);
+        float d = Vector3::Dot(mouse_movement, axis_base_view.normalized());
+        selectedGO->transform()->Translate(axis_base * d, Space::World);
     }
 }
 
@@ -517,27 +521,42 @@ void EditorGUI::DrawSceneGizmo()
     }
     
     Bounds aabb(Vector3::zero, Vector3::one*0.5f);
-    if (!interested && inRegion) {
-        interested = aabb.IntersectRay(ray);
-        if (interested)
+    bool interested6 = false;
+    if (inRegion && !interested) {
+        interested6 = aabb.IntersectRay(ray);
+        if (interested6)
             hoverIndex = 6;
-    } else {
-        interested = false;
     }
+    interested = interested || interested6;
     
     sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
     sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-    sceneGizmoMaterial->SetVector3("_Color", interested ? Vector3(1, 1, 0) : Vector3(1, 1, 1));
+    sceneGizmoMaterial->SetVector3("_Color", interested6 ? Vector3(1, 1, 0) : Vector3(1, 1, 1));
     shader->PreRender();
     sceneGizmoMaterial->Update();
     shader->CheckStatus();
     cubeMesh->Render();
     
     shader->PostRender();
-    
+
     if (interested && Input::GetMouseButtonDown(0))
     {
         Debug::Log("%d", hoverIndex);
+        if (hoverIndex == 6) {
+            // TODO
+        } else {
+            Vector3 offset(f + hoverIndex * 6);
+            Vector3 up(0, 1, 0);
+            if (offset.y == 1) {
+                up.Set(0, 0, -1);
+            } else if (offset.y == -1) {
+                up.Set(0, 0, 1);
+            }
+            camera->transform()->setLocalPosition(camera->m_focusPoint + offset * 4);
+            camera->transform()->LookAt(camera->m_focusPoint, up);
+            //camera->transform()->setLocalEulerAngles(Vector3(f + hoverIndex * 6 + 3));
+            //camera->FrameSelected(Selection::activeGameObject());
+        }
     }
     
     auto v = camera->viewport();

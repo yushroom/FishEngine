@@ -50,10 +50,13 @@ private:
     static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
 
     static int m_selectedAxis; // temp
+    static std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
     static void DrawTranslateGizmo();
     static void DrawRotateGizmo();
     static void DrawScaleGizmo();
     static void DrawSceneGizmo();
+
+    //static void ChangeCameraView();
     
     static bool m_showAssectSelectionDialogBox;
 };

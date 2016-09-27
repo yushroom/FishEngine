@@ -6,9 +6,10 @@
 
 NAMESPACE_FISHENGINE_BEGIN
 
-Camera::Camera(float fov, float aspect, float zNear, float zFar) : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar)
+Camera::Camera(float fov, float aspect, float zNear, float zFar) 
+    : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar)
 {
-
+    //m_focusPoint = transform()->position() + transform()->forward() * 5.f;
 }
 
 
@@ -62,5 +63,18 @@ std::shared_ptr<Camera> Camera::main()
 {
     return Scene::mainCamera();
 }
+
+
+void FishEngine::Camera::FrameSelected(std::shared_ptr<GameObject>& selected)
+{
+    auto camera = Camera::main()->transform();
+    float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);
+    m_focusPoint = selected->transform()->position();
+    auto camera_dir = camera->forward().normalized();
+    auto target_camera_position = m_focusPoint - camera_dir * focus_distance;
+    auto translation = target_camera_position - camera->position();
+    camera->Translate(translation, Space::World);
+}
+
 
 NAMESPACE_FISHENGINE_END

@@ -19,8 +19,6 @@ namespace FishEngine {
         typedef std::shared_ptr<ModelNode> PModelNode;
         std::string     name;
         ModelNode*      parent;
-        //uint32_t        numChildren;
-        //ModelNode*      children;
         std::vector<PModelNode> children;
         std::vector<uint32_t> meshes;
     };
@@ -54,18 +52,27 @@ namespace FishEngine {
     class ModelImporter : public AssetImporter
     {
     public:
-        ModelImporter() = delete;
+        ModelImporter() = default;
         
-        static std::shared_ptr<Model>
+        void
+        setFileScale(const float fileScale)
+        {
+            m_fileScale = fileScale;
+        }
+        
+        std::shared_ptr<Model>
         LoadFromFile(const std::string path,
                      int vertexUsage = VertexUsagePNUT,
                      MeshLoadFlags flags = 0);
     private:
-        static ModelNode::PModelNode
+        
+        float m_fileScale = 1.0f;
+        
+        ModelNode::PModelNode
         buildModelTree(const aiNode* assimp_node);
         
         
-        static std::shared_ptr<Mesh>
+        std::shared_ptr<Mesh>
         ParseMesh(const aiMesh* assimp_mesh,
                   int vertexUsage,
                   bool load_uv,

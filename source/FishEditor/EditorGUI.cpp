@@ -12,13 +12,13 @@
 #include "Mesh.hpp"
 #include "Common.hpp"
 #include "Debug.hpp"
-//#include "RenderSettings.hpp"
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
 #include <Time.hpp>
 #include <sstream>
 #include <Matrix4x4.hpp>
 #include <Bounds.hpp>
+#include <Ray.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -30,7 +30,7 @@ constexpr float translate_gizmo_length = 0.1f;
 
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
-int FishEditor::EditorGUI::m_selectedAxis = -1;
+int EditorGUI::m_selectedAxis = -1;
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
 
 Material::PMaterial sceneGizmoMaterial = nullptr;
@@ -427,7 +427,7 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
         Vector3 axis_dir_view = vp * Vector4(axis_dir, 0);
         float distance = Vector3::Dot(dir, axis_dir_view);
         Debug::Log("distance: %lf", distance);
-        selectedGO->transform()->Translate(axis_dir * distance);
+        selectedGO->transform()->Translate(axis_dir * distance, Space::World);
     }
 }
 
@@ -445,30 +445,36 @@ void FishEditor::EditorGUI::DrawScaleGizmo()
 
 void EditorGUI::DrawSceneGizmo()
 {
-    int w = Screen::width();
-    int h = Screen::height();
-    glViewport(0, 0, GLsizei(w*0.1f), GLsizei(w*0.1f));
+    int w = Screen::width()*0.06f;
+    int margin = 20;
+    glViewport(margin, margin, GLsizei(w), GLsizei(w));
     
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
     
-    auto camera_pos = Vector3(0, 0, -5);
+    Vector3 camera_pos(0, 0, -5);
     sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
     auto camera = Camera::main();
     auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-    auto proj = Matrix4x4::Perspective(60.f, 1.f, 0.1f, 100.f);
+    auto proj = Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10);
     auto vp = proj * view;
     auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
-    
-    ShaderUniforms uniforms;
-    sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-    sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-    sceneGizmoMaterial->SetVector3("_Color", Vector3(1, 1, 1));
-    shader->PreRender();
-    sceneGizmoMaterial->Update();
-    shader->CheckStatus();
-    cubeMesh->Render();
 
+    auto inv_model = model.inverse();
+    
+    auto mousePos = Input::mousePosition();
+    bool inRegion = false;
+    float x = mousePos.x - margin;
+    float y = mousePos.y - margin;
+    Ray ray(Vector3::zero, Vector3::zero);
+    if (x > 0 && x < w && y > 0 && y < w) {
+        inRegion = true;
+        //Debug::Log("In SceneGizmo region");
+        //ray = Ray(camera_pos, ray_world.normalized()); // world space
+        ray.origin = inv_model * Vector4(2.0f*x/w-1.f, 2.0f*y/w-1.0f, -5, 1);
+        ray.direction = inv_model * Vector4(0, 0, 1, 0);
+    }
+    
     auto s = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
     
     float f[] = {
@@ -479,24 +485,64 @@ void EditorGUI::DrawSceneGizmo()
          0,  1,  0,  180, 0,   0,
          0,  0,  1,  -90, 0,   0,
     };
+    
+    ShaderUniforms uniforms;
+    bool interested = false;
+    int hoverIndex = -1;
+    
     static Transform t;
     for (int i = 0; i < 6; ++i) {
         int j = i*6;
-        t.setLocalPosition(f[j], f[j+1], f[j+2]);
+        Vector3 pos(f+j);
+        Vector3 color(1, 1, 1);
+        if (i >= 3)
+            color = Vector3(f+j);
+        if (inRegion && !interested) {
+            Bounds aabb(pos*0.7f, Vector3::one*0.5f);
+            if (aabb.IntersectRay(ray)) {
+                interested = true;
+                hoverIndex = i;
+                color.Set(1, 1, 0); // yellow
+            }
+        }
+        t.setLocalPosition(pos);
         t.setLocalEulerAngles(f[j+3], f[j+4], f[j+5]);
-        //t.Update();
         auto modelMat = model * t.localToWorldMatrix() * s;
         sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
         sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
-        if (i >= 3)
-            sceneGizmoMaterial->SetVector3("_Color", Vector3(f[j], f[j+1], f[j+2]));
+        //if (i >= 3)
+        sceneGizmoMaterial->SetVector3("_Color", color);
         sceneGizmoMaterial->Update();
         coneMesh->Render();
     }
     
+    Bounds aabb(Vector3::zero, Vector3::one*0.5f);
+    if (!interested && inRegion) {
+        interested = aabb.IntersectRay(ray);
+        if (interested)
+            hoverIndex = 6;
+    } else {
+        interested = false;
+    }
+    
+    sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+    sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+    sceneGizmoMaterial->SetVector3("_Color", interested ? Vector3(1, 1, 0) : Vector3(1, 1, 1));
+    shader->PreRender();
+    sceneGizmoMaterial->Update();
+    shader->CheckStatus();
+    cubeMesh->Render();
+    
     shader->PostRender();
     
+    if (interested && Input::GetMouseButtonDown(0))
+    {
+        Debug::Log("%d", hoverIndex);
+    }
+    
     auto v = camera->viewport();
+    w = Screen::width();
+    int h = Screen::height();
     glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
 }
 

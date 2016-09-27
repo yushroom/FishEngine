@@ -26,6 +26,7 @@ using namespace FishEditor;
 #include <ModelImporter.hpp>
 #include <CameraController.hpp>
 #include <Bounds.hpp>
+#include <ModelImporter.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -281,7 +282,8 @@ public:
         auto plane = Mesh::builtinMesh("plane");
         
         //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
-        auto mitsuba = ModelImporter::LoadFromFile(models_dir + "mitsuba-sphere.obj");
+        ModelImporter importer;
+        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
         mitsuba->CreateGameObject();
         //auto boblampclean = Mesh::CreateFromObjFile(models_dir + "boblampclean.md5mesh");
 
@@ -454,7 +456,9 @@ public:
         auto plane = Mesh::builtinMesh("plane");
         
         //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
-        auto model = ModelImporter::LoadFromFile(chan_dir + "unitychan.fbx");
+        ModelImporter importer;
+        importer.setFileScale(0.01f);
+        auto model = importer.LoadFromFile(chan_dir + "unitychan.fbx");
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir + "TANGS_zou.FBX");
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir+"Archer_max/archer_attacking.max");
         
@@ -485,18 +489,19 @@ public:
         
         auto modelGO = model->CreateGameObject();
         //go->transform()->setLocalEulerAngles(90, 0, 0);
-        modelGO->transform()->setLocalScale(0.05f, 0.05f, 0.05f);
-        modelGO->transform()->setLocalPosition(0, -4, 0);
+        modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
+        //modelGO->transform()->setLocalPosition(0, 0, 0);
         
         //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;
 
+        constexpr float edgeThickness = 0.5f;
         material = Material::builtinMaterial("TextureDoubleSided");
         material->SetTexture("DiffuseMap", bodyTexture);
         auto material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", bodyTexture);
-        material2->SetFloat("_EdgeThickness", 4.0f);
+        material2->SetFloat("_EdgeThickness", edgeThickness);
         material->BindTextures(textures);
         for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -510,7 +515,7 @@ public:
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", skinTexture);
-        material2->SetFloat("_EdgeThickness", 4.0f);
+        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"skin"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -523,7 +528,7 @@ public:
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", faceTexture);
-        material2->SetFloat("_EdgeThickness", 4.0f);
+        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -536,7 +541,7 @@ public:
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", hairTexture);
-        material2->SetFloat("_EdgeThickness", 4.0f);
+        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -586,27 +591,12 @@ public:
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
         }
         
-        auto sphereGO = Scene::CreateGameObject("Sphere");
-        sphereGO->transform()->setLocalScale(Vector3::one*0.1f);
-        sphereGO->AddComponent(make_shared<MeshFilter>(sphere));
-        material = Material::builtinMaterial("PBR");
-        material->SetVector3("albedo", Vector3(1, 1, 1));
-        sphereGO->AddComponent(make_shared<MeshRenderer>(material));
-        
-        go = Scene::CreateGameObject("Cube");
-        go->AddComponent(make_shared<MeshFilter>(cube));
-        material = Material::builtinMaterial("PBR");
-        material->SetVector3("albedo", Vector3(1, 1, 1));
-        go->AddComponent(make_shared<MeshRenderer>(material));
-        //auto test_aabb = make_shared<TestAABB>();
-        //test_aabb->target = sphereGO;
-        //go->AddScript(test_aabb);
-        
-        //Selection::setActiveGameObject(go);
+        // Camera
         
         auto cameraGO = Scene::mainCamera()->gameObject();
-        cameraGO->transform()->setPosition(0, 0, -7);
-        cameraGO->transform()->LookAt(0, 0, 0);
+        cameraGO->transform()->setLocalPosition(0, 0.8, -2.6);
+        cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
+        //cameraGO->transform()->LookAt(0, 0, 0);
         //cameraGO->transform()->setPosition(0, 0, -5);
         //cameraGO->transform()->LookAt(0, 0, 0);
         //cameraGO->transform()->LookAt(0, 0, 0);

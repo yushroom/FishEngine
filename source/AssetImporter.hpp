@@ -8,7 +8,7 @@ namespace FishEngine {
     class AssetImporter : public Object
     {
     public:
-        AssetImporter() = delete;
+        AssetImporter() = default;
         virtual ~AssetImporter() {};
         
         typedef std::shared_ptr<AssetImporter> PAssetImporter;

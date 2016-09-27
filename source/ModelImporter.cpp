@@ -164,6 +164,10 @@ namespace FishEngine {
         
         bool loadAnimation = scene->HasAnimations();
         
+//        scene->mRootNode->mTransformation *= aiMatrix4x4(m_fileScale, 0, 0, 0,
+//                                                         0, m_fileScale, 0, 0,
+//                                                         0, 0, m_fileScale, 0,
+//                                                         0, 0, 0, 1);
         for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
         {
             auto mesh = ParseMesh(scene->mMeshes[meshIndex], vertexUsage, load_uv, load_tangent);

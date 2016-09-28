@@ -34,7 +34,9 @@
 
 - [ ] transform父子关系改变时的操作，应该维持子节点在world space下的T、R、S都不变
 
-- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点
+- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点（done，导入时加参数），解析每个节点的local transformation。
+
+- [ ] basic model用NEF代替：http://assimp.sourceforge.net/howtoBasicShapes.html
 
 - [ ] eulerangles数值不自然
 

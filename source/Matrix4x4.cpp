@@ -121,13 +121,13 @@ namespace FishEngine {
         Matrix4x4&          outLocalToWorld, 
         Matrix4x4&          outWorldToLocal)
     {
-//        auto l2w =
-//        glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, translation.z)) *
-//        glm::mat4_cast(glm::quat(rotation.w, rotation.x, rotation.y, rotation.z)) *
-//        glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
-//        outLocalToWorld = l2w;
-//        outWorldToLocal = glm::inverse(l2w);
-//        return;
+        auto l2w =
+        glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, translation.z)) *
+        glm::mat4_cast(glm::quat(rotation.w, rotation.x, rotation.y, rotation.z)) *
+        glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+        outLocalToWorld = l2w;
+        outWorldToLocal = glm::inverse(l2w);
+        return;
         // outLocalToWorld = TRS
         // outWorldToLocal = inverse(outLocalToWorld) = (S^-1)(R')(T^-1)
         //outLocalToWorld = glm::mat4_cast((glm::quat)rotation);

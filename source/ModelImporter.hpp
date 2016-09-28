@@ -20,7 +20,8 @@ namespace FishEngine {
         std::string     name;
         ModelNode*      parent;
         std::vector<PModelNode> children;
-        std::vector<uint32_t> meshes;
+        std::vector<uint32_t> meshesIndices;
+        Matrix4x4       transform;
     };
     
     enum class BuiltinModelTyep {
@@ -83,7 +84,7 @@ namespace FishEngine {
         float m_fileScale = 1.0f;
         
         ModelNode::PModelNode
-        buildModelTree(const aiNode* assimp_node);
+        buildModelTree(const aiNode* assimp_node, const ModelNode* parentNode);
         
         
         std::shared_ptr<Mesh>

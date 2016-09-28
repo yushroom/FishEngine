@@ -3,10 +3,10 @@
 
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
-//#define GLM_FORCE_LEFT_HANDED
-//#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-//#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-//#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+#define GLM_FORCE_LEFT_HANDED
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 namespace FishEngine {
 
@@ -48,16 +48,16 @@ public:
 
     }
 
-    //Matrix4x4(const glm::mat4& glm_mat4)
-    //{
-    //    memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
-    //}
+    Matrix4x4(const glm::mat4& glm_mat4)
+    {
+        memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
+    }
 
-    //operator glm::mat4() const {
-    //    glm::mat4 result;
-    //    memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
-    //    return result;
-    //}
+    operator glm::mat4() const {
+        glm::mat4 result;
+        memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
+        return result;
+    }
 
     const float* data() const {
         return m[0];
@@ -103,19 +103,19 @@ public:
     }
 
 
-    //void operator*=(const Matrix4x4& rhs)
-    //{
-    //    for (int i = 0; i < 4; i++) {
-    //        float f[4];
-    //        for (int j = 0; j < 4; j++) {
-    //            f[j] = m[i][0] * rhs.m[0][j] + m[i][1] * rhs.m[1][j] +
-    //                m[i][2] * rhs.m[2][j] + m[i][3] * rhs.m[3][j];
-    //        }
-    //        for (int j = 0; j < 4; j++) {
-    //            m[i][j] = f[j];
-    //        }
-    //    }
-    //}
+    void operator*=(const Matrix4x4& rhs)
+    {
+        for (int i = 0; i < 4; i++) {
+            float f[4];
+            for (int j = 0; j < 4; j++) {
+                f[j] = m[i][0] * rhs.m[0][j] + m[i][1] * rhs.m[1][j] +
+                    m[i][2] * rhs.m[2][j] + m[i][3] * rhs.m[3][j];
+            }
+            for (int j = 0; j < 4; j++) {
+                m[i][j] = f[j];
+            }
+        }
+    }
 
     friend Matrix4x4 operator*(const Matrix4x4& m, const float f);
     //{

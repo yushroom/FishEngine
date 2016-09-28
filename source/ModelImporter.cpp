@@ -32,25 +32,39 @@ namespace FishEngine {
     }
     
     Matrix4x4
-    ConvertMatrix(aiMatrix4x4& m) {
+    ConvertMatrix(const aiMatrix4x4& m) {
         Matrix4x4 result;
         memcpy(result.m, &m.a1, 16*sizeof(float));
+        //result *= Matrix4x4(1, 0, 0, 0,   0, 1, 0, 0,   0, 0, -1, 0,   0, 0, 0, 1);
         return result;
     }
 
-    ModelNode::PModelNode ModelImporter::buildModelTree(const aiNode* assimp_node) {
+    ModelNode::PModelNode 
+    ModelImporter::buildModelTree(
+        const aiNode* assimp_node, 
+        const ModelNode* parentNode) 
+    {
         //Debug::Log("NODE: %s mesh count: %d ", assimp_node->mName.C_Str(), assimp_node->mNumMeshes);
         //for (int i = 0; i < assimp_node->mNumChildren; ++i) {
         //    Debug::Log("    CHILD: %s", assimp_node->mChildren[i]->mName.C_Str());
         //}
         auto node = std::make_shared<ModelNode>();
         node->name = assimp_node->mName.C_Str();
+        Debug::Log(node->name.c_str());
+        aiVector3D pos;
+        aiQuaternion rotation;
+        aiVector3D scale;
+        assimp_node->mTransformation.Decompose(scale, rotation, pos);
+        Vector3 euler = Quaternion(rotation.x, rotation.y, rotation.z, rotation.w).eulerAngles();
+        node->transform = ConvertMatrix(assimp_node->mTransformation);
+        //if (parentNode != nullptr)
+        //    node->transform = parentNode->transform * node->transform;
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
-            node->meshes.push_back(assimp_node->mMeshes[i]);
+            node->meshesIndices.push_back(assimp_node->mMeshes[i]);
         }
         for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i) {
             //Debug::Log("    CHILD: %s", assimp_node->mName.C_Str());
-            auto child = buildModelTree(assimp_node->mChildren[i]);
+            auto child = buildModelTree(assimp_node->mChildren[i], node.get());
             node->children.push_back(child);
         }
         return node;
@@ -80,9 +94,9 @@ namespace FishEngine {
         // Vertex
         for (unsigned int j = 0; j < assimp_mesh->mNumVertices; ++j) {
             auto& v = assimp_mesh->mVertices[j];
-            mesh->m_positionBuffer.push_back(v.x);
-            mesh->m_positionBuffer.push_back(v.y);
-            mesh->m_positionBuffer.push_back(v.z);
+            mesh->m_positionBuffer.push_back(v.x * m_fileScale);
+            mesh->m_positionBuffer.push_back(v.y * m_fileScale);
+            mesh->m_positionBuffer.push_back(v.z * m_fileScale);
 
             auto& n = assimp_mesh->mNormals[j];
             mesh->m_normalBuffer.push_back(n.x);
@@ -160,11 +174,12 @@ namespace FishEngine {
         load_option |= aiProcess_CalcTangentSpace;
         load_option |= aiProcess_LimitBoneWeights;
         //load_option |= aiProcess_FixInfacingNormals;
-        load_option |= aiProcess_OptimizeMeshes;
+        //load_option |= aiProcess_OptimizeMeshes;
         //load_option |= aiProcess_SortByPType;
         //load_option |= aiProcess_JoinIdenticalVertices;
         //load_option |= aiProcess_OptimizeGraph;
         load_option |= aiProcess_ConvertToLeftHanded;
+        load_option |= aiProcess_FlipUVs;
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         if (flags & MeshLoadFlag_RegenerateNormal) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
@@ -177,6 +192,7 @@ namespace FishEngine {
             load_option |= aiProcess_CalcTangentSpace;
         const aiScene* scene = importer.ReadFile(path.c_str(), load_option);
         if (!scene) {
+            Debug::LogError(importer.GetErrorString());
             Debug::LogError("Can not open file %s", path.c_str());
             abort();
         }
@@ -198,7 +214,7 @@ namespace FishEngine {
             model->AddMesh(mesh);
         }
         
-        model->m_rootNode = buildModelTree(scene->mRootNode);
+        model->m_rootNode = buildModelTree(scene->mRootNode, nullptr);
         
         return model;
     }
@@ -211,24 +227,34 @@ namespace FishEngine {
     std::shared_ptr<GameObject> Model::ResursivelyCreateGameObject(const ModelNode::PModelNode & node) const
     {
         auto go = Scene::CreateGameObject(node->name);
-        
-        if (node->meshes.size() == 1) {
+        Vector3 postion;
+        Quaternion rotation;
+        Vector3 scale;
+        Matrix4x4::Decompose(node->transform, &postion, &rotation, &scale);
+        //postion *= 0.01f;;
+        auto t = go->transform();
+        t->setLocalPosition(postion);
+        t->setLocalRotation(rotation);
+        t->setLocalScale(scale);
+
+        if (node->meshesIndices.size() == 1) {
             auto material = Material::defaultMaterial();
             auto meshRenderer = std::make_shared<MeshRenderer>(material);
-            auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
+            auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
             go->AddComponent(meshRenderer);
             go->AddComponent(meshFilter);
-        } else if (node->meshes.size() > 1) {
-            for (auto& idx : node->meshes) {
-                auto& m = m_meshes[idx];
-                auto child = Scene::CreateGameObject(m->name());
-                child->transform()->SetParent(go->transform());
-                auto material = Material::defaultMaterial();
-                auto meshRenderer = std::make_shared<MeshRenderer>(material);
-                auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
-                child->AddComponent(meshRenderer);
-                child->AddComponent(meshFilter);
-            }
+        } else if (node->meshesIndices.size() > 1) {
+            //for (auto& idx : node->meshesIndices) {
+            //    auto& m = m_meshes[idx];
+            //    auto child = Scene::CreateGameObject(m->name());
+            //    child->transform()->SetParent(go->transform());
+            //    auto material = Material::defaultMaterial();
+            //    auto meshRenderer = std::make_shared<MeshRenderer>(material);
+            //    auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
+            //    child->AddComponent(meshRenderer);
+            //    child->AddComponent(meshFilter);
+            //}
+            abort();
         }
         
         for (auto& c : node->children) {

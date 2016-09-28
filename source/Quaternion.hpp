@@ -16,10 +16,7 @@ public:
     Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
     Quaternion() : Quaternion(0, 0, 0, 1) {}
 
-    Vector3 eulerAngles() const
-    {
-    	return Vector3(pitch(), yaw(), roll());
-    }
+    Vector3 eulerAngles() const;
 
     float roll() const {
     	return Mathf::Rad2Deg * ::std::atan2(2.0f * (x*y+w*z), w*w+x*x-y*y-z*z);
@@ -114,20 +111,7 @@ public:
         return Euler(Vector3(x, y, z));
     }
 
-    static Quaternion Euler(const Vector3& euler)
-    {
-        //return glm::quat(glm::radians((glm::vec3)euler));
-        Quaternion result;
-        auto rad = euler
-        * (Mathf::Deg2Rad * 0.5f);
-        auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
-        auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
-        result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-        result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-        result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-        result.z = c.x * c.y * s.z - s.x * s.y * c.z;
-        return result;
-    }
+    static Quaternion Euler(const Vector3& euler);
 
     static Quaternion FromToRotation(const Vector3& fromDirection, const Vector3& toDirection);
     

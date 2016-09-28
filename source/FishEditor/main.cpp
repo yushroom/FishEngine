@@ -452,7 +452,7 @@ public:
         
         //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
         ModelImporter importer;
-        importer.setFileScale(0.01f);
+        //importer.setFileScale(0.01f);
         auto model = importer.LoadFromFile(chan_dir + "unitychan.fbx");
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir + "TANGS_zou.FBX");
         //auto boblampclean = ModelImporter::LoadFromFile(models_dir+"Archer_max/archer_attacking.max");

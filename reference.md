@@ -64,6 +64,8 @@ http://http.developer.nvidia.com/GPUGems3/gpugems3_ch10.html
 
 load animation using Assimp
 
+http://assimp.sourceforge.net/lib_html/data.html
+
 http://ogldev.atspace.co.uk/www/tutorial38/tutorial38.html
 
 http://gamedev.stackexchange.com/questions/26382/i-cant-figure-out-how-to-animate-my-loaded-model-with-assimp

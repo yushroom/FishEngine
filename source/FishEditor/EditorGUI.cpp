@@ -233,7 +233,7 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
     bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
 
     if (ImGui::IsItemClicked()) {
-        Debug::Log("select: %s", gameObject->name().c_str());
+        //Debug::Log("select: %s", gameObject->name().c_str());
         Selection::setActiveGameObject(gameObject);
         s_isAnyItemClicked = true;
     }
@@ -259,6 +259,7 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
     //ImGui::BeginDock("Hierarchy");
     ImGui::Begin("Hierarchy");
     if (ImGui::Button("Create")) {
+        s_isAnyItemClicked = true;
         auto go = Scene::CreateGameObject("GameObject");
         if (Selection::activeGameObject() != nullptr) {
             go->transform()->SetParent(Selection::activeGameObject()->transform());
@@ -268,6 +269,7 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
     if (selectedGO != nullptr) {
         ImGui::SameLine();
         if (ImGui::Button("Destroy")) {
+            s_isAnyItemClicked = true;
             Object::Destroy(selectedGO);
             //Selection::setActiveGameObject(nullptr);
         }
@@ -281,8 +283,9 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
     }
     ImGui::PopStyleVar();
 
+    // TODO: remove this
     if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow()) {
-        Debug::Log("Mouse Clicked here");
+        //Debug::Log("Mouse Clicked here");
         Selection::setActiveGameObject(nullptr);
     }
 

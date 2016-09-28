@@ -49,12 +49,22 @@ private:
     static int m_idCount;   // temp
     static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
 
+    // https://docs.unity3d.com/Manual/LearningtheInterface.html
+    static void DrawInspectorWindow();
+    static void DrawHierarchyWindow();
+    static void DrawSceneView();
+    static void DrawToolbar();
+    static void DrawProjectWindwo();
+    static void DrawMainMenu();
+
     static int m_selectedAxis; // temp
     static std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
     static void DrawTranslateGizmo();
     static void DrawRotateGizmo();
     static void DrawScaleGizmo();
     static void DrawSceneGizmo();
+
+    static bool s_isAnyItemClicked;
 
     //static void ChangeCameraView();
     

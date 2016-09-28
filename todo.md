@@ -11,7 +11,7 @@
 - [x] 如何减少transform::update的调用次数？简单实用脏属性来标记是不正确的，因为不知道父节点上的信息是不是更新了（那么父节点变化时通知所有子节点？或者脏属性像GameObject::active一样拿（这样也有个问题，就是父节点可能变脏了，但是在子节点check脏属性之前父节点update了）？）。
 
       ​	暂时的解决方案：节点变化（第一次变脏）时将所有子节点标记为脏（递归过程，会把子孙所有节点标记为脏）。
-      
+
 - [ ] SceneView按F选中的物体会自动居中，并且按boundingbox调整相机距离
 
 - [ ] 高分屏的处理（尤其是高分屏移动到普通屏）
@@ -68,7 +68,7 @@
 
 - [x] 相机旋转时的万向锁的问题
 
-- [x] SceneGizmo：遮挡问题（clear depth buffer解决），鼠标hover事件，点击后旋转相机
+- [x] SceneGizmo：遮挡问题（clear depth buffer解决），鼠标hover事件，点击后旋转相机、切换相机的透视模式
 
 - [x] 鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）
 

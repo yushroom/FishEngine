@@ -31,10 +31,13 @@ constexpr float translate_gizmo_length = 0.1f;
 
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
+
+
 int EditorGUI::m_selectedAxis = -1;
 
 std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
 
+bool EditorGUI::s_isAnyItemClicked = false;
 bool EditorGUI::m_showAssectSelectionDialogBox = false;
 
 Material::PMaterial sceneGizmoMaterial = nullptr;
@@ -87,121 +90,16 @@ void EditorGUI::Update()
         else if (m_transformToolType == TransformToolType::Scale)
             DrawScaleGizmo();
     }
-        
-    
-    static double time_stamp = glfwGetTime();
+
     //ImGuiContext& g = *GImGui;
     //ImGuiStyle& style = g.Style;
     
     //ImGui::BeginDock("Dock");
     //ImGui::EndDock();
     
-    // Inspector Editor
-    //ImGui::BeginDock("Inspector", nullptr);
-    ImGui::Begin("Inspector", nullptr);
-    ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
-    if (selectedGO != nullptr) {
-        ImGui::PushID("Inspector.selected.active");
-        ImGui::Checkbox("", &selectedGO->m_activeSelf);
-        ImGui::PopID();
-        char name[128] = {0};
-        memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
-        name[selectedGO->m_name.size()] = 0;
-        ImGui::SameLine();
-        ImGui::PushID("Inspector.selected.name");
-        if (ImGui::InputText("", name, 127)) {
-            selectedGO->m_name = name;
-        }
-        ImGui::PopID();
-
-        ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
-        //ImGui::LabelText("", "Tag");
-        ImGui::Text("Tag");
-        ImGui::SameLine();
-        ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
-        ImGui::SameLine();
-        ImGui::Text("Layer");
-        ImGui::SameLine();
-        ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
-        ImGui::PopItemWidth();
-        
-        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
-            selectedGO->m_transform->OnInspectorGUI();
-        }
-        
-        for (auto& c : selectedGO->m_components) {
-            bool is_open = true;
-            if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-                c->OnInspectorGUI();
-            if (!is_open) {
-                Object::Destroy(c);
-            }
-        }
-        for (auto& s : selectedGO->m_scripts) {
-            bool is_open = true;
-            if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName())+"##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-                s->OnInspectorGUI();
-            if (!is_open) {
-                Object::Destroy(s);
-            }
-        }
-    }
-    
-    EditorGUI::Button("Add Component");
-    //ImGui::EndDock(); // Inspector Editor
-    ImGui::End();
-    
-    
-    // Main menu bar
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            ImGui::MenuItem("New Scene", "Ctrl+N");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit")) {
-            ImGui::EndMenu();
-        }
-        
-        double new_time = glfwGetTime();
-        int fps = (int)roundf(1.f / (new_time - time_stamp));
-        time_stamp = new_time;
-        std::ostringstream sout;
-        sout << "FPS: " << fps;
-        const char* s = sout.str().c_str();
-        auto fps_stats_size = ImGui::CalcTextSize(s);
-        ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
-        ImGui::Text("%s", s);
-        ImGui::EndMainMenuBar();
-    }
-    
-    // Hierarchy view
-    //ImGui::BeginDock("Hierarchy");
-    ImGui::Begin("Hierarchy");
-    if (ImGui::Button("Create")) {
-        auto go = Scene::CreateGameObject("GameObject");
-        if (Selection::activeGameObject() != nullptr) {
-            go->transform()->SetParent(Selection::activeGameObject()->transform());
-        }
-    }
-    
-    if (selectedGO != nullptr) {
-        ImGui::SameLine();
-        if (ImGui::Button("Destroy")) {
-            Object::Destroy(selectedGO);
-            //Selection::setActiveGameObject(nullptr);
-        }
-    }
-    m_idCount = 0;
-    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
-    for (auto& go : Scene::m_gameObjects) {
-        if (go->transform()->parent() == nullptr) {
-            HierarchyItem(go);
-        }
-    }
-    ImGui::PopStyleVar();
-    //ImGui::EndDock();
-    ImGui::End();
-    
+    DrawMainMenu();
+    DrawHierarchyWindow();
+    DrawInspectorWindow();
     
     // Project view
     //ImGui::BeginDock("Project");
@@ -337,6 +235,7 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
     if (ImGui::IsItemClicked()) {
         Debug::Log("select: %s", gameObject->name().c_str());
         Selection::setActiveGameObject(gameObject);
+        s_isAnyItemClicked = true;
     }
     // child node
     if (!is_leaf) {
@@ -350,6 +249,136 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
     if (!gameObject->activeSelf()) {
         ImGui::PopStyleColor();
     }
+}
+
+void FishEditor::EditorGUI::DrawHierarchyWindow()
+{
+    s_isAnyItemClicked = false;
+    auto selectedGO = Selection::activeGameObject();
+    // Hierarchy view
+    //ImGui::BeginDock("Hierarchy");
+    ImGui::Begin("Hierarchy");
+    if (ImGui::Button("Create")) {
+        auto go = Scene::CreateGameObject("GameObject");
+        if (Selection::activeGameObject() != nullptr) {
+            go->transform()->SetParent(Selection::activeGameObject()->transform());
+        }
+    }
+
+    if (selectedGO != nullptr) {
+        ImGui::SameLine();
+        if (ImGui::Button("Destroy")) {
+            Object::Destroy(selectedGO);
+            //Selection::setActiveGameObject(nullptr);
+        }
+    }
+    m_idCount = 0;
+    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
+    for (auto& go : Scene::m_gameObjects) {
+        if (go->transform()->parent() == nullptr) {
+            HierarchyItem(go);
+        }
+    }
+    ImGui::PopStyleVar();
+
+    if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow()) {
+        Debug::Log("Mouse Clicked here");
+        Selection::setActiveGameObject(nullptr);
+    }
+
+    //ImGui::EndDock();
+    ImGui::End();
+
+}
+
+void FishEditor::EditorGUI::DrawInspectorWindow()
+{
+    auto selectedGO = Selection::activeGameObject();
+
+    // Inspector Editor
+    //ImGui::BeginDock("Inspector", nullptr);
+    ImGui::Begin("Inspector", nullptr);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
+    if (selectedGO != nullptr) {
+        ImGui::PushID("Inspector.selected.active");
+        ImGui::Checkbox("", &selectedGO->m_activeSelf);
+        ImGui::PopID();
+        char name[128] = { 0 };
+        memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
+        name[selectedGO->m_name.size()] = 0;
+        ImGui::SameLine();
+        ImGui::PushID("Inspector.selected.name");
+        if (ImGui::InputText("", name, 127)) {
+            selectedGO->m_name = name;
+        }
+        ImGui::PopID();
+
+        ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
+        //ImGui::LabelText("", "Tag");
+        ImGui::Text("Tag");
+        ImGui::SameLine();
+        ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
+        ImGui::SameLine();
+        ImGui::Text("Layer");
+        ImGui::SameLine();
+        ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
+        ImGui::PopItemWidth();
+
+        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
+            selectedGO->m_transform->OnInspectorGUI();
+        }
+
+        for (auto& c : selectedGO->m_components) {
+            bool is_open = true;
+            if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+                c->OnInspectorGUI();
+            if (!is_open) {
+                Object::Destroy(c);
+            }
+        }
+        for (auto& s : selectedGO->m_scripts) {
+            bool is_open = true;
+            if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+                s->OnInspectorGUI();
+            if (!is_open) {
+                Object::Destroy(s);
+            }
+        }
+    }
+
+    EditorGUI::Button("Add Component");
+
+    //ImGui::EndDock(); // Inspector Editor
+    ImGui::End();
+}
+
+
+void FishEditor::EditorGUI::DrawMainMenu()
+{
+    static float time_stamp = 0;
+
+    // Main menu bar
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            ImGui::MenuItem("New Scene", "Ctrl+N");
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            ImGui::EndMenu();
+        }
+
+        double new_time = glfwGetTime();
+        int fps = (int)roundf(1.f / float(new_time - time_stamp));
+        time_stamp = new_time;
+        std::ostringstream sout;
+        sout << "FPS: " << fps;
+        const char* s = sout.str().c_str();
+        auto fps_stats_size = ImGui::CalcTextSize(s);
+        ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
+        ImGui::Text("%s", s);
+        ImGui::EndMainMenuBar();
+    }
+
 }
 
 void FishEditor::EditorGUI::DrawTranslateGizmo()
@@ -450,7 +479,7 @@ void FishEditor::EditorGUI::DrawScaleGizmo()
 
 void EditorGUI::DrawSceneGizmo()
 {
-    int w = Screen::width()*0.06f;
+    int w = int(Screen::width()*0.06f);
     int margin = 20;
     glViewport(margin, margin, GLsizei(w), GLsizei(w));
     
@@ -461,7 +490,7 @@ void EditorGUI::DrawSceneGizmo()
     sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
     auto camera = Camera::main();
     auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-    auto proj = Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10);
+    auto proj = camera->m_orthographic ? Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10) : Matrix4x4::Perspective(45, 1, 0.3f, 10.f);
     auto vp = proj * view;
     auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
 
@@ -544,7 +573,8 @@ void EditorGUI::DrawSceneGizmo()
     {
         Debug::Log("%d", hoverIndex);
         if (hoverIndex == 6) {
-            // TODO
+            camera->setOrthographic(!camera->orghographic());
+            //camera->m_orthographic = !camera->m_orthographic;
         } else {
             Vector3 offset(f + hoverIndex * 6);
             Vector3 up(0, 1, 0);

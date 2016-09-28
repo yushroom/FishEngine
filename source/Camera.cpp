@@ -7,7 +7,7 @@
 NAMESPACE_FISHENGINE_BEGIN
 
 Camera::Camera(float fov, float aspect, float zNear, float zFar) 
-    : m_fov(fov), m_aspect(aspect), m_zNear(zNear), m_zFar(zFar)
+    : m_fieldOfView(fov), m_aspect(aspect), m_nearClipPlane(zNear), m_farClipPlane(zFar)
 {
     //m_focusPoint = transform()->position() + transform()->forward() * 5.f;
 }
@@ -16,7 +16,12 @@ Camera::Camera(float fov, float aspect, float zNear, float zFar)
 Matrix4x4 Camera::projectionMatrix() const
 {
     if (m_isDirty) {
-        m_projectMatrix = Matrix4x4::Perspective(m_fov, m_aspect, m_zNear, m_zFar);
+        if (m_orthographic) {
+            float w = Screen::aspect() * m_orthographicSize;
+            m_projectMatrix = Matrix4x4::Ortho(-w, w, -m_orthographicSize, m_orthographicSize, m_nearClipPlane, m_farClipPlane);
+        } else {
+            m_projectMatrix = Matrix4x4::Perspective(m_fieldOfView, m_aspect, m_nearClipPlane, m_farClipPlane);
+        }
         m_isDirty = false;
     }
     return m_projectMatrix;
@@ -24,13 +29,32 @@ Matrix4x4 Camera::projectionMatrix() const
 
 void Camera::OnInspectorGUI()
 {
-    if (ImGui::SliderFloat("Field of View", &m_fov, 1, 179)) {
+    const char* listbox_items[] = {
+        "Perspective", "Orthographic"
+    };
+    int list_item_current = m_orthographic ? 1 : 0;
+    ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
+    if (m_orthographic != (list_item_current == 1)) {
+        m_orthographic = !m_orthographic;
         m_isDirty = true;
     }
-    if (ImGui::InputFloat("Clipping Planes(Near)", &m_zNear)) {
+    //m_orthographic = list_item_current == 1;
+    
+    if (m_orthographic) {
+        if (ImGui::InputFloat("Size", &m_orthographicSize)) {
+            m_isDirty = true;
+        }
+    }
+    else {
+        if (ImGui::SliderFloat("Field of View", &m_fieldOfView, 1, 179)) {
+            m_isDirty = true;
+        }
+    }
+
+    if (ImGui::InputFloat("Clipping Planes(Near)", &m_nearClipPlane)) {
         m_isDirty = true;
     }
-    if (ImGui::InputFloat("Clipping Planes(Far)", &m_zFar)) {
+    if (ImGui::InputFloat("Clipping Planes(Far)", &m_farClipPlane)) {
         m_isDirty = true;
     }
     ImGui::InputFloat4("Viewport Rect", m_viewport.data());

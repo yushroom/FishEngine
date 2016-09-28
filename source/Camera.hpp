@@ -26,17 +26,26 @@ public:
         return m_aspect;
     }
 
+    bool orghographic() const {
+        return m_orthographic;
+    }
+
+    void setOrthographic(bool value) {
+        m_orthographic = value;
+        m_isDirty = true;
+    }
+
     void setAspect(float aspect) {
         m_aspect = aspect;
         m_isDirty = true;
     }
 
     float nearClipPlane() const {
-        return m_zNear;
+        return m_nearClipPlane;
     }
 
     float farClipPlane() const {
-        return m_zFar;
+        return m_farClipPlane;
     }
 
     // Matrix that transforms from world to camera space (i.e. view matrix).
@@ -62,14 +71,17 @@ private:
     friend class RenderSystem;
     friend class FishEditor::EditorGUI;
     
-    float m_fov;
+    float m_fieldOfView;
+    float m_orthographicSize = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
     float m_aspect; // The aspect ratio (width divided by height).
-    float m_zFar;
-    float m_zNear;
+    float m_farClipPlane;
+    float m_nearClipPlane;
     Vector4 m_viewport{0, 0, 1, 1};
     mutable bool m_isDirty = true;
     
-    CameraType m_cameraType = CameraType::Game;
+    CameraType  m_cameraType        = CameraType::Game;
+    bool        m_orthographic      = false;
+
 
     mutable Matrix4x4 m_projectMatrix;
 

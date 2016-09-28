@@ -45,10 +45,10 @@ namespace FishEngine {
         //}
         auto node = std::make_shared<ModelNode>();
         node->name = assimp_node->mName.C_Str();
-        for (int i = 0; i < assimp_node->mNumMeshes; ++i) {
+        for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshes.push_back(assimp_node->mMeshes[i]);
         }
-        for (int i = 0; i < assimp_node->mNumChildren; ++i) {
+        for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i) {
             //Debug::Log("    CHILD: %s", assimp_node->mName.C_Str());
             auto child = buildModelTree(assimp_node->mChildren[i]);
             node->children.push_back(child);
@@ -115,7 +115,7 @@ namespace FishEngine {
         std::map<std::string, uint32_t> boneMapping;
         uint32_t numBones = 0;
 
-        for (int j = 0; j < assimp_mesh->mNumBones; ++j) {
+        for (uint32_t j = 0; j < assimp_mesh->mNumBones; ++j) {
             uint32_t boneIndex = 0;
             auto& bone = assimp_mesh->mBones[j];
             std::string boneName(bone->mName.C_Str());
@@ -131,7 +131,7 @@ namespace FishEngine {
                 boneIndex = boneMapping[boneName];
             }
 
-            for (int k = 0; k < bone->mNumWeights; ++k) {
+            for (uint32_t k = 0; k < bone->mNumWeights; ++k) {
                 uint32_t vextexID = bone->mWeights[k].mVertexId;
                 float weight = bone->mWeights[k].mWeight;
                 mesh->m_boneWeights[vextexID].AddBoneData(boneIndex, weight);
@@ -154,6 +154,7 @@ namespace FishEngine {
         int vertexUsage,
         MeshLoadFlags flags)
     {
+        //AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS
         Assimp::Importer importer;
         unsigned int load_option = aiProcess_Triangulate;
         load_option |= aiProcess_CalcTangentSpace;
@@ -164,6 +165,7 @@ namespace FishEngine {
         //load_option |= aiProcess_JoinIdenticalVertices;
         //load_option |= aiProcess_OptimizeGraph;
         load_option |= aiProcess_ConvertToLeftHanded;
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         if (flags & MeshLoadFlag_RegenerateNormal) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
             load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;

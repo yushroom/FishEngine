@@ -589,7 +589,7 @@ public:
         // Camera
         
         auto cameraGO = Scene::mainCamera()->gameObject();
-        cameraGO->transform()->setLocalPosition(0, 0.8, -2.6);
+        cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
         //cameraGO->transform()->LookAt(0, 0, 0);
         //cameraGO->transform()->setPosition(0, 0, -5);

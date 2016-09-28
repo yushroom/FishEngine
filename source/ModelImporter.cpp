@@ -10,7 +10,29 @@
 
 namespace FishEngine {
     
-    Matrix4x4 ConvertMatrix(aiMatrix4x4& m) {
+    std::map<BuiltinModelTyep, Model::PModel> Model::s_builtinModels;
+    
+    void Model::Init() {
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "../../assets/models/";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
+#endif
+        ModelImporter importer;
+        s_builtinModels[BuiltinModelTyep::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
+        s_builtinModels[BuiltinModelTyep::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
+        s_builtinModels[BuiltinModelTyep::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
+        s_builtinModels[BuiltinModelTyep::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
+        s_builtinModels[BuiltinModelTyep::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
+    }
+    
+    Model::PModel
+    Model::builtinModel(const BuiltinModelTyep type) {
+        return s_builtinModels[type];
+    }
+    
+    Matrix4x4
+    ConvertMatrix(aiMatrix4x4& m) {
         Matrix4x4 result;
         memcpy(result.m, &m.a1, 16*sizeof(float));
         return result;
@@ -189,10 +211,7 @@ namespace FishEngine {
         auto go = Scene::CreateGameObject(node->name);
         
         if (node->meshes.size() == 1) {
-            //auto child = Scene::CreateGameObject(m->name());
-            //child->transform()->SetParent(go->transform());
-            auto material = Material::builtinMaterial("PBR");
-            material->SetVector3("albedo", Vector3(1, 1, 1));
+            auto material = Material::defaultMaterial();
             auto meshRenderer = std::make_shared<MeshRenderer>(material);
             auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
             go->AddComponent(meshRenderer);
@@ -202,8 +221,7 @@ namespace FishEngine {
                 auto& m = m_meshes[idx];
                 auto child = Scene::CreateGameObject(m->name());
                 child->transform()->SetParent(go->transform());
-                auto material = Material::builtinMaterial("PBR");
-                material->SetVector3("albedo", Vector3(1, 1, 1));
+                auto material = Material::defaultMaterial();
                 auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshes.front()]);
                 child->AddComponent(meshRenderer);

@@ -19,6 +19,7 @@
 #include <Matrix4x4.hpp>
 #include <Bounds.hpp>
 #include <Ray.hpp>
+#include <ModelImporter.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -63,8 +64,8 @@ void EditorGUI::Init()
     style.WindowMinSize = ImVec2(256, 256);
     
     sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
-    cubeMesh = Mesh::builtinMesh("cube");
-    coneMesh = Mesh::builtinMesh("cone");
+    cubeMesh = Model::builtinModel(BuiltinModelTyep::Cube)->mainMesh();
+    coneMesh = Model::builtinModel(BuiltinModelTyep::Cone)->mainMesh();
 }
 
 void EditorGUI::Update()
@@ -270,7 +271,7 @@ bool EditorGUI::OnMouseButton(MouseButtonCode button, MouseButtonState action)
         auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
         for (int i = 0; i < 3; ++i) {
             if (aabb[i].IntersectRay(ray)) {
-                Debug::Log("%c axis", "xyz"[i]);
+                //Debug::Log("%c axis", "xyz"[i]);
                 m_selectedAxis = i;
                 return true;
             }

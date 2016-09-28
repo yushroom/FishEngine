@@ -4,6 +4,7 @@
 #include "Object.hpp"
 #include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
+#include "Bounds.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -98,10 +99,6 @@ public:
     
     typedef std::shared_ptr<Mesh> PMesh;
 
-    static PMesh CreateFromObjFile(const std::string path, int vertexUsage = VertexUsagePNUT, MeshLoadFlags flags = 0);
-
-    void FromObjFile(const std::string path, int vertexUsage = VertexUsagePNUT, MeshLoadFlags flags = 0);
-
     void SetVertexUsage(int vertexUsage) {
         BindBuffer(vertexUsage);
     }
@@ -109,17 +106,20 @@ public:
     void Render();
     //void renderPatch(const Shader& shader);
     
-    //static Model& getQuad();
-    //static Model& getBox();
-    //static Model& getSphere();
-    //static Model& getIcosahedron();
+    // The bounding volume of the mesh.
+    Bounds bounds() const {
+        return m_bounds;
+    }
 
-    static void Init();
-    static PMesh builtinMesh(const std::string& name);
+    //static void Init();
+    //static PMesh builtinMesh(const std::string& name);
     
 private:
     friend class FishEditor::EditorGUI;
     friend class ModelImporter;
+    
+    Bounds m_bounds;
+    
     std::vector<float>      m_positionBuffer;
     std::vector<float>      m_normalBuffer;
     std::vector<float>      m_uvBuffer;
@@ -127,6 +127,7 @@ private:
     std::vector<uint32_t>   m_indexBuffer;
     std::vector<Bone>       m_bones;
     std::vector<BoneWeight> m_boneWeights;
+    
     GLuint m_VAO;
     GLuint m_indexVBO;
     GLuint m_positionVBO;
@@ -134,7 +135,7 @@ private:
     GLuint m_uvVBO;
     GLuint m_tangentVBO;
     
-    static std::map<std::string, PMesh> m_meshes;
+    //static std::map<std::string, PMesh> m_meshes;
     
     void GenerateBuffer(int vertexUsage);
     void BindBuffer(int vertexUsage);

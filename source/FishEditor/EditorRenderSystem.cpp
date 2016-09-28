@@ -19,6 +19,7 @@
 #include <MeshFilter.hpp>
 #include <Screen.hpp>
 #include "Selection.hpp"
+#include <ModelImporter.hpp>
 
 using namespace FishEngine;
 
@@ -45,7 +46,7 @@ void EditorRenderSystem::Init()
     
     Shader::Init();
     Material::Init();
-    Mesh::Init();
+    Model::Init();
     EditorGUI::Init();
     Scene::Init();
 //#ifdef GLM_FORCE_LEFT_HANDED
@@ -165,7 +166,8 @@ void EditorRenderSystem::Render()
         auto m = Material::builtinMaterial("ScreenTexture");
         m->shader()->Use();
         m->shader()->BindTextures(textures);
-        Mesh::builtinMesh("quad")->Render();
+        //Mesh::builtinMesh("quad")->Render();
+        Model::builtinModel(BuiltinModelTyep::Quad)->mainMesh()->Render();
     }
     EditorGUI::Update();
 

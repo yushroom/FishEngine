@@ -14,6 +14,8 @@
       
 - [ ] SceneView按F选中的物体会自动居中，并且按boundingbox调整相机距离
 
+- [ ] 高分屏的处理（尤其是高分屏移动到普通屏）
+
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
 - [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离（Model已经分离，动画导入WIP）
@@ -89,6 +91,8 @@
 - [ ] Docking GUI
 
 - [ ] hierarchy中的方向键的移动
+
+- [ ] hierarchy中过滤器（名字，类型。。。）
 
       ​
 

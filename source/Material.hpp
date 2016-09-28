@@ -80,6 +80,8 @@ public:
     }
     
     static PMaterial builtinMaterial(const std::string& name);
+    
+    static PMaterial defaultMaterial();
 
 private:
     std::shared_ptr<Shader> m_shader = nullptr;
@@ -88,6 +90,7 @@ private:
     ShaderUniforms m_uniforms;
 
     static std::map<std::string, PMaterial> m_builtinMaterial;
+    static PMaterial s_defaultMaterial;
 };
 
 NAMESPACE_FISHENGINE_END

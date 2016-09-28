@@ -5,6 +5,7 @@
 NAMESPACE_FISHENGINE_BEGIN
 
 std::map<std::string, Material::PMaterial> Material::m_builtinMaterial;
+Material::PMaterial Material::s_defaultMaterial = nullptr;
 
 void FishEngine::Material::SetShader(std::shared_ptr<Shader> shader)
 {
@@ -52,24 +53,21 @@ FishEngine::Material::PMaterial FishEngine::Material::builtinMaterial(const std:
     auto material = CreateMaterial();
     material->SetShader(shader);
     return material;
-//    auto it = m_builtinMaterial.find(name);
-//    if (it != m_builtinMaterial.end()) {
-//        return it->second;
-//    }
-//    Debug::LogWarning("No built-in material called %d", name.c_str());
-//    abort();
-//    return nullptr;
 }
 
+Material::PMaterial Material::defaultMaterial()
+{
+    return s_defaultMaterial;
+}
 
 void FishEngine::Material::Init()
 {
-//    for (auto& s : std::vector<std::string>{ "SkyBox", "NormalMap", "VisualizeNormal", "PBR", "VertexLit", "Diffuse", "ShadowMap" , "ScreenTexture", "SolidColor"})
-//    {
-//        auto material = std::make_shared<Material>();
-//        material->SetShader(Shader::builtinShader(s));
-//        m_builtinMaterial[s] = material;
-//    }
+    s_defaultMaterial = CreateMaterial();
+    s_defaultMaterial->name() = "DefaultMaterial";
+    s_defaultMaterial->SetShader(Shader::builtinShader("PBR"));
+    s_defaultMaterial->SetFloat("metallic", 0.5f);
+    s_defaultMaterial->SetFloat("roughness", 0.5f);
+    s_defaultMaterial->SetVector3("albedo", Vector3(1, 1, 1));
 }
 
 NAMESPACE_FISHENGINE_END

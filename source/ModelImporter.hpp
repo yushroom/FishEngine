@@ -23,18 +23,29 @@ namespace FishEngine {
         std::vector<uint32_t> meshes;
     };
     
+    enum class BuiltinModelTyep {
+        Cube, Sphere, Capsule, Cylinder, Plane, Quad, Cone,
+    };
+    
     class Model : public Object
     {
     public:
         Model() = default;
         
+        typedef std::shared_ptr<Model> PModel;
+        
         std::shared_ptr<GameObject> CreateGameObject() const;
+        
+        Mesh::PMesh mainMesh() const {
+            return m_meshes[0];
+        }
+        
+        static void Init();
+        
+        static Model::PModel builtinModel(const BuiltinModelTyep type);
         
     private:
         friend class ModelImporter;
-        //void AddNode(ModelNode::PModelNode& node) {
-        //    m_modelNodes.push_back(node);
-        //}
 
         void AddMesh(Mesh::PMesh& mesh) {
             m_meshes.push_back(mesh);
@@ -46,6 +57,8 @@ namespace FishEngine {
         std::vector<std::shared_ptr<Mesh>> m_meshes;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
         ModelNode::PModelNode m_rootNode;
+        
+        static std::map<BuiltinModelTyep, PModel> s_builtinModels;
     };
 
     
@@ -64,6 +77,7 @@ namespace FishEngine {
         LoadFromFile(const std::string path,
                      int vertexUsage = VertexUsagePNUT,
                      MeshLoadFlags flags = 0);
+        
     private:
         
         float m_fileScale = 1.0f;

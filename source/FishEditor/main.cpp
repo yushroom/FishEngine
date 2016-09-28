@@ -262,160 +262,155 @@ public:
 };
 
 
-class TestPBR : public App
-{
-public:
-
-    virtual void Init() override {
-        glCheckError();
-#if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../assets/";
-#else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
-#endif
-        const std::string models_dir = root_dir + "models/";
-        const std::string textures_dir = root_dir + "textures/";
-
-        auto sphere = Mesh::builtinMesh("sphere");
-        auto cone = Mesh::builtinMesh("cone");
-        auto cube = Mesh::builtinMesh("cube");
-        auto plane = Mesh::builtinMesh("plane");
-        
-        //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
-        ModelImporter importer;
-        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
-        mitsuba->CreateGameObject();
-        //auto boblampclean = Mesh::CreateFromObjFile(models_dir + "boblampclean.md5mesh");
-
-        auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
-        //auto sky_texture = Texture::CreateFromFile(textures_dir + "uffizi_cross_filtered_y.dds");
-        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
-        //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
-        //auto head_normalmap = Texture::CreateFromFile(models_dir + "head/NormalMap_RG16f_1024_mipmaps.dds");
-        
-        map<string, Texture::PTexture> textures;
-        textures["skyTex"] = sky_texture;
-        
-        auto skyboxGO = Scene::CreateGameObject("SkyBox");
-        skyboxGO->transform()->setLocalScale(20, 20, 20);
-        auto meshFilter = make_shared<MeshFilter>(sphere);
-        auto material = Material::builtinMaterial("SkyBox");
-        material->BindTextures(textures);
-        auto meshRenderer = make_shared<MeshRenderer>(material);
-        skyboxGO->AddComponent(meshFilter);
-        skyboxGO->AddComponent(meshRenderer);
-        
-        //textures.clear();
-        //textures["diffuseMap"] = head_diffuse;
-        //textures["normalMap"] = head_normalmap;
-
-//        auto headGO = Scene::CreateGameObject();
-//        headGO->transform()->setScale(10, 10, 10);
-//        auto meshFilter1 = make_shared<MeshFilter>(headModel);
-//        auto material1 = Material::builtinMaterial("NormalMap");
-//        material1->BindTextures(textures);
-//        auto meshRenderer1 = make_shared<MeshRenderer>(material1);
-//        headGO->AddComponent(meshFilter1);
-//        headGO->AddComponent(meshRenderer1);
-//        headGO->AddScript(make_shared<VisualizeNormal>());
-//        //headGO->AddScript(make_shared<DeactiveSelf>());
-        textures["AmbientCubemap"] = sky_texture;
-        
-//        auto go = Scene::CreateGameObject("Sphere");
-//        //go->transform()->setScale(20, 20, 20);
-//        meshFilter = make_shared<MeshFilter>(mitsuba);
-//        material = Material::builtinMaterial("PBR");
-//        material->SetVector3("albedo", Vector3(0.972f, 0.960f, 0.915f));
+//class TestPBR : public App
+//{
+//public:
+//
+//    virtual void Init() override {
+//        glCheckError();
+//#if FISHENGINE_PLATFORM_WINDOWS
+//        const std::string root_dir = "../../assets/";
+//#else
+//        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+//#endif
+//        const std::string models_dir = root_dir + "models/";
+//        const std::string textures_dir = root_dir + "textures/";
+//        
+//        //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
+//        ModelImporter importer;
+//        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
+//        mitsuba->CreateGameObject();
+//        //auto boblampclean = Mesh::CreateFromObjFile(models_dir + "boblampclean.md5mesh");
+//
+//        auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
+//        //auto sky_texture = Texture::CreateFromFile(textures_dir + "uffizi_cross_filtered_y.dds");
+//        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+//        //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
+//        //auto head_normalmap = Texture::CreateFromFile(models_dir + "head/NormalMap_RG16f_1024_mipmaps.dds");
+//        
+//        map<string, Texture::PTexture> textures;
+//        textures["skyTex"] = sky_texture;
+//        
+//        auto skyboxGO = Scene::CreateGameObject("SkyBox");
+//        skyboxGO->transform()->setLocalScale(20, 20, 20);
+//        auto meshFilter = make_shared<MeshFilter>(Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh());
+//        auto material = Material::builtinMaterial("SkyBox");
 //        material->BindTextures(textures);
-//        meshRenderer = make_shared<MeshRenderer>(material);
-//        go->AddComponent(meshFilter);
-//        go->AddComponent(meshRenderer);
-//        go->AddScript(make_shared<VisualizeNormal>());
-        //go->AddScript(make_shared<DisplayMatrix>());
-        //go->AddScript(make_shared<DeactiveSelf>());
-        //go->SetActive(false);
-        //Scene::SelectGameObject(go.get());
-
-        
-        auto group = Scene::CreateGameObject("Group");
-        
-        auto create_sphere = [&sphere, &textures, &group](
-                                                //std::shared_ptr<GameObject>& parent,
-                                                int x, int y) {
-            auto go = Scene::CreateGameObject("Sphere");
-            go->transform()->SetParent(group->transform());
-            go->transform()->setLocalPosition(x*1.2f, y*1.2f, 0);
-            //go->transform()->setPosition(0, 0, 2);
-            go->transform()->setLocalEulerAngles(0, 30, 0);
-            go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-            auto meshFilter = make_shared<MeshFilter>(sphere);
-            auto material = Material::builtinMaterial("PBR");
-            material->BindTextures(textures);
-            material->SetFloat("metallic", 0.1f*x);
-            material->SetFloat("roughness", 0.1f*y);
-            material->SetVector3("albedo", Vector3(1.f, 0.6f, 0.6f));
-            auto meshRenderer = make_shared<MeshRenderer>(material);
-            go->AddComponent(meshFilter);
-            go->AddComponent(meshRenderer);
-            //go->AddScript(make_shared<DisplayMatrix>());
-            //go->transform()->SetParent(parent->transform());
-            return go;
-        };
-
-        
-        for (int x = 0; x < 11; ++x) {
-            for (int y = 0; y < 11; y++) {
-                create_sphere(x, y);
-            }
-        }
-        //create_sphere(0, 0);
-
-//        auto child0 = create_cube(go);
-//        auto child1 = create_cube(child0);
-//        auto child2 = create_cube(child1);
-
-//        go = Scene::CreateGameObject("Plane");
-//        meshFilter = make_shared<MeshFilter>(plane);
-//        material = Material::builtinMaterial("Diffuse");
-//        textures.clear();
-//        textures["diffuseMap"] = checkboard_texture;
-//        material->BindTextures(textures);
-//        meshRenderer = make_shared<MeshRenderer>(material);
-//        go->AddComponent(meshFilter);
-//        go->AddComponent(meshRenderer);
-        //go->AddScript(make_shared<VisualizeNormal>());
-        //go->AddScript(make_shared<DisplayMatrix>());
-        
-        auto cameraGO = Scene::mainCamera()->gameObject();
-        cameraGO->transform()->setPosition(6, 6, -12);
-        cameraGO->transform()->LookAt(6, 6, 0);
-        //cameraGO->transform()->setPosition(0, 0, -5);
-        //cameraGO->transform()->LookAt(0, 0, 0);
-        //cameraGO->transform()->LookAt(0, 0, 0);
-        cameraGO->AddScript(make_shared<ShowFPS>());
-        cameraGO->AddScript(make_shared<TakeScreenShot>());
-        //cameraGO->AddScript(make_shared<RenderSettings>());
-        //cameraGO->AddScript(make_shared<DisplayMatrix>());
-        cameraGO->AddScript(make_shared<EditorRenderSettings>());
-        Selection::setActiveGameObject(cameraGO);
-
-        auto go = Scene::CreateGameObject("Directional Light");
-        go->transform()->setPosition(6, 5, -10);
-        go->transform()->LookAt(6, 0, 0);
-        //go->transform()->setPosition(6, 5, -10);
-        //go->transform()->LookAt(0, 0, 0);
-        go->AddComponent(Light::Create());
-        go->AddScript(make_shared<Rotator>());
-        
-        
-        //auto child0 = Scene::CreateGameObject("child0");
-        //child0->transform()->SetParent(go->transform());
-        //auto child1 = Scene::CreateGameObject("child1");
-        //child1->transform()->SetParent(go->transform());
-        //auto child3 = Scene::CreateGameObject("child3");
-        //child3->transform()->SetParent(child0->transform());
-    }
-};
+//        auto meshRenderer = make_shared<MeshRenderer>(material);
+//        skyboxGO->AddComponent(meshFilter);
+//        skyboxGO->AddComponent(meshRenderer);
+//        
+//        //textures.clear();
+//        //textures["diffuseMap"] = head_diffuse;
+//        //textures["normalMap"] = head_normalmap;
+//
+////        auto headGO = Scene::CreateGameObject();
+////        headGO->transform()->setScale(10, 10, 10);
+////        auto meshFilter1 = make_shared<MeshFilter>(headModel);
+////        auto material1 = Material::builtinMaterial("NormalMap");
+////        material1->BindTextures(textures);
+////        auto meshRenderer1 = make_shared<MeshRenderer>(material1);
+////        headGO->AddComponent(meshFilter1);
+////        headGO->AddComponent(meshRenderer1);
+////        headGO->AddScript(make_shared<VisualizeNormal>());
+////        //headGO->AddScript(make_shared<DeactiveSelf>());
+//        textures["AmbientCubemap"] = sky_texture;
+//        
+////        auto go = Scene::CreateGameObject("Sphere");
+////        //go->transform()->setScale(20, 20, 20);
+////        meshFilter = make_shared<MeshFilter>(mitsuba);
+////        material = Material::builtinMaterial("PBR");
+////        material->SetVector3("albedo", Vector3(0.972f, 0.960f, 0.915f));
+////        material->BindTextures(textures);
+////        meshRenderer = make_shared<MeshRenderer>(material);
+////        go->AddComponent(meshFilter);
+////        go->AddComponent(meshRenderer);
+////        go->AddScript(make_shared<VisualizeNormal>());
+//        //go->AddScript(make_shared<DisplayMatrix>());
+//        //go->AddScript(make_shared<DeactiveSelf>());
+//        //go->SetActive(false);
+//        //Scene::SelectGameObject(go.get());
+//
+//        
+//        auto group = Scene::CreateGameObject("Group");
+//        
+//        auto create_sphere = [&sphere, &textures, &group](
+//                                                //std::shared_ptr<GameObject>& parent,
+//                                                int x, int y) {
+//            auto go = Scene::CreateGameObject("Sphere");
+//            go->transform()->SetParent(group->transform());
+//            go->transform()->setLocalPosition(x*1.2f, y*1.2f, 0);
+//            //go->transform()->setPosition(0, 0, 2);
+//            go->transform()->setLocalEulerAngles(0, 30, 0);
+//            go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+//            auto meshFilter = make_shared<MeshFilter>(sphere);
+//            auto material = Material::builtinMaterial("PBR");
+//            material->BindTextures(textures);
+//            material->SetFloat("metallic", 0.1f*x);
+//            material->SetFloat("roughness", 0.1f*y);
+//            material->SetVector3("albedo", Vector3(1.f, 0.6f, 0.6f));
+//            auto meshRenderer = make_shared<MeshRenderer>(material);
+//            go->AddComponent(meshFilter);
+//            go->AddComponent(meshRenderer);
+//            //go->AddScript(make_shared<DisplayMatrix>());
+//            //go->transform()->SetParent(parent->transform());
+//            return go;
+//        };
+//
+//        
+//        for (int x = 0; x < 11; ++x) {
+//            for (int y = 0; y < 11; y++) {
+//                create_sphere(x, y);
+//            }
+//        }
+//        //create_sphere(0, 0);
+//
+////        auto child0 = create_cube(go);
+////        auto child1 = create_cube(child0);
+////        auto child2 = create_cube(child1);
+//
+////        go = Scene::CreateGameObject("Plane");
+////        meshFilter = make_shared<MeshFilter>(plane);
+////        material = Material::builtinMaterial("Diffuse");
+////        textures.clear();
+////        textures["diffuseMap"] = checkboard_texture;
+////        material->BindTextures(textures);
+////        meshRenderer = make_shared<MeshRenderer>(material);
+////        go->AddComponent(meshFilter);
+////        go->AddComponent(meshRenderer);
+//        //go->AddScript(make_shared<VisualizeNormal>());
+//        //go->AddScript(make_shared<DisplayMatrix>());
+//        
+//        auto cameraGO = Scene::mainCamera()->gameObject();
+//        cameraGO->transform()->setPosition(6, 6, -12);
+//        cameraGO->transform()->LookAt(6, 6, 0);
+//        //cameraGO->transform()->setPosition(0, 0, -5);
+//        //cameraGO->transform()->LookAt(0, 0, 0);
+//        //cameraGO->transform()->LookAt(0, 0, 0);
+//        cameraGO->AddScript(make_shared<ShowFPS>());
+//        cameraGO->AddScript(make_shared<TakeScreenShot>());
+//        //cameraGO->AddScript(make_shared<RenderSettings>());
+//        //cameraGO->AddScript(make_shared<DisplayMatrix>());
+//        cameraGO->AddScript(make_shared<EditorRenderSettings>());
+//        Selection::setActiveGameObject(cameraGO);
+//
+//        auto go = Scene::CreateGameObject("Directional Light");
+//        go->transform()->setPosition(6, 5, -10);
+//        go->transform()->LookAt(6, 0, 0);
+//        //go->transform()->setPosition(6, 5, -10);
+//        //go->transform()->LookAt(0, 0, 0);
+//        go->AddComponent(Light::Create());
+//        go->AddScript(make_shared<Rotator>());
+//        
+//        
+//        //auto child0 = Scene::CreateGameObject("child0");
+//        //child0->transform()->SetParent(go->transform());
+//        //auto child1 = Scene::CreateGameObject("child1");
+//        //child1->transform()->SetParent(go->transform());
+//        //auto child3 = Scene::CreateGameObject("child3");
+//        //child3->transform()->SetParent(child0->transform());
+//    }
+//};
 
             
 class TestAnimation : public App
@@ -450,10 +445,10 @@ public:
         const std::string textures_dir = root_dir + "textures/";
         const std::string chan_dir = models_dir + "UnityChan/";
         
-        auto sphere = Mesh::builtinMesh("sphere");
-        auto cone = Mesh::builtinMesh("cone");
-        auto cube = Mesh::builtinMesh("cube");
-        auto plane = Mesh::builtinMesh("plane");
+        auto sphere = Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh();
+        //auto cone = Mesh::builtinMesh("cone");
+        //auto cube = Mesh::builtinMesh("cube");
+        //auto plane = Mesh::builtinMesh("plane");
         
         //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
         ModelImporter importer;

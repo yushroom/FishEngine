@@ -14,6 +14,46 @@ struct aiMesh;
 
 namespace FishEngine {
 
+
+    struct Vector3Key
+    {
+        float time;
+        Vector3 value;
+    };
+
+    struct QuaternionKey
+    {
+        float time;
+        Quaternion value;
+    };
+
+    struct AnimationNode
+    {
+        std::string name;
+        std::vector<Vector3Key> positionKeys;
+        std::vector<QuaternionKey> rotationKeys;
+        std::vector<Vector3Key> scalingKeys;
+    };
+
+    struct Animation
+    {
+        std::string name;
+        float duration;
+        float ticksPerSecond;
+        std::map<std::string, AnimationNode> channels;
+    };
+
+    class Animator : public Component
+    {
+    public:
+        InjectClassName(Animator);
+        std::shared_ptr<Animation> m_animation;
+
+        void Play() {
+
+        }
+    };
+
     struct ModelNode
     {
         typedef std::shared_ptr<ModelNode> PModelNode;
@@ -22,6 +62,7 @@ namespace FishEngine {
         std::vector<PModelNode> children;
         std::vector<uint32_t>   meshesIndices;
         Matrix4x4               transform;
+        bool                    isBone;
     };
     
     enum class BuiltinModelTyep {
@@ -56,12 +97,12 @@ namespace FishEngine {
         ResursivelyCreateGameObject(const ModelNode::PModelNode& node) const;
         
         std::vector<std::shared_ptr<Mesh>> m_meshes;
+        std::vector<std::shared_ptr<Animation>> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
         ModelNode::PModelNode m_rootNode;
         
         static std::map<BuiltinModelTyep, PModel> s_builtinModels;
     };
-
     
     class ModelImporter : public AssetImporter
     {
@@ -82,6 +123,8 @@ namespace FishEngine {
     private:
         
         float m_fileScale = 1.0f;
+
+        std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
         
         ModelNode::PModelNode
         buildModelTree(const aiNode* assimp_node, const ModelNode* parentNode);

@@ -451,6 +451,8 @@ public:
         ModelImporter importer;
         //importer.setFileScale(0.01f);
         auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
+        ModelImporter importer2;
+        auto run00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
@@ -504,6 +506,9 @@ public:
         //go->transform()->setLocalEulerAngles(90, 0, 0);
         modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         //modelGO->transform()->setLocalPosition(0, 0, 0);
+
+        auto run00GO = run00Model->CreateGameObject();
+        run00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         
         //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;

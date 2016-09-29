@@ -51,6 +51,8 @@ namespace FishEngine {
         auto node = std::make_shared<ModelNode>();
         node->name = assimp_node->mName.C_Str();
         node->transform = ConvertMatrix(assimp_node->mTransformation);
+        node->isBone = false;
+        m_nodes[node->name] = node;
         
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshesIndices.push_back(assimp_node->mMeshes[i]);
@@ -59,6 +61,7 @@ namespace FishEngine {
             //Debug::Log("    CHILD: %s", assimp_node->mName.C_Str());
             auto child = buildModelTree(assimp_node->mChildren[i], node.get());
             node->children.push_back(child);
+            child->parent = node.get();
         }
         return node;
     }
@@ -126,6 +129,9 @@ namespace FishEngine {
             uint32_t boneIndex = 0;
             auto& bone = assimp_mesh->mBones[j];
             std::string boneName(bone->mName.C_Str());
+            auto it = m_nodes.find(boneName);
+            assert(it != m_nodes.end());
+            it->second->isBone = true;
 
             if (boneMapping.find(boneName) == boneMapping.end()) {
                 boneIndex = numBones;
@@ -174,6 +180,10 @@ namespace FishEngine {
         load_option |= aiProcess_ConvertToLeftHanded;
         load_option |= aiProcess_FlipUVs;
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_LIGHTS, false);
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_CAMERAS, false);
         if (flags & MeshLoadFlag_RegenerateNormal) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
             load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;
@@ -192,23 +202,87 @@ namespace FishEngine {
 
         bool load_uv = (vertexUsage & VertexUsageUV) != 0;
         
+        
         auto model = std::make_shared<Model>();
         model->m_name = split(path, "/").back();
         
         bool loadAnimation = scene->HasAnimations();
-        
-//        scene->mRootNode->mTransformation *= aiMatrix4x4(m_fileScale, 0, 0, 0,
-//                                                         0, m_fileScale, 0, 0,
-//                                                         0, 0, m_fileScale, 0,
-//                                                         0, 0, 0, 1);
+        if (loadAnimation)
+            Debug::Log("%s has animation", path.c_str());
+
+        model->m_rootNode = buildModelTree(scene->mRootNode, nullptr);
+
         for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
         {
             auto mesh = ParseMesh(scene->mMeshes[meshIndex], vertexUsage, load_uv, load_tangent);
             model->AddMesh(mesh);
         }
-        
-        model->m_rootNode = buildModelTree(scene->mRootNode, nullptr);
-        
+
+        auto node = model->m_rootNode;
+        if (node->isBone) {
+
+        }
+
+        auto ConvertVector3 = [](const aiVector3D& avec3) {
+            return Vector3(avec3.x, avec3.y, avec3.z);
+        };
+
+        auto ConvertQuaternion = [](const aiQuaternion& aquat) {
+            return Quaternion(aquat.x, aquat.y, aquat.z, aquat.w);
+        };
+
+        for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
+            model->m_animations.push_back(std::make_shared<Animation>());
+            auto& animation = model->m_animations.back();
+            auto a = scene->mAnimations[animIndex];
+            animation->name = a->mName.C_Str();
+            animation->duration = a->mDuration;
+            animation->ticksPerSecond = a->mTicksPerSecond;
+            //animation->channels.resize(a->mNumChannels);
+
+            for (uint32_t i = 0; i < a->mNumChannels; ++i) {
+                auto an = a->mChannels[i];
+                std::string name = an->mNodeName.C_Str();
+                //auto& n = animation->channels[i];
+                auto pos = name.find("_$AssimpFbx$");
+                if (pos != std::string::npos) {
+                    name = name.substr(0, pos);
+                }
+                auto it = animation->channels.find(name);
+                if (it == animation->channels.end()) {
+                    animation->channels[name] = AnimationNode();
+                }
+                auto& n = animation->channels[name];
+
+                n.name = name;
+                if (an->mNumPositionKeys > 1) {
+                    //n.positionKeys.resize(an->mNumPositionKeys);
+                    for (int j = 0; j < an->mNumPositionKeys; ++j) {
+                        //n.positionKeys[j].time = an->mPositionKeys[j].mTime;
+                        //n.positionKeys[j].value = ConvertVector3(an->mPositionKeys[j].mValue);
+                        n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue) });
+                    }
+                }
+                //n.rotationKeys.resize(an->mNumRotationKeys);
+                if (an->mNumRotationKeys > 1) {
+                    for (int j = 0; j < an->mNumRotationKeys; ++j) {
+                        //n.rotationKeys[j].time = an->mRotationKeys[j].mTime;
+                        //n.rotationKeys[j].value = ConvertQuaternion(an->mRotationKeys[j].mValue);
+                        n.rotationKeys.emplace_back(QuaternionKey{ (float)an->mRotationKeys[j].mTime, ConvertQuaternion(an->mRotationKeys[j].mValue) });
+                    }
+                }
+                //n.scalingKeys.resize(an->mNumScalingKeys);
+                if (an->mNumScalingKeys > 1) {
+                    for (int j = 0; j < an->mNumScalingKeys; ++j) {
+                        //n.scalingKeys[j].time = an->mScalingKeys[j].mTime;
+                        //n.scalingKeys[j].value = ConvertVector3(an->mScalingKeys[j].mValue);
+                        n.scalingKeys.emplace_back(Vector3Key{ (float)an->mScalingKeys[j].mTime, ConvertVector3(an->mScalingKeys[j].mValue) });
+                    }
+                }
+            }
+            Debug::Log("animation name: %s", a->mName.C_Str());
+        }
+
         return model;
     }
 

@@ -74,6 +74,14 @@ https://github.com/smasherprog/Assimp_Animation_Helper
 
 
 
+Assimp: a issue
+
+https://github.com/assimp/assimp/issues/894
+
+https://github.com/urho3d/Urho3D/blob/master/Source/Tools/AssetImporter/AssetImporter.cpp
+
+
+
 The meaning of tangent.w
 
 https://docs.unity3d.com/ScriptReference/Mesh-tangents.html

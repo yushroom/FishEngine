@@ -50,15 +50,8 @@ namespace FishEngine {
         //}
         auto node = std::make_shared<ModelNode>();
         node->name = assimp_node->mName.C_Str();
-        Debug::Log(node->name.c_str());
-        aiVector3D pos;
-        aiQuaternion rotation;
-        aiVector3D scale;
-        assimp_node->mTransformation.Decompose(scale, rotation, pos);
-        Vector3 euler = Quaternion(rotation.x, rotation.y, rotation.z, rotation.w).eulerAngles();
         node->transform = ConvertMatrix(assimp_node->mTransformation);
-        //if (parentNode != nullptr)
-        //    node->transform = parentNode->transform * node->transform;
+        
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshesIndices.push_back(assimp_node->mMeshes[i]);
         }
@@ -227,15 +220,7 @@ namespace FishEngine {
     std::shared_ptr<GameObject> Model::ResursivelyCreateGameObject(const ModelNode::PModelNode & node) const
     {
         auto go = Scene::CreateGameObject(node->name);
-        Vector3 postion;
-        Quaternion rotation;
-        Vector3 scale;
-        Matrix4x4::Decompose(node->transform, &postion, &rotation, &scale);
-        //postion *= 0.01f;;
-        auto t = go->transform();
-        t->setLocalPosition(postion);
-        t->setLocalRotation(rotation);
-        t->setLocalScale(scale);
+        go->transform()->setLocalToWorldMatrix(node->transform);
 
         if (node->meshesIndices.size() == 1) {
             auto material = Material::defaultMaterial();
@@ -244,17 +229,18 @@ namespace FishEngine {
             go->AddComponent(meshRenderer);
             go->AddComponent(meshFilter);
         } else if (node->meshesIndices.size() > 1) {
-            //for (auto& idx : node->meshesIndices) {
-            //    auto& m = m_meshes[idx];
-            //    auto child = Scene::CreateGameObject(m->name());
-            //    child->transform()->SetParent(go->transform());
-            //    auto material = Material::defaultMaterial();
-            //    auto meshRenderer = std::make_shared<MeshRenderer>(material);
-            //    auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
-            //    child->AddComponent(meshRenderer);
-            //    child->AddComponent(meshFilter);
-            //}
-            abort();
+            for (auto& idx : node->meshesIndices) {
+                auto& m = m_meshes[idx];
+                auto child = Scene::CreateGameObject(m->name());
+                child->transform()->SetParent(go->transform());
+                auto material = Material::defaultMaterial();
+                auto meshRenderer = std::make_shared<MeshRenderer>(material);
+                auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
+                child->AddComponent(meshRenderer);
+                child->AddComponent(meshFilter);
+                //child->transform()->setLocalToWorldMatrix();
+            }
+            //abort();
         }
         
         for (auto& c : node->children) {

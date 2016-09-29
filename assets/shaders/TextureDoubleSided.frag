@@ -7,7 +7,7 @@ in VS_OUT {
 
 uniform sampler2D DiffuseMap;
 
-out float4 color;
+out vec4 color;
 
 void main()
 {

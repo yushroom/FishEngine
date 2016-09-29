@@ -3,12 +3,24 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <boost/algorithm/string.hpp>
 
 #include "Texture.hpp"
 #include "Common.hpp"
 #include "Debug.hpp"
 
 using namespace std;
+
+
+std::string readFile(const std::string& path)
+{
+    std::ifstream stream(path);
+    assert(stream.is_open());
+    std::stringstream sstream;
+    sstream << stream.rdbuf();
+    return sstream.str();
+}
+
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -85,6 +97,11 @@ void Shader::FromString(const std::string& vs_string,
                         const std::string& gs_string,
                         const std::string& fs_string)
 {
+#if FISHENGINE_PLATFORM_WINDOWS
+    const std::string root_dir = "../../assets/shaders/";
+#else
+    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
+#endif
     assert(m_program == 0);
     assert(!vs_string.empty() && !fs_string.empty());
     //assert(tcs_string.empty() || (!tcs_string.empty() && !tes_string.empty()));
@@ -135,12 +152,15 @@ void Shader::FromString(const std::string& vs_string,
     
     map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
     
-    auto extractSettings = [&settings](const string& shader_str) -> void {
+    std::vector<std::string> headers;
+    
+    auto extractSettings = [&settings, &headers](const string& shader_str) -> void {
         auto lines = split(shader_str, "\n");
         for (auto& line : lines) {
+            boost::trim(line);
             if (startsWith(line, "///")) {
                 line = line.substr(3);
-                line = trim(line);
+                boost::trim(line);
                 auto s = split(line, " ");
                 if (s.size() > 2) {
                     Debug::LogWarning("Incorrect shader setting format: %s", line.c_str());
@@ -149,6 +169,11 @@ void Shader::FromString(const std::string& vs_string,
                 if (res != settings.end()) {
                     Debug::Log("Override shader setting: %s", line.c_str());
                     settings[s[0]] = s[1];
+                } else if (boost::starts_with(line, "#include")) {
+                    line = line.substr(8);
+                    boost::trim(line);
+                    line = line.substr(1, line.size()-2);
+                    headers.push_back(line);
                 } else {
                     Debug::LogWarning("Unknown shader setting: %s", line.c_str());
                 }
@@ -156,20 +181,27 @@ void Shader::FromString(const std::string& vs_string,
         }
     };
     
-    extractSettings(vs_string+"\n"+fs_string);
+    extractSettings(vs_string);
+    std::string header_string;
+    for (auto& h : headers) {
+        header_string += readFile(root_dir + h) + "\n";
+    }
+    
+    headers.clear();
+    auto parsed_vs = m_shaderVariables + "\n" + header_string + "\n" + vs_string;
+    extractSettings(fs_string);
+    header_string.clear();
+    for (auto& h : headers) {
+        header_string += readFile(root_dir + h) + "\n";
+    }
+    auto parsed_fs = m_shaderVariables + "\n" + header_string + "\n" + fs_string;
+    
     m_cullface = ToEnum<Cullface>(settings["Cull"]);
-    //if (settings["Cull"] == "Back") {
-    //    m_cullface = Cullface::Back;
-    //} else if ((settings["Cull"] == "Front")) {
-    //    m_cullface = Cullface::Front;
-    //} else {
-    //    m_cullface = Cullface::Off;
-    //}
     m_ZWrite = settings["ZWrite"] == "On";
     m_blend = settings["Blend"] == "On";
     
-    compileShader(vs, GL_VERTEX_SHADER, m_shaderVariables + vs_string);
-    compileShader(ps, GL_FRAGMENT_SHADER, m_shaderVariables + fs_string);
+    compileShader(vs, GL_VERTEX_SHADER, parsed_vs);
+    compileShader(ps, GL_FRAGMENT_SHADER, parsed_fs);
     
     // gs
     if (use_gs) {
@@ -238,15 +270,6 @@ void Shader::FromString(const std::string& vs_string,
         glDeleteShader(tes);
     }
     glCheckError();
-}
-
-std::string readFile(const std::string& path)
-{
-    std::ifstream stream(path);
-    assert(stream.is_open());
-    std::stringstream sstream;
-    sstream << stream.rdbuf();
-    return sstream.str();
 }
 
 void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)

@@ -58,7 +58,6 @@ public:
 
     friend Vector3 operator *(Quaternion rotation, Vector3 point)
     {
-        //return glm::quat(rotation) * glm::vec3(point);
         float num = rotation.x * 2.f;
         float num2 = rotation.y * 2.f;
         float num3 = rotation.z * 2.f;
@@ -87,7 +86,6 @@ public:
 
     static Quaternion AngleAxis(float angle, const Vector3& axis)
     {
-        //return glm::angleAxis(Mathf::Radians(angle), (glm::vec3)axis.normalized());
         Quaternion Result;
 
         float s = Mathf::Sin(angle * 0.5f);

@@ -25,6 +25,7 @@ xcuserdata/
 # assets
 /assets/models/
 /assets/textures/
+/example/
 
 # vscode
 /.vscode/

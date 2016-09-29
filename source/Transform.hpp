@@ -105,7 +105,6 @@ public:
     }
 
     void setLocalEulerAngles(const Vector3& eulerAngles) {
-        //m_localRotation = glm::quat(glm::radians((glm::vec3)eulerAngles));
         m_localRotation.setEulerAngles(eulerAngles);
         MakeDirty();
     }
@@ -136,6 +135,12 @@ public:
     Matrix4x4 localToWorldMatrix() const {
         Update();
         return m_localToWorldMatrix;
+    }
+    
+    void setLocalToWorldMatrix(const Matrix4x4& localToWorld) {
+        m_localToWorldMatrix = localToWorld;
+        Matrix4x4::Decompose(localToWorld, &m_localPosition, &m_localRotation, &m_localScale);
+        MakeDirty();
     }
 
     Matrix4x4 worldToLocalMatrix() const {

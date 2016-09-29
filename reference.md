@@ -71,3 +71,9 @@ http://ogldev.atspace.co.uk/www/tutorial38/tutorial38.html
 http://gamedev.stackexchange.com/questions/26382/i-cant-figure-out-how-to-animate-my-loaded-model-with-assimp
 
 https://github.com/smasherprog/Assimp_Animation_Helper
+
+
+
+The meaning of tangent.w
+
+https://docs.unity3d.com/ScriptReference/Mesh-tangents.html

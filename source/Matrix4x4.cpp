@@ -1,14 +1,10 @@
 #include "Matrix4x4.hpp"
 #include <cassert>
-#define GLM_FORCE_LEFT_HANDED
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 namespace FishEngine {
 
     Matrix4x4 Matrix4x4::Inverse(const Matrix4x4& m)
     {
-        //return glm::inverse((glm::mat4)m);
         float p10_21 = m.m[1][0] * m.m[2][1] - m.m[2][0] * m.m[1][1];
         float p10_22 = m.m[1][0] * m.m[2][2] - m.m[2][0] * m.m[1][2];
         float p10_23 = m.m[1][0] * m.m[2][3] - m.m[2][0] * m.m[1][3];
@@ -94,9 +90,6 @@ namespace FishEngine {
 
     void Matrix4x4::SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
     {
-        //*this = glm::scale(glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q), (glm::vec3)s);
-        //*this = glm::translate(glm::mat4(1.0f), (glm::vec3)pos) * glm::mat4_cast((glm::quat)q) * glm::scale(glm::mat4(1.0f), (glm::vec3)s);
-        //*this = glm::mat4_cast((glm::quat)q);
         *this = Matrix4x4::FromRotation(q);
 
         m[0][3] = pos.x;
@@ -121,16 +114,8 @@ namespace FishEngine {
         Matrix4x4&          outLocalToWorld, 
         Matrix4x4&          outWorldToLocal)
     {
-        auto l2w =
-        glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, translation.z)) *
-        glm::mat4_cast(glm::quat(rotation.w, rotation.x, rotation.y, rotation.z)) *
-        glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
-        outLocalToWorld = l2w;
-        outWorldToLocal = glm::inverse(l2w);
-        return;
         // outLocalToWorld = TRS
         // outWorldToLocal = inverse(outLocalToWorld) = (S^-1)(R')(T^-1)
-        //outLocalToWorld = glm::mat4_cast((glm::quat)rotation);
         outLocalToWorld = Matrix4x4::FromRotation(rotation);
         
         for (int i = 0; i < 3; ++i) {
@@ -190,26 +175,34 @@ namespace FishEngine {
         Quaternion*         outRotation, 
         Vector3*            outScale)
     {
-        glm::mat4 m;
-        memcpy(glm::value_ptr(m), transformation.transpose().m, 16 * sizeof(float));
-
-        glm::vec3 scale;
-        glm::quat rotation;
-        glm::vec3 translation;
-        glm::vec3 skew;
-        glm::vec4 perspective;
-        glm::decompose(m, scale, rotation, translation, skew, perspective);
-        if (outTranslation != nullptr) 
-            outTranslation->Set(translation.x, translation.y, translation.z);
-        if (outScale != nullptr)
-            outScale->Set(scale.x, scale.y, scale.z);
-        if (outRotation != nullptr)
-            *outRotation = Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
+        auto& m = transformation;
+        outScale->x = sqrtf(m.m[0][0]*m.m[0][0] + m.m[1][0]*m.m[1][0] + m.m[2][0]*m.m[2][0]);
+        outScale->y = sqrtf(m.m[0][1]*m.m[0][1] + m.m[1][1]*m.m[1][1] + m.m[2][1]*m.m[2][1]);
+        outScale->z = sqrtf(m.m[0][2]*m.m[0][2] + m.m[1][2]*m.m[1][2] + m.m[2][2]*m.m[2][2]);
+        
+        outTranslation->Set(m.m[0][3], m.m[1][3], m.m[2][3]);
+        Matrix4x4 rot_mat;
+        rot_mat.m[0][0] = m.m[0][0] / outScale->x;
+        rot_mat.m[1][0] = m.m[1][0] / outScale->x;
+        rot_mat.m[2][0] = m.m[2][0] / outScale->x;
+        rot_mat.m[3][0] = 0;
+        rot_mat.m[0][1] = m.m[0][1] / outScale->y;
+        rot_mat.m[1][1] = m.m[1][1] / outScale->y;
+        rot_mat.m[2][1] = m.m[2][1] / outScale->y;
+        rot_mat.m[3][1] = 0;
+        rot_mat.m[0][2] = m.m[0][2] / outScale->z;
+        rot_mat.m[1][2] = m.m[1][2] / outScale->z;
+        rot_mat.m[2][2] = m.m[2][2] / outScale->z;
+        rot_mat.m[3][2] = 0;
+        rot_mat.m[0][3] = 0;
+        rot_mat.m[1][3] = 0;
+        rot_mat.m[2][3] = 0;
+        rot_mat.m[3][3] = 1;
+        *outRotation = rot_mat.ToRotation();
     }
 
     Quaternion Matrix4x4::ToRotation() const
     {
-        //return glm::quat_cast((glm::mat4)*this);
         float fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
         float fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
         float fourZSquaredMinus1 = m[2][2] - m[0][0] - m[1][1];
@@ -275,7 +268,6 @@ namespace FishEngine {
     {
         // Real-time rendering 3rd, p76
         auto& q = rotation;
-        //return glm::mat4_cast(glm::quat(r.w, r.x, r.y, r.z));
         Matrix4x4 result;
         float qxx = q.x * q.x;
         float qyy = q.y * q.y;
@@ -347,7 +339,6 @@ namespace FishEngine {
 
     Matrix4x4 Matrix4x4::LookAt(const Vector3& eye, const Vector3& center, const Vector3 up)
     {
-        //return glm::lookAtLH(glm::vec3(eye), glm::vec3(center), glm::vec3(up));
         Vector3 f = Vector3::Normalize(center - eye);
         Vector3 s = Vector3::Normalize(Vector3::Cross(up, f));
         Vector3 u = Vector3::Cross(f, s);

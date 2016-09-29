@@ -3,10 +3,6 @@
 
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
-#define GLM_FORCE_LEFT_HANDED
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
 namespace FishEngine {
 
@@ -48,17 +44,6 @@ public:
 
     }
 
-    Matrix4x4(const glm::mat4& glm_mat4)
-    {
-        memcpy(m, glm::value_ptr(glm::transpose(glm_mat4)), 16*sizeof(float));
-    }
-
-    operator glm::mat4() const {
-        glm::mat4 result;
-        memcpy(glm::value_ptr(result), transpose().m, 16 * sizeof(float));
-        return result;
-    }
-
     const float* data() const {
         return m[0];
     }
@@ -88,7 +73,6 @@ public:
     }
 
     friend const Vector4 operator*(const Matrix4x4& lhs, const Vector4& rhs) {
-        ////return glm::mat4(lhs) * glm::vec4(rhs);
         //Vector4 result;
         //for (int i = 0; i < 4; i++) {
         //    //result[i] = lhs.m[i][0] * rhs.x + lhs.m[i][1] * rhs.y + lhs.m[i][2] * rhs.z + lhs.m[i][3] * rhs.w;

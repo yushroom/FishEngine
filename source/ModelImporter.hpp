@@ -17,11 +17,11 @@ namespace FishEngine {
     struct ModelNode
     {
         typedef std::shared_ptr<ModelNode> PModelNode;
-        std::string     name;
-        ModelNode*      parent;
+        std::string             name;
+        ModelNode*              parent;
         std::vector<PModelNode> children;
-        std::vector<uint32_t> meshesIndices;
-        Matrix4x4       transform;
+        std::vector<uint32_t>   meshesIndices;
+        Matrix4x4               transform;
     };
     
     enum class BuiltinModelTyep {

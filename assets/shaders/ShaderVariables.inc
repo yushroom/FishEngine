@@ -7,6 +7,8 @@
 #define PI 3.141592653589793f
 #define INV_PI 0.3183098861837907f
 
+// http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+
 // Transformations
 uniform mat4 MATRIX_MVP;
 //uniform mat4 MATRIX_MV;
@@ -37,6 +39,9 @@ uniform vec3 _WorldSpaceCameraPos;
 
 // Lighting
 //	 forward rendering
+
+// http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+
 uniform vec4 _LightColor0;
 uniform vec4 _WorldSpaceLightPos0;	//Directional lights: (world space direction, 0). Other lights: (world space position, 1).
 
@@ -47,14 +52,22 @@ uniform mat4 _LightMatrix0; // World-to-light matrix. Used to sample cookie & at
 //	 Vertex-lit rendering
 uniform vec3 unity_LightPosition; // view space light position
 
-// HLSL
-#define float2 vec2
-#define float3 vec3
-#define float4 vec4
-#define uint2 uvec2
-#define uint3 uvec3
-#define uint4 uvec4
-#define lerp(x, y, t) mix(x, y, t)
-#define frac(x) fract(x)
-#define saturate(x) clamp(x, 0.0, 1.0)
+// uniform mat4 UNITY_MATRIX_MVP;  // Current model * view * projection matrix.
+// uniform mat4 UNITY_MATRIX_MV;   // Current model * view matrix.
+// uniform mat4 UNITY_MATRIX_V;    // Current view matrix.
+// uniform mat4 UNITY_MATRIX_P;    // Current projection matrix.
+// uniform mat4 UNITY_MATRIX_VP;   // Current view * projection matrix.
+// uniform mat4 UNITY_MATRIX_T_MV; // Transpose of model * view matrix.
+// uniform mat4 UNITY_MATRIX_IT_MV;// Inverse transpose of model * view matrix.
+// uniform mat4 _Object2World;     // Current model matrix.
+// uniform mat4 _World2Object;     // Inverse of current world matrix.
 
+#define UNITY_MATRIX_MVP MATRIX_MVP
+#define unity_ObjectToWorld _Object2World
+
+// UnituShaderVariables.cginc
+#define UNITY_MATRIX_P glstate_matrix_projection
+#define UNITY_MATRIX_V unity_MatrixV
+#define UNITY_MATRIX_I_V unity_MatrixInvV
+#define UNITY_MATRIX_VP unity_MatrixVP
+#define UNITY_MATRIX_M unity_ObjectToWorld

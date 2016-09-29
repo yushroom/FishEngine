@@ -1,4 +1,4 @@
-/// #inclue "BRDF.inc"
+///#include "HLSL.inc"
 #define half float
 #define half2 vec2
 #define half3 vec3

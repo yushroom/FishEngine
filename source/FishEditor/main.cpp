@@ -443,31 +443,49 @@ public:
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-        const std::string chan_dir = models_dir + "UnityChan/";
+        //const std::string chan_dir = models_dir + "UnityChan/";
+        const std::string chan_root_dir = root_dir + "../example/UnityChan/assets/";
         
         auto sphere = Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh();
-        //auto cone = Mesh::builtinMesh("cone");
-        //auto cube = Mesh::builtinMesh("cube");
-        //auto plane = Mesh::builtinMesh("plane");
         
-        //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
         ModelImporter importer;
         //importer.setFileScale(0.01f);
-        auto model = importer.LoadFromFile(chan_dir + "unitychan.fbx");
-        //auto boblampclean = ModelImporter::LoadFromFile(models_dir + "TANGS_zou.FBX");
-        //auto boblampclean = ModelImporter::LoadFromFile(models_dir+"Archer_max/archer_attacking.max");
-        
+        auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
+
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
-        auto bodyTexture = Texture::CreateFromFile(chan_dir + "body_01.tga");
-        auto skinTexture = Texture::CreateFromFile(chan_dir + "skin_01.tga");
-        auto hairTexture = Texture::CreateFromFile(chan_dir + "hair_01.tga");
-        auto faceTexture = Texture::CreateFromFile(chan_dir + "face_00.tga");
-        auto eyelineTexture = Texture::CreateFromFile(chan_dir + "eyeline_00.tga");
-        auto eyeirisLTexture = Texture::CreateFromFile(chan_dir + "eye_iris_L_00.tga");
-        auto eyeirisRTexture = Texture::CreateFromFile(chan_dir + "eye_iris_R_00.tga");
-        auto cheekTexture = Texture::CreateFromFile(chan_dir + "cheek_00.tga");
+        std::string chan_texture_dir = chan_root_dir + "textures/";
+        auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "body_01.tga");
+        auto skinTexture = Texture::CreateFromFile(chan_texture_dir + "skin_01.tga");
+        auto hairTexture = Texture::CreateFromFile(chan_texture_dir + "hair_01.tga");
+        auto faceTexture = Texture::CreateFromFile(chan_texture_dir + "face_00.tga");
+        auto eyelineTexture = Texture::CreateFromFile(chan_texture_dir + "eyeline_00.tga");
+        auto eyeirisLTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_L_00.tga");
+        auto eyeirisRTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_R_00.tga");
+        auto cheekTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+        
+        //auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+        auto rolloffTexture = Texture::CreateFromFile(chan_texture_dir + "FO_CLOTH1.tga");
+        auto rimLightTexture = Texture::CreateFromFile(chan_texture_dir + "FO_RIM1.tga");
+        auto specularTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_SPEC.tga");
+        auto envTexture = Texture::CreateFromFile(chan_texture_dir + "ENV2.tga");
+        auto normalMapTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_NRM.tga");
 
+        
+        auto chanMainShader = make_shared<Shader>();
+        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
+        auto bodyMaterial = Material::CreateMaterial();
+        bodyMaterial->SetShader(chanMainShader);
+        bodyMaterial->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        bodyMaterial->SetFloat("_SpecularPower", 20.f);
+        bodyMaterial->SetTexture("_MainTex", bodyTexture);
+        bodyMaterial->SetTexture("_FalloffSampler", rolloffTexture);
+        bodyMaterial->SetTexture("_RimLightSampler", rimLightTexture);
+        bodyMaterial->SetTexture("_SpecularReflectionSampler", specularTexture);
+        bodyMaterial->SetTexture("_EnvMapSampler", envTexture);
+        bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
+        
+        
         map<string, Texture::PTexture> textures;
         //textures["skyTex"] = sky_texture;
         
@@ -491,7 +509,8 @@ public:
         std::shared_ptr<GameObject> go;
 
         constexpr float edgeThickness = 0.5f;
-        material = Material::builtinMaterial("TextureDoubleSided");
+        //material = Material::builtinMaterial("TextureDoubleSided");
+        material = bodyMaterial;
         material->SetTexture("DiffuseMap", bodyTexture);
         auto material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));

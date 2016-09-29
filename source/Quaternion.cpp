@@ -37,7 +37,6 @@ namespace FishEngine {
 
     FishEngine::Quaternion Quaternion::Euler(const Vector3& euler)
     {
-        //return glm::quat(glm::radians((glm::vec3)euler));
         Quaternion result;
         auto rad = euler * (Mathf::Deg2Rad * 0.5f);
         auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));

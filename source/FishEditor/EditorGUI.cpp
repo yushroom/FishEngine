@@ -32,7 +32,7 @@ constexpr float translate_gizmo_length = 0.1f;
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int EditorGUI::m_idCount = 0;
 
-
+bool EditorGUI::s_locked = false;
 int EditorGUI::m_selectedAxis = -1;
 
 std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
@@ -220,7 +220,7 @@ void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> c
 void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
 {
     ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
-    if (gameObject == Selection::activeGameObject())
+    if (gameObject == Selection::selectedGameOjbectInHierarchy())
         node_flags |= ImGuiTreeNodeFlags_Selected;
     
     bool is_leaf = (gameObject->transform()->childCount() == 0);
@@ -233,8 +233,10 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
     bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
 
     if (ImGui::IsItemClicked()) {
-        //Debug::Log("select: %s", gameObject->name().c_str());
-        Selection::setActiveGameObject(gameObject);
+        if (!s_locked) {
+            Selection::setActiveGameObject(gameObject);
+        }
+        Selection::setSelectedGameOjbectInHierarchy(gameObject);
         s_isAnyItemClicked = true;
     }
     // child node
@@ -254,7 +256,8 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
 void FishEditor::EditorGUI::DrawHierarchyWindow()
 {
     s_isAnyItemClicked = false;
-    auto selectedGO = Selection::activeGameObject();
+    //auto selectedGO = Selection::activeGameObject();
+    auto selectedGO = Selection::selectedGameOjbectInHierarchy();
     // Hierarchy view
     //ImGui::BeginDock("Hierarchy");
     ImGui::Begin("Hierarchy");
@@ -285,8 +288,10 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
 
     // TODO: remove this
     if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow()) {
-        //Debug::Log("Mouse Clicked here");
-        Selection::setActiveGameObject(nullptr);
+        Selection::setSelectedGameOjbectInHierarchy(nullptr);
+        if (!s_locked)
+            Selection::setActiveGameObject(nullptr);
+        Selection::setSelectedGameOjbectInHierarchy(nullptr);
     }
 
     //ImGui::EndDock();
@@ -302,50 +307,57 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
     //ImGui::BeginDock("Inspector", nullptr);
     ImGui::Begin("Inspector", nullptr);
     ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
-    if (selectedGO != nullptr) {
-        ImGui::PushID("Inspector.selected.active");
-        ImGui::Checkbox("", &selectedGO->m_activeSelf);
-        ImGui::PopID();
-        char name[128] = { 0 };
-        memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
-        name[selectedGO->m_name.size()] = 0;
-        ImGui::SameLine();
-        ImGui::PushID("Inspector.selected.name");
-        if (ImGui::InputText("", name, 127)) {
-            selectedGO->m_name = name;
-        }
-        ImGui::PopID();
+    if (selectedGO == nullptr) {
+        //ImGui::EndDock(); // Inspector Editor
+        ImGui::End();
+        return;
+    }
+    if (ImGui::Checkbox("Lock", &s_locked)) {
+        if (!s_locked)
+            Selection::setActiveGameObject(Selection::selectedGameOjbectInHierarchy());
+    }
+    ImGui::PushID("Inspector.selected.active");
+    ImGui::Checkbox("", &selectedGO->m_activeSelf);
+    ImGui::PopID();
+    char name[128] = { 0 };
+    memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
+    name[selectedGO->m_name.size()] = 0;
+    ImGui::SameLine();
+    ImGui::PushID("Inspector.selected.name");
+    if (ImGui::InputText("", name, 127)) {
+        selectedGO->m_name = name;
+    }
+    ImGui::PopID();
 
-        ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
-        //ImGui::LabelText("", "Tag");
-        ImGui::Text("Tag");
-        ImGui::SameLine();
-        ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
-        ImGui::SameLine();
-        ImGui::Text("Layer");
-        ImGui::SameLine();
-        ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
-        ImGui::PopItemWidth();
+    ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
+    //ImGui::LabelText("", "Tag");
+    ImGui::Text("Tag");
+    ImGui::SameLine();
+    ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
+    ImGui::SameLine();
+    ImGui::Text("Layer");
+    ImGui::SameLine();
+    ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
+    ImGui::PopItemWidth();
 
-        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
-            selectedGO->m_transform->OnInspectorGUI();
-        }
+    if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
+        selectedGO->m_transform->OnInspectorGUI();
+    }
 
-        for (auto& c : selectedGO->m_components) {
-            bool is_open = true;
-            if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-                c->OnInspectorGUI();
-            if (!is_open) {
-                Object::Destroy(c);
-            }
+    for (auto& c : selectedGO->m_components) {
+        bool is_open = true;
+        if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+            c->OnInspectorGUI();
+        if (!is_open) {
+            Object::Destroy(c);
         }
-        for (auto& s : selectedGO->m_scripts) {
-            bool is_open = true;
-            if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-                s->OnInspectorGUI();
-            if (!is_open) {
-                Object::Destroy(s);
-            }
+    }
+    for (auto& s : selectedGO->m_scripts) {
+        bool is_open = true;
+        if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+            s->OnInspectorGUI();
+        if (!is_open) {
+            Object::Destroy(s);
         }
     }
 
@@ -386,7 +398,7 @@ void FishEditor::EditorGUI::DrawMainMenu()
 
 void FishEditor::EditorGUI::DrawTranslateGizmo()
 {
-    auto selectedGO = Selection::activeGameObject();
+    auto selectedGO = Selection::selectedGameOjbectInHierarchy();
     if (m_lastSelectedGameObject.lock() != selectedGO) {
         m_selectedAxis = -1;
         m_lastSelectedGameObject = selectedGO;

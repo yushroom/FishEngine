@@ -56,6 +56,8 @@ private:
     static void DrawToolbar();
     static void DrawProjectWindwo();
     static void DrawMainMenu();
+    
+    static bool s_locked;       // temp
 
     static int m_selectedAxis; // temp
     static std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp

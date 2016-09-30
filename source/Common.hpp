@@ -12,12 +12,17 @@ std::vector<std::string> split(const std::string& str, const std::string& separa
 std::string camelCaseToReadable(const std::string& str);
 
 //void trim(std::string& str);
-std::string trim(const std::string& str);
+//std::string trim(const std::string& str);
 
 bool startsWith(const std::string& str, const std::string& str2);
 
 template<typename T>
 inline T ToEnum(const std::string& s);
+
+template<typename T>
+inline T TryUpdate()
+{
+}
 
 NAMESPACE_FISHENGINE_END
 

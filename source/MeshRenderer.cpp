@@ -5,6 +5,7 @@
 #include "MeshFilter.hpp"
 #include "Mesh.hpp"
 #include "Light.hpp"
+#include "Animator.hpp"
 
 FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(material)
 {
@@ -60,6 +61,12 @@ void MeshRenderer::Render() const
     uniforms.vec4s["_WorldSpaceLightPos0"] = lightDir;
     uniforms.mat4s["_LightMatrix0"] = lightVP;
 
+    auto mesh = meshFilter->mesh();
+    auto animator = gameObject()->GetComponent<Animator>();
+    if (mesh->m_skinned && animator != nullptr) {
+        //mesh->
+    }
+    
     for (auto& m : m_materials) {
         auto shader = m->shader();
         shader->Use();

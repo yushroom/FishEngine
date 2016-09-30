@@ -15,6 +15,9 @@ void MeshFilter::OnInspectorGUI()
     //});
     ImGui::SameLine();
     ImGui::LabelText("Mesh", "%s", m_mesh->name().c_str());
+    
+    bool skinned = m_mesh->m_skinned;
+    ImGui::Checkbox("Skinned", &skinned);
 }
 
 NAMESPACE_FISHENGINE_END

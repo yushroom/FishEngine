@@ -32,6 +32,8 @@
 		BFAF11DF1D9930A100101DCD /* Ray.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11D91D9930A100101DCD /* Ray.hpp */; };
 		BFAF11E01D9930A100101DCD /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAF11DA1D9930A100101DCD /* Screen.cpp */; };
 		BFAF11E11D9930A100101DCD /* Screen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11DB1D9930A100101DCD /* Screen.hpp */; };
+		BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */; };
+		BFD20AC91D9D52AD00DB88E1 /* Animator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
 		BFDC74BC1D8EDDF50082A6DC /* App.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC748C1D8EDDF50082A6DC /* App.hpp */; };
 		BFDC74BD1D8EDDF50082A6DC /* Behaviour.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */; };
@@ -108,6 +110,8 @@
 		BFAF11D91D9930A100101DCD /* Ray.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Ray.hpp; path = ../../source/Ray.hpp; sourceTree = "<group>"; };
 		BFAF11DA1D9930A100101DCD /* Screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Screen.cpp; path = ../../source/Screen.cpp; sourceTree = "<group>"; };
 		BFAF11DB1D9930A100101DCD /* Screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Screen.hpp; path = ../../source/Screen.hpp; sourceTree = "<group>"; };
+		BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Animator.cpp; path = ../../source/Animator.cpp; sourceTree = "<group>"; };
+		BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Animator.hpp; path = ../../source/Animator.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC748B1D8EDDF50082A6DC /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../../source/App.cpp; sourceTree = "<group>"; };
 		BFDC748C1D8EDDF50082A6DC /* App.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = App.hpp; path = ../../source/App.hpp; sourceTree = "<group>"; };
@@ -173,6 +177,8 @@
 		BF3211F61D8EE55F00FA80E6 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */,
+				BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */,
 				BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */,
 				BFDC748E1D8EDDF50082A6DC /* Behaviour.hpp */,
 				BFDC748F1D8EDDF50082A6DC /* Camera.cpp */,
@@ -318,6 +324,7 @@
 				BFDC74D21D8EDDF50082A6DC /* Material.hpp in Headers */,
 				BF26B4EB1D940F9A00237680 /* RenderTexture.hpp in Headers */,
 				BFDC74CA1D8EDDF50082A6DC /* GameLoop.hpp in Headers */,
+				BFD20AC91D9D52AD00DB88E1 /* Animator.hpp in Headers */,
 				BFAF11D41D9838A100101DCD /* SkinnedMeshRenderer.hpp in Headers */,
 				BFDC74C71D8EDDF50082A6DC /* Debug.hpp in Headers */,
 				BFDC74BE1D8EDDF50082A6DC /* Behaviour.hpp in Headers */,
@@ -442,6 +449,7 @@
 				BFDC74C41D8EDDF50082A6DC /* Component.cpp in Sources */,
 				BFDC74D71D8EDDF50082A6DC /* MeshRenderer.cpp in Sources */,
 				BFDC74D51D8EDDF50082A6DC /* MeshFilter.cpp in Sources */,
+				BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */,
 				BFDC74C61D8EDDF50082A6DC /* Debug.cpp in Sources */,
 				BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */,
 				BFDC74E31D8EDDF50082A6DC /* Shader.cpp in Sources */,

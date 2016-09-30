@@ -122,6 +122,15 @@ void Mesh::GenerateBuffer(int vertexUsage) {
         glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
         glBufferData(GL_ARRAY_BUFFER, m_tangentBuffer.size() * 4, m_tangentBuffer.data(), GL_STATIC_DRAW);
     }
+    
+    if (m_skinned) {
+        glGenBuffers(1, &m_boneIndexVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
+        glBufferData(GL_ARRAY_BUFFER, m_boneIndexBuffer.size() * sizeof(int), m_boneIndexBuffer.data(), GL_STATIC_DRAW);
+        glGenBuffers(1, &m_boneWeightVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
+        glBufferData(GL_ARRAY_BUFFER, m_boneWeightBuffer.size() * sizeof(float), m_boneWeightBuffer.data(), GL_STATIC_DRAW);
+    }
 }
 
 void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
@@ -150,6 +159,16 @@ void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
         glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
         glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(TangentIndex);
+    }
+    
+    if (m_skinned) {
+        glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
+        glVertexAttribPointer(BoneIndexIndex, 4, GL_INT, GL_FALSE, 4 * sizeof(GLint), (GLvoid*)0);
+        glEnableVertexAttribArray(BoneIndexIndex);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
+        glVertexAttribPointer(BoneWeightIndex, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(BoneWeightIndex);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind

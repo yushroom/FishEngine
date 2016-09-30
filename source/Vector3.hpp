@@ -396,6 +396,18 @@ public:
 private:
     bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z) || isnan(w); }
 };
+    
+struct Int2{
+    int m[2];
+};
+    
+struct Int3{
+    int m[3];
+};
+    
+struct Int4{
+    int m[4];
+};
 
 }
 

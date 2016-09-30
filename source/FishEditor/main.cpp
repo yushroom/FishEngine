@@ -506,9 +506,12 @@ public:
         //go->transform()->setLocalEulerAngles(90, 0, 0);
         modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         //modelGO->transform()->setLocalPosition(0, 0, 0);
+        auto animator = std::make_shared<Animator>();
+        animator->m_animation = run00Model->mainAnimation();
+        modelGO->AddComponent(animator);
 
-        auto run00GO = run00Model->CreateGameObject();
-        run00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
+        //auto run00GO = run00Model->CreateGameObject();
+        //run00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         
         //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;

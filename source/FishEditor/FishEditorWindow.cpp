@@ -83,6 +83,7 @@ void FishEditorWindow::Run()
     Scene::Start();
     float fixed_delta_time = 1.0f / m_fixedFrameRate;
     float old_time = 0;
+    Time::m_time = (float)glfwGetTime();
     
     // Game loop
     while (!glfwWindowShouldClose(m_window))
@@ -107,6 +108,8 @@ void FishEditorWindow::Run()
         }
 
         old_time = (float)glfwGetTime();
+        Time::m_deltaTime = old_time - Time::m_time;
+        Time::m_time = old_time;
     }
 }
 

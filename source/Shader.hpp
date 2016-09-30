@@ -11,6 +11,8 @@
 #define NormalIndex 1
 #define UVIndex 2
 #define TangentIndex 3
+#define BoneIndexIndex 4
+#define BoneWeightIndex 5
 
 NAMESPACE_FISHENGINE_BEGIN
 

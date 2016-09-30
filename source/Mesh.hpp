@@ -114,6 +114,8 @@ public:
     //static void Init();
     //static PMesh builtinMesh(const std::string& name);
     
+    bool   m_skinned = false; // temp
+    
 private:
     friend class FishEditor::EditorGUI;
     friend class ModelImporter;
@@ -125,7 +127,10 @@ private:
     std::vector<float>      m_uvBuffer;
     std::vector<float>      m_tangentBuffer;
     std::vector<uint32_t>   m_indexBuffer;
-    std::vector<Bone>       m_bones;
+    std::vector<Int4>       m_boneIndexBuffer;
+    std::vector<Vector4>    m_boneWeightBuffer;
+    //std::vector<Bone>       m_bones;
+    //std::vector<>
     std::vector<BoneWeight> m_boneWeights;
     
     GLuint m_VAO;
@@ -134,6 +139,8 @@ private:
     GLuint m_normalVBO;
     GLuint m_uvVBO;
     GLuint m_tangentVBO;
+    GLuint m_boneIndexVBO;
+    GLuint m_boneWeightVBO;
     
     //static std::map<std::string, PMesh> m_meshes;
     

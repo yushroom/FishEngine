@@ -31,6 +31,10 @@ void FishEngine::GameObject::Update()
     for (auto& s : m_scripts) {
         s->Update();
     }
+    
+    for (auto& c : m_components) {
+        c->Update();
+    }
 }
 
 

@@ -8,55 +8,17 @@
 #include "MeshRenderer.hpp"
 #include "Material.hpp"
 #include "MeshFilter.hpp"
+#include "Animator.hpp"
 
 struct aiNode;
 struct aiMesh;
 
 namespace FishEngine {
 
-
-    struct Vector3Key
-    {
-        float time;
-        Vector3 value;
-    };
-
-    struct QuaternionKey
-    {
-        float time;
-        Quaternion value;
-    };
-
-    struct AnimationNode
-    {
-        std::string name;
-        std::vector<Vector3Key> positionKeys;
-        std::vector<QuaternionKey> rotationKeys;
-        std::vector<Vector3Key> scalingKeys;
-    };
-
-    struct Animation
-    {
-        std::string name;
-        float duration;
-        float ticksPerSecond;
-        std::map<std::string, AnimationNode> channels;
-    };
-
-    class Animator : public Component
-    {
-    public:
-        InjectClassName(Animator);
-        std::shared_ptr<Animation> m_animation;
-
-        void Play() {
-
-        }
-    };
-
     struct ModelNode
     {
         typedef std::shared_ptr<ModelNode> PModelNode;
+        uint32_t                index;
         std::string             name;
         ModelNode*              parent;
         std::vector<PModelNode> children;
@@ -82,6 +44,12 @@ namespace FishEngine {
             return m_meshes[0];
         }
         
+        Animation::PAnimation mainAnimation() const {
+            if (m_animations.empty())
+                return nullptr;
+            return m_animations.front();
+        }
+        
         static void Init();
         
         static Model::PModel builtinModel(const BuiltinModelTyep type);
@@ -100,6 +68,8 @@ namespace FishEngine {
         std::vector<std::shared_ptr<Animation>> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
         ModelNode::PModelNode m_rootNode;
+        //std::vector<ModelNode::PModelNode> m_bones;
+        std::map<std::string, int> m_boneToIndex;
         
         static std::map<BuiltinModelTyep, PModel> s_builtinModels;
     };
@@ -127,8 +97,8 @@ namespace FishEngine {
         std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
         
         ModelNode::PModelNode
-        buildModelTree(const aiNode* assimp_node, const ModelNode* parentNode);
-        
+        buildModelTree(const aiNode* assimp_node,
+                       Model::PModel& model);
         
         std::shared_ptr<Mesh>
         ParseMesh(const aiMesh* assimp_mesh,

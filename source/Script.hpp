@@ -24,7 +24,7 @@ public:
 
     virtual void FixedUpdate() {};
 
-    virtual void Update() {};
+    //virtual void Update() {};
 
     virtual void LateUpdate() {};
 

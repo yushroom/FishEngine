@@ -27,10 +27,11 @@ public:
     // The Transform attached to this GameObject (null if there is none attached).
     std::shared_ptr<Transform> transform() const;
     
-    friend class GameObject;
+    virtual void Update() {}
     
 //protected:
 private:
+    friend class GameObject;
     friend class Scene;
     std::weak_ptr<GameObject> m_gameObject;
 };

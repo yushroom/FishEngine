@@ -47,7 +47,7 @@ namespace FishEngine {
         bool m_playing = false;      // false
         std::shared_ptr<Animation> m_animation;
         
-        virtual void OnInspectorGUI() override;
+        //virtual void OnInspectorGUI() override;
         
         void Play() {
             

@@ -12,8 +12,8 @@ out VS_OUT {
 void main() {
     vec4 posH = vec4(position, 1);
     gl_Position = MATRIX_MVP * posH;
-    vs_out.position = (_Object2World * posH).xyz;
+    vs_out.position = (Object2World * posH).xyz;
     vs_out.normal = mat3(MATRIX_IT_M) * normal;
     vs_out.uv = uv;
-    vs_out.positionInLightSpace = _LightMatrix0 * vec4(vs_out.position, 1.0f);
+    vs_out.positionInLightSpace = LightMatrix0 * vec4(vs_out.position, 1.0f);
 }

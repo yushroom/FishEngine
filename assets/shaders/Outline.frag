@@ -1,4 +1,4 @@
-///#include "CG.inc"
+#include "CGSupport.inc"
 /// Cull Front
 in VS_OUT {
     vec2 uv;
@@ -23,5 +23,5 @@ void main()
 	float3 lerpVals = saturate( ( newMapColor.rgb - float3( maxChan, maxChan, maxChan ) ) * 255.0 );
 	newMapColor.rgb = lerp( SATURATION_FACTOR * newMapColor.rgb, newMapColor.rgb, lerpVals );
 	
-	color = float4( BRIGHTNESS_FACTOR * newMapColor.rgb * diffuseMapColor.rgb, diffuseMapColor.a ) * _Color * _LightColor0; 
+	color = float4( BRIGHTNESS_FACTOR * newMapColor.rgb * diffuseMapColor.rgb, diffuseMapColor.a ) * _Color * LightColor0; 
 }

@@ -71,7 +71,16 @@ private:
     //static void ChangeCameraView();
     
     static bool m_showAssectSelectionDialogBox;
+    
+    template<class T>
+    static void OnInspectorGUI(const std::shared_ptr<T>& component);
 };
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component);
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform);
 
 NAMESPACE_FISHEDITOR_END
 

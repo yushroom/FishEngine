@@ -20,19 +20,19 @@ Transform::~Transform()
     }
 }
 
-void Transform::OnInspectorGUI()
-{
-    if (ImGui::InputFloat3("Position", m_localPosition.data())) {
-        MakeDirty();
-    }
-    if (ImGui::InputFloat3("Rotation", m_localEulerAngles.data())) {
-        m_localRotation.setEulerAngles(m_localEulerAngles);
-        MakeDirty();
-    }
-    if (ImGui::InputFloat3("Scale", m_localScale.data())) {
-        MakeDirty();
-    }
-}
+//void Transform::OnInspectorGUI()
+//{
+//    if (ImGui::InputFloat3("Position", m_localPosition.data())) {
+//        MakeDirty();
+//    }
+//    if (ImGui::InputFloat3("Rotation", m_localEulerAngles.data())) {
+//        m_localRotation.setEulerAngles(m_localEulerAngles);
+//        MakeDirty();
+//    }
+//    if (ImGui::InputFloat3("Scale", m_localScale.data())) {
+//        MakeDirty();
+//    }
+//}
 
 void Transform::Update() const
 {

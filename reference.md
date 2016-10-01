@@ -22,9 +22,29 @@ http://austinbrunkhorst.com/blog/category/reflection/
 
 
 
-Opengl教程
+Opengl Tutorials
 
 http://ogldev.atspace.co.uk
+
+
+
+Opengl Best Pratices
+
+https://www.opengl.org/wiki/Category:Best_Practices
+
+https://www.opengl.org/wiki/GLSL_Optimizations
+
+
+
+HLSL and GLSL
+
+https://anteru.net/blog/2016/mapping-between-hlsl-and-glsl/
+
+
+
+OpenGL like Vulkan
+
+https://developer.nvidia.com/opengl-vulkan
 
 
 

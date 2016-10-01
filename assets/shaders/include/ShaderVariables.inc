@@ -1,4 +1,6 @@
-#version 410 core
+#ifndef ShaderVariables_inc
+#define ShaderVariables_inc
+
 #define PositionIndex 0
 #define NormalIndex 1
 #define UVIndex 2
@@ -10,19 +12,24 @@
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
 // Transformations
+
+// Per Draw
 uniform mat4 MATRIX_MVP;
-//uniform mat4 MATRIX_MV;
+uniform mat4 MATRIX_MV;
+uniform mat4 MATRIX_M;
 uniform mat4 MATRIX_V;
 uniform mat4 MATRIX_P;
 uniform mat4 MATRIX_VP;
 //uniform mat4 MATRIX_T_MV;
+//uniform mat4 MATRIX_I_V;
 uniform mat4 MATRIX_IT_MV;
 uniform mat4 MATRIX_IT_M;   // new
-uniform mat4 _Object2World; // MATRIX_M
-//uniform mat4 _World2Object; // MATRIX_I_M
+
+#define Object2World MATRIX_M
+#define World2Object MATRIX_I_M
 
 // Camera and screen
-uniform vec3 _WorldSpaceCameraPos;
+uniform vec3 WorldSpaceCameraPos;
 //uniform vec4 _ProjectionParams;
 //uniform vec4 _ScreenParams;
 //uniform vec4 _ZBufferParams;
@@ -42,12 +49,12 @@ uniform vec3 _WorldSpaceCameraPos;
 
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
-uniform vec4 _LightColor0;
-uniform vec4 _WorldSpaceLightPos0;	//Directional lights: (world space direction, 0). Other lights: (world space position, 1).
+uniform vec4 LightColor0;
+uniform vec4 WorldSpaceLightPos0;	//Directional lights: (world space direction, 0). Other lights: (world space position, 1).
 
 //	 Deffered shading/lighting
-uniform vec4 _LightColor;
-uniform mat4 _LightMatrix0; // World-to-light matrix. Used to sample cookie & attenuation textures.
+uniform vec4 LightColor;
+uniform mat4 LightMatrix0; // World-to-light matrix. Used to sample cookie & attenuation textures.
 
 //	 Vertex-lit rendering
 uniform vec3 unity_LightPosition; // view space light position
@@ -63,7 +70,7 @@ uniform vec3 unity_LightPosition; // view space light position
 // uniform mat4 _World2Object;     // Inverse of current world matrix.
 
 #define UNITY_MATRIX_MVP MATRIX_MVP
-#define unity_ObjectToWorld _Object2World
+#define unity_ObjectToWorld Object2World
 
 // UnituShaderVariables.cginc
 #define UNITY_MATRIX_P glstate_matrix_projection
@@ -71,3 +78,5 @@ uniform vec3 unity_LightPosition; // view space light position
 #define UNITY_MATRIX_I_V unity_MatrixInvV
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
+
+#endif // ShaderVariables_inc

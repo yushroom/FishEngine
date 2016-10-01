@@ -23,7 +23,7 @@ public:
     ~Transform();
 
     
-    virtual void OnInspectorGUI() override;
+    //virtual void OnInspectorGUI() override;
 
     uint32_t childCount() const {
         return (uint32_t)m_children.size();

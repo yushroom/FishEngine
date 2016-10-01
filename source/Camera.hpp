@@ -58,7 +58,7 @@ public:
         return m_viewport;
     }
 
-    virtual void OnInspectorGUI() override;
+    //virtual void OnInspectorGUI() override;
 
     // Returns a ray going from camera through a screen point.
     Ray ScreenPointToRay(const Vector3& position);

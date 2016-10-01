@@ -35,7 +35,7 @@ public:
         m_materials.push_back(material);
     }
     
-    virtual void OnInspectorGUI() override;
+    //virtual void OnInspectorGUI() override;
     
 protected:
     virtual void Render() const = 0;

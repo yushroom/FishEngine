@@ -29,6 +29,7 @@ public:
     virtual void LateUpdate() {};
 
     //virtual void OnGUI() {};
+    //virtual void OnInspectorGUI() {};
 };
 
 NAMESPACE_FISHENGINE_END

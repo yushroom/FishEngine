@@ -1,3 +1,6 @@
+#ifndef CGSupport_inc
+#define CGSupport_inc
+
 #define float2 vec2
 #define float3 vec3
 #define float4 vec4
@@ -21,3 +24,5 @@ float4 lit(float NdotL, float NdotH, float m)
 #define tex2D texture
 
 #define mul(M, V) ((M) * (V))
+
+#endif //CGSupport_inc

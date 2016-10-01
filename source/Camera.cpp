@@ -27,39 +27,39 @@ Matrix4x4 Camera::projectionMatrix() const
     return m_projectMatrix;
 }
 
-void Camera::OnInspectorGUI()
-{
-    const char* listbox_items[] = {
-        "Perspective", "Orthographic"
-    };
-    int list_item_current = m_orthographic ? 1 : 0;
-    ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
-    if (m_orthographic != (list_item_current == 1)) {
-        m_orthographic = !m_orthographic;
-        m_isDirty = true;
-    }
-    //m_orthographic = list_item_current == 1;
-    
-    if (m_orthographic) {
-        if (ImGui::InputFloat("Size", &m_orthographicSize)) {
-            m_isDirty = true;
-        }
-    }
-    else {
-        if (ImGui::SliderFloat("Field of View", &m_fieldOfView, 1, 179)) {
-            m_isDirty = true;
-        }
-    }
-
-    if (ImGui::InputFloat("Clipping Planes(Near)", &m_nearClipPlane)) {
-        m_isDirty = true;
-    }
-    if (ImGui::InputFloat("Clipping Planes(Far)", &m_farClipPlane)) {
-        m_isDirty = true;
-    }
-    ImGui::InputFloat4("Viewport Rect", m_viewport.data());
-}
-
+//void Camera::OnInspectorGUI()
+//{
+//    const char* listbox_items[] = {
+//        "Perspective", "Orthographic"
+//    };
+//    int list_item_current = m_orthographic ? 1 : 0;
+//    ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
+//    if (m_orthographic != (list_item_current == 1)) {
+//        m_orthographic = !m_orthographic;
+//        m_isDirty = true;
+//    }
+//    //m_orthographic = list_item_current == 1;
+//    
+//    if (m_orthographic) {
+//        if (ImGui::InputFloat("Size", &m_orthographicSize)) {
+//            m_isDirty = true;
+//        }
+//    }
+//    else {
+//        if (ImGui::SliderFloat("Field of View", &m_fieldOfView, 1, 179)) {
+//            m_isDirty = true;
+//        }
+//    }
+//
+//    if (ImGui::InputFloat("Clipping Planes(Near)", &m_nearClipPlane)) {
+//        m_isDirty = true;
+//    }
+//    if (ImGui::InputFloat("Clipping Planes(Far)", &m_farClipPlane)) {
+//        m_isDirty = true;
+//    }
+//    ImGui::InputFloat4("Viewport Rect", m_viewport.data());
+//}
+//
 FishEngine::Ray FishEngine::Camera::ScreenPointToRay(const Vector3& position)
 {
     //http://antongerdelan.net/opengl/raycasting.html

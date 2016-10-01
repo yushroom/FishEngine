@@ -16,6 +16,9 @@ public:
     
     //protected:
     virtual void Render() const override;
+
+private:
+    friend class FishEditor::EditorGUI;
 };
 
 NAMESPACE_FISHENGINE_END

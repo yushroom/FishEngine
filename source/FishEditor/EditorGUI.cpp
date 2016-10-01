@@ -341,13 +341,15 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
     ImGui::PopItemWidth();
 
     if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
-        selectedGO->m_transform->OnInspectorGUI();
+        //selectedGO->m_transform->OnInspectorGUI();
+        OnInspectorGUI<FishEngine::Transform>(std::static_pointer_cast<FishEngine::Transform>(selectedGO->m_transform));
     }
 
     for (auto& c : selectedGO->m_components) {
         bool is_open = true;
         if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-            c->OnInspectorGUI();
+            OnInspectorGUI(c);
+            //c->OnInspectorGUI();
         if (!is_open) {
             Object::Destroy(c);
         }
@@ -355,6 +357,7 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
     for (auto& s : selectedGO->m_scripts) {
         bool is_open = true;
         if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+            //OnInspectorGUI(s);
             s->OnInspectorGUI();
         if (!is_open) {
             Object::Destroy(s);
@@ -611,5 +614,112 @@ void EditorGUI::DrawSceneGizmo()
     glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
 }
 
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
+{
+    if (ImGui::InputFloat3("Position", transform->m_localPosition.data())) {
+        transform->MakeDirty();
+    }
+    if (ImGui::InputFloat3("Rotation", transform->m_localEulerAngles.data())) {
+        transform->m_localRotation.setEulerAngles(transform->m_localEulerAngles);
+        transform->MakeDirty();
+    }
+    if (ImGui::InputFloat3("Scale", transform->m_localScale.data())) {
+        transform->MakeDirty();
+    }
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Camera>& camera)
+{
+    const char* listbox_items[] = {
+        "Perspective", "Orthographic"
+    };
+    int list_item_current = camera->m_orthographic ? 1 : 0;
+    ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
+    if (camera->m_orthographic != (list_item_current == 1)) {
+        camera->m_orthographic = !camera->m_orthographic;
+        camera->m_isDirty = true;
+    }
+    //m_orthographic = list_item_current == 1;
+    
+    if (camera->m_orthographic) {
+        if (ImGui::InputFloat("Size", &camera->m_orthographicSize)) {
+            camera->m_isDirty = true;
+        }
+    }
+    else {
+        if (ImGui::SliderFloat("Field of View", &camera->m_fieldOfView, 1, 179)) {
+            camera->m_isDirty = true;
+        }
+    }
+    
+    if (ImGui::InputFloat("Clipping Planes(Near)", &camera->m_nearClipPlane)) {
+        camera->m_isDirty = true;
+    }
+    if (ImGui::InputFloat("Clipping Planes(Far)", &camera->m_farClipPlane)) {
+        camera->m_isDirty = true;
+    }
+    ImGui::InputFloat4("Viewport Rect", camera->m_viewport.data());
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& animator)
+{
+    int channels = animator->m_animation->channels.size();
+    ImGui::InputInt("Channel count", &channels);
+    if (animator->m_playing) {
+        if (ImGui::Button("Stop")) {
+            animator->Stop();
+        }
+        ImGui::InputFloat("Time", &animator->m_time);
+    } else {
+        if (ImGui::Button("Play")) {
+            animator->PlayOnce();
+        }
+    }
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& meshFilter)
+{
+    if (ImGui::Button("Change")) {
+        ImGui::OpenPopup("Select ...");
+    }
+    EditorGUI::SelectMeshDialogBox([&meshFilter](Mesh::PMesh mesh)->void {
+        meshFilter->SetMesh(mesh);
+    });
+    //ImGui::SameLine();
+    ImGui::LabelText("Mesh", "%s", meshFilter->m_mesh->name().c_str());
+    
+    bool skinned = meshFilter->m_mesh->m_skinned;
+    ImGui::Checkbox("Skinned", &skinned);
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& meshRenderer)
+{
+    for (auto& m : meshRenderer->m_materials) {
+        m->OnInspectorGUI();
+    }
+}
+
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component)
+{
+    if (component->ClassName() == FishEngine::Transform::StaticClassName()) {
+        OnInspectorGUI(std::static_pointer_cast<FishEngine::Transform>(component));
+    } else if (component->ClassName() == FishEngine::Camera::StaticClassName()) {
+        OnInspectorGUI(std::static_pointer_cast<FishEngine::Camera>(component));
+    } else if (component->ClassName() == FishEngine::Animator::StaticClassName()) {
+        OnInspectorGUI(std::static_pointer_cast<FishEngine::Animator>(component));
+    } else if (component->ClassName() == FishEngine::MeshFilter::StaticClassName()) {
+        OnInspectorGUI(std::static_pointer_cast<FishEngine::MeshFilter>(component));
+    } else if (component->ClassName() == FishEngine::MeshRenderer::StaticClassName()) {
+        OnInspectorGUI(std::static_pointer_cast<FishEngine::MeshRenderer>(component));
+    }
+}
 
 NAMESPACE_FISHEDITOR_END

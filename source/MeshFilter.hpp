@@ -24,9 +24,10 @@ public:
         m_mesh = mesh;
     }
     
-    virtual void OnInspectorGUI() override;
+    //virtual void OnInspectorGUI() override;
     
 private:
+    friend class FishEditor::EditorGUI;
     std::shared_ptr<Mesh> m_mesh = nullptr;
 };
 

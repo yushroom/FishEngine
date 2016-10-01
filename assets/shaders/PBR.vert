@@ -11,7 +11,7 @@ out VS_OUT {
 void main() {
     vec4 posH = vec4(position, 1);
     gl_Position = MATRIX_MVP * posH;
-    vs_out.position = (_Object2World * posH).xyz;
+    vs_out.position = (MATRIX_M * posH).xyz;
     vs_out.normal = mat3(MATRIX_IT_M) * normal;
     vs_out.uv = uv;
 }

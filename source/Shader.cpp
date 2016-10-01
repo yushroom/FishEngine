@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <set>
 #include <boost/algorithm/string.hpp>
 
 #include "Texture.hpp"
@@ -11,6 +12,11 @@
 
 using namespace std;
 
+#if FISHENGINE_PLATFORM_WINDOWS
+static const std::string include_dir = "../../assets/shaders/include/";
+#else
+static const std::string include_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/include/";
+#endif
 
 std::string readFile(const std::string& path)
 {
@@ -19,6 +25,26 @@ std::string readFile(const std::string& path)
     std::stringstream sstream;
     sstream << stream.rdbuf();
     return sstream.str();
+}
+
+std::string processInclude(const std::string& str)
+{
+    auto result(str);
+    std::set<std::string> loaded_headers;
+    auto pos = result.find("#include", 0);
+    while (pos != std::string::npos) {
+        auto pos2 = result.find("\n", pos);
+        std::string filename = result.substr(pos+8+2, pos2-pos-8-2-1);
+        if (loaded_headers.find(filename) == loaded_headers.end()) {
+            loaded_headers.insert(filename);
+            auto include_file = readFile(include_dir + filename);
+            result = result.substr(0, pos) + include_file + result.substr(pos2);
+        } else {
+            result = result.substr(0, pos) + result.substr(pos2);
+        }
+        pos = result.find("#include", pos);
+    }
+    return result;
 }
 
 
@@ -97,11 +123,6 @@ void Shader::FromString(const std::string& vs_string,
                         const std::string& gs_string,
                         const std::string& fs_string)
 {
-#if FISHENGINE_PLATFORM_WINDOWS
-    const std::string root_dir = "../../assets/shaders/";
-#else
-    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
-#endif
     assert(m_program == 0);
     assert(!vs_string.empty() && !fs_string.empty());
     //assert(tcs_string.empty() || (!tcs_string.empty() && !tes_string.empty()));
@@ -152,9 +173,7 @@ void Shader::FromString(const std::string& vs_string,
     
     map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
     
-    std::vector<std::string> headers;
-    
-    auto extractSettings = [&settings, &headers](const string& shader_str) -> void {
+    auto extractSettings = [&settings](const string& shader_str) -> void {
         auto lines = split(shader_str, "\n");
         for (auto& line : lines) {
             boost::trim(line);
@@ -169,11 +188,6 @@ void Shader::FromString(const std::string& vs_string,
                 if (res != settings.end()) {
                     Debug::Log("Override shader setting: %s", line.c_str());
                     settings[s[0]] = s[1];
-                } else if (boost::starts_with(line, "#include")) {
-                    line = line.substr(8);
-                    boost::trim(line);
-                    line = line.substr(1, line.size()-2);
-                    headers.push_back(line);
                 } else {
                     Debug::LogWarning("Unknown shader setting: %s", line.c_str());
                 }
@@ -182,19 +196,9 @@ void Shader::FromString(const std::string& vs_string,
     };
     
     extractSettings(vs_string);
-    std::string header_string;
-    for (auto& h : headers) {
-        header_string += readFile(root_dir + h) + "\n";
-    }
-    
-    headers.clear();
-    auto parsed_vs = m_shaderVariables + "\n" + header_string + "\n" + vs_string;
+    auto parsed_vs = m_shaderVariables + "\n" + processInclude(vs_string);
     extractSettings(fs_string);
-    header_string.clear();
-    for (auto& h : headers) {
-        header_string += readFile(root_dir + h) + "\n";
-    }
-    auto parsed_fs = m_shaderVariables + "\n" + header_string + "\n" + fs_string;
+    auto parsed_fs = m_shaderVariables + "\n" + processInclude(fs_string);
     
     m_cullface = ToEnum<Cullface>(settings["Cull"]);
     m_ZWrite = settings["ZWrite"] == "On";
@@ -448,7 +452,7 @@ void Shader::Init() {
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif
-    m_shaderVariables = readFile(root_dir + "ShaderVariables.inc") + "\n";
+    m_shaderVariables = "#version 410 core\n" + readFile(root_dir + "include/ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
     for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline"}) {
         Debug::Log("Compile shader: %s", n);

@@ -148,6 +148,25 @@ private:
     void BindBuffer(int vertexUsage);
 };
 
+
+// position buffer array
+class SimpleMesh
+{
+public:
+    // 3 components(float) for each vertex
+    SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
+    //SimpleMesh(std::vector<float> positionBuffer);
+    
+    void Render() const;
+    
+private:
+    std::vector<float> m_positionBuffer;
+    
+    GLenum m_drawMode = GL_LINES;   // mode in glDrawArrays
+    GLuint m_VAO = 0;
+    GLuint m_VBO = 0;
+};
+
 NAMESPACE_FISHENGINE_END
 
 #endif /* Model_hpp */

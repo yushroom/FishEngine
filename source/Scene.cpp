@@ -116,6 +116,13 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Scene::OnDrawGizmos()
+{
+    for (auto& go : m_gameObjects) {
+        go->OnDrawGizmos();
+    }
+}
+
 //void Scene::Render()
 //{
 //    for (auto& go : m_gameObjects) {

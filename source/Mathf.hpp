@@ -104,6 +104,25 @@ public:
     {
         return ::std::sqrtf(f);
     }
+    
+    // return
+    static float RcpSqrt(float f)
+    {
+        float const threehalfs = 1.5f;
+        
+        float x2 = f * 0.5f;
+        union {
+            float f;
+            int32_t i;
+        } fni;
+        
+        fni.f = f;											// evil floating point bit level hacking
+        fni.i = 0x5f375a86 - (fni.i >> 1);						// what the fuck?
+        fni.f = fni.f * (threehalfs - (x2 * fni.f * fni.f));	// 1st iteration
+        fni.f = fni.f * (threehalfs - (x2 * fni.f * fni.f));		// 2nd iteration, this can be removed
+        
+        return fni.f;
+    }
 
     static float Pow(float f, float p)
     {

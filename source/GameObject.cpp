@@ -37,6 +37,12 @@ void FishEngine::GameObject::Update()
     }
 }
 
+void FishEngine::GameObject::OnDrawGizmos()
+{
+    for (auto& s : m_scripts) {
+        s->OnDrawGizmos();
+    }
+}
 
 void FishEngine::GameObject::Start()
 {

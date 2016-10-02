@@ -13,22 +13,32 @@ public:
         float m[4];
     };
 
-    Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {
+        NormalizeSelf();
+    }
     Quaternion() : Quaternion(0, 0, 0, 1) {}
 
     Vector3 eulerAngles() const;
 
-    float roll() const {
-    	return Mathf::Rad2Deg * ::std::atan2(2.0f * (x*y+w*z), w*w+x*x-y*y-z*z);
+    void NormalizeSelf() {
+        float inv_len = 1.0f / std::sqrtf(x*x+y*y+z*z+w*w);
+        x *= inv_len;
+        y *= inv_len;
+        z *= inv_len;
+        w *= inv_len;
     }
-
-    float pitch() const {
-		return Mathf::Rad2Deg * ::std::atan2(2.0f * (y*z+w*x), w*w-x*x-y*y+z*z);
-    }
-
-    float yaw() const {
-    	return Mathf::Rad2Deg * ::std::asin(Mathf::Clamp(-2.f*(x*z-w*y), -1.f, 1.f));
-    }
+    
+//    float roll() const {
+//    	return Mathf::Rad2Deg * ::std::atan2(2.0f * (x*y+w*z), w*w+x*x-y*y-z*z);
+//    }
+//
+//    float pitch() const {
+//		return Mathf::Rad2Deg * ::std::atan2(2.0f * (y*z+w*x), w*w-x*x-y*y+z*z);
+//    }
+//
+//    float yaw() const {
+//    	return Mathf::Rad2Deg * ::std::asin(Mathf::Clamp(-2.f*(x*z-w*y), -1.f, 1.f));
+//    }
     
     void setEulerAngles(const Vector3& angles)
     {

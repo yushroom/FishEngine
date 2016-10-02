@@ -20,6 +20,7 @@
 #include <Screen.hpp>
 #include "Selection.hpp"
 #include <ModelImporter.hpp>
+#include <Gizmos.hpp>
 
 using namespace FishEngine;
 
@@ -47,6 +48,7 @@ void EditorRenderSystem::Init()
     Shader::Init();
     Material::Init();
     Model::Init();
+    Gizmos::Init();
     EditorGUI::Init();
     Scene::Init();
 //#ifdef GLM_FORCE_LEFT_HANDED
@@ -56,6 +58,7 @@ void EditorRenderSystem::Init()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 void EditorRenderSystem::Render()
@@ -95,7 +98,7 @@ void EditorRenderSystem::Render()
         material->shader()->Use();
 
         std::list<std::shared_ptr<GameObject>> selections;
-        auto go = Selection::activeGameObject();
+        auto go = Selection::selectedGameObjectInHierarchy();
         selections.push_back(go);
         while (!selections.empty()) {
             go = selections.front();
@@ -158,6 +161,8 @@ void EditorRenderSystem::Render()
     if (m_isWireFrameMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    Scene::OnDrawGizmos();
+    
     if (m_showShadowMap) {
         auto& l = Light::lights().front();
         std::map<std::string, Texture::PTexture> textures;

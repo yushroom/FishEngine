@@ -20,6 +20,7 @@
 #include <Bounds.hpp>
 #include <Ray.hpp>
 #include <ModelImporter.hpp>
+#include <Gizmos.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -73,7 +74,7 @@ void EditorGUI::Init()
 
 void EditorGUI::Update()
 {
-    auto selectedGO = Selection::activeGameObject();
+    auto selectedGO = Selection::selectedGameObjectInHierarchy();
 
     if (Input::GetKeyDown(KeyCode::F)) {
         Camera::main()->FrameSelected(selectedGO);
@@ -146,7 +147,7 @@ bool EditorGUI::OnMouseButton(MouseButtonCode button, MouseButtonState action)
     if (button == MouseButtonCode::Left &&
         action == MouseButtonState::Down)
     {
-        auto selectedGO = Selection::activeGameObject();
+        auto selectedGO = Selection::selectedGameObjectInHierarchy();
         if (selectedGO == nullptr)
             return false;
         
@@ -220,7 +221,7 @@ void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> c
 void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
 {
     ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
-    if (gameObject == Selection::selectedGameOjbectInHierarchy())
+    if (gameObject == Selection::selectedGameObjectInHierarchy())
         node_flags |= ImGuiTreeNodeFlags_Selected;
     
     bool is_leaf = (gameObject->transform()->childCount() == 0);
@@ -236,7 +237,7 @@ void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
         if (!s_locked) {
             Selection::setActiveGameObject(gameObject);
         }
-        Selection::setSelectedGameOjbectInHierarchy(gameObject);
+        Selection::setSelectedGameObjectInHierarchy(gameObject);
         s_isAnyItemClicked = true;
     }
     // child node
@@ -257,15 +258,15 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
 {
     s_isAnyItemClicked = false;
     //auto selectedGO = Selection::activeGameObject();
-    auto selectedGO = Selection::selectedGameOjbectInHierarchy();
+    auto selectedGO = Selection::selectedGameObjectInHierarchy();
     // Hierarchy view
     //ImGui::BeginDock("Hierarchy");
     ImGui::Begin("Hierarchy");
     if (ImGui::Button("Create")) {
         s_isAnyItemClicked = true;
         auto go = Scene::CreateGameObject("GameObject");
-        if (Selection::activeGameObject() != nullptr) {
-            go->transform()->SetParent(Selection::activeGameObject()->transform());
+        if (Selection::selectedGameObjectInHierarchy() != nullptr) {
+            go->transform()->SetParent(Selection::selectedGameObjectInHierarchy()->transform());
         }
     }
 
@@ -288,10 +289,10 @@ void FishEditor::EditorGUI::DrawHierarchyWindow()
 
     // TODO: remove this
     if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow()) {
-        Selection::setSelectedGameOjbectInHierarchy(nullptr);
+        Selection::setSelectedGameObjectInHierarchy(nullptr);
         if (!s_locked)
             Selection::setActiveGameObject(nullptr);
-        Selection::setSelectedGameOjbectInHierarchy(nullptr);
+        Selection::setSelectedGameObjectInHierarchy(nullptr);
     }
 
     //ImGui::EndDock();
@@ -314,7 +315,7 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
     }
     if (ImGui::Checkbox("Lock", &s_locked)) {
         if (!s_locked)
-            Selection::setActiveGameObject(Selection::selectedGameOjbectInHierarchy());
+            Selection::setActiveGameObject(Selection::selectedGameObjectInHierarchy());
     }
     ImGui::PushID("Inspector.selected.active");
     ImGui::Checkbox("", &selectedGO->m_activeSelf);
@@ -401,14 +402,16 @@ void FishEditor::EditorGUI::DrawMainMenu()
 
 void FishEditor::EditorGUI::DrawTranslateGizmo()
 {
-    auto selectedGO = Selection::selectedGameOjbectInHierarchy();
+    //Gizmos::DrawLine(Vector3(0, 0, 0), Vector3(1, 0, 0));
+    
+    auto selectedGO = Selection::selectedGameObjectInHierarchy();
     if (m_lastSelectedGameObject.lock() != selectedGO) {
         m_selectedAxis = -1;
         m_lastSelectedGameObject = selectedGO;
     }
     if (selectedGO == nullptr)
         return;
-
+    
     auto shader = sceneGizmoMaterial->shader();
     shader->Use();
     //auto camera_pos = Vector3(0, 0, -5);
@@ -434,6 +437,7 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
     Vector3 dir = center - camera_pos;
     float distance = dir.magnitude();
     center = dir.normalized() + camera_pos;
+
     
     for (int i = 0; i < 3; ++i) {
         int j = 6 * i;
@@ -447,23 +451,14 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
         sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
         Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f+j);
         sceneGizmoMaterial->SetVector3("_Color", color);
+        shader->Use();
         shader->PreRender();
         sceneGizmoMaterial->Update();
         shader->CheckStatus();
         coneMesh->Render();
         
-        Vector3 trans = center;
-        trans[i] += translate_gizmo_length * 0.5f;
-        t.setLocalPosition(trans);
-        Vector3 scale = Vector3::one*0.002f;
-        scale[i] = translate_gizmo_length;
-        t.setLocalScale(scale);
-        t.setLocalEulerAngles(0, 0, 0);
-        model = t.localToWorldMatrix();
-        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-        sceneGizmoMaterial->Update();
-        cubeMesh->Render();
+        Gizmos::setColor(Color(color.x, color.y, color.z, 1.0f));
+        Gizmos::DrawLine(center, pos);
     }
 
     if (m_selectedAxis < 0)
@@ -486,7 +481,6 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
 
 void FishEditor::EditorGUI::DrawRotateGizmo()
 {
-
 }
 
 

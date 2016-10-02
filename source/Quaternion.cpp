@@ -48,4 +48,18 @@ namespace FishEngine {
         return result;
     }
 
+    Quaternion Quaternion::FromToRotation(const Vector3& fromDirection, const Vector3& toDirection)
+    {
+        const float cos_theta = Vector3::Dot(fromDirection, toDirection);
+        if (cos_theta == 1.0f) {
+            return Quaternion::identity;
+        } else {
+            if (cos_theta == -1.0f) {
+                return Quaternion(1, 0, 0, 0);
+            } else {
+                Vector3 w = Vector3::Cross(fromDirection, toDirection);
+                return Quaternion(w.x, w.y, w.z, 1+cos_theta);
+            }
+        }
+    }
 }

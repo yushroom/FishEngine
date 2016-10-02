@@ -35,6 +35,7 @@ class GameLoop;
 class Input;
 class Material;
 class Mesh;
+class SimpleMesh;
 class Object;
 class Shader;
 class Texture;

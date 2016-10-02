@@ -19,6 +19,7 @@ public:
     static void Start();
     static void Update();
     static void RenderShadow(std::shared_ptr<Light>& light);
+    static void OnDrawGizmos();
     //static void Render();
     //static void OnInspectorGUI();
     

@@ -198,4 +198,24 @@ void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
 //    }
 //}
 
+SimpleMesh::SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode)
+    : m_positionBuffer(positionBuffer, positionBuffer+vertexCount*3),
+    m_drawMode(drawMode)
+{
+    glGenVertexArrays(1, &m_VAO);
+    glBindVertexArray(m_VAO);
+    glGenBuffers(1, &m_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size()*sizeof(GLfloat), m_positionBuffer.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(PositionIndex);
+}
+
+void SimpleMesh::Render() const
+{
+    glBindVertexArray(m_VAO);
+    glDrawArrays(m_drawMode, 0, m_positionBuffer.size()/3);
+    glBindVertexArray(0);
+}
+
 NAMESPACE_FISHENGINE_END

@@ -21,19 +21,19 @@ public:
     }
     
     static std::shared_ptr<FishEngine::GameObject>
-    selectedGameOjbectInHierarchy() {
-        return m_selectedGameOjbectInHierarchy.lock();
+    selectedGameObjectInHierarchy() {
+        return m_selectedGameObjectInHierarchy.lock();
     }
     
     static void
-    setSelectedGameOjbectInHierarchy(std::shared_ptr<FishEngine::GameObject> gameObject) {
-        m_selectedGameOjbectInHierarchy = gameObject;
+    setSelectedGameObjectInHierarchy(std::shared_ptr<FishEngine::GameObject> gameObject) {
+        m_selectedGameObjectInHierarchy = gameObject;
     }
 
 private:
     //friend class EditorGUI;
     static std::weak_ptr<FishEngine::GameObject> m_activeGameObject;
-    static std::weak_ptr<FishEngine::GameObject> m_selectedGameOjbectInHierarchy;
+    static std::weak_ptr<FishEngine::GameObject> m_selectedGameObjectInHierarchy;
 };
 
 

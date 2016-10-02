@@ -15,21 +15,59 @@ public:
     virtual ~Script() = default;
 
     //InjectClassName(Script);
-    //virtual onEnable();
-
+    
+    /********** Editor **********/
+    
+    // Reset is called in the Editor when the script is attached or reset
+    virtual void Reset() {}
+    
+    
+    /********** Initializtion **********/
+    
     // Awake is called when the script instance is being loaded.
     virtual void Awake() {}
+    //
+    virtual void OnEnable() {}
+    // Start is only called once for a given script
+    virtual void Start() {}
 
-    virtual void Start() {};
+    
+    /********** Physics **********/
+    
+    //
+    virtual void FixedUpdate() {}
 
-    virtual void FixedUpdate() {};
+    
+    /********** Input events **********/
+    
+    
+    /********** Game Logic **********/
 
-    //virtual void Update() {};
+    //virtual void Update() {}
 
-    virtual void LateUpdate() {};
+    virtual void LateUpdate() {}
 
-    //virtual void OnGUI() {};
+    /********** Scene rendering **********/
     //virtual void OnInspectorGUI() {};
+    
+    /********** Gizmo rendering **********/
+    virtual void OnDrawGizmos() {}
+    
+    /********** GUI rendering **********/
+    virtual void OnGUI() {}
+    
+    /********** End of frame **********/
+    
+    /********** Pausing **********/
+    virtual void OnApplicationPause() {}
+    
+    /********** Disable/enable **********/
+    virtual void OnDisable() {}
+    
+    /********** Decommissioning **********/
+    virtual void OnApplicationQuit() {};
+    //virtual void OnDisable() {}
+    virtual void OnDestroy() {}
 };
 
 NAMESPACE_FISHENGINE_END

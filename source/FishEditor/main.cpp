@@ -27,6 +27,7 @@ using namespace FishEditor;
 #include <CameraController.hpp>
 #include <Bounds.hpp>
 #include <ModelImporter.hpp>
+#include <Gizmos.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -261,6 +262,23 @@ public:
     }
 };
 
+            
+class TestGizmos : public Script
+{
+public:
+    InjectClassName(TestGizmos);
+    
+    virtual void OnDrawGizmos() override {
+        Gizmos::setColor(Color::red);
+        Gizmos::DrawWireSphere(Vector3(1, 1, 1), 1.f);
+        
+        Gizmos::setColor(Color::blue);
+        Gizmos::DrawLine(Vector3(1, 1, 1), Vector3(2, 1, 1));
+        
+        Gizmos::setColor(Color::green);
+        Gizmos::DrawWireCube(Vector3(0, 1, 1), Vector3(1, 2, 3));
+    }
+};
 
 //class TestPBR : public App
 //{
@@ -630,6 +648,7 @@ public:
         s->m_useGammaCorrection = false;
         cameraGO->AddScript(s);
         //cameraGO->GetComponent<EditorRenderSettings>()->m_useGammaCorrection = false;
+        cameraGO->AddScript(make_shared<TestGizmos>());
 
         Selection::setActiveGameObject(cameraGO);
         

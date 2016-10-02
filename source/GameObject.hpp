@@ -109,8 +109,8 @@ public:
 protected:
     friend class Scene;
     void Start();
-
     void Update();
+    void OnDrawGizmos();
 
 private:
     friend class FishEditor::EditorGUI;

@@ -24,6 +24,20 @@
 		BF51E5F11D9FDA9800AF948A /* Serialization.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E5EF1D9FDA9800AF948A /* Serialization.hpp */; };
 		BF51E5F51D9FF96200AF948A /* Gizmos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E5F31D9FF96200AF948A /* Gizmos.cpp */; };
 		BF51E5F61D9FF96200AF948A /* Gizmos.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E5F41D9FF96200AF948A /* Gizmos.hpp */; };
+		BF51E5F91DA15D7100AF948A /* PhysicsSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E5F71DA15D7100AF948A /* PhysicsSystem.cpp */; };
+		BF51E5FA1DA15D7100AF948A /* PhysicsSystem.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E5F81DA15D7100AF948A /* PhysicsSystem.hpp */; };
+		BF51E6731DA1665000AF948A /* Rigidbody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E6711DA1665000AF948A /* Rigidbody.cpp */; };
+		BF51E6741DA1665000AF948A /* Rigidbody.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E6721DA1665000AF948A /* Rigidbody.hpp */; };
+		BF51E6801DA2AC2B00AF948A /* BoxCollider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E6761DA2AC2B00AF948A /* BoxCollider.cpp */; };
+		BF51E6811DA2AC2B00AF948A /* BoxCollider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E6771DA2AC2B00AF948A /* BoxCollider.hpp */; };
+		BF51E6821DA2AC2B00AF948A /* CapsuleCollider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E6781DA2AC2B00AF948A /* CapsuleCollider.cpp */; };
+		BF51E6831DA2AC2B00AF948A /* CapsuleCollider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E6791DA2AC2B00AF948A /* CapsuleCollider.hpp */; };
+		BF51E6841DA2AC2B00AF948A /* Collider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E67A1DA2AC2B00AF948A /* Collider.cpp */; };
+		BF51E6851DA2AC2B00AF948A /* Collider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E67B1DA2AC2B00AF948A /* Collider.hpp */; };
+		BF51E6861DA2AC2B00AF948A /* MeshCollider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E67C1DA2AC2B00AF948A /* MeshCollider.cpp */; };
+		BF51E6871DA2AC2B00AF948A /* MeshCollider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E67D1DA2AC2B00AF948A /* MeshCollider.hpp */; };
+		BF51E6881DA2AC2B00AF948A /* SphereCollider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E67E1DA2AC2B00AF948A /* SphereCollider.cpp */; };
+		BF51E6891DA2AC2B00AF948A /* SphereCollider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF51E67F1DA2AC2B00AF948A /* SphereCollider.hpp */; };
 		BF9499701D964E85001F65E4 /* AssetImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF94996E1D964E85001F65E4 /* AssetImporter.cpp */; };
 		BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF94996F1D964E85001F65E4 /* AssetImporter.hpp */; };
 		BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF9499771D96AB68001F65E4 /* ModelImporter.cpp */; };
@@ -106,6 +120,20 @@
 		BF51E5EF1D9FDA9800AF948A /* Serialization.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Serialization.hpp; path = ../../source/Serialization.hpp; sourceTree = "<group>"; };
 		BF51E5F31D9FF96200AF948A /* Gizmos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Gizmos.cpp; path = ../../source/Gizmos.cpp; sourceTree = "<group>"; };
 		BF51E5F41D9FF96200AF948A /* Gizmos.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Gizmos.hpp; path = ../../source/Gizmos.hpp; sourceTree = "<group>"; };
+		BF51E5F71DA15D7100AF948A /* PhysicsSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PhysicsSystem.cpp; path = ../../source/PhysicsSystem.cpp; sourceTree = "<group>"; };
+		BF51E5F81DA15D7100AF948A /* PhysicsSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PhysicsSystem.hpp; path = ../../source/PhysicsSystem.hpp; sourceTree = "<group>"; };
+		BF51E6711DA1665000AF948A /* Rigidbody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Rigidbody.cpp; path = ../../source/Rigidbody.cpp; sourceTree = "<group>"; };
+		BF51E6721DA1665000AF948A /* Rigidbody.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Rigidbody.hpp; path = ../../source/Rigidbody.hpp; sourceTree = "<group>"; };
+		BF51E6761DA2AC2B00AF948A /* BoxCollider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoxCollider.cpp; path = ../../source/BoxCollider.cpp; sourceTree = "<group>"; };
+		BF51E6771DA2AC2B00AF948A /* BoxCollider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BoxCollider.hpp; path = ../../source/BoxCollider.hpp; sourceTree = "<group>"; };
+		BF51E6781DA2AC2B00AF948A /* CapsuleCollider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CapsuleCollider.cpp; path = ../../source/CapsuleCollider.cpp; sourceTree = "<group>"; };
+		BF51E6791DA2AC2B00AF948A /* CapsuleCollider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CapsuleCollider.hpp; path = ../../source/CapsuleCollider.hpp; sourceTree = "<group>"; };
+		BF51E67A1DA2AC2B00AF948A /* Collider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Collider.cpp; path = ../../source/Collider.cpp; sourceTree = "<group>"; };
+		BF51E67B1DA2AC2B00AF948A /* Collider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Collider.hpp; path = ../../source/Collider.hpp; sourceTree = "<group>"; };
+		BF51E67C1DA2AC2B00AF948A /* MeshCollider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshCollider.cpp; path = ../../source/MeshCollider.cpp; sourceTree = "<group>"; };
+		BF51E67D1DA2AC2B00AF948A /* MeshCollider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshCollider.hpp; path = ../../source/MeshCollider.hpp; sourceTree = "<group>"; };
+		BF51E67E1DA2AC2B00AF948A /* SphereCollider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SphereCollider.cpp; path = ../../source/SphereCollider.cpp; sourceTree = "<group>"; };
+		BF51E67F1DA2AC2B00AF948A /* SphereCollider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SphereCollider.hpp; path = ../../source/SphereCollider.hpp; sourceTree = "<group>"; };
 		BF94996E1D964E85001F65E4 /* AssetImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AssetImporter.cpp; path = ../../source/AssetImporter.cpp; sourceTree = "<group>"; };
 		BF94996F1D964E85001F65E4 /* AssetImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AssetImporter.hpp; path = ../../source/AssetImporter.hpp; sourceTree = "<group>"; };
 		BF9499771D96AB68001F65E4 /* ModelImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelImporter.cpp; path = ../../source/ModelImporter.cpp; sourceTree = "<group>"; };
@@ -185,6 +213,7 @@
 		BF3211F61D8EE55F00FA80E6 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				BF51E6751DA2AC2100AF948A /* Collider */,
 				BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */,
 				BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */,
 				BFDC748D1D8EDDF50082A6DC /* Behaviour.cpp */,
@@ -199,6 +228,8 @@
 				BFDC74A81D8EDDF50082A6DC /* MeshRenderer.hpp */,
 				BFDC74AB1D8EDDF50082A6DC /* Renderer.cpp */,
 				BFDC74AC1D8EDDF50082A6DC /* Renderer.hpp */,
+				BF51E6711DA1665000AF948A /* Rigidbody.cpp */,
+				BF51E6721DA1665000AF948A /* Rigidbody.hpp */,
 				BFDC74B21D8EDDF50082A6DC /* Script.hpp */,
 				BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */,
 				BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */,
@@ -262,6 +293,23 @@
 			name = Math;
 			sourceTree = "<group>";
 		};
+		BF51E6751DA2AC2100AF948A /* Collider */ = {
+			isa = PBXGroup;
+			children = (
+				BF51E6761DA2AC2B00AF948A /* BoxCollider.cpp */,
+				BF51E6771DA2AC2B00AF948A /* BoxCollider.hpp */,
+				BF51E6781DA2AC2B00AF948A /* CapsuleCollider.cpp */,
+				BF51E6791DA2AC2B00AF948A /* CapsuleCollider.hpp */,
+				BF51E67A1DA2AC2B00AF948A /* Collider.cpp */,
+				BF51E67B1DA2AC2B00AF948A /* Collider.hpp */,
+				BF51E67C1DA2AC2B00AF948A /* MeshCollider.cpp */,
+				BF51E67D1DA2AC2B00AF948A /* MeshCollider.hpp */,
+				BF51E67E1DA2AC2B00AF948A /* SphereCollider.cpp */,
+				BF51E67F1DA2AC2B00AF948A /* SphereCollider.hpp */,
+			);
+			name = Collider;
+			sourceTree = "<group>";
+		};
 		BF9499721D964E8D001F65E4 /* Importer */ = {
 			isa = PBXGroup;
 			children = (
@@ -312,6 +360,8 @@
 				BFDC74A01D8EDDF50082A6DC /* Input.hpp */,
 				BFDC74A91D8EDDF50082A6DC /* Object.cpp */,
 				BFDC74AA1D8EDDF50082A6DC /* Object.hpp */,
+				BF51E5F71DA15D7100AF948A /* PhysicsSystem.cpp */,
+				BF51E5F81DA15D7100AF948A /* PhysicsSystem.hpp */,
 				BF51E5EE1D9FDA9800AF948A /* Serialization.cpp */,
 				BF51E5EF1D9FDA9800AF948A /* Serialization.hpp */,
 				BFDC74B01D8EDDF50082A6DC /* Scene.cpp */,
@@ -342,11 +392,13 @@
 				BFDC74BE1D8EDDF50082A6DC /* Behaviour.hpp in Headers */,
 				BFDC74D01D8EDDF50082A6DC /* Input.hpp in Headers */,
 				BFDC74E21D8EDDF50082A6DC /* Script.hpp in Headers */,
+				BF51E5FA1DA15D7100AF948A /* PhysicsSystem.hpp in Headers */,
 				BFDC74DA1D8EDDF50082A6DC /* Object.hpp in Headers */,
 				BF3212241D9173FF00FA80E6 /* Quaternion.hpp in Headers */,
 				BFDC74E11D8EDDF50082A6DC /* Scene.hpp in Headers */,
 				BFDC74D41D8EDDF50082A6DC /* Mesh.hpp in Headers */,
 				BFAF11DD1D9930A100101DCD /* Bounds.hpp in Headers */,
+				BF51E6871DA2AC2B00AF948A /* MeshCollider.hpp in Headers */,
 				BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */,
 				BF51E5F61D9FF96200AF948A /* Gizmos.hpp in Headers */,
 				BFDC74E81D8EDDF50082A6DC /* Time.hpp in Headers */,
@@ -360,16 +412,21 @@
 				BFDC74C81D8EDDF50082A6DC /* FishEngine.hpp in Headers */,
 				BF51E5F11D9FDA9800AF948A /* Serialization.hpp in Headers */,
 				BF94997A1D96AB68001F65E4 /* ModelImporter.hpp in Headers */,
+				BF51E6831DA2AC2B00AF948A /* CapsuleCollider.hpp in Headers */,
+				BF51E6851DA2AC2B00AF948A /* Collider.hpp in Headers */,
 				BF3212201D9173FF00FA80E6 /* Mathf.hpp in Headers */,
 				BFDC74D81D8EDDF50082A6DC /* MeshRenderer.hpp in Headers */,
 				BFDC74C31D8EDDF50082A6DC /* Common.hpp in Headers */,
 				BF26B4E61D94001400237680 /* Light.hpp in Headers */,
+				BF51E6811DA2AC2B00AF948A /* BoxCollider.hpp in Headers */,
 				BFDC74C51D8EDDF50082A6DC /* Component.hpp in Headers */,
 				BFDC74E41D8EDDF50082A6DC /* Shader.hpp in Headers */,
 				BFDC74E61D8EDDF50082A6DC /* Texture.hpp in Headers */,
 				BFDC74DF1D8EDDF50082A6DC /* RenderSystem.hpp in Headers */,
 				BFDC74DD1D8EDDF50082A6DC /* RenderSettings.hpp in Headers */,
 				BFDC74CE1D8EDDF50082A6DC /* GLEnvironment.hpp in Headers */,
+				BF51E6741DA1665000AF948A /* Rigidbody.hpp in Headers */,
+				BF51E6891DA2AC2B00AF948A /* SphereCollider.hpp in Headers */,
 				BFDC74C11D8EDDF50082A6DC /* CameraController.hpp in Headers */,
 				BFDC74CC1D8EDDF50082A6DC /* GameObject.hpp in Headers */,
 				BFAF11DF1D9930A100101DCD /* Ray.hpp in Headers */,
@@ -434,6 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF26B4E51D94001400237680 /* Light.cpp in Sources */,
+				BF51E6841DA2AC2B00AF948A /* Collider.cpp in Sources */,
 				BFDC74CB1D8EDDF50082A6DC /* GameObject.cpp in Sources */,
 				BF26B4E31D94001400237680 /* Color.cpp in Sources */,
 				BFAF11E01D9930A100101DCD /* Screen.cpp in Sources */,
@@ -445,6 +503,7 @@
 				BFDC74DB1D8EDDF50082A6DC /* Renderer.cpp in Sources */,
 				BF3212231D9173FF00FA80E6 /* Quaternion.cpp in Sources */,
 				BFDC74E51D8EDDF50082A6DC /* Texture.cpp in Sources */,
+				BF51E6821DA2AC2B00AF948A /* CapsuleCollider.cpp in Sources */,
 				BF51E5F01D9FDA9800AF948A /* Serialization.cpp in Sources */,
 				BFAF11D31D9838A100101DCD /* SkinnedMeshRenderer.cpp in Sources */,
 				BFDC74E91D8EDDF50082A6DC /* Transform.cpp in Sources */,
@@ -465,11 +524,16 @@
 				BFDC74D71D8EDDF50082A6DC /* MeshRenderer.cpp in Sources */,
 				BFDC74D51D8EDDF50082A6DC /* MeshFilter.cpp in Sources */,
 				BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */,
+				BF51E5F91DA15D7100AF948A /* PhysicsSystem.cpp in Sources */,
 				BFDC74C61D8EDDF50082A6DC /* Debug.cpp in Sources */,
+				BF51E6881DA2AC2B00AF948A /* SphereCollider.cpp in Sources */,
 				BF51E5F51D9FF96200AF948A /* Gizmos.cpp in Sources */,
 				BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */,
+				BF51E6731DA1665000AF948A /* Rigidbody.cpp in Sources */,
 				BFDC74E31D8EDDF50082A6DC /* Shader.cpp in Sources */,
 				BFDC74DE1D8EDDF50082A6DC /* RenderSystem.cpp in Sources */,
+				BF51E6861DA2AC2B00AF948A /* MeshCollider.cpp in Sources */,
+				BF51E6801DA2AC2B00AF948A /* BoxCollider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +637,7 @@
 					../../external,
 					../../external/glew,
 					../../external/boost_1_61_0,
+					../../external/PhysXSDK/Include,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -588,6 +653,7 @@
 					../../external,
 					../../external/glew,
 					../../external/boost_1_61_0,
+					../../external/PhysXSDK/Include,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

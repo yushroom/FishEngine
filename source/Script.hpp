@@ -52,6 +52,7 @@ public:
     
     /********** Gizmo rendering **********/
     virtual void OnDrawGizmos() {}
+    virtual void OnDrawGizmosSelected() {}
     
     /********** GUI rendering **********/
     virtual void OnGUI() {}

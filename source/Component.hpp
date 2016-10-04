@@ -13,7 +13,8 @@ public:
 
     virtual ~Component() = default;
     
-    virtual void OnInspectorGUI() {};
+    virtual void OnInspectorGUI() {}
+    virtual void OnDrawGizmos() {}
 
     // The game object this component is attached to. A component is always attached to a game object.
     std::shared_ptr<GameObject> gameObject() const { return m_gameObject.lock(); }

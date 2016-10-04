@@ -8,6 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		BF3211FF1D8EFB1E00FA80E6 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */; };
+		BF51E6391DA1634800AF948A /* libLowLevel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6011DA1634800AF948A /* libLowLevel.a */; };
+		BF51E63B1DA1634800AF948A /* libLowLevelCloth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6031DA1634800AF948A /* libLowLevelCloth.a */; };
+		BF51E6411DA1634800AF948A /* libPhysX3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6091DA1634800AF948A /* libPhysX3.a */; };
+		BF51E6421DA1634800AF948A /* libPhysX3CharacterKinematic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E60A1DA1634800AF948A /* libPhysX3CharacterKinematic.a */; };
+		BF51E6471DA1634800AF948A /* libPhysX3Common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E60F1DA1634800AF948A /* libPhysX3Common.a */; };
+		BF51E64B1DA1634800AF948A /* libPhysX3Cooking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6131DA1634800AF948A /* libPhysX3Cooking.a */; };
+		BF51E64F1DA1634800AF948A /* libPhysX3DEBUG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6171DA1634800AF948A /* libPhysX3DEBUG.a */; };
+		BF51E6501DA1634800AF948A /* libPhysX3Extensions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6181DA1634800AF948A /* libPhysX3Extensions.a */; };
+		BF51E6541DA1634800AF948A /* libPhysX3PROFILE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E61C1DA1634800AF948A /* libPhysX3PROFILE.a */; };
+		BF51E6551DA1634800AF948A /* libPhysX3Vehicle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E61D1DA1634800AF948A /* libPhysX3Vehicle.a */; };
+		BF51E6591DA1634800AF948A /* libPhysXProfileSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6211DA1634800AF948A /* libPhysXProfileSDK.a */; };
+		BF51E65D1DA1634800AF948A /* libPhysXVisualDebuggerSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6251DA1634800AF948A /* libPhysXVisualDebuggerSDK.a */; };
+		BF51E6611DA1634800AF948A /* libPvdRuntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6291DA1634800AF948A /* libPvdRuntime.a */; };
+		BF51E6651DA1634800AF948A /* libPxTask.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E62D1DA1634800AF948A /* libPxTask.a */; };
+		BF51E6691DA1634800AF948A /* libSceneQuery.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6311DA1634800AF948A /* libSceneQuery.a */; };
+		BF51E66D1DA1634800AF948A /* libSimulationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6351DA1634800AF948A /* libSimulationController.a */; };
+		BF51E68C1DA2C63D00AF948A /* EditorTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E68A1DA2C63D00AF948A /* EditorTime.cpp */; };
 		BF6E19EB1D919FA100C9D2E8 /* imgui_dock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */; };
 		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
 		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
@@ -58,6 +75,24 @@
 		BF3212031D90468100FA80E6 /* imgui_impl_glfw_gl3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_impl_glfw_gl3.h; path = ../../external/imgui/imgui_impl_glfw_gl3.h; sourceTree = "<group>"; };
 		BF3212041D90468100FA80E6 /* imgui_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_internal.h; path = ../../external/imgui/imgui_internal.h; sourceTree = "<group>"; };
 		BF3212051D90468100FA80E6 /* imgui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui.h; path = ../../external/imgui/imgui.h; sourceTree = "<group>"; };
+		BF51E6011DA1634800AF948A /* libLowLevel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLowLevel.a; path = ../../external/libs/osx/libLowLevel.a; sourceTree = "<group>"; };
+		BF51E6031DA1634800AF948A /* libLowLevelCloth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLowLevelCloth.a; path = ../../external/libs/osx/libLowLevelCloth.a; sourceTree = "<group>"; };
+		BF51E6091DA1634800AF948A /* libPhysX3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3.a; path = ../../external/libs/osx/libPhysX3.a; sourceTree = "<group>"; };
+		BF51E60A1DA1634800AF948A /* libPhysX3CharacterKinematic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3CharacterKinematic.a; path = ../../external/libs/osx/libPhysX3CharacterKinematic.a; sourceTree = "<group>"; };
+		BF51E60F1DA1634800AF948A /* libPhysX3Common.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3Common.a; path = ../../external/libs/osx/libPhysX3Common.a; sourceTree = "<group>"; };
+		BF51E6131DA1634800AF948A /* libPhysX3Cooking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3Cooking.a; path = ../../external/libs/osx/libPhysX3Cooking.a; sourceTree = "<group>"; };
+		BF51E6171DA1634800AF948A /* libPhysX3DEBUG.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3DEBUG.a; path = ../../external/libs/osx/libPhysX3DEBUG.a; sourceTree = "<group>"; };
+		BF51E6181DA1634800AF948A /* libPhysX3Extensions.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3Extensions.a; path = ../../external/libs/osx/libPhysX3Extensions.a; sourceTree = "<group>"; };
+		BF51E61C1DA1634800AF948A /* libPhysX3PROFILE.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3PROFILE.a; path = ../../external/libs/osx/libPhysX3PROFILE.a; sourceTree = "<group>"; };
+		BF51E61D1DA1634800AF948A /* libPhysX3Vehicle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysX3Vehicle.a; path = ../../external/libs/osx/libPhysX3Vehicle.a; sourceTree = "<group>"; };
+		BF51E6211DA1634800AF948A /* libPhysXProfileSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysXProfileSDK.a; path = ../../external/libs/osx/libPhysXProfileSDK.a; sourceTree = "<group>"; };
+		BF51E6251DA1634800AF948A /* libPhysXVisualDebuggerSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPhysXVisualDebuggerSDK.a; path = ../../external/libs/osx/libPhysXVisualDebuggerSDK.a; sourceTree = "<group>"; };
+		BF51E6291DA1634800AF948A /* libPvdRuntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPvdRuntime.a; path = ../../external/libs/osx/libPvdRuntime.a; sourceTree = "<group>"; };
+		BF51E62D1DA1634800AF948A /* libPxTask.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPxTask.a; path = ../../external/libs/osx/libPxTask.a; sourceTree = "<group>"; };
+		BF51E6311DA1634800AF948A /* libSceneQuery.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSceneQuery.a; path = ../../external/libs/osx/libSceneQuery.a; sourceTree = "<group>"; };
+		BF51E6351DA1634800AF948A /* libSimulationController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSimulationController.a; path = ../../external/libs/osx/libSimulationController.a; sourceTree = "<group>"; };
+		BF51E68A1DA2C63D00AF948A /* EditorTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorTime.cpp; path = ../../source/FishEditor/EditorTime.cpp; sourceTree = "<group>"; };
+		BF51E68B1DA2C63D00AF948A /* EditorTime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = EditorTime.hpp; path = ../../source/FishEditor/EditorTime.hpp; sourceTree = "<group>"; };
 		BF6E19E81D919F4E00C9D2E8 /* imgui_dock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_dock.h; path = ../../external/imgui/imgui_dock.h; sourceTree = "<group>"; };
 		BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_dock.cpp; path = ../../external/imgui/imgui_dock.cpp; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,15 +127,31 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF51E6471DA1634800AF948A /* libPhysX3Common.a in Frameworks */,
+				BF51E6411DA1634800AF948A /* libPhysX3.a in Frameworks */,
+				BF51E64B1DA1634800AF948A /* libPhysX3Cooking.a in Frameworks */,
+				BF51E6591DA1634800AF948A /* libPhysXProfileSDK.a in Frameworks */,
+				BF51E65D1DA1634800AF948A /* libPhysXVisualDebuggerSDK.a in Frameworks */,
+				BF51E6391DA1634800AF948A /* libLowLevel.a in Frameworks */,
 				BFDC75381D8EE4110082A6DC /* libz.tbd in Frameworks */,
 				BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */,
 				BFDC75331D8EE3D00082A6DC /* IOKit.framework in Frameworks */,
+				BF51E6501DA1634800AF948A /* libPhysX3Extensions.a in Frameworks */,
+				BF51E6421DA1634800AF948A /* libPhysX3CharacterKinematic.a in Frameworks */,
+				BF51E64F1DA1634800AF948A /* libPhysX3DEBUG.a in Frameworks */,
+				BF51E63B1DA1634800AF948A /* libLowLevelCloth.a in Frameworks */,
 				BFDC75301D8EE2970082A6DC /* Cocoa.framework in Frameworks */,
 				BFDC752E1D8EE28A0082A6DC /* OpenGL.framework in Frameworks */,
 				BFDC75241D8EE0F10082A6DC /* libFishEngine.a in Frameworks */,
 				BFDC75291D8EE1250082A6DC /* libGLEW.a in Frameworks */,
+				BF51E6691DA1634800AF948A /* libSceneQuery.a in Frameworks */,
+				BF51E6611DA1634800AF948A /* libPvdRuntime.a in Frameworks */,
+				BF51E66D1DA1634800AF948A /* libSimulationController.a in Frameworks */,
 				BFDC75281D8EE1250082A6DC /* libassimp.a in Frameworks */,
 				BFDC752A1D8EE1250082A6DC /* libglfw3.a in Frameworks */,
+				BF51E6541DA1634800AF948A /* libPhysX3PROFILE.a in Frameworks */,
+				BF51E6651DA1634800AF948A /* libPxTask.a in Frameworks */,
+				BF51E6551DA1634800AF948A /* libPhysX3Vehicle.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +195,8 @@
 				BFDC750C1D8EE0330082A6DC /* EditorGUI.hpp */,
 				BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */,
 				BFDC750E1D8EE0330082A6DC /* EditorRenderSystem.hpp */,
+				BF51E68A1DA2C63D00AF948A /* EditorTime.cpp */,
+				BF51E68B1DA2C63D00AF948A /* EditorTime.hpp */,
 				BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */,
 				BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */,
 				BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */,
@@ -178,6 +231,22 @@
 				BFDC75251D8EE1250082A6DC /* libassimp.a */,
 				BFDC75261D8EE1250082A6DC /* libGLEW.a */,
 				BFDC75271D8EE1250082A6DC /* libglfw3.a */,
+				BF51E6011DA1634800AF948A /* libLowLevel.a */,
+				BF51E6031DA1634800AF948A /* libLowLevelCloth.a */,
+				BF51E6091DA1634800AF948A /* libPhysX3.a */,
+				BF51E60A1DA1634800AF948A /* libPhysX3CharacterKinematic.a */,
+				BF51E60F1DA1634800AF948A /* libPhysX3Common.a */,
+				BF51E6131DA1634800AF948A /* libPhysX3Cooking.a */,
+				BF51E6171DA1634800AF948A /* libPhysX3DEBUG.a */,
+				BF51E6181DA1634800AF948A /* libPhysX3Extensions.a */,
+				BF51E61C1DA1634800AF948A /* libPhysX3PROFILE.a */,
+				BF51E61D1DA1634800AF948A /* libPhysX3Vehicle.a */,
+				BF51E6211DA1634800AF948A /* libPhysXProfileSDK.a */,
+				BF51E6251DA1634800AF948A /* libPhysXVisualDebuggerSDK.a */,
+				BF51E6291DA1634800AF948A /* libPvdRuntime.a */,
+				BF51E62D1DA1634800AF948A /* libPxTask.a */,
+				BF51E6311DA1634800AF948A /* libSceneQuery.a */,
+				BF51E6351DA1634800AF948A /* libSimulationController.a */,
 			);
 			name = lib;
 			sourceTree = "<group>";
@@ -268,6 +337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BFDC75221D8EE0D60082A6DC /* imgui_impl_glfw_gl3.cpp in Sources */,
+				BF51E68C1DA2C63D00AF948A /* EditorTime.cpp in Sources */,
 				BFDC751A1D8EE0330082A6DC /* Selection.cpp in Sources */,
 				BF6E19EB1D919FA100C9D2E8 /* imgui_dock.cpp in Sources */,
 				BFDC75211D8EE0D60082A6DC /* imgui_draw.cpp in Sources */,

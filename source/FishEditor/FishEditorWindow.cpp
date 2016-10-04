@@ -12,9 +12,11 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include "App.hpp"
+#include <PhysicsSystem.hpp>
 
 #include "EditorRenderSystem.hpp"
 #include "EditorGUI.hpp"
+#include "EditorTime.hpp"
 
 const uint32_t WIDTH = 1280, HEIGHT = 960;
 
@@ -73,6 +75,8 @@ void FishEditorWindow::Init()
     
     EditorRenderSystem::Init();
     
+    PhysicsSystem::Init();
+    
     for (auto& r : m_apps) {
         r->Init();
     }
@@ -81,9 +85,11 @@ void FishEditorWindow::Init()
 void FishEditorWindow::Run()
 {
     Scene::Start();
-    float fixed_delta_time = 1.0f / m_fixedFrameRate;
-    float old_time = 0;
-    Time::m_time = (float)glfwGetTime();
+    //PhysicsSystem::Start();
+    
+    const float fixed_delta_time = 1.0f / m_fixedFrameRate;
+    //float old_time = 0;
+    EditorTime::m_time = (float)glfwGetTime();
     
     // Game loop
     while (!glfwWindowShouldClose(m_window))
@@ -100,16 +106,18 @@ void FishEditorWindow::Run()
         
         EditorRenderSystem::Render();
         
+        PhysicsSystem::FixedUpdate();
+        
         float new_t = (float)glfwGetTime();
-        float interval = new_t - old_time;
+        float interval = new_t - EditorTime::m_time;
         if (interval < fixed_delta_time) {
             std::chrono::milliseconds sleep_time((long long)((fixed_delta_time - interval) * 1000));
             std::this_thread::sleep_for(sleep_time);
         }
 
-        old_time = (float)glfwGetTime();
-        Time::m_deltaTime = old_time - Time::m_time;
-        Time::m_time = old_time;
+        const float old_time = (float)glfwGetTime();
+        EditorTime::m_deltaTime = old_time - EditorTime::m_time;
+        EditorTime::m_time = old_time;
     }
 }
 
@@ -120,6 +128,8 @@ void FishEditorWindow::Clean()
 //    }
     
     EditorRenderSystem::Clean();
+    
+    PhysicsSystem::Clean();
     
     // Terminate GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();

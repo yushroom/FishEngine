@@ -21,6 +21,10 @@
 #include <Ray.hpp>
 #include <ModelImporter.hpp>
 #include <Gizmos.hpp>
+#include <BoxCollider.hpp>
+#include <SphereCollider.hpp>
+#include <CapsuleCollider.hpp>
+#include <Rigidbody.hpp>
 
 #include <imgui/imgui_dock.h>
 
@@ -699,21 +703,52 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& 
     }
 }
 
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Rigidbody>& rigidBody)
+{
+    ImGui::InputFloat("Mass", &rigidBody->m_mass);
+    ImGui::InputFloat("Drag", &rigidBody->m_drag);
+    ImGui::InputFloat("Angular", &rigidBody->m_angularDrag);
+    ImGui::Checkbox("Use Gravity", &rigidBody->m_useGravity);
+    ImGui::Checkbox("Is Kinematic", &rigidBody->m_isKinematic);
+}
+
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::BoxCollider>& boxCollider)
+{
+    ImGui::Checkbox("Is Trigger", &boxCollider->m_isTrigger);
+    ImGui::InputFloat3("Center", boxCollider->m_center.data());
+    ImGui::InputFloat3("Size", boxCollider->m_size.data());
+}
+
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider>& capsuleCollider)
+{
+    ImGui::Checkbox("Is Trigger", &capsuleCollider->m_isTrigger);
+    ImGui::InputFloat3("Center", capsuleCollider->m_center.data());
+    ImGui::InputFloat("Radius", &capsuleCollider->m_radius);
+    ImGui::InputFloat("Height", &capsuleCollider->m_height);
+    ImGui::InputFloat3("Direction", capsuleCollider->m_direction.data());
+}
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component)
 {
+#define Case(T) else if (component->ClassName() == FishEngine::T::StaticClassName()) { OnInspectorGUI(std::static_pointer_cast<FishEngine::T>(component)); }
+    
     if (component->ClassName() == FishEngine::Transform::StaticClassName()) {
         OnInspectorGUI(std::static_pointer_cast<FishEngine::Transform>(component));
-    } else if (component->ClassName() == FishEngine::Camera::StaticClassName()) {
-        OnInspectorGUI(std::static_pointer_cast<FishEngine::Camera>(component));
-    } else if (component->ClassName() == FishEngine::Animator::StaticClassName()) {
-        OnInspectorGUI(std::static_pointer_cast<FishEngine::Animator>(component));
-    } else if (component->ClassName() == FishEngine::MeshFilter::StaticClassName()) {
-        OnInspectorGUI(std::static_pointer_cast<FishEngine::MeshFilter>(component));
-    } else if (component->ClassName() == FishEngine::MeshRenderer::StaticClassName()) {
-        OnInspectorGUI(std::static_pointer_cast<FishEngine::MeshRenderer>(component));
     }
+    Case(Camera)
+    Case(Animator)
+    Case(MeshFilter)
+    Case(MeshRenderer)
+    Case(BoxCollider)
+    Case(CapsuleCollider)
+    Case(Rigidbody)
+#undef Case
 }
 
 NAMESPACE_FISHEDITOR_END

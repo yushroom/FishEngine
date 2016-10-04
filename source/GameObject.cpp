@@ -1,5 +1,6 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
+#include "Gizmos.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -39,8 +40,14 @@ void FishEngine::GameObject::Update()
 
 void FishEngine::GameObject::OnDrawGizmos()
 {
+    for (auto& c : m_components) {
+        c->OnDrawGizmos();
+        Gizmos::setColor(Color::green);
+    }
+
     for (auto& s : m_scripts) {
         s->OnDrawGizmos();
+        Gizmos::setColor(Color::green);
     }
 }
 

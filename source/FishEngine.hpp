@@ -53,8 +53,16 @@ class RenderTexture;
 class AssetImporter;
 class Model;
 class ModelImporter;
+class Rigidbody;
+class Collider;
+class BoxCollider;
+class CapsuleCollider;
+class SphereCollider;
+class MeshCollider;
+
 struct Ray;
 struct Bounds;
+
 
 NAMESPACE_FISHENGINE_END
 

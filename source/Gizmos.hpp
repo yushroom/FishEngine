@@ -52,6 +52,11 @@ namespace FishEngine
         DrawWireSphere(const Vector3& center,
                        const float radius);
         
+        static void
+        DrawWireCapsule(const Vector3& center,
+                        const float radius,
+                        const float height);
+        
     private:
         friend FishEditor::EditorRenderSystem;
         friend FishEditor::EditorGUI;

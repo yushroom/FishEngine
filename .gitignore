@@ -21,6 +21,8 @@ xcuserdata/
 
 # external libs
 /external/boost*
+/external/PhysXSDK/
+/external/libs/
 
 # assets
 /assets/models/

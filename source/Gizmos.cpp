@@ -122,3 +122,23 @@ DrawWireCube(const Vector3& center,
     shader->BindUniforms(uniforms);
     s_boxMesh->Render();
 }
+
+void Gizmos::
+DrawWireCapsule(const Vector3& center,
+                const float radius,
+                const float height)
+{
+    Vector3 c1 = center+Vector3(0, height*0.5f-radius, 0);
+    Vector3 c2 = center-Vector3(0, height*0.5f-radius, 0);
+    DrawWireSphere(c1, radius);
+    DrawWireSphere(c2, radius);
+    
+    Vector3 offset(radius, 0, 0);
+    DrawLine(c1+offset, c2+offset);
+    offset.Set(-radius, 0, 0);
+    DrawLine(c1+offset, c2+offset);
+    offset.Set(0, 0, radius);
+    DrawLine(c1+offset, c2+offset);
+    offset.Set(0, 0, -radius);
+    DrawLine(c1+offset, c2+offset);
+}

@@ -35,7 +35,7 @@ public:
 private:
     friend class RenderSystem;
     friend class GameLoop;
-    friend class FishEditor::FishEditorWindow;
+    //friend class FishEditor::FishEditorWindow;
     
     static float m_deltaTime;
     static float m_fixedDeltaTime;

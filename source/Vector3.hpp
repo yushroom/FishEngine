@@ -65,21 +65,30 @@ public:
         z *= scale.z;
     }
 
-    float&          operator[](const int index)         { return m[index]; }
-    float           operator[](const int index) const   { return m[index]; }
-    Vector3&        operator=(const Vector3& v)         { Assert(!v.hasNaNs()); x = v.x; y = v.y; z = v.z; return *this; }
-    Vector3         operator-() const                   { return Vector3(-x, -y, -z); }
-    Vector3         operator*(const float f) const      { Assert(!isnan(f)); return Vector3(x * f, y * f, z * f); }
-    Vector3         operator*(const Vector3 v) const    { return Vector3(x*v.x, y*v.y, z*v.z); }
-    Vector3         operator/(const float f) const      { Assert(!isnan(f) && f!=0.f); return Vector3(x / f, y / f, z / f); }
+    float&      operator[](const int index)         { return m[index]; }
+    float       operator[](const int index) const   { return m[index]; }
+    Vector3&    operator=(const Vector3& v)         { Assert(!v.hasNaNs()); x = v.x; y = v.y; z = v.z; return *this; }
+    Vector3     operator-() const                   { return Vector3(-x, -y, -z); }
+
+    Vector3     operator+(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x + v.x, y + v.y, z + v.z); }
+    Vector3     operator-(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x - v.x, y - v.y, z - v.z); }
+    Vector3     operator*(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x * v.x, y * v.y, z * v.z); }
+    void        operator+=(const Vector3& v)        { Assert(!v.hasNaNs()); x += v.x; y += v.y; z += v.z; }
+    void        operator-=(const Vector3& v)        { Assert(!v.hasNaNs()); x -= v.x; y -= v.y; z -= v.z; }
+    
+    Vector3     operator+(const float f) const      { Assert(!isnan(f)); return Vector3(x + f, y + f, z + f); }
+    Vector3     operator-(const float f) const      { Assert(!isnan(f)); return Vector3(x - f, y - f, z - f); }
+    Vector3     operator*(const float f) const      { Assert(!isnan(f)); return Vector3(x * f, y * f, z * f); }
+    Vector3     operator/(const float f) const      { Assert(!isnan(f) && f!=0.f); return Vector3(x / f, y / f, z / f); }
+    void        operator+=(const float f)           { Assert(!isnan(f)); x += f; y += f; z += f; }
+    void        operator-=(const float f)           { Assert(!isnan(f)); x -= f; y -= f; z -= f; }
+    void        operator*=(const float f)           { Assert(!isnan(f)); x *= f; y *= f; z *= f; }
+    void        operator/=(const float f)           { Assert(!isnan(f)); x /= f; y /= f; z /= f; }
+    
     friend Vector3  operator*(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(v.x * f, v.y * f, v.z * f); }
     friend Vector3  operator/(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(f/v.x, f/v.y, f/v.z); }
-    Vector3         operator+(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x + v.x, y + v.y, z + v.z); }
-    Vector3         operator-(const Vector3& v) const   { Assert(!v.hasNaNs()); return Vector3(x - v.x, y - v.y, z - v.z); }
-    void            operator+=(const Vector3& v)        { Assert(!v.hasNaNs()); x += v.x; y += v.y; z += v.z; }
-    void            operator-=(const Vector3& v)        { Assert(!v.hasNaNs()); x -= v.x; y -= v.y; z -= v.z; }
-    void            operator*=(const float f)           { Assert(!isnan(f)); x *= f; y *= f; z *= f; }
-    void            operator/=(const float f)           { Assert(!isnan(f)); x /= f; y /= f; z /= f; }
+
+
     //bool          operator==(const Vector3& v) const { Assert(!v.hasNaNs()); return (equal(x, v.x) && equal(y, v.y) && equal(z, v.z)); }
     //bool          operator!=(const Vector3& v) const { Assert(!v.hasNaNs()); return !operator==(v); }
 

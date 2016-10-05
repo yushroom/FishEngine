@@ -34,7 +34,7 @@ namespace FishEngine {
     class Model : public Object
     {
     public:
-        Model() = default;
+        Model() : m_avatar(std::make_shared<Avatar>()) {}
         
         typedef std::shared_ptr<Model> PModel;
         
@@ -48,6 +48,10 @@ namespace FishEngine {
             if (m_animations.empty())
                 return nullptr;
             return m_animations.front();
+        }
+
+        std::shared_ptr<Avatar> avatar() const {
+            return m_avatar;
         }
         
         static void Init();
@@ -69,7 +73,8 @@ namespace FishEngine {
         //std::vector<ModelNode::PModelNode> m_modelNodes;
         ModelNode::PModelNode m_rootNode;
         //std::vector<ModelNode::PModelNode> m_bones;
-        std::map<std::string, int> m_boneToIndex;
+        //std::map<std::string, int> m_boneToIndex;
+        std::shared_ptr<Avatar> m_avatar;
         
         static std::map<BuiltinModelTyep, PModel> s_builtinModels;
     };

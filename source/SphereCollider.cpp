@@ -1,8 +1,7 @@
 #include "SphereCollider.hpp"
 #include "Transform.hpp"
 #include "Gizmos.hpp"
-#define NDEBUG
-#include "PxPhysicsAPI.h"
+#include "PhysicsSystem.hpp"
 
 using namespace physx;
 extern physx::PxPhysics*    gPhysics;

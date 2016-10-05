@@ -59,7 +59,7 @@ class BoxCollider;
 class CapsuleCollider;
 class SphereCollider;
 class MeshCollider;
-
+struct Avatar;
 struct Ray;
 struct Bounds;
 

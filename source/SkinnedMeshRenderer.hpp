@@ -2,6 +2,7 @@
 #define SkinnedMeshRenderer_hpp
 
 #include "Renderer.hpp"
+#include "Animator.hpp"
 
 namespace FishEngine {
     
@@ -14,6 +15,8 @@ namespace FishEngine {
         
         SkinnedMeshRenderer(std::shared_ptr<Material> material);
         
+        virtual void OnInspectorGUI() override;
+
         virtual void Render() const override;
         
         const std::vector<std::weak_ptr<Transform>>& bones() const {
@@ -21,8 +24,9 @@ namespace FishEngine {
         }
         
     private:
-        friend class ModelImporter;
+        //friend class ModelImporter;
         std::vector<std::weak_ptr<Transform>> m_bones;
+        std::shared_ptr<Avatar> m_avatar;
     };
 }
 

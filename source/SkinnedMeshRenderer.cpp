@@ -5,6 +5,7 @@
 #include "MeshFilter.hpp"
 #include "Mesh.hpp"
 #include "Light.hpp"
+#include <imgui/imgui.h>
 
 namespace FishEngine {
     SkinnedMeshRenderer::SkinnedMeshRenderer(Material::PMaterial material) : Renderer(material)
@@ -12,6 +13,12 @@ namespace FishEngine {
         
     }
     
+    void SkinnedMeshRenderer::OnInspectorGUI()
+    {
+        int boneCount = m_avatar->m_boneToIndex.size();
+        ImGui::InputInt("Bone Count", &boneCount);
+    }
+
     void SkinnedMeshRenderer::Render() const
     {
         //Debug::Log("Rendere %s", m_gameObject->name().c_str());

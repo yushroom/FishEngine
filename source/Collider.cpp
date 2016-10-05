@@ -2,9 +2,8 @@
 #include "Transform.hpp"
 #include "GameObject.hpp"
 #include "Rigidbody.hpp"
+#include "PhysicsSystem.hpp"
 
-#define NDEBUG
-#include "PxPhysicsAPI.h"
 using namespace physx;
 extern physx::PxPhysics*    gPhysics;
 extern physx::PxScene*      gScene;

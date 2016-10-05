@@ -14,6 +14,21 @@ FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(
 
 NAMESPACE_FISHENGINE_BEGIN
 
+void RecursivelyGetTransformation(
+    std::shared_ptr<Transform>&     transform, 
+    std::vector<Matrix4x4>&         transformation, 
+    std::map<std::string, int>&     nameToIndex)
+{
+    const auto& name = transform->name();
+    auto& it = nameToIndex.find(name);
+    if (it != nameToIndex.end()) {
+        transformation[nameToIndex[name]] = transform->localToWorldMatrix();
+    }
+    for (auto& child : transform->children()) {
+        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex);
+    }
+}
+
 void MeshRenderer::Render() const
 {
     //Debug::Log("Rendere %s", m_gameObject->name().c_str());
@@ -50,7 +65,7 @@ void MeshRenderer::Render() const
     if (lights.size() > 0) {
         auto& l = lights.front();
         if (l->transform() != nullptr) {
-            lightDir = Vector4(l->transform()->forward(), 0);
+            lightDir = Vector4(l->transform()->forward(), 0); 
             auto view = l->gameObject()->transform()->worldToLocalMatrix();
             auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
             lightVP = proj * view;
@@ -61,10 +76,12 @@ void MeshRenderer::Render() const
     uniforms.vec4s["WorldSpaceLightPos0"] = lightDir;
     uniforms.mat4s["LightMatrix0"] = lightVP;
 
-    auto mesh = meshFilter->mesh();
-    auto animator = gameObject()->GetComponent<Animator>();
-    if (mesh->m_skinned && animator != nullptr) {
-        //mesh->
+    //auto mesh = meshFilter->mesh();
+    //auto animator = gameObject()->GetComponent<Animator>();
+    std::vector<Matrix4x4> boneTransformation;
+    if (m_avatar != nullptr) {
+        boneTransformation.resize(m_avatar->m_boneToIndex.size());
+        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, m_avatar->m_boneToIndex);
     }
     
     for (auto& m : m_materials) {
@@ -72,6 +89,8 @@ void MeshRenderer::Render() const
         shader->Use();
         shader->PreRender();
         shader->BindUniforms(uniforms);
+        if (m_avatar != nullptr)
+            shader->BindMatrixArray("BoneTransformations", boneTransformation);
         m->BindTextures(textures);
         //shader->BindTextures(textures);
         m->Update();

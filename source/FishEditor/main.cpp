@@ -476,7 +476,7 @@ public:
         //importer.setFileScale(0.01f);
         auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
         ModelImporter importer2;
-        auto run00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
+        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
@@ -531,29 +531,36 @@ public:
         modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         //modelGO->transform()->setLocalPosition(0, 0, 0);
         auto animator = std::make_shared<Animator>();
-        animator->m_animation = run00Model->mainAnimation();
+        animator->m_animation = jump00Model->mainAnimation();
         modelGO->AddComponent(animator);
 
-        //auto run00GO = run00Model->CreateGameObject();
-        //run00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
+        auto jump00GO = jump00Model->CreateGameObject();
+        jump00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         
         //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;
 
         constexpr float edgeThickness = 0.5f;
         //material = Material::builtinMaterial("TextureDoubleSided");
-        material = bodyMaterial;
+        //material = bodyMaterial;
+        material = Material::builtinMaterial("SkinnedMesh");
         material->SetTexture("DiffuseMap", bodyTexture);
         auto material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", bodyTexture);
         material2->SetFloat("_EdgeThickness", edgeThickness);
+
+        textures["DiffuseMap"] = bodyTexture;
         material->BindTextures(textures);
+        //material->BindTextures("DiffuseMap", )
         for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+            auto renderer = child->GetComponent<MeshRenderer>();
+            renderer->setAvatar(jump00Model->avatar());
+            renderer->setRootBone(modelGO->transform());
+            renderer->SetMaterial(material);
+            //renderer->AddMaterial(material2);
         }
 
         material = Material::builtinMaterial("Texture");
@@ -654,7 +661,6 @@ public:
         s->m_useGammaCorrection = false;
         cameraGO->AddScript(s);
         //cameraGO->GetComponent<EditorRenderSettings>()->m_useGammaCorrection = false;
-        cameraGO->AddScript(make_shared<TestGizmos>());
 
         Selection::setActiveGameObject(cameraGO);
         

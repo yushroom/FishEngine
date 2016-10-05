@@ -28,6 +28,9 @@
     <Filter Include="Importer">
       <UniqueIdentifier>{3f37f387-42fe-463a-85f7-9bb6eec67685}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Collider">
+      <UniqueIdentifier>{23a33904-fc15-497e-b140-83e2fb4704e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\RenderSettings.hpp">
@@ -159,6 +162,36 @@
     <ClInclude Include="..\..\source\Screen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Animator.hpp">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\SkinnedMeshRenderer.hpp">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Gizmos.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Collider.hpp">
+      <Filter>Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\BoxCollider.hpp">
+      <Filter>Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\SphereCollider.hpp">
+      <Filter>Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\CapsuleCollider.hpp">
+      <Filter>Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\MeshCollider.hpp">
+      <Filter>Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rigidbody.hpp">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\PhysicsSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -273,6 +306,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Bounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Animator.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\SkinnedMeshRenderer.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Gizmos.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Collider.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\BoxCollider.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\SphereCollider.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\CapsuleCollider.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\MeshCollider.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Rigidbody.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

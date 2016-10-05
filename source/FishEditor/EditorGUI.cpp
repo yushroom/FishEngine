@@ -390,7 +390,7 @@ void FishEditor::EditorGUI::DrawMainMenu()
             ImGui::EndMenu();
         }
 
-        double new_time = glfwGetTime();
+        float new_time = (float)glfwGetTime();
         int fps = (int)roundf(1.f / float(new_time - time_stamp));
         time_stamp = new_time;
         std::ostringstream sout;

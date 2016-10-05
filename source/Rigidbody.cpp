@@ -3,8 +3,7 @@
 #include "PhysicsSystem.hpp"
 #include "Gizmos.hpp"
 #include "Transform.hpp"
-#define NDEBUG
-#include "PxPhysicsAPI.h"
+#include "PhysicsSystem.hpp"
 
 using namespace FishEngine;
 using namespace physx;

@@ -69,11 +69,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -82,6 +82,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -102,6 +103,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -128,12 +130,16 @@
     <ClInclude Include="..\..\external\imgui\imgui_dock.h" />
     <ClInclude Include="..\..\external\imgui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="..\..\external\imgui\imgui_internal.h" />
+    <ClInclude Include="..\..\source\Animator.hpp" />
     <ClInclude Include="..\..\source\App.hpp" />
     <ClInclude Include="..\..\source\AssetImporter.hpp" />
     <ClInclude Include="..\..\source\Behaviour.hpp" />
     <ClInclude Include="..\..\source\Bounds.hpp" />
+    <ClInclude Include="..\..\source\BoxCollider.hpp" />
     <ClInclude Include="..\..\source\Camera.hpp" />
     <ClInclude Include="..\..\source\CameraController.hpp" />
+    <ClInclude Include="..\..\source\CapsuleCollider.hpp" />
+    <ClInclude Include="..\..\source\Collider.hpp" />
     <ClInclude Include="..\..\source\Color.hpp" />
     <ClInclude Include="..\..\source\Common.hpp" />
     <ClInclude Include="..\..\source\Component.hpp" />
@@ -141,6 +147,7 @@
     <ClInclude Include="..\..\source\FishEngine.hpp" />
     <ClInclude Include="..\..\source\GameLoop.hpp" />
     <ClInclude Include="..\..\source\GameObject.hpp" />
+    <ClInclude Include="..\..\source\Gizmos.hpp" />
     <ClInclude Include="..\..\source\GLEnvironment.hpp" />
     <ClInclude Include="..\..\source\Input.hpp" />
     <ClInclude Include="..\..\source\Light.hpp" />
@@ -148,20 +155,25 @@
     <ClInclude Include="..\..\source\Mathf.hpp" />
     <ClInclude Include="..\..\source\Matrix4x4.hpp" />
     <ClInclude Include="..\..\source\Mesh.hpp" />
+    <ClInclude Include="..\..\source\MeshCollider.hpp" />
     <ClInclude Include="..\..\source\MeshFilter.hpp" />
     <ClInclude Include="..\..\source\MeshRenderer.hpp" />
     <ClInclude Include="..\..\source\ModelImporter.hpp" />
     <ClInclude Include="..\..\source\Object.hpp" />
+    <ClInclude Include="..\..\source\PhysicsSystem.hpp" />
     <ClInclude Include="..\..\source\Quaternion.hpp" />
     <ClInclude Include="..\..\source\Ray.hpp" />
     <ClInclude Include="..\..\source\Renderer.hpp" />
     <ClInclude Include="..\..\source\RenderSettings.hpp" />
     <ClInclude Include="..\..\source\RenderSystem.hpp" />
     <ClInclude Include="..\..\source\RenderTexture.hpp" />
+    <ClInclude Include="..\..\source\rigidbody.hpp" />
     <ClInclude Include="..\..\source\Scene.hpp" />
     <ClInclude Include="..\..\source\Screen.hpp" />
     <ClInclude Include="..\..\source\Script.hpp" />
     <ClInclude Include="..\..\source\Shader.hpp" />
+    <ClInclude Include="..\..\source\SkinnedMeshRenderer.hpp" />
+    <ClInclude Include="..\..\source\SphereCollider.hpp" />
     <ClInclude Include="..\..\source\Texture.hpp" />
     <ClInclude Include="..\..\source\Time.hpp" />
     <ClInclude Include="..\..\source\Transform.hpp" />
@@ -173,35 +185,45 @@
     <ClCompile Include="..\..\external\imgui\imgui_dock.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\external\imgui\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="..\..\source\Animator.cpp" />
     <ClCompile Include="..\..\source\App.cpp" />
     <ClCompile Include="..\..\source\AssetImporter.cpp" />
     <ClCompile Include="..\..\source\Behaviour.cpp" />
     <ClCompile Include="..\..\source\Bounds.cpp" />
+    <ClCompile Include="..\..\source\BoxCollider.cpp" />
     <ClCompile Include="..\..\source\Camera.cpp" />
+    <ClCompile Include="..\..\source\CapsuleCollider.cpp" />
+    <ClCompile Include="..\..\source\Collider.cpp" />
     <ClCompile Include="..\..\source\Color.cpp" />
     <ClCompile Include="..\..\source\Common.cpp" />
     <ClCompile Include="..\..\source\Component.cpp" />
     <ClCompile Include="..\..\source\Debug.cpp" />
     <ClCompile Include="..\..\source\GameLoop.cpp" />
     <ClCompile Include="..\..\source\GameObject.cpp" />
+    <ClCompile Include="..\..\source\Gizmos.cpp" />
     <ClCompile Include="..\..\source\GLEnvironment.cpp" />
     <ClCompile Include="..\..\source\Input.cpp" />
     <ClCompile Include="..\..\source\Light.cpp" />
     <ClCompile Include="..\..\source\Material.cpp" />
     <ClCompile Include="..\..\source\Matrix4x4.cpp" />
     <ClCompile Include="..\..\source\Mesh.cpp" />
+    <ClCompile Include="..\..\source\MeshCollider.cpp" />
     <ClCompile Include="..\..\source\MeshFilter.cpp" />
     <ClCompile Include="..\..\source\MeshRenderer.cpp" />
     <ClCompile Include="..\..\source\ModelImporter.cpp" />
     <ClCompile Include="..\..\source\Object.cpp" />
+    <ClCompile Include="..\..\source\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\source\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Ray.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />
     <ClCompile Include="..\..\source\RenderSystem.cpp" />
     <ClCompile Include="..\..\source\RenderTexture.cpp" />
+    <ClCompile Include="..\..\source\Rigidbody.cpp" />
     <ClCompile Include="..\..\source\Scene.cpp" />
     <ClCompile Include="..\..\source\Screen.cpp" />
     <ClCompile Include="..\..\source\Shader.cpp" />
+    <ClCompile Include="..\..\source\SkinnedMeshRenderer.cpp" />
+    <ClCompile Include="..\..\source\SphereCollider.cpp" />
     <ClCompile Include="..\..\source\Texture.cpp" />
     <ClCompile Include="..\..\source\Time.cpp" />
     <ClCompile Include="..\..\source\Transform.cpp" />

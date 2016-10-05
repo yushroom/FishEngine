@@ -173,6 +173,7 @@ public:
 
     //void BindUniformTexture(const char* name, const GLuint texture, const GLuint id, GLenum textureType = GL_TEXTURE_2D) const;
 
+    void BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray);
     void BindUniforms(const ShaderUniforms& uniforms);
     void BindTextures(const std::map<std::string, std::shared_ptr<Texture>>& textures);
     

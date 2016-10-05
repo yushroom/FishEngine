@@ -123,6 +123,11 @@ void Shader::FromString(const std::string& vs_string,
                         const std::string& gs_string,
                         const std::string& fs_string)
 {
+#if FISHENGINE_PLATFORM_WINDOWS
+    const std::string root_dir = "../../assets/shaders/";
+#else
+    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
+#endif
     assert(m_program == 0);
     assert(!vs_string.empty() && !fs_string.empty());
     //assert(tcs_string.empty() || (!tcs_string.empty() && !tes_string.empty()));
@@ -301,6 +306,22 @@ void Shader::Use() const {
 //    return glGetAttribLocation(m_program, name);
 //}
 
+void Shader::BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray)
+{
+    //auto loc = GetUniformLocation(name.c_str());
+    //glUniformMatrix4fv(loc, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
+    //glCheckError();
+    for (auto& u : m_uniforms) {
+        if (boost::starts_with(u.name, name)) {
+            glUniformMatrix4fv(u.location, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
+            glCheckError();
+            u.binded = true;
+            return;
+        }
+    }
+    Debug::LogWarning("Uniform %s not found!", name.c_str());
+}
+
 //void Shader::BindUniformFloat(const char* name, const float value) const {
 //    GLint loc = GetUniformLocation(name);
 //    glUniform1f(loc, value);
@@ -454,7 +475,7 @@ void Shader::Init() {
 #endif
     m_shaderVariables = "#version 410 core\n" + readFile(root_dir + "include/ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
-    for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline"}) {
+    for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline", "SkinnedMesh"}) {
         Debug::Log("Compile shader: %s", n);
         m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }

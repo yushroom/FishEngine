@@ -33,7 +33,7 @@ namespace FishEngine
         friend class FishEditor::EditorGUI;
         float m_mass = 2;
         float m_drag = 0;
-        float m_angularDrag = 0.05;
+        float m_angularDrag = 0.05f;
         bool m_useGravity = true;
         bool m_isKinematic = false;
         

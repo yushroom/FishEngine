@@ -38,6 +38,11 @@ namespace FishEngine {
         std::map<std::string, AnimationNode> channels;
     };
     
+    struct Avatar
+    {
+        std::map<std::string, int> m_boneToIndex;
+    };
+
     class Animator : public Component
     {
     public:
@@ -64,7 +69,17 @@ namespace FishEngine {
         }
         
         virtual void Update() override;
+
+        std::shared_ptr<Avatar>& avatar() {
+            return m_avatar;
+        }
+
+        void setAvatar(std::shared_ptr<Avatar> avatar) {
+            m_avatar = avatar;
+        }
         
+    private:
+        std::shared_ptr<Avatar> m_avatar;
         void RecursivelyUpdate(const std::shared_ptr<GameObject>& go);
     };
 }

@@ -52,8 +52,8 @@ namespace FishEngine {
         node->isBone = false;
         //model->m_bones.push_back(node);
         //node->index = model->m_bones.size();
-        int index = model->m_boneToIndex.size();
-        model->m_boneToIndex[node->name] = index;
+        int index = model->m_avatar->m_boneToIndex.size();
+        model->m_avatar->m_boneToIndex[node->name] = index;
         m_nodes[node->name] = node;
         
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
@@ -132,9 +132,11 @@ namespace FishEngine {
             mesh->m_boneWeights.resize(n_vertices);
             mesh->m_boneIndexBuffer.resize(n_vertices);
             mesh->m_boneWeightBuffer.resize(n_vertices);
+            Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
             for (uint32_t j = 0; j < assimp_mesh->mNumBones; ++j) {
                 auto& bone = assimp_mesh->mBones[j];
                 std::string boneName(bone->mName.C_Str());
+                Debug::Log("    bone name: %s", boneName.c_str());
                 auto it = m_nodes.find(boneName);
                 assert(it != m_nodes.end());
                 it->second->isBone = true;
@@ -147,7 +149,7 @@ namespace FishEngine {
                 }
             }
             
-            for (int i = 0; i < n_vertices; ++i) {
+            for (uint32_t i = 0; i < n_vertices; ++i) {
                 auto& b = mesh->m_boneWeights[i];
                 mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
                 mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
@@ -234,8 +236,8 @@ namespace FishEngine {
             auto& animation = model->m_animations.back();
             auto a = scene->mAnimations[animIndex];
             animation->name = a->mName.C_Str();
-            animation->duration = a->mDuration;
-            animation->ticksPerSecond = a->mTicksPerSecond;
+            animation->duration = (float)a->mDuration;
+            animation->ticksPerSecond = (float)a->mTicksPerSecond;
             //animation->channels.resize(a->mNumChannels);
 
             for (uint32_t i = 0; i < a->mNumChannels; ++i) {
@@ -243,8 +245,10 @@ namespace FishEngine {
                 std::string name = an->mNodeName.C_Str();
                 //auto& n = animation->channels[i];
                 auto pos = name.find("_$AssimpFbx$");
+                //Debug::Log("old name: %s", name.c_str());
                 if (pos != std::string::npos) {
                     name = name.substr(0, pos);
+                    //Debug::Log("new name: %s", name.c_str());
                 }
                 auto it = animation->channels.find(name);
                 if (it == animation->channels.end()) {
@@ -255,19 +259,19 @@ namespace FishEngine {
                 n.name = name;
                 if (an->mNumPositionKeys > 1) {
                     //n.positionKeys.resize(an->mNumPositionKeys);
-                    for (int j = 0; j < an->mNumPositionKeys; ++j) {
+                    for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
                         n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue) });
                     }
                 }
                 //n.rotationKeys.resize(an->mNumRotationKeys);
                 if (an->mNumRotationKeys > 1) {
-                    for (int j = 0; j < an->mNumRotationKeys; ++j) {
+                    for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
                         n.rotationKeys.emplace_back(QuaternionKey{ (float)an->mRotationKeys[j].mTime, ConvertQuaternion(an->mRotationKeys[j].mValue) });
                     }
                 }
                 //n.scalingKeys.resize(an->mNumScalingKeys);
                 if (an->mNumScalingKeys > 1) {
-                    for (int j = 0; j < an->mNumScalingKeys; ++j) {
+                    for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
                         n.scalingKeys.emplace_back(Vector3Key{ (float)an->mScalingKeys[j].mTime, ConvertVector3(an->mScalingKeys[j].mValue) });
                     }
                 }
@@ -278,11 +282,11 @@ namespace FishEngine {
         return model;
     }
 
-    std::shared_ptr<GameObject> Model::CreateGameObject() const
+    std::shared_ptr<GameObject> 
+    Model::CreateGameObject() const
     {
         auto root = ResursivelyCreateGameObject(m_rootNode);
         if (m_animations.size() > 0) {
-            //auto a = m_animations.front();
             auto animator = std::make_shared<Animator>();
             animator->m_animation = m_animations.front();
             root->AddComponent(animator);
@@ -290,7 +294,8 @@ namespace FishEngine {
         return root;
     }
 
-    std::shared_ptr<GameObject> Model::ResursivelyCreateGameObject(const ModelNode::PModelNode & node) const
+    std::shared_ptr<GameObject> 
+    Model::ResursivelyCreateGameObject(const ModelNode::PModelNode & node) const
     {
         auto go = Scene::CreateGameObject(node->name);
         go->transform()->setLocalToWorldMatrix(node->transform);
@@ -311,9 +316,13 @@ namespace FishEngine {
                 auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
                 child->AddComponent(meshRenderer);
                 child->AddComponent(meshFilter);
-                //child->transform()->setLocalToWorldMatrix();
             }
-            //abort();
+        } else if (node->isBone) {
+            auto material = Material::defaultMaterial();
+            auto meshRenderer = std::make_shared<MeshRenderer>(material);
+            auto meshFilter = std::make_shared<MeshFilter>(Model::builtinModel(BuiltinModelTyep::Cube)->m_meshes.front());
+            go->AddComponent(meshRenderer);
+            go->AddComponent(meshFilter);
         }
         
         for (auto& c : node->children) {

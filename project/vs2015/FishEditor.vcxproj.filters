@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\FishEditor\EditorTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\FishEditor\SceneView.hpp">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\FishEditor\FishEditor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\FishEditor\EditorTime.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

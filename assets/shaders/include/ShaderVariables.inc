@@ -5,6 +5,8 @@
 #define NormalIndex 1
 #define UVIndex 2
 #define TangentIndex 3
+#define BoneIndexIndex 4
+#define BoneWeightIndex 5
 
 #define PI 3.141592653589793f
 #define INV_PI 0.3183098861837907f

@@ -13,6 +13,7 @@ namespace FishEngine
                        const float raduis);
         
         virtual void OnDrawGizmos() override;
+        virtual void CreatePhysicsShape() override;
         
     private:
         friend class FishEditor::EditorGUI;

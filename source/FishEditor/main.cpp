@@ -667,47 +667,50 @@ public:
         go->AddScript(make_shared<Rotator>());
     }
 };
-            
+
+std::shared_ptr<GameObject> CreateCube()
+{
+    auto model = Model::builtinModel(BuiltinModelTyep::Cube);
+    auto go = model->CreateGameObject();
+    auto collider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
+    go->AddComponent(collider);
+    auto rigidBody = make_shared<Rigidbody>();
+    go->AddComponent(rigidBody);
+    collider->physicsShape();
+    return go;
+}
             
 class TestPhysics : public App
 {
 public:
     virtual void Init() override
     {
-        auto planeModel = Model::builtinModel(BuiltinModelTyep::Plane);
-        auto planeGO = planeModel->CreateGameObject();
-        
-        auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(10, 0.01f, 10));
-        planeGO->AddComponent(boxCollider);
-        //auto rigidBody = make_shared<Rigidbody>();
-        //rigidBody->Start();
-        //rigidBody->setUseGravity(false);
-        //planeGO->AddComponent(rigidBody);
-        //rigidBody->Start();
-        //boxCollider->Start();
-        boxCollider->Start();
+        auto model = Model::builtinModel(BuiltinModelTyep::Cube);
+        auto go = model->CreateGameObject();
+        //go->transform()->setLocalEulerAngles(0, 0, 10);
+        go->transform()->setPosition(0, -1.0f-0.1f*0.5f, 0);
+        go->transform()->setLocalScale(10, 0.1f, 10);
+        auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
+        go->AddComponent(boxCollider);
+        boxCollider->physicsShape();
         
         auto sphereModel = Model::builtinModel(BuiltinModelTyep::Sphere);
-        //auto sphereModel = Model::builtinModel(BuiltinModelTyep::Cube);
         auto sphereGO = sphereModel->CreateGameObject();
-        sphereGO->transform()->setPosition(0, 5, 0);
-        
-        //boxCollider = make_shared<Sphere>(Vector3::zero, Vector3::one);
+        sphereGO->transform()->setPosition(0, 0, 0);
         auto sphereCollider = make_shared<SphereCollider>(Vector3::zero, 0.5f);
         sphereGO->AddComponent(sphereCollider);
-        //boxCollider->Start();
         auto rigidBody = make_shared<Rigidbody>();
-        //rigidBody->Start();
         sphereGO->AddComponent(rigidBody);
-        rigidBody->Start();
-        //sphereGO->AddComponent(make_shared<Rigidbody>());
+        sphereCollider->physicsShape();
+        
+        //auto cubeGO = CreateCube();
         
         auto cameraGO = Scene::mainCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 2, -10);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
-        cameraGO->AddComponent(make_shared<TestGizmos>());
+        //cameraGO->AddComponent(make_shared<TestGizmos>());
         
-        auto go = Scene::CreateGameObject("Directional Light");
+        go = Scene::CreateGameObject("Directional Light");
         go->transform()->setPosition(6, 5, -10);
         go->transform()->LookAt(0, 0, 0);
         go->AddComponent(Light::Create());

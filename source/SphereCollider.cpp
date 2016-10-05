@@ -1,20 +1,34 @@
 #include "SphereCollider.hpp"
 #include "Transform.hpp"
 #include "Gizmos.hpp"
+#define NDEBUG
+#include "PxPhysicsAPI.h"
+
+using namespace physx;
+extern physx::PxPhysics*    gPhysics;
+extern physx::PxScene*      gScene;
+extern physx::PxMaterial*   gMaterial;
 
 FishEngine::SphereCollider::
 SphereCollider(const Vector3& center,
                const float radius)
 : m_center(center), m_radius(radius)
 {
-    //m_physxShape = gPhysics->createShape(PxBoxGeometry(size.x*0.5f, size.y*0.5f, size.z*0.5f), *gMaterial);
 }
 
+
+void FishEngine::SphereCollider::
+CreatePhysicsShape()
+{
+    if (m_physxShape == nullptr) {
+        m_physxShape = gPhysics->createShape(PxSphereGeometry(m_radius), *gMaterial);
+        m_physxShape->setLocalPose(PxTransform(m_center.x, m_center.y, m_center.z));
+    }
+}
 
 
 void FishEngine::SphereCollider::
 OnDrawGizmos()
 {
-    //Gizmos::DrawWireCube(transform()->position()+m_center, m_size);
-    Gizmos::DrawWireSphere(transform()->position(), m_radius);
+    Gizmos::DrawWireSphere(m_center, m_radius, transform()->localToWorldMatrix());
 }

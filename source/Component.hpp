@@ -28,6 +28,7 @@ public:
     // The Transform attached to this GameObject (null if there is none attached).
     std::shared_ptr<Transform> transform() const;
     
+    //virtual void Init() {}
     virtual void Update() {}
     
 //protected:

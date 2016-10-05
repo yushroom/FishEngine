@@ -4,6 +4,7 @@
 #include "FishEngine.hpp"
 #include "Color.hpp"
 #include "Vector3.hpp"
+#include "Matrix4x4.hpp"
 #include "GLEnvironment.hpp"
 
 namespace FishEngine
@@ -46,16 +47,19 @@ namespace FishEngine
         
         static void
         DrawWireCube(const Vector3& center,
-                     const Vector3& size);
+                     const Vector3& size,
+                     const Matrix4x4& modelMatrix = Matrix4x4::identity);
         
         static void
         DrawWireSphere(const Vector3& center,
-                       const float radius);
+                       const float radius,
+                       const Matrix4x4& modelMatrix = Matrix4x4::identity);
         
         static void
         DrawWireCapsule(const Vector3& center,
                         const float radius,
-                        const float height);
+                        const float height,
+                        const Matrix4x4& modelMatrix = Matrix4x4::identity);
         
     private:
         friend FishEditor::EditorRenderSystem;

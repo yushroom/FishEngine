@@ -12,6 +12,7 @@ namespace FishEngine
         BoxCollider(const Vector3& center,
                     const Vector3& size);
         
+        virtual void CreatePhysicsShape() override;
         virtual void OnDrawGizmos() override;
         
     private:

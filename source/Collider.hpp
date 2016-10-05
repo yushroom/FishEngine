@@ -19,8 +19,8 @@ namespace FishEngine
         Vector3 ClosestPointOnBounds(const Vector3& position);
         //bool Raycast(const Ray& ray, RaycastHit* out_hitInfo, const float maxDistance);
         
-        //virtual void OnDrawGizmos();
-        void Start();
+        physx::PxShape* physicsShape();
+        virtual void CreatePhysicsShape() = 0;
         
     protected:
         std::shared_ptr<Rigidbody> m_attachedRigidbody;
@@ -29,7 +29,7 @@ namespace FishEngine
         bool    m_enabled;
         bool    m_isTrigger;
         
-        physx::PxShape* m_physxShape;
+        physx::PxShape* m_physxShape = nullptr;
         //physx::PxRigidDynamic* m_physxRigidDynamic;
     };
 }

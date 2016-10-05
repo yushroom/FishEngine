@@ -72,7 +72,7 @@ void FishEngine::PhysicsSystem::
 FixedUpdate()
 {
     gScene->simulate(1.0f/30.f);
-    gScene->fetchResults();
+    gScene->fetchResults(true);
 }
 
 void FishEngine::PhysicsSystem::

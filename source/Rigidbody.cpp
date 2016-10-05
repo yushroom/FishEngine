@@ -1,4 +1,5 @@
 #include "Rigidbody.hpp"
+#include "GameObject.hpp"
 #include "PhysicsSystem.hpp"
 #include "Gizmos.hpp"
 #include "Transform.hpp"
@@ -8,15 +9,8 @@
 using namespace FishEngine;
 using namespace physx;
 
-extern physx::PxDefaultAllocator		gAllocator;
-extern physx::PxDefaultErrorCallback	gErrorCallback;
-
-extern physx::PxFoundation*			gFoundation;
 extern physx::PxPhysics*				gPhysics;
-
-extern physx::PxDefaultCpuDispatcher*	gDispatcher;
 extern physx::PxScene*				gScene;
-
 extern physx::PxMaterial*				gMaterial;
 
 static physx::PxVec3 PxVec3(const FishEngine::Vector3& v)
@@ -25,15 +19,14 @@ static physx::PxVec3 PxVec3(const FishEngine::Vector3& v)
 }
 
 void FishEngine::Rigidbody::
-Start()
+Start(PxShape* shape)
 {
-    //auto m_physxShape = gPhysics->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *gMaterial);
-    auto m_physxShape = gPhysics->createShape(PxSphereGeometry(0.5f), *gMaterial);
     const auto& t = transform();
     const Vector3 p = t->position();
-    PxTransform localTm(p.x, p.y, p.z);
+    const auto& q = t->rotation();
+    PxTransform localTm(p.x, p.y, p.z, PxQuat(q.x, q.y, q.z, q.w));
     m_physxRigidDynamic = gPhysics->createRigidDynamic(localTm);
-    m_physxRigidDynamic->attachShape(*m_physxShape);
+    m_physxRigidDynamic->attachShape(*shape);
     //m_physxRigidDynamic->userData = (void*)(t.get());
     PxRigidBodyExt::updateMassAndInertia(*m_physxRigidDynamic, 10.0f);
     m_physxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !m_useGravity);
@@ -47,5 +40,6 @@ Update()
     //m_physxRigidDynamic->user
     const auto& t = m_physxRigidDynamic->getGlobalPose();
     //const auto& pt = t.actor2World;
-    transform()->setLocalPosition(t.p.x, t.p.y, t.p.z);
+    transform()->setPosition(t.p.x, t.p.y, t.p.z);
+    transform()->setLocalRotation(Quaternion(t.q.x, t.q.y, t.q.z, t.q.w));
 }

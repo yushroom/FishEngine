@@ -18,7 +18,7 @@ namespace FishEngine
         InjectClassName(Rigidbody);
         Rigidbody() = default;
         
-        void Start();
+        void Start(physx::PxShape* shape);
         virtual void Update() override;
       
         void setUseGravity(bool value) {

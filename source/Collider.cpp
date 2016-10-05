@@ -1,33 +1,45 @@
 #include "Collider.hpp"
+#include "Transform.hpp"
 #include "GameObject.hpp"
 #include "Rigidbody.hpp"
-//#include "<#header#>"
+
 #define NDEBUG
 #include "PxPhysicsAPI.h"
-
 using namespace physx;
-
-extern physx::PxDefaultAllocator		gAllocator;
-extern physx::PxDefaultErrorCallback	gErrorCallback;
-
-extern physx::PxFoundation*			gFoundation;
-extern physx::PxPhysics*				gPhysics;
-
-extern physx::PxDefaultCpuDispatcher*	gDispatcher;
-extern physx::PxScene*				gScene;
-
-extern physx::PxMaterial*				gMaterial;
+extern physx::PxPhysics*    gPhysics;
+extern physx::PxScene*      gScene;
+extern physx::PxMaterial*   gMaterial;
 
 using namespace FishEngine;
 
-void FishEngine::Collider::
-Start()
+physx::PxShape* FishEngine::Collider::
+physicsShape()
 {
-    auto rigidbody = gameObject()->GetComponent<Rigidbody>();
-    if (rigidbody != nullptr) {
-        //return;
-        
+    if (m_physxShape == nullptr) {
+        //m_physxShape = gPhysics->createShape(PxSphereGeometry(m_radius), *gMaterial);
+        CreatePhysicsShape();
+        auto rigidbody = gameObject()->GetComponent<Rigidbody>();
+        if (rigidbody == nullptr) {
+            //PxRigidStatic* rigidStatic = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+            const auto& t = transform();
+            auto p = t->position();
+            auto q = t->rotation();
+            auto rigidStatic = PxCreateStatic(*gPhysics, PxTransform(p.x, p.y, p.z, PxQuat(q.x, q.y, q.z, q.w)), *m_physxShape);
+            gScene->addActor(*rigidStatic);
+        } else {
+            rigidbody->Start(m_physxShape);
+        }
     }
-    PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-    gScene->addActor(*groundPlane);
+    return m_physxShape;
 }
+
+//void FishEngine::Collider::
+//Start()
+//{
+//    auto rigidbody = gameObject()->GetComponent<Rigidbody>();
+//    if (rigidbody != nullptr) {
+//        return;
+//    }
+//    PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+//    gScene->addActor(*groundPlane);
+//}

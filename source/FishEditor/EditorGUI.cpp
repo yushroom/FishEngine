@@ -722,6 +722,14 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::BoxCollider>& b
     ImGui::InputFloat3("Size", boxCollider->m_size.data());
 }
 
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SphereCollider>& sphereCollider)
+{
+    ImGui::Checkbox("Is Trigger", &sphereCollider->m_isTrigger);
+    ImGui::InputFloat3("Center", sphereCollider->m_center.data());
+    ImGui::InputFloat3("Radius", &sphereCollider->m_radius);
+}
+
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider>& capsuleCollider)
@@ -730,7 +738,11 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider
     ImGui::InputFloat3("Center", capsuleCollider->m_center.data());
     ImGui::InputFloat("Radius", &capsuleCollider->m_radius);
     ImGui::InputFloat("Height", &capsuleCollider->m_height);
-    ImGui::InputFloat3("Direction", capsuleCollider->m_direction.data());
+    //ImGui::InputFloat3("Direction", capsuleCollider->m_direction);
+    const char* listbox_items[] = {
+        "X-Axis", "Y-Axis", "Z-Axis"
+    };
+    ImGui::Combo("Direction", &capsuleCollider->m_direction, listbox_items, 3);
 }
 
 template<>
@@ -746,6 +758,7 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& com
     Case(MeshFilter)
     Case(MeshRenderer)
     Case(BoxCollider)
+    Case(SphereCollider)
     Case(CapsuleCollider)
     Case(Rigidbody)
 #undef Case

@@ -80,7 +80,9 @@ void Gizmos::DrawIcon(Vector3 center,
     
 }
 
-void Gizmos::DrawWireSphere(const Vector3& center, float radius)
+void Gizmos::DrawWireSphere(const Vector3& center,
+                            float radius,
+                            const Matrix4x4& modelMatrix)
 {
     const auto& shader = Shader::builtinShader("SolidColor");
     shader->Use();
@@ -100,7 +102,7 @@ void Gizmos::DrawWireSphere(const Vector3& center, float radius)
     for (int i = 0; i < 3; ++i) {
         float* e = euler_angles + i*3;
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
-        uniforms.mat4s["MATRIX_MVP"] = p * v * m;
+        uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
         shader->BindUniforms(uniforms);
         s_circleMesh->Render();
     }
@@ -108,7 +110,8 @@ void Gizmos::DrawWireSphere(const Vector3& center, float radius)
 
 void Gizmos::
 DrawWireCube(const Vector3& center,
-             const Vector3& size)
+             const Vector3& size,
+             const Matrix4x4& modelMatrix)
 {
     const auto& shader = Shader::builtinShader("SolidColor");
     shader->Use();
@@ -118,7 +121,7 @@ DrawWireCube(const Vector3& center,
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
     uniforms.vec4s["Color"] = s_color;
-    uniforms.mat4s["MATRIX_MVP"] = p * v * m;
+    uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
     shader->BindUniforms(uniforms);
     s_boxMesh->Render();
 }
@@ -126,7 +129,8 @@ DrawWireCube(const Vector3& center,
 void Gizmos::
 DrawWireCapsule(const Vector3& center,
                 const float radius,
-                const float height)
+                const float height,
+                const Matrix4x4& modelMatrix)
 {
     Vector3 c1 = center+Vector3(0, height*0.5f-radius, 0);
     Vector3 c2 = center-Vector3(0, height*0.5f-radius, 0);

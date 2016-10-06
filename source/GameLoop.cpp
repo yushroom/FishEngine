@@ -130,7 +130,7 @@ void GameLoop::MouseScrollCallback(GLFWwindow* window, double xoffset, double yo
     //        return;
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
     //auto& t = m_mainCamera->gameObject->transform;
-    auto t = Scene::mainCamera()->transform();
+    auto t = Camera::main()->transform();
     t->setLocalPosition(t->position() + 0.2f*float(yoffset)*t->forward());
     
 }

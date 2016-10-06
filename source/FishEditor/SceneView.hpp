@@ -4,22 +4,27 @@
 #include "FishEditor.hpp"
 #include "Camera.hpp"
 
-NAMESPACE_FISHEDITOR_BEGIN
-
-class SceneView
+namespace FishEditor
 {
-public:
-    SceneView() = delete;
+    class SceneView
+    {
+    public:
+        SceneView() = delete;
+        
+        static void Init();
+        static void Update();
 
-    static FishEngine::Camera& camera() {
-        return m_camera;
-    }
-    
-
-private:
-    static FishEngine::Camera m_camera;
-};
-
-NAMESPACE_FISHEDITOR_END
+        static std::shared_ptr<FishEngine::Camera> camera()
+        {
+            return m_camera;
+        }
+        
+    private:
+        friend class FishEditorWindow;
+        friend class EditorRenderSystem;
+        static std::shared_ptr<FishEngine::Camera> m_camera;
+        static std::shared_ptr<FishEngine::GameObject> m_cameraGameObject;
+    };
+}
 
 #endif //SceneView_hpp

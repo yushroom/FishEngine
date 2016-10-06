@@ -68,13 +68,24 @@ public:
                 return std::static_pointer_cast<T>(comp);
             }
         }
-        //for (auto& s : m_scripts) {
-        //    if (s->ClassName() == T::StaticClassName()) {
-        //        return std::static_pointer_cast<T>(s);
-        //    }
-        //}
+//        for (auto& s : m_scripts) {
+//            if (s->ClassName() == T::StaticClassName()) {
+//                return std::static_pointer_cast<T>(s);
+//            }
+//        }
         return nullptr;
     }
+    
+    template<typename T>
+    std::shared_ptr<T> GetScript() const {
+        for (auto& s : m_scripts) {
+            if (s->ClassName() == T::StaticClassName()) {
+                return std::static_pointer_cast<T>(s);
+            }
+        }
+        return nullptr;
+    }
+
 
     // Adds a component class named className to the game object.
     void AddComponent(std::shared_ptr<Component> component) {

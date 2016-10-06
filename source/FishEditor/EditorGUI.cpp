@@ -25,6 +25,7 @@
 #include <SphereCollider.hpp>
 #include <CapsuleCollider.hpp>
 #include <Rigidbody.hpp>
+#include "FishEditorWindow.hpp"
 
 #include <imgui/imgui_dock.h>
 
@@ -35,16 +36,13 @@ NAMESPACE_FISHEDITOR_BEGIN
 constexpr float translate_gizmo_length = 0.1f;
 
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
-int EditorGUI::m_idCount = 0;
-
-bool EditorGUI::s_locked = false;
-int EditorGUI::m_selectedAxis = -1;
+int     EditorGUI::m_idCount = 0;
+bool    EditorGUI::s_locked = false;
+int     EditorGUI::m_selectedAxis = -1;
+bool    EditorGUI::s_isAnyItemClicked = false;
+bool    EditorGUI::m_showAssectSelectionDialogBox = false;
 
 std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
-
-bool EditorGUI::s_isAnyItemClicked = false;
-bool EditorGUI::m_showAssectSelectionDialogBox = false;
-
 Material::PMaterial sceneGizmoMaterial = nullptr;
 Mesh::PMesh cubeMesh = nullptr;
 Mesh::PMesh coneMesh = nullptr;
@@ -103,6 +101,7 @@ void EditorGUI::Update()
     //ImGui::EndDock();
     
     DrawMainMenu();
+    //DrawToolBar();
     DrawHierarchyWindow();
     DrawInspectorWindow();
     
@@ -389,6 +388,15 @@ void FishEditor::EditorGUI::DrawMainMenu()
         if (ImGui::BeginMenu("Edit")) {
             ImGui::EndMenu();
         }
+        if (FishEditorWindow::InPlayMode()) {
+            if (ImGui::Button("Stop")) {
+                FishEditorWindow::Stop();
+            }
+        } else {
+            if (ImGui::Button("Play")) {
+                FishEditorWindow::Play();
+            }
+        }
 
         float new_time = (float)glfwGetTime();
         int fps = (int)roundf(1.f / float(new_time - time_stamp));
@@ -402,6 +410,13 @@ void FishEditor::EditorGUI::DrawMainMenu()
         ImGui::EndMainMenuBar();
     }
 
+}
+
+void FishEditor::EditorGUI::DrawToolBar()
+{
+    ImGui::Begin("ToolBar");
+    ImGui::Button("Play");
+    ImGui::End();
 }
 
 void FishEditor::EditorGUI::DrawTranslateGizmo()

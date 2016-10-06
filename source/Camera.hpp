@@ -19,8 +19,23 @@ class Camera : public Behaviour
 public:
     InjectClassName(Camera)
 
-    Camera(float fov, float aspect, float zNear, float zFar);
+    static std::shared_ptr<Camera>
+    Create(float fov,
+           float aspect,
+           float nearClipPlane,
+           float farClipPlane,
+           CameraType type = CameraType::Game)
+    {
+        auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
+        camera->m_cameraType = type;
+        m_allCameras.push_back(camera);
+        return camera;
+    }
+ 
+//private:
+    Camera(float fov, float aspect, float nearClipPlane, float farClipPlane);
 
+//public:
     // The aspect ratio (width divided by height).
     float aspect() const {
         return m_aspect;
@@ -66,10 +81,13 @@ public:
     // TODO
     // The first enabled camera tagged "MainCamera" (Read Only).
     static std::shared_ptr<Camera> main();
+    
+    static std::shared_ptr<Camera> mainGameCamera();
 
 private:
     friend class RenderSystem;
     friend class FishEditor::EditorGUI;
+    friend class FishEditor::FishEditorWindow;
     
     float m_fieldOfView;
     float m_orthographicSize = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
@@ -82,13 +100,15 @@ private:
     CameraType  m_cameraType        = CameraType::Game;
     bool        m_orthographic      = false;
 
-
     mutable Matrix4x4 m_projectMatrix;
 
     // temp
-    // file:///D:/Program%20Files/Unity/Editor/Data/Documentation/en/Manual/SceneViewNavigation.html
+    // https://docs.unity3d.com/Manual/SceneViewNavigation.html
     mutable Vector3 m_focusPoint{0, 0, 0};
     void FrameSelected(std::shared_ptr<GameObject>& selected);
+    
+    static std::shared_ptr<Camera> m_mainCamera;
+    static std::vector<std::shared_ptr<Camera>> m_allCameras;
 };
 
 NAMESPACE_FISHENGINE_END

@@ -35,6 +35,7 @@ public:
 private:
     friend class GameObject;
     friend class Scene;
+    friend class FishEditor::SceneView;
     std::weak_ptr<GameObject> m_gameObject;
 };
 

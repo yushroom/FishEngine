@@ -286,6 +286,22 @@ public:
     }
 };
 
+void DefaultScene()
+{
+    auto camera = Camera::Create(60.0f, Screen::aspect(), 0.3f, 1000.f);
+    auto camera_go = Scene::CreateGameObject("Main Camera");
+    camera_go->AddComponent(camera);
+    camera_go->transform()->setLocalPosition(0, 0, 5);
+    camera_go->transform()->LookAt(0, 0, 0);
+    camera_go->SetTag("MainCamera");
+    
+    auto light_go = Scene::CreateGameObject("Directional Light");
+    light_go->transform()->setPosition(0, 3, 0);
+    light_go->transform()->setLocalEulerAngles(50, -30, 0);
+    light_go->AddComponent(Light::Create());
+    light_go->AddScript(make_shared<Rotator>());
+}
+            
 //class TestPBR : public App
 //{
 //public:
@@ -459,6 +475,9 @@ public:
     }
     
     virtual void Init() override {
+        
+        DefaultScene();
+        
         glCheckError();
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "../../assets/";
@@ -646,7 +665,7 @@ public:
         
         // Camera
         
-        auto cameraGO = Scene::mainCamera()->gameObject();
+        auto cameraGO = Camera::mainGameCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
         //cameraGO->transform()->LookAt(0, 0, 0);
@@ -663,14 +682,6 @@ public:
         //cameraGO->GetComponent<EditorRenderSettings>()->m_useGammaCorrection = false;
 
         Selection::setActiveGameObject(cameraGO);
-        
-        go = Scene::CreateGameObject("Directional Light");
-        go->transform()->setPosition(6, 5, -10);
-        go->transform()->LookAt(0, 0, 0);
-        //go->transform()->setPosition(6, 5, -10);
-        //go->transform()->LookAt(0, 0, 0);
-        go->AddComponent(Light::Create());
-        go->AddScript(make_shared<Rotator>());
     }
 };
 
@@ -691,6 +702,8 @@ class TestPhysics : public App
 public:
     virtual void Init() override
     {
+        DefaultScene();
+        
         auto model = Model::builtinModel(BuiltinModelTyep::Cube);
         auto go = model->CreateGameObject();
         //go->transform()->setLocalEulerAngles(0, 0, 10);
@@ -711,16 +724,10 @@ public:
         
         //auto cubeGO = CreateCube();
         
-        auto cameraGO = Scene::mainCamera()->gameObject();
+        auto cameraGO = Camera::mainGameCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 2, -10);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
         //cameraGO->AddComponent(make_shared<TestGizmos>());
-        
-        go = Scene::CreateGameObject("Directional Light");
-        go->transform()->setPosition(6, 5, -10);
-        go->transform()->LookAt(0, 0, 0);
-        go->AddComponent(Light::Create());
-        go->AddScript(make_shared<Rotator>());
     }
 };
 

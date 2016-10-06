@@ -44,6 +44,7 @@
 		BFDC75331D8EE3D00082A6DC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75321D8EE3D00082A6DC /* IOKit.framework */; };
 		BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */; };
 		BFDC75381D8EE4110082A6DC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75371D8EE4110082A6DC /* libz.tbd */; };
+		BFF192E31DA558BA008634D8 /* SceneView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFF192E21DA558BA008634D8 /* SceneView.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +121,7 @@
 		BFDC75321D8EE3D00082A6DC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		BFDC75371D8EE4110082A6DC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		BFF192E21DA558BA008634D8 /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneView.cpp; path = ../../source/FishEditor/SceneView.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +202,7 @@
 				BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */,
 				BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */,
 				BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */,
+				BFF192E21DA558BA008634D8 /* SceneView.cpp */,
 				BFDC75131D8EE0330082A6DC /* SceneView.hpp */,
 				BFDC75141D8EE0330082A6DC /* Selection.cpp */,
 				BFDC75151D8EE0330082A6DC /* Selection.hpp */,
@@ -348,6 +351,7 @@
 				BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */,
 				BF3211FF1D8EFB1E00FA80E6 /* Editor.cpp in Sources */,
 				BFDC75231D8EE0D60082A6DC /* imgui.cpp in Sources */,
+				BFF192E31DA558BA008634D8 /* SceneView.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +398,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../../external;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -435,6 +440,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../../external;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -450,6 +456,7 @@
 					../../external/,
 					../../external/glew,
 					../../external/boost_1_61_0,
+					../../external/PhysXSDK/Include,
 				);
 				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -465,6 +472,7 @@
 					../../external/,
 					../../external/glew,
 					../../external/boost_1_61_0,
+					../../external/PhysXSDK/Include,
 				);
 				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";

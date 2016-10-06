@@ -15,14 +15,14 @@ FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(
 NAMESPACE_FISHENGINE_BEGIN
 
 void RecursivelyGetTransformation(
-    std::shared_ptr<Transform>&     transform, 
+    const std::shared_ptr<Transform>&     transform,
     std::vector<Matrix4x4>&         transformation, 
     std::map<std::string, int>&     nameToIndex)
 {
     const auto& name = transform->name();
-    auto& it = nameToIndex.find(name);
+    const auto& it = nameToIndex.find(name);
     if (it != nameToIndex.end()) {
-        transformation[nameToIndex[name]] = transform->localToWorldMatrix();
+        transformation[it->second] = transform->localToWorldMatrix();
     }
     for (auto& child : transform->children()) {
         RecursivelyGetTransformation(child.lock(), transformation, nameToIndex);

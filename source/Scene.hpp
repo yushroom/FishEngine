@@ -9,10 +9,9 @@ NAMESPACE_FISHENGINE_BEGIN
 class Scene
 {
 public:
-    static std::shared_ptr<Camera> mainCamera() {
-        return m_mainCamera;
-    }
     
+    Scene() = delete;
+
     static std::shared_ptr<GameObject> CreateGameObject(const std::string& name);
     
     static void Init();
@@ -25,10 +24,6 @@ public:
     
     //typedef std::weak_ptr<GameObject> WPGameObject;
     typedef GameObject* WPGameObject;
-
-    //static void SelectGameObject(WPGameObject gameObject) {
-    //    m_activeGameObject = gameObject;
-    //}
     
     static GameObject::PGameObject Find(const std::string& name);
     
@@ -48,14 +43,10 @@ private:
     friend class RenderSystem;
     friend class FishEditor::EditorGUI;
     friend class FishEditor::EditorRenderSystem;
-    static std::shared_ptr<Camera> m_mainCamera;
     static std::list<std::shared_ptr<GameObject>> m_gameObjects;
     static std::vector<std::shared_ptr<GameObject>> m_gameObjectsToBeDestroyed;
     static std::vector<std::shared_ptr<Component>> m_componentsToBeDestroyed;
     static std::vector<std::shared_ptr<Script>> m_scriptsToBeDestroyed;
-    
-    // the selected GameObject in the editor
-    //static WPGameObject m_activeGameObject;
 };
 
 NAMESPACE_FISHENGINE_END

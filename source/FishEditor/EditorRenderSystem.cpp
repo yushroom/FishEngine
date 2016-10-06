@@ -21,6 +21,7 @@
 #include "Selection.hpp"
 #include <ModelImporter.hpp>
 #include <Gizmos.hpp>
+#include "SceneView.hpp"
 
 using namespace FishEngine;
 
@@ -77,7 +78,7 @@ void EditorRenderSystem::Render()
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    auto v = Scene::mainCamera()->viewport();
+    auto v = Camera::main()->viewport();
     const int w = Screen::width();
     const int h = Screen::height();
     glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
@@ -85,7 +86,7 @@ void EditorRenderSystem::Render()
     // Selection
 
     if (m_highlightSelections) {
-        auto camera = Scene::mainCamera();
+        auto camera = Camera::main();
         auto view = camera->worldToCameraMatrix();
         auto proj = camera->projectionMatrix();
         auto vp = proj * view;
@@ -207,7 +208,9 @@ void EditorRenderSystem::SaveScreenShot(const std::string& path)
 
 void EditorRenderSystem::OnWindowSizeChanged(const int width, const int height) {
     //glViewport(0, 0, m_width, m_height);
-    Scene::mainCamera()->setAspect(float(width)/height);
+    //Scene::mainCamera()->setAspect(float(width)/height);
+    SceneView::m_camera->setAspect(float(width)/height);
+    Camera::main()->setAspect(float(width)/height);
 }
 
 

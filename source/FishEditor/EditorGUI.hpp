@@ -56,6 +56,7 @@ private:
     static void DrawToolbar();
     static void DrawProjectWindwo();
     static void DrawMainMenu();
+    static void DrawToolBar();
     
     static bool s_locked;       // temp
 

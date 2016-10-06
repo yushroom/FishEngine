@@ -6,6 +6,9 @@
 
 NAMESPACE_FISHENGINE_BEGIN
 
+std::shared_ptr<Camera> Camera::m_mainCamera = nullptr;
+std::vector<std::shared_ptr<Camera>> Camera::m_allCameras;
+
 Camera::Camera(float fov, float aspect, float zNear, float zFar) 
     : m_fieldOfView(fov), m_aspect(aspect), m_nearClipPlane(zNear), m_farClipPlane(zFar)
 {
@@ -85,7 +88,32 @@ Matrix4x4 Camera::worldToCameraMatrix() const
 
 std::shared_ptr<Camera> Camera::main()
 {
-    return Scene::mainCamera();
+    if (m_mainCamera == nullptr)
+    {
+        for (auto& c : m_allCameras)
+        {
+            if (c->tag() == "MainCamera")
+            {
+                m_mainCamera = c;
+                return m_mainCamera;
+            }
+        }
+    }
+    return m_mainCamera;
+}
+
+
+std::shared_ptr<Camera> Camera::
+mainGameCamera()
+{
+    for (auto& c : m_allCameras)
+    {
+        if (c->tag() == "MainCamera" && c->m_cameraType == CameraType::Game)
+        {
+            return c;
+        }
+    }
+    return nullptr;
 }
 
 

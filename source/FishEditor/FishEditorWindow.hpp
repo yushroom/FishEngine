@@ -25,6 +25,12 @@ public:
     static GLFWwindow* window() {
         return m_window;
     }
+    
+    static void Play();
+    static void Stop();
+    static bool InPlayMode() {
+        return m_inPlayMode;
+    }
   
 private:
     
@@ -37,6 +43,7 @@ private:
     static std::vector<std::shared_ptr<FishEngine::App>> m_apps;
     
     static float m_fixedFrameRate;
+    static bool m_inPlayMode;
     
     // glfw callback
     static void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode);

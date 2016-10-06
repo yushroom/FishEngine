@@ -13,6 +13,7 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include "App.hpp"
 #include <PhysicsSystem.hpp>
+#include "SceneView.hpp"
 
 #include "EditorRenderSystem.hpp"
 #include "EditorGUI.hpp"
@@ -30,6 +31,7 @@ int FishEditorWindow::m_windowHeight = HEIGHT;
 GLFWwindow* FishEditorWindow::m_window = nullptr;
 std::vector<std::shared_ptr<App>> FishEditorWindow::m_apps;
 float FishEditorWindow::m_fixedFrameRate = 30;
+bool FishEditorWindow::m_inPlayMode = false;
 
 static void GlfwErrorCallback(int error, const char* description)
 {
@@ -73,6 +75,8 @@ void FishEditorWindow::Init()
     Screen::m_width = w;
     Screen::m_height = h;
     
+    SceneView::Init();
+    Camera::m_mainCamera = SceneView::m_camera;
     EditorRenderSystem::Init();
     
     PhysicsSystem::Init();
@@ -102,11 +106,13 @@ void FishEditorWindow::Run()
         glfwGetCursorPos(m_window, &xpos, &ypos);
         Input::UpdateMousePosition(float(xpos)/m_windowWidth, 1.0f-float(ypos)/m_windowHeight);
         
-        Scene::Update();
+        SceneView::Update();
+        if (m_inPlayMode) {
+            Scene::Update();
+            PhysicsSystem::FixedUpdate();
+        }
         
         EditorRenderSystem::Render();
-        
-        PhysicsSystem::FixedUpdate();
         
         float new_t = (float)glfwGetTime();
         float interval = new_t - EditorTime::m_time;
@@ -120,6 +126,18 @@ void FishEditorWindow::Run()
         EditorTime::m_time = old_time;
     }
 }
+
+void FishEditorWindow::Play() {
+    m_inPlayMode = true;
+    Camera::m_mainCamera = nullptr;
+    //Camera::m_mainCamera = Scene::mainCamera();
+}
+
+void FishEditorWindow::Stop() {
+    m_inPlayMode = false;
+    Camera::m_mainCamera = SceneView::m_camera;
+}
+
 
 void FishEditorWindow::Clean()
 {

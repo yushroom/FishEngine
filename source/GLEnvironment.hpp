@@ -9,11 +9,11 @@
 // GLFW
 #include <glfw/glfw3.h>
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #define glCheckError() _checkOpenGLError(__FILE__,__LINE__)
-#else
-#define glCheckError()
-#endif
+//#else
+//#define glCheckError()
+//#endif
 
 void _checkOpenGLError(const char *file, int line);
 

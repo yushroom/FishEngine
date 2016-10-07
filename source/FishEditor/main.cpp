@@ -31,6 +31,7 @@ using namespace FishEditor;
 #include <BoxCollider.hpp>
 #include <SphereCollider.hpp>
 #include <Rigidbody.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -218,12 +219,13 @@ public:
     
     bool draw = true;
     
-    void DrawNode(std::shared_ptr<Transform>& node) {
-        if (node->gameObject()->GetComponent<MeshFilter>() != nullptr) {
+    virtual void OnDrawGizmos() override {
+        if (transform()->parent() == nullptr) {
             return;
         }
+        Gizmos::DrawLine(transform()->parent()->position(), transform()->position());
     }
-    
+
     virtual void Update() override {
     }
     
@@ -291,6 +293,7 @@ void DefaultScene()
     auto camera = Camera::Create(60.0f, Screen::aspect(), 0.3f, 1000.f);
     auto camera_go = Scene::CreateGameObject("Main Camera");
     camera_go->AddComponent(camera);
+    camera_go->AddScript(make_shared<CameraController>());
     camera_go->transform()->setLocalPosition(0, 0, 5);
     camera_go->transform()->LookAt(0, 0, 0);
     camera_go->SetTag("MainCamera");
@@ -452,6 +455,15 @@ void DefaultScene()
 //    }
 //};
 
+template<typename T>
+void RecursivelyAddScript(std::shared_ptr<FishEngine::Transform>& t)
+{
+
+    t->gameObject()->AddScript(make_shared<T>());
+    for (auto& c : t->children()) {
+        RecursivelyAddScript<T>(c.lock());
+    }
+}
             
 class TestAnimation : public App
 {
@@ -491,11 +503,12 @@ public:
         
         auto sphere = Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh();
         
-        ModelImporter importer;
+        //ModelImporter importer;
         //importer.setFileScale(0.01f);
-        auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
+        //auto model = importer.LoadFBX(chan_root_dir + "models/unitychan.fbx");
+        //auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
         ModelImporter importer2;
-        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
+        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
@@ -545,133 +558,133 @@ public:
 
         textures["AmbientCubemap"] = sky_texture;
         
-        auto modelGO = model->CreateGameObject();
+        //auto modelGO = model->CreateGameObject();
+
+        auto modelGO = jump00Model->CreateGameObject();
         //go->transform()->setLocalEulerAngles(90, 0, 0);
         modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         //modelGO->transform()->setLocalPosition(0, 0, 0);
-        auto animator = std::make_shared<Animator>();
-        animator->m_animation = jump00Model->mainAnimation();
-        modelGO->AddComponent(animator);
+        //auto animator = std::make_shared<Animator>();
+        //animator->m_animation = jump00Model->mainAnimation();
+        //modelGO->AddComponent(animator);
+        modelGO->AddScript(make_shared<DrawSkeleton>());
+        RecursivelyAddScript<DrawSkeleton>(modelGO->transform());
 
-        auto jump00GO = jump00Model->CreateGameObject();
-        jump00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
+        //auto jump00GO = jump00Model->CreateGameObject();
+        //jump00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         
         //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;
 
-        constexpr float edgeThickness = 0.5f;
-        //material = Material::builtinMaterial("TextureDoubleSided");
-        //material = bodyMaterial;
-        material = Material::builtinMaterial("SkinnedMesh");
-        material->SetTexture("DiffuseMap", bodyTexture);
-        auto material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", bodyTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
+        //constexpr float edgeThickness = 0.5f;
+        ////material = Material::builtinMaterial("TextureDoubleSided");
+        ////material = bodyMaterial;
+        //material = Material::builtinMaterial("SkinnedMesh");
+        //material->SetTexture("DiffuseMap", bodyTexture);
+        //auto material2 = Material::builtinMaterial("Outline");
+        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        //material2->SetTexture("_MainTex", bodyTexture);
+        //material2->SetFloat("_EdgeThickness", edgeThickness);
 
-        textures["DiffuseMap"] = bodyTexture;
-        material->BindTextures(textures);
-        //material->BindTextures("DiffuseMap", )
-        for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            auto renderer = child->GetComponent<MeshRenderer>();
-            renderer->setAvatar(jump00Model->avatar());
-            renderer->setRootBone(modelGO->transform());
-            renderer->SetMaterial(material);
-            //renderer->AddMaterial(material2);
-        }
+        //textures["DiffuseMap"] = bodyTexture;
+        //material->BindTextures(textures);
+        ////material->BindTextures("DiffuseMap", )
+        //for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    auto renderer = child->GetComponent<MeshRenderer>();
+        //    renderer->setAvatar(jump00Model->avatar());
+        //    renderer->setRootBone(modelGO->transform());
+        //    renderer->SetMaterial(material);
+        //    //renderer->AddMaterial(material2);
+        //}
 
-        material = Material::builtinMaterial("Texture");
-        material->SetTexture("DiffuseMap", skinTexture);
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", skinTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
-        for (auto name : {"skin"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        }
+        //material = Material::builtinMaterial("Texture");
+        //material->SetTexture("DiffuseMap", skinTexture);
+        //material2 = Material::builtinMaterial("Outline");
+        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        //material2->SetTexture("_MainTex", skinTexture);
+        //material2->SetFloat("_EdgeThickness", edgeThickness);
+        //for (auto name : {"skin"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        //}
 
-        material = Material::builtinMaterial("Texture");
-        material->SetTexture("DiffuseMap", faceTexture);
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", faceTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
-        for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        }
-        
-        material = Material::builtinMaterial("Texture");
-        material->SetTexture("DiffuseMap", hairTexture);
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", hairTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
-        for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
-        }
+        //material = Material::builtinMaterial("Texture");
+        //material->SetTexture("DiffuseMap", faceTexture);
+        //material2 = Material::builtinMaterial("Outline");
+        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        //material2->SetTexture("_MainTex", faceTexture);
+        //material2->SetFloat("_EdgeThickness", edgeThickness);
+        //for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        //}
+        //
+        //material = Material::builtinMaterial("Texture");
+        //material->SetTexture("DiffuseMap", hairTexture);
+        //material2 = Material::builtinMaterial("Outline");
+        //material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        //material2->SetTexture("_MainTex", hairTexture);
+        //material2->SetFloat("_EdgeThickness", edgeThickness);
+        //for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //    child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+        //}
 
-        material = Material::builtinMaterial("Transparent");
-        material->SetTexture("DiffuseMap", eyeirisLTexture);
-        for (auto name : {"eye_L_old"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            //child->SetActive(false);
-        }
-        
-        material = Material::builtinMaterial("Transparent");
-        material->SetTexture("DiffuseMap", eyeirisRTexture);
-        for (auto name : {"eye_R_old"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        }
-        
-        material = Material::builtinMaterial("Transparent");
-        material->SetTexture("DiffuseMap", eyelineTexture);
-        for (auto name : {"BLW_DEF", "EL_DEF"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        }
-        
-        material = Material::builtinMaterial("Texture");
-        material->SetTexture("DiffuseMap", eyelineTexture);
-        for (auto name : {"eye_base_old"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            //Selection::setActiveGameObject(child);
-        }
+        //material = Material::builtinMaterial("Transparent");
+        //material->SetTexture("DiffuseMap", eyeirisLTexture);
+        //for (auto name : {"eye_L_old"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //    //child->SetActive(false);
+        //}
+        //
+        //material = Material::builtinMaterial("Transparent");
+        //material->SetTexture("DiffuseMap", eyeirisRTexture);
+        //for (auto name : {"eye_R_old"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //}
+        //
+        //material = Material::builtinMaterial("Transparent");
+        //material->SetTexture("DiffuseMap", eyelineTexture);
+        //for (auto name : {"BLW_DEF", "EL_DEF"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //}
+        //
+        //material = Material::builtinMaterial("Texture");
+        //material->SetTexture("DiffuseMap", eyelineTexture);
+        //for (auto name : {"eye_base_old"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //    //Selection::setActiveGameObject(child);
+        //}
 
-        material = Material::builtinMaterial("Transparent");
-        material->SetTexture("DiffuseMap", cheekTexture);
-        for (auto name : {"cheek"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-        }
+        //material = Material::builtinMaterial("Transparent");
+        //material->SetTexture("DiffuseMap", cheekTexture);
+        //for (auto name : {"cheek"}) {
+        //    auto child = FindNamedChild(modelGO, name);
+        //    assert(child != nullptr);
+        //    child->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //}
         
         // Camera
         
         auto cameraGO = Camera::mainGameCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
-        //cameraGO->transform()->LookAt(0, 0, 0);
-        //cameraGO->transform()->setPosition(0, 0, -5);
-        //cameraGO->transform()->LookAt(0, 0, 0);
-        //cameraGO->transform()->LookAt(0, 0, 0);
         cameraGO->AddScript(make_shared<ShowFPS>());
         cameraGO->AddScript(make_shared<TakeScreenShot>());
         //cameraGO->AddScript(make_shared<RenderSettings>());
@@ -733,8 +746,8 @@ public:
 
 int main()
 {
-    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
-    FishEditorWindow::AddApp(make_shared<TestPhysics>());
+    FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();

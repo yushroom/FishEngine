@@ -53,10 +53,10 @@ namespace FishEngine {
             }
         }
 
-        auto I = A*m;
-        if (!I.isIdentity()) {
-            abort();
-        }
+        //auto I = A*m;
+        //if (!I.isIdentity()) {
+        //    abort();
+        //}
         return A;
     }
 

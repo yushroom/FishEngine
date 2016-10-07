@@ -96,6 +96,7 @@ public:
     
     void setLocalRotation(const Quaternion& rotation) {
         m_localRotation = rotation;
+        MakeDirty();
     }
 
     // The rotation as Euler angles in degrees relative to the parent transform's rotation.

@@ -106,10 +106,13 @@ void FishEditorWindow::Run()
         glfwGetCursorPos(m_window, &xpos, &ypos);
         Input::UpdateMousePosition(float(xpos)/m_windowWidth, 1.0f-float(ypos)/m_windowHeight);
         
-        SceneView::Update();
+        
         if (m_inPlayMode) {
             Scene::Update();
             PhysicsSystem::FixedUpdate();
+        }
+        else {
+            SceneView::Update();
         }
         
         EditorRenderSystem::Render();
@@ -123,6 +126,7 @@ void FishEditorWindow::Run()
 
         const float old_time = (float)glfwGetTime();
         EditorTime::m_deltaTime = old_time - EditorTime::m_time;
+        Time::m_deltaTime = EditorTime::m_deltaTime;
         EditorTime::m_time = old_time;
     }
 }

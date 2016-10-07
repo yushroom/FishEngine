@@ -23,6 +23,7 @@ xcuserdata/
 /external/boost*
 /external/PhysXSDK/
 /external/libs/
+/external/fbxsdk/
 
 # assets
 /assets/models/
@@ -33,3 +34,5 @@ xcuserdata/
 /.vscode/
 
 imgui.ini
+
+*.dll

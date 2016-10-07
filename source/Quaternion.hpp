@@ -87,6 +87,10 @@ public:
         return result;
     }
 
+    bool operator==(const Quaternion& q) {
+        return Mathf::Approximately(x, q.x) && Mathf::Approximately(y, q.y) && Mathf::Approximately(z, q.z);
+    }
+
 
     static float Angle(const Quaternion& a, const Quaternion& b)
     {

@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\source\FishEditor\EditorTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\FishEditor\SceneView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\FishEditor\SceneView.hpp">

@@ -5,3 +5,6 @@ stb commit e71369 https://github.com/nothings/stb
 assimp 3.3.1 https://github.com/assimp/assimp
 gli 8.1.1 https://github.com/g-truc/gli
 glm 0.9.8 https://github.com/g-truc/glm
+pugixl 1.7 https://github.com/zeux/pugixml
+physx 3.3.4 https://developer.nvidia.com/physx-sdk
+fbxsdk 2017.0 http://www.autodesk.com/products/fbx/overview

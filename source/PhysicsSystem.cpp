@@ -1,8 +1,6 @@
 #include "PhysicsSystem.hpp"
 #include "Transform.hpp"
 #include "Debug.hpp"
-#define NDEBUG
-#include <PhysXSDK/Include/PxPhysicsAPI.h>
 #include <PhysXSDK/Snippets/SnippetCommon/SnippetPrint.h>
 #include <PhysXSDK/Snippets/SnippetCommon/SnippetPVD.h>
 #include <PhysXSDK/Snippets/SnippetUtils/SnippetUtils.h>

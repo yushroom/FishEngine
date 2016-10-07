@@ -89,7 +89,7 @@ public:
     friend Vector3  operator/(const float f, const Vector3& v) { Assert(!isnan(f) && !v.hasNaNs()); return Vector3(f/v.x, f/v.y, f/v.z); }
 
 
-    //bool          operator==(const Vector3& v) const { Assert(!v.hasNaNs()); return (equal(x, v.x) && equal(y, v.y) && equal(z, v.z)); }
+    bool          operator==(const Vector3& v) const { Assert(!v.hasNaNs()); return (Mathf::Approximately(x, v.x) && Mathf::Approximately(y, v.y) && Mathf::Approximately(z, v.z)); }
     //bool          operator!=(const Vector3& v) const { Assert(!v.hasNaNs()); return !operator==(v); }
 
 

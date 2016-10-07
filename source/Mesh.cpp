@@ -126,10 +126,10 @@ void Mesh::GenerateBuffer(int vertexUsage) {
     if (m_skinned) {
         glGenBuffers(1, &m_boneIndexVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
-        glBufferData(GL_ARRAY_BUFFER, m_boneIndexBuffer.size() * sizeof(int), m_boneIndexBuffer.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, m_boneIndexBuffer.size() * 4 * sizeof(int), m_boneIndexBuffer.data(), GL_STATIC_DRAW);
         glGenBuffers(1, &m_boneWeightVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
-        glBufferData(GL_ARRAY_BUFFER, m_boneWeightBuffer.size() * sizeof(float), m_boneWeightBuffer.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, m_boneWeightBuffer.size() * 4 * sizeof(float), m_boneWeightBuffer.data(), GL_STATIC_DRAW);
     }
 }
 
@@ -163,7 +163,7 @@ void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
     
     if (m_skinned) {
         glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
-        glVertexAttribPointer(BoneIndexIndex, 4, GL_INT, GL_FALSE, 4 * sizeof(GLint), (GLvoid*)0);
+        glVertexAttribIPointer(BoneIndexIndex, 4, GL_INT, 4 * sizeof(GLint), (GLvoid*)0);
         glEnableVertexAttribArray(BoneIndexIndex);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);

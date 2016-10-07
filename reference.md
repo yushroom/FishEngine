@@ -108,6 +108,16 @@ https://github.com/smasherprog/Assimp_Animation_Helper
 
 
 
+FBX
+
+http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html
+
+http://help.autodesk.com/view/FBX/2017/ENU/
+
+http://blog.csdn.net/bugrunner/article/details/7210511
+
+
+
 Assimp: a issue
 
 https://github.com/assimp/assimp/issues/894

@@ -69,11 +69,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;..\..\external\fbxsdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\external;..\..\external\glew;..\..\external\boost_1_61_0;..\..\external\PhysXSDK\Include;..\..\external\fbxsdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -82,7 +82,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;assimp-vc130-mt.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>

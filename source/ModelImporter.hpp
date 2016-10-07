@@ -13,6 +13,13 @@
 struct aiNode;
 struct aiMesh;
 
+namespace fbxsdk
+{
+    class FbxNode;
+    class FbxMesh;
+}
+
+
 namespace FishEngine {
 
     struct ModelNode
@@ -61,9 +68,7 @@ namespace FishEngine {
     private:
         friend class ModelImporter;
 
-        void AddMesh(Mesh::PMesh& mesh) {
-            m_meshes.push_back(mesh);
-        }
+        void AddMesh(Mesh::PMesh& mesh);
 
         std::shared_ptr<GameObject>
         ResursivelyCreateGameObject(const ModelNode::PModelNode& node) const;
@@ -85,16 +90,24 @@ namespace FishEngine {
         ModelImporter() = default;
         
         void
-        setFileScale(const float fileScale)
+        setFileScale(
+            const float fileScale)
         {
             m_fileScale = fileScale;
         }
         
         std::shared_ptr<Model>
-        LoadFromFile(const std::string path,
-                     int vertexUsage = VertexUsagePNUT,
-                     MeshLoadFlags flags = 0);
-        
+        LoadFromFile(
+            const std::string& path,
+            int                vertexUsage = VertexUsagePNUT,
+            MeshLoadFlags      flags = 0);
+
+        std::shared_ptr<Model>
+        LoadFBX(
+            const std::string&  path,
+            int                 vertexUsage = VertexUsagePNUT,
+            MeshLoadFlags       flags = 0);
+
     private:
         
         float m_fileScale = 1.0f;
@@ -102,14 +115,26 @@ namespace FishEngine {
         std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
         
         ModelNode::PModelNode
-        buildModelTree(const aiNode* assimp_node,
-                       Model::PModel& model);
+        buildModelTree(
+            const aiNode*   assimp_node,
+            Model::PModel&  model);
         
+        ModelNode::PModelNode
+        buildModelTree(
+            fbxsdk::FbxNode* pNode);
+
+        Mesh::PMesh
+        ParseMesh(
+            fbxsdk::FbxMesh* pMesh);
+
         std::shared_ptr<Mesh>
-        ParseMesh(const aiMesh* assimp_mesh,
-                  int vertexUsage,
-                  bool load_uv,
-                  bool load_tangent);
+        ParseMesh(
+            const aiMesh*   assimp_mesh,
+            int             vertexUsage,
+            bool            load_uv,
+            bool            load_tangent);
+
+        std::shared_ptr<Model> m_model;
     };
 }
 

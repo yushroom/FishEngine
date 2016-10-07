@@ -5,6 +5,7 @@
 #include "Component.hpp"
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
+#include "Matrix4x4.hpp"
 
 namespace FishEngine {
     
@@ -20,6 +21,12 @@ namespace FishEngine {
         float time;
         Quaternion value;
     };
+
+    struct TransformationKey
+    {
+        float time;
+        Matrix4x4 value;
+    };
     
     struct AnimationNode
     {
@@ -27,6 +34,7 @@ namespace FishEngine {
         std::vector<Vector3Key> positionKeys;
         std::vector<QuaternionKey> rotationKeys;
         std::vector<Vector3Key> scalingKeys;
+        std::vector<TransformationKey> transformationKeys;
     };
     
     struct Animation
@@ -50,6 +58,8 @@ namespace FishEngine {
         
         float m_time;   // temp
         bool m_playing = false;      // false
+        bool m_playOneFrame = false;
+        int m_currentFrame = 0;
         std::shared_ptr<Animation> m_animation;
         
         //virtual void OnInspectorGUI() override;
@@ -60,12 +70,14 @@ namespace FishEngine {
         
         void PlayOnce() {
             m_playing = true;
-            m_time = 0;
+            //m_time = 0;
         }
+
+        void NextFrame();
         
         void Stop() {
             m_playing = false;
-            //m_time = 0;
+            m_time = 0;
         }
         
         virtual void Update() override;
@@ -81,6 +93,7 @@ namespace FishEngine {
     private:
         std::shared_ptr<Avatar> m_avatar;
         void RecursivelyUpdate(const std::shared_ptr<GameObject>& go);
+        void RecursivelyUpdate2(const std::shared_ptr<GameObject>& go);
     };
 }
 

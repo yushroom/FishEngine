@@ -686,12 +686,16 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& anim
         if (ImGui::Button("Stop")) {
             animator->Stop();
         }
-        ImGui::InputFloat("Time", &animator->m_time);
     } else {
         if (ImGui::Button("Play")) {
             animator->PlayOnce();
         }
     }
+
+    if (ImGui::Button("Next Frame")) {
+        animator->NextFrame();
+    }
+    ImGui::InputFloat("Time", &animator->m_time);
 }
 
 template<>

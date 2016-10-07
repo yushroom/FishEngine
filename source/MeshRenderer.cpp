@@ -17,15 +17,17 @@ NAMESPACE_FISHENGINE_BEGIN
 void RecursivelyGetTransformation(
     const std::shared_ptr<Transform>&     transform,
     std::vector<Matrix4x4>&         transformation, 
-    std::map<std::string, int>&     nameToIndex)
+    std::map<std::string, int>&     nameToIndex,
+    std::map<std::string, Bone>&    nameToBone,
+    const Matrix4x4& invGlobalTransform)
 {
     const auto& name = transform->name();
     const auto& it = nameToIndex.find(name);
     if (it != nameToIndex.end()) {
-        transformation[it->second] = transform->localToWorldMatrix();
+        transformation[it->second] = invGlobalTransform * transform->localToWorldMatrix() * nameToBone[name].boneOffset;
     }
     for (auto& child : transform->children()) {
-        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex);
+        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex, nameToBone, invGlobalTransform);
     }
 }
 
@@ -81,7 +83,7 @@ void MeshRenderer::Render() const
     std::vector<Matrix4x4> boneTransformation;
     if (m_avatar != nullptr) {
         boneTransformation.resize(m_avatar->m_boneToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, m_avatar->m_boneToIndex);
+        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, m_avatar->m_boneToIndex, meshFilter->mesh()->nameToBone(), gameObject()->transform()->worldToLocalMatrix());
     }
     
     for (auto& m : m_materials) {

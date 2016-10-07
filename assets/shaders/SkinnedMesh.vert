@@ -8,6 +8,7 @@ layout (location = BoneWeightIndex) in vec4 boneWeight;
 uniform mat4 BoneTransformations[MAX_BONE_SIZE];
 
 out VS_OUT {
+	vec3 position;
     vec3 normal;
     vec2 uv;
 } vs_out;
@@ -25,7 +26,8 @@ void main() {
 	boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
 
 	vec4 posL = boneTransformation * vec4(position, 1);
-    gl_Position = MATRIX_VP * posL;
+    gl_Position = MATRIX_MVP * posL;
+    vs_out.position = (MATRIX_M * posL).xyz;
     vs_out.normal = mat3(MATRIX_IT_M) * normal;
     vs_out.uv = uv;
 }

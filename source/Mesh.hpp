@@ -29,11 +29,11 @@ typedef int MeshLoadFlags;
 struct Bone
 {
     //uint32_t index;
-    uint32_t parentIndex;
-    Matrix4x4 boneOffse;
+    //uint32_t parentIndex;
+    Matrix4x4 boneOffset;   // //! Matrix that transforms from mesh space to bone space in bind pose
     Matrix4x4 finalTransformation;
-    std::vector<uint32_t> children;
-    std::string name;
+    //std::vector<uint32_t> children;
+    //std::string name;
 };
 
 static constexpr int MaxBoneForEachVertex = 4;
@@ -115,7 +115,11 @@ public:
     //static PMesh builtinMesh(const std::string& name);
     
     bool   m_skinned = false; // temp
-    
+    std::map<std::string, Bone>& nameToBone()
+    {
+        return m_bones;
+    }
+
 private:
     friend class FishEditor::EditorGUI;
     friend class ModelImporter;
@@ -129,7 +133,7 @@ private:
     std::vector<uint32_t>   m_indexBuffer;
     std::vector<Int4>       m_boneIndexBuffer;
     std::vector<Vector4>    m_boneWeightBuffer;
-    //std::vector<Bone>       m_bones;
+    std::map<std::string, Bone>       m_bones;
     //std::vector<>
     std::vector<BoneWeight> m_boneWeights;
     

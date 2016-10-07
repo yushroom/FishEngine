@@ -56,8 +56,7 @@ namespace FishEngine {
 
     ModelNode::PModelNode ModelImporter::
     buildModelTree(
-        const aiNode*   assimp_node, 
-        Model::PModel&  model)
+        const aiNode*   assimp_node)
     {
         //Debug::Log("NODE: %s mesh count: %d ", assimp_node->mName.C_Str(), assimp_node->mNumMeshes);
         //for (int i = 0; i < assimp_node->mNumChildren; ++i) {
@@ -70,8 +69,8 @@ namespace FishEngine {
         node->isBone = false;
         //model->m_bones.push_back(node);
         //node->index = model->m_bones.size();
-        int index = model->m_avatar->m_boneToIndex.size();
-        model->m_avatar->m_boneToIndex[node->name] = index;
+        int index = m_model->m_avatar->m_boneToIndex.size();
+        m_model->m_avatar->m_boneToIndex[node->name] = index;
         node->index = index;
         m_nodes[node->name] = node;
         
@@ -81,7 +80,7 @@ namespace FishEngine {
 
         for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i) {
             //Debug::Log("    CHILD: %s", assimp_node->mName.C_Str());
-            auto child = buildModelTree(assimp_node->mChildren[i], model);
+            auto child = buildModelTree(assimp_node->mChildren[i]);
             node->children.push_back(child);
             child->parent = node.get();
         }
@@ -192,6 +191,8 @@ namespace FishEngine {
                 assert(it != m_nodes.end());
                 it->second->isBone = true;
                 uint32_t boneIndex = it->second->index;
+
+                mesh->m_bones[boneName].boneOffset = ConvertMatrix(bone->mOffsetMatrix);
                 
                 for (uint32_t k = 0; k < bone->mNumWeights; ++k) {
                     uint32_t vextexID = bone->mWeights[k].mVertexId;
@@ -416,22 +417,22 @@ namespace FishEngine {
         bool load_uv = (vertexUsage & VertexUsageUV) != 0;
         
         
-        auto model = std::make_shared<Model>();
-        model->m_name = split(path, "/").back();
+        m_model = std::make_shared<Model>();
+        m_model->m_name = split(path, "/").back();
         
         bool loadAnimation = scene->HasAnimations();
         if (loadAnimation)
             Debug::Log("%s has animation", path.c_str());
 
-        model->m_rootNode = buildModelTree(scene->mRootNode, model);
+        m_model->m_rootNode = buildModelTree(scene->mRootNode);
         
         for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
         {
             auto mesh = ParseMesh(scene->mMeshes[meshIndex], vertexUsage, load_uv, load_tangent);
             if (mesh->m_name.empty()) {
-                mesh->m_name = "mesh" + boost::lexical_cast<std::string>(model->m_meshes.size());
+                mesh->m_name = "mesh" + boost::lexical_cast<std::string>(m_model->m_meshes.size());
             }
-            model->AddMesh(mesh);
+            m_model->AddMesh(mesh);
         }
 
         auto ConvertVector3 = [](const aiVector3D& avec3) {
@@ -443,8 +444,8 @@ namespace FishEngine {
         };
 
         for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
-            model->m_animations.push_back(std::make_shared<Animation>());
-            auto& animation = model->m_animations.back();
+            m_model->m_animations.push_back(std::make_shared<Animation>());
+            auto& animation = m_model->m_animations.back();
             auto a = scene->mAnimations[animIndex];
             animation->name = a->mName.C_Str();
             animation->duration = (float)a->mDuration;
@@ -525,13 +526,13 @@ namespace FishEngine {
             Debug::Log("animation name: %s", a->mName.C_Str());
         }
 
-        for (auto& animation : model->m_animations) {
+        for (auto& animation : m_model->m_animations) {
             for (auto & channel : animation->channels) {
 
             }
         }
 
-        return model;
+        return m_model;
     }
 
 
@@ -635,7 +636,7 @@ namespace FishEngine {
                 auto& m = m_meshes[idx];
                 auto child = Scene::CreateGameObject(m->name());
                 child->transform()->SetParent(go->transform());
-                auto material = Material::defaultMaterial();
+                auto material = Material::builtinMaterial("SkinnedMesh");
                 auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 auto meshFilter = std::make_shared<MeshFilter>(m_meshes[idx]);
                 child->AddComponent(meshRenderer);

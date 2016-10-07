@@ -116,8 +116,7 @@ namespace FishEngine {
         
         ModelNode::PModelNode
         buildModelTree(
-            const aiNode*   assimp_node,
-            Model::PModel&  model);
+            const aiNode*   assimp_node);
         
         ModelNode::PModelNode
         buildModelTree(

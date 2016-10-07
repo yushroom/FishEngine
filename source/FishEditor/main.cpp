@@ -569,6 +569,16 @@ public:
         //modelGO->AddComponent(animator);
         modelGO->AddScript(make_shared<DrawSkeleton>());
         RecursivelyAddScript<DrawSkeleton>(modelGO->transform());
+        //material->BindTextures("DiffuseMap", )
+        for (auto name : {"mesh0", "mesh1", "mesh2", "mesh3", "mesh4", "mesh5"}) {
+            auto child = FindNamedChild(modelGO, name);
+            assert(child != nullptr);
+            auto renderer = child->GetComponent<MeshRenderer>();
+            renderer->setAvatar(jump00Model->avatar());
+            renderer->setRootBone(modelGO->transform());
+            //renderer->SetMaterial(material);
+            //renderer->AddMaterial(material2);
+        }
 
         //auto jump00GO = jump00Model->CreateGameObject();
         //jump00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);

@@ -13,11 +13,11 @@
 struct aiNode;
 struct aiMesh;
 
-namespace fbxsdk
-{
-    class FbxNode;
-    class FbxMesh;
-}
+//namespace fbxsdk
+//{
+//    class FbxNode;
+//    class FbxMesh;
+//}
 
 
 namespace FishEngine {
@@ -118,13 +118,13 @@ namespace FishEngine {
         buildModelTree(
             const aiNode*   assimp_node);
         
-        ModelNode::PModelNode
-        buildModelTree(
-            fbxsdk::FbxNode* pNode);
-
-        Mesh::PMesh
-        ParseMesh(
-            fbxsdk::FbxMesh* pMesh);
+//        ModelNode::PModelNode
+//        buildModelTree(
+//            fbxsdk::FbxNode* pNode);
+//
+//        Mesh::PMesh
+//        ParseMesh(
+//            fbxsdk::FbxMesh* pMesh);
 
         std::shared_ptr<Mesh>
         ParseMesh(

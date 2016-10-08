@@ -45,6 +45,7 @@
 		BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */; };
 		BFDC75381D8EE4110082A6DC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC75371D8EE4110082A6DC /* libz.tbd */; };
 		BFF192E31DA558BA008634D8 /* SceneView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFF192E21DA558BA008634D8 /* SceneView.cpp */; };
+		BFF192E71DA7CBEA008634D8 /* libfbxsdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +123,7 @@
 		BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		BFDC75371D8EE4110082A6DC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		BFF192E21DA558BA008634D8 /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneView.cpp; path = ../../source/FishEditor/SceneView.cpp; sourceTree = "<group>"; };
+		BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfbxsdk.a; path = ../../external/libs/osx/libfbxsdk.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +144,7 @@
 				BF51E6421DA1634800AF948A /* libPhysX3CharacterKinematic.a in Frameworks */,
 				BF51E64F1DA1634800AF948A /* libPhysX3DEBUG.a in Frameworks */,
 				BF51E63B1DA1634800AF948A /* libLowLevelCloth.a in Frameworks */,
+				BFF192E71DA7CBEA008634D8 /* libfbxsdk.a in Frameworks */,
 				BFDC75301D8EE2970082A6DC /* Cocoa.framework in Frameworks */,
 				BFDC752E1D8EE28A0082A6DC /* OpenGL.framework in Frameworks */,
 				BFDC75241D8EE0F10082A6DC /* libFishEngine.a in Frameworks */,
@@ -234,6 +237,7 @@
 				BFDC75251D8EE1250082A6DC /* libassimp.a */,
 				BFDC75261D8EE1250082A6DC /* libGLEW.a */,
 				BFDC75271D8EE1250082A6DC /* libglfw3.a */,
+				BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */,
 				BF51E6011DA1634800AF948A /* libLowLevel.a */,
 				BF51E6031DA1634800AF948A /* libLowLevelCloth.a */,
 				BF51E6091DA1634800AF948A /* libPhysX3.a */,

@@ -638,6 +638,7 @@
 					../../external/glew,
 					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
+					../../external/fbxsdk/include,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -654,6 +655,7 @@
 					../../external/glew,
 					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
+					../../external/fbxsdk/include,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

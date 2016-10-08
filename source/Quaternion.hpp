@@ -98,16 +98,18 @@ public:
         return Mathf::Acos(Mathf::Min(Mathf::Abs(f), 1.f)) * 2.f * 57.29578f;
     }
 
-    static Quaternion AngleAxis(float angle, const Vector3& axis)
+    /// @brief Creates a rotation which rotates angle degrees around axis.
+    static Quaternion AngleAxis(const float angle, const Vector3& axis)
     {
+        auto a = axis.normalized();
         Quaternion Result;
 
         float s = Mathf::Sin(angle * 0.5f);
 
         Result.w = Mathf::Cos(angle * 0.5f);
-        Result.x = axis.x * s;
-        Result.y = axis.y * s;
-        Result.z = axis.z * s;
+        Result.x = a.x * s;
+        Result.y = a.y * s;
+        Result.z = a.z * s;
         return Result;
     }
 

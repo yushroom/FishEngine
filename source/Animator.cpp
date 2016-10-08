@@ -6,21 +6,6 @@
 
 using namespace FishEngine;
 
-//void Animator::OnInspectorGUI() {
-//    int channels = m_animation->channels.size();
-//    ImGui::InputInt("Channel count", &channels);
-//    if (m_playing) {
-//        if (ImGui::Button("Stop")) {
-//            Stop();
-//        }
-//        ImGui::InputFloat("Time", &m_time);
-//    } else {
-//        if (ImGui::Button("Play")) {
-//            PlayOnce();
-//        }
-//    }
-//}
-
 void Animator::Update() {
     if (!m_playing)
         return;

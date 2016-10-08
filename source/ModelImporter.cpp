@@ -4,7 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <fbxsdk.h>
+//#include <fbxsdk.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -88,34 +88,34 @@ namespace FishEngine {
     }
 
 
-    ModelNode::PModelNode ModelImporter::
-    buildModelTree(
-        fbxsdk::FbxNode* pNode)
-    {
-        const char* nodeName = pNode->GetName();
-        auto node = std::make_shared<ModelNode>();
-        node->isBone = false;
-        node->name = nodeName;
-        Debug::Log("FBX node: %s", nodeName);
-        
-        if (pNode->GetNodeAttribute())
-        {
-            switch (pNode->GetNodeAttribute()->GetAttributeType())
-            {
-            case FbxNodeAttribute::eMesh:
-                auto pMesh = pNode->GetMesh();
-                auto mesh = ParseMesh(pMesh);
-                m_model->AddMesh(mesh);
-                break;
-            }
-        }
-        for (int j = 0; j < pNode->GetChildCount(); j++) {
-            auto child = buildModelTree(pNode->GetChild(j));
-            node->children.push_back(child);
-            child->parent = node.get();
-        }
-        return node;
-    }
+//    ModelNode::PModelNode ModelImporter::
+//    buildModelTree(
+//        fbxsdk::FbxNode* pNode)
+//    {
+//        const char* nodeName = pNode->GetName();
+//        auto node = std::make_shared<ModelNode>();
+//        node->isBone = false;
+//        node->name = nodeName;
+//        Debug::Log("FBX node: %s", nodeName);
+//        
+//        if (pNode->GetNodeAttribute())
+//        {
+//            switch (pNode->GetNodeAttribute()->GetAttributeType())
+//            {
+//            case FbxNodeAttribute::eMesh:
+//                auto pMesh = pNode->GetMesh();
+//                auto mesh = ParseMesh(pMesh);
+//                m_model->AddMesh(mesh);
+//                break;
+//            }
+//        }
+//        for (int j = 0; j < pNode->GetChildCount(); j++) {
+//            auto child = buildModelTree(pNode->GetChild(j));
+//            node->children.push_back(child);
+//            child->parent = node.get();
+//        }
+//        return node;
+//    }
 
 
     Mesh::PMesh ModelImporter::
@@ -218,147 +218,147 @@ namespace FishEngine {
     }
 
 
-    Mesh::PMesh ModelImporter::
-    ParseMesh(
-        FbxMesh* pMesh)
-    {
-        assert(pMesh != nullptr);
-        auto mesh = std::make_shared<Mesh>();
-
-        //assert(pMesh->IsTriangleMesh());
-
-        //auto n_controlPoints = pMesh->GetControlPointsCount();
-        //auto controlPoints = pMesh->GetControlPoints();
-        auto n_vertices = pMesh->GetPolygonVertexCount();
-        auto n_triangles = pMesh->GetPolygonCount();;
-        mesh->m_positionBuffer.reserve(n_vertices * 3);
-        mesh->m_normalBuffer.reserve(n_vertices * 3);
-        mesh->m_uvBuffer.reserve(n_vertices * 2);
-        mesh->m_indexBuffer.resize(n_triangles * 3);
-        mesh->m_tangentBuffer.reserve(n_triangles * 3);
-
-        int* vertices = pMesh->GetPolygonVertices();
-        memcpy(mesh->m_indexBuffer.data(), vertices, n_triangles * 3 * sizeof(int));
-
-        auto positions = pMesh->GetControlPoints();
-        for (int i = 0; i < n_vertices; ++i)
-        {
-            auto& p = positions[i];
-            mesh->m_positionBuffer.push_back(p.mData[0]);
-            mesh->m_positionBuffer.push_back(p.mData[1]);
-            mesh->m_positionBuffer.push_back(p.mData[2]);
-        }
-
-        auto n_uvs = pMesh->GetElementUVCount();
-        auto n_normals = pMesh->GetElementNormalCount();
-        auto n_tangents = pMesh->GetElementTangentCount();
-        auto normals = pMesh->GetElementNormal(0);
-        switch (normals->GetMappingMode()) 
-        {
-        case FbxLayerElement::eByControlPoint:
-            Debug::Log("by control point");
-            switch (normals->GetReferenceMode())
-            {
-            case FbxLayerElement::eDirect:
-                n_normals = normals->GetDirectArray().GetCount();
-                for (int i = 0; i < n_normals; ++i) {
-                    auto n = normals->GetDirectArray().GetAt(i);
-                    mesh->m_normalBuffer.push_back(n.mData[0]);
-                    mesh->m_normalBuffer.push_back(n.mData[1]);
-                    mesh->m_normalBuffer.push_back(n.mData[2]);
-                }
-                Debug::Log("eDirect");
-                break;
-            case FbxLayerElement::eIndexToDirect:
-                Debug::Log("eIndexToDirect");
-                abort();
-                break;
-            }
-            break;
-        case FbxLayerElement::eByPolygonVertex:
-            Debug::Log("by polygon vertex");
-            switch (normals->GetReferenceMode())
-            {
-            case FbxLayerElement::eDirect:
-                n_normals = normals->GetDirectArray().GetCount();
-                for (int i = 0; i < n_normals; ++i) {
-                    auto n = normals->GetDirectArray().GetAt(i);
-                    mesh->m_normalBuffer.push_back(n.mData[0]);
-                    mesh->m_normalBuffer.push_back(n.mData[1]);
-                    mesh->m_normalBuffer.push_back(n.mData[2]);
-                }
-                Debug::Log("eDirect");
-                break;
-            case FbxLayerElement::eIndexToDirect:
-                Debug::Log("eIndexToDirect");
-                abort();
-                break;
-            }
-            break;
-        }
-
-        Debug::Log("triangles %ld", n_triangles);
-        //for (int i = 0; i < triangleCount; ++i) {
-        //    int idx = pMesh->GetPolygonVertexIndex()
-        //}
-        return mesh;
-    }
-
-
-    /* Tab character ("\t") counter */
-    int numTabs = 0;
-
-    /**
-    * Print the required number of tabs.
-    */
-    void PrintTabs() {
-        for (int i = 0; i < numTabs; i++)
-            printf("\t");
-    }
-
-
-    /**
-    * Return a string-based representation based on the attribute type.
-    */
-    FbxString GetAttributeTypeName(FbxNodeAttribute::EType type) {
-        switch (type) {
-        case FbxNodeAttribute::eUnknown: return "unidentified";
-        case FbxNodeAttribute::eNull: return "null";
-        case FbxNodeAttribute::eMarker: return "marker";
-        case FbxNodeAttribute::eSkeleton: return "skeleton";
-        case FbxNodeAttribute::eMesh: return "mesh";
-        case FbxNodeAttribute::eNurbs: return "nurbs";
-        case FbxNodeAttribute::ePatch: return "patch";
-        case FbxNodeAttribute::eCamera: return "camera";
-        case FbxNodeAttribute::eCameraStereo: return "stereo";
-        case FbxNodeAttribute::eCameraSwitcher: return "camera switcher";
-        case FbxNodeAttribute::eLight: return "light";
-        case FbxNodeAttribute::eOpticalReference: return "optical reference";
-        case FbxNodeAttribute::eOpticalMarker: return "marker";
-        case FbxNodeAttribute::eNurbsCurve: return "nurbs curve";
-        case FbxNodeAttribute::eTrimNurbsSurface: return "trim nurbs surface";
-        case FbxNodeAttribute::eBoundary: return "boundary";
-        case FbxNodeAttribute::eNurbsSurface: return "nurbs surface";
-        case FbxNodeAttribute::eShape: return "shape";
-        case FbxNodeAttribute::eLODGroup: return "lodgroup";
-        case FbxNodeAttribute::eSubDiv: return "subdiv";
-        default: return "unknown";
-        }
-    }
-
-
-    /**
-    * Print an attribute.
-    */
-    void PrintAttribute(FbxNodeAttribute* pAttribute) {
-        if (!pAttribute) return;
-
-        FbxString typeName = GetAttributeTypeName(pAttribute->GetAttributeType());
-        FbxString attrName = pAttribute->GetName();
-        PrintTabs();
-        // Note: to retrieve the character array of a FbxString, use its Buffer() method.
-        printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
-    }
+//    Mesh::PMesh ModelImporter::
+//    ParseMesh(
+//        FbxMesh* pMesh)
+//    {
+//        assert(pMesh != nullptr);
+//        auto mesh = std::make_shared<Mesh>();
+//
+//        //assert(pMesh->IsTriangleMesh());
+//
+//        //auto n_controlPoints = pMesh->GetControlPointsCount();
+//        //auto controlPoints = pMesh->GetControlPoints();
+//        auto n_vertices = pMesh->GetPolygonVertexCount();
+//        auto n_triangles = pMesh->GetPolygonCount();;
+//        mesh->m_positionBuffer.reserve(n_vertices * 3);
+//        mesh->m_normalBuffer.reserve(n_vertices * 3);
+//        mesh->m_uvBuffer.reserve(n_vertices * 2);
+//        mesh->m_indexBuffer.resize(n_triangles * 3);
+//        mesh->m_tangentBuffer.reserve(n_triangles * 3);
+//
+//        int* vertices = pMesh->GetPolygonVertices();
+//        memcpy(mesh->m_indexBuffer.data(), vertices, n_triangles * 3 * sizeof(int));
+//
+//        auto positions = pMesh->GetControlPoints();
+//        for (int i = 0; i < n_vertices; ++i)
+//        {
+//            auto& p = positions[i];
+//            mesh->m_positionBuffer.push_back(p.mData[0]);
+//            mesh->m_positionBuffer.push_back(p.mData[1]);
+//            mesh->m_positionBuffer.push_back(p.mData[2]);
+//        }
+//
+//        auto n_uvs = pMesh->GetElementUVCount();
+//        auto n_normals = pMesh->GetElementNormalCount();
+//        auto n_tangents = pMesh->GetElementTangentCount();
+//        auto normals = pMesh->GetElementNormal(0);
+//        switch (normals->GetMappingMode()) 
+//        {
+//        case FbxLayerElement::eByControlPoint:
+//            Debug::Log("by control point");
+//            switch (normals->GetReferenceMode())
+//            {
+//            case FbxLayerElement::eDirect:
+//                n_normals = normals->GetDirectArray().GetCount();
+//                for (int i = 0; i < n_normals; ++i) {
+//                    auto n = normals->GetDirectArray().GetAt(i);
+//                    mesh->m_normalBuffer.push_back(n.mData[0]);
+//                    mesh->m_normalBuffer.push_back(n.mData[1]);
+//                    mesh->m_normalBuffer.push_back(n.mData[2]);
+//                }
+//                Debug::Log("eDirect");
+//                break;
+//            case FbxLayerElement::eIndexToDirect:
+//                Debug::Log("eIndexToDirect");
+//                abort();
+//                break;
+//            }
+//            break;
+//        case FbxLayerElement::eByPolygonVertex:
+//            Debug::Log("by polygon vertex");
+//            switch (normals->GetReferenceMode())
+//            {
+//            case FbxLayerElement::eDirect:
+//                n_normals = normals->GetDirectArray().GetCount();
+//                for (int i = 0; i < n_normals; ++i) {
+//                    auto n = normals->GetDirectArray().GetAt(i);
+//                    mesh->m_normalBuffer.push_back(n.mData[0]);
+//                    mesh->m_normalBuffer.push_back(n.mData[1]);
+//                    mesh->m_normalBuffer.push_back(n.mData[2]);
+//                }
+//                Debug::Log("eDirect");
+//                break;
+//            case FbxLayerElement::eIndexToDirect:
+//                Debug::Log("eIndexToDirect");
+//                abort();
+//                break;
+//            }
+//            break;
+//        }
+//
+//        Debug::Log("triangles %ld", n_triangles);
+//        //for (int i = 0; i < triangleCount; ++i) {
+//        //    int idx = pMesh->GetPolygonVertexIndex()
+//        //}
+//        return mesh;
+//    }
+//
+//
+//    /* Tab character ("\t") counter */
+//    int numTabs = 0;
+//
+//    /**
+//    * Print the required number of tabs.
+//    */
+//    void PrintTabs() {
+//        for (int i = 0; i < numTabs; i++)
+//            printf("\t");
+//    }
+//
+//
+//    /**
+//    * Return a string-based representation based on the attribute type.
+//    */
+//    FbxString GetAttributeTypeName(FbxNodeAttribute::EType type) {
+//        switch (type) {
+//        case FbxNodeAttribute::eUnknown: return "unidentified";
+//        case FbxNodeAttribute::eNull: return "null";
+//        case FbxNodeAttribute::eMarker: return "marker";
+//        case FbxNodeAttribute::eSkeleton: return "skeleton";
+//        case FbxNodeAttribute::eMesh: return "mesh";
+//        case FbxNodeAttribute::eNurbs: return "nurbs";
+//        case FbxNodeAttribute::ePatch: return "patch";
+//        case FbxNodeAttribute::eCamera: return "camera";
+//        case FbxNodeAttribute::eCameraStereo: return "stereo";
+//        case FbxNodeAttribute::eCameraSwitcher: return "camera switcher";
+//        case FbxNodeAttribute::eLight: return "light";
+//        case FbxNodeAttribute::eOpticalReference: return "optical reference";
+//        case FbxNodeAttribute::eOpticalMarker: return "marker";
+//        case FbxNodeAttribute::eNurbsCurve: return "nurbs curve";
+//        case FbxNodeAttribute::eTrimNurbsSurface: return "trim nurbs surface";
+//        case FbxNodeAttribute::eBoundary: return "boundary";
+//        case FbxNodeAttribute::eNurbsSurface: return "nurbs surface";
+//        case FbxNodeAttribute::eShape: return "shape";
+//        case FbxNodeAttribute::eLODGroup: return "lodgroup";
+//        case FbxNodeAttribute::eSubDiv: return "subdiv";
+//        default: return "unknown";
+//        }
+//    }
+//
+//
+//    /**
+//    * Print an attribute.
+//    */
+//    void PrintAttribute(FbxNodeAttribute* pAttribute) {
+//        if (!pAttribute) return;
+//
+//        FbxString typeName = GetAttributeTypeName(pAttribute->GetAttributeType());
+//        FbxString attrName = pAttribute->GetName();
+//        PrintTabs();
+//        // Note: to retrieve the character array of a FbxString, use its Buffer() method.
+//        printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
+//    }
 
 
     std::shared_ptr<Model> ModelImporter::
@@ -536,55 +536,55 @@ namespace FishEngine {
     }
 
 
-    std::shared_ptr<Model> ModelImporter::
-    LoadFBX(
-        const std::string&  path, 
-        int                 vertexUsage /*= VertexUsagePNUT*/, 
-        MeshLoadFlags       flags /*= 0*/)
-    {
-        // Initialize the SDK manager. This object handles all our memory management.
-        FbxManager* lSdkManager = FbxManager::Create();
-
-        // Create the IO settings object.
-        FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
-        lSdkManager->SetIOSettings(ios);
-
-        // Create an importer using the SDK manager.
-        FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
-
-        // Use the first argument as the filename for the importer.
-        if (!lImporter->Initialize(path.c_str(), -1, lSdkManager->GetIOSettings())) {
-            printf("Call to FbxImporter::Initialize() failed.\n");
-            printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
-            exit(-1);
-        }
-
-        // Create a new scene so that it can be populated by the imported file.
-        FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
-
-        // Import the contents of the file into the scene.
-        lImporter->Import(lScene);
-
-        // The file is imported; so get rid of the importer.
-        lImporter->Destroy();
-
-        m_model = std::make_shared<Model>();
-        m_model->m_name = split(path, "/").back();
-
-        // Print the nodes of the scene and their attributes recursively.
-        // Note that we are not printing the root node because it should
-        // not contain any attributes.
-        FbxNode* lRootNode = lScene->GetRootNode();
-        buildModelTree(lRootNode);
-        //if (lRootNode) {
-        //    for (int i = 0; i < lRootNode->GetChildCount(); i++)
-        //        buildModelTree(lRootNode->GetChild(i));
-        //}
-        // Destroy the SDK manager and all the other objects it was handling.
-        lSdkManager->Destroy();
-
-        return m_model;
-    }
+//    std::shared_ptr<Model> ModelImporter::
+//    LoadFBX(
+//        const std::string&  path, 
+//        int                 vertexUsage /*= VertexUsagePNUT*/, 
+//        MeshLoadFlags       flags /*= 0*/)
+//    {
+//        // Initialize the SDK manager. This object handles all our memory management.
+//        FbxManager* lSdkManager = FbxManager::Create();
+//
+//        // Create the IO settings object.
+//        FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+//        lSdkManager->SetIOSettings(ios);
+//
+//        // Create an importer using the SDK manager.
+//        FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
+//
+//        // Use the first argument as the filename for the importer.
+//        if (!lImporter->Initialize(path.c_str(), -1, lSdkManager->GetIOSettings())) {
+//            printf("Call to FbxImporter::Initialize() failed.\n");
+//            printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+//            exit(-1);
+//        }
+//
+//        // Create a new scene so that it can be populated by the imported file.
+//        FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
+//
+//        // Import the contents of the file into the scene.
+//        lImporter->Import(lScene);
+//
+//        // The file is imported; so get rid of the importer.
+//        lImporter->Destroy();
+//
+//        m_model = std::make_shared<Model>();
+//        m_model->m_name = split(path, "/").back();
+//
+//        // Print the nodes of the scene and their attributes recursively.
+//        // Note that we are not printing the root node because it should
+//        // not contain any attributes.
+//        FbxNode* lRootNode = lScene->GetRootNode();
+//        buildModelTree(lRootNode);
+//        //if (lRootNode) {
+//        //    for (int i = 0; i < lRootNode->GetChildCount(); i++)
+//        //        buildModelTree(lRootNode->GetChild(i));
+//        //}
+//        // Destroy the SDK manager and all the other objects it was handling.
+//        lSdkManager->Destroy();
+//
+//        return m_model;
+//    }
 
 
     std::shared_ptr<GameObject> Model::

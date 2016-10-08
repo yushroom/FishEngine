@@ -301,6 +301,7 @@ void DefaultScene()
     auto light_go = Scene::CreateGameObject("Directional Light");
     light_go->transform()->setPosition(0, 3, 0);
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
+    //auto euler = light_go->transform()->localEulerAngles();
     light_go->AddComponent(Light::Create());
     light_go->AddScript(make_shared<Rotator>());
 }
@@ -456,7 +457,7 @@ void DefaultScene()
 //};
 
 template<typename T>
-void RecursivelyAddScript(std::shared_ptr<FishEngine::Transform>& t)
+void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
 {
 
     t->gameObject()->AddScript(make_shared<T>());
@@ -512,37 +513,37 @@ public:
 
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
-        std::string chan_texture_dir = chan_root_dir + "textures/";
-        auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "body_01.tga");
-        auto skinTexture = Texture::CreateFromFile(chan_texture_dir + "skin_01.tga");
-        auto hairTexture = Texture::CreateFromFile(chan_texture_dir + "hair_01.tga");
-        auto faceTexture = Texture::CreateFromFile(chan_texture_dir + "face_00.tga");
-        auto eyelineTexture = Texture::CreateFromFile(chan_texture_dir + "eyeline_00.tga");
-        auto eyeirisLTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_L_00.tga");
-        auto eyeirisRTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_R_00.tga");
-        auto cheekTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
-        
-        //auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
-        auto rolloffTexture = Texture::CreateFromFile(chan_texture_dir + "FO_CLOTH1.tga");
-        auto rimLightTexture = Texture::CreateFromFile(chan_texture_dir + "FO_RIM1.tga");
-        auto specularTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_SPEC.tga");
-        auto envTexture = Texture::CreateFromFile(chan_texture_dir + "ENV2.tga");
-        auto normalMapTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_NRM.tga");
+//        std::string chan_texture_dir = chan_root_dir + "textures/";
+//        auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "body_01.tga");
+//        auto skinTexture = Texture::CreateFromFile(chan_texture_dir + "skin_01.tga");
+//        auto hairTexture = Texture::CreateFromFile(chan_texture_dir + "hair_01.tga");
+//        auto faceTexture = Texture::CreateFromFile(chan_texture_dir + "face_00.tga");
+//        auto eyelineTexture = Texture::CreateFromFile(chan_texture_dir + "eyeline_00.tga");
+//        auto eyeirisLTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_L_00.tga");
+//        auto eyeirisRTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_R_00.tga");
+//        auto cheekTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+//        
+//        //auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+//        auto rolloffTexture = Texture::CreateFromFile(chan_texture_dir + "FO_CLOTH1.tga");
+//        auto rimLightTexture = Texture::CreateFromFile(chan_texture_dir + "FO_RIM1.tga");
+//        auto specularTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_SPEC.tga");
+//        auto envTexture = Texture::CreateFromFile(chan_texture_dir + "ENV2.tga");
+//        auto normalMapTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_NRM.tga");
 
         
-        auto chanMainShader = make_shared<Shader>();
-        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
-        auto bodyMaterial = Material::CreateMaterial();
-        bodyMaterial->SetShader(chanMainShader);
-        bodyMaterial->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        bodyMaterial->SetFloat("_SpecularPower", 20.f);
-        bodyMaterial->SetTexture("_MainTex", bodyTexture);
-        bodyMaterial->SetTexture("_FalloffSampler", rolloffTexture);
-        bodyMaterial->SetTexture("_RimLightSampler", rimLightTexture);
-        bodyMaterial->SetTexture("_SpecularReflectionSampler", specularTexture);
-        bodyMaterial->SetTexture("_EnvMapSampler", envTexture);
-        bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
-        
+//        auto chanMainShader = make_shared<Shader>();
+//        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
+//        auto bodyMaterial = Material::CreateMaterial();
+//        bodyMaterial->SetShader(chanMainShader);
+//        bodyMaterial->SetVector4("_Color", Vector4(1, 1, 1, 1));
+//        bodyMaterial->SetFloat("_SpecularPower", 20.f);
+//        bodyMaterial->SetTexture("_MainTex", bodyTexture);
+//        bodyMaterial->SetTexture("_FalloffSampler", rolloffTexture);
+//        bodyMaterial->SetTexture("_RimLightSampler", rimLightTexture);
+//        bodyMaterial->SetTexture("_SpecularReflectionSampler", specularTexture);
+//        bodyMaterial->SetTexture("_EnvMapSampler", envTexture);
+//        bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
+//        
         
         map<string, Texture::PTexture> textures;
         //textures["skyTex"] = sky_texture;
@@ -567,7 +568,7 @@ public:
         //auto animator = std::make_shared<Animator>();
         //animator->m_animation = jump00Model->mainAnimation();
         //modelGO->AddComponent(animator);
-        modelGO->AddScript(make_shared<DrawSkeleton>());
+        //modelGO->AddScript(make_shared<DrawSkeleton>());
         RecursivelyAddScript<DrawSkeleton>(modelGO->transform());
         //material->BindTextures("DiffuseMap", )
         for (auto name : {"mesh0", "mesh1", "mesh2", "mesh3", "mesh4", "mesh5"}) {

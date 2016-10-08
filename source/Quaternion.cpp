@@ -7,36 +7,38 @@ namespace FishEngine {
     Vector3 Quaternion::eulerAngles() const
     {
         // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-        float yaw, pitch, roll;
+        // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_Angles_Conversion
+        float heading, attitude, bank;  // y, z, x
         float sqx = x*x;
         float sqy = y*y;
         float sqz = z*z;
         float sqw = w*w;
         float unit = sqx + sqy + sqz + sqw;
-        float test = w*x + y*z;
+        float test = x*y + z*w;
         if (test > 0.499f * unit) {
-            yaw = 2 * atan2(z, w);
-            pitch = Mathf::PI / 2.f;
-            roll = 0.0f;
+            heading = 2 * atan2(x, w);
+            attitude = Mathf::PI / 2.f;
+            bank = 0.0f;
         }
         else {
             if (test < -0.499f * unit) {
-                yaw = 02 * atan2(z, w);
-                pitch = -Mathf::PI / 2;
-                roll = 0.f;
+                heading = -2 * atan2(x, w);
+                attitude = -Mathf::PI / 2;
+                bank = 0.f;
             }
             else {
-                yaw = atan2(2 * (y*w - x*z), -sqx - sqy + sqz + sqw);
-                pitch = asin(2 * test / unit);
-                roll = atan2(2 * (z*w - x*y), -sqx + sqy - sqz + sqw);
+                heading = atan2(2 * (y*w - x*z), sqx - sqy - sqz + sqw);
+                attitude = asin(2 * test / unit);
+                bank = atan2(2 * (x*w - y*z), -sqx + sqy - sqz + sqw);
             }
         }
-        return Vector3(pitch, yaw, roll) * Mathf::Rad2Deg;
+        return Vector3(bank, heading, attitude) * Mathf::Rad2Deg;
         //return Vector3(pitch(), yaw(), roll());
     }
 
     FishEngine::Quaternion Quaternion::Euler(const Vector3& euler)
     {
+        // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_to_Quaternion_Conversion
         Quaternion result;
         auto rad = euler * (Mathf::Deg2Rad * 0.5f);
         auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));

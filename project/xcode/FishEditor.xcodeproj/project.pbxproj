@@ -23,9 +23,11 @@
 		BF51E6611DA1634800AF948A /* libPvdRuntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6291DA1634800AF948A /* libPvdRuntime.a */; };
 		BF51E6651DA1634800AF948A /* libPxTask.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E62D1DA1634800AF948A /* libPxTask.a */; };
 		BF51E6691DA1634800AF948A /* libSceneQuery.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6311DA1634800AF948A /* libSceneQuery.a */; };
-		BF51E66D1DA1634800AF948A /* libSimulationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF51E6351DA1634800AF948A /* libSimulationController.a */; };
 		BF51E68C1DA2C63D00AF948A /* EditorTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51E68A1DA2C63D00AF948A /* EditorTime.cpp */; };
 		BF6E19EB1D919FA100C9D2E8 /* imgui_dock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */; };
+		BFB361A11DAA2D7200CD0DCB /* libboost_serialization-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */; };
+		BFB361A21DAA2D7200CD0DCB /* libboost_system-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */; };
+		BFB361A41DAA324E00CD0DCB /* libSimulationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB361A31DAA324E00CD0DCB /* libSimulationController.a */; };
 		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
 		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
 		BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */; };
@@ -92,11 +94,13 @@
 		BF51E6291DA1634800AF948A /* libPvdRuntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPvdRuntime.a; path = ../../external/libs/osx/libPvdRuntime.a; sourceTree = "<group>"; };
 		BF51E62D1DA1634800AF948A /* libPxTask.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPxTask.a; path = ../../external/libs/osx/libPxTask.a; sourceTree = "<group>"; };
 		BF51E6311DA1634800AF948A /* libSceneQuery.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSceneQuery.a; path = ../../external/libs/osx/libSceneQuery.a; sourceTree = "<group>"; };
-		BF51E6351DA1634800AF948A /* libSimulationController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSimulationController.a; path = ../../external/libs/osx/libSimulationController.a; sourceTree = "<group>"; };
 		BF51E68A1DA2C63D00AF948A /* EditorTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorTime.cpp; path = ../../source/FishEditor/EditorTime.cpp; sourceTree = "<group>"; };
 		BF51E68B1DA2C63D00AF948A /* EditorTime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = EditorTime.hpp; path = ../../source/FishEditor/EditorTime.hpp; sourceTree = "<group>"; };
 		BF6E19E81D919F4E00C9D2E8 /* imgui_dock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_dock.h; path = ../../external/imgui/imgui_dock.h; sourceTree = "<group>"; };
 		BF6E19EA1D919FA100C9D2E8 /* imgui_dock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_dock.cpp; path = ../../external/imgui/imgui_dock.cpp; sourceTree = "<group>"; };
+		BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_serialization-mt.a"; path = "/usr/local/Cellar/boost/1.62.0/lib/libboost_serialization-mt.a"; sourceTree = "<absolute>"; };
+		BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_system-mt.a"; path = "/usr/local/Cellar/boost/1.62.0/lib/libboost_system-mt.a"; sourceTree = "<absolute>"; };
+		BFB361A31DAA324E00CD0DCB /* libSimulationController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSimulationController.a; path = ../../external/libs/osx/libSimulationController.a; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
 		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
@@ -131,9 +135,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFB361A41DAA324E00CD0DCB /* libSimulationController.a in Frameworks */,
 				BF51E6471DA1634800AF948A /* libPhysX3Common.a in Frameworks */,
 				BF51E6411DA1634800AF948A /* libPhysX3.a in Frameworks */,
 				BF51E64B1DA1634800AF948A /* libPhysX3Cooking.a in Frameworks */,
+				BFB361A11DAA2D7200CD0DCB /* libboost_serialization-mt.a in Frameworks */,
 				BF51E6591DA1634800AF948A /* libPhysXProfileSDK.a in Frameworks */,
 				BF51E65D1DA1634800AF948A /* libPhysXVisualDebuggerSDK.a in Frameworks */,
 				BF51E6391DA1634800AF948A /* libLowLevel.a in Frameworks */,
@@ -141,6 +147,7 @@
 				BFDC75361D8EE3DB0082A6DC /* CoreVideo.framework in Frameworks */,
 				BFDC75331D8EE3D00082A6DC /* IOKit.framework in Frameworks */,
 				BF51E6501DA1634800AF948A /* libPhysX3Extensions.a in Frameworks */,
+				BFB361A21DAA2D7200CD0DCB /* libboost_system-mt.a in Frameworks */,
 				BF51E6421DA1634800AF948A /* libPhysX3CharacterKinematic.a in Frameworks */,
 				BF51E64F1DA1634800AF948A /* libPhysX3DEBUG.a in Frameworks */,
 				BF51E63B1DA1634800AF948A /* libLowLevelCloth.a in Frameworks */,
@@ -151,7 +158,6 @@
 				BFDC75291D8EE1250082A6DC /* libGLEW.a in Frameworks */,
 				BF51E6691DA1634800AF948A /* libSceneQuery.a in Frameworks */,
 				BF51E6611DA1634800AF948A /* libPvdRuntime.a in Frameworks */,
-				BF51E66D1DA1634800AF948A /* libSimulationController.a in Frameworks */,
 				BFDC75281D8EE1250082A6DC /* libassimp.a in Frameworks */,
 				BFDC752A1D8EE1250082A6DC /* libglfw3.a in Frameworks */,
 				BF51E6541DA1634800AF948A /* libPhysX3PROFILE.a in Frameworks */,
@@ -163,6 +169,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BFB361AB1DAA32C600CD0DCB /* boost */ = {
+			isa = PBXGroup;
+			children = (
+				BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */,
+				BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */,
+			);
+			name = boost;
+			sourceTree = "<group>";
+		};
+		BFB361AC1DAA32CE00CD0DCB /* physx */ = {
+			isa = PBXGroup;
+			children = (
+				BF51E6011DA1634800AF948A /* libLowLevel.a */,
+				BF51E6031DA1634800AF948A /* libLowLevelCloth.a */,
+				BF51E6091DA1634800AF948A /* libPhysX3.a */,
+				BF51E60A1DA1634800AF948A /* libPhysX3CharacterKinematic.a */,
+				BF51E60F1DA1634800AF948A /* libPhysX3Common.a */,
+				BF51E6131DA1634800AF948A /* libPhysX3Cooking.a */,
+				BF51E6171DA1634800AF948A /* libPhysX3DEBUG.a */,
+				BF51E6181DA1634800AF948A /* libPhysX3Extensions.a */,
+				BF51E61C1DA1634800AF948A /* libPhysX3PROFILE.a */,
+				BF51E61D1DA1634800AF948A /* libPhysX3Vehicle.a */,
+				BF51E6211DA1634800AF948A /* libPhysXProfileSDK.a */,
+				BF51E6251DA1634800AF948A /* libPhysXVisualDebuggerSDK.a */,
+				BF51E6291DA1634800AF948A /* libPvdRuntime.a */,
+				BF51E62D1DA1634800AF948A /* libPxTask.a */,
+				BF51E6311DA1634800AF948A /* libSceneQuery.a */,
+				BFB361A31DAA324E00CD0DCB /* libSimulationController.a */,
+			);
+			name = physx;
+			sourceTree = "<group>";
+		};
 		BFDC74EB1D8EDEEC0082A6DC = {
 			isa = PBXGroup;
 			children = (
@@ -234,26 +272,12 @@
 			isa = PBXGroup;
 			children = (
 				BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */,
+				BFB361AC1DAA32CE00CD0DCB /* physx */,
+				BFB361AB1DAA32C600CD0DCB /* boost */,
 				BFDC75251D8EE1250082A6DC /* libassimp.a */,
 				BFDC75261D8EE1250082A6DC /* libGLEW.a */,
 				BFDC75271D8EE1250082A6DC /* libglfw3.a */,
 				BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */,
-				BF51E6011DA1634800AF948A /* libLowLevel.a */,
-				BF51E6031DA1634800AF948A /* libLowLevelCloth.a */,
-				BF51E6091DA1634800AF948A /* libPhysX3.a */,
-				BF51E60A1DA1634800AF948A /* libPhysX3CharacterKinematic.a */,
-				BF51E60F1DA1634800AF948A /* libPhysX3Common.a */,
-				BF51E6131DA1634800AF948A /* libPhysX3Cooking.a */,
-				BF51E6171DA1634800AF948A /* libPhysX3DEBUG.a */,
-				BF51E6181DA1634800AF948A /* libPhysX3Extensions.a */,
-				BF51E61C1DA1634800AF948A /* libPhysX3PROFILE.a */,
-				BF51E61D1DA1634800AF948A /* libPhysX3Vehicle.a */,
-				BF51E6211DA1634800AF948A /* libPhysXProfileSDK.a */,
-				BF51E6251DA1634800AF948A /* libPhysXVisualDebuggerSDK.a */,
-				BF51E6291DA1634800AF948A /* libPvdRuntime.a */,
-				BF51E62D1DA1634800AF948A /* libPxTask.a */,
-				BF51E6311DA1634800AF948A /* libSceneQuery.a */,
-				BF51E6351DA1634800AF948A /* libSimulationController.a */,
 			);
 			name = lib;
 			sourceTree = "<group>";
@@ -454,15 +478,21 @@
 		BFDC74FC1D8EDEEC0082A6DC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				HEADER_SEARCH_PATHS = (
 					../../source/,
 					../../external/,
 					../../external/glew,
-					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
+					../../external/folly,
+					/usr/local/include,
 				);
-				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
+				LIBRARY_SEARCH_PATHS = (
+					../../external/libs/osx,
+					/usr/local/Cellar/boost/1.62.0/lib,
+					/usr/local/Cellar/folly/2016.09.05.00_1/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -470,15 +500,21 @@
 		BFDC74FD1D8EDEEC0082A6DC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				HEADER_SEARCH_PATHS = (
 					../../source/,
 					../../external/,
 					../../external/glew,
-					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
+					../../external/folly,
+					/usr/local/include,
 				);
-				LIBRARY_SEARCH_PATHS = ../../external/libs/osx;
+				LIBRARY_SEARCH_PATHS = (
+					../../external/libs/osx,
+					/usr/local/Cellar/boost/1.62.0/lib,
+					/usr/local/Cellar/folly/2016.09.05.00_1/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -3,6 +3,7 @@
 
 #include "FishEngine.hpp"
 #include <string>
+#include "Serialization.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -27,6 +28,14 @@ public:
 
 protected:
     std::string m_name;
+    
+private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    inline void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & BOOST_SERIALIZATION_NVP(m_name);
+    }
 };
 
 NAMESPACE_FISHENGINE_END

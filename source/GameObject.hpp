@@ -88,15 +88,57 @@ public:
 
 
     // Adds a component class named className to the game object.
-    void AddComponent(std::shared_ptr<Component> component) {
+    template<class T,
+             std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
+    void AddComponent(std::shared_ptr<T> component) {
+        static_assert(std::is_base_of<Component, T>::value, "Component only");
         component->m_gameObject = m_transform->gameObject();
         m_components.push_back(component);
     }
     
-    void AddScript(std::shared_ptr<Script> script) {
+    template<class T,
+             std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
+    void AddComponent(std::shared_ptr<T> component) {
+        static_assert(std::is_base_of<Script, T>::value, "Script only");
+        component->m_gameObject = m_transform->gameObject();
+        m_scripts.push_back(component);
+    }
+    
+//    void AddComponent(std::shared_ptr<Script> component) {
+//        component->m_gameObject = m_transform->gameObject();
+//        m_components.push_back(component);
+//    }
+    
+    template<class T,
+              std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
+    void AddComponent() {
+        static_assert(std::is_base_of<Component, T>::value, "Component only");
+        auto component = std::make_shared<T>();
+        component->m_gameObject = m_transform->gameObject();
+        m_components.push_back(component);
+    }
+    
+    template<class T,
+             std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
+    void AddComponent() {
+        static_assert(std::is_base_of<Script, T>::value, "Script only");
+        auto script = std::make_shared<T>();
         script->m_gameObject = m_transform->gameObject();
         m_scripts.push_back(script);
     }
+    
+//    void AddScript(std::shared_ptr<Script> script) {
+//        script->m_gameObject = m_transform->gameObject();
+//        m_scripts.push_back(script);
+//    }
+    
+//    template<typename T>
+//    void AddScript() {
+//        auto script = std::make_shared<T>();
+//        script->m_gameObject = m_transform->gameObject();
+//        m_scripts.push_back(script);
+//    }
+
 
     void RemoveComponent(std::shared_ptr<Component> component) {
         m_components.remove(component);

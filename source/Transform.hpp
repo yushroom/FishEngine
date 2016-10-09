@@ -254,6 +254,15 @@ private:
 
     bool dirtyInHierarchy() const;
     void MakeDirty() const;
+    
+    friend class boost::serialization::access;
+    template<class Archive>
+    inline void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & BOOST_SERIALIZATION_NVP(m_localPosition)
+        & BOOST_SERIALIZATION_NVP(m_localRotation)
+        & BOOST_SERIALIZATION_NVP(m_localScale);
+    }
 };
 
 NAMESPACE_FISHENGINE_END

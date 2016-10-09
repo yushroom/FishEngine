@@ -31,7 +31,11 @@ using namespace FishEditor;
 #include <BoxCollider.hpp>
 #include <SphereCollider.hpp>
 #include <Rigidbody.hpp>
-#include <boost/algorithm/string.hpp>
+//#include <boost/type_traits.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <Serialization.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -293,7 +297,7 @@ void DefaultScene()
     auto camera = Camera::Create(60.0f, Screen::aspect(), 0.3f, 1000.f);
     auto camera_go = Scene::CreateGameObject("Main Camera");
     camera_go->AddComponent(camera);
-    camera_go->AddScript(make_shared<CameraController>());
+    camera_go->AddComponent<CameraController>();
     camera_go->transform()->setLocalPosition(0, 0, 5);
     camera_go->transform()->LookAt(0, 0, 0);
     camera_go->SetTag("MainCamera");
@@ -303,7 +307,7 @@ void DefaultScene()
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
     //auto euler = light_go->transform()->localEulerAngles();
     light_go->AddComponent(Light::Create());
-    light_go->AddScript(make_shared<Rotator>());
+    light_go->AddComponent<Rotator>();
 }
             
 //class TestPBR : public App
@@ -460,7 +464,7 @@ template<typename T>
 void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
 {
 
-    t->gameObject()->AddScript(make_shared<T>());
+    t->gameObject()->AddComponent<T>();
     for (auto& c : t->children()) {
         RecursivelyAddScript<T>(c.lock());
     }
@@ -575,7 +579,7 @@ public:
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             auto renderer = child->GetComponent<MeshRenderer>();
-            renderer->setAvatar(jump00Model->avatar());
+            //renderer->setAvatar(jump00Model->avatar());
             renderer->setRootBone(modelGO->transform());
             //renderer->SetMaterial(material);
             //renderer->AddMaterial(material2);
@@ -696,13 +700,13 @@ public:
         auto cameraGO = Camera::mainGameCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
-        cameraGO->AddScript(make_shared<ShowFPS>());
-        cameraGO->AddScript(make_shared<TakeScreenShot>());
+        cameraGO->AddComponent<ShowFPS>();
+        cameraGO->AddComponent<TakeScreenShot>();
         //cameraGO->AddScript(make_shared<RenderSettings>());
         //cameraGO->AddScript(make_shared<DisplayMatrix>());
         auto s = make_shared<EditorRenderSettings>();
         s->m_useGammaCorrection = false;
-        cameraGO->AddScript(s);
+        cameraGO->AddComponent(s);
         //cameraGO->GetComponent<EditorRenderSettings>()->m_useGammaCorrection = false;
 
         Selection::setActiveGameObject(cameraGO);
@@ -715,8 +719,7 @@ std::shared_ptr<GameObject> CreateCube()
     auto go = model->CreateGameObject();
     auto collider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
     go->AddComponent(collider);
-    auto rigidBody = make_shared<Rigidbody>();
-    go->AddComponent(rigidBody);
+    go->AddComponent<Rigidbody>();
     collider->physicsShape();
     return go;
 }
@@ -742,8 +745,7 @@ public:
         sphereGO->transform()->setPosition(0, 0, 0);
         auto sphereCollider = make_shared<SphereCollider>(Vector3::zero, 0.5f);
         sphereGO->AddComponent(sphereCollider);
-        auto rigidBody = make_shared<Rigidbody>();
-        sphereGO->AddComponent(rigidBody);
+        sphereGO->AddComponent<Rigidbody>();
         sphereCollider->physicsShape();
         
         //auto cubeGO = CreateCube();
@@ -754,9 +756,52 @@ public:
         //cameraGO->AddComponent(make_shared<TestGizmos>());
     }
 };
+            
+void test()
+{
+    cout << std::is_base_of<Component, Mesh>::value;
+    {
+        Vector3 v(1, 2, 3);
+        Vector3 v2;
+        std::stringstream ss;
+        boost::archive::xml_oarchive oa(ss);
+        oa << BOOST_SERIALIZATION_NVP(v);
+        
+        boost::archive::xml_iarchive ia(ss);
+        ia >> BOOST_SERIALIZATION_NVP(v2);
+        auto xml = ss.str();
+        cout << xml << endl;
+    }
+    {
+        Transform t;
+        t.setLocalPosition(1, 2, 3);
+        t.setLocalEulerAngles(10, 15, 27);
+        t.setLocalScale(1.1, 2.2, 3.3);
+        Transform t2;
+        std::stringstream ss;
+        boost::archive::xml_oarchive oa(ss);
+        oa << BOOST_SERIALIZATION_NVP(t);
+        
+        boost::archive::xml_iarchive ia(ss);
+        ia >> BOOST_SERIALIZATION_NVP(t2);
+        auto xml = ss.str();
+        cout << xml << endl;
+    }
+    {
+        std::stringstream ss;
+        boost::archive::xml_oarchive oa(ss);
+        boost::archive::xml_iarchive ia(ss);
+        
+        Camera camera2(60.0f, Screen::aspect(), 0.3f, 1000.f);
+        oa << BOOST_SERIALIZATION_NVP(camera2);
+        auto xml = ss.str();
+        cout << xml << endl;
+    }
+}
 
 int main()
 {
+    test();
     FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();

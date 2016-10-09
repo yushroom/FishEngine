@@ -628,7 +628,11 @@ namespace FishEngine {
         if (node->meshesIndices.size() == 1) {
             auto material = Material::defaultMaterial();
             auto meshRenderer = std::make_shared<MeshRenderer>(material);
-            auto meshFilter = std::make_shared<MeshFilter>(m_meshes[node->meshesIndices.front()]);
+            const auto& mesh = m_meshes[node->meshesIndices.front()];
+            if (mesh->m_skinned) {
+                meshRenderer->setAvatar(m_avatar);
+            }
+            auto meshFilter = std::make_shared<MeshFilter>(mesh);
             go->AddComponent(meshRenderer);
             go->AddComponent(meshFilter);
         } else if (node->meshesIndices.size() > 1) {
@@ -638,7 +642,11 @@ namespace FishEngine {
                 child->transform()->SetParent(go->transform());
                 auto material = Material::builtinMaterial("SkinnedMesh");
                 auto meshRenderer = std::make_shared<MeshRenderer>(material);
-                auto meshFilter = std::make_shared<MeshFilter>(m_meshes[idx]);
+                const auto& mesh = m_meshes[idx];
+                if (mesh->m_skinned) {
+                    meshRenderer->setAvatar(m_avatar);
+                }
+                auto meshFilter = std::make_shared<MeshFilter>(mesh);
                 child->AddComponent(meshRenderer);
                 child->AddComponent(meshFilter);
             }

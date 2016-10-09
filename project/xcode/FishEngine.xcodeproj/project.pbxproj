@@ -545,7 +545,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -592,7 +592,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -636,9 +636,10 @@
 				HEADER_SEARCH_PATHS = (
 					../../external,
 					../../external/glew,
-					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
 					../../external/fbxsdk/include,
+					../../external/folly,
+					/usr/local/Cellar/boost/1.62.0/include/,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -653,9 +654,10 @@
 				HEADER_SEARCH_PATHS = (
 					../../external,
 					../../external/glew,
-					../../external/boost_1_61_0,
 					../../external/PhysXSDK/Include,
 					../../external/fbxsdk/include,
+					../../external/folly,
+					/usr/local/Cellar/boost/1.62.0/include/,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

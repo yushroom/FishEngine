@@ -154,7 +154,7 @@ private:
 
 
 // position buffer array
-class SimpleMesh
+class SimpleMesh : public Object
 {
 public:
     // 3 components(float) for each vertex

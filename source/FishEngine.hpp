@@ -72,4 +72,10 @@ namespace FishEditor {
     class SceneView;
 }
 
+namespace boost {
+    namespace serialization {
+        class access;
+    }
+}
+
 #endif /* FishEngine_h */

@@ -17,11 +17,29 @@ public:
                              int line) override
     {
         // error processing implementation
-        Debug::LogWarning("Pyhsx Error[file %s at line %d]: %s", file, message, line);
+        Debug::LogWarning("Pyhsx Error[file %s at line %d]: %s", file, line, message);
+        abort();
     }
 };
 
+//class FishEnginePhysxAllocator : public PxAllocatorCallback
+//{
+//public:
+//    void* allocate(size_t size, const char*, const char*, int)
+//    {
+//        void* ptr = ::memalign(16, size);
+//        PX_ASSERT((reinterpret_cast<size_t>(ptr) & 15)==0);
+//        return ptr;
+//    }
+//    
+//    void deallocate(void* ptr)
+//    {
+//        ::free(ptr);
+//    }
+//};
+
 PxDefaultAllocator		gAllocator;
+//FishEnginePhysxAllocator		gAllocator;
 //PxDefaultErrorCallback	gErrorCallback;
 FishEnginePhysxErrorCallback       gErrorCallback;
 

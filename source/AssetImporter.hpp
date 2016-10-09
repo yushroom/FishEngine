@@ -4,6 +4,11 @@
 #include "FishEngine.hpp"
 #include "Object.hpp"
 
+#define BOOST_FILESYSTEM_NO_DEPRECATED
+#include <boost/filesystem.hpp>
+
+using Path = boost::filesystem::path;
+
 namespace FishEngine {
     class AssetImporter : public Object
     {
@@ -15,10 +20,15 @@ namespace FishEngine {
         
         static PAssetImporter GetAtPath(const std::string& path);
         
+        static Path assetsRootDirectory() {
+            return s_assetsRootDirectory;
+        }
+        
     private:
         std::string m_assetBundleName;
         std::string m_assetBundelVariant;
-        std::string m_assetPath;
+        Path m_assetPath;
+        static Path s_assetsRootDirectory;
     };
 }
 

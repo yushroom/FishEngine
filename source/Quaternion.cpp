@@ -72,4 +72,49 @@ namespace FishEngine {
             }
         }
     }
+
+    FishEngine::Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b, float t)
+    {
+        SlerpUnclamped(a, b, Mathf::Clamp01(t));
+    }
+
+    FishEngine::Quaternion Quaternion::SlerpUnclamped(const Quaternion& a, const Quaternion& b, float t)
+    {
+        // from Assimp
+
+        float cosTheta = Quaternion::Dot(a, b);
+
+        // adjust signs (if necessary)
+        Quaternion end = b;
+        if (cosTheta < 0.0f)
+        {
+            cosTheta = -cosTheta;
+            end.x = -end.x;
+            end.y = -end.y;
+            end.z = -end.z;
+            end.w = -end.w;
+        }
+
+        float sclp, sclq;
+        if ((1.0f - cosTheta) > 0.0001f) {
+            // Standard case (slerp)
+            float theta, sinTheta;
+            theta    = std::acos(cosTheta);
+            sinTheta = std::sin(theta);
+            sclp     = std::sin((1.0f - t) * theta) / sinTheta;
+            sclq     = std::sin(t * theta) / sinTheta;
+        }
+        else {
+            // Very close, do LERP (because it's faster)
+            sclp = 1.0f - t;
+            sclq = t;
+        }
+
+        return Quaternion(
+            sclp * a.x + sclq * end.x,
+            sclp * a.y + sclq * end.y,
+            sclp * a.z + sclq * end.z,
+            sclp * a.w + sclq * end.w);
+    }
+
 }

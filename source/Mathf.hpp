@@ -177,6 +177,12 @@ public:
         return a + (b - a)*Clamp01(t);
     }
 
+
+    template<typename T>
+    static T LerpUnclamped(const T& a, const T& b, const float t) {
+        return a + (b - a) * t;
+    }
+
     static float LerpUnclamped(float a, float b, float t)
     {
         return a + (b - a) * t;

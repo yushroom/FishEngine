@@ -464,7 +464,6 @@ void DefaultScene()
 template<typename T>
 void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
 {
-
     t->gameObject()->AddComponent<T>();
     for (auto& c : t->children()) {
         RecursivelyAddScript<T>(c.lock());
@@ -514,7 +513,7 @@ public:
         //auto model = importer.LoadFBX(chan_root_dir + "models/unitychan.fbx");
         //auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
         ModelImporter importer2;
-        importer2.setNormalsImportSettings(ImporterSettings::Calculate);
+        importer2.setImportNormals(ModelImporterNormals::Calculate);
         importer2.setFileScale(0.01f);
         auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
         //auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
@@ -565,33 +564,10 @@ public:
         skyboxGO->AddComponent(meshRenderer);
 
         textures["AmbientCubemap"] = sky_texture;
-        
-        //auto modelGO = model->CreateGameObject();
 
         auto modelGO = jump00Model->CreateGameObject();
-        //go->transform()->setLocalEulerAngles(90, 0, 0);
-        //modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
-        //modelGO->transform()->setLocalPosition(0, 0, 0);
-        //auto animator = std::make_shared<Animator>();
-        //animator->m_animation = jump00Model->mainAnimation();
-        //modelGO->AddComponent(animator);
-        //modelGO->AddScript(make_shared<DrawSkeleton>());
         RecursivelyAddScript<DrawSkeleton>(modelGO->transform());
-        //material->BindTextures("DiffuseMap", )
-        for (auto name : {"mesh0", "mesh1", "mesh2", "mesh3", "mesh4", "mesh5"}) {
-            auto child = FindNamedChild(modelGO, name);
-            assert(child != nullptr);
-            auto renderer = child->GetComponent<MeshRenderer>();
-            //renderer->setAvatar(jump00Model->avatar());
-            renderer->setRootBone(modelGO->transform());
-            //renderer->SetMaterial(material);
-            //renderer->AddMaterial(material2);
-        }
 
-        //auto jump00GO = jump00Model->CreateGameObject();
-        //jump00GO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
-        
-        //auto go = FindNamedChild(modelGO, "button");
         std::shared_ptr<GameObject> go;
 
         //constexpr float edgeThickness = 0.5f;

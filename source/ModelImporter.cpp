@@ -66,7 +66,7 @@ namespace FishEngine {
         //}
         auto node = std::make_shared<ModelNode>();
         node->name = assimp_node->mName.C_Str();
-        Debug::LogWarning("Node: %s", node->name.c_str());
+        //Debug::LogWarning("Node: %s", node->name.c_str());
         node->transform = ConvertMatrix(assimp_node->mTransformation);
         node->transform.m[0][3] *= m_fileScale;
         node->transform.m[1][3] *= m_fileScale;
@@ -195,9 +195,6 @@ namespace FishEngine {
                 std::string boneName(bone->mName.C_Str());
                 Debug::Log("    bone name: %s", boneName.c_str());
                 mesh->m_boneNameToIndex[boneName] = boneIndex;
-                //auto it = mesh->m_boneNameToIndex.find(boneName);
-                //it->second->isBone = true;
-                //uint32_t boneIndex = it->second;
 
                 auto offsetMat = ConvertMatrix(bone->mOffsetMatrix);
                 offsetMat.m[0][3] *= m_fileScale;
@@ -220,10 +217,6 @@ namespace FishEngine {
 
         mesh->GenerateBuffer(m_vertexUsages);
         mesh->BindBuffer(m_vertexUsages);
-        //mesh->m_name = std::string(assimp_mesh->mName.C_Str());
-        //if (mesh->m_name.size() == 0) {
-        //    mesh->m_name = "Mesh" + boost::lexical_cast<std::string>(meshIndex);
-        //}
         return mesh;
     }
 
@@ -371,6 +364,61 @@ namespace FishEngine {
 //    }
 
 
+    Vector3 ConvertVector3(const aiVector3D& avec3) {
+        return Vector3(avec3.x, avec3.y, avec3.z);
+    };
+
+    Quaternion ConvertQuaternion(const aiQuaternion& aquat) {
+        return Quaternion(aquat.x, aquat.y, aquat.z, aquat.w);
+    };
+
+    std::shared_ptr<Animation>
+    ParseAnimation(
+        const aiAnimation* assimp_animation, const float fileScale)
+    {
+        auto animation = std::make_shared<Animation>();
+        auto& a = assimp_animation;
+        animation->name = a->mName.C_Str();
+        animation->duration = (float)a->mDuration;
+        animation->ticksPerSecond = (float)a->mTicksPerSecond;
+        if (animation->ticksPerSecond <= 0.f) {
+            animation->ticksPerSecond = 25.f;
+        }
+        //animation->channels.resize(a->mNumChannels);
+
+        for (uint32_t i = 0; i < a->mNumChannels; ++i) {
+            auto an = a->mChannels[i];
+            std::string name = an->mNodeName.C_Str();
+    #ifndef PRESERVE_FBX_PIVOT
+            auto pos = name.find("_$AssimpFbx$");
+            Debug::Log("old name: %s", name.c_str());
+            if (pos != std::string::npos) {
+                name = name.substr(0, pos);
+                Debug::Log("new name: %s", name.c_str());
+            }
+    #endif
+            auto it = animation->channels.find(name);
+            if (it == animation->channels.end()) {
+                animation->channels[name] = AnimationNode();
+            }
+            auto& n = animation->channels[name];
+
+            n.name = name;
+            for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
+                n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue)*fileScale });
+            }
+            for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
+                n.rotationKeys.emplace_back(QuaternionKey{ (float)an->mRotationKeys[j].mTime, ConvertQuaternion(an->mRotationKeys[j].mValue) });
+            }
+            for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
+                n.scalingKeys.emplace_back(Vector3Key{ (float)an->mScalingKeys[j].mTime, ConvertVector3(an->mScalingKeys[j].mValue) });
+            }
+        }
+        Debug::Log("animation name: %s", a->mName.C_Str());
+        return animation;
+    }
+
+
     std::shared_ptr<Model> ModelImporter::
     LoadFromFile(
         const std::string&  path)
@@ -396,20 +444,20 @@ namespace FishEngine {
         //load_option |= aiProcess_OptimizeGraph;
         load_option |= aiProcess_ConvertToLeftHanded;
         //load_option |= aiProcess_FlipUVs;
-#ifndef PRESERVE_PIVOT
+#ifndef PRESERVE_FBX_PIVOT
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 #endif
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_LIGHTS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_CAMERAS, false);
-        if (m_normalsImportSettings == ImporterSettings::Calculate) {
+        if (m_importNormals == ModelImporterNormals::Calculate) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
             load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;
         } else {
             load_option |= aiProcess_GenNormals;
         }
-        bool load_tangent = (m_tangentsImportSettings != ImporterSettings::None);
+        bool load_tangent = (m_importTangents != ModelImporterTangents::None);
         if (load_tangent)
             load_option |= aiProcess_CalcTangentSpace;
         const aiScene* scene = importer.ReadFile(path.c_str(), load_option);
@@ -440,95 +488,8 @@ namespace FishEngine {
             m_model->AddMesh(mesh);
         }
 
-        auto ConvertVector3 = [](const aiVector3D& avec3) {
-            return Vector3(avec3.x, avec3.y, avec3.z);
-        };
-
-        auto ConvertQuaternion = [](const aiQuaternion& aquat) {
-            return Quaternion(aquat.x, aquat.y, aquat.z, aquat.w);
-        };
-
         for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
-            m_model->m_animations.push_back(std::make_shared<Animation>());
-            auto& animation = m_model->m_animations.back();
-            auto a = scene->mAnimations[animIndex];
-            animation->name = a->mName.C_Str();
-            animation->duration = (float)a->mDuration;
-            animation->ticksPerSecond = (float)a->mTicksPerSecond;
-            //animation->channels.resize(a->mNumChannels);
-
-            for (uint32_t i = 0; i < a->mNumChannels; ++i) {
-                auto an = a->mChannels[i];
-                std::string name = an->mNodeName.C_Str();
-#ifndef PRESERVE_PIVOT
-                auto pos = name.find("_$AssimpFbx$");
-                Debug::Log("old name: %s", name.c_str());
-                if (pos != std::string::npos) {
-                    name = name.substr(0, pos);
-                    Debug::Log("new name: %s", name.c_str());
-                }
-#endif
-                auto it = animation->channels.find(name);
-                if (it == animation->channels.end()) {
-                    animation->channels[name] = AnimationNode();
-                }
-                auto& n = animation->channels[name];
-
-                n.name = name;
-                //if (an->mNumPositionKeys > 1) {
-                    //n.positionKeys.resize(an->mNumPositionKeys);
-                    for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
-                        n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue)*m_fileScale });
-                    }
-                //}
-                //n.rotationKeys.resize(an->mNumRotationKeys);
-                //if (an->mNumRotationKeys > 1) {
-                    for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
-                        n.rotationKeys.emplace_back(QuaternionKey{ (float)an->mRotationKeys[j].mTime, ConvertQuaternion(an->mRotationKeys[j].mValue) });
-                    }
-                //}
-                //n.scalingKeys.resize(an->mNumScalingKeys);
-                //if (an->mNumScalingKeys > 1) {
-                    for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
-                        n.scalingKeys.emplace_back(Vector3Key{ (float)an->mScalingKeys[j].mTime, ConvertVector3(an->mScalingKeys[j].mValue) });
-                    }
-                //}
-                //std::vector<float> all_key_time;
-                //for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
-                //    all_key_time.push_back((float)an->mPositionKeys[j].mTime);
-                //}
-                //for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
-                //    all_key_time.push_back((float)an->mRotationKeys[j].mTime);
-                //}
-                //for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
-                //    all_key_time.push_back((float)an->mScalingKeys[j].mTime);
-                //}
-                //std::sort(all_key_time.begin(), all_key_time.end());
-                //auto last = std::unique(all_key_time.begin(), all_key_time.end());
-                //all_key_time.erase(last, all_key_time.end());
-                //
-                //n.transformationKeys.reserve(all_key_time.size());
-                //for (auto& t : all_key_time) {
-                //    Matrix4x4 m;
-                //    auto pos = Vector3::zero;
-                //    auto rot = Quaternion::identity;
-                //    auto scale = Vector3::one;
-
-                //    uint32_t j = 0;
-                //    for (j = 1; j < an->mNumPositionKeys && t > (float)an->mPositionKeys[j].mTime; ++j) {}
-                //    pos = ConvertVector3(an->mPositionKeys[j-1].mValue);
-
-                //    for (j = 1; j < an->mNumRotationKeys && t > (float)an->mRotationKeys[j].mTime; ++j) {}
-                //    rot = ConvertQuaternion(an->mRotationKeys[j-1].mValue);
-
-                //    for (j = 1; j < an->mNumScalingKeys && t > (float)an->mScalingKeys[j].mTime; ++j) {}
-                //    scale = ConvertVector3(an->mScalingKeys[j-1].mValue);
-
-                //    m.SetTRS(pos, rot, scale);
-                //    n.transformationKeys.emplace_back(TransformationKey{ t, m });
-                //}
-            }
-            Debug::Log("animation name: %s", a->mName.C_Str());
+            m_model->m_animations.push_back(ParseAnimation(scene->mAnimations[animIndex], m_fileScale));
         }
 
         for (auto& animation : m_model->m_animations) {
@@ -539,7 +500,6 @@ namespace FishEngine {
 
         return m_model;
     }
-
 
 //    std::shared_ptr<Model> ModelImporter::
 //    LoadFBX(
@@ -630,12 +590,17 @@ namespace FishEngine {
         auto go = Scene::CreateGameObject(node->name);
         go->transform()->setLocalToWorldMatrix(node->transform);
 
+        if (m_rootGameObject.expired()) {
+            m_rootGameObject = go;
+        }
+
         if (node->meshesIndices.size() == 1) {
             auto material = Material::defaultMaterial();
             auto meshRenderer = std::make_shared<MeshRenderer>(material);
             const auto& mesh = m_meshes[node->meshesIndices.front()];
             if (mesh->m_skinned) {
                 meshRenderer->setAvatar(m_avatar);
+                meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
             }
             auto meshFilter = std::make_shared<MeshFilter>(mesh);
             go->AddComponent(meshRenderer);
@@ -650,6 +615,7 @@ namespace FishEngine {
                 const auto& mesh = m_meshes[idx];
                 if (mesh->m_skinned) {
                     meshRenderer->setAvatar(m_avatar);
+                    meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
                 }
                 auto meshFilter = std::make_shared<MeshFilter>(mesh);
                 child->AddComponent(meshRenderer);

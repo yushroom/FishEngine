@@ -33,50 +33,89 @@ void Animator::RecursivelyUpdate(const std::shared_ptr<GameObject>& go)
     auto t = go->transform();
     auto it = m_animation->channels.find(name);
     auto tm = m_time * m_animation->ticksPerSecond;
+    float time = fmodf(tm, m_animation->duration);
     if (it != m_animation->channels.end()) {
         auto& node = it->second;
-        auto pos = t->localPosition();
-        for (auto& pk : node.positionKeys) {
-            if (tm < pk.time) {
-                break;
+
+        ///////////////////////////////////////////////
+        Vector3 presentPosition(0, 0, 0);
+        if (node.positionKeys.size() > 0) 
+        {
+            uint32_t frame = 0;
+            while (frame < node.positionKeys.size() - 1)
+            {
+                if (time < node.positionKeys[frame + 1].time)
+                    break;
+                frame++;
             }
-            pos = pk.value;
+            uint32_t nextFrame = (frame + 1) % node.positionKeys.size();
+            const auto& key = node.positionKeys[frame];
+            const auto& nextKey = node.positionKeys[nextFrame];
+            float diffTime = nextKey.time - key.time;
+            if (diffTime < 0.0f)
+            {
+                diffTime += m_animation->duration;
+            }
+            if (diffTime > 0)
+            {
+                float factor = float((time - key.time) / diffTime);
+                presentPosition = Mathf::LerpUnclamped(key.value, nextKey.value, factor);
+            }
+            else
+            {
+                presentPosition = key.value;
+            }
         }
 
-
-        auto rot = t->localRotation();
-        for (auto& rk : node.rotationKeys) {
-            if (tm < rk.time) {
-                break;
+        /////////////////////////////////////////////////////////////
+        auto presentRotation = Quaternion::identity;
+        if (node.rotationKeys.size() > 0)
+        {
+            uint32_t frame = 0;
+            while (frame < node.rotationKeys.size() - 1)
+            {
+                if (time < node.rotationKeys[frame + 1].time)
+                    break;
+                frame++;
             }
-            rot = rk.value;
+            uint32_t nextFrame = (frame + 1) % node.rotationKeys.size();
+            const auto& key = node.rotationKeys[frame];
+            const auto& nextKey = node.rotationKeys[nextFrame];
+            float diffTime = nextKey.time - key.time;
+            if (diffTime < 0.0f)
+            {
+                diffTime += m_animation->duration;
+            }
+            if (diffTime > 0)
+            {
+                float factor = float((time - key.time) / diffTime);
+                presentRotation = Quaternion::SlerpUnclamped(key.value, nextKey.value, factor);
+            }
+            else
+            {
+                presentRotation = key.value;
+            }
         }
 
-
-        auto s = t->localScale();
-        for (auto& sk : node.scalingKeys) {
-            if (tm < sk.time) {
-                break;
+        /////////////////////////////////////////////////////////////
+        auto presentScaling = Vector3::one;
+        if (node.scalingKeys.size() > 0)
+        {
+            uint32_t frame = 0;
+            while (frame < node.scalingKeys.size() - 1)
+            {
+                if (time < node.scalingKeys[frame + 1].time)
+                    break;
+                frame++;
             }
-            s = sk.value;
+            // TODO: LERP scale?
+            presentScaling = node.scalingKeys[frame].value;
         }
+
 #if 1
-        //auto pos = Vector3::zero;
-        //auto rot = Quaternion::identity;
-        //auto s = Vector3::one;
-        //uint32_t j = 0;
-        //for (j = 1; j < node.positionKeys.size() && tm >= node.positionKeys[j].time; ++j) {}
-        //pos = node.positionKeys[j - 1].value;
-        //for (j = 1; j < node.rotationKeys.size() && tm >= node.rotationKeys[j].time; ++j) {}
-        //rot = node.rotationKeys[j - 1].value;
-        //for (j = 1; j < node.scalingKeys.size() && tm >= node.scalingKeys[j].time; ++j) {}
-        //s = node.scalingKeys[j - 1].value;
-
-        //Matrix4x4 m = Matrix4x4::TRS(pos, rot, s);
-        //t->setLocalToWorldMatrix(m);
-        t->setLocalPosition(pos);
-        t->setLocalRotation(rot);
-        t->setLocalScale(s);
+        t->setLocalPosition(presentPosition);
+        t->setLocalRotation(presentRotation);
+        t->setLocalScale(presentScaling);
 #else
         Matrix4x4 m;
         uint32_t j = 0;

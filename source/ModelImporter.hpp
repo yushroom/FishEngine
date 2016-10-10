@@ -12,6 +12,7 @@
 
 struct aiNode;
 struct aiMesh;
+struct aiAnimation;
 
 //namespace fbxsdk
 //{
@@ -80,16 +81,29 @@ namespace FishEngine {
         //std::vector<ModelNode::PModelNode> m_bones;
         //std::map<std::string, int> m_boneToIndex;
         std::shared_ptr<Avatar> m_avatar;
+
+        mutable std::weak_ptr<GameObject>   m_rootGameObject; // temp
         
         static std::map<BuiltinModelType, PModel> s_builtinModels;
     };
 
-    enum class ImporterSettings
+    // Vertex normal generation options for ModelImporter.
+    enum class ModelImporterNormals
     {
-        Import,
-        Calculate,
-        None,
-    }; 
+        Import,     // Import vertex normals from model file(default).
+        Calculate,  // Calculate vertex normals.
+        None,       // Do not import vertex normals.
+    };
+
+
+    // Vertex tangent generation options for ModelImporter.
+    enum class ModelImporterTangents
+    {
+        Import,         // Import vertex tangents from model file.
+        //CalculateMikk,// Calculate tangents using MikkTSpace(default).
+        Calculate,      // Calculate tangents.
+        None,           // Do not import vertex tangents.
+    };
     
     class ModelImporter : public AssetImporter
     {
@@ -111,12 +125,12 @@ namespace FishEngine {
         LoadFBX(
             const std::string&  path);
 
-        void setNormalsImportSettings(ImporterSettings settings) {
-            m_normalsImportSettings = settings;
+        void setImportNormals(ModelImporterNormals importNormals) {
+            m_importNormals = importNormals;
         }
 
-        void setTangentsImportSettings(ImporterSettings settings) {
-            m_tangentsImportSettings = settings;
+        void setImportTangents(ModelImporterTangents importTangents) {
+            m_importTangents = importTangents;
         }
 
     private:
@@ -143,11 +157,15 @@ namespace FishEngine {
             bool            load_uv,
             bool            load_tangent);
 
-        std::shared_ptr<Model> m_model;
+        std::shared_ptr<Model>      m_model;
 
         VertexUsages m_vertexUsages = (int)VertexUsage::PNUT;
-        ImporterSettings m_normalsImportSettings    = ImporterSettings::Import;
-        ImporterSettings m_tangentsImportSettings   = ImporterSettings::Calculate;
+
+        // Vertex normal import options.
+        ModelImporterNormals m_importNormals    = ModelImporterNormals::Import;
+
+        // Vertex tangent import options.
+        ModelImporterTangents m_importTangents  = ModelImporterTangents::Calculate;
     };
 }
 

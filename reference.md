@@ -18,6 +18,14 @@ http://austinbrunkhorst.com/blog/category/reflection/
 
 
 
+## C++
+
+"static_if"
+
+http://baptiste-wicht.com/posts/2015/07/simulate-static_if-with-c11c14.html
+
+
+
 ## OpenGL
 
 

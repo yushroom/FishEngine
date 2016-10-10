@@ -8,3 +8,4 @@ glm 0.9.8 https://github.com/g-truc/glm
 pugixl 1.7 https://github.com/zeux/pugixml
 physx 3.3.4 https://developer.nvidia.com/physx-sdk
 fbxsdk 2017.0 http://www.autodesk.com/products/fbx/overview
+boost 1.62.0 http://www.boost.org/

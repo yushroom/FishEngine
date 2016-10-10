@@ -629,18 +629,54 @@ void EditorGUI::DrawSceneGizmo()
     glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
 }
 
+// read-write
+bool Float(const char* label, float* value)
+{
+    return ImGui::InputFloat(label, value);
+}
+
+bool Int(const char* label, int* value)
+{
+    return ImGui::InputInt(label, value);
+}
+
+bool Bool(const char* label, bool* value)
+{
+    return ImGui::Checkbox(label, value);
+}
+
+bool Vector3(const char* label, Vector3* value)
+{
+    return ImGui::InputFloat3(label, value->data());
+}
+
+// read-only version
+void Float(const char* label, float value)
+{
+    ImGui::InputFloat(label, &value, 0.f, 0.f, -1, ImGuiInputTextFlags_ReadOnly);
+}
+
+void Int(const char* label, int value)
+{
+    ImGui::InputInt(label, &value, 0, 0, ImGuiInputTextFlags_ReadOnly);
+}
+
+void Bool(const char* label, bool value)
+{
+    ImGui::Checkbox(label, &value);
+}
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
 {
-    if (ImGui::InputFloat3("Position", transform->m_localPosition.data())) {
+    if (Vector3("Position", &transform->m_localPosition)) {
         transform->MakeDirty();
     }
-    if (ImGui::InputFloat3("Rotation", transform->m_localEulerAngles.data())) {
+    if (Vector3("Rotation", &transform->m_localEulerAngles)) {
         transform->m_localRotation.setEulerAngles(transform->m_localEulerAngles);
         transform->MakeDirty();
     }
-    if (ImGui::InputFloat3("Scale", transform->m_localScale.data())) {
+    if (Vector3("Scale", &transform->m_localScale)) {
         transform->MakeDirty();
     }
 }
@@ -660,7 +696,7 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Camera>& camera
     //m_orthographic = list_item_current == 1;
     
     if (camera->m_orthographic) {
-        if (ImGui::InputFloat("Size", &camera->m_orthographicSize)) {
+        if (Float("Size", &camera->m_orthographicSize)) {
             camera->m_isDirty = true;
         }
     }
@@ -670,10 +706,10 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Camera>& camera
         }
     }
     
-    if (ImGui::InputFloat("Clipping Planes(Near)", &camera->m_nearClipPlane)) {
+    if (Float("Clipping Planes(Near)", &camera->m_nearClipPlane)) {
         camera->m_isDirty = true;
     }
-    if (ImGui::InputFloat("Clipping Planes(Far)", &camera->m_farClipPlane)) {
+    if (Float("Clipping Planes(Far)", &camera->m_farClipPlane)) {
         camera->m_isDirty = true;
     }
     ImGui::InputFloat4("Viewport Rect", camera->m_viewport.data());
@@ -682,8 +718,8 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Camera>& camera
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& animator)
 {
-    int channels = animator->m_animation->channels.size();
-    ImGui::InputInt("Channel count", &channels);
+    int channels = (int)animator->m_animation->channels.size();
+    Int("Channel count", channels);
     if (animator->m_playing) {
         if (ImGui::Button("Stop")) {
             animator->Stop();
@@ -701,7 +737,7 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& anim
     if (ImGui::Button("Next Frame")) {
         animator->NextFrame();
     }
-    ImGui::InputFloat("Time", &animator->m_time);
+    Float("Time", &animator->m_time);
 }
 
 template<>
@@ -716,11 +752,11 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& me
     //ImGui::SameLine();
     ImGui::LabelText("Mesh", "%s", meshFilter->m_mesh->name().c_str());
     
-    bool skinned = meshFilter->m_mesh->m_skinned;
+    //bool skinned = meshFilter->m_mesh->m_skinned;
     //ImGui::Checkbox("Skinned", &skinned);
-    if (skinned) {
+    if (meshFilter->m_mesh->m_skinned) {
         int boneCount = meshFilter->m_mesh->m_boneNameToIndex.size();
-        ImGui::InputInt("Bone Count", &boneCount);
+        Int("Bone Count", boneCount);
     }
 }
 
@@ -735,38 +771,38 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Rigidbody>& rigidBody)
 {
-    ImGui::InputFloat("Mass", &rigidBody->m_mass);
-    ImGui::InputFloat("Drag", &rigidBody->m_drag);
-    ImGui::InputFloat("Angular", &rigidBody->m_angularDrag);
-    ImGui::Checkbox("Use Gravity", &rigidBody->m_useGravity);
-    ImGui::Checkbox("Is Kinematic", &rigidBody->m_isKinematic);
+    Float("Mass",           &rigidBody->m_mass);
+    Float("Drag",           &rigidBody->m_drag);
+    Float("Angular",        &rigidBody->m_angularDrag);
+    Bool( "Use Gravity",    &rigidBody->m_useGravity);
+    Bool( "Is Kinematic",   &rigidBody->m_isKinematic);
 }
 
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::BoxCollider>& boxCollider)
 {
-    ImGui::Checkbox("Is Trigger", &boxCollider->m_isTrigger);
-    ImGui::InputFloat3("Center", boxCollider->m_center.data());
-    ImGui::InputFloat3("Size", boxCollider->m_size.data());
+    Bool(   "Is Trigger",   &boxCollider->m_isTrigger);
+    Vector3("Center",       &boxCollider->m_center);
+    Vector3("Size",         &boxCollider->m_size);
 }
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SphereCollider>& sphereCollider)
 {
-    ImGui::Checkbox("Is Trigger", &sphereCollider->m_isTrigger);
-    ImGui::InputFloat3("Center", sphereCollider->m_center.data());
-    ImGui::InputFloat3("Radius", &sphereCollider->m_radius);
+    Bool(   "Is Trigger",   &sphereCollider->m_isTrigger);
+    Vector3("Center",       &sphereCollider->m_center);
+    Float(  "Radius",       &sphereCollider->m_radius);
 }
 
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider>& capsuleCollider)
 {
-    ImGui::Checkbox("Is Trigger", &capsuleCollider->m_isTrigger);
-    ImGui::InputFloat3("Center", capsuleCollider->m_center.data());
-    ImGui::InputFloat("Radius", &capsuleCollider->m_radius);
-    ImGui::InputFloat("Height", &capsuleCollider->m_height);
+    Bool(   "Is Trigger",   &capsuleCollider->m_isTrigger);
+    Vector3("Center",       &capsuleCollider->m_center);
+    Float(  "Radius",       &capsuleCollider->m_radius);
+    Float(  "Height",       &capsuleCollider->m_height);
     //ImGui::InputFloat3("Direction", capsuleCollider->m_direction);
     const char* listbox_items[] = {
         "X-Axis", "Y-Axis", "Z-Axis"

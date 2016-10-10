@@ -22,11 +22,11 @@
 
 - [ ] depth \in (-1, 1)，下次换成D3D的时候小心
 
-- [ ] glm四元数的-0问题，eulerangle的数字不太合适
+- [ ] glm四元数的-0问题，eulerangle的数字不太合适(暂时OK)
 
 - [ ] GameObject构造函数改成非public的(需要解决make_shared调用非public ctor，貌似没有特别优雅的解决方案，http://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const)
 
-- [ ] 将Scene里面的Script和Component合并到一起去（需要在运行时知道是不是某个类的子类）
+- [x] 将Scene里面的Script和Component合并到一起去（~~需要在运行时知道是不是某个类的子类~~，搞定，用enable_if)
 
 - [ ] 不依赖代码生成和外部工具的（自动）反射可行吗？
 
@@ -34,7 +34,7 @@
 
 - [ ] transform父子关系改变时的操作，应该维持子节点在world space下的T、R、S都不变
 
-- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点（done，导入时加参数），解析每个节点的local transformation。
+- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点（~~done，导入时加参数~~），解析每个节点的local transformation。
 
 - [ ] basic model用NEF代替：http://assimp.sourceforge.net/howtoBasicShapes.html
 
@@ -88,7 +88,7 @@
 
 - [ ] 场景中的网格平面
 
-- [ ] 场景的序列化和反序列化（要依赖反射）
+- [ ] 场景的序列化和反序列化（~~要依赖反射~~，内部的component可以不依赖反射，直接手写序列化，但是user defined的类需要反射来做自动序列化和反序列化）
 
 - [ ] Docking GUI
 
@@ -97,6 +97,8 @@
 - [ ] hierarchy中过滤器（名字，类型。。。）
 
 - [ ] ToolBar
+
+- [ ] 区分read-only的属性 ImGuiInputTextFlags_ReadOnly
 
       ​
 

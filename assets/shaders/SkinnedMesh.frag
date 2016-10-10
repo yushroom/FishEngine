@@ -11,7 +11,7 @@ out vec4 color;
 void main()
 {
 	//color = texture(DiffuseMap, vs_out.uv);
-	vec3 L = WorldSpaceLightPos0.xyz;
+	vec3 L = -WorldSpaceLightPos0.xyz;
     if (WorldSpaceLightPos0.w > 0.5f) {
         L = normalize(WorldSpaceLightPos0.xyz - vs_out.position);
     }

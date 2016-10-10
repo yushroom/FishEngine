@@ -11,7 +11,9 @@
 #include "Debug.hpp"
 #include "Common.hpp"
 
-#define PRESERVE_PIVOT
+#define PRESERVE_FBX_PIVOT
+
+constexpr int MAX_BONE_SIZE = 200;
 
 namespace FishEngine {
     
@@ -20,7 +22,7 @@ namespace FishEngine {
         m_meshes.push_back(mesh);
     }
 
-    std::map<BuiltinModelTyep, Model::PModel> Model::s_builtinModels;
+    std::map<BuiltinModelType, Model::PModel> Model::s_builtinModels;
     
     void Model::Init() {
 #if FISHENGINE_PLATFORM_WINDOWS
@@ -29,17 +31,17 @@ namespace FishEngine {
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif
         ModelImporter importer;
-        s_builtinModels[BuiltinModelTyep::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
-        s_builtinModels[BuiltinModelTyep::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
-        s_builtinModels[BuiltinModelTyep::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
-        s_builtinModels[BuiltinModelTyep::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
-        s_builtinModels[BuiltinModelTyep::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
+        s_builtinModels[BuiltinModelType::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
+        s_builtinModels[BuiltinModelType::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
+        s_builtinModels[BuiltinModelType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
+        s_builtinModels[BuiltinModelType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
+        s_builtinModels[BuiltinModelType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
     }
     
 
     Model::PModel Model::
     builtinModel(
-        const BuiltinModelTyep type) {
+        const BuiltinModelType type) {
         return s_builtinModels[type];
     }
     
@@ -66,13 +68,16 @@ namespace FishEngine {
         node->name = assimp_node->mName.C_Str();
         Debug::LogWarning("Node: %s", node->name.c_str());
         node->transform = ConvertMatrix(assimp_node->mTransformation);
+        node->transform.m[0][3] *= m_fileScale;
+        node->transform.m[1][3] *= m_fileScale;
+        node->transform.m[2][3] *= m_fileScale;
         node->isBone = false;
         //model->m_bones.push_back(node);
         //node->index = model->m_bones.size();
         int index = m_model->m_avatar->m_boneToIndex.size();
         m_model->m_avatar->m_boneToIndex[node->name] = index;
         node->index = index;
-        m_nodes[node->name] = node;
+        //m_nodes[node->name] = node;
         
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshesIndices.push_back(assimp_node->mMeshes[i]);
@@ -120,9 +125,8 @@ namespace FishEngine {
 
     Mesh::PMesh ModelImporter::
     ParseMesh(
-        const aiMesh*   assimp_mesh, 
-        int             vertexUsage, 
-        bool            load_uv, 
+        const aiMesh*   assimp_mesh,
+        bool            load_uv,
         bool            load_tangent)
     {
         auto mesh = std::make_shared<Mesh>();
@@ -175,41 +179,47 @@ namespace FishEngine {
         }
 
         mesh->m_skinned = assimp_mesh->mNumBones > 0;
-        
+
         if (mesh->m_skinned)
         {
+            assert(assimp_mesh->mNumBones <= MAX_BONE_SIZE);
+            std::vector<BoneWeight> boneWeights;
             //mesh->m_bones.resize(n_bones);
-            mesh->m_boneWeights.resize(n_vertices);
+            boneWeights.resize(n_vertices);
             mesh->m_boneIndexBuffer.resize(n_vertices);
             mesh->m_boneWeightBuffer.resize(n_vertices);
+            mesh->bindposes().resize(assimp_mesh->mNumBones);
             Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
-            for (uint32_t j = 0; j < assimp_mesh->mNumBones; ++j) {
-                auto& bone = assimp_mesh->mBones[j];
+            for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex){
+                auto& bone = assimp_mesh->mBones[boneIndex];
                 std::string boneName(bone->mName.C_Str());
                 Debug::Log("    bone name: %s", boneName.c_str());
-                auto it = m_nodes.find(boneName);
-                assert(it != m_nodes.end());
-                it->second->isBone = true;
-                uint32_t boneIndex = it->second->index;
+                mesh->m_boneNameToIndex[boneName] = boneIndex;
+                //auto it = mesh->m_boneNameToIndex.find(boneName);
+                //it->second->isBone = true;
+                //uint32_t boneIndex = it->second;
 
-                mesh->m_bones[boneName].boneOffset = ConvertMatrix(bone->mOffsetMatrix);
-                
+                auto offsetMat = ConvertMatrix(bone->mOffsetMatrix);
+                offsetMat.m[0][3] *= m_fileScale;
+                offsetMat.m[1][3] *= m_fileScale;
+                offsetMat.m[2][3] *= m_fileScale;
+                mesh->bindposes()[boneIndex] = offsetMat;
                 for (uint32_t k = 0; k < bone->mNumWeights; ++k) {
                     uint32_t vextexID = bone->mWeights[k].mVertexId;
                     float weight = bone->mWeights[k].mWeight;
-                    mesh->m_boneWeights[vextexID].AddBoneData(boneIndex, weight);
+                    boneWeights[vextexID].AddBoneData(boneIndex, weight);
                 }
             }
             
             for (uint32_t i = 0; i < n_vertices; ++i) {
-                auto& b = mesh->m_boneWeights[i];
+                auto& b = boneWeights[i];
                 mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
                 mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
             }
         }
 
-        mesh->GenerateBuffer(vertexUsage);
-        mesh->BindBuffer(vertexUsage);
+        mesh->GenerateBuffer(m_vertexUsages);
+        mesh->BindBuffer(m_vertexUsages);
         //mesh->m_name = std::string(assimp_mesh->mName.C_Str());
         //if (mesh->m_name.size() == 0) {
         //    mesh->m_name = "Mesh" + boost::lexical_cast<std::string>(meshIndex);
@@ -363,31 +373,26 @@ namespace FishEngine {
 
     std::shared_ptr<Model> ModelImporter::
     LoadFromFile(
-        const std::string&  path,
-        int                 vertexUsage,
-        MeshLoadFlags       flags)
+        const std::string&  path)
     {
         Assimp::Importer importer;
         unsigned int load_option = aiProcess_Triangulate;
         load_option |= aiProcess_LimitBoneWeights;
-        //load_option |= aiProcess_JoinIdenticalVertices;
-        //load_option |= aiProcess_ValidateDataStructure;
+        load_option |= aiProcess_JoinIdenticalVertices;
+        load_option |= aiProcess_ValidateDataStructure;
 
-        //load_option |= aiProcess_ImproveCacheLocality;
-        //load_option |= aiProcess_RemoveRedundantMaterials;
-        //load_option |= aiProcess_FindDegenerates;
-        //load_option |= aiProcess_FindInvalidData;
+        load_option |= aiProcess_ImproveCacheLocality;
+        load_option |= aiProcess_RemoveRedundantMaterials;
+        load_option |= aiProcess_FindDegenerates;
+        load_option |= aiProcess_FindInvalidData;
         //load_option |= aiProcess_GenUVCoords;
         //load_option |= aiProcess_TransformUVCoords;
-        //load_option |= aiProcess_FindInstances;
-        //load_option |= aiProcess_OptimizeMeshes;
+        load_option |= aiProcess_FindInstances;
+        load_option |= aiProcess_OptimizeMeshes;
         //load_option |= aiProcess_SplitByBoneCount;
         //load_option |= aiProcess_SortByPType;
         //load_option |= aiProcess_SplitLargeMeshes;
         //load_option |= aiProcess_FixInfacingNormals;
-        //load_option |= aiProcess_OptimizeMeshes;
-        //load_option |= aiProcess_SortByPType;
-        //load_option |= aiProcess_JoinIdenticalVertices;
         //load_option |= aiProcess_OptimizeGraph;
         load_option |= aiProcess_ConvertToLeftHanded;
         //load_option |= aiProcess_FlipUVs;
@@ -398,13 +403,13 @@ namespace FishEngine {
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_LIGHTS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_CAMERAS, false);
-        if (flags & MeshLoadFlag_RegenerateNormal) {
+        if (m_normalsImportSettings == ImporterSettings::Calculate) {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
             load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;
         } else {
             load_option |= aiProcess_GenNormals;
         }
-        bool load_tangent = (vertexUsage & VertexUsageTangent) != 0;
+        bool load_tangent = (m_tangentsImportSettings != ImporterSettings::None);
         if (load_tangent)
             load_option |= aiProcess_CalcTangentSpace;
         const aiScene* scene = importer.ReadFile(path.c_str(), load_option);
@@ -414,7 +419,7 @@ namespace FishEngine {
             abort();
         }
 
-        bool load_uv = (vertexUsage & VertexUsageUV) != 0;
+        bool load_uv = (m_vertexUsages & (int)VertexUsage::UV) != 0;
         
         
         m_model = std::make_shared<Model>();
@@ -428,7 +433,7 @@ namespace FishEngine {
         
         for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
         {
-            auto mesh = ParseMesh(scene->mMeshes[meshIndex], vertexUsage, load_uv, load_tangent);
+            auto mesh = ParseMesh(scene->mMeshes[meshIndex], load_uv, load_tangent);
             if (mesh->m_name.empty()) {
                 mesh->m_name = "mesh" + boost::lexical_cast<std::string>(m_model->m_meshes.size());
             }
@@ -473,7 +478,7 @@ namespace FishEngine {
                 //if (an->mNumPositionKeys > 1) {
                     //n.positionKeys.resize(an->mNumPositionKeys);
                     for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
-                        n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue) });
+                        n.positionKeys.emplace_back(Vector3Key{ (float)an->mPositionKeys[j].mTime, ConvertVector3(an->mPositionKeys[j].mValue)*m_fileScale });
                     }
                 //}
                 //n.rotationKeys.resize(an->mNumRotationKeys);
@@ -488,40 +493,40 @@ namespace FishEngine {
                         n.scalingKeys.emplace_back(Vector3Key{ (float)an->mScalingKeys[j].mTime, ConvertVector3(an->mScalingKeys[j].mValue) });
                     }
                 //}
-                std::vector<float> all_key_time;
-                for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
-                    all_key_time.push_back((float)an->mPositionKeys[j].mTime);
-                }
-                for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
-                    all_key_time.push_back((float)an->mRotationKeys[j].mTime);
-                }
-                for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
-                    all_key_time.push_back((float)an->mScalingKeys[j].mTime);
-                }
-                std::sort(all_key_time.begin(), all_key_time.end());
-                auto last = std::unique(all_key_time.begin(), all_key_time.end());
-                all_key_time.erase(last, all_key_time.end());
-                
-                n.transformationKeys.reserve(all_key_time.size());
-                for (auto& t : all_key_time) {
-                    Matrix4x4 m;
-                    auto pos = Vector3::zero;
-                    auto rot = Quaternion::identity;
-                    auto scale = Vector3::one;
+                //std::vector<float> all_key_time;
+                //for (uint32_t j = 0; j < an->mNumPositionKeys; ++j) {
+                //    all_key_time.push_back((float)an->mPositionKeys[j].mTime);
+                //}
+                //for (uint32_t j = 0; j < an->mNumRotationKeys; ++j) {
+                //    all_key_time.push_back((float)an->mRotationKeys[j].mTime);
+                //}
+                //for (uint32_t j = 0; j < an->mNumScalingKeys; ++j) {
+                //    all_key_time.push_back((float)an->mScalingKeys[j].mTime);
+                //}
+                //std::sort(all_key_time.begin(), all_key_time.end());
+                //auto last = std::unique(all_key_time.begin(), all_key_time.end());
+                //all_key_time.erase(last, all_key_time.end());
+                //
+                //n.transformationKeys.reserve(all_key_time.size());
+                //for (auto& t : all_key_time) {
+                //    Matrix4x4 m;
+                //    auto pos = Vector3::zero;
+                //    auto rot = Quaternion::identity;
+                //    auto scale = Vector3::one;
 
-                    uint32_t j = 0;
-                    for (j = 1; j < an->mNumPositionKeys && t > (float)an->mPositionKeys[j].mTime; ++j) {}
-                    pos = ConvertVector3(an->mPositionKeys[j-1].mValue);
+                //    uint32_t j = 0;
+                //    for (j = 1; j < an->mNumPositionKeys && t > (float)an->mPositionKeys[j].mTime; ++j) {}
+                //    pos = ConvertVector3(an->mPositionKeys[j-1].mValue);
 
-                    for (j = 1; j < an->mNumRotationKeys && t > (float)an->mRotationKeys[j].mTime; ++j) {}
-                    rot = ConvertQuaternion(an->mRotationKeys[j-1].mValue);
+                //    for (j = 1; j < an->mNumRotationKeys && t > (float)an->mRotationKeys[j].mTime; ++j) {}
+                //    rot = ConvertQuaternion(an->mRotationKeys[j-1].mValue);
 
-                    for (j = 1; j < an->mNumScalingKeys && t > (float)an->mScalingKeys[j].mTime; ++j) {}
-                    scale = ConvertVector3(an->mScalingKeys[j-1].mValue);
+                //    for (j = 1; j < an->mNumScalingKeys && t > (float)an->mScalingKeys[j].mTime; ++j) {}
+                //    scale = ConvertVector3(an->mScalingKeys[j-1].mValue);
 
-                    m.SetTRS(pos, rot, scale);
-                    n.transformationKeys.emplace_back(TransformationKey{ t, m });
-                }
+                //    m.SetTRS(pos, rot, scale);
+                //    n.transformationKeys.emplace_back(TransformationKey{ t, m });
+                //}
             }
             Debug::Log("animation name: %s", a->mName.C_Str());
         }
@@ -650,13 +655,14 @@ namespace FishEngine {
                 child->AddComponent(meshRenderer);
                 child->AddComponent(meshFilter);
             }
-        } else if (node->isBone) {
-            auto material = Material::defaultMaterial();
-            auto meshRenderer = std::make_shared<MeshRenderer>(material);
-            auto meshFilter = std::make_shared<MeshFilter>(Model::builtinModel(BuiltinModelTyep::Cube)->m_meshes.front());
-            go->AddComponent(meshRenderer);
-            go->AddComponent(meshFilter);
         }
+        //else if (node->isBone) {
+        //    auto material = Material::defaultMaterial();
+        //    auto meshRenderer = std::make_shared<MeshRenderer>(material);
+        //    auto meshFilter = std::make_shared<MeshFilter>(Model::builtinModel(BuiltinModelType::Cube)->m_meshes.front());
+        //    go->AddComponent(meshRenderer);
+        //    go->AddComponent(meshFilter);
+        //}
         
         for (auto& c : node->children) {
             auto child = ResursivelyCreateGameObject(c);

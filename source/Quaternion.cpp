@@ -38,15 +38,23 @@ namespace FishEngine {
 
     FishEngine::Quaternion Quaternion::Euler(const Vector3& euler)
     {
-        // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_to_Quaternion_Conversion
+        // http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
         Quaternion result;
         auto rad = euler * (Mathf::Deg2Rad * 0.5f);
-        auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
-        auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
-        result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-        result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-        result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-        result.z = c.x * c.y * s.z - s.x * s.y * c.z;
+        //auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
+        //auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
+        //result.w = c.x * c.y * c.z + s.x * s.y * s.z;
+        //result.x = s.x * c.y * c.z - c.x * s.y * s.z;
+        //result.y = c.x * s.y * c.z + s.x * c.y * s.z;
+        //result.z = c.x * c.y * s.z - s.x * s.y * c.z;
+
+        // heading, attitude, bank -> y,z,x
+        auto c = Vector3(cos(rad.y), cos(rad.z), cos(rad.x));
+        auto s = Vector3(sin(rad.y), sin(rad.z), sin(rad.x));
+        result.w = c.x * c.y * c.z - s.x * s.y * s.z;
+        result.x = s.x * s.y * c.z + c.x * c.y * s.z;
+        result.y = s.x * c.y * c.z + c.x * s.y * s.z;
+        result.z = c.x * s.y * c.z - s.x * c.y * s.z;
         return result;
     }
 

@@ -173,7 +173,7 @@ void EditorRenderSystem::Render()
         m->shader()->Use();
         m->shader()->BindTextures(textures);
         //Mesh::builtinMesh("quad")->Render();
-        Model::builtinModel(BuiltinModelTyep::Quad)->mainMesh()->Render();
+        Model::builtinModel(BuiltinModelType::Quad)->mainMesh()->Render();
     }
     EditorGUI::Update();
 

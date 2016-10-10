@@ -51,7 +51,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 
 void main()
 {
-	vec3 L = WorldSpaceLightPos0.xyz;
+	vec3 L = -WorldSpaceLightPos0.xyz;
     if (WorldSpaceLightPos0.w > 0.5f) {
         L = normalize(WorldSpaceLightPos0.xyz - vs_out.position);
     }

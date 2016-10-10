@@ -299,7 +299,8 @@ void DefaultScene()
     camera_go->AddComponent(camera);
     camera_go->AddComponent<CameraController>();
     camera_go->transform()->setLocalPosition(0, 0, 5);
-    camera_go->transform()->LookAt(0, 0, 0);
+    camera_go->transform()->setLocalPosition(0, 1, -10);
+    //camera_go->transform()->LookAt(0, 0, 0);
     camera_go->SetTag("MainCamera");
     
     auto light_go = Scene::CreateGameObject("Directional Light");
@@ -506,15 +507,17 @@ public:
         //const std::string chan_dir = models_dir + "UnityChan/";
         const std::string chan_root_dir = root_dir + "../example/UnityChan/assets/";
         
-        auto sphere = Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh();
+        auto sphere = Model::builtinModel(BuiltinModelType::Sphere)->mainMesh();
         
         //ModelImporter importer;
         //importer.setFileScale(0.01f);
         //auto model = importer.LoadFBX(chan_root_dir + "models/unitychan.fbx");
         //auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
         ModelImporter importer2;
+        importer2.setNormalsImportSettings(ImporterSettings::Calculate);
+        importer2.setFileScale(0.01f);
         auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
-
+        //auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
 //        std::string chan_texture_dir = chan_root_dir + "textures/";
@@ -567,7 +570,7 @@ public:
 
         auto modelGO = jump00Model->CreateGameObject();
         //go->transform()->setLocalEulerAngles(90, 0, 0);
-        modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
+        //modelGO->transform()->setLocalScale(0.01f, 0.01f, 0.01f);
         //modelGO->transform()->setLocalPosition(0, 0, 0);
         //auto animator = std::make_shared<Animator>();
         //animator->m_animation = jump00Model->mainAnimation();
@@ -698,7 +701,7 @@ public:
         // Camera
         
         auto cameraGO = Camera::mainGameCamera()->gameObject();
-        cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
+        cameraGO->transform()->setLocalPosition(0, 0.2f, -1);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
         cameraGO->AddComponent<ShowFPS>();
         cameraGO->AddComponent<TakeScreenShot>();
@@ -715,7 +718,7 @@ public:
 
 std::shared_ptr<GameObject> CreateCube()
 {
-    auto model = Model::builtinModel(BuiltinModelTyep::Cube);
+    auto model = Model::builtinModel(BuiltinModelType::Cube);
     auto go = model->CreateGameObject();
     auto collider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
     go->AddComponent(collider);
@@ -731,7 +734,7 @@ public:
     {
         DefaultScene();
         
-        auto model = Model::builtinModel(BuiltinModelTyep::Cube);
+        auto model = Model::builtinModel(BuiltinModelType::Cube);
         auto go = model->CreateGameObject();
         //go->transform()->setLocalEulerAngles(0, 0, 10);
         go->transform()->setPosition(0, -1.0f-0.1f*0.5f, 0);
@@ -740,7 +743,7 @@ public:
         go->AddComponent(boxCollider);
         boxCollider->physicsShape();
         
-        auto sphereModel = Model::builtinModel(BuiltinModelTyep::Sphere);
+        auto sphereModel = Model::builtinModel(BuiltinModelType::Sphere);
         auto sphereGO = sphereModel->CreateGameObject();
         sphereGO->transform()->setPosition(0, 0, 0);
         auto sphereCollider = make_shared<SphereCollider>(Vector3::zero, 0.5f);

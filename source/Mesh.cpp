@@ -23,15 +23,15 @@ Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* ind
     :   m_positionBuffer(positions, positions+n_vertex*3),
         m_indexBuffer(indices, indices+n_face*3)
 {
-    GenerateBuffer(VertexUsagePosition);
-    BindBuffer(VertexUsagePosition);
+    GenerateBuffer((int)VertexUsage::Position);
+    BindBuffer((int)VertexUsage::Position);
 }
 
 Mesh::Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer)
 : m_positionBuffer(position_buffer), m_indexBuffer(index_buffer)
 {
-    GenerateBuffer(VertexUsagePosition);
-    BindBuffer(VertexUsagePosition);
+    GenerateBuffer((int)VertexUsage::Position);
+    BindBuffer((int)VertexUsage::Position);
 }
 
 Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices)
@@ -39,8 +39,8 @@ Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normal
         m_normalBuffer(normals, normals+n_vertex*3),
         m_indexBuffer(indices, indices+n_face*3)
 {
-    GenerateBuffer(VertexUsagePN);
-    BindBuffer(VertexUsagePN);
+    GenerateBuffer((int)VertexUsage::PN);
+    BindBuffer((int)VertexUsage::PN);
 }
 
 Mesh::Mesh(Mesh&& m) 
@@ -105,19 +105,19 @@ void Mesh::GenerateBuffer(int vertexUsage) {
     glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
     glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size() * 4, m_positionBuffer.data(), GL_STATIC_DRAW);
 
-    if (vertexUsage & VertexUsageNormal) {
+    if (vertexUsage & (int)VertexUsage::Normal) {
         glGenBuffers(1, &m_normalVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
         glBufferData(GL_ARRAY_BUFFER, m_normalBuffer.size() * 4, m_normalBuffer.data(), GL_STATIC_DRAW);
     }
 
-    if (vertexUsage & VertexUsageUV) {
+    if (vertexUsage & (int)VertexUsage::UV) {
         glGenBuffers(1, &m_uvVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
         glBufferData(GL_ARRAY_BUFFER, m_uvBuffer.size() * 4, m_uvBuffer.data(), GL_STATIC_DRAW);
     }
 
-    if (vertexUsage & VertexUsageTangent) {
+    if (vertexUsage & (int)VertexUsage::Tangent) {
         glGenBuffers(1, &m_tangentVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
         glBufferData(GL_ARRAY_BUFFER, m_tangentBuffer.size() * 4, m_tangentBuffer.data(), GL_STATIC_DRAW);
@@ -143,19 +143,19 @@ void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
     glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(PositionIndex);
     
-    if (vertexUsage & VertexUsageNormal) {
+    if (vertexUsage & (int)VertexUsage::Normal) {
         glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
         glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(NormalIndex);
     }
     
-    if (vertexUsage & VertexUsageUV) {
+    if (vertexUsage & (int)VertexUsage::UV) {
         glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
         glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(UVIndex);
     }
     
-    if (vertexUsage & VertexUsageTangent) {
+    if (vertexUsage & (int)VertexUsage::Tangent) {
         glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
         glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(TangentIndex);

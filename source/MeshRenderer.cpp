@@ -18,16 +18,17 @@ void RecursivelyGetTransformation(
     const std::shared_ptr<Transform>&     transform,
     std::vector<Matrix4x4>&         transformation, 
     std::map<std::string, int>&     nameToIndex,
-    std::map<std::string, Bone>&    nameToBone,
+    std::vector<Matrix4x4>&         bindposes,
     const Matrix4x4& invGlobalTransform)
 {
     const auto& name = transform->name();
     const auto& it = nameToIndex.find(name);
     if (it != nameToIndex.end()) {
-        transformation[it->second] = invGlobalTransform * transform->localToWorldMatrix() * nameToBone[name].boneOffset;
+        const auto boneIndex = it->second;
+        transformation[boneIndex] = invGlobalTransform * transform->localToWorldMatrix() * bindposes[boneIndex];
     }
     for (auto& child : transform->children()) {
-        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex, nameToBone, invGlobalTransform);
+        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex, bindposes, invGlobalTransform);
     }
 }
 
@@ -81,9 +82,10 @@ void MeshRenderer::Render() const
     //auto mesh = meshFilter->mesh();
     //auto animator = gameObject()->GetComponent<Animator>();
     std::vector<Matrix4x4> boneTransformation;
+    const auto& mesh = meshFilter->mesh();
     if (m_avatar != nullptr) {
-        boneTransformation.resize(m_avatar->m_boneToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, m_avatar->m_boneToIndex, meshFilter->mesh()->nameToBone(), gameObject()->transform()->worldToLocalMatrix());
+        boneTransformation.resize(mesh->m_boneNameToIndex.size());
+        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, mesh->m_boneNameToIndex, mesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
     }
     
     for (auto& m : m_materials) {
@@ -97,7 +99,7 @@ void MeshRenderer::Render() const
         //shader->BindTextures(textures);
         m->Update();
         shader->CheckStatus();
-        meshFilter->mesh()->Render();
+        mesh->Render();
         shader->PostRender();
     }
 }

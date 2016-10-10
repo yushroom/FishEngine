@@ -8,23 +8,17 @@
 
 NAMESPACE_FISHENGINE_BEGIN
 
-enum VertexUsage {
-    VertexUsagePosition = 1<<0,
-    VertexUsageNormal   = 1<<1,
-    VertexUsageUV       = 1<<2,
-    VertexUsageTangent  = 1<<3,
-    VertexUsagePN       = VertexUsagePosition | VertexUsageNormal,
-    VertexUsagePNU      = VertexUsagePN | VertexUsageUV,
-    VertexUsagePNUT     = VertexUsagePNU | VertexUsageTangent
+enum class VertexUsage {
+    Position = 1<<0,
+    Normal   = 1<<1,
+    UV       = 1<<2,
+    Tangent  = 1<<3,
+    PN       = Position | Normal,
+    PNU      = PN | UV,
+    PNUT     = PNU | Tangent
 };
 
 typedef int VertexUsages;
-
-enum MeslLoadFlag {
-    MeshLoadFlag_RegenerateNormal = 1<<0,
-};
-
-typedef int MeshLoadFlags;
 
 struct Bone
 {
@@ -115,14 +109,17 @@ public:
     //static PMesh builtinMesh(const std::string& name);
     
     bool   m_skinned = false; // temp
-    std::map<std::string, Bone>& nameToBone()
+
+    // The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
+    std::vector<Matrix4x4>& bindposes()
     {
-        return m_bones;
+        return m_bindposes;
     }
 
 private:
     friend class FishEditor::EditorGUI;
     friend class ModelImporter;
+    friend class MeshRenderer;
     
     Bounds m_bounds;
     
@@ -133,9 +130,10 @@ private:
     std::vector<uint32_t>   m_indexBuffer;
     std::vector<Int4>       m_boneIndexBuffer;
     std::vector<Vector4>    m_boneWeightBuffer;
-    std::map<std::string, Bone>       m_bones;
-    //std::vector<>
-    std::vector<BoneWeight> m_boneWeights;
+
+    std::map<std::string, int> m_boneNameToIndex;
+    std::vector<Matrix4x4>  m_bindposes;
+    //std::vector<BoneWeight> m_boneWeights;
     
     GLuint m_VAO;
     GLuint m_indexVBO;

@@ -1,21 +1,21 @@
 #include "EditorGUI.hpp"
 
+#include <sstream>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include <imgui/imgui_internal.h>
+//#include <imgui/imgui_dock.h>
 
-#include "GameObject.hpp"
-#include "Scene.hpp"
-#include "Material.hpp"
-#include "MeshFilter.hpp"
-#include "MeshRenderer.hpp"
-#include "Mesh.hpp"
-#include "Common.hpp"
-#include "Debug.hpp"
-#include "Selection.hpp"
-#include "EditorRenderSystem.hpp"
+#include <GameObject.hpp>
+#include <Scene.hpp>
+#include <Material.hpp>
+#include <MeshFilter.hpp>
+#include <MeshRenderer.hpp>
+#include <Mesh.hpp>
+#include <Common.hpp>
+#include <Debug.hpp>
 #include <Time.hpp>
-#include <sstream>
 #include <Matrix4x4.hpp>
 #include <Bounds.hpp>
 #include <Ray.hpp>
@@ -25,9 +25,11 @@
 #include <SphereCollider.hpp>
 #include <CapsuleCollider.hpp>
 #include <Rigidbody.hpp>
-#include "FishEditorWindow.hpp"
 
-#include <imgui/imgui_dock.h>
+#include "FishEditorWindow.hpp"
+#include "Selection.hpp"
+#include "EditorRenderSystem.hpp"
+
 
 using namespace FishEngine;
 
@@ -70,8 +72,8 @@ void EditorGUI::Init()
     style.WindowMinSize = ImVec2(256, 256);
     
     sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
-    cubeMesh = Model::builtinModel(BuiltinModelTyep::Cube)->mainMesh();
-    coneMesh = Model::builtinModel(BuiltinModelTyep::Cone)->mainMesh();
+    cubeMesh = Model::builtinModel(BuiltinModelType::Cube)->mainMesh();
+    coneMesh = Model::builtinModel(BuiltinModelType::Cone)->mainMesh();
 }
 
 void EditorGUI::Update()
@@ -688,6 +690,10 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& anim
         }
     } else {
         if (ImGui::Button("Play")) {
+            animator->Play();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Play Once")) {
             animator->PlayOnce();
         }
     }
@@ -711,7 +717,11 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& me
     ImGui::LabelText("Mesh", "%s", meshFilter->m_mesh->name().c_str());
     
     bool skinned = meshFilter->m_mesh->m_skinned;
-    ImGui::Checkbox("Skinned", &skinned);
+    //ImGui::Checkbox("Skinned", &skinned);
+    if (skinned) {
+        int boneCount = meshFilter->m_mesh->m_boneNameToIndex.size();
+        ImGui::InputInt("Bone Count", &boneCount);
+    }
 }
 
 template<>

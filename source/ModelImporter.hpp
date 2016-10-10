@@ -34,7 +34,7 @@ namespace FishEngine {
         bool                    isBone;
     };
     
-    enum class BuiltinModelTyep {
+    enum class BuiltinModelType {
         Cube, Sphere, Capsule, Cylinder, Plane, Quad, Cone,
     };
     
@@ -63,7 +63,7 @@ namespace FishEngine {
         
         static void Init();
         
-        static Model::PModel builtinModel(const BuiltinModelTyep type);
+        static Model::PModel builtinModel(const BuiltinModelType type);
         
     private:
         friend class ModelImporter;
@@ -81,8 +81,15 @@ namespace FishEngine {
         //std::map<std::string, int> m_boneToIndex;
         std::shared_ptr<Avatar> m_avatar;
         
-        static std::map<BuiltinModelTyep, PModel> s_builtinModels;
+        static std::map<BuiltinModelType, PModel> s_builtinModels;
     };
+
+    enum class ImporterSettings
+    {
+        Import,
+        Calculate,
+        None,
+    }; 
     
     class ModelImporter : public AssetImporter
     {
@@ -98,21 +105,25 @@ namespace FishEngine {
         
         std::shared_ptr<Model>
         LoadFromFile(
-            const std::string& path,
-            int                vertexUsage = VertexUsagePNUT,
-            MeshLoadFlags      flags = 0);
+            const std::string& path);
 
         std::shared_ptr<Model>
         LoadFBX(
-            const std::string&  path,
-            int                 vertexUsage = VertexUsagePNUT,
-            MeshLoadFlags       flags = 0);
+            const std::string&  path);
+
+        void setNormalsImportSettings(ImporterSettings settings) {
+            m_normalsImportSettings = settings;
+        }
+
+        void setTangentsImportSettings(ImporterSettings settings) {
+            m_tangentsImportSettings = settings;
+        }
 
     private:
         
         float m_fileScale = 1.0f;
 
-        std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
+        //std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
         
         ModelNode::PModelNode
         buildModelTree(
@@ -129,11 +140,14 @@ namespace FishEngine {
         std::shared_ptr<Mesh>
         ParseMesh(
             const aiMesh*   assimp_mesh,
-            int             vertexUsage,
             bool            load_uv,
             bool            load_tangent);
 
         std::shared_ptr<Model> m_model;
+
+        VertexUsages m_vertexUsages = (int)VertexUsage::PNUT;
+        ImporterSettings m_normalsImportSettings    = ImporterSettings::Import;
+        ImporterSettings m_tangentsImportSettings   = ImporterSettings::Calculate;
     };
 }
 

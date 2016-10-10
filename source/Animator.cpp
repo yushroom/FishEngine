@@ -11,12 +11,16 @@ void Animator::Update() {
         return;
     m_time += Time::deltaTime();
     if (m_time * m_animation->ticksPerSecond > m_animation->duration) {
-        Stop();
+        if (m_playingOnce) {
+            Stop();
+            m_playingOnce = false;
+        }
+        else {
+            m_time -= m_animation->duration / m_animation->ticksPerSecond;
+        }
         return;
     }
     RecursivelyUpdate(gameObject());
-    //Stop();
-    //Debug::Log("time %lf", m_time);
     if (m_playOneFrame) {
         m_playing = false;
         m_playOneFrame = false;
@@ -94,18 +98,18 @@ void FishEngine::Animator::NextFrame()
     //RecursivelyUpdate2(gameObject());
 }
 
-void FishEngine::Animator::RecursivelyUpdate2(const std::shared_ptr<GameObject>& go)
-{
-    auto name = go->name();
-    auto t = go->transform();
-    auto it = m_animation->channels.find(name);
-    //auto tm = m_time * m_animation->ticksPerSecond;
-    if (it != m_animation->channels.end()) {
-        auto& node = it->second;
-        t->setLocalToWorldMatrix(node.transformationKeys[m_currentFrame].value);
-    }
-
-    for (auto child : t->children()) {
-        RecursivelyUpdate2(child.lock()->gameObject());
-    }
-}
+//void FishEngine::Animator::RecursivelyUpdate2(const std::shared_ptr<GameObject>& go)
+//{
+//    auto name = go->name();
+//    auto t = go->transform();
+//    auto it = m_animation->channels.find(name);
+//    //auto tm = m_time * m_animation->ticksPerSecond;
+//    if (it != m_animation->channels.end()) {
+//        auto& node = it->second;
+//        t->setLocalToWorldMatrix(node.transformationKeys[m_currentFrame].value);
+//    }
+//
+//    for (auto child : t->children()) {
+//        RecursivelyUpdate2(child.lock()->gameObject());
+//    }
+//}

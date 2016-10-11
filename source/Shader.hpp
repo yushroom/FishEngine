@@ -196,16 +196,15 @@ public:
         return m_blend;
     }
     
+    std::shared_ptr<Shader> m_skinnedShader = nullptr;
+    
 private:
-    //Shader& operator=(const Shader&) = default;
+    Shader& operator=(const Shader&) = default;
+    
     GLuint m_program = 0;
-
-    //std::shared_ptr<Shader> m_skinnedShader = nullptr;
     
     void GetAllUniforms();
     GLint GetUniformLocation(const char* name) const;
-
-    //GLuint LinkShader(GLuint vs, GLuint tcs, GLuint tes, GLuint gs, GLuint fs);
 
     std::vector<UniformInfo> m_uniforms;
     

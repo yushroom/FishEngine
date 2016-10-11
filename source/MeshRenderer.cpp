@@ -69,19 +69,24 @@ void MeshRenderer::Render() const
     //auto animator = gameObject()->GetComponent<Animator>();
     std::vector<Matrix4x4> boneTransformation;
     const auto& mesh = meshFilter->mesh();
-    if (m_avatar != nullptr) {
+    bool skinned = m_avatar != nullptr;
+    if (skinned) {
         boneTransformation.resize(mesh->m_boneNameToIndex.size());
         RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, mesh->m_boneNameToIndex, mesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
     }
     
     for (auto& m : m_materials) {
         auto shader = m->shader();
+        if (skinned) {
+            shader = shader->m_skinnedShader;
+        }
+        assert(shader != nullptr);
         shader->Use();
         shader->PreRender();
         if (m_avatar != nullptr)
             shader->BindMatrixArray("BoneTransformations", boneTransformation);
         //m->BindTextures(textures);
-        m->Update();
+        m->Update(skinned);
         shader->CheckStatus();
         mesh->Render();
         shader->PostRender();

@@ -30,12 +30,13 @@ namespace FishEngine
         {
             glGenBuffers(1, &perDrawUBO);
             glGenBuffers(1, &perFrameUBO);
+            //glGenBuffers(1, &bonesUBO);
         }
 
         static void BindPerDrawUniforms()
         {
             glBindBuffer(GL_UNIFORM_BUFFER, perDrawUBO);
-            auto size = sizeof(perDrawUniformData);
+            //auto size = sizeof(perDrawUniformData);
             glBufferData(GL_UNIFORM_BUFFER, sizeof(perDrawUniformData), (void*)&perDrawUniformData, GL_DYNAMIC_DRAW);
             glBindBufferBase(GL_UNIFORM_BUFFER, PerDrawUBOBindingPoint, perDrawUBO);
             glCheckError();
@@ -44,21 +45,33 @@ namespace FishEngine
         static void BindPerFrameUniforms()
         {
             glBindBuffer(GL_UNIFORM_BUFFER, perFrameUBO);
-            auto size = sizeof(perFrameUniformData);
+            //auto size = sizeof(perFrameUniformData);
             glBufferData(GL_UNIFORM_BUFFER, sizeof(perFrameUniformData), (void*)&perFrameUniformData, GL_DYNAMIC_DRAW);
             glBindBufferBase(GL_UNIFORM_BUFFER, PerFrameUBOBindingPoint, perFrameUBO);
             glCheckError();
         }
+        
+//        static void BindBonesUniforms()
+//        {
+//            glBindBuffer(GL_UNIFORM_BUFFER, bonesUBO);
+//            //auto size = sizeof(perFrameUniformData);
+//            glBufferData(GL_UNIFORM_BUFFER, sizeof(bonesUniformData), (void*)&bonesUniformData, GL_DYNAMIC_DRAW);
+//            glBindBufferBase(GL_UNIFORM_BUFFER, BonesUBOBindingPoint, bonesUBO);
+//            glCheckError();
+//        }
 
         static const GLuint PerDrawUBOBindingPoint = 0;
         static const GLuint PerFrameUBOBindingPoint = 1;
+        //static const GLuint BonesUBOBindingPoint = 2;
 
         static PerDraw perDrawUniformData;
         static PerFrame perFrameUniformData;
+        //static Bones bonesUniformData;
 
     private:
         static GLuint perDrawUBO;
         static GLuint perFrameUBO;
+        //static GLuint bonesUBO;
     };
 }
 

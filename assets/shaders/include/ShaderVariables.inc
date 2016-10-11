@@ -72,6 +72,14 @@ layout(std140, row_major) uniform PerFrame
 	//vec3 unity_LightPosition; // view space light position
 };
 
+
+// #define MAX_BONE_SIZE 100
+// //uniform mat4 BoneTransformations[MAX_BONE_SIZE];
+// layout(std140, row_major) uniform Bones
+// {
+//     mat4 BoneTransformations2[MAX_BONE_SIZE];
+// };
+
 #ifndef CPP
 
 #define PI 3.141592653589793f

@@ -1,10 +1,11 @@
 layout (triangles) in;
 layout (line_strip, max_vertices = 6) out;
+
 in VS_OUT {
     vec3 normal;
 } gs_in[];
 
-const float MAGNITUDE = 0.3f;
+const float MAGNITUDE = 0.01f;
 
 void GenerateLine(int index) {
     gl_Position = gl_in[index].gl_Position;

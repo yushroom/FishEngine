@@ -765,7 +765,7 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& me
     //bool skinned = meshFilter->m_mesh->m_skinned;
     //ImGui::Checkbox("Skinned", &skinned);
     if (meshFilter->m_mesh->m_skinned) {
-        int boneCount = meshFilter->m_mesh->m_boneNameToIndex.size();
+        int boneCount = (int)meshFilter->m_mesh->m_boneNameToIndex.size();
         Int("Bone Count", boneCount);
     }
 }

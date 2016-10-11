@@ -1,6 +1,10 @@
 #ifndef AppDataTan_inc
 #define AppDataTan_inc
 
+#ifdef AppDataBase_inc
+#error "You can inclue only *one* header from AppDataBase.h and AppDataTan.h"
+#endif
+
 #include "CG.inc"
 
 layout (location = PositionIndex) 	in vec3 InputPositon;

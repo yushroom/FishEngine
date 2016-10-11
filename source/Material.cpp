@@ -20,10 +20,15 @@ void FishEngine::Material::SetShader(std::shared_ptr<Shader> shader)
     }
 }
 
-void FishEngine::Material::Update()
+void FishEngine::Material::Update(bool skinned /* = false*/)
 {
-    m_shader->BindUniforms(m_uniforms);
-    m_shader->BindTextures(m_textures);
+    if (skinned) {
+        m_shader->m_skinnedShader->BindUniforms(m_uniforms);
+        m_shader->m_skinnedShader->BindTextures(m_textures);
+    } else {
+        m_shader->BindUniforms(m_uniforms);
+        m_shader->BindTextures(m_textures);
+    }
 }
 
 void Material::OnInspectorGUI() {

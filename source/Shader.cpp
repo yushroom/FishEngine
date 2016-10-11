@@ -154,15 +154,7 @@ LinkShader(
         if (tcs != 0) glDetachShader(program, tcs);
         glDetachShader(program, tes);
     }
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-    if (gs != 0) {
-        glDeleteShader(gs);
-    }
-    if (tes != 0) {
-        if (tcs != 0) glDeleteShader(tcs);
-        glDeleteShader(tes);
-    }
+
     glCheckError();
     return program;
 }
@@ -251,6 +243,10 @@ void Shader::FromString(const std::string& vs_string,
         }
     };
     
+    bool hasSkinnedVersion =
+        (vs_string.find("AppDataBase.inc") != std::string::npos)
+    || (vs_string.find("AppDataTan.inc") != std::string::npos);
+    
     extractSettings(vs_string);
     auto parsed_vs = m_shaderVariables + "\n" + processInclude(vs_string);
     extractSettings(fs_string);
@@ -261,7 +257,8 @@ void Shader::FromString(const std::string& vs_string,
     m_blend = settings["Blend"] == "On";
     
     compileShader(vs, GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
-    compileShader(vs_skinned, GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
+    if (hasSkinnedVersion)
+        compileShader(vs_skinned, GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
     compileShader(fs, GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
     
     // gs
@@ -275,12 +272,26 @@ void Shader::FromString(const std::string& vs_string,
     }
 
     m_program = LinkShader(vs, tcs, tes, gs, fs);
-    //m_skinnedShader = std::make_shared<Shader>();
-    //*m_skinnedShader = *this;
-    //m_skinnedShader->m_program = LinkShader(vs_skinned, tcs, tes, gs, fs);
-
     GetAllUniforms();
-    //m_skinnedShader->GetAllUniforms();
+    
+    if (hasSkinnedVersion) {
+        m_skinnedShader = std::make_shared<Shader>();
+        *m_skinnedShader = *this;
+        m_skinnedShader->m_program = LinkShader(vs_skinned, tcs, tes, gs, fs);
+        m_skinnedShader->GetAllUniforms();
+        assert(m_uniforms.size()+1 == m_skinnedShader->m_uniforms.size());
+    }
+    
+    glDeleteShader(vs);
+    glDeleteShader(vs_skinned);
+    glDeleteShader(fs);
+    if (gs != 0) {
+        glDeleteShader(gs);
+    }
+    if (tes != 0) {
+        if (tcs != 0) glDeleteShader(tcs);
+        glDeleteShader(tes);
+    }
 }
 
 void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)
@@ -453,7 +464,7 @@ Shader::PShader Shader::builtinShader(const std::string& name)
     if (it != m_builtinShaders.end()) {
         return it->second;
     }
-    Debug::LogWarning("No built-in shader called %d", name.c_str());
+    Debug::LogWarning("No built-in shader called %s", name.c_str());
     abort();
     return nullptr;
 }
@@ -489,15 +500,32 @@ void FishEngine::Shader::GetAllUniforms()
     //}
 
     GLuint blockID = glGetUniformBlockIndex(m_program, "PerDraw");
-    assert(blockID != GL_INVALID_INDEX);
-    glUniformBlockBinding(m_program, blockID, Pipeline::PerDrawUBOBindingPoint);
     GLint blockSize = 0;
-    glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+    //assert(blockID != GL_INVALID_INDEX);
+    if (blockID != GL_INVALID_INDEX)
+    {
+        glUniformBlockBinding(m_program, blockID, Pipeline::PerDrawUBOBindingPoint);
+        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+        assert(blockSize == sizeof(Pipeline::perDrawUniformData));
+    }
 
     blockID = glGetUniformBlockIndex(m_program, "PerFrame");
-    assert(blockID != GL_INVALID_INDEX);
-    glUniformBlockBinding(m_program, blockID, Pipeline::PerFrameUBOBindingPoint);
-    glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+    //assert(blockID != GL_INVALID_INDEX);
+    if (blockID != GL_INVALID_INDEX)
+    {
+        glUniformBlockBinding(m_program, blockID, Pipeline::PerFrameUBOBindingPoint);
+        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+        assert(blockSize == sizeof(Pipeline::perFrameUniformData));
+    }
+    
+//    blockID = glGetUniformBlockIndex(m_program, "Bones");
+//    //assert(blockID != GL_INVALID_INDEX);
+//    if (blockID != GL_INVALID_INDEX)
+//    {
+//        glUniformBlockBinding(m_program, blockID, Pipeline::BonesUBOBindingPoint);
+//        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+//        assert(blockSize == sizeof(Pipeline::bonesUniformData));
+//    }
 
     GLint count;
     GLint size; // size of the variable
@@ -539,7 +567,7 @@ void Shader::Init() {
 #endif
     m_shaderVariables = readFile(root_dir + "include/ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
-    for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline", "SkinnedMesh"}) {
+    for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline"}) {
         Debug::Log("Compile shader: %s", n);
         m_builtinShaders[n] = Shader::CreateFromFile(root_dir+n+".vert", root_dir+n+".frag");
     }

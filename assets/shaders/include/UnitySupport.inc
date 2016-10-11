@@ -5,7 +5,6 @@
 
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
-
 #define float2 vec2
 #define float3 vec3
 #define float4 vec4
@@ -39,6 +38,7 @@
 // #define UNITY_MATRIX_T_MV glstate_matrix_transpose_modelview0
 // #define UNITY_MATRIX_IT_MV glstate_matrix_invtrans_modelview0
 #define UNITY_MATRIX_MVP MATRIX_MVP
+#define Object2World MATRIX_M
 #define unity_ObjectToWorld Object2World
 
 // UnituShaderVariables.cginc

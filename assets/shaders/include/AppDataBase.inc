@@ -1,6 +1,10 @@
 #ifndef AppDataBase_inc
 #define AppDataBase_inc
 
+#ifdef AppDataTan_inc
+#error "You can inclue only *one* header from AppDataBase.h and AppDataTan.h"
+#endif
+
 #include "CG.inc"
 
 layout (location = PositionIndex) 	in vec3 InputPositon;
@@ -32,10 +36,11 @@ void main()
 	boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
 	boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
     appdata.position	= boneTransformation * vec4(InputPositon, 1);
+    appdata.normal      = mat3(boneTransformation) * InputNormal;
 #else
 	appdata.position	= vec4(InputPositon, 1);
+    appdata.normal      = InputNormal;
 #endif
-    appdata.normal  	= InputNormal;
     appdata.uv			= InputUV;
     vs_main(appdata);
 }

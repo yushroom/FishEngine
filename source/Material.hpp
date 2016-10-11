@@ -67,7 +67,7 @@ public:
 //        return m_uniforms;
 //    }
     
-    void Update();
+    void Update(bool skinned = false);
     
     void OnInspectorGUI();
     

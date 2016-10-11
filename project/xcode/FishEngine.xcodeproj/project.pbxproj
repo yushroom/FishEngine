@@ -50,6 +50,8 @@
 		BFAF11DF1D9930A100101DCD /* Ray.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11D91D9930A100101DCD /* Ray.hpp */; };
 		BFAF11E01D9930A100101DCD /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAF11DA1D9930A100101DCD /* Screen.cpp */; };
 		BFAF11E11D9930A100101DCD /* Screen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11DB1D9930A100101DCD /* Screen.hpp */; };
+		BFB361B91DAD11DC00CD0DCB /* Pipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */; };
+		BFB361BA1DAD11DC00CD0DCB /* Pipeline.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */; };
 		BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */; };
 		BFD20AC91D9D52AD00DB88E1 /* Animator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
@@ -146,6 +148,8 @@
 		BFAF11D91D9930A100101DCD /* Ray.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Ray.hpp; path = ../../source/Ray.hpp; sourceTree = "<group>"; };
 		BFAF11DA1D9930A100101DCD /* Screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Screen.cpp; path = ../../source/Screen.cpp; sourceTree = "<group>"; };
 		BFAF11DB1D9930A100101DCD /* Screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Screen.hpp; path = ../../source/Screen.hpp; sourceTree = "<group>"; };
+		BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Pipeline.cpp; path = ../../source/Pipeline.cpp; sourceTree = "<group>"; };
+		BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Pipeline.hpp; path = ../../source/Pipeline.hpp; sourceTree = "<group>"; };
 		BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Animator.cpp; path = ../../source/Animator.cpp; sourceTree = "<group>"; };
 		BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Animator.hpp; path = ../../source/Animator.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -254,6 +258,8 @@
 				BFDC74A21D8EDDF50082A6DC /* Material.hpp */,
 				BFDC74A31D8EDDF50082A6DC /* Mesh.cpp */,
 				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
+				BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */,
+				BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */,
 				BFDC74AE1D8EDDF50082A6DC /* RenderSystem.cpp */,
 				BFDC74AF1D8EDDF50082A6DC /* RenderSystem.hpp */,
 				BF26B4E81D940F9A00237680 /* RenderTexture.cpp */,
@@ -423,6 +429,7 @@
 				BFDC74E41D8EDDF50082A6DC /* Shader.hpp in Headers */,
 				BFDC74E61D8EDDF50082A6DC /* Texture.hpp in Headers */,
 				BFDC74DF1D8EDDF50082A6DC /* RenderSystem.hpp in Headers */,
+				BFB361BA1DAD11DC00CD0DCB /* Pipeline.hpp in Headers */,
 				BFDC74DD1D8EDDF50082A6DC /* RenderSettings.hpp in Headers */,
 				BFDC74CE1D8EDDF50082A6DC /* GLEnvironment.hpp in Headers */,
 				BF51E6741DA1665000AF948A /* Rigidbody.hpp in Headers */,
@@ -502,6 +509,7 @@
 				BFDC74C91D8EDDF50082A6DC /* GameLoop.cpp in Sources */,
 				BFDC74DB1D8EDDF50082A6DC /* Renderer.cpp in Sources */,
 				BF3212231D9173FF00FA80E6 /* Quaternion.cpp in Sources */,
+				BFB361B91DAD11DC00CD0DCB /* Pipeline.cpp in Sources */,
 				BFDC74E51D8EDDF50082A6DC /* Texture.cpp in Sources */,
 				BF51E6821DA2AC2B00AF948A /* CapsuleCollider.cpp in Sources */,
 				BF51E5F01D9FDA9800AF948A /* Serialization.cpp in Sources */,

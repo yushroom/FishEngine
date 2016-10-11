@@ -529,11 +529,7 @@ namespace FishEngine {
 
         if (node->meshesIndices.size() == 1) {
             const auto& mesh = m_meshes[node->meshesIndices.front()];
-            std::shared_ptr<Material> material;
-            if (mesh->m_skinned)
-                material = Material::builtinMaterial("SkinnedMesh");
-            else
-                material = Material::defaultMaterial();
+            auto material = Material::defaultMaterial();
             auto meshRenderer = std::make_shared<MeshRenderer>(material);
             if (mesh->m_skinned) {
                 meshRenderer->setAvatar(m_avatar);
@@ -547,12 +543,8 @@ namespace FishEngine {
                 auto& m = m_meshes[idx];
                 auto child = Scene::CreateGameObject(m->name());
                 child->transform()->SetParent(go->transform());
-                std::shared_ptr<Material> material;
                 const auto& mesh = m_meshes[idx];
-                if (mesh->m_skinned)
-                    material = Material::builtinMaterial("SkinnedMesh");
-                else
-                    material = Material::defaultMaterial();
+                auto material = Material::defaultMaterial();
                 auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 if (mesh->m_skinned) {
                     meshRenderer->setAvatar(m_avatar);

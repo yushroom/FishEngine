@@ -32,9 +32,9 @@ void Material::OnInspectorGUI() {
     if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
         auto& uniforms = m_shader->uniforms();
         for (auto& u : uniforms) {
-            if (builtinUniformNames.find(u.name) != builtinUniformNames.end()) {
-                continue;
-            }
+            //if (builtinUniformNames.find(u.name) != builtinUniformNames.end()) {
+            //    continue;
+            //}
             if (u.type == GL_FLOAT) {
                 ImGui::SliderFloat(u.name.c_str(), &m_uniforms.floats[u.name], 0, 1);
             } else if (u.type == GL_FLOAT_VEC3) {

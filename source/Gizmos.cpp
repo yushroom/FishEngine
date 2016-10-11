@@ -2,6 +2,7 @@
 #include "Shader.hpp"
 #include "Camera.hpp"
 #include "Mesh.hpp"
+#include "Pipeline.hpp"
 
 using namespace FishEngine;
 
@@ -68,7 +69,9 @@ void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
     uniforms.vec4s["Color"] = s_color;
-    uniforms.mat4s["MATRIX_MVP"] = p * v * m;
+    //uniforms.mat4s["MATRIX_MVP"] = p * v * m;
+    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m;
+    Pipeline::BindPerDrawUniforms();
     shader->BindUniforms(uniforms);
     s_lineMesh->Render();
 }
@@ -102,7 +105,9 @@ void Gizmos::DrawWireSphere(const Vector3& center,
     for (int i = 0; i < 3; ++i) {
         float* e = euler_angles + i*3;
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
-        uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
+        //uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
+        Pipeline::perDrawUniformData.MATRIX_MVP = p * v * modelMatrix * m;
+        Pipeline::BindPerDrawUniforms();
         shader->BindUniforms(uniforms);
         s_circleMesh->Render();
     }
@@ -121,7 +126,9 @@ DrawWireCube(const Vector3& center,
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
     uniforms.vec4s["Color"] = s_color;
-    uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
+    //uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
+    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * modelMatrix * m;
+    Pipeline::BindPerDrawUniforms();
     shader->BindUniforms(uniforms);
     s_boxMesh->Render();
 }

@@ -13,7 +13,7 @@ out VS_OUT {
 void main()
 {
     vs_out.normal = mat3(MATRIX_IT_M) * normal;
-    vs_out.tangent = mat3(Object2World) * tangent;
+    vs_out.tangent = mat3(MATRIX_M) * tangent;
     vs_out.uv = uv;
     gl_Position = MATRIX_MVP * vec4(position, 1.0);
 }

@@ -5,6 +5,7 @@
 #include "Light.hpp"
 #include "Mesh.hpp"
 #include "MeshFilter.hpp"
+#include "Pipeline.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -72,7 +73,7 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
     auto m = Material::builtinMaterial("ShadowMap");
     auto shader = m->shader();
     shader->Use();
-    ShaderUniforms uniforms;
+    //ShaderUniforms uniforms;
     auto view = light->gameObject()->transform()->worldToLocalMatrix();
     auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);
     
@@ -90,8 +91,10 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
             //auto shader = m->shader();
             //shader->Use();
             //shader->PreRender();
-            uniforms.mat4s["MATRIX_MVP"] = proj * view * go->transform()->localToWorldMatrix();
-            shader->BindUniforms(uniforms);
+            //uniforms.mat4s["MATRIX_MVP"] = proj * view * go->transform()->localToWorldMatrix();
+            Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
+            Pipeline::BindPerDrawUniforms();
+            //shader->BindUniforms(uniforms);
             //m->Update();
             shader->CheckStatus();
             meshFilter->mesh()->Render();

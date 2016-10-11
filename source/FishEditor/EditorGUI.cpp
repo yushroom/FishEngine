@@ -25,6 +25,7 @@
 #include <SphereCollider.hpp>
 #include <CapsuleCollider.hpp>
 #include <Rigidbody.hpp>
+#include <Pipeline.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -468,8 +469,11 @@ void FishEditor::EditorGUI::DrawTranslateGizmo()
         Vector3 pos = center + Vector3(f+j)*translate_gizmo_length;
         t.setLocalPosition(pos);
         auto model = t.localToWorldMatrix();
-        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+        Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
+        Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
+        Pipeline::BindPerDrawUniforms();
+        //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+        //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
         Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f+j);
         sceneGizmoMaterial->SetVector3("_Color", color);
         shader->Use();
@@ -575,8 +579,11 @@ void EditorGUI::DrawSceneGizmo()
         t.setLocalPosition(pos);
         t.setLocalEulerAngles(f[j+3], f[j+4], f[j+5]);
         auto modelMat = model * t.localToWorldMatrix() * s;
-        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
-        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
+        //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
+        //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
+        Pipeline::perDrawUniformData.MATRIX_MVP = vp*modelMat;
+        Pipeline::perDrawUniformData.MATRIX_IT_MV = (view * modelMat).transpose().inverse();
+        Pipeline::BindPerDrawUniforms();
         //if (i >= 3)
         sceneGizmoMaterial->SetVector3("_Color", color);
         sceneGizmoMaterial->Update();
@@ -592,8 +599,11 @@ void EditorGUI::DrawSceneGizmo()
     }
     interested = interested || interested6;
     
-    sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-    sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
+    Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
+    Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
+    Pipeline::BindPerDrawUniforms();
+    //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
+    //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
     sceneGizmoMaterial->SetVector3("_Color", interested6 ? Vector3(1, 1, 0) : Vector3(1, 1, 1));
     shader->PreRender();
     sceneGizmoMaterial->Update();
@@ -645,7 +655,7 @@ bool Bool(const char* label, bool* value)
     return ImGui::Checkbox(label, value);
 }
 
-bool Vector3(const char* label, Vector3* value)
+bool Float3(const char* label, Vector3* value)
 {
     return ImGui::InputFloat3(label, value->data());
 }
@@ -669,14 +679,14 @@ void Bool(const char* label, bool value)
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
 {
-    if (Vector3("Position", &transform->m_localPosition)) {
+    if (Float3("Position", &transform->m_localPosition)) {
         transform->MakeDirty();
     }
-    if (Vector3("Rotation", &transform->m_localEulerAngles)) {
+    if (Float3("Rotation", &transform->m_localEulerAngles)) {
         transform->m_localRotation.setEulerAngles(transform->m_localEulerAngles);
         transform->MakeDirty();
     }
-    if (Vector3("Scale", &transform->m_localScale)) {
+    if (Float3("Scale", &transform->m_localScale)) {
         transform->MakeDirty();
     }
 }
@@ -783,15 +793,15 @@ template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::BoxCollider>& boxCollider)
 {
     Bool(   "Is Trigger",   &boxCollider->m_isTrigger);
-    Vector3("Center",       &boxCollider->m_center);
-    Vector3("Size",         &boxCollider->m_size);
+    Float3("Center",       &boxCollider->m_center);
+    Float3("Size",         &boxCollider->m_size);
 }
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SphereCollider>& sphereCollider)
 {
     Bool(   "Is Trigger",   &sphereCollider->m_isTrigger);
-    Vector3("Center",       &sphereCollider->m_center);
+    Float3("Center",       &sphereCollider->m_center);
     Float(  "Radius",       &sphereCollider->m_radius);
 }
 
@@ -800,7 +810,7 @@ template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider>& capsuleCollider)
 {
     Bool(   "Is Trigger",   &capsuleCollider->m_isTrigger);
-    Vector3("Center",       &capsuleCollider->m_center);
+    Float3("Center",       &capsuleCollider->m_center);
     Float(  "Radius",       &capsuleCollider->m_radius);
     Float(  "Height",       &capsuleCollider->m_height);
     //ImGui::InputFloat3("Direction", capsuleCollider->m_direction);

@@ -20,16 +20,6 @@ enum class VertexUsage {
 
 typedef int VertexUsages;
 
-struct Bone
-{
-    //uint32_t index;
-    //uint32_t parentIndex;
-    Matrix4x4 boneOffset;   // //! Matrix that transforms from mesh space to bone space in bind pose
-    Matrix4x4 finalTransformation;
-    //std::vector<uint32_t> children;
-    //std::string name;
-};
-
 static constexpr int MaxBoneForEachVertex = 4;
 
 struct BoneWeight

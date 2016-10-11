@@ -161,6 +161,7 @@
     <ClInclude Include="..\..\source\ModelImporter.hpp" />
     <ClInclude Include="..\..\source\Object.hpp" />
     <ClInclude Include="..\..\source\PhysicsSystem.hpp" />
+    <ClInclude Include="..\..\source\Pipeline.hpp" />
     <ClInclude Include="..\..\source\Quaternion.hpp" />
     <ClInclude Include="..\..\source\Ray.hpp" />
     <ClInclude Include="..\..\source\Renderer.hpp" />
@@ -213,6 +214,7 @@
     <ClCompile Include="..\..\source\ModelImporter.cpp" />
     <ClCompile Include="..\..\source\Object.cpp" />
     <ClCompile Include="..\..\source\PhysicsSystem.cpp" />
+    <ClCompile Include="..\..\source\Pipeline.cpp" />
     <ClCompile Include="..\..\source\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Ray.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />

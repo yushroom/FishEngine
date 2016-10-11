@@ -22,6 +22,7 @@
 #include <ModelImporter.hpp>
 #include <Gizmos.hpp>
 #include "SceneView.hpp"
+#include <Pipeline.hpp>
 
 using namespace FishEngine;
 
@@ -46,6 +47,7 @@ void EditorRenderSystem::Init()
 
     ImGui_ImplGlfwGL3_Init(window, false);
     
+    Pipeline::Init();
     Shader::Init();
     Material::Init();
     Model::Init();
@@ -66,13 +68,40 @@ void EditorRenderSystem::Render()
 {
     ImGui_ImplGlfwGL3_NewFrame();
 
+    auto camera = Camera::main();
+    auto proj = camera->projectionMatrix();
+    auto view = camera->worldToCameraMatrix();
+    Pipeline::perFrameUniformData.MATRIX_P = proj;
+    Pipeline::perFrameUniformData.MATRIX_V = view;
+    Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
+    Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
+    Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::mainGameCamera()->transform()->position();
+    Pipeline::BindPerFrameUniforms();
+
+    Vector4 lightDir(0, 0, 0, 0);
+    //std::map<std::string, Texture::PTexture> textures;
+    Matrix4x4 lightVP;
+    auto& lights = Light::lights();
+    if (lights.size() > 0) {
+        auto& l = lights.front();
+        if (l->transform() != nullptr) {
+            lightDir = Vector4(-l->transform()->forward(), 0);
+            auto view = l->gameObject()->transform()->worldToLocalMatrix();
+            auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
+            lightVP = proj * view;
+            //textures["shadowMap"] = l->m_shadowMap;
+        }
+        Pipeline::perFrameUniformData.LightColor0 = l->m_color;
+    }
+    Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
+    Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
+
     // Shadow
     
-    auto lights = Light::lights();
+    //auto lights = Light::lights();
     for (auto& l : lights) {
         Scene::RenderShadow(l);
     }
-
     
     // Render
     
@@ -93,7 +122,6 @@ void EditorRenderSystem::Render()
         glEnable(GL_POLYGON_OFFSET_LINE);
         glPolygonOffset(-1.0, -1.0f);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        ShaderUniforms uniforms;
         auto material = Material::builtinMaterial("SolidColor");
         material->SetVector4("Color", Vector4(0, 1, 0, 1));
         material->shader()->Use();
@@ -114,9 +142,8 @@ void EditorRenderSystem::Render()
             auto meshFilter = go->GetComponent<MeshFilter>();
             if (meshFilter != nullptr) {
                 auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-                uniforms.mat4s["MATRIX_MVP"] = vp * model;
-                
-                material->shader()->BindUniforms(uniforms);
+                Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
+                Pipeline::BindPerDrawUniforms();
                 material->Update();
                 material->shader()->CheckStatus();
                 meshFilter->mesh()->Render();

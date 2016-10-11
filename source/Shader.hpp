@@ -18,10 +18,10 @@ NAMESPACE_FISHENGINE_BEGIN
 
 // Unity Built-in shader variables
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-static std::set<std::string> builtinUniformNames{
-"MATRIX_MVP", "MATRIX_V", "MATRIX_P", "MATRIX_VP", "MATRIX_IT_MV", "MATRIX_IT_M"
-    "_Object2World", "_WorldSpaceCameraPos"
-};
+//static std::set<std::string> builtinUniformNames{
+//"MATRIX_MVP", "MATRIX_V", "MATRIX_P", "MATRIX_VP", "MATRIX_IT_MV", "MATRIX_IT_M"
+//    "_Object2World", "_WorldSpaceCameraPos"
+//};
 
 struct ShaderUniforms
 {
@@ -131,7 +131,7 @@ class Shader
 public:
     Shader() = default;
     Shader(const Shader&) = delete;
-    Shader& operator=(const Shader&) = delete;
+    //Shader& operator=(const Shader&) = delete;
     Shader(Shader&&);
 
     typedef std::shared_ptr<Shader> PShader;
@@ -197,10 +197,15 @@ public:
     }
     
 private:
+    //Shader& operator=(const Shader&) = default;
     GLuint m_program = 0;
+
+    //std::shared_ptr<Shader> m_skinnedShader = nullptr;
     
+    void GetAllUniforms();
     GLint GetUniformLocation(const char* name) const;
-    
+
+    //GLuint LinkShader(GLuint vs, GLuint tcs, GLuint tes, GLuint gs, GLuint fs);
 
     std::vector<UniformInfo> m_uniforms;
     

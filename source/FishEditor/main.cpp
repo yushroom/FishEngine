@@ -787,7 +787,7 @@ void test()
 
 int main()
 {
-    test();
+    //test();
     FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();

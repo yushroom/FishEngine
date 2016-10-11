@@ -1,3 +1,4 @@
+#include "CG.inc"
 #include "HLSLSupport.inc"
 #define half float
 #define half2 vec2
@@ -355,10 +356,7 @@ float3 PBR_BlinnPhong( float3 DiffuseColor, float3 Cspec, float3 LightColor, flo
 
 void main()
 {
-    vec3 L = -WorldSpaceLightPos0.xyz; // directional light
-    if (WorldSpaceLightPos0.w > 0.5f) { // other type
-        L = normalize(WorldSpaceLightPos0.xyz - vs_out.position);
-    }
+    vec3 L = normalize(WorldSpaceLightDir(vs_out.position));
     vec3 V = normalize(WorldSpaceCameraPos - vs_out.position);
     vec3 N = normalize(vs_out.normal);
     color.rgb = PRBShading(L, V, N);

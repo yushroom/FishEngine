@@ -9,6 +9,7 @@
 #include "Texture.hpp"
 #include "Common.hpp"
 #include "Debug.hpp"
+#include "Pipeline.hpp"
 
 using namespace std;
 
@@ -117,6 +118,55 @@ string GLenumToString(GLenum e) {
     }
 }
 
+GLuint
+LinkShader(
+    GLuint vs,
+    GLuint tcs,
+    GLuint tes,
+    GLuint gs,
+    GLuint fs)
+{
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    if (gs != 0)
+        glAttachShader(program, gs);
+    if (tes != 0) {
+        if (tcs != 0) glAttachShader(program, tcs);
+        glAttachShader(program, tes);
+    }
+    glLinkProgram(program);
+    GLint success;
+    GLchar infoLog[1024];
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(program, 1024, NULL, infoLog);
+        Debug::LogError("%s", infoLog);
+        abort();
+    }
+
+    glDetachShader(program, vs);
+    glDetachShader(program, fs);
+    if (gs != 0) {
+        glDetachShader(program, gs);
+    }
+    if (tes != 0) {
+        if (tcs != 0) glDetachShader(program, tcs);
+        glDetachShader(program, tes);
+    }
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    if (gs != 0) {
+        glDeleteShader(gs);
+    }
+    if (tes != 0) {
+        if (tcs != 0) glDeleteShader(tcs);
+        glDeleteShader(tes);
+    }
+    glCheckError();
+    return program;
+}
+
 void Shader::FromString(const std::string& vs_string,
                         const std::string& tcs_string,
                         const std::string& tes_string,
@@ -136,7 +186,8 @@ void Shader::FromString(const std::string& vs_string,
     bool use_gs = !gs_string.empty();
     bool use_ts = !tes_string.empty();
     GLuint vs = 0;
-    GLuint ps = 0;
+    GLuint vs_skinned = 0;
+    GLuint fs = 0;
     GLuint gs = 0;
     GLuint tcs = 0;
     GLuint tes = 0;
@@ -191,7 +242,7 @@ void Shader::FromString(const std::string& vs_string,
                 }
                 auto res = settings.find(s[0]);
                 if (res != settings.end()) {
-                    Debug::Log("Override shader setting: %s", line.c_str());
+                    Debug::Log("\tOverride shader setting: %s", line.c_str());
                     settings[s[0]] = s[1];
                 } else {
                     Debug::LogWarning("Unknown shader setting: %s", line.c_str());
@@ -209,76 +260,27 @@ void Shader::FromString(const std::string& vs_string,
     m_ZWrite = settings["ZWrite"] == "On";
     m_blend = settings["Blend"] == "On";
     
-    compileShader(vs, GL_VERTEX_SHADER, parsed_vs);
-    compileShader(ps, GL_FRAGMENT_SHADER, parsed_fs);
+    compileShader(vs, GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
+    compileShader(vs_skinned, GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
+    compileShader(fs, GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
     
     // gs
     if (use_gs) {
-        compileShader(gs, GL_GEOMETRY_SHADER, m_shaderVariables + gs_string);
+        compileShader(gs, GL_GEOMETRY_SHADER, "#version 410 core\n" + m_shaderVariables + gs_string);
     }
     if (use_ts) {
         if (!tcs_string.empty())
-            compileShader(tcs, GL_TESS_CONTROL_SHADER, m_shaderVariables + tcs_string);
+            compileShader(tcs, GL_TESS_CONTROL_SHADER,  m_shaderVariables + tcs_string);
         compileShader(tes, GL_TESS_EVALUATION_SHADER, m_shaderVariables + tes_string);
     }
 
-    m_program = glCreateProgram();
-    glAttachShader(m_program, vs);
-    glAttachShader(m_program, ps);
-    if (use_gs)
-        glAttachShader(m_program, gs);
-    if (use_ts) {
-        if (tcs != 0) glAttachShader(m_program, tcs);
-        glAttachShader(m_program, tes);
-    }
-    glLinkProgram(m_program);
-    GLint success;
-    GLchar infoLog[1024];
-    glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(m_program, 1024, NULL, infoLog);
-        Debug::LogError("%s", infoLog);
-        abort();
-    }
-    
-    GLint count;
-    GLint size; // size of the variable
-    GLenum type; // type of the variable (float, vec3 or mat4, etc)
-    const GLsizei bufSize = 32; // maximum name length
-    GLchar name[bufSize]; // variable name in GLSL
-    GLsizei length; // name length
-    
-    glGetProgramiv(m_program, GL_ACTIVE_UNIFORMS, &count);
-    //Debug::Log("Program %u, Active Uniforms: %d", m_program, count);
-    m_uniforms.clear();
-    
-    for (int i = 0; i < count; i++) {
-        glGetActiveUniform(m_program, (GLuint)i, bufSize, &length, &size, &type, name);
-        //GLint location = glGetUniformLocation(m_program, name);
-        auto loc = GetUniformLocation(name);
-        //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type).c_str(), name, loc);
-        m_uniforms.push_back(UniformInfo{type, string(name), (GLuint)loc, false});
-    }
+    m_program = LinkShader(vs, tcs, tes, gs, fs);
+    //m_skinnedShader = std::make_shared<Shader>();
+    //*m_skinnedShader = *this;
+    //m_skinnedShader->m_program = LinkShader(vs_skinned, tcs, tes, gs, fs);
 
-    glDetachShader(m_program, vs);
-    glDetachShader(m_program, ps);
-    if (use_gs) {
-        glDetachShader(m_program, gs);
-    }
-    if (use_ts) {
-        if (tcs != 0) glDetachShader(m_program, tcs);
-        glDetachShader(m_program, tes);
-    }
-    glDeleteShader(vs);
-    glDeleteShader(ps);
-    if (use_gs) {
-        glDeleteShader(gs);
-    }
-    if (use_ts) {
-        if (tcs != 0) glDeleteShader(tcs);
-        glDeleteShader(tes);
-    }
-    glCheckError();
+    GetAllUniforms();
+    //m_skinnedShader->GetAllUniforms();
 }
 
 void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)
@@ -456,6 +458,68 @@ Shader::PShader Shader::builtinShader(const std::string& name)
     return nullptr;
 }
 
+//static const char* PerDrawUniformNames[] =
+//{
+//    "MATRIX_MVP",
+//    "MATRIX_MV",
+//    "MATRIX_M",
+//    "MATRIX_V",
+//    "MATRIX_P",
+//    "MATRIX_VP",
+//    "MATRIX_IT_MV",
+//    "MATRIX_IT_M",
+//};
+
+void FishEngine::Shader::GetAllUniforms()
+{
+    //{
+    //    GLuint perDrawUBO = glGetUniformBlockIndex(m_program, "PerDraw");
+    //    GLint ubo_size = 0;
+    //    glGetActiveUniformBlockiv(m_program, perDrawUBO, GL_UNIFORM_BLOCK_DATA_SIZE, &ubo_size);
+    //    const int perDrawUBOCount = 8;
+    //    GLuint indices[perDrawUBOCount];
+    //    GLint size[perDrawUBOCount];
+    //    GLint offset[perDrawUBOCount];
+    //    GLint type[perDrawUBOCount];
+    //    glGetUniformIndices(m_program, perDrawUBOCount, PerDrawUniformNames, indices);
+    //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_OFFSET, offset);
+    //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_SIZE, size);
+    //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_TYPE, type);
+    //    Debug::Log("here");
+    //}
+
+    GLuint blockID = glGetUniformBlockIndex(m_program, "PerDraw");
+    assert(blockID != GL_INVALID_INDEX);
+    glUniformBlockBinding(m_program, blockID, Pipeline::PerDrawUBOBindingPoint);
+    GLint blockSize = 0;
+    glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+    blockID = glGetUniformBlockIndex(m_program, "PerFrame");
+    assert(blockID != GL_INVALID_INDEX);
+    glUniformBlockBinding(m_program, blockID, Pipeline::PerFrameUBOBindingPoint);
+    glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+    GLint count;
+    GLint size; // size of the variable
+    GLenum type; // type of the variable (float, vec3 or mat4, etc)
+    const GLsizei bufSize = 32; // maximum name length
+    GLchar name[bufSize]; // variable name in GLSL
+    GLsizei length; // name length
+
+    glGetProgramiv(m_program, GL_ACTIVE_UNIFORMS, &count);
+    //Debug::Log("Program %u, Active Uniforms: %d", m_program, count);
+    m_uniforms.clear();
+
+    for (int i = 0; i < count; i++) {
+        glGetActiveUniform(m_program, (GLuint)i, bufSize, &length, &size, &type, name);
+        //GLint location = glGetUniformLocation(m_program, name);
+        GLint loc = glGetUniformLocation(m_program, name);
+        //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type).c_str(), name, loc);
+        if (loc >= 0)
+            m_uniforms.push_back(UniformInfo{ type, string(name), (GLuint)loc, false });
+    }
+}
+
 GLint Shader::GetUniformLocation(const char* name) const {
     GLint loc = glGetUniformLocation(m_program, name);
     if (loc == -1) {
@@ -473,7 +537,7 @@ void Shader::Init() {
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif
-    m_shaderVariables = "#version 410 core\n" + readFile(root_dir + "include/ShaderVariables.inc") + "\n";
+    m_shaderVariables = readFile(root_dir + "include/ShaderVariables.inc") + "\n";
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
     for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline", "SkinnedMesh"}) {
         Debug::Log("Compile shader: %s", n);

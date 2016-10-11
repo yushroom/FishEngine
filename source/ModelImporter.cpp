@@ -4,27 +4,32 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-//#include <fbxsdk.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "Debug.hpp"
 #include "Common.hpp"
 
-#define PRESERVE_FBX_PIVOT
+#define REMOVE_FBX_PIVOT
+#define DEBUG_ANIMATION
 
-constexpr int MAX_BONE_SIZE = 200;
+constexpr int MAX_BONE_SIZE = 100;
+
+static const std::set<std::string> DummyNodeNames = { "Translation", "PreRotation", "Rotation", "PostRotation", "Scaling" };
 
 namespace FishEngine {
-    
-    void Model::AddMesh(Mesh::PMesh& mesh)
+
+    std::map<BuiltinModelType, Model::PModel> Model::s_builtinModels;
+
+    void Model::
+    AddMesh(
+        Mesh::PMesh& mesh)
     {
         m_meshes.push_back(mesh);
     }
-
-    std::map<BuiltinModelType, Model::PModel> Model::s_builtinModels;
     
-    void Model::Init() {
+    void Model::
+    Init() {
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "../../assets/models/";
 #else
@@ -44,7 +49,7 @@ namespace FishEngine {
         const BuiltinModelType type) {
         return s_builtinModels[type];
     }
-    
+
 
     Matrix4x4
     ConvertMatrix(
@@ -60,67 +65,56 @@ namespace FishEngine {
     buildModelTree(
         const aiNode*   assimp_node)
     {
-        //Debug::Log("NODE: %s mesh count: %d ", assimp_node->mName.C_Str(), assimp_node->mNumMeshes);
-        //for (int i = 0; i < assimp_node->mNumChildren; ++i) {
-        //    Debug::Log("    CHILD: %s", assimp_node->mChildren[i]->mName.C_Str());
-        //}
+        std::string name = assimp_node->mName.C_Str();
+        Matrix4x4 transform = ConvertMatrix(assimp_node->mTransformation);
+        transform.m[0][3] *= m_fileScale;
+        transform.m[1][3] *= m_fileScale;
+        transform.m[2][3] *= m_fileScale;
+
+#ifdef REMOVE_FBX_PIVOT
+        // remove dummyNode
+        auto pos = name.find("_$AssimpFbx$");
+        if (pos != std::string::npos)
+        {
+            auto trueName = name.substr(0, pos);
+            auto typeName = name.substr(pos + 13);
+            assert(DummyNodeNames.find(typeName) != DummyNodeNames.end());
+            auto it = m_nodeTransformations.find(trueName);
+            if (it != m_nodeTransformations.end()) {
+                it->second[typeName] = transform;
+            } else {
+                m_nodeTransformations[trueName] = { { typeName, transform } };
+            }
+
+            assert(assimp_node->mNumChildren == 1);
+            auto child = assimp_node->mChildren[0];
+            assert(boost::starts_with(child->mName.C_Str(), trueName));
+            auto c = buildModelTree(child);
+            c->transform = transform * c->transform;
+            return c;
+        }
+#endif
+
         auto node = std::make_shared<ModelNode>();
-        node->name = assimp_node->mName.C_Str();
+        node->name = name;
         //Debug::LogWarning("Node: %s", node->name.c_str());
-        node->transform = ConvertMatrix(assimp_node->mTransformation);
-        node->transform.m[0][3] *= m_fileScale;
-        node->transform.m[1][3] *= m_fileScale;
-        node->transform.m[2][3] *= m_fileScale;
+        node->transform = transform;
         node->isBone = false;
-        //model->m_bones.push_back(node);
-        //node->index = model->m_bones.size();
         int index = m_model->m_avatar->m_boneToIndex.size();
         m_model->m_avatar->m_boneToIndex[node->name] = index;
         node->index = index;
-        //m_nodes[node->name] = node;
         
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
             node->meshesIndices.push_back(assimp_node->mMeshes[i]);
         }
 
         for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i) {
-            //Debug::Log("    CHILD: %s", assimp_node->mName.C_Str());
             auto child = buildModelTree(assimp_node->mChildren[i]);
             node->children.push_back(child);
             child->parent = node.get();
         }
         return node;
     }
-
-
-//    ModelNode::PModelNode ModelImporter::
-//    buildModelTree(
-//        fbxsdk::FbxNode* pNode)
-//    {
-//        const char* nodeName = pNode->GetName();
-//        auto node = std::make_shared<ModelNode>();
-//        node->isBone = false;
-//        node->name = nodeName;
-//        Debug::Log("FBX node: %s", nodeName);
-//        
-//        if (pNode->GetNodeAttribute())
-//        {
-//            switch (pNode->GetNodeAttribute()->GetAttributeType())
-//            {
-//            case FbxNodeAttribute::eMesh:
-//                auto pMesh = pNode->GetMesh();
-//                auto mesh = ParseMesh(pMesh);
-//                m_model->AddMesh(mesh);
-//                break;
-//            }
-//        }
-//        for (int j = 0; j < pNode->GetChildCount(); j++) {
-//            auto child = buildModelTree(pNode->GetChild(j));
-//            node->children.push_back(child);
-//            child->parent = node.get();
-//        }
-//        return node;
-//    }
 
 
     Mesh::PMesh ModelImporter::
@@ -193,7 +187,7 @@ namespace FishEngine {
             for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex){
                 auto& bone = assimp_mesh->mBones[boneIndex];
                 std::string boneName(bone->mName.C_Str());
-                Debug::Log("    bone name: %s", boneName.c_str());
+                //Debug::Log("    bone name: %s", boneName.c_str());
                 mesh->m_boneNameToIndex[boneName] = boneIndex;
 
                 auto offsetMat = ConvertMatrix(bone->mOffsetMatrix);
@@ -221,182 +215,48 @@ namespace FishEngine {
     }
 
 
-//    Mesh::PMesh ModelImporter::
-//    ParseMesh(
-//        FbxMesh* pMesh)
-//    {
-//        assert(pMesh != nullptr);
-//        auto mesh = std::make_shared<Mesh>();
-//
-//        //assert(pMesh->IsTriangleMesh());
-//
-//        //auto n_controlPoints = pMesh->GetControlPointsCount();
-//        //auto controlPoints = pMesh->GetControlPoints();
-//        auto n_vertices = pMesh->GetPolygonVertexCount();
-//        auto n_triangles = pMesh->GetPolygonCount();;
-//        mesh->m_positionBuffer.reserve(n_vertices * 3);
-//        mesh->m_normalBuffer.reserve(n_vertices * 3);
-//        mesh->m_uvBuffer.reserve(n_vertices * 2);
-//        mesh->m_indexBuffer.resize(n_triangles * 3);
-//        mesh->m_tangentBuffer.reserve(n_triangles * 3);
-//
-//        int* vertices = pMesh->GetPolygonVertices();
-//        memcpy(mesh->m_indexBuffer.data(), vertices, n_triangles * 3 * sizeof(int));
-//
-//        auto positions = pMesh->GetControlPoints();
-//        for (int i = 0; i < n_vertices; ++i)
-//        {
-//            auto& p = positions[i];
-//            mesh->m_positionBuffer.push_back(p.mData[0]);
-//            mesh->m_positionBuffer.push_back(p.mData[1]);
-//            mesh->m_positionBuffer.push_back(p.mData[2]);
-//        }
-//
-//        auto n_uvs = pMesh->GetElementUVCount();
-//        auto n_normals = pMesh->GetElementNormalCount();
-//        auto n_tangents = pMesh->GetElementTangentCount();
-//        auto normals = pMesh->GetElementNormal(0);
-//        switch (normals->GetMappingMode()) 
-//        {
-//        case FbxLayerElement::eByControlPoint:
-//            Debug::Log("by control point");
-//            switch (normals->GetReferenceMode())
-//            {
-//            case FbxLayerElement::eDirect:
-//                n_normals = normals->GetDirectArray().GetCount();
-//                for (int i = 0; i < n_normals; ++i) {
-//                    auto n = normals->GetDirectArray().GetAt(i);
-//                    mesh->m_normalBuffer.push_back(n.mData[0]);
-//                    mesh->m_normalBuffer.push_back(n.mData[1]);
-//                    mesh->m_normalBuffer.push_back(n.mData[2]);
-//                }
-//                Debug::Log("eDirect");
-//                break;
-//            case FbxLayerElement::eIndexToDirect:
-//                Debug::Log("eIndexToDirect");
-//                abort();
-//                break;
-//            }
-//            break;
-//        case FbxLayerElement::eByPolygonVertex:
-//            Debug::Log("by polygon vertex");
-//            switch (normals->GetReferenceMode())
-//            {
-//            case FbxLayerElement::eDirect:
-//                n_normals = normals->GetDirectArray().GetCount();
-//                for (int i = 0; i < n_normals; ++i) {
-//                    auto n = normals->GetDirectArray().GetAt(i);
-//                    mesh->m_normalBuffer.push_back(n.mData[0]);
-//                    mesh->m_normalBuffer.push_back(n.mData[1]);
-//                    mesh->m_normalBuffer.push_back(n.mData[2]);
-//                }
-//                Debug::Log("eDirect");
-//                break;
-//            case FbxLayerElement::eIndexToDirect:
-//                Debug::Log("eIndexToDirect");
-//                abort();
-//                break;
-//            }
-//            break;
-//        }
-//
-//        Debug::Log("triangles %ld", n_triangles);
-//        //for (int i = 0; i < triangleCount; ++i) {
-//        //    int idx = pMesh->GetPolygonVertexIndex()
-//        //}
-//        return mesh;
-//    }
-//
-//
-//    /* Tab character ("\t") counter */
-//    int numTabs = 0;
-//
-//    /**
-//    * Print the required number of tabs.
-//    */
-//    void PrintTabs() {
-//        for (int i = 0; i < numTabs; i++)
-//            printf("\t");
-//    }
-//
-//
-//    /**
-//    * Return a string-based representation based on the attribute type.
-//    */
-//    FbxString GetAttributeTypeName(FbxNodeAttribute::EType type) {
-//        switch (type) {
-//        case FbxNodeAttribute::eUnknown: return "unidentified";
-//        case FbxNodeAttribute::eNull: return "null";
-//        case FbxNodeAttribute::eMarker: return "marker";
-//        case FbxNodeAttribute::eSkeleton: return "skeleton";
-//        case FbxNodeAttribute::eMesh: return "mesh";
-//        case FbxNodeAttribute::eNurbs: return "nurbs";
-//        case FbxNodeAttribute::ePatch: return "patch";
-//        case FbxNodeAttribute::eCamera: return "camera";
-//        case FbxNodeAttribute::eCameraStereo: return "stereo";
-//        case FbxNodeAttribute::eCameraSwitcher: return "camera switcher";
-//        case FbxNodeAttribute::eLight: return "light";
-//        case FbxNodeAttribute::eOpticalReference: return "optical reference";
-//        case FbxNodeAttribute::eOpticalMarker: return "marker";
-//        case FbxNodeAttribute::eNurbsCurve: return "nurbs curve";
-//        case FbxNodeAttribute::eTrimNurbsSurface: return "trim nurbs surface";
-//        case FbxNodeAttribute::eBoundary: return "boundary";
-//        case FbxNodeAttribute::eNurbsSurface: return "nurbs surface";
-//        case FbxNodeAttribute::eShape: return "shape";
-//        case FbxNodeAttribute::eLODGroup: return "lodgroup";
-//        case FbxNodeAttribute::eSubDiv: return "subdiv";
-//        default: return "unknown";
-//        }
-//    }
-//
-//
-//    /**
-//    * Print an attribute.
-//    */
-//    void PrintAttribute(FbxNodeAttribute* pAttribute) {
-//        if (!pAttribute) return;
-//
-//        FbxString typeName = GetAttributeTypeName(pAttribute->GetAttributeType());
-//        FbxString attrName = pAttribute->GetName();
-//        PrintTabs();
-//        // Note: to retrieve the character array of a FbxString, use its Buffer() method.
-//        printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
-//    }
-
-
-    Vector3 ConvertVector3(const aiVector3D& avec3) {
+    Vector3
+    ConvertVector3(
+        const aiVector3D& avec3) {
         return Vector3(avec3.x, avec3.y, avec3.z);
     };
 
-    Quaternion ConvertQuaternion(const aiQuaternion& aquat) {
+
+    Quaternion
+    ConvertQuaternion(
+        const aiQuaternion& aquat) {
         return Quaternion(aquat.x, aquat.y, aquat.z, aquat.w);
     };
 
+
     std::shared_ptr<Animation>
     ParseAnimation(
-        const aiAnimation* assimp_animation, const float fileScale)
+        const aiAnimation* assimp_animation,
+        const float fileScale)
     {
         auto animation = std::make_shared<Animation>();
         auto& a = assimp_animation;
         animation->name = a->mName.C_Str();
+#ifdef DEBUG_ANIMATION
+        // remove dummyNode
+        auto pos = animation->name.find("_$AssimpFbx$");
+        if (pos != std::string::npos)
+        {
+            //auto trueName = animation->name.substr(0, pos);
+            auto typeName = animation->name.substr(pos + 13);
+            assert(typeName == "Translation" || typeName == "Rotation" || typeName == "Scaling");
+        }
+#endif
         animation->duration = (float)a->mDuration;
         animation->ticksPerSecond = (float)a->mTicksPerSecond;
         if (animation->ticksPerSecond <= 0.f) {
             animation->ticksPerSecond = 25.f;
         }
-        //animation->channels.resize(a->mNumChannels);
 
         for (uint32_t i = 0; i < a->mNumChannels; ++i) {
             auto an = a->mChannels[i];
             std::string name = an->mNodeName.C_Str();
-    #ifndef PRESERVE_FBX_PIVOT
-            auto pos = name.find("_$AssimpFbx$");
-            Debug::Log("old name: %s", name.c_str());
-            if (pos != std::string::npos) {
-                name = name.substr(0, pos);
-                Debug::Log("new name: %s", name.c_str());
-            }
-    #endif
+
             auto it = animation->channels.find(name);
             if (it == animation->channels.end()) {
                 animation->channels[name] = AnimationNode();
@@ -433,20 +293,19 @@ namespace FishEngine {
         load_option |= aiProcess_RemoveRedundantMaterials;
         load_option |= aiProcess_FindDegenerates;
         load_option |= aiProcess_FindInvalidData;
-        //load_option |= aiProcess_GenUVCoords;
-        //load_option |= aiProcess_TransformUVCoords;
         load_option |= aiProcess_FindInstances;
         load_option |= aiProcess_OptimizeMeshes;
+        load_option |= aiProcess_ConvertToLeftHanded;
+        //load_option |= aiProcess_GenUVCoords;
+        //load_option |= aiProcess_TransformUVCoords;
         //load_option |= aiProcess_SplitByBoneCount;
         //load_option |= aiProcess_SortByPType;
         //load_option |= aiProcess_SplitLargeMeshes;
         //load_option |= aiProcess_FixInfacingNormals;
         //load_option |= aiProcess_OptimizeGraph;
-        load_option |= aiProcess_ConvertToLeftHanded;
         //load_option |= aiProcess_FlipUVs;
-#ifndef PRESERVE_FBX_PIVOT
-        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-#endif
+
+        //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_LIGHTS, false);
@@ -469,9 +328,9 @@ namespace FishEngine {
 
         bool load_uv = (m_vertexUsages & (int)VertexUsage::UV) != 0;
         
-        
         m_model = std::make_shared<Model>();
         m_model->m_name = split(path, "/").back();
+        bool isFBX = boost::to_lower_copy(m_model->m_name.substr(m_model->m_name.size() - 3)) == "fbx";
         
         bool loadAnimation = scene->HasAnimations();
         if (loadAnimation)
@@ -485,71 +344,163 @@ namespace FishEngine {
             if (mesh->m_name.empty()) {
                 mesh->m_name = "mesh" + boost::lexical_cast<std::string>(m_model->m_meshes.size());
             }
+
             m_model->AddMesh(mesh);
         }
 
         for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
-            m_model->m_animations.push_back(ParseAnimation(scene->mAnimations[animIndex], m_fileScale));
-        }
-
-        for (auto& animation : m_model->m_animations) {
-            for (auto & channel : animation->channels) {
-
-            }
+            auto animation = ParseAnimation(scene->mAnimations[animIndex], m_fileScale);
+#ifdef REMOVE_FBX_PIVOT
+            if (isFBX)
+                RemoveDummyNodeFBX(animation);
+#endif
+            m_model->m_animations.push_back(animation);
         }
 
         return m_model;
     }
 
-//    std::shared_ptr<Model> ModelImporter::
-//    LoadFBX(
-//        const std::string&  path, 
-//        int                 vertexUsage /*= VertexUsagePNUT*/, 
-//        MeshLoadFlags       flags /*= 0*/)
-//    {
-//        // Initialize the SDK manager. This object handles all our memory management.
-//        FbxManager* lSdkManager = FbxManager::Create();
-//
-//        // Create the IO settings object.
-//        FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
-//        lSdkManager->SetIOSettings(ios);
-//
-//        // Create an importer using the SDK manager.
-//        FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
-//
-//        // Use the first argument as the filename for the importer.
-//        if (!lImporter->Initialize(path.c_str(), -1, lSdkManager->GetIOSettings())) {
-//            printf("Call to FbxImporter::Initialize() failed.\n");
-//            printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
-//            exit(-1);
-//        }
-//
-//        // Create a new scene so that it can be populated by the imported file.
-//        FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
-//
-//        // Import the contents of the file into the scene.
-//        lImporter->Import(lScene);
-//
-//        // The file is imported; so get rid of the importer.
-//        lImporter->Destroy();
-//
-//        m_model = std::make_shared<Model>();
-//        m_model->m_name = split(path, "/").back();
-//
-//        // Print the nodes of the scene and their attributes recursively.
-//        // Note that we are not printing the root node because it should
-//        // not contain any attributes.
-//        FbxNode* lRootNode = lScene->GetRootNode();
-//        buildModelTree(lRootNode);
-//        //if (lRootNode) {
-//        //    for (int i = 0; i < lRootNode->GetChildCount(); i++)
-//        //        buildModelTree(lRootNode->GetChild(i));
-//        //}
-//        // Destroy the SDK manager and all the other objects it was handling.
-//        lSdkManager->Destroy();
-//
-//        return m_model;
-//    }
+
+    void ModelImporter::
+    RemoveDummyNodeFBX(
+        std::shared_ptr<Animation> animation)
+    {
+        for (auto& it : m_nodeTransformations) {
+            auto& name = it.first;
+            AnimationNode resultNode;
+            resultNode.name = name;
+
+            // position
+            {
+                auto it2 = it.second.find("Translation");
+                if (it2 == it.second.end()) {   // No translation subnode;
+                    resultNode.positionKeys.emplace_back(Vector3Key{ 0.f, Vector3::zero });
+                }
+                else {
+                    Matrix4x4 positionMat = it2->second;
+                    Vector3 initPosition(positionMat.m[0][3], positionMat.m[1][3], positionMat.m[2][3]);
+                    auto fullName = name + "_$AssimpFbx$_Translation";
+                    auto it3 = animation->channels.find(fullName);
+                    if (it3 == animation->channels.end()) { // no animation on Translation
+                        resultNode.positionKeys.emplace_back(Vector3Key{ 0.f, initPosition });
+                    }
+                    else {
+#ifdef DEBUG_ANIMATION
+                        assert(it3->second.rotationKeys.size() == 1);
+                        assert(it3->second.rotationKeys[0].value == Quaternion::identity);
+                        assert(it3->second.scalingKeys.size() == 1);
+                        assert(it3->second.scalingKeys[0].value == Vector3::one);
+#endif
+                        resultNode.positionKeys = it3->second.positionKeys;
+                        animation->channels.erase(it3);
+                    }
+                }
+            }
+
+            // rotation
+            {
+                Matrix4x4 preRotation, postRotation;
+                {
+                    auto it2 = it.second.find("PreRotation");
+                    if (it2 != it.second.end()) {
+                        preRotation = it2->second;
+                    }
+                    auto it3 = it.second.find("PostRotation");
+                    if (it3 != it.second.end()) {
+                        postRotation = it3->second;
+                    }
+                }
+
+                auto it2 = it.second.find("Rotation");
+                if (it2 == it.second.end()) {   // No rotation subnode;
+                    auto rotMat = preRotation * postRotation;
+#ifdef DEBUG_ANIMATION
+                    Vector3 pos;
+                    Quaternion rot;
+                    Vector3 scale;
+                    Matrix4x4::Decompose(rotMat, &pos, &rot, &scale);
+                    assert(pos == Vector3::zero);
+                    assert(scale == Vector3::one);
+                    assert(rot == rotMat.ToRotation());
+#else
+                    Quaternion rot = rotMat.ToRotation();
+#endif
+                    resultNode.rotationKeys.emplace_back(QuaternionKey{ 0.f, rot });
+                }
+                else {
+                    auto fullName = name + "_$AssimpFbx$_Rotation";
+                    auto it3 = animation->channels.find(fullName);
+                    if (it3 == animation->channels.end()) { // no animation on rotation
+                        Matrix4x4 rotMat = preRotation * it2->second * postRotation;
+#ifdef DEBUG_ANIMATION
+                        Vector3 pos;
+                        Quaternion initRotation;
+                        Vector3 scale;
+                        Matrix4x4::Decompose(rotMat, &pos, &initRotation, &scale);
+                        assert(pos == Vector3::zero);
+                        assert(scale == Vector3::one);
+                        assert(initRotation == rotMat.ToRotation());
+#else
+                        Quaternion initRotation = rotMat.ToRotation();
+#endif
+                        resultNode.rotationKeys.emplace_back(QuaternionKey{ 0.f, initRotation });
+                    }
+                    else {
+#ifdef DEBUG_ANIMATION
+                        assert(it3->second.positionKeys.size() == 1);
+                        assert(it3->second.positionKeys[0].value == Vector3::zero);
+                        assert(it3->second.scalingKeys.size() == 1);
+                        assert(it3->second.scalingKeys[0].value == Vector3::one);
+#endif
+                        for (auto& rk : it3->second.rotationKeys) {
+                            auto rotMat = preRotation * Matrix4x4::FromRotation(rk.value) * postRotation;
+                            Vector3 pos;
+                            Quaternion rot;
+                            Vector3 scale;
+                            Matrix4x4::Decompose(rotMat, &pos, &rot, &scale);
+                            resultNode.rotationKeys.emplace_back(QuaternionKey{ rk.time, rot });
+                        }
+                        //resultNode.rotationKeys = it3->second.rotationKeys;
+                        animation->channels.erase(it3);
+                    }
+                }
+            }
+
+            // scale
+            {
+                auto it2 = it.second.find("Scaling");
+                if (it2 == it.second.end()) {   // No scaling subnode;
+                    resultNode.scalingKeys.emplace_back(Vector3Key{ 0.f, Vector3::one });
+                }
+                else {
+                    auto fullName = name + "_$AssimpFbx$_Scaling";
+                    auto it3 = animation->channels.find(fullName);
+                    if (it3 == animation->channels.end()) { // no animation on Scaling
+                        Matrix4x4 scaleMat = it2->second;
+                        Vector3 pos;
+                        Quaternion rot;
+                        Vector3 initScale;
+                        Matrix4x4::Decompose(scaleMat, &pos, &rot, &initScale);
+                        assert(pos == Vector3::zero);
+                        assert(rot == Quaternion::identity);
+                        resultNode.scalingKeys.emplace_back(Vector3Key{ 0.f, initScale });
+                    }
+                    else {
+#ifdef DEBUG_ANIMATION
+                        assert(it3->second.positionKeys.size() == 1);
+                        assert(it3->second.positionKeys[0].value == Vector3::zero);
+                        assert(it3->second.rotationKeys.size() == 1);
+                        assert(it3->second.rotationKeys[0].value == Quaternion::identity);
+#endif
+                        resultNode.scalingKeys = it3->second.scalingKeys;
+                        animation->channels.erase(it3);
+                    }
+                }
+            }
+
+            animation->channels[name] = resultNode;
+        }
+    }
 
 
     std::shared_ptr<GameObject> Model::
@@ -564,29 +515,11 @@ namespace FishEngine {
         return root;
     }
 
+
     std::shared_ptr<GameObject> Model::
     ResursivelyCreateGameObject(
         const ModelNode::PModelNode & node) const
     {
-        //auto pos = node->name.find("_$AssimpFbx$");
-        //if (pos != std::string::npos) { // remove dummy node
-        //    auto trueName = node->name.substr(0, pos);
-        //    auto typeName = node->name.substr(pos + 13);
-        //    //dummyNodeMap[trueName] = std::map<std::string, Matrix4x4>{ {typeName, node->transform} };
-        //    Matrix4x4 transform = node->transform;
-        //    assert(node->children.size() == 1);
-        //    auto child = node->children[0];
-        //    while (child->name != trueName) {
-        //        assert(boost::starts_with(child->name, trueName));
-        //        assert(child->children.size() == 1);
-        //        transform *= child->transform;
-        //        child = child->children[0];
-        //    }
-        //    transform *= child->transform;
-        //    child->transform = transform;
-        //    return ResursivelyCreateGameObject(child);
-        //}
-
         auto go = Scene::CreateGameObject(node->name);
         go->transform()->setLocalToWorldMatrix(node->transform);
 
@@ -595,9 +528,13 @@ namespace FishEngine {
         }
 
         if (node->meshesIndices.size() == 1) {
-            auto material = Material::defaultMaterial();
-            auto meshRenderer = std::make_shared<MeshRenderer>(material);
             const auto& mesh = m_meshes[node->meshesIndices.front()];
+            std::shared_ptr<Material> material;
+            if (mesh->m_skinned)
+                material = Material::builtinMaterial("SkinnedMesh");
+            else
+                material = Material::defaultMaterial();
+            auto meshRenderer = std::make_shared<MeshRenderer>(material);
             if (mesh->m_skinned) {
                 meshRenderer->setAvatar(m_avatar);
                 meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
@@ -610,9 +547,13 @@ namespace FishEngine {
                 auto& m = m_meshes[idx];
                 auto child = Scene::CreateGameObject(m->name());
                 child->transform()->SetParent(go->transform());
-                auto material = Material::builtinMaterial("SkinnedMesh");
-                auto meshRenderer = std::make_shared<MeshRenderer>(material);
+                std::shared_ptr<Material> material;
                 const auto& mesh = m_meshes[idx];
+                if (mesh->m_skinned)
+                    material = Material::builtinMaterial("SkinnedMesh");
+                else
+                    material = Material::defaultMaterial();
+                auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 if (mesh->m_skinned) {
                     meshRenderer->setAvatar(m_avatar);
                     meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
@@ -622,13 +563,6 @@ namespace FishEngine {
                 child->AddComponent(meshFilter);
             }
         }
-        //else if (node->isBone) {
-        //    auto material = Material::defaultMaterial();
-        //    auto meshRenderer = std::make_shared<MeshRenderer>(material);
-        //    auto meshFilter = std::make_shared<MeshFilter>(Model::builtinModel(BuiltinModelType::Cube)->m_meshes.front());
-        //    go->AddComponent(meshRenderer);
-        //    go->AddComponent(meshFilter);
-        //}
         
         for (auto& c : node->children) {
             auto child = ResursivelyCreateGameObject(c);

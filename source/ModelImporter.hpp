@@ -14,13 +14,6 @@ struct aiNode;
 struct aiMesh;
 struct aiAnimation;
 
-//namespace fbxsdk
-//{
-//    class FbxNode;
-//    class FbxMesh;
-//}
-
-
 namespace FishEngine {
 
     struct ModelNode
@@ -121,41 +114,37 @@ namespace FishEngine {
         LoadFromFile(
             const std::string& path);
 
-        std::shared_ptr<Model>
-        LoadFBX(
-            const std::string&  path);
-
-        void setImportNormals(ModelImporterNormals importNormals) {
+        void
+        setImportNormals(
+            ModelImporterNormals importNormals) 
+        {
             m_importNormals = importNormals;
         }
 
-        void setImportTangents(ModelImporterTangents importTangents) {
+        void
+        setImportTangents(
+            ModelImporterTangents importTangents) 
+        {
             m_importTangents = importTangents;
         }
 
     private:
         
         float m_fileScale = 1.0f;
-
-        //std::map<std::string, ModelNode::PModelNode> m_nodes; // temp
         
         ModelNode::PModelNode
         buildModelTree(
             const aiNode*   assimp_node);
         
-//        ModelNode::PModelNode
-//        buildModelTree(
-//            fbxsdk::FbxNode* pNode);
-//
-//        Mesh::PMesh
-//        ParseMesh(
-//            fbxsdk::FbxMesh* pMesh);
-
         std::shared_ptr<Mesh>
         ParseMesh(
             const aiMesh*   assimp_mesh,
             bool            load_uv,
             bool            load_tangent);
+
+        void
+        RemoveDummyNodeFBX(
+            std::shared_ptr<Animation> animation);
 
         std::shared_ptr<Model>      m_model;
 
@@ -166,6 +155,10 @@ namespace FishEngine {
 
         // Vertex tangent import options.
         ModelImporterTangents m_importTangents  = ModelImporterTangents::Calculate;
+
+
+        // remove dummy nodes
+        std::map<std::string, std::map<std::string, Matrix4x4>> m_nodeTransformations;
     };
 }
 

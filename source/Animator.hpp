@@ -65,17 +65,9 @@ namespace FishEngine {
         
         //virtual void OnInspectorGUI() override;
         
-        void Play() {
-            m_playing = true;
-            m_playingOnce = false;
-            m_playOneFrame = false;
-        }
+        void Play();
         
-        void PlayOnce() {
-            m_playing = true;
-            m_playingOnce = true;
-            m_playOneFrame = false;
-        }
+        void PlayOnce();
 
         void NextFrame();
         

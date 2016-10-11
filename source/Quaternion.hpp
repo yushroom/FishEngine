@@ -20,25 +20,7 @@ public:
 
     Vector3 eulerAngles() const;
 
-    void NormalizeSelf() {
-        float inv_len = 1.0f / std::sqrtf(x*x+y*y+z*z+w*w);
-        x *= inv_len;
-        y *= inv_len;
-        z *= inv_len;
-        w *= inv_len;
-    }
-    
-//    float roll() const {
-//    	return Mathf::Rad2Deg * ::std::atan2(2.0f * (x*y+w*z), w*w+x*x-y*y-z*z);
-//    }
-//
-//    float pitch() const {
-//		return Mathf::Rad2Deg * ::std::atan2(2.0f * (y*z+w*x), w*w-x*x-y*y+z*z);
-//    }
-//
-//    float yaw() const {
-//    	return Mathf::Rad2Deg * ::std::asin(Mathf::Clamp(-2.f*(x*z-w*y), -1.f, 1.f));
-//    }
+    void NormalizeSelf();
     
     void setEulerAngles(const Vector3& angles)
     {
@@ -61,34 +43,15 @@ public:
         return m[index];
     }
 
-    friend Quaternion operator *(Quaternion lhs, Quaternion rhs)
-    {
-        return Quaternion(lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z);
-    }
+    Quaternion operator *(Quaternion rhs) const;
 
-    friend Vector3 operator *(Quaternion rotation, Vector3 point)
-    {
-        float num = rotation.x * 2.f;
-        float num2 = rotation.y * 2.f;
-        float num3 = rotation.z * 2.f;
-        float num4 = rotation.x * num;
-        float num5 = rotation.y * num2;
-        float num6 = rotation.z * num3;
-        float num7 = rotation.x * num2;
-        float num8 = rotation.x * num3;
-        float num9 = rotation.y * num3;
-        float num10 = rotation.w * num;
-        float num11 = rotation.w * num2;
-        float num12 = rotation.w * num3;
-        Vector3 result;
-        result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
-        result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
-        result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
-        return result;
-    }
+    Vector3 operator *(Vector3 point) const;
 
     bool operator==(const Quaternion& q) {
-        return Mathf::Approximately(x, q.x) && Mathf::Approximately(y, q.y) && Mathf::Approximately(z, q.z);
+        return Mathf::Approximately(x, q.x) 
+            && Mathf::Approximately(y, q.y)
+            && Mathf::Approximately(z, q.z) 
+            && Mathf::Approximately(w, q.w);
     }
 
 
@@ -99,19 +62,7 @@ public:
     }
 
     /// @brief Creates a rotation which rotates angle degrees around axis.
-    static Quaternion AngleAxis(const float angle, const Vector3& axis)
-    {
-        auto a = axis.normalized();
-        Quaternion Result;
-
-        float s = Mathf::Sin(angle * 0.5f);
-
-        Result.w = Mathf::Cos(angle * 0.5f);
-        Result.x = a.x * s;
-        Result.y = a.y * s;
-        Result.z = a.z * s;
-        return Result;
-    }
+    static Quaternion AngleAxis(const float angle, const Vector3& axis);
 
     void ToAngleAxis(float* angle, Vector3* axis);
 
@@ -162,16 +113,7 @@ public:
 
     static Quaternion LookRotation(const Vector3& forward);
 
-    static Quaternion RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta)
-    {
-        float num = Quaternion::Angle(from, to);
-        if (num == 0.f)
-        {
-            return to;
-        }
-        float t = Mathf::Min(1.f, maxDegreesDelta / num);
-        return Quaternion::SlerpUnclamped(from, to, t);
-    }
+    static Quaternion RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta);
 
     static const Quaternion identity;
 };

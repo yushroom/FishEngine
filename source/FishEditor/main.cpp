@@ -469,28 +469,29 @@ void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
         RecursivelyAddScript<T>(c.lock());
     }
 }
-            
+
+
+std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & root, const std::string& name)
+{
+    auto& children = root->transform()->children();
+    for (auto& c : children) {
+        const auto& g = c.lock();
+        //Debug::Log("Name: %s", g->name().c_str());
+        if (g->name() == name) {
+            return g->gameObject();
+        }
+        auto r = FindNamedChild(g->gameObject(), name);
+        if (r != nullptr) {
+            return r;
+        }
+    }
+    return nullptr;
+}
+
+
 class TestAnimation : public App
 {
 public:
-
-    std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & go, const std::string& name)
-    {
-        auto& children = go->transform()->children();
-        for (auto& c : children) {
-            const auto& g = c.lock();
-            //Debug::Log("Name: %s", g->name().c_str());
-            if (g->name() == name) {
-                return g->gameObject();
-            }
-            auto r = FindNamedChild(g->gameObject(), name);
-            if (r != nullptr) {
-                return r;
-            }
-        }
-        return nullptr;
-    }
-    
     virtual void Init() override {
         
         DefaultScene();
@@ -508,15 +509,16 @@ public:
         
         auto sphere = Model::builtinModel(BuiltinModelType::Sphere)->mainMesh();
         
-        //ModelImporter importer;
-        //importer.setFileScale(0.01f);
+        ModelImporter importer;
+        importer.setFileScale(0.01f);
         //auto model = importer.LoadFBX(chan_root_dir + "models/unitychan.fbx");
-        //auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
+        auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
+        
         ModelImporter importer2;
         importer2.setImportNormals(ModelImporterNormals::Calculate);
         importer2.setFileScale(0.01f);
-        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
-        //auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
+        //auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
+        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         //auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
 //        std::string chan_texture_dir = chan_root_dir + "textures/";
@@ -565,8 +567,13 @@ public:
 
         textures["AmbientCubemap"] = sky_texture;
 
-        auto modelGO = jump00Model->CreateGameObject();
-        RecursivelyAddScript<DrawSkeleton>(modelGO->transform());
+#if 1
+        auto modelGO = model->CreateGameObject();
+        modelGO->AddComponent<Animator>();
+        auto animator = modelGO->GetComponent<Animator>();
+        animator->setAvatar(model->avatar());
+        animator->m_animation = jump00Model->mainAnimation();
+#endif
 
         std::shared_ptr<GameObject> go;
 

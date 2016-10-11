@@ -13,14 +13,13 @@ void Animator::Update() {
     if (m_time * m_animation->ticksPerSecond > m_animation->duration) {
         if (m_playingOnce) {
             Stop();
-            m_playingOnce = false;
         }
-        else {
-            m_time -= m_animation->duration / m_animation->ticksPerSecond;
-        }
+        m_time -= m_animation->duration / m_animation->ticksPerSecond;
         return;
     }
+
     RecursivelyUpdate(gameObject());
+
     if (m_playOneFrame) {
         m_playing = false;
         m_playOneFrame = false;
@@ -129,9 +128,24 @@ void Animator::RecursivelyUpdate(const std::shared_ptr<GameObject>& go)
     }
 }
 
+void FishEngine::Animator::Play()
+{
+    m_playing = true;
+    m_playingOnce = false;
+    m_playOneFrame = false;
+}
+
+void FishEngine::Animator::PlayOnce()
+{
+    m_playing = true;
+    m_playingOnce = true;
+    m_playOneFrame = false;
+}
+
 void FishEngine::Animator::NextFrame()
 {
     m_playing = true;
+    m_playingOnce = false;
     m_playOneFrame = true;
     //m_currentFrame++;
     //RecursivelyUpdate2(gameObject());

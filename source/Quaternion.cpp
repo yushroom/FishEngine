@@ -36,6 +36,60 @@ namespace FishEngine {
         //return Vector3(pitch(), yaw(), roll());
     }
 
+    void Quaternion::NormalizeSelf()
+    {
+        float inv_len = 1.0f / std::sqrtf(x*x + y*y + z*z + w*w);
+        x *= inv_len;
+        y *= inv_len;
+        z *= inv_len;
+        w *= inv_len;
+    }
+
+    FishEngine::Vector3 Quaternion::operator*(Vector3 point) const
+    {
+        float num = x * 2.f;
+        float num2 = y * 2.f;
+        float num3 = z * 2.f;
+        float num4 = x * num;
+        float num5 = y * num2;
+        float num6 = z * num3;
+        float num7 = x * num2;
+        float num8 = x * num3;
+        float num9 = y * num3;
+        float num10 = w * num;
+        float num11 = w * num2;
+        float num12 = w * num3;
+        Vector3 result;
+        result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
+        result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
+        result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
+        return result;
+    }
+
+    FishEngine::Quaternion Quaternion::operator*(Quaternion rhs) const
+    {
+        // [p.w*q.v + q.w*p.v + corss(p.v, q.v), p.w*q.w-dot(p.v, q.v)]
+        return Quaternion(
+            w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+            w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+            w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
+            w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
+    }
+
+    FishEngine::Quaternion Quaternion::AngleAxis(const float angle, const Vector3& axis)
+    {
+        auto a = axis.normalized();
+        Quaternion Result;
+
+        float s = Mathf::Sin(angle * 0.5f);
+
+        Result.w = Mathf::Cos(angle * 0.5f);
+        Result.x = a.x * s;
+        Result.y = a.y * s;
+        Result.z = a.z * s;
+        return Result;
+    }
+
     FishEngine::Quaternion Quaternion::Euler(const Vector3& euler)
     {
         // http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
@@ -75,7 +129,7 @@ namespace FishEngine {
 
     FishEngine::Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b, float t)
     {
-        SlerpUnclamped(a, b, Mathf::Clamp01(t));
+        return SlerpUnclamped(a, b, Mathf::Clamp01(t));
     }
 
     FishEngine::Quaternion Quaternion::SlerpUnclamped(const Quaternion& a, const Quaternion& b, float t)
@@ -117,4 +171,14 @@ namespace FishEngine {
             sclp * a.w + sclq * end.w);
     }
 
+    FishEngine::Quaternion Quaternion::RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta)
+    {
+        float num = Quaternion::Angle(from, to);
+        if (num == 0.f)
+        {
+            return to;
+        }
+        float t = Mathf::Min(1.f, maxDegreesDelta / num);
+        return Quaternion::SlerpUnclamped(from, to, t);
+    }
 }

@@ -15,3 +15,5 @@ void vs_main(AppData appdata)
     vs_out.uv = appdata.uv;
     vs_out.positionInLightSpace = LightMatrix0 * vec4(vs_out.position, 1.0f);
 }
+
+#include "AppDataBaseMain.inc"

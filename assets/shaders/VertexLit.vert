@@ -15,3 +15,5 @@ void vs_main(AppData appdata)
     c = clamp(c, 0, 1);
     vs_out.color = _Color * c;
 }
+
+#include "AppDataBaseMain.inc"

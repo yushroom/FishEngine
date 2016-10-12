@@ -10,3 +10,5 @@ void vs_main(AppData appdata)
     mat3 normalMatrix = mat3(MATRIX_IT_M);
     vs_out.normal = normalize(vec3(MATRIX_VP * vec4(normalMatrix*appdata.normal, 0.0)));
 }
+
+#include "AppDataBaseMain.inc"

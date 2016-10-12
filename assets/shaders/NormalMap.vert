@@ -13,3 +13,5 @@ void vs_main(AppData appdata)
     vs_out.uv = appdata.uv;
     gl_Position = MATRIX_MVP * appdata.position;
 }
+
+#include "AppDataTanMain.inc"

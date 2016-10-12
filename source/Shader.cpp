@@ -22,7 +22,10 @@ static const std::string include_dir = "/Users/yushroom/program/graphics/FishEng
 std::string readFile(const std::string& path)
 {
     std::ifstream stream(path);
-    assert(stream.is_open());
+    if (!stream.is_open()) {
+        FishEngine::Debug::LogError("Can not open shader header file: %s", path.c_str());
+        abort();
+    }
     std::stringstream sstream;
     sstream << stream.rdbuf();
     return sstream.str();
@@ -35,6 +38,8 @@ std::string processInclude(const std::string& str)
     auto pos = result.find("#include", 0);
     while (pos != std::string::npos) {
         auto pos2 = result.find("\n", pos);
+        if (pos2 == std::string::npos)
+            pos2 = result.size();
         std::string filename = result.substr(pos+8+2, pos2-pos-8-2-1);
         if (loaded_headers.find(filename) == loaded_headers.end()) {
             loaded_headers.insert(filename);
@@ -566,6 +571,7 @@ void Shader::Init() {
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif
     m_shaderVariables = readFile(root_dir + "include/ShaderVariables.inc") + "\n";
+    Debug::Log("Compile shader: VisualizeNormal");
     m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir+"VisualizeNormal.vert", root_dir+"VisualizeNormal.frag", root_dir+"VisualizeNormal.geom");
     for (auto& n : {"PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline"}) {
         Debug::Log("Compile shader: %s", n);

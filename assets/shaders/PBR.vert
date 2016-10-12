@@ -13,3 +13,5 @@ void vs_main(AppData appdata)
     vs_out.normal = mat3(MATRIX_IT_M) * appdata.normal;
     vs_out.uv = appdata.uv;
 }
+
+#include "AppDataBaseMain.inc"

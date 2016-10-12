@@ -18,3 +18,5 @@ void vs_main(AppData appdata)
 	gl_Position = projSpacePos + scaledNormal;
     vs_out.uv = appdata.uv;
 }
+
+#include "AppDataBaseMain.inc"

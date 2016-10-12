@@ -2,7 +2,7 @@
 #define AppDataBase_inc
 
 #ifdef AppDataTan_inc
-#error "You can inclue only *one* header from AppDataBase.h and AppDataTan.h"
+#error You can inclue only *one* header from AppDataBase.h and AppDataTan.h
 #endif
 
 #include "CG.inc"
@@ -24,26 +24,26 @@ struct AppData {
     vec2 uv;
 };
 
-void vs_main(AppData appdata);
+// void vs_main(AppData appdata);
 
-void main()
-{
+// void main()
+// {
 
-    AppData appdata;
-#ifdef SKINNED
-	mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
-	boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
-	boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
-	boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
-    appdata.position	= boneTransformation * vec4(InputPositon, 1);
-    appdata.normal      = mat3(boneTransformation) * InputNormal;
-#else
-	appdata.position	= vec4(InputPositon, 1);
-    appdata.normal      = InputNormal;
-#endif
-    appdata.uv			= InputUV;
-    vs_main(appdata);
-}
+//     AppData appdata;
+// #ifdef SKINNED
+// 	mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
+// 	boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
+// 	boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
+// 	boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
+//     appdata.position	= boneTransformation * vec4(InputPositon, 1);
+//     appdata.normal      = mat3(boneTransformation) * InputNormal;
+// #else
+// 	appdata.position	= vec4(InputPositon, 1);
+//     appdata.normal      = InputNormal;
+// #endif
+//     appdata.uv			= InputUV;
+//     vs_main(appdata);
+// }
 
 #endif //AppDataBase_inc
 

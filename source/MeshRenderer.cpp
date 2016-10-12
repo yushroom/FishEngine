@@ -7,6 +7,7 @@
 #include "Light.hpp"
 #include "Animator.hpp"
 #include "Pipeline.hpp"
+#include <cassert>
 
 FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(material)
 {

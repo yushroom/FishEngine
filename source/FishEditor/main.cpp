@@ -17,7 +17,8 @@ using namespace FishEditor;
 #include "Time.hpp"
 #include "Mesh.hpp"
 #include "MeshFilter.hpp"
-#include "MeshRenderer.hpp"
+#include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
 #include "RenderSettings.hpp"
 #include "Scene.hpp"
 #include "Selection.hpp"
@@ -596,7 +597,7 @@ public:
         for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
-            auto renderer = child->GetComponent<MeshRenderer>();
+            auto renderer = child->GetComponent<SkinnedMeshRenderer>();
             //renderer->setAvatar(jump00Model->avatar());
             //renderer->setRootBone(modelGO->transform());
             renderer->SetMaterial(material);
@@ -612,8 +613,8 @@ public:
         for (auto name : {"skin"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+            child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
+            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(material2);
         }
 
         material = Material::builtinMaterial("Texture");
@@ -638,8 +639,8 @@ public:
         for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+            child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
+            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(material2);
         }
 
         material = Material::builtinMaterial("Transparent");
@@ -681,7 +682,7 @@ public:
         for (auto name : {"cheek"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
-            child->GetComponent<MeshRenderer>()->SetMaterial(material);
+            child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
         }
         
         // Camera

@@ -8,7 +8,8 @@
 #include "EditorGUI.hpp"
 #include "Camera.hpp"
 #include "Time.hpp"
-#include "MeshRenderer.hpp"
+#include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
 #include "Scene.hpp"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
@@ -167,9 +168,11 @@ void EditorRenderSystem::Render()
     std::vector<std::shared_ptr<GameObject>> transparentQueue;
     for (auto& go : Scene::m_gameObjects) {
         if (!go->activeInHierarchy()) continue;
-        auto renderer = go->GetComponent<MeshRenderer>();
+        std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
         if (renderer == nullptr) {
-            continue;
+            renderer = go->GetComponent<SkinnedMeshRenderer>();
+            if (renderer == nullptr)
+                continue;
         }
         bool isTransparent = renderer->material()->shader()->IsTransparent();
         if (isTransparent) {
@@ -180,7 +183,10 @@ void EditorRenderSystem::Render()
     }
 
     for (auto& go : transparentQueue) {
-        auto renderer = go->GetComponent<MeshRenderer>();
+        std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+        if (renderer == nullptr) {
+            renderer = go->GetComponent<SkinnedMeshRenderer>();
+        }
         renderer->Render();
     }
 

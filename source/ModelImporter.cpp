@@ -9,6 +9,8 @@
 
 #include "Debug.hpp"
 #include "Common.hpp"
+#include "MeshRenderer.hpp"
+#include "SkinnedMeshRenderer.hpp"
 
 #define REMOVE_FBX_PIVOT
 #define DEBUG_ANIMATION
@@ -136,13 +138,24 @@ namespace FishEngine {
         mesh->m_indexBuffer.reserve(n_triangles * 3);
         mesh->m_tangentBuffer.reserve(n_vertices * 3);
 
+        Vector3 vmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
+        Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
 
         // Vertex
         for (unsigned int j = 0; j < assimp_mesh->mNumVertices; ++j) {
             auto& v = assimp_mesh->mVertices[j];
-            mesh->m_positionBuffer.push_back(v.x * m_fileScale);
-            mesh->m_positionBuffer.push_back(v.y * m_fileScale);
-            mesh->m_positionBuffer.push_back(v.z * m_fileScale);
+            float vx = v.x * m_fileScale;
+            float vy = v.y * m_fileScale;
+            float vz = v.z * m_fileScale;
+            if (vmin.x > vx) vmin.x = vx;
+            if (vmin.y > vy) vmin.y = vy;
+            if (vmin.z > vz) vmin.z = vz;
+            if (vmax.x < vx) vmax.x = vx;
+            if (vmax.y < vy) vmax.y = vy;
+            if (vmax.z < vz) vmax.z = vz;
+            mesh->m_positionBuffer.push_back(vx);
+            mesh->m_positionBuffer.push_back(vy);
+            mesh->m_positionBuffer.push_back(vz);
 
             auto& n = assimp_mesh->mNormals[j];
             mesh->m_normalBuffer.push_back(n.x);
@@ -163,6 +176,8 @@ namespace FishEngine {
             }
         }
 
+        mesh->m_bounds.SetMinMax(vmin, vmax);
+
         // face index
         for (unsigned int j = 0; j < assimp_mesh->mNumFaces; j++) {
             auto& face = assimp_mesh->mFaces[j];
@@ -177,9 +192,9 @@ namespace FishEngine {
         if (mesh->m_skinned)
         {
             assert(assimp_mesh->mNumBones <= MAX_BONE_SIZE);
-            std::vector<BoneWeight> boneWeights;
+            //std::vector<BoneWeight> boneWeights;
             //mesh->m_bones.resize(n_bones);
-            boneWeights.resize(n_vertices);
+            mesh->m_boneWeights.resize(n_vertices);
             mesh->m_boneIndexBuffer.resize(n_vertices);
             mesh->m_boneWeightBuffer.resize(n_vertices);
             mesh->bindposes().resize(assimp_mesh->mNumBones);
@@ -198,12 +213,12 @@ namespace FishEngine {
                 for (uint32_t k = 0; k < bone->mNumWeights; ++k) {
                     uint32_t vextexID = bone->mWeights[k].mVertexId;
                     float weight = bone->mWeights[k].mWeight;
-                    boneWeights[vextexID].AddBoneData(boneIndex, weight);
+                    mesh->m_boneWeights[vextexID].AddBoneData(boneIndex, weight);
                 }
             }
             
             for (uint32_t i = 0; i < n_vertices; ++i) {
-                auto& b = boneWeights[i];
+                auto& b = mesh->m_boneWeights[i];
                 mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
                 mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
             }
@@ -530,13 +545,16 @@ namespace FishEngine {
         if (node->meshesIndices.size() == 1) {
             const auto& mesh = m_meshes[node->meshesIndices.front()];
             auto material = Material::defaultMaterial();
-            auto meshRenderer = std::make_shared<MeshRenderer>(material);
             if (mesh->m_skinned) {
+                auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
                 meshRenderer->setAvatar(m_avatar);
                 meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
+                go->AddComponent(meshRenderer);
+            } else {
+                auto meshRenderer = std::make_shared<MeshRenderer>(material);
+                go->AddComponent(meshRenderer);
             }
             auto meshFilter = std::make_shared<MeshFilter>(mesh);
-            go->AddComponent(meshRenderer);
             go->AddComponent(meshFilter);
         } else if (node->meshesIndices.size() > 1) {
             for (auto& idx : node->meshesIndices) {
@@ -545,13 +563,18 @@ namespace FishEngine {
                 child->transform()->SetParent(go->transform());
                 const auto& mesh = m_meshes[idx];
                 auto material = Material::defaultMaterial();
-                auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 if (mesh->m_skinned) {
+                    auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
                     meshRenderer->setAvatar(m_avatar);
                     meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
+                    child->AddComponent(meshRenderer);
+                }
+                else {
+                    auto meshRenderer = std::make_shared<MeshRenderer>(material);
+                    child->AddComponent(meshRenderer);
                 }
                 auto meshFilter = std::make_shared<MeshFilter>(mesh);
-                child->AddComponent(meshRenderer);
+                //child->AddComponent(meshRenderer);
                 child->AddComponent(meshFilter);
             }
         }

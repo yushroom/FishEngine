@@ -3,34 +3,23 @@
 
 #include "Renderer.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-class MeshRenderer : public Renderer
+namespace FishEngine
 {
-public:
-    InjectClassName(MeshRenderer)
-    
-    MeshRenderer() = default;
-    
-    MeshRenderer(std::shared_ptr<Material> material);
-    
-    //protected:
-    virtual void Render() const override;
+    class MeshRenderer : public Renderer
+    {
+    public:
+        InjectClassName(MeshRenderer);
 
-    void setAvatar(std::shared_ptr<Avatar> avatar) {
-        m_avatar = avatar;
-    }
+        MeshRenderer() = default;
 
-    void setRootBone(std::weak_ptr<Transform> rootBone) {
-        m_rootBone = rootBone;
-    }
+        MeshRenderer(std::shared_ptr<Material> material);
 
-private:
-    friend class FishEditor::EditorGUI;
-    std::shared_ptr<Avatar> m_avatar = nullptr;     // TODO: => SkinnedMeshRenderer
-    std::weak_ptr<Transform> m_rootBone;            // TODO: => SkinnedMeshRenderer
-};
+        //protected:
+        virtual void Render() const override;
 
-NAMESPACE_FISHENGINE_END
+    private:
+        friend class FishEditor::EditorGUI;
+    };
+}
 
 #endif /* MeshRenderer_hpp */

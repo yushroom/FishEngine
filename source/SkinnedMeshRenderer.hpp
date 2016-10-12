@@ -9,25 +9,29 @@ namespace FishEngine {
     class SkinnedMeshRenderer : public Renderer
     {
     public:
-        InjectClassName(SkinnedMeshRenderer);
-        
-        SkinnedMeshRenderer() = default;
-        
-        SkinnedMeshRenderer(std::shared_ptr<Material> material);
-        
-        virtual void OnInspectorGUI() override;
+        InjectClassName(SkinnedMeshRenderer)
 
+            SkinnedMeshRenderer() = default;
+
+        SkinnedMeshRenderer(std::shared_ptr<Material> material);
+
+        //protected:
         virtual void Render() const override;
-        
-        const std::vector<std::weak_ptr<Transform>>& bones() const {
-            return m_bones;
+
+        void setAvatar(std::shared_ptr<Avatar> avatar) {
+            m_avatar = avatar;
         }
-        
+
+        void setRootBone(std::weak_ptr<Transform> rootBone) {
+            m_rootBone = rootBone;
+        }
+
     private:
-        //friend class ModelImporter;
-        std::vector<std::weak_ptr<Transform>> m_bones;
-        std::shared_ptr<Avatar> m_avatar;
+        friend class FishEditor::EditorGUI;
+        std::shared_ptr<Avatar> m_avatar = nullptr;     // TODO: => SkinnedMeshRenderer
+        std::weak_ptr<Transform> m_rootBone;            // TODO: => SkinnedMeshRenderer
     };
+
 }
 
 #endif /* SkinnedMeshRenderer_hpp */

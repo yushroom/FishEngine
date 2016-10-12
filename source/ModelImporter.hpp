@@ -5,7 +5,6 @@
 #include "Mesh.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
-#include "MeshRenderer.hpp"
 #include "Material.hpp"
 #include "MeshFilter.hpp"
 #include "Animator.hpp"

@@ -9,30 +9,14 @@
 #include "Pipeline.hpp"
 #include <cassert>
 
+
+using namespace FishEngine;
+
 FishEngine::MeshRenderer::MeshRenderer(Material::PMaterial material) : Renderer(material)
 {
 
 }
 
-NAMESPACE_FISHENGINE_BEGIN
-
-void RecursivelyGetTransformation(
-    const std::shared_ptr<Transform>&     transform,
-    std::vector<Matrix4x4>&         transformation, 
-    std::map<std::string, int>&     nameToIndex,
-    std::vector<Matrix4x4>&         bindposes,
-    const Matrix4x4& invGlobalTransform)
-{
-    const auto& name = transform->name();
-    const auto& it = nameToIndex.find(name);
-    if (it != nameToIndex.end()) {
-        const auto boneIndex = it->second;
-        transformation[boneIndex] = invGlobalTransform * transform->localToWorldMatrix() * bindposes[boneIndex];
-    }
-    for (auto& child : transform->children()) {
-        RecursivelyGetTransformation(child.lock(), transformation, nameToIndex, bindposes, invGlobalTransform);
-    }
-}
 
 void MeshRenderer::Render() const
 {
@@ -70,28 +54,16 @@ void MeshRenderer::Render() const
     //auto animator = gameObject()->GetComponent<Animator>();
     std::vector<Matrix4x4> boneTransformation;
     const auto& mesh = meshFilter->mesh();
-    bool skinned = m_avatar != nullptr;
-    if (skinned) {
-        boneTransformation.resize(mesh->m_boneNameToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, mesh->m_boneNameToIndex, mesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
-    }
     
     for (auto& m : m_materials) {
         auto shader = m->shader();
-        if (skinned) {
-            shader = shader->m_skinnedShader;
-        }
         assert(shader != nullptr);
         shader->Use();
         shader->PreRender();
-        if (m_avatar != nullptr)
-            shader->BindMatrixArray("BoneTransformations", boneTransformation);
         //m->BindTextures(textures);
-        m->Update(skinned);
+        m->Update();
         shader->CheckStatus();
         mesh->Render();
         shader->PostRender();
     }
 }
-
-NAMESPACE_FISHENGINE_END

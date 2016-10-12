@@ -110,6 +110,7 @@ private:
     friend class FishEditor::EditorGUI;
     friend class ModelImporter;
     friend class MeshRenderer;
+    friend class SkinnedMeshRenderer;
     
     Bounds m_bounds;
     
@@ -122,7 +123,9 @@ private:
     std::vector<Vector4>    m_boneWeightBuffer;
 
     std::map<std::string, int> m_boneNameToIndex;
+
     std::vector<Matrix4x4>  m_bindposes;
+    std::vector<BoneWeight> m_boneWeights;
     //std::vector<BoneWeight> m_boneWeights;
     
     GLuint m_VAO;

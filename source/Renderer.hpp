@@ -18,6 +18,8 @@ public:
         m_materials.push_back(material);
     }
     
+    virtual void Render() const = 0;
+
     void AddMaterial(std::shared_ptr<Material> material) {
         m_materials.push_back(material);
     }
@@ -38,7 +40,6 @@ public:
     //virtual void OnInspectorGUI() override;
     
 protected:
-    virtual void Render() const = 0;
     std::vector<std::shared_ptr<Material>> m_materials;
 };
 

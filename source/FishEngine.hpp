@@ -20,15 +20,17 @@
 
 namespace FishEngine
 {
+    class Object;
+    class GameObject;
+    class Transform;
+    class Component;
     class Behaviour;
     class Camera;
-    class Component;
+    class Renderer;
     class MeshFilter;
     class MeshRenderer;
     class SkinnedMeshRenderer;
     class Script;
-    class Renderer;
-    class Transform;
     class Debug;
     class GameObject;
     class GameLoop;
@@ -36,7 +38,6 @@ namespace FishEngine
     class Material;
     class Mesh;
     class SimpleMesh;
-    class Object;
     class Shader;
     class Texture;
     class Time;
@@ -59,6 +60,7 @@ namespace FishEngine
     class CapsuleCollider;
     class SphereCollider;
     class MeshCollider;
+    class Pipeline;
     struct Avatar;
     struct Ray;
     struct Bounds;

@@ -64,28 +64,28 @@ Shader::Shader(Shader&& s)
     m_program = s.m_program;
 }
 
-FishEngine::Shader::PShader FishEngine::Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
+Shader::PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
 {
     auto s = std::make_shared<Shader>();
     s->FromString(vs_str, fs_str, gs_str);
     return s;
 }
 
-FishEngine::Shader::PShader FishEngine::Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
+Shader::PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
 {
     auto s = std::make_shared<Shader>();
     s->FromString(vs_str, fs_str);
     return s;
 }
 
-FishEngine::Shader::PShader FishEngine::Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
+Shader::PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
 {
     auto s = std::make_shared<Shader>();
     s->FromFile(vs_path, fs_path);
     return s;
 }
 
-FishEngine::Shader::PShader FishEngine::Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
+Shader::PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
 {
     auto s = std::make_shared<Shader>();
     s->FromFile(vs_path, fs_path, gs_path);
@@ -103,7 +103,8 @@ void Shader::FromString(const std::string& vs_string, const std::string& fs_stri
 }
 
 
-string GLenumToString(GLenum e) {
+const char* GLenumToString(GLenum e)
+{
     switch (e) {
         case GL_FLOAT:
             return "GL_FLOAT";
@@ -230,7 +231,7 @@ void Shader::FromString(const std::string& vs_string,
         auto lines = split(shader_str, "\n");
         for (auto& line : lines) {
             boost::trim(line);
-            if (startsWith(line, "///")) {
+            if (boost::starts_with(line, "///")) {
                 line = line.substr(3);
                 boost::trim(line);
                 auto s = split(line, " ");
@@ -424,7 +425,7 @@ void Shader::BindTextures(const std::map<std::string, Texture::PTexture>& textur
             u.binded = true;
         }
         else {
-            Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+            Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
         }
     }
 }

@@ -41,6 +41,7 @@ public:
     //virtual void OnInspectorGUI() override;
     
 protected:
+    friend class FishEditor::EditorGUI;
     std::vector<std::shared_ptr<Material>> m_materials;
 };
 

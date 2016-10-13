@@ -3,6 +3,7 @@
 #include <stb/stb_image.h>
 #include <gli/gli.hpp>
 #include "Debug.hpp"
+#include "Common.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -218,15 +219,14 @@ GLuint CreateTexture(const std::string& path) {
 FishEngine::Texture::PTexture FishEngine::Texture::CreateFromFile(const std::string& path)
 {
     auto t = std::make_shared<Texture>();
+    t->m_name = getFileNameWithoutExtension(path);
     t->FromFile(path);
     return t;
 }
 
 void Texture::FromFile(const std::string& path)
 {
-    auto pos = path.find_last_of('.');
-    assert(pos != std::string::npos);
-    auto ext = path.substr(pos + 1);
+    auto ext = getExtensionWithoutDot(path);
     if (ext == "dds") {
         m_texture = create_texture(path.c_str());
     }

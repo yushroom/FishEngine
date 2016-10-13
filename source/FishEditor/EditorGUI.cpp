@@ -39,6 +39,8 @@ NAMESPACE_FISHEDITOR_BEGIN
 
 constexpr float translate_gizmo_length = 0.1f;
 
+constexpr float inspector_indent_width = 4;
+
 TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
 int     EditorGUI::m_idCount = 0;
 bool    EditorGUI::s_locked = false;
@@ -350,24 +352,38 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
 
     if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
         //selectedGO->m_transform->OnInspectorGUI();
+        ImGui::Indent(inspector_indent_width);
         OnInspectorGUI<FishEngine::Transform>(std::static_pointer_cast<FishEngine::Transform>(selectedGO->m_transform));
+        ImGui::Unindent(inspector_indent_width);
     }
 
-    for (auto& c : selectedGO->m_components) {
+    for (auto& c : selectedGO->m_components)
+    {
         bool is_open = true;
         if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Indent(inspector_indent_width);
             OnInspectorGUI(c);
-            //c->OnInspectorGUI();
-        if (!is_open) {
+            ImGui::Unindent(inspector_indent_width);
+        }
+        if (!is_open)
+        {
             Object::Destroy(c);
         }
     }
-    for (auto& s : selectedGO->m_scripts) {
+
+    for (auto& s : selectedGO->m_scripts)
+    {
         bool is_open = true;
         if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+        {
             //OnInspectorGUI(s);
+            ImGui::Indent(inspector_indent_width);
             s->OnInspectorGUI();
-        if (!is_open) {
+            ImGui::Unindent(inspector_indent_width);
+        }
+        if (!is_open)
+        {
             Object::Destroy(s);
         }
     }
@@ -413,7 +429,6 @@ void FishEditor::EditorGUI::DrawMainMenu()
         ImGui::Text("%s", s);
         ImGui::EndMainMenuBar();
     }
-
 }
 
 void FishEditor::EditorGUI::DrawToolBar()
@@ -777,12 +792,67 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& me
 }
 
 template<>
-void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& meshRenderer)
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<Material>& material)
 {
-    for (auto& m : meshRenderer->m_materials) {
-        m->OnInspectorGUI();
+    if (ImGui::CollapsingHeader(material->m_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::Indent();
+        auto& uniforms = material->m_shader->uniforms();
+        for (auto& u : uniforms) {
+            if (u.type == GL_FLOAT) {
+                ImGui::SliderFloat(u.name.c_str(), &material->m_uniforms.floats[u.name], 0, 1);
+            }
+            else if (u.type == GL_FLOAT_VEC3) {
+                ImGui::InputFloat3(u.name.c_str(), material->m_uniforms.vec3s[u.name].data());
+            }
+            else if (u.type == GL_FLOAT_VEC4) {
+                ImGui::InputFloat4(u.name.c_str(), material->m_uniforms.vec4s[u.name].data());
+            }
+            else if (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE) {
+                ImGui::LabelText(u.name.c_str(), "%s", material->m_textures[u.name]->name().c_str());
+            }
+        }
+        ImGui::Unindent();
     }
 }
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<Renderer>& renderer)
+{
+    if (ImGui::CollapsingHeader("Materials", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Indent(inspector_indent_width);
+        Int("Size", (int)renderer->m_materials.size());
+        for (auto& m : renderer->m_materials)
+        {
+            OnInspectorGUI(m);
+        }
+        ImGui::Unindent(inspector_indent_width);
+    }
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& renderer)
+{
+    OnInspectorGUI<Renderer>(renderer);
+}
+
+
+template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SkinnedMeshRenderer>& renderer)
+{
+    OnInspectorGUI<Renderer>(renderer);
+
+    ImGui::LabelText("Mesh", "%s", renderer->m_sharedMesh->name().c_str());
+    ImGui::LabelText("Root Bone", "%s", renderer->m_rootBone.lock()->name().c_str());
+
+    ImGui::Text("Bounds");
+    Bounds bounds = renderer->localBounds();
+    auto center = bounds.center();
+    auto extents = bounds.extents();
+    Float3("Center", center);
+    Float3("Extents", extents);
+}
+
 
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Rigidbody>& rigidBody)
@@ -824,24 +894,6 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider
         "X-Axis", "Y-Axis", "Z-Axis"
     };
     ImGui::Combo("Direction", &capsuleCollider->m_direction, listbox_items, 3);
-}
-
-template<>
-void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SkinnedMeshRenderer>& renderer)
-{
-    ImGui::Text("Materials");
-    Int("Size", (int)renderer->m_materials.size());
-    ImGui::LabelText("Element0", "%s", renderer->m_materials.front()->name().c_str());
-    
-    ImGui::LabelText("Mesh", "%s", renderer->m_sharedMesh->name().c_str());
-    ImGui::LabelText("Root Bone", "%s", renderer->m_rootBone.lock()->name().c_str());
-    
-    ImGui::Text("Bounds");
-    Bounds bounds = renderer->localBounds();
-    auto center = bounds.center();
-    auto extents = bounds.extents();
-    Float3("Center", center);
-    Float3("Extents", extents);
 }
 
 

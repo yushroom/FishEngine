@@ -562,6 +562,7 @@ public:
         auto chanMainShader = make_shared<Shader>();
         chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
         auto bodyMaterial = Material::CreateMaterial();
+        bodyMaterial->setName("body");
         bodyMaterial->SetShader(chanMainShader);
         bodyMaterial->SetVector4("_Color", Vector4(1, 1, 1, 1));
         bodyMaterial->SetFloat("_SpecularPower", 20.f);
@@ -605,10 +606,11 @@ public:
         //material = bodyMaterial;
         //material = Material::builtinMaterial("SkinnedMesh");
         material->SetTexture("DiffuseMap", bodyTexture);
-        auto material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", bodyTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
+        auto outline_material = Material::builtinMaterial("Outline");
+        outline_material->setName("Outline");
+        outline_material->SetVector4("_Color", Vector4(1, 1, 1, 1));
+        outline_material->SetTexture("_MainTex", bodyTexture);
+        outline_material->SetFloat("_EdgeThickness", edgeThickness);
 
         textures["DiffuseMap"] = bodyTexture;
         material->BindTextures(textures);
@@ -620,50 +622,38 @@ public:
             auto renderer = child->GetComponent<SkinnedMeshRenderer>();
             //renderer->setAvatar(jump00Model->avatar());
             //renderer->setRootBone(modelGO->transform());
-            renderer->SetMaterial(material);
-            //renderer->AddMaterial(material2);
+            renderer->SetMaterial(bodyMaterial);
+            renderer->AddMaterial(outline_material);
         }
 
         material = Material::builtinMaterial("Texture");
         material->SetTexture("DiffuseMap", skinTexture);
         material->setName("skin");
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", skinTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"skin"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
-            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(material2);
+            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(outline_material);
         }
 
         material = Material::builtinMaterial("Texture");
         material->setName("face");
         material->SetTexture("DiffuseMap", faceTexture);
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", faceTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             child->GetComponent<MeshRenderer>()->SetMaterial(material);
-            child->GetComponent<MeshRenderer>()->AddMaterial(material2);
+            child->GetComponent<MeshRenderer>()->AddMaterial(outline_material);
         }
         
         material = Material::builtinMaterial("Texture");
         material->setName("hair");
         material->SetTexture("DiffuseMap", hairTexture);
-        material2 = Material::builtinMaterial("Outline");
-        material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        material2->SetTexture("_MainTex", hairTexture);
-        material2->SetFloat("_EdgeThickness", edgeThickness);
         for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
-            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(material2);
+            child->GetComponent<SkinnedMeshRenderer>()->AddMaterial(outline_material);
         }
 
         material = Material::builtinMaterial("Transparent");
@@ -715,7 +705,7 @@ public:
         // Camera
         
         auto cameraGO = Camera::mainGameCamera()->gameObject();
-        cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6);
+        cameraGO->transform()->setLocalPosition(0, 0.8f, -2.6f);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
         cameraGO->AddComponent<ShowFPS>();
         cameraGO->AddComponent<TakeScreenShot>();
@@ -793,7 +783,7 @@ void test()
         Transform t;
         t.setLocalPosition(1, 2, 3);
         t.setLocalEulerAngles(10, 15, 27);
-        t.setLocalScale(1.1, 2.2, 3.3);
+        t.setLocalScale(1.1f, 2.2f, 3.3f);
         Transform t2;
         std::stringstream ss;
         boost::archive::xml_oarchive oa(ss);

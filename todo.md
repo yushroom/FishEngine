@@ -120,3 +120,10 @@
 ## 物理
 
 - [ ] PhysX（WIP）
+
+
+
+## Asset
+
+- [ ] Texture里面加入sampler2D之类的类型标识
+

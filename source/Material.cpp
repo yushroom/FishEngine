@@ -1,11 +1,55 @@
 #include "Material.hpp"
-#include <imgui/imgui.h>
+//#include <imgui/imgui.h>
 #include "Debug.hpp"
+#include <cassert>
 
 NAMESPACE_FISHENGINE_BEGIN
 
 std::map<std::string, Material::PMaterial> Material::m_builtinMaterial;
 Material::PMaterial Material::s_defaultMaterial = nullptr;
+
+// https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
+template<typename T>
+constexpr GLenum GLType()
+{
+    static_assert(false, "Not implemented");
+}
+
+template<>
+constexpr GLenum GLType<float>()
+{
+    return GL_FLOAT;
+}
+
+template<>
+constexpr GLenum GLType<Vector3>()
+{
+    return GL_FLOAT_VEC3;
+}
+
+template<>
+constexpr GLenum GLType<Vector4>()
+{
+    return GL_FLOAT_VEC4;
+}
+
+template<>
+constexpr GLenum GLType<Matrix4x4>()
+{
+    return GL_FLOAT_MAT4;
+}
+
+template<typename T>
+bool FindUniformInShader(std::vector<UniformInfo>& uniforms, const std::string& name)
+{
+    constexpr auto type = GLType<T>();
+    for (auto& u : uniforms) {
+        if (u.name == name && u.type == type) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void FishEngine::Material::SetShader(std::shared_ptr<Shader> shader)
 {
@@ -31,39 +75,76 @@ void FishEngine::Material::Update(bool skinned /* = false*/)
     }
 }
 
-void Material::OnInspectorGUI() {
-    //ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize());
-    ImGui::Indent();
-    if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
-        auto& uniforms = m_shader->uniforms();
-        for (auto& u : uniforms) {
-            //if (builtinUniformNames.find(u.name) != builtinUniformNames.end()) {
-            //    continue;
-            //}
-            if (u.type == GL_FLOAT) {
-                ImGui::SliderFloat(u.name.c_str(), &m_uniforms.floats[u.name], 0, 1);
-            } else if (u.type == GL_FLOAT_VEC3) {
-                ImGui::InputFloat3(u.name.c_str(), m_uniforms.vec3s[u.name].data());
-            }
+void FishEngine::Material::SetFloat(const std::string& name, const float value)
+{
+    if (FindUniformInShader<float>(m_shader->m_uniforms, name)) {
+        m_uniforms.floats[name] = value;
+        return;
+    }
+    Debug::LogWarning("Uniform %s[float] not found.", name.c_str());
+}
+
+
+void FishEngine::Material::SetVector3(const std::string& name, const Vector3& value)
+{
+    //m_shader->BindUniformVec3(name.c_str(), value);
+    if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name)) {
+        m_uniforms.vec3s[name] = value;
+        return;
+    }
+    Debug::LogWarning("Uniform %s[vec3] not found.", name.c_str());
+}
+
+
+void FishEngine::Material::SetVector4(const std::string& name, const Vector4& value)
+{
+    if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name)) {
+        m_uniforms.vec4s[name] = value;
+        return;
+    }
+    Debug::LogWarning("Uniform %s[vec4] not found.", name.c_str());
+}
+
+
+void FishEngine::Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& texture)
+{
+    for (auto& u : m_shader->m_uniforms)
+    {
+        if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE))
+        {
+            m_textures[name] = texture;
+            return;
         }
     }
-    ImGui::Unindent();
-    //ImGui::PopStyleVar();
+    Debug::LogWarning("Uniform %s[sampler2D] not found.", name.c_str());
 }
+
 
 FishEngine::Material::PMaterial FishEngine::Material::builtinMaterial(const std::string& name)
 {
     auto shader = Shader::builtinShader(name);
     assert(shader!=nullptr);
     auto material = CreateMaterial();
+    material->setName(name);
     material->SetShader(shader);
     return material;
 }
+
+
+void FishEngine::Material::BindTextures(const std::map<std::string, Texture::PTexture>& textures)
+{
+    //m_textures = textures;
+    for (auto& pair : textures) {
+        m_textures[pair.first] = pair.second;
+    }
+}
+
 
 Material::PMaterial Material::defaultMaterial()
 {
     return s_defaultMaterial;
 }
+
 
 void FishEngine::Material::Init()
 {

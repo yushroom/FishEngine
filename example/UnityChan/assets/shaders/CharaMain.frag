@@ -63,7 +63,8 @@ void main()
 {
     float4_t diffSamplerColor = tex2D( _MainTex, vs_out.uv.xy );
 
-    float3_t normalVec = vs_out.normal;// GetNormalFromMap( i );
+    //float3_t normalVec = vs_out.normal;
+    float3_t normalVec = GetNormalFromMap();
     
     // Falloff. Convert the angle between the normal and the camera direction into a lookup for the gradient
     float_t normalDotEye = dot( normalVec, vs_out.eyeDir.xyz );

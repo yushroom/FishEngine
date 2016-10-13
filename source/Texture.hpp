@@ -1,11 +1,12 @@
 #ifndef Texture_hpp
 #define Texture_hpp
 
+#include "Object.hpp"
 #include "GLEnvironment.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
-class Texture
+class Texture : public Object
 {
 public:
     Texture() {}

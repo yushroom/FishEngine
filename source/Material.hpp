@@ -26,21 +26,14 @@ public:
         return m_shader;
     }
 
+
     // Set a named float value.
-    void SetFloat(const std::string& name, const float value) {
-        //m_shader->BindUniformFloat(name.c_str(), value);
-        m_uniforms.floats[name] = value;
-    }
+    void SetFloat(const std::string& name, const float value);
 
     // Set a named Vector3 value.
-    void SetVector3(const std::string& name, const Vector3& value) {
-        //m_shader->BindUniformVec3(name.c_str(), value);
-        m_uniforms.vec3s[name] = value;
-    }
+    void SetVector3(const std::string& name, const Vector3& value);
 
-    void SetVector4(const std::string& name, const Vector4& value) {
-        m_uniforms.vec4s[name] = value;
-    }
+    void SetVector4(const std::string& name, const Vector4& value);
 
     // Set a named matrix for the shader.
     void SetMatrix(const std::string& name, const Matrix4x4& value) {
@@ -48,16 +41,9 @@ public:
     }
 
     // Set a named texture
-    void SetTexture(const std::string& name, std::shared_ptr<Texture>& texture) {
-        m_textures[name] = texture;
-    }
+    void SetTexture(const std::string& name, std::shared_ptr<Texture>& texture);
     
-    void BindTextures(const std::map<std::string, Texture::PTexture>& textures) {
-        //m_textures = textures;
-        for (auto& pair : textures) {
-            m_textures[pair.first] = pair.second;
-        }
-    }
+    void BindTextures(const std::map<std::string, Texture::PTexture>& textures);
 
 //    auto uniforms() const {
 //        return m_uniforms;
@@ -69,7 +55,7 @@ public:
     
     void Update(bool skinned = false);
     
-    void OnInspectorGUI();
+    //void OnInspectorGUI();
     
     //========== Static Region ==========
     
@@ -84,6 +70,7 @@ public:
     static PMaterial defaultMaterial();
 
 private:
+    friend class FishEditor::EditorGUI;
     std::shared_ptr<Shader> m_shader = nullptr;
     std::map<std::string, Texture::PTexture> m_textures;
     

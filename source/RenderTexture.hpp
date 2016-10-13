@@ -8,7 +8,7 @@ namespace FishEngine {
     
     enum class RenderTextureFormat
     {
-        ARGB32, // 4 channel, 8bie per channel
+        ARGB32, // 4 channel, 8 bit per channel
         Dpeth,  //
         Shadowmap,
     };

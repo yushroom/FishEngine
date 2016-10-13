@@ -199,6 +199,7 @@ public:
     std::shared_ptr<Shader> m_skinnedShader = nullptr;
     
 private:
+    friend class Material;
     Shader& operator=(const Shader&) = default;
     
     GLuint m_program = 0;

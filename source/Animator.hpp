@@ -49,6 +49,7 @@ namespace FishEngine {
     struct Avatar
     {
         std::map<std::string, int> m_boneToIndex;
+        std::map<int, std::string> m_indexToBone;
     };
 
     class Animator : public Component
@@ -92,6 +93,7 @@ namespace FishEngine {
         std::shared_ptr<Avatar> m_avatar;
         void RecursivelyUpdate(const std::shared_ptr<GameObject>& go);
         //void RecursivelyUpdate2(const std::shared_ptr<GameObject>& go);
+        std::map<std::string, std::weak_ptr<GameObject>> m_nameToGameObject;
     };
 }
 

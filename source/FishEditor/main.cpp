@@ -541,7 +541,17 @@ public:
         auto specularTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_SPEC.tga");
         auto envTexture = Texture::CreateFromFile(chan_texture_dir + "ENV2.tga");
         auto normalMapTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_NRM.tga");
+        
+        auto stageBaseTexture = Texture::CreateFromFile(chan_texture_dir + "unitychan_tile5.png");
+        auto stageMaskTexture = Texture::CreateFromFile(chan_texture_dir + "AlphaMask.png");
 
+        
+        auto alphaMaskShader = make_shared<Shader>();
+        alphaMaskShader->FromFile(chan_root_dir+"shaders/AlphaMask.vert", chan_root_dir+"shaders/AlphaMask.frag");
+        auto stageMaterial = Material::CreateMaterial();
+        stageMaterial->SetShader(alphaMaskShader);
+        stageMaterial->SetTexture("_MainTex", stageBaseTexture);
+        stageMaterial->SetTexture("_AlphaMask", stageMaskTexture);
         
         auto chanMainShader = make_shared<Shader>();
         chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
@@ -573,6 +583,9 @@ public:
 
         std::shared_ptr<GameObject> go;
         
+        go = Model::builtinModel(BuiltinModelType::Plane)->CreateGameObject();
+        go->transform()->GetChild(0)->gameObject()->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
+        
         auto modelGO = model->CreateGameObject();
 #if 1
         modelGO->AddComponent<Animator>();
@@ -593,8 +606,9 @@ public:
 
         textures["DiffuseMap"] = bodyTexture;
         material->BindTextures(textures);
+        material->setName("body");
         //material->BindTextures("DiffuseMap", )
-        for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK"}) {
+        for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK", "hair_accce"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
             auto renderer = child->GetComponent<SkinnedMeshRenderer>();
@@ -606,6 +620,7 @@ public:
 
         material = Material::builtinMaterial("Texture");
         material->SetTexture("DiffuseMap", skinTexture);
+        material->setName("skin");
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
         material2->SetTexture("_MainTex", skinTexture);
@@ -618,6 +633,7 @@ public:
         }
 
         material = Material::builtinMaterial("Texture");
+        material->setName("face");
         material->SetTexture("DiffuseMap", faceTexture);
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
@@ -631,6 +647,7 @@ public:
         }
         
         material = Material::builtinMaterial("Texture");
+        material->setName("hair");
         material->SetTexture("DiffuseMap", hairTexture);
         material2 = Material::builtinMaterial("Outline");
         material2->SetVector4("_Color", Vector4(1, 1, 1, 1));
@@ -644,6 +661,7 @@ public:
         }
 
         material = Material::builtinMaterial("Transparent");
+        material->setName("eye_L1");
         material->SetTexture("DiffuseMap", eyeirisLTexture);
         for (auto name : {"eye_L_old"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -653,6 +671,7 @@ public:
         }
         
         material = Material::builtinMaterial("Transparent");
+        material->setName("eye_R1");
         material->SetTexture("DiffuseMap", eyeirisRTexture);
         for (auto name : {"eye_R_old"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -669,6 +688,7 @@ public:
         }
         
         material = Material::builtinMaterial("Texture");
+        material->setName("eyeline");
         material->SetTexture("DiffuseMap", eyelineTexture);
         for (auto name : {"eye_base_old"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -678,6 +698,7 @@ public:
         }
 
         material = Material::builtinMaterial("Transparent");
+        material->setName("mat_cheek");
         material->SetTexture("DiffuseMap", cheekTexture);
         for (auto name : {"cheek"}) {
             auto child = FindNamedChild(modelGO, name);

@@ -28,7 +28,14 @@ xcuserdata/
 # assets
 /assets/models/
 /assets/textures/
-/example/
+/example/Content
+*.png
+*.tga
+*.jpg
+*.fbx
+*.meta
+*.md5anim
+*.md5mesh
 
 # vscode
 /.vscode/

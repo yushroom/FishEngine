@@ -3,6 +3,7 @@
 
 #include "Component.hpp"
 #include "Material.hpp"
+#include "Bounds.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 

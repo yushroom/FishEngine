@@ -64,7 +64,8 @@ namespace FishEngine {
         void AddMesh(Mesh::PMesh& mesh);
 
         std::shared_ptr<GameObject>
-        ResursivelyCreateGameObject(const ModelNode::PModelNode& node) const;
+        ResursivelyCreateGameObject(const ModelNode::PModelNode& node,
+                                    std::map<std::string, std::weak_ptr<GameObject>>& nameToGameObject) const;
         
         std::vector<std::shared_ptr<Mesh>> m_meshes;
         std::vector<std::shared_ptr<Animation>> m_animations;
@@ -75,6 +76,7 @@ namespace FishEngine {
         std::shared_ptr<Avatar> m_avatar;
 
         mutable std::weak_ptr<GameObject>   m_rootGameObject; // temp
+        //mutable std::vector<std::weak_ptr<SkinnedMeshRenderer>> m_skinnedMeshRenderersToFindLCA;
         
         static std::map<BuiltinModelType, PModel> s_builtinModels;
     };

@@ -9,12 +9,22 @@
 #include "Pipeline.hpp"
 #include <cassert>
 
-FishEngine::SkinnedMeshRenderer::SkinnedMeshRenderer(Material::PMaterial material) : Renderer(material)
-{
-
-}
 
 NAMESPACE_FISHENGINE_BEGIN
+
+SkinnedMeshRenderer::
+SkinnedMeshRenderer(Material::PMaterial material)
+: Renderer(material)
+{
+    
+}
+
+
+Bounds SkinnedMeshRenderer::
+localBounds() const {
+    return m_sharedMesh->bounds();
+}
+
 
 void RecursivelyGetTransformation(
     const std::shared_ptr<Transform>&     transform,
@@ -34,15 +44,16 @@ void RecursivelyGetTransformation(
     }
 }
 
+
+void SkinnedMeshRenderer::Update()
+{
+    m_boneTransformation.resize(m_sharedMesh->m_boneNameToIndex.size());
+    RecursivelyGetTransformation(m_rootBone.lock(), m_boneTransformation, m_sharedMesh->m_boneNameToIndex, m_sharedMesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
+}
+
+
 void SkinnedMeshRenderer::Render() const
 {
-    //Debug::Log("Rendere %s", m_gameObject->name().c_str());
-    auto meshFilter = gameObject()->GetComponent<MeshFilter>();
-    if (meshFilter == nullptr) {
-        Debug::LogWarning("This GameObject has no MeshFilter");
-        return;
-    }
-
     auto model = transform()->localToWorldMatrix();
     auto camera = Camera::main();
     auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
@@ -65,14 +76,10 @@ void SkinnedMeshRenderer::Render() const
     //    }
     //}
 
-    //auto mesh = meshFilter->mesh();
-    //auto animator = gameObject()->GetComponent<Animator>();
-    std::vector<Matrix4x4> boneTransformation;
-    const auto& mesh = meshFilter->mesh();
     bool skinned = m_avatar != nullptr;
-    if (skinned) {
-        boneTransformation.resize(mesh->m_boneNameToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), boneTransformation, mesh->m_boneNameToIndex, mesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
+    if (skinned && m_boneTransformation.size() == 0) {
+        m_boneTransformation.resize(m_sharedMesh->m_boneNameToIndex.size());
+        RecursivelyGetTransformation(m_rootBone.lock(), m_boneTransformation, m_sharedMesh->m_boneNameToIndex, m_sharedMesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
     }
 
     for (auto& m : m_materials) {
@@ -84,11 +91,11 @@ void SkinnedMeshRenderer::Render() const
         shader->Use();
         shader->PreRender();
         if (m_avatar != nullptr)
-            shader->BindMatrixArray("BoneTransformations", boneTransformation);
+            shader->BindMatrixArray("BoneTransformations", m_boneTransformation);
         //m->BindTextures(textures);
         m->Update(skinned);
         shader->CheckStatus();
-        mesh->Render();
+        m_sharedMesh->Render();
         shader->PostRender();
     }
 }

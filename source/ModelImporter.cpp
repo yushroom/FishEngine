@@ -104,6 +104,7 @@ namespace FishEngine {
         node->isBone = false;
         int index = m_model->m_avatar->m_boneToIndex.size();
         m_model->m_avatar->m_boneToIndex[node->name] = index;
+        m_model->m_avatar->m_indexToBone[index] = node->name;
         node->index = index;
         
         for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
@@ -179,10 +180,12 @@ namespace FishEngine {
         mesh->m_bounds.SetMinMax(vmin, vmax);
 
         // face index
-        for (unsigned int j = 0; j < assimp_mesh->mNumFaces; j++) {
+        for (unsigned int j = 0; j < assimp_mesh->mNumFaces; j++)
+        {
             auto& face = assimp_mesh->mFaces[j];
             assert(face.mNumIndices == 3);
-            for (int fi = 0; fi < 3; ++fi) {
+            for (int fi = 0; fi < 3; ++fi)
+            {
                 mesh->m_indexBuffer.push_back(face.mIndices[fi]);
             }
         }
@@ -199,7 +202,8 @@ namespace FishEngine {
             mesh->m_boneWeightBuffer.resize(n_vertices);
             mesh->bindposes().resize(assimp_mesh->mNumBones);
             Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
-            for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex){
+            for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex)
+            {
                 auto& bone = assimp_mesh->mBones[boneIndex];
                 std::string boneName(bone->mName.C_Str());
                 //Debug::Log("    bone name: %s", boneName.c_str());
@@ -210,14 +214,16 @@ namespace FishEngine {
                 offsetMat.m[1][3] *= m_fileScale;
                 offsetMat.m[2][3] *= m_fileScale;
                 mesh->bindposes()[boneIndex] = offsetMat;
-                for (uint32_t k = 0; k < bone->mNumWeights; ++k) {
+                for (uint32_t k = 0; k < bone->mNumWeights; ++k)
+                {
                     uint32_t vextexID = bone->mWeights[k].mVertexId;
                     float weight = bone->mWeights[k].mWeight;
                     mesh->m_boneWeights[vextexID].AddBoneData(boneIndex, weight);
                 }
             }
             
-            for (uint32_t i = 0; i < n_vertices; ++i) {
+            for (uint32_t i = 0; i < n_vertices; ++i)
+            {
                 auto& b = mesh->m_boneWeights[i];
                 mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
                 mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
@@ -517,12 +523,13 @@ namespace FishEngine {
         }
     }
 
-
     std::shared_ptr<GameObject> Model::
     CreateGameObject() const
     {
-        auto root = ResursivelyCreateGameObject(m_rootNode);
-        if (m_animations.size() > 0) {
+        std::map<std::string, std::weak_ptr<GameObject>> nameToGameObject;
+        auto root = ResursivelyCreateGameObject(m_rootNode, nameToGameObject);
+        if (m_animations.size() > 0)
+        {
             auto animator = std::make_shared<Animator>();
             animator->m_animation = m_animations.front();
             root->AddComponent(animator);
@@ -533,54 +540,72 @@ namespace FishEngine {
 
     std::shared_ptr<GameObject> Model::
     ResursivelyCreateGameObject(
-        const ModelNode::PModelNode & node) const
+        const ModelNode::PModelNode & node,
+        std::map<std::string, std::weak_ptr<GameObject>>& nameToGameObject) const
     {
         auto go = Scene::CreateGameObject(node->name);
         go->transform()->setLocalToWorldMatrix(node->transform);
+        nameToGameObject[node->name] = go;
 
-        if (m_rootGameObject.expired()) {
+        if (m_rootGameObject.expired())
+        {
             m_rootGameObject = go;
         }
 
-        if (node->meshesIndices.size() == 1) {
+        if (node->meshesIndices.size() == 1)
+        {
             const auto& mesh = m_meshes[node->meshesIndices.front()];
+            mesh->setName(node->name);
             auto material = Material::defaultMaterial();
-            if (mesh->m_skinned) {
+            if (mesh->m_skinned)
+            {
                 auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
+                meshRenderer->setSharedMesh(mesh);
                 meshRenderer->setAvatar(m_avatar);
                 meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
                 go->AddComponent(meshRenderer);
-            } else {
+                //m_skinnedMeshRenderersToFindLCA.push_back(meshRenderer);
+            }
+            else
+            {
                 auto meshRenderer = std::make_shared<MeshRenderer>(material);
                 go->AddComponent(meshRenderer);
+                auto meshFilter = std::make_shared<MeshFilter>(mesh);
+                go->AddComponent(meshFilter);
             }
-            auto meshFilter = std::make_shared<MeshFilter>(mesh);
-            go->AddComponent(meshFilter);
-        } else if (node->meshesIndices.size() > 1) {
-            for (auto& idx : node->meshesIndices) {
+        }
+        else if (node->meshesIndices.size() > 1)
+        {
+            for (auto& idx : node->meshesIndices)
+            {
                 auto& m = m_meshes[idx];
                 auto child = Scene::CreateGameObject(m->name());
                 child->transform()->SetParent(go->transform());
+                nameToGameObject[m->name()] = child;
                 const auto& mesh = m_meshes[idx];
                 auto material = Material::defaultMaterial();
-                if (mesh->m_skinned) {
+                if (mesh->m_skinned)
+                {
                     auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
+                    meshRenderer->setSharedMesh(mesh);
                     meshRenderer->setAvatar(m_avatar);
                     meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
                     child->AddComponent(meshRenderer);
+                    //m_skinnedMeshRenderersToFindLCA.push_back(meshRenderer);
                 }
-                else {
+                else
+                {
                     auto meshRenderer = std::make_shared<MeshRenderer>(material);
                     child->AddComponent(meshRenderer);
+                    auto meshFilter = std::make_shared<MeshFilter>(mesh);
+                    child->AddComponent(meshFilter);
                 }
-                auto meshFilter = std::make_shared<MeshFilter>(mesh);
-                //child->AddComponent(meshRenderer);
-                child->AddComponent(meshFilter);
             }
         }
         
-        for (auto& c : node->children) {
-            auto child = ResursivelyCreateGameObject(c);
+        for (auto& c : node->children)
+        {
+            auto child = ResursivelyCreateGameObject(c, nameToGameObject);
             child->transform()->SetParent(go->transform());
         }
         

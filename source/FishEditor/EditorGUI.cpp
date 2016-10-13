@@ -26,6 +26,7 @@
 #include <CapsuleCollider.hpp>
 #include <Rigidbody.hpp>
 #include <Pipeline.hpp>
+#include <SkinnedMeshRenderer.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -676,6 +677,11 @@ void Bool(const char* label, bool value)
     ImGui::Checkbox(label, &value);
 }
 
+void Float3(const char* label, Vector3& value)
+{
+    ImGui::InputFloat3(label, value.data(), -1, ImGuiInputTextFlags_ReadOnly);
+}
+
 template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
 {
@@ -821,6 +827,25 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider
 }
 
 template<>
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SkinnedMeshRenderer>& renderer)
+{
+    ImGui::Text("Materials");
+    Int("Size", (int)renderer->m_materials.size());
+    ImGui::LabelText("Element0", "%s", renderer->m_materials.front()->name().c_str());
+    
+    ImGui::LabelText("Mesh", "%s", renderer->m_sharedMesh->name().c_str());
+    ImGui::LabelText("Root Bone", "%s", renderer->m_rootBone.lock()->name().c_str());
+    
+    ImGui::Text("Bounds");
+    Bounds bounds = renderer->localBounds();
+    auto center = bounds.center();
+    auto extents = bounds.extents();
+    Float3("Center", center);
+    Float3("Extents", extents);
+}
+
+
+template<>
 void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component)
 {
 #define Case(T) else if (component->ClassName() == FishEngine::T::StaticClassName()) { OnInspectorGUI(std::static_pointer_cast<FishEngine::T>(component)); }
@@ -836,6 +861,7 @@ void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& com
     Case(SphereCollider)
     Case(CapsuleCollider)
     Case(Rigidbody)
+    Case(SkinnedMeshRenderer)
 #undef Case
 }
 

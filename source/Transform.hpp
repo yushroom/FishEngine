@@ -111,7 +111,7 @@ public:
     }
     
     void setLocalEulerAngles(const float x, const float y, const float z) {
-        setLocalEulerAngles(Vector3(x, y , z));
+        setLocalEulerAngles(Vector3(x, y, z));
     }
 
     // position is in world space
@@ -128,7 +128,15 @@ public:
         setPosition(Vector3(x, y, z));
     }
 
-    void setRotation(const Quaternion& new_rotation);
+    void setRotation(const Quaternion& new_rotation)
+    {
+        if (m_parent.expired()) {
+            m_localRotation = new_rotation;
+        } else {
+            m_localRotation = Quaternion::Inverse(parent()->rotation()) * new_rotation;
+        }
+        MakeDirty();
+    }
 
     void setEulerAngles(const Vector3& eulerAngles);
 

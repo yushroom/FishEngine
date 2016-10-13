@@ -41,17 +41,15 @@ void MeshRenderer::Render() const
 
     Pipeline::BindPerDrawUniforms();
 
-    //std::map<std::string, Texture::PTexture> textures;
-    //auto& lights = Light::lights();
-    //if (lights.size() > 0) {
-    //    auto& l = lights.front();
-    //    if (l->transform() != nullptr) {
-    //        textures["shadowMap"] = l->m_shadowMap;
-    //    }
-    //}
+    std::map<std::string, Texture::PTexture> textures;
+    auto& lights = Light::lights();
+    if (lights.size() > 0) {
+        auto& l = lights.front();
+        if (l->transform() != nullptr) {
+            textures["shadowMap"] = l->m_shadowMap;
+        }
+    }
 
-    //auto mesh = meshFilter->mesh();
-    //auto animator = gameObject()->GetComponent<Animator>();
     std::vector<Matrix4x4> boneTransformation;
     const auto& mesh = meshFilter->mesh();
     
@@ -60,7 +58,7 @@ void MeshRenderer::Render() const
         assert(shader != nullptr);
         shader->Use();
         shader->PreRender();
-        //m->BindTextures(textures);
+        m->BindTextures(textures);
         m->Update();
         shader->CheckStatus();
         mesh->Render();

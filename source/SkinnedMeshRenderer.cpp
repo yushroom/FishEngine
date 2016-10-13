@@ -67,15 +67,17 @@ void SkinnedMeshRenderer::Render() const
 
     Pipeline::BindPerDrawUniforms();
 
-    //std::map<std::string, Texture::PTexture> textures;
-    //auto& lights = Light::lights();
-    //if (lights.size() > 0) {
-    //    auto& l = lights.front();
-    //    if (l->transform() != nullptr) {
-    //        textures["shadowMap"] = l->m_shadowMap;
-    //    }
-    //}
+    std::map<std::string, Texture::PTexture> textures;
+    auto& lights = Light::lights();
+    if (lights.size() > 0) {
+        auto& l = lights.front();
+        if (l->transform() != nullptr) {
+            textures["shadowMap"] = l->m_shadowMap;
+        }
+    }
 
+    // hack
+    // TODO: remove this block
     bool skinned = m_avatar != nullptr;
     if (skinned && m_boneTransformation.size() == 0) {
         m_boneTransformation.resize(m_sharedMesh->m_boneNameToIndex.size());
@@ -92,7 +94,7 @@ void SkinnedMeshRenderer::Render() const
         shader->PreRender();
         if (m_avatar != nullptr)
             shader->BindMatrixArray("BoneTransformations", m_boneTransformation);
-        //m->BindTextures(textures);
+        m->BindTextures(textures);
         m->Update(skinned);
         shader->CheckStatus();
         m_sharedMesh->Render();

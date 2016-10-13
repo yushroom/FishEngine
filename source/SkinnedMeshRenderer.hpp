@@ -44,6 +44,7 @@ namespace FishEngine {
 
     private:
         friend class FishEditor::EditorGUI;
+        friend class Scene;
         
         // The mesh used for skinning.
         std::shared_ptr<Mesh> m_sharedMesh = nullptr;

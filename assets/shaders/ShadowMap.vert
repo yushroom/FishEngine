@@ -1,7 +1,10 @@
-layout (location = PositionIndex) in vec3 position;
+//layout (location = PositionIndex) in vec3 position;
 
-void main()
+#include "AppDataBase.inc"
+
+void vs_main(AppData appdata)
 {
-    vec4 posH = vec4(position, 1);
-    gl_Position = MATRIX_MVP * posH;
+    gl_Position = MATRIX_MVP * appdata.position;
 }
+
+#include "AppDataBaseMain.inc"

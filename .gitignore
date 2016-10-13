@@ -19,6 +19,8 @@ project.xcworkspace/
 xcuserdata/
 /project/xcode/build/
 
+*.DS_Store
+
 # external libs
 /external/boost*
 /external/PhysXSDK/

@@ -545,13 +545,19 @@ public:
         auto stageBaseTexture = Texture::CreateFromFile(chan_texture_dir + "unitychan_tile5.png");
         auto stageMaskTexture = Texture::CreateFromFile(chan_texture_dir + "AlphaMask.png");
 
-        
+#if 0
         auto alphaMaskShader = make_shared<Shader>();
         alphaMaskShader->FromFile(chan_root_dir+"shaders/AlphaMask.vert", chan_root_dir+"shaders/AlphaMask.frag");
         auto stageMaterial = Material::CreateMaterial();
         stageMaterial->SetShader(alphaMaskShader);
         stageMaterial->SetTexture("_MainTex", stageBaseTexture);
         stageMaterial->SetTexture("_AlphaMask", stageMaskTexture);
+#else
+        auto stageMaterial = Material::builtinMaterial("Diffuse");
+        stageMaterial->SetTexture("diffuseMap", stageBaseTexture);
+#endif
+
+        //Model::builtinModel(BuiltinModelType::Cube)->CreateGameObject();
         
         auto chanMainShader = make_shared<Shader>();
         chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");

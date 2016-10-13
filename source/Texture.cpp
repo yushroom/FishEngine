@@ -194,7 +194,11 @@ GLuint create_texture(char const* Filename)
 GLuint CreateTexture(const std::string& path) {
     int width, height, n;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 4);
-    assert(data!=nullptr);
+    if (data == nullptr) {
+        Debug::LogError("Texture not found, path: %s", path.c_str());
+        abort();
+    }
+    //assert(data!=nullptr);
     GLuint t;
     glGenTextures(1, &t);
     glBindTexture(GL_TEXTURE_2D, t);

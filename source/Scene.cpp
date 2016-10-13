@@ -6,6 +6,7 @@
 #include "Mesh.hpp"
 #include "MeshFilter.hpp"
 #include "Pipeline.hpp"
+#include "SkinnedMeshRenderer.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 
@@ -72,7 +73,7 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
     //glCullFace(GL_FRONT);
     auto m = Material::builtinMaterial("ShadowMap");
     auto shader = m->shader();
-    shader->Use();
+    //shader->Use();
     //ShaderUniforms uniforms;
     auto view = light->gameObject()->transform()->worldToLocalMatrix();
     auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);
@@ -84,21 +85,33 @@ void Scene::RenderShadow(std::shared_ptr<Light>& light)
     
     for (auto& go : m_gameObjects) {
         if (!go->activeInHierarchy()) continue;
-        auto renderer = go->GetComponent<MeshRenderer>();
-        auto meshFilter = go->GetComponent<MeshFilter>();
-        if (renderer != nullptr && meshFilter != nullptr) {
-            //renderer->Render();
-            //auto shader = m->shader();
-            //shader->Use();
-            //shader->PreRender();
-            //uniforms.mat4s["MATRIX_MVP"] = proj * view * go->transform()->localToWorldMatrix();
+
+        // TODO: remove this line
+        if ("SkyBox" == go->name()) continue;
+
+        std::shared_ptr<Mesh> mesh;
+        if (go->GetComponent<MeshRenderer>()) {
+            auto meshFilter = go->GetComponent<MeshFilter>();
+            if (meshFilter != nullptr) {
+                mesh = meshFilter->mesh();
+                shader->Use();
+                Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
+                Pipeline::BindPerDrawUniforms();
+                shader->CheckStatus();
+                mesh->Render();
+                continue;
+            }
+        }
+        auto renderer = go->GetComponent<SkinnedMeshRenderer>();
+        if (renderer != nullptr) {
+            mesh = renderer->sharedMesh();
+            shader->m_skinnedShader->Use();
             Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
             Pipeline::BindPerDrawUniforms();
-            //shader->BindUniforms(uniforms);
-            //m->Update();
-            shader->CheckStatus();
-            meshFilter->mesh()->Render();
-            //shader->PostRender();
+            if (renderer->m_avatar != nullptr)
+                shader->m_skinnedShader->BindMatrixArray("BoneTransformations", renderer->m_boneTransformation);
+            shader->m_skinnedShader->CheckStatus();
+            mesh->Render();
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

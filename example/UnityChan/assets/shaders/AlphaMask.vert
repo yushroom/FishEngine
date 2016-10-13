@@ -1,16 +1,9 @@
-#include "UnitySupport.inc"
-#include "AppDataBase.inc"
-
-out VS_OUT {
-    vec2 uv;
-    vec3 normal;
-} vs_out;
+#include "AppData.inc"
 
 void vs_main(AppData appdata)
 {
     gl_Position = MATRIX_MVP * appdata.position;
+    vs_out.position = (MATRIX_M * appdata.position).xyz;
+    vs_out.normal = normalize(mat3(MATRIX_IT_M) * appdata.normal);
     vs_out.uv = appdata.uv;
-    vs_out.normal = normalize((Object2World * vec4(appdata.normal, 0)).xyz);
 }
-
-#include "AppDataBaseMain.inc"

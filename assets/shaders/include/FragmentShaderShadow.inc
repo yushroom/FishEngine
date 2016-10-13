@@ -1,8 +1,17 @@
 #ifndef FragmentShaderShadow_inc
 #define FragmentShaderShadow_inc
 
+#include "CG.inc"
+
 uniform sampler2D shadowMap;
-const float bias = 0.005f;
+const float bias = 0.0002f;
+
+in VS_OUT {
+    vec3 position;      // in world space
+    vec3 normal;        // in world space
+    vec2 uv;
+    vec4 positionInLightSpace; // light space
+} vs_out;
 
 out vec4 color;
 
@@ -20,7 +29,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
     // Calculate bias (based on depth map resolution and slope)
     vec3 N = normalize(normal);
     //vec3 lightDir = normalize(lightPos - fs_in.FragPos);
-    float bias = max(0.05 * (1.0 - dot(N, lightDir)), bias);
+    float bias = max(0.0002 * (1.0 - dot(N, lightDir)), bias);
     // Check whether current frag pos is in shadow
     //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     
@@ -44,14 +53,32 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
     return shadow;
 }
 
-void ps_main();
+struct SurfaceData
+{
+    vec3 L;
+    vec3 V;
+    vec3 N;
+    vec2 uv;
+};
+
+void ps_main(SurfaceData surfaceData);
 
 void main()
 {
-    ps_main();
-    float shadowFactor = ShadowCalculation(vs_out.positionInLightSpace, L);
+    SurfaceData surfaceData;
+    vec3 L = normalize(WorldSpaceLightDir(vs_out.position));
+    vec3 V = normalize(WorldSpaceCameraPos - vs_out.position);
+    vec3 N = normalize(vs_out.normal);
+    surfaceData.L = L;
+    surfaceData.V = V;
+    surfaceData.N = N;
+    surfaceData.uv = vs_out.uv;
+
+    ps_main(surfaceData);
+
+    float shadowFactor = ShadowCalculation(vs_out.positionInLightSpace, L, N);
     color.rgb *= (1.f-shadowFactor);
-    color.a = 1.0f;
+    //color.a = 1.0f;
 }
 
 #endif // FragmentShaderShadow_inc

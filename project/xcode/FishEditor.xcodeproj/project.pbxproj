@@ -28,6 +28,7 @@
 		BFB361A11DAA2D7200CD0DCB /* libboost_serialization-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */; };
 		BFB361A21DAA2D7200CD0DCB /* libboost_system-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */; };
 		BFB361A41DAA324E00CD0DCB /* libSimulationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB361A31DAA324E00CD0DCB /* libSimulationController.a */; };
+		BFB361BD1DAFA6E800CD0DCB /* libboost_filesystem-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB361BC1DAFA6E800CD0DCB /* libboost_filesystem-mt.a */; };
 		BFDC75161D8EE0330082A6DC /* EditorGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */; };
 		BFDC75171D8EE0330082A6DC /* EditorRenderSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC750D1D8EE0330082A6DC /* EditorRenderSystem.cpp */; };
 		BFDC75181D8EE0330082A6DC /* FishEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */; };
@@ -101,6 +102,7 @@
 		BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_serialization-mt.a"; path = "/usr/local/Cellar/boost/1.62.0/lib/libboost_serialization-mt.a"; sourceTree = "<absolute>"; };
 		BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_system-mt.a"; path = "/usr/local/Cellar/boost/1.62.0/lib/libboost_system-mt.a"; sourceTree = "<absolute>"; };
 		BFB361A31DAA324E00CD0DCB /* libSimulationController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSimulationController.a; path = ../../external/libs/osx/libSimulationController.a; sourceTree = "<group>"; };
+		BFB361BC1DAFA6E800CD0DCB /* libboost_filesystem-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_filesystem-mt.a"; path = "../../../../../../../usr/local/Cellar/boost/1.62.0/lib/libboost_filesystem-mt.a"; sourceTree = "<group>"; };
 		BFDC74F41D8EDEEC0082A6DC /* FishEditor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FishEditor; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = FishEngine.xcodeproj; sourceTree = "<group>"; };
 		BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditorGUI.cpp; path = ../../source/FishEditor/EditorGUI.cpp; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				BFB361A21DAA2D7200CD0DCB /* libboost_system-mt.a in Frameworks */,
 				BF51E6421DA1634800AF948A /* libPhysX3CharacterKinematic.a in Frameworks */,
 				BF51E64F1DA1634800AF948A /* libPhysX3DEBUG.a in Frameworks */,
+				BFB361BD1DAFA6E800CD0DCB /* libboost_filesystem-mt.a in Frameworks */,
 				BF51E63B1DA1634800AF948A /* libLowLevelCloth.a in Frameworks */,
 				BFF192E71DA7CBEA008634D8 /* libfbxsdk.a in Frameworks */,
 				BFDC75301D8EE2970082A6DC /* Cocoa.framework in Frameworks */,
@@ -172,6 +175,7 @@
 		BFB361AB1DAA32C600CD0DCB /* boost */ = {
 			isa = PBXGroup;
 			children = (
+				BFB361BC1DAFA6E800CD0DCB /* libboost_filesystem-mt.a */,
 				BFB3619F1DAA2D7200CD0DCB /* libboost_serialization-mt.a */,
 				BFB361A01DAA2D7200CD0DCB /* libboost_system-mt.a */,
 			);

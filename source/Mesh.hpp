@@ -155,6 +155,7 @@ public:
     void Render() const;
     
 private:
+    friend class Gizmos;
     std::vector<float> m_positionBuffer;
     
     GLenum m_drawMode = GL_LINES;   // mode in glDrawArrays

@@ -20,7 +20,6 @@ namespace FishEngine
         //bool Raycast(const Ray& ray, RaycastHit* out_hitInfo, const float maxDistance);
         
         physx::PxShape* physicsShape();
-        virtual void CreatePhysicsShape() = 0;
         
     protected:
         std::shared_ptr<Rigidbody> m_attachedRigidbody;
@@ -28,6 +27,8 @@ namespace FishEngine
         float   m_contactOffset;
         bool    m_enabled;
         bool    m_isTrigger;
+        
+        virtual void CreatePhysicsShape() = 0;
         
         physx::PxShape* m_physxShape = nullptr;
         //physx::PxRigidDynamic* m_physxRigidDynamic;

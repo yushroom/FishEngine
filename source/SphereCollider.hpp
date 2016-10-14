@@ -9,16 +9,18 @@ namespace FishEngine
     {
     public:
         InjectClassName(SphereCollider);
+        SphereCollider() = default;
         SphereCollider(const Vector3& center,
                        const float raduis);
         
         virtual void OnDrawGizmos() override;
-        virtual void CreatePhysicsShape() override;
-        
+
     private:
         friend class FishEditor::EditorGUI;
-        Vector3 m_center;
-        float m_radius;
+        Vector3 m_center{0, 0, 0};
+        float m_radius = 1;
+        
+        virtual void CreatePhysicsShape() override;
     };
 }
 

@@ -10,10 +10,10 @@ Material::PMaterial Material::s_defaultMaterial = nullptr;
 
 // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
 template<typename T>
-constexpr GLenum GLType()
-{
-    static_assert(false, "Not implemented");
-}
+constexpr GLenum GLType();
+//{
+//    static_assert(false, "Not implemented");
+//}
 
 template<>
 constexpr GLenum GLType<float>()

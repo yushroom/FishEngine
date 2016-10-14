@@ -35,15 +35,20 @@ namespace FishEngine
         DrawLine(const Vector3& from,
                  const Vector3& to);
         
+        
         static void
         DrawSphere(const Vector3& center,
                    const float radius);
+        
+        
         static void
         DrawRay(const Ray& r);
+        
         
         static void
         DrawRay(const Vector3& from,
                 const Vector3& direction);
+        
         
         static void
         DrawWireCube(const Vector3& center,
@@ -64,6 +69,12 @@ namespace FishEngine
     private:
         friend FishEditor::EditorRenderSystem;
         friend FishEditor::EditorGUI;
+        
+        static void
+        DrawHalfWireSphere(const Vector3& center,
+                           const float radius,
+                           const Matrix4x4& modelMatrix = Matrix4x4::identity);
+        
         static Color s_color;
 
         static void Init();
@@ -71,6 +82,7 @@ namespace FishEngine
         static std::shared_ptr<SimpleMesh> s_lineMesh;
         static std::shared_ptr<SimpleMesh> s_circleMesh;
         static std::shared_ptr<SimpleMesh> s_boxMesh;
+        //static std::shared_ptr<SimpleMesh> s_wiredSphereMesh;
     };
 }
 

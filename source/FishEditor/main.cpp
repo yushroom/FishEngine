@@ -37,6 +37,7 @@ using namespace FishEditor;
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <Serialization.hpp>
+#include <CapsuleCollider.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -592,8 +593,17 @@ public:
         
         go = Model::builtinModel(BuiltinModelType::Plane)->CreateGameObject();
         go->transform()->GetChild(0)->gameObject()->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
+        auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(1, 0.1f, 1));
+        go->AddComponent(boxCollider);
+        boxCollider->physicsShape();
         
         auto modelGO = model->CreateGameObject();
+        //modelGO->AddComponent<TestGizmos>();
+        auto capsuleCollider = make_shared<CapsuleCollider>(Vector3(0, 0.8f, 0), 1.6f, 0.5f);
+        modelGO->AddComponent(capsuleCollider);
+        modelGO->AddComponent<Rigidbody>();
+        capsuleCollider->physicsShape();
+        
 #if 1
         modelGO->AddComponent<Animator>();
         auto animator = modelGO->GetComponent<Animator>();

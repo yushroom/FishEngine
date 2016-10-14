@@ -4,34 +4,33 @@
 #include "Object.hpp"
 #include "GLEnvironment.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-class Texture : public Object
+namespace FishEngine
 {
-public:
-    Texture() {}
-    //Texture(GLuint texture) : m_texture(texture) {};
-    Texture(const std::string& path);
-    Texture(const Texture&) = delete;
-    void operator=(const Texture&) = delete;
-    virtual ~Texture();
+    class Texture : public Object
+    {
+    public:
+        Texture() {}
+        //Texture(GLuint texture) : m_texture(texture) {};
+        Texture(const std::string& path);
+        Texture(const Texture&) = delete;
+        void operator=(const Texture&) = delete;
+        virtual ~Texture();
 
-    typedef std::shared_ptr<Texture> PTexture;
-    
-    //static Texture& GetSimpleTexutreCubeMap();
+        typedef std::shared_ptr<Texture> PTexture;
 
-    static PTexture CreateFromFile(const std::string& path);
+        //static Texture& GetSimpleTexutreCubeMap();
 
-    void FromFile(const std::string& path);
-    
-    GLuint GLTexuture() const {
-        return m_texture;
-    }
-    
-protected:
-    GLuint m_texture = 0;
-};
+        static PTexture CreateFromFile(const std::string& path);
 
-NAMESPACE_FISHENGINE_END
+        void FromFile(const std::string& path);
+
+        GLuint GLTexuture() const {
+            return m_texture;
+        }
+
+    protected:
+        GLuint m_texture = 0;
+    };
+}
 
 #endif /* Texture_hpp */

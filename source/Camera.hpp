@@ -6,132 +6,131 @@
 #include "Matrix4x4.hpp"
 #include "Ray.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-enum class CameraType {
-    Game,
-    SceneView,
-    Preview,
-};
-
-class Camera : public Behaviour
+namespace FishEngine 
 {
-public:
-    InjectClassName(Camera)
+    enum class CameraType {
+        Game,
+        SceneView,
+        Preview,
+    };
 
-    static std::shared_ptr<Camera>
-    Create(float fov,
-           float aspect,
-           float nearClipPlane,
-           float farClipPlane,
-           CameraType type = CameraType::Game)
+    class Camera : public Behaviour
     {
-        auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
-        camera->m_cameraType = type;
-        m_allCameras.push_back(camera);
-        return camera;
-    }
- 
-//private:
-    Camera() = default;
-    Camera(float fov, float aspect, float nearClipPlane, float farClipPlane);
+    public:
+        InjectClassName(Camera)
 
-//public:
-    // The aspect ratio (width divided by height).
-    float aspect() const {
-        return m_aspect;
-    }
-    
-    float orthographicSize() const {
-        return m_orthographicSize;
-    }
+            static std::shared_ptr<Camera>
+            Create(float fov,
+                float aspect,
+                float nearClipPlane,
+                float farClipPlane,
+                CameraType type = CameraType::Game)
+        {
+            auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
+            camera->m_cameraType = type;
+            m_allCameras.push_back(camera);
+            return camera;
+        }
 
-    bool orghographic() const {
-        return m_orthographic;
-    }
+        //private:
+        Camera() = default;
+        Camera(float fov, float aspect, float nearClipPlane, float farClipPlane);
 
-    void setOrthographic(bool value) {
-        m_orthographic = value;
-        m_isDirty = true;
-    }
+        //public:
+            // The aspect ratio (width divided by height).
+        float aspect() const {
+            return m_aspect;
+        }
 
-    void setAspect(float aspect) {
-        m_aspect = aspect;
-        m_isDirty = true;
-    }
+        float orthographicSize() const {
+            return m_orthographicSize;
+        }
 
-    float nearClipPlane() const {
-        return m_nearClipPlane;
-    }
+        bool orghographic() const {
+            return m_orthographic;
+        }
 
-    float farClipPlane() const {
-        return m_farClipPlane;
-    }
+        void setOrthographic(bool value) {
+            m_orthographic = value;
+            m_isDirty = true;
+        }
 
-    // Matrix that transforms from world to camera space (i.e. view matrix).
-    Matrix4x4 worldToCameraMatrix() const;
+        void setAspect(float aspect) {
+            m_aspect = aspect;
+            m_isDirty = true;
+        }
 
-    // projection matrix.
-    Matrix4x4 projectionMatrix() const;
+        float nearClipPlane() const {
+            return m_nearClipPlane;
+        }
 
-    const Vector4& viewport() const {
-        return m_viewport;
-    }
+        float farClipPlane() const {
+            return m_farClipPlane;
+        }
 
-    //virtual void OnInspectorGUI() override;
+        // Matrix that transforms from world to camera space (i.e. view matrix).
+        Matrix4x4 worldToCameraMatrix() const;
 
-    // Returns a ray going from camera through a screen point.
-    Ray ScreenPointToRay(const Vector3& position);
-    
-    // TODO
-    // The first enabled camera tagged "MainCamera" (Read Only).
-    static std::shared_ptr<Camera> main();
-    
-    static std::shared_ptr<Camera> mainGameCamera();
+        // projection matrix.
+        Matrix4x4 projectionMatrix() const;
 
-private:
-    friend class RenderSystem;
-    friend class FishEditor::EditorGUI;
-    friend class FishEditor::FishEditorWindow;
-    
-    float m_fieldOfView         = 60.f;
-    float m_orthographicSize    = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
-    float m_aspect              = 1.0f; // The aspect ratio (width divided by height).
-    float m_farClipPlane        = 0.3f;
-    float m_nearClipPlane       = 100.f;
-    Vector4 m_viewport{0, 0, 1, 1};
-    mutable bool m_isDirty = true;
-    
-    CameraType  m_cameraType        = CameraType::Game;
-    bool        m_orthographic      = false;
+        const Vector4& viewport() const {
+            return m_viewport;
+        }
 
-    mutable Matrix4x4 m_projectMatrix;
+        //virtual void OnInspectorGUI() override;
 
-    // temp
-    // https://docs.unity3d.com/Manual/SceneViewNavigation.html
-    mutable Vector3 m_focusPoint{0, 0, 0};
-    void FrameSelected(std::shared_ptr<GameObject>& selected);
-    
-    static std::shared_ptr<Camera> m_mainCamera;
-    static std::vector<std::shared_ptr<Camera>> m_allCameras;
-    
-    friend class boost::serialization::access;
-    template<class Archive>
-    inline void serialize(Archive& ar, const unsigned int version)
-    {
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Behaviour);
-        ar & BOOST_SERIALIZATION_NVP(m_fieldOfView);
-        ar & BOOST_SERIALIZATION_NVP(m_orthographicSize);
-        ar & BOOST_SERIALIZATION_NVP(m_aspect);
-        ar & BOOST_SERIALIZATION_NVP(m_farClipPlane);
-        ar & BOOST_SERIALIZATION_NVP(m_nearClipPlane);
-        ar & BOOST_SERIALIZATION_NVP(m_viewport);
-        ar & BOOST_SERIALIZATION_NVP(m_isDirty);
-        ar & BOOST_SERIALIZATION_NVP(m_cameraType);
-        ar & BOOST_SERIALIZATION_NVP(m_orthographic);
-    }
-};
+        // Returns a ray going from camera through a screen point.
+        Ray ScreenPointToRay(const Vector3& position);
 
-NAMESPACE_FISHENGINE_END
+        // TODO
+        // The first enabled camera tagged "MainCamera" (Read Only).
+        static std::shared_ptr<Camera> main();
+
+        static std::shared_ptr<Camera> mainGameCamera();
+
+    private:
+        friend class RenderSystem;
+        friend class FishEditor::EditorGUI;
+        friend class FishEditor::FishEditorWindow;
+
+        float m_fieldOfView = 60.f;
+        float m_orthographicSize = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
+        float m_aspect = 1.0f; // The aspect ratio (width divided by height).
+        float m_farClipPlane = 0.3f;
+        float m_nearClipPlane = 100.f;
+        Vector4 m_viewport{ 0, 0, 1, 1 };
+        mutable bool m_isDirty = true;
+
+        CameraType  m_cameraType = CameraType::Game;
+        bool        m_orthographic = false;
+
+        mutable Matrix4x4 m_projectMatrix;
+
+        // temp
+        // https://docs.unity3d.com/Manual/SceneViewNavigation.html
+        mutable Vector3 m_focusPoint{ 0, 0, 0 };
+        void FrameSelected(std::shared_ptr<GameObject>& selected);
+
+        static std::shared_ptr<Camera> m_mainCamera;
+        static std::vector<std::shared_ptr<Camera>> m_allCameras;
+
+        friend class boost::serialization::access;
+        template<class Archive>
+        inline void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Behaviour);
+            ar & BOOST_SERIALIZATION_NVP(m_fieldOfView);
+            ar & BOOST_SERIALIZATION_NVP(m_orthographicSize);
+            ar & BOOST_SERIALIZATION_NVP(m_aspect);
+            ar & BOOST_SERIALIZATION_NVP(m_farClipPlane);
+            ar & BOOST_SERIALIZATION_NVP(m_nearClipPlane);
+            ar & BOOST_SERIALIZATION_NVP(m_viewport);
+            ar & BOOST_SERIALIZATION_NVP(m_isDirty);
+            ar & BOOST_SERIALIZATION_NVP(m_cameraType);
+            ar & BOOST_SERIALIZATION_NVP(m_orthographic);
+        }
+    };
+}
 
 #endif /* Camera_hpp */

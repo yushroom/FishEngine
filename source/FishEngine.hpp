@@ -9,9 +9,6 @@
 #define FISHENGINE_PLATFORM_LINUX 1
 #endif
 
-#define NAMESPACE_FISHENGINE_BEGIN namespace FishEngine {
-#define NAMESPACE_FISHENGINE_END }
-
 #include <string>
 #include <vector>
 #include <map>

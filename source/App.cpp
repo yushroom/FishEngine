@@ -1,7 +1,6 @@
 #include "App.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-App::~App() = default;
-
-NAMESPACE_FISHENGINE_END
+namespace FishEngine
+{
+    App::~App() = default;
+}

@@ -9,67 +9,65 @@
 // https://docs.unity3d.com/Manual/Lighting.html
 // https://docs.unity3d.com/Manual/class-Light.html
 
-
-NAMESPACE_FISHENGINE_BEGIN
-
-enum class LightType
+namespace FishEngine
 {
-    Directional,
-    Point,
-    Spot,
-    Area,
-};
+    enum class LightType
+    {
+        Directional,
+        Point,
+        Spot,
+        Area,
+    };
 
-class Light : public Behaviour
-{
-public:
+    class Light : public Behaviour
+    {
+    public:
 
-    InjectClassName(Light);
-    Light() {
-        m_shadowMap = RenderTexture::CreateShadowMap();
-    }
+        InjectClassName(Light);
+        Light() {
+            m_shadowMap = RenderTexture::CreateShadowMap();
+        }
 
-    static std::shared_ptr<Light> Create();
+        static std::shared_ptr<Light> Create();
 
-    static std::list<std::shared_ptr<Light>>& lights() {
-        return m_lights;
-    }
-    
-    float shadowNearPlane() const {
-        return m_shadowNearPlane;
-    }
+        static std::list<std::shared_ptr<Light>>& lights() {
+            return m_lights;
+        }
 
-    virtual void OnInspectorGUI() override;
+        float shadowNearPlane() const {
+            return m_shadowNearPlane;
+        }
 
-private:
-    friend class Scene;
-    friend class FishEditor::EditorRenderSystem;
-    friend class MeshRenderer;
-    friend class SkinnedMeshRenderer;
-    // The current type of light. Possible values are Directional, Point, Spot and Area
-    LightType m_type;
+        virtual void OnInspectorGUI() override;
 
-    // How far light is emitted from the center of the object (Point and Spot lights only).
-    float m_range;
+    private:
+        friend class Scene;
+        friend class FishEditor::EditorRenderSystem;
+        friend class MeshRenderer;
+        friend class SkinnedMeshRenderer;
+        // The current type of light. Possible values are Directional, Point, Spot and Area
+        LightType m_type;
 
-    // Determines the angle(in degrees) at the base of a spot light¡¯s cone(Spot light only).
-    float m_spotAngle;
+        // How far light is emitted from the center of the object (Point and Spot lights only).
+        float m_range;
 
-    // The color of the light emitted.
-    Color m_color;
+        // Determines the angle(in degrees) at the base of a spot light¡¯s cone(Spot light only).
+        float m_spotAngle;
 
-    // Brightness of the light. The default value for a Point, Spot or Area light is 1 but for a Directional light, it is 0.5.
-    float m_intensity;
-    
-    float m_shadowBias = 0.2f;
-    float m_shadowNormalBias = 0.4f;
-    float m_shadowNearPlane = 0.2f;
-    
-    std::shared_ptr<RenderTexture> m_shadowMap;
+        // The color of the light emitted.
+        Color m_color;
 
-    static std::list<std::shared_ptr<Light>> m_lights;
-};
+        // Brightness of the light. The default value for a Point, Spot or Area light is 1 but for a Directional light, it is 0.5.
+        float m_intensity;
 
-NAMESPACE_FISHENGINE_END
+        float m_shadowBias = 0.2f;
+        float m_shadowNormalBias = 0.4f;
+        float m_shadowNearPlane = 0.2f;
+
+        std::shared_ptr<RenderTexture> m_shadowMap;
+
+        static std::list<std::shared_ptr<Light>> m_lights;
+    };
+}
 
 #endif // Light_hpp

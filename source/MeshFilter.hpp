@@ -3,34 +3,33 @@
 
 #include "Component.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-class MeshFilter : public Component
+namespace FishEngine
 {
-public:
-    InjectClassName(MeshFilter)
-    
-    MeshFilter() = default;
-    
-    MeshFilter(std::shared_ptr<Mesh> mesh) : m_mesh(mesh) {
-        
-    }
-    
-    std::shared_ptr<Mesh> mesh() const {
-        return m_mesh;
-    }
-    
-    void SetMesh(std::shared_ptr<Mesh> mesh) {
-        m_mesh = mesh;
-    }
-    
-    //virtual void OnInspectorGUI() override;
-    
-private:
-    friend class FishEditor::EditorGUI;
-    std::shared_ptr<Mesh> m_mesh = nullptr;
-};
+    class MeshFilter : public Component
+    {
+    public:
+        InjectClassName(MeshFilter)
 
-NAMESPACE_FISHENGINE_END
+        MeshFilter() = default;
+
+        MeshFilter(std::shared_ptr<Mesh> mesh) : m_mesh(mesh) {
+
+        }
+
+        std::shared_ptr<Mesh> mesh() const {
+            return m_mesh;
+        }
+
+        void SetMesh(std::shared_ptr<Mesh> mesh) {
+            m_mesh = mesh;
+        }
+
+        //virtual void OnInspectorGUI() override;
+
+    private:
+        friend class FishEditor::EditorGUI;
+        std::shared_ptr<Mesh> m_mesh = nullptr;
+    };
+}
 
 #endif /* MeshFilter_hpp */

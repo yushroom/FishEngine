@@ -3,40 +3,38 @@
 
 #include "FishEditor.hpp"
 
-NAMESPACE_FISHEDITOR_BEGIN
-
-// Access to the selection in the editor.
-class Selection
+namespace FishEditor
 {
-public:
-    // Returns the active game object. (The one shown in the inspector).
-    static std::shared_ptr<FishEngine::GameObject>
-    activeGameObject() {
-        return m_activeGameObject.lock();
-    }
+    // Access to the selection in the editor.
+    class Selection
+    {
+    public:
+        // Returns the active game object. (The one shown in the inspector).
+        static std::shared_ptr<FishEngine::GameObject>
+            activeGameObject() {
+            return m_activeGameObject.lock();
+        }
 
-    static void
-    setActiveGameObject(std::shared_ptr<FishEngine::GameObject> gameObject) {
-        m_activeGameObject = gameObject;
-    }
-    
-    static std::shared_ptr<FishEngine::GameObject>
-    selectedGameObjectInHierarchy() {
-        return m_selectedGameObjectInHierarchy.lock();
-    }
-    
-    static void
-    setSelectedGameObjectInHierarchy(std::shared_ptr<FishEngine::GameObject> gameObject) {
-        m_selectedGameObjectInHierarchy = gameObject;
-    }
+        static void
+            setActiveGameObject(std::shared_ptr<FishEngine::GameObject> gameObject) {
+            m_activeGameObject = gameObject;
+        }
 
-private:
-    //friend class EditorGUI;
-    static std::weak_ptr<FishEngine::GameObject> m_activeGameObject;
-    static std::weak_ptr<FishEngine::GameObject> m_selectedGameObjectInHierarchy;
-};
+        static std::shared_ptr<FishEngine::GameObject>
+            selectedGameObjectInHierarchy() {
+            return m_selectedGameObjectInHierarchy.lock();
+        }
 
+        static void
+            setSelectedGameObjectInHierarchy(std::shared_ptr<FishEngine::GameObject> gameObject) {
+            m_selectedGameObjectInHierarchy = gameObject;
+        }
 
-NAMESPACE_FISHEDITOR_END
+    private:
+        //friend class EditorGUI;
+        static std::weak_ptr<FishEngine::GameObject> m_activeGameObject;
+        static std::weak_ptr<FishEngine::GameObject> m_selectedGameObjectInHierarchy;
+    };
+}
 
 #endif // Selection_hpp

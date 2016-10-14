@@ -5,14 +5,13 @@
 #include "RenderSystem.hpp"
 #include <imgui/imgui.h>
 
-NAMESPACE_FISHENGINE_BEGIN
-
-class RenderSettings : public Script
+namespace FishEngine
 {
-public:
-    InjectClassName(RenderSettings);
-};
-
-NAMESPACE_FISHENGINE_END
+    class RenderSettings : public Script
+    {
+    public:
+        InjectClassName(RenderSettings);
+    };
+}
 
 #endif // RenderSettings_hpp

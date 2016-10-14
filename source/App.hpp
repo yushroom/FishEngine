@@ -3,17 +3,16 @@
 
 #include "FishEngine.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-class App
+namespace FishEngine
 {
-public:
-    virtual ~App() = 0;
-    virtual void Init() = 0;
-    //virtual void Update() = 0;
-    //virtual void Clean() = 0;
-};
-
-NAMESPACE_FISHENGINE_END
+    class App
+    {
+    public:
+        virtual ~App() = 0;
+        virtual void Init() = 0;
+        //virtual void Update() = 0;
+        //virtual void Clean() = 0;
+    };
+}
 
 #endif // App_hpp

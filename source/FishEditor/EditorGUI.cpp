@@ -6,6 +6,7 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include <imgui/imgui_internal.h>
 //#include <imgui/imgui_dock.h>
+#include <boost/lexical_cast.hpp>
 
 #include <GameObject.hpp>
 #include <Scene.hpp>
@@ -27,6 +28,7 @@
 #include <Rigidbody.hpp>
 #include <Pipeline.hpp>
 #include <SkinnedMeshRenderer.hpp>
+#include <Camera.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -357,10 +359,19 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
         ImGui::Unindent(inspector_indent_width);
     }
 
-    for (auto& c : selectedGO->m_components)
+    int local_id = 0;
+
+    //auto headerName = [&local_id](const std::string& className) {
+    //    return camelCaseToReadable(className) + "##header" + boost::lexical_cast<std::string>(local_id++);
+    //};
+
+    std::shared_ptr<Component> componentToBeDestroyed = nullptr;
+
+    for (auto c : selectedGO->m_components)
     {
+        ImGui::PushID(local_id++);
         bool is_open = true;
-        if (ImGui::CollapsingHeader((camelCaseToReadable(c->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(c->ClassName().c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(inspector_indent_width);
             OnInspectorGUI(c);
@@ -368,14 +379,25 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
         }
         if (!is_open)
         {
-            Object::Destroy(c);
+            //Object::DestroyImmediate(c);
+            componentToBeDestroyed = c;
         }
+        ImGui::PopID();
     }
 
-    for (auto& s : selectedGO->m_scripts)
+    if (componentToBeDestroyed != nullptr)
     {
+        Object::DestroyImmediate(componentToBeDestroyed);
+    }
+
+
+    std::shared_ptr<Script> scriptToBeDestroyed = nullptr;
+
+    for (auto s : selectedGO->m_scripts)
+    {
+        ImGui::PushID(local_id++);
         bool is_open = true;
-        if (ImGui::CollapsingHeader((camelCaseToReadable(s->ClassName()) + "##header").c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(s->ClassName().c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
         {
             //OnInspectorGUI(s);
             ImGui::Indent(inspector_indent_width);
@@ -384,11 +406,26 @@ void FishEditor::EditorGUI::DrawInspectorWindow()
         }
         if (!is_open)
         {
-            Object::Destroy(s);
+            //Object::DestroyImmediate(s);
+            scriptToBeDestroyed = s;
+        }
+        ImGui::PopID();
+    }
+
+    if (scriptToBeDestroyed != nullptr)
+    {
+        Object::DestroyImmediate(scriptToBeDestroyed);
+    }
+
+    if (selectedGO != nullptr)
+    {
+        if (EditorGUI::Button("Add Component"))
+        {
+            auto comp = Component::CreateComponent("Camera");
+            selectedGO->AddComponent(comp);
         }
     }
 
-    EditorGUI::Button("Add Component");
 
     //ImGui::EndDock(); // Inspector Editor
     ImGui::End();

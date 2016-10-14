@@ -30,7 +30,7 @@ using namespace FishEngine;
 NAMESPACE_FISHEDITOR_BEGIN
 
 bool EditorRenderSystem::m_isWireFrameMode = false;
-bool EditorRenderSystem::m_useGammaCorrection = true;
+bool EditorRenderSystem::m_useGammaCorrection = false;
 bool EditorRenderSystem::m_showShadowMap = false;
 bool EditorRenderSystem::m_highlightSelections = true;
 

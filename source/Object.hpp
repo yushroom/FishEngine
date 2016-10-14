@@ -26,6 +26,11 @@ public:
 
     static void Destroy(std::shared_ptr<Script> script, float t = 0.0f);
 
+    // Removes a component.
+    static void DestroyImmediate(std::shared_ptr<Component> component);
+
+    static void DestroyImmediate(std::shared_ptr<Script> script);
+
 protected:
     std::string m_name;
     

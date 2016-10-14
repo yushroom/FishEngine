@@ -34,7 +34,8 @@ void FishEngine::CapsuleCollider::
 CreatePhysicsShape()
 {
     if (m_physxShape == nullptr) {
+        //PxTransform relativePose(PxQuat(PxHalfPi, PxVec3(0, 0, 1))); // standing upright
         m_physxShape = gPhysics->createShape(PxCapsuleGeometry(m_radius, m_height*0.5f-m_radius), *gMaterial);
-        m_physxShape->setLocalPose(PxTransform(m_center.x, m_center.y, m_center.z));
+        m_physxShape->setLocalPose(PxTransform(m_center.x, m_center.y, m_center.z, PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
     }
 }

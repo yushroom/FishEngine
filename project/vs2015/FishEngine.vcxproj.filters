@@ -186,14 +186,14 @@
     <ClInclude Include="..\..\source\MeshCollider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rigidbody.hpp">
-      <Filter>Component</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\PhysicsSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Pipeline.hpp">
       <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Rigidbody.hpp">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

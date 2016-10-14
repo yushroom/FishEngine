@@ -88,7 +88,7 @@ void FishEditorWindow::Init()
 
 void FishEditorWindow::Run()
 {
-    Scene::Start();
+    //Scene::Start();
     //PhysicsSystem::Start();
     
     const float fixed_delta_time = 1.0f / m_fixedFrameRate;
@@ -134,6 +134,7 @@ void FishEditorWindow::Run()
 void FishEditorWindow::Play() {
     m_inPlayMode = true;
     Camera::m_mainCamera = nullptr;
+    Scene::Start();
     //Camera::m_mainCamera = Scene::mainCamera();
 }
 

@@ -53,9 +53,9 @@ void FishEngine::GameObject::OnDrawGizmos()
 
 void FishEngine::GameObject::Start()
 {
-    //        for (auto& c : m_components) {
-    //            c->init();
-    //        }
+    for (auto& c : m_components) {
+        c->Start();
+    }
     for (auto& s : m_scripts) {
         s->Start();
     }

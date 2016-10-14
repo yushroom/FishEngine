@@ -1,4 +1,7 @@
 #include "SkinnedMeshRenderer.hpp"
+
+#include <cassert>
+
 #include "GameObject.hpp"
 #include "Debug.hpp"
 #include "Scene.hpp"
@@ -7,8 +10,7 @@
 #include "Light.hpp"
 #include "Animator.hpp"
 #include "Pipeline.hpp"
-#include <cassert>
-
+#include "Camera.hpp"
 
 NAMESPACE_FISHENGINE_BEGIN
 

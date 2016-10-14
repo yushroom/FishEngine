@@ -3,51 +3,53 @@
 
 #include "Object.hpp"
 
-NAMESPACE_FISHENGINE_BEGIN
-
-// Base class for everything attached to GameObjects.
-class Component : public Object
+namespace FishEngine
 {
-public:
-    virtual std::string ClassName() const = 0;
-
-    virtual ~Component() = default;
-    
-    virtual void OnInspectorGUI() {}
-    virtual void OnDrawGizmos() {}
-
-    // The game object this component is attached to. A component is always attached to a game object.
-    std::shared_ptr<GameObject> gameObject() const { return m_gameObject.lock(); }
-    
-    // The tag of this game object.
-    std::string tag() const;
-    
-    // The tag of this game object.
-    virtual std::string name() const override;
-    
-    // The Transform attached to this GameObject (null if there is none attached).
-    std::shared_ptr<Transform> transform() const;
-    
-    //virtual void Init() {}
-    virtual void Update() {}
-    
-//protected:
-private:
-    friend class GameObject;
-    friend class Scene;
-    friend class FishEditor::SceneView;
-    std::weak_ptr<GameObject> m_gameObject;
-    
-    friend class boost::serialization::access;
-    template<class Archive>
-    inline void serialize(Archive& ar, const unsigned int version)
+    // Base class for everything attached to GameObjects.
+    class Component : public Object
     {
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-        //ar & BOOST_SERIALIZATION_NVP(m_gameObject);
-    }
-};
+    public:
+        virtual std::string ClassName() const = 0;
 
-NAMESPACE_FISHENGINE_END
+        virtual ~Component() = default;
+
+        virtual void OnInspectorGUI() {}
+        virtual void OnDrawGizmos() {}
+
+        // The game object this component is attached to. A component is always attached to a game object.
+        std::shared_ptr<GameObject> gameObject() const { return m_gameObject.lock(); }
+
+        // The tag of this game object.
+        std::string tag() const;
+
+        // The tag of this game object.
+        virtual std::string name() const override;
+
+        // The Transform attached to this GameObject (null if there is none attached).
+        std::shared_ptr<Transform> transform() const;
+
+        //virtual void Init() {}
+        virtual void Start() {}
+        virtual void Update() {}
+
+        static std::shared_ptr<Component> CreateComponent(const std::string& componentClassName);
+
+        //protected:
+    private:
+        friend class GameObject;
+        friend class Scene;
+        friend class FishEditor::SceneView;
+        std::weak_ptr<GameObject> m_gameObject;
+
+        friend class boost::serialization::access;
+        template<class Archive>
+        inline void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
+            //ar & BOOST_SERIALIZATION_NVP(m_gameObject);
+        }
+    };
+}
 
 #define InjectClassName(name) \
     static std::string StaticClassName() { \

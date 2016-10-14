@@ -9,6 +9,8 @@ namespace FishEngine
     {
     public:
         InjectClassName(BoxCollider);
+
+        BoxCollider() = default;
         BoxCollider(const Vector3& center,
                     const Vector3& size);
         
@@ -16,8 +18,8 @@ namespace FishEngine
         
     private:
         friend class FishEditor::EditorGUI;
-        Vector3 m_center;
-        Vector3 m_size;
+        Vector3 m_center{0, 0, 0};
+        Vector3 m_size{1, 1, 1};
         
         virtual void CreatePhysicsShape() override;
     };

@@ -168,7 +168,7 @@
     <ClInclude Include="..\..\source\RenderSettings.hpp" />
     <ClInclude Include="..\..\source\RenderSystem.hpp" />
     <ClInclude Include="..\..\source\RenderTexture.hpp" />
-    <ClInclude Include="..\..\source\rigidbody.hpp" />
+    <ClInclude Include="..\..\source\Rigidbody.hpp" />
     <ClInclude Include="..\..\source\Scene.hpp" />
     <ClInclude Include="..\..\source\Screen.hpp" />
     <ClInclude Include="..\..\source\Script.hpp" />

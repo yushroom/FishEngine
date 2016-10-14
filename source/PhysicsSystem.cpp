@@ -60,7 +60,8 @@ Init()
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
     PxProfileZoneManager* profileZoneManager = &PxProfileZoneManager::createProfileZoneManager(gFoundation);
-    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,profileZoneManager);
+    PxTolerancesScale scale;
+    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, scale,true,profileZoneManager);
     
     if(gPhysics->getPvdConnectionManager())
     {
@@ -79,9 +80,6 @@ Init()
     gScene = gPhysics->createScene(sceneDesc);
     
     gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    
-    //PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-    //gScene->addActor(*groundPlane);
 }
 
 void FishEngine::PhysicsSystem::

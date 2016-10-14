@@ -21,19 +21,22 @@ void FishEngine::Rigidbody::
 Start(PxShape* shape)
 {
     const auto& t = transform();
-    //const Vector3 p = t->position();
+    const Vector3 p = t->position();
     const auto& q = t->rotation();
-    //PxTransform localTm(p.x, p.y, p.z, PxQuat::createIdentity());
-    m_physxRigidDynamic = gPhysics->createRigidDynamic(shape->getLocalPose());
-    //shape->setLocalPose(PxTransform(0, 0, 0));
-    //m_physxRigidDynamic->pose
+    m_physxRigidDynamic = gPhysics->createRigidDynamic(PxTransform(p.x, p.y, p.z, PxQuat(q.x, q.y, q.z, q.w)));
     m_physxRigidDynamic->attachShape(*shape);
-    //m_physxRigidDynamic->userData = (void*)(t.get());
+    shape->release();
+}
+
+void FishEngine::Rigidbody::Start()
+{
+    const auto& t = transform();
+    const Vector3 p = t->position();
+    const auto& q = t->rotation();
+    m_physxRigidDynamic->setGlobalPose(PxTransform(p.x, p.y, p.z, PxQuat(q.x, q.y, q.z, q.w)));
     PxRigidBodyExt::updateMassAndInertia(*m_physxRigidDynamic, 10.0f);
     m_physxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !m_useGravity);
     gScene->addActor(*m_physxRigidDynamic);
-    //m_physxShape->release();
-    shape->release();
 }
 
 void FishEngine::Rigidbody::

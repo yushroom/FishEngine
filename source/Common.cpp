@@ -29,7 +29,7 @@ namespace FishEngine
                 ret.push_back(' ');
             ret.push_back(c);
         }
-        ret.push_back(0);
+        //ret.push_back(0);
         return ret;
     }
 

@@ -33,6 +33,7 @@ public:
     }
  
 //private:
+    Camera() = default;
     Camera(float fov, float aspect, float nearClipPlane, float farClipPlane);
 
 //public:
@@ -93,11 +94,11 @@ private:
     friend class FishEditor::EditorGUI;
     friend class FishEditor::FishEditorWindow;
     
-    float m_fieldOfView;
-    float m_orthographicSize = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
-    float m_aspect; // The aspect ratio (width divided by height).
-    float m_farClipPlane;
-    float m_nearClipPlane;
+    float m_fieldOfView         = 60.f;
+    float m_orthographicSize    = 5.f;   // Projection's half-size(vertical) when in orthographic mode.
+    float m_aspect              = 1.0f; // The aspect ratio (width divided by height).
+    float m_farClipPlane        = 0.3f;
+    float m_nearClipPlane       = 100.f;
     Vector4 m_viewport{0, 0, 1, 1};
     mutable bool m_isDirty = true;
     

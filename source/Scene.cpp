@@ -1,4 +1,6 @@
 #include "Scene.hpp"
+#include "GameObject.hpp"
+#include "Camera.hpp"
 #include "RenderSystem.hpp"
 #include "MeshRenderer.hpp"
 #include "CameraController.hpp"
@@ -123,6 +125,50 @@ void Scene::OnDrawGizmos()
         go->OnDrawGizmos();
     }
 }
+
+
+void FishEngine::Scene::Destroy(std::shared_ptr<GameObject> obj, const float t /*= 0.0f*/)
+{
+    m_gameObjectsToBeDestroyed.push_back(obj);
+}
+
+
+void FishEngine::Scene::Destroy(std::shared_ptr<Script> s, const float t /*= 0.0f*/)
+{
+    m_scriptsToBeDestroyed.push_back(s);
+}
+
+
+void FishEngine::Scene::Destroy(std::shared_ptr<Component> c, const float t /*= 0.0f*/)
+{
+    m_componentsToBeDestroyed.push_back(c);
+}
+
+
+void FishEngine::Scene::DestroyImmediate(std::shared_ptr<GameObject> g)
+{
+    m_gameObjects.remove(g);
+    auto t = g->transform();
+    t->SetParent(nullptr);  // remove from parent
+
+    // remove children
+    for (auto& c : t->m_children) {
+        m_gameObjects.remove(c.lock()->gameObject());
+    }
+}
+
+
+void FishEngine::Scene::DestroyImmediate(std::shared_ptr<Component> c)
+{
+    c->gameObject()->RemoveComponent(c);
+}
+
+
+void FishEngine::Scene::DestroyImmediate(std::shared_ptr<Script> s)
+{
+    s->gameObject()->RemoveScript(s);
+}
+
 
 //void Scene::Render()
 //{

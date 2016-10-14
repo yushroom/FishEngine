@@ -64,6 +64,35 @@ namespace FishEngine
     struct Avatar;
     struct Ray;
     struct Bounds;
+
+    typedef std::shared_ptr<Object> PObject;
+    typedef std::shared_ptr<GameObject> PGameObject;
+    typedef std::shared_ptr<Transform> PTransform;
+    typedef std::shared_ptr<Component> PComponent;
+    typedef std::shared_ptr<Behaviour> PBehaviour;
+    typedef std::shared_ptr<Camera> PCamera;
+    typedef std::shared_ptr<Renderer> PRenderer;
+    typedef std::shared_ptr<MeshFilter> PMeshFilter;
+    typedef std::shared_ptr<MeshRenderer> PMeshRenderer;
+    typedef std::shared_ptr<SkinnedMeshRenderer> PSkinnedMeshRenderer;
+    typedef std::shared_ptr<Script> PScript;
+    typedef std::shared_ptr<GameObject> PGameObject;
+    typedef std::shared_ptr<Material> PMaterial;
+    typedef std::shared_ptr<Mesh> PMesh;
+    typedef std::shared_ptr<SimpleMesh> PSimpleMesh;
+    typedef std::shared_ptr<Shader> PShader;
+    typedef std::shared_ptr<Texture> PTexture;
+    typedef std::shared_ptr<App> PApp;
+    typedef std::shared_ptr<Light> PLight;
+    typedef std::shared_ptr<RenderTexture> PRenderTexture;
+    typedef std::shared_ptr<Model> PModel;
+    typedef std::shared_ptr<Rigidbody> PRigidbody;
+    typedef std::shared_ptr<Collider> PCollider;
+    typedef std::shared_ptr<BoxCollider> PBoxCollider;
+    typedef std::shared_ptr<CapsuleCollider> PCapsuleCollider;
+    typedef std::shared_ptr<SphereCollider> PSphereCollider;
+    typedef std::shared_ptr<MeshCollider> PMeshCollider;
+    typedef std::shared_ptr<Avatar> PAvatar;
 }
 
 // hack: inject FishEditor namespace

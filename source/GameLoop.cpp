@@ -1,7 +1,10 @@
 #include "GameLoop.hpp"
 
 #include <thread>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
+#include "Transform.hpp"
 #include "Debug.hpp"
 #include "RenderSystem.hpp"
 #include "Input.hpp"
@@ -9,9 +12,8 @@
 #include "Material.hpp"
 #include "Time.hpp"
 #include "Scene.hpp"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
 #include "App.hpp"
+#include "Camera.hpp"
 
 const uint32_t WIDTH = 800, HEIGHT = 600;
 

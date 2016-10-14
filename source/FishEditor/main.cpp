@@ -522,8 +522,8 @@ public:
         ModelImporter importer2;
         //importer2.setImportNormals(ModelImporterNormals::Calculate);
         importer2.setFileScale(0.01f);
-        //auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
-        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_JUMP00.fbx");
+        //auto jump00Model = importer2.LoadFromFile(chan_roo t_dir + "animations/boblampclean.md5mesh");
+        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_RUN00_F.fbx");
         auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
         auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
         std::string chan_texture_dir = chan_root_dir + "textures/";

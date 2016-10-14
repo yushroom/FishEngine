@@ -18,7 +18,7 @@ namespace FishEngine {
     public:
         RenderTexture() = default;
         
-        static std::shared_ptr<RenderTexture> CreateShadowMap();
+        static PRenderTexture CreateShadowMap();
         
         int width() const {
             return m_width;

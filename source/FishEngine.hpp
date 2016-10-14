@@ -33,6 +33,7 @@ namespace FishEngine
     class GameLoop;
     class Input;
     class Material;
+    class Animator;
     class Mesh;
     class SimpleMesh;
     class Shader;
@@ -75,6 +76,7 @@ namespace FishEngine
     typedef std::shared_ptr<Script> PScript;
     typedef std::shared_ptr<GameObject> PGameObject;
     typedef std::shared_ptr<Material> PMaterial;
+    typedef std::shared_ptr<Animator> PAnimator;
     typedef std::shared_ptr<Mesh> PMesh;
     typedef std::shared_ptr<SimpleMesh> PSimpleMesh;
     typedef std::shared_ptr<Shader> PShader;

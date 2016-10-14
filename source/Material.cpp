@@ -5,8 +5,8 @@
 
 namespace FishEngine
 {
-    std::map<std::string, Material::PMaterial> Material::m_builtinMaterial;
-    Material::PMaterial Material::s_defaultMaterial = nullptr;
+    std::map<std::string, PMaterial> Material::m_builtinMaterial;
+    PMaterial Material::s_defaultMaterial = nullptr;
 
     // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
     template<typename T>
@@ -107,7 +107,7 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& texture)
+    void Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& texture)
     {
         for (auto& u : m_shader->m_uniforms)
         {
@@ -121,7 +121,7 @@ namespace FishEngine
     }
 
 
-    FishEngine::Material::PMaterial FishEngine::Material::builtinMaterial(const std::string& name)
+    PMaterial Material::builtinMaterial(const std::string& name)
     {
         auto shader = Shader::builtinShader(name);
         assert(shader != nullptr);
@@ -132,7 +132,7 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Material::BindTextures(const std::map<std::string, Texture::PTexture>& textures)
+    void Material::BindTextures(const std::map<std::string, PTexture>& textures)
     {
         //m_textures = textures;
         for (auto& pair : textures) {
@@ -141,13 +141,13 @@ namespace FishEngine
     }
 
 
-    Material::PMaterial Material::defaultMaterial()
+    PMaterial Material::defaultMaterial()
     {
         return s_defaultMaterial;
     }
 
 
-    void FishEngine::Material::Init()
+    void Material::Init()
     {
         s_defaultMaterial = CreateMaterial();
         s_defaultMaterial->name() = "DefaultMaterial";

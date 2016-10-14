@@ -57,35 +57,35 @@ std::string processInclude(const std::string& str)
 namespace FishEngine {
 
     std::string Shader::m_shaderVariables;
-    std::map<std::string, Shader::PShader> Shader::m_builtinShaders;
+    std::map<std::string, PShader> Shader::m_builtinShaders;
 
     Shader::Shader(Shader&& s)
     {
         m_program = s.m_program;
     }
 
-    Shader::PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
+    PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
     {
         auto s = std::make_shared<Shader>();
         s->FromString(vs_str, fs_str, gs_str);
         return s;
     }
 
-    Shader::PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
+    PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
     {
         auto s = std::make_shared<Shader>();
         s->FromString(vs_str, fs_str);
         return s;
     }
 
-    Shader::PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
+    PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
     {
         auto s = std::make_shared<Shader>();
         s->FromFile(vs_path, fs_path);
         return s;
     }
 
-    Shader::PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
+    PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
     {
         auto s = std::make_shared<Shader>();
         s->FromFile(vs_path, fs_path, gs_path);
@@ -409,7 +409,7 @@ namespace FishEngine {
         }
     }
 
-    void Shader::BindTextures(const std::map<std::string, Texture::PTexture>& textures)
+    void Shader::BindTextures(const std::map<std::string, PTexture>& textures)
     {
         int texture_id = 0;
         for (auto& u : m_uniforms) {
@@ -465,7 +465,7 @@ namespace FishEngine {
         }
     }
 
-    Shader::PShader Shader::builtinShader(const std::string& name)
+    PShader Shader::builtinShader(const std::string& name)
     {
         auto it = m_builtinShaders.find(name);
         if (it != m_builtinShaders.end()) {

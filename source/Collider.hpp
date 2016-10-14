@@ -22,7 +22,7 @@ namespace FishEngine
         physx::PxShape* physicsShape();
         
     protected:
-        std::shared_ptr<Rigidbody> m_attachedRigidbody;
+        PRigidbody m_attachedRigidbody;
         Bounds  m_bounds;
         float   m_contactOffset;
         bool    m_enabled;

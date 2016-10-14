@@ -2,7 +2,7 @@
 
 using namespace FishEngine;
 
-std::shared_ptr<RenderTexture> FishEngine::RenderTexture::CreateShadowMap()
+PRenderTexture FishEngine::RenderTexture::CreateShadowMap()
 {
     auto rt = std::make_shared<RenderTexture>();
     rt->m_width = 4096;

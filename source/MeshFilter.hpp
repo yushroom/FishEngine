@@ -12,15 +12,15 @@ namespace FishEngine
 
         MeshFilter() = default;
 
-        MeshFilter(std::shared_ptr<Mesh> mesh) : m_mesh(mesh) {
+        MeshFilter(PMesh mesh) : m_mesh(mesh) {
 
         }
 
-        std::shared_ptr<Mesh> mesh() const {
+        PMesh mesh() const {
             return m_mesh;
         }
 
-        void SetMesh(std::shared_ptr<Mesh> mesh) {
+        void SetMesh(PMesh mesh) {
             m_mesh = mesh;
         }
 
@@ -28,7 +28,7 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        std::shared_ptr<Mesh> m_mesh = nullptr;
+        PMesh m_mesh = nullptr;
     };
 }
 

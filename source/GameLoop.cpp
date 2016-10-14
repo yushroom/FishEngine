@@ -20,7 +20,7 @@ const uint32_t WIDTH = 800, HEIGHT = 600;
 namespace FishEngine
 {
     GLFWwindow* GameLoop::m_window = nullptr;
-    std::vector<std::shared_ptr<App>> GameLoop::m_apps;
+    std::vector<PApp> GameLoop::m_apps;
     float GameLoop::m_fixedFrameRate = 30;
 
     static void GlfwErrorCallback(int error, const char* description)

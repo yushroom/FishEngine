@@ -39,12 +39,13 @@ namespace FishEngine {
     
     struct Animation
     {
-        typedef std::shared_ptr<Animation> PAnimation;
         std::string name;
         float duration;
         float ticksPerSecond;
         std::map<std::string, AnimationNode> channels;
     };
+
+    typedef std::shared_ptr<Animation> PAnimation;
     
     struct Avatar
     {

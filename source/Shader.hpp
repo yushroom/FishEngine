@@ -135,8 +135,6 @@ namespace FishEngine
         //Shader& operator=(const Shader&) = delete;
         Shader(Shader&&);
 
-        typedef std::shared_ptr<Shader> PShader;
-
         static void Init();
 
         static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str);

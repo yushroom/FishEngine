@@ -81,8 +81,6 @@ namespace FishEngine
 
         ~Mesh();
 
-        typedef std::shared_ptr<Mesh> PMesh;
-
         void SetVertexUsage(int vertexUsage) {
             BindBuffer(vertexUsage);
         }

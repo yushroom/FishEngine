@@ -14,26 +14,26 @@ namespace FishEngine
 
             Renderer() = default;
 
-        Renderer(std::shared_ptr<Material> material)
+        Renderer(PMaterial material)
         {
             m_materials.push_back(material);
         }
 
         virtual void Render() const = 0;
 
-        void AddMaterial(std::shared_ptr<Material> material) {
+        void AddMaterial(PMaterial material) {
             m_materials.push_back(material);
         }
 
-        std::shared_ptr<Material> material() const {
+        PMaterial material() const {
             return m_materials.size() > 0 ? m_materials[0] : nullptr;
         }
 
-        std::vector<std::shared_ptr<Material>>& materials() {
+        std::vector<PMaterial>& materials() {
             return m_materials;
         }
 
-        void SetMaterial(std::shared_ptr<Material> material) {
+        void SetMaterial(PMaterial material) {
             m_materials.clear();
             m_materials.push_back(material);
         }
@@ -42,7 +42,7 @@ namespace FishEngine
 
     protected:
         friend class FishEditor::EditorGUI;
-        std::vector<std::shared_ptr<Material>> m_materials;
+        std::vector<PMaterial> m_materials;
     };
 }
 

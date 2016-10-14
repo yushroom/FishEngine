@@ -21,11 +21,11 @@ static const std::set<std::string> DummyNodeNames = { "Translation", "PreRotatio
 
 namespace FishEngine {
 
-    std::map<BuiltinModelType, Model::PModel> Model::s_builtinModels;
+    std::map<BuiltinModelType, PModel> Model::s_builtinModels;
 
     void Model::
     AddMesh(
-        Mesh::PMesh& mesh)
+        PMesh& mesh)
     {
         m_meshes.push_back(mesh);
     }
@@ -46,7 +46,7 @@ namespace FishEngine {
     }
     
 
-    Model::PModel Model::
+    PModel Model::
     builtinModel(
         const BuiltinModelType type) {
         return s_builtinModels[type];
@@ -63,7 +63,7 @@ namespace FishEngine {
     }
 
 
-    ModelNode::PModelNode ModelImporter::
+    PModelNode ModelImporter::
     buildModelTree(
         const aiNode*   assimp_node)
     {
@@ -120,7 +120,7 @@ namespace FishEngine {
     }
 
 
-    Mesh::PMesh ModelImporter::
+    PMesh ModelImporter::
     ParseMesh(
         const aiMesh*   assimp_mesh,
         bool            load_uv,
@@ -250,7 +250,7 @@ namespace FishEngine {
     };
 
 
-    std::shared_ptr<Animation>
+    PAnimation
     ParseAnimation(
         const aiAnimation* assimp_animation,
         const float fileScale)
@@ -300,7 +300,7 @@ namespace FishEngine {
     }
 
 
-    std::shared_ptr<Model> ModelImporter::
+    PModel ModelImporter::
     LoadFromFile(
         const std::string&  path)
     {
@@ -384,7 +384,7 @@ namespace FishEngine {
 
     void ModelImporter::
     RemoveDummyNodeFBX(
-        std::shared_ptr<Animation> animation)
+        PAnimation animation)
     {
         for (auto& it : m_nodeTransformations) {
             auto& name = it.first;
@@ -523,7 +523,7 @@ namespace FishEngine {
         }
     }
 
-    std::shared_ptr<GameObject> Model::
+    PGameObject Model::
     CreateGameObject() const
     {
         std::map<std::string, std::weak_ptr<GameObject>> nameToGameObject;
@@ -538,9 +538,9 @@ namespace FishEngine {
     }
 
 
-    std::shared_ptr<GameObject> Model::
+    PGameObject Model::
     ResursivelyCreateGameObject(
-        const ModelNode::PModelNode & node,
+        const PModelNode & node,
         std::map<std::string, std::weak_ptr<GameObject>>& nameToGameObject) const
     {
         auto go = Scene::CreateGameObject(node->name);

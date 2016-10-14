@@ -14,15 +14,13 @@ namespace FishEngine
 
         }
 
-        Material(Shader::PShader shader) {
+        Material(PShader shader) {
             SetShader(shader);
         }
 
-        void SetShader(std::shared_ptr<Shader> shader);
+        void SetShader(PShader shader);
 
-        typedef std::shared_ptr<Material> PMaterial;
-
-        std::shared_ptr<Shader> shader() const {
+        PShader shader() const {
             return m_shader;
         }
 
@@ -41,9 +39,9 @@ namespace FishEngine
         }
 
         // Set a named texture
-        void SetTexture(const std::string& name, std::shared_ptr<Texture>& texture);
+        void SetTexture(const std::string& name, PTexture& texture);
 
-        void BindTextures(const std::map<std::string, Texture::PTexture>& textures);
+        void BindTextures(const std::map<std::string, PTexture>& textures);
 
         //    auto uniforms() const {
         //        return m_uniforms;
@@ -71,8 +69,8 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        std::shared_ptr<Shader> m_shader = nullptr;
-        std::map<std::string, Texture::PTexture> m_textures;
+        PShader m_shader = nullptr;
+        std::map<std::string, PTexture> m_textures;
 
         ShaderUniforms m_uniforms;
 

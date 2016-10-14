@@ -22,8 +22,8 @@ namespace FishEditor
     private:
         friend class FishEditorWindow;
         friend class EditorRenderSystem;
-        static std::shared_ptr<FishEngine::Camera> m_camera;
-        static std::shared_ptr<FishEngine::GameObject> m_cameraGameObject;
+        static FishEngine::PCamera m_camera;
+        static FishEngine::PGameObject m_cameraGameObject;
     };
 }
 

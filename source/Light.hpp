@@ -28,9 +28,9 @@ namespace FishEngine
             m_shadowMap = RenderTexture::CreateShadowMap();
         }
 
-        static std::shared_ptr<Light> Create();
+        static PLight Create();
 
-        static std::list<std::shared_ptr<Light>>& lights() {
+        static std::list<PLight>& lights() {
             return m_lights;
         }
 
@@ -64,9 +64,9 @@ namespace FishEngine
         float m_shadowNormalBias = 0.4f;
         float m_shadowNearPlane = 0.2f;
 
-        std::shared_ptr<RenderTexture> m_shadowMap;
+        PRenderTexture m_shadowMap;
 
-        static std::list<std::shared_ptr<Light>> m_lights;
+        static std::list<PLight> m_lights;
     };
 }
 

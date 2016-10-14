@@ -16,9 +16,7 @@ namespace FishEngine {
         AssetImporter() = default;
         virtual ~AssetImporter() {};
         
-        typedef std::shared_ptr<AssetImporter> PAssetImporter;
-        
-        static PAssetImporter GetAtPath(const std::string& path);
+        //static PAssetImporter GetAtPath(const std::string& path);
         
         static Path assetsRootDirectory() {
             return s_assetsRootDirectory;

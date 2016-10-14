@@ -79,10 +79,10 @@ namespace FishEngine
 
         static void Init();
         
-        static std::shared_ptr<SimpleMesh> s_lineMesh;
-        static std::shared_ptr<SimpleMesh> s_circleMesh;
-        static std::shared_ptr<SimpleMesh> s_boxMesh;
-        //static std::shared_ptr<SimpleMesh> s_wiredSphereMesh;
+        static PSimpleMesh s_lineMesh;
+        static PSimpleMesh s_circleMesh;
+        static PSimpleMesh s_boxMesh;
+        //static PSimpleMesh s_wiredSphereMesh;
     };
 }
 

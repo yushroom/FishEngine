@@ -6,8 +6,8 @@
 
 using namespace FishEngine;
 
-std::shared_ptr<Camera> FishEditor::SceneView::m_camera = nullptr;
-std::shared_ptr<GameObject> FishEditor::SceneView::m_cameraGameObject;
+PCamera FishEditor::SceneView::m_camera = nullptr;
+PGameObject FishEditor::SceneView::m_cameraGameObject;
 
 void FishEditor::SceneView::Init()
 {

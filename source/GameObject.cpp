@@ -21,7 +21,7 @@ namespace FishEngine
         m_name = name;
     }
 
-    GameObject::PGameObject GameObject::Find(const std::string& name)
+    PGameObject GameObject::Find(const std::string& name)
     {
         return Scene::Find(name);
     }

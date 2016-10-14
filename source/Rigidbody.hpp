@@ -22,11 +22,13 @@ namespace FishEngine
         virtual void Start() override;
         virtual void Update() override;
       
-        void setUseGravity(bool value) {
+        void setUseGravity(bool value)
+        {
             m_useGravity = value;
         }
         
-        bool useGravity() const {
+        bool useGravity() const
+        {
             return m_useGravity;
         }
         

@@ -7,31 +7,36 @@ namespace FishEngine
 
     Object::~Object() = default;
 
-    void Object::Destroy(std::shared_ptr<GameObject> obj, const float t /*= 0.0f*/) {
+    void Object::Destroy(PGameObject obj, const float t /*= 0.0f*/) {
         Scene::Destroy(obj, t);
     }
 
 
-    void FishEngine::Object::Destroy(std::shared_ptr<Component> component, float t /*= 0.0f*/)
+    void Object::Destroy(PComponent component, float t /*= 0.0f*/)
     {
         Scene::Destroy(component, t);
     }
 
 
-    void FishEngine::Object::Destroy(std::shared_ptr<Script> script, float t /*= 0.0f*/)
+    void Object::Destroy(PScript script, float t /*= 0.0f*/)
     {
         Scene::Destroy(script, t);
     }
 
 
-    void FishEngine::Object::DestroyImmediate(std::shared_ptr<Script> script)
+    void Object::DestroyImmediate(PScript script)
     {
         Scene::DestroyImmediate(script);
     }
 
-    void FishEngine::Object::DestroyImmediate(std::shared_ptr<Component> component)
+    void Object::DestroyImmediate(PComponent component)
     {
         Scene::DestroyImmediate(component);
+    }
+
+    void Object::DestroyImmediate(PGameObject obj)
+    {
+        Scene::DestroyImmediate(obj);
     }
 
 }

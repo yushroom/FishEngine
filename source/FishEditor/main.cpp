@@ -100,8 +100,8 @@ class VisualizeNormal : public Script
 {
 private:
     bool m_added = false;
-    shared_ptr<MeshRenderer> m_meshRenderer = nullptr;
-    Material::PMaterial m_material = nullptr;
+    PMeshRenderer m_meshRenderer = nullptr;
+    PMaterial m_material = nullptr;
 
 public:
     InjectClassName(VisualizeNormal);
@@ -575,7 +575,7 @@ public:
         bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
         
         
-        map<string, Texture::PTexture> textures;
+        map<string, PTexture> textures;
         //textures["skyTex"] = sky_texture;
         
         auto skyboxGO = Scene::CreateGameObject("SkyBox");
@@ -593,13 +593,13 @@ public:
         
         go = Model::builtinModel(BuiltinModelType::Plane)->CreateGameObject();
         go->transform()->GetChild(0)->gameObject()->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
-        auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(1, 0.1f, 1));
+        auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(10, 0.01f, 10));
         go->AddComponent(boxCollider);
         boxCollider->physicsShape();
         
         auto modelGO = model->CreateGameObject();
         //modelGO->AddComponent<TestGizmos>();
-        auto capsuleCollider = make_shared<CapsuleCollider>(Vector3(0, 0.8f, 0), 1.6f, 0.5f);
+        auto capsuleCollider = make_shared<CapsuleCollider>(Vector3(0, 0.8f, 0), 1.6f, 0.25f);
         modelGO->AddComponent(capsuleCollider);
         modelGO->AddComponent<Rigidbody>();
         capsuleCollider->physicsShape();

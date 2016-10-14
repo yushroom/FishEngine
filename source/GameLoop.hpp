@@ -17,7 +17,7 @@ namespace FishEngine
 
         static void Clean();
 
-        static void AddApp(std::shared_ptr<App> app) {
+        static void AddApp(PApp app) {
             m_apps.push_back(app);
         }
 
@@ -27,7 +27,7 @@ namespace FishEngine
 
     private:
         static GLFWwindow* m_window;
-        static std::vector<std::shared_ptr<App>> m_apps;
+        static std::vector<PApp> m_apps;
 
         static float m_fixedFrameRate;
 

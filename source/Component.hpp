@@ -17,7 +17,7 @@ namespace FishEngine
         virtual void OnDrawGizmos() {}
 
         // The game object this component is attached to. A component is always attached to a game object.
-        std::shared_ptr<GameObject> gameObject() const { return m_gameObject.lock(); }
+        PGameObject gameObject() const { return m_gameObject.lock(); }
 
         // The tag of this game object.
         std::string tag() const;
@@ -26,19 +26,20 @@ namespace FishEngine
         virtual std::string name() const override;
 
         // The Transform attached to this GameObject (null if there is none attached).
-        std::shared_ptr<Transform> transform() const;
+        PTransform transform() const;
 
         //virtual void Init() {}
         virtual void Start() {}
         virtual void Update() {}
 
-        static std::shared_ptr<Component> CreateComponent(const std::string& componentClassName);
+        //static PComponent CreateComponent(const std::string& componentClassName);
 
         //protected:
     private:
         friend class GameObject;
         friend class Scene;
         friend class FishEditor::SceneView;
+
         std::weak_ptr<GameObject> m_gameObject;
 
         friend class boost::serialization::access;

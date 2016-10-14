@@ -16,8 +16,6 @@ namespace FishEngine
         void operator=(const Texture&) = delete;
         virtual ~Texture();
 
-        typedef std::shared_ptr<Texture> PTexture;
-
         //static Texture& GetSimpleTexutreCubeMap();
 
         static PTexture CreateFromFile(const std::string& path);

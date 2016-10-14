@@ -19,12 +19,13 @@ namespace FishEngine
     public:
         InjectClassName(Camera)
 
-            static std::shared_ptr<Camera>
-            Create(float fov,
-                float aspect,
-                float nearClipPlane,
-                float farClipPlane,
-                CameraType type = CameraType::Game)
+        static PCamera
+        Create(
+            float fov,
+            float aspect,
+            float nearClipPlane,
+            float farClipPlane,
+            CameraType type = CameraType::Game)
         {
             auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
             camera->m_cameraType = type;
@@ -85,9 +86,9 @@ namespace FishEngine
 
         // TODO
         // The first enabled camera tagged "MainCamera" (Read Only).
-        static std::shared_ptr<Camera> main();
+        static PCamera main();
 
-        static std::shared_ptr<Camera> mainGameCamera();
+        static PCamera mainGameCamera();
 
     private:
         friend class RenderSystem;
@@ -110,10 +111,10 @@ namespace FishEngine
         // temp
         // https://docs.unity3d.com/Manual/SceneViewNavigation.html
         mutable Vector3 m_focusPoint{ 0, 0, 0 };
-        void FrameSelected(std::shared_ptr<GameObject>& selected);
+        void FrameSelected(PGameObject& selected);
 
-        static std::shared_ptr<Camera> m_mainCamera;
-        static std::vector<std::shared_ptr<Camera>> m_allCameras;
+        static PCamera m_mainCamera;
+        static std::vector<PCamera> m_allCameras;
 
         friend class boost::serialization::access;
         template<class Archive>

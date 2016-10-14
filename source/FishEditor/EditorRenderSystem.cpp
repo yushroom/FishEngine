@@ -62,7 +62,7 @@ namespace FishEditor
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-        glEnable(GL_LINE_SMOOTH);
+        //glEnable(GL_LINE_SMOOTH);
     }
 
     void EditorRenderSystem::Render()
@@ -76,7 +76,7 @@ namespace FishEditor
         Pipeline::perFrameUniformData.MATRIX_V = view;
         Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
         Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
-        Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::mainGameCamera()->transform()->position();
+        Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::main()->transform()->position();
         Pipeline::BindPerFrameUniforms();
 
         Vector4 lightDir(0, 0, 0, 0);
@@ -199,7 +199,7 @@ namespace FishEditor
 
         if (m_showShadowMap) {
             auto& l = Light::lights().front();
-            std::map<std::string, Texture::PTexture> textures;
+            std::map<std::string, PTexture> textures;
             textures["screenTexture"] = l->m_shadowMap;
             glViewport(200, 200, 400, 400);
             auto m = Material::builtinMaterial("ScreenTexture");

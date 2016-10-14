@@ -29,6 +29,7 @@
 #include <Pipeline.hpp>
 #include <SkinnedMeshRenderer.hpp>
 #include <Camera.hpp>
+#include <Component_gen.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -51,9 +52,9 @@ namespace FishEditor
     bool    EditorGUI::m_showAssectSelectionDialogBox = false;
 
     std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
-    Material::PMaterial sceneGizmoMaterial = nullptr;
-    Mesh::PMesh cubeMesh = nullptr;
-    Mesh::PMesh coneMesh = nullptr;
+    PMaterial sceneGizmoMaterial = nullptr;
+    PMesh cubeMesh = nullptr;
+    PMesh coneMesh = nullptr;
 
     void EditorGUI::Init()
     {
@@ -273,26 +274,33 @@ namespace FishEditor
         // Hierarchy view
         //ImGui::BeginDock("Hierarchy");
         ImGui::Begin("Hierarchy");
-        if (ImGui::Button("Create")) {
+        if (ImGui::Button("Create"))
+        {
             s_isAnyItemClicked = true;
             auto go = Scene::CreateGameObject("GameObject");
-            if (Selection::selectedGameObjectInHierarchy() != nullptr) {
+            if (Selection::selectedGameObjectInHierarchy() != nullptr)
+            {
                 go->transform()->SetParent(Selection::selectedGameObjectInHierarchy()->transform());
             }
         }
 
-        if (selectedGO != nullptr) {
-            ImGui::SameLine();
-            if (ImGui::Button("Destroy")) {
-                s_isAnyItemClicked = true;
-                Object::Destroy(selectedGO);
-                //Selection::setActiveGameObject(nullptr);
-            }
-        }
+        //if (selectedGO != nullptr)
+        //{
+        //    ImGui::SameLine();
+        //    if (ImGui::Button("Destroy"))
+        //    {
+        //        s_isAnyItemClicked = true;
+        //        Object::DestroyImmediate(selectedGO);
+        //        Selection::setActiveGameObject(nullptr);
+        //    }
+        //}
+
         m_idCount = 0;
         ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
-        for (auto& go : Scene::m_gameObjects) {
-            if (go->transform()->parent() == nullptr) {
+        for (auto& go : Scene::m_gameObjects)
+        {
+            if (go->transform()->parent() == nullptr)
+            {
                 HierarchyItem(go);
             }
         }
@@ -366,7 +374,6 @@ namespace FishEditor
         //};
 
         std::shared_ptr<Component> componentToBeDestroyed = nullptr;
-
         for (auto c : selectedGO->m_components)
         {
             ImGui::PushID(local_id++);
@@ -392,7 +399,6 @@ namespace FishEditor
 
 
         std::shared_ptr<Script> scriptToBeDestroyed = nullptr;
-
         for (auto s : selectedGO->m_scripts)
         {
             ImGui::PushID(local_id++);
@@ -417,15 +423,58 @@ namespace FishEditor
             Object::DestroyImmediate(scriptToBeDestroyed);
         }
 
+        /************************************************************************/
+        /* Add Component                                                        */
+        /************************************************************************/
         if (selectedGO != nullptr)
         {
             if (EditorGUI::Button("Add Component"))
             {
-                auto comp = Component::CreateComponent("Camera");
-                selectedGO->AddComponent(comp);
+                ImGui::OpenPopup("AddComponent");
+                //auto comp = Component::CreateComponent("Camera");
+                //selectedGO->AddComponent(comp);
+            }
+
+            static const char* names[] = {
+                "Camera", "Animator", "MeshFilter", "MeshRenderer", "Rigidbody", "SkinnedMeshRenderer",
+                "BoxCollider", "CapsuleCollider", "SphereCollider", "SphereCollider",
+            };
+
+            bool addComponentFailed = false;
+            static const char* failedComponentName = nullptr;
+            if (ImGui::BeginPopup("AddComponent"))
+            {
+                ImGui::Text("Components");
+                ImGui::Separator();
+                for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+                {
+                    if (ImGui::Selectable(names[i]))
+                    {
+                        //auto comp = Component::CreateComponent(names[i]);
+                        //selectedGO->AddComponent(comp);
+                        if (nullptr == AddComponentToGameObject(names[i], selectedGO))
+                        {
+                            //ImGui::OpenPopup("SameComponentWarning");
+                            failedComponentName = names[i];
+                            addComponentFailed = true;
+                            break;
+                        }
+                    }
+                }
+                ImGui::EndPopup();
+            }
+
+            if (addComponentFailed)
+                ImGui::OpenPopup("SameComponentWarning");
+            if (ImGui::BeginPopupModal("SameComponentWarning", nullptr,
+                ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
+            {
+                ImGui::Text("The Component %s can't be added \n because %s already contains the same component.", failedComponentName, selectedGO->name().c_str());
+                if (ImGui::Button("Cancel"))
+                    ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
             }
         }
-
 
         //ImGui::EndDock(); // Inspector Editor
         ImGui::End();
@@ -789,8 +838,10 @@ namespace FishEditor
     template<>
     void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& animator)
     {
-        int channels = (int)animator->m_animation->channels.size();
-        Int("Channel count", channels);
+        if (animator->m_animation != nullptr) {
+            int channels = (int)animator->m_animation->channels.size();
+            Int("Channel count", channels);
+        }
         if (animator->m_playing) {
             if (ImGui::Button("Stop")) {
                 animator->Stop();
@@ -818,7 +869,7 @@ namespace FishEditor
         if (ImGui::Button("Change")) {
             ImGui::OpenPopup("Select ...");
         }
-        EditorGUI::SelectMeshDialogBox([&meshFilter](Mesh::PMesh mesh)->void {
+        EditorGUI::SelectMeshDialogBox([&meshFilter](PMesh mesh)->void {
             meshFilter->SetMesh(mesh);
         });
         //ImGui::SameLine();
@@ -947,14 +998,14 @@ namespace FishEditor
             OnInspectorGUI(std::static_pointer_cast<FishEngine::Transform>(component));
         }
         Case(Camera)
-            Case(Animator)
-            Case(MeshFilter)
-            Case(MeshRenderer)
-            Case(BoxCollider)
-            Case(SphereCollider)
-            Case(CapsuleCollider)
-            Case(Rigidbody)
-            Case(SkinnedMeshRenderer)
+        Case(Animator)
+        Case(MeshFilter)
+        Case(MeshRenderer)
+        Case(BoxCollider)
+        Case(SphereCollider)
+        Case(CapsuleCollider)
+        Case(Rigidbody)
+        Case(SkinnedMeshRenderer)
 #undef Case
     }
 }

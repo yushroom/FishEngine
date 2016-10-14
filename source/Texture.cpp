@@ -216,7 +216,7 @@ namespace FishEngine
         return t;
     }
 
-    FishEngine::Texture::PTexture FishEngine::Texture::CreateFromFile(const std::string& path)
+    PTexture Texture::CreateFromFile(const std::string& path)
     {
         auto t = std::make_shared<Texture>();
         t->m_name = getFileNameWithoutExtension(path);

@@ -143,6 +143,7 @@
     <ClInclude Include="..\..\source\Color.hpp" />
     <ClInclude Include="..\..\source\Common.hpp" />
     <ClInclude Include="..\..\source\Component.hpp" />
+    <ClInclude Include="..\..\source\Component_gen.hpp" />
     <ClInclude Include="..\..\source\Debug.hpp" />
     <ClInclude Include="..\..\source\FishEngine.hpp" />
     <ClInclude Include="..\..\source\GameLoop.hpp" />
@@ -198,6 +199,7 @@
     <ClCompile Include="..\..\source\Color.cpp" />
     <ClCompile Include="..\..\source\Common.cpp" />
     <ClCompile Include="..\..\source\Component.cpp" />
+    <ClCompile Include="..\..\source\Component_gen.cpp" />
     <ClCompile Include="..\..\source\Debug.cpp" />
     <ClCompile Include="..\..\source\GameLoop.cpp" />
     <ClCompile Include="..\..\source\GameObject.cpp" />

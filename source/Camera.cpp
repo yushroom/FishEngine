@@ -6,8 +6,8 @@
 
 namespace FishEngine
 {
-    std::shared_ptr<Camera> Camera::m_mainCamera = nullptr;
-    std::vector<std::shared_ptr<Camera>> Camera::m_allCameras;
+    PCamera Camera::m_mainCamera = nullptr;
+    std::vector<PCamera> Camera::m_allCameras;
 
     Camera::Camera(float fov, float aspect, float zNear, float zFar)
         : m_fieldOfView(fov), m_aspect(aspect), m_nearClipPlane(zNear), m_farClipPlane(zFar)

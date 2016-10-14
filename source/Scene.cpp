@@ -12,15 +12,15 @@
 
 namespace FishEngine
 {
-    std::list<std::shared_ptr<GameObject>>      Scene::m_gameObjects;
-    std::vector<std::shared_ptr<GameObject>>    Scene::m_gameObjectsToBeDestroyed;
-    std::vector<std::shared_ptr<Script>>        Scene::m_scriptsToBeDestroyed;
-    std::vector<std::shared_ptr<Component>>     Scene::m_componentsToBeDestroyed;
+    std::list<PGameObject>      Scene::m_gameObjects;
+    std::vector<PGameObject>    Scene::m_gameObjectsToBeDestroyed;
+    std::vector<PScript>        Scene::m_scriptsToBeDestroyed;
+    std::vector<PComponent>     Scene::m_componentsToBeDestroyed;
 
-    //std::shared_ptr<GameObject> Scene::m_activeGameObject = nullptr;
+    //PGameObject> Scene::m_activeGameObject = nullptr;
     //GameObject* Scene::m_activeGameObject = nullptr;
 
-    std::shared_ptr<GameObject> FishEngine::Scene::CreateGameObject(const std::string& name)
+    PGameObject FishEngine::Scene::CreateGameObject(const std::string& name)
     {
         auto go = std::make_shared<GameObject>(name);
         go->transform()->m_gameObject = go;
@@ -53,14 +53,7 @@ namespace FishEngine
 
         // Destroy gameobjcets
         for (auto& g : m_gameObjectsToBeDestroyed) {
-            m_gameObjects.remove(g);
-            auto t = g->transform();
-            t->SetParent(nullptr);  // remove from parent
-
-            // remove children
-            for (auto& c : t->m_children) {
-                m_gameObjects.remove(c.lock()->gameObject());
-            }
+            DestroyImmediate(g);
         }
         m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, gameobjects should be destroyed automatically.
 
@@ -70,7 +63,7 @@ namespace FishEngine
         }
     }
 
-    void Scene::RenderShadow(std::shared_ptr<Light>& light)
+    void Scene::RenderShadow(PLight& light)
     {
         //glCullFace(GL_FRONT);
         auto m = Material::builtinMaterial("ShadowMap");
@@ -91,7 +84,7 @@ namespace FishEngine
             // TODO: remove this line
             if ("SkyBox" == go->name()) continue;
 
-            std::shared_ptr<Mesh> mesh;
+            PMesh mesh;
             if (go->GetComponent<MeshRenderer>()) {
                 auto meshFilter = go->GetComponent<MeshFilter>();
                 if (meshFilter != nullptr) {
@@ -127,44 +120,45 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Scene::Destroy(std::shared_ptr<GameObject> obj, const float t /*= 0.0f*/)
+    void FishEngine::Scene::Destroy(PGameObject obj, const float t /*= 0.0f*/)
     {
         m_gameObjectsToBeDestroyed.push_back(obj);
     }
 
 
-    void FishEngine::Scene::Destroy(std::shared_ptr<Script> s, const float t /*= 0.0f*/)
+    void FishEngine::Scene::Destroy(PScript s, const float t /*= 0.0f*/)
     {
         m_scriptsToBeDestroyed.push_back(s);
     }
 
 
-    void FishEngine::Scene::Destroy(std::shared_ptr<Component> c, const float t /*= 0.0f*/)
+    void FishEngine::Scene::Destroy(PComponent c, const float t /*= 0.0f*/)
     {
         m_componentsToBeDestroyed.push_back(c);
     }
 
 
-    void FishEngine::Scene::DestroyImmediate(std::shared_ptr<GameObject> g)
+    void FishEngine::Scene::DestroyImmediate(PGameObject g)
     {
-        m_gameObjects.remove(g);
         auto t = g->transform();
-        t->SetParent(nullptr);  // remove from parent
-
         // remove children
-        for (auto& c : t->m_children) {
-            m_gameObjects.remove(c.lock()->gameObject());
+        while (!t->m_children.empty())
+        {
+            auto c = t->m_children.back();
+            t->m_children.pop_back();
+            DestroyImmediate(c.lock()->gameObject());
         }
+        t->SetParent(nullptr);  // remove from parent
+        m_gameObjects.remove(g);
     }
 
-
-    void FishEngine::Scene::DestroyImmediate(std::shared_ptr<Component> c)
+    void FishEngine::Scene::DestroyImmediate(PComponent c)
     {
         c->gameObject()->RemoveComponent(c);
     }
 
 
-    void FishEngine::Scene::DestroyImmediate(std::shared_ptr<Script> s)
+    void FishEngine::Scene::DestroyImmediate(PScript s)
     {
         s->gameObject()->RemoveScript(s);
     }
@@ -181,7 +175,7 @@ namespace FishEngine
     //    }
     //}
 
-    GameObject::PGameObject FishEngine::Scene::Find(const std::string& name)
+    PGameObject FishEngine::Scene::Find(const std::string& name)
     {
         for (auto& go : m_gameObjects) {
             if (go->name() == name) {

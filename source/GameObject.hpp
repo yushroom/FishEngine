@@ -43,7 +43,7 @@ namespace FishEngine
             return m_layer;
         }
 
-        void SetLayer(int layer)
+        void setLayer(int layer)
         {
             m_layer = layer;
         }
@@ -54,7 +54,7 @@ namespace FishEngine
             return m_tag;
         }
 
-        void SetTag(const std::string& tag)
+        void setTag(const std::string& tag)
         {
             m_tag = tag;
         }
@@ -70,7 +70,7 @@ namespace FishEngine
         /************************************************************************/
 
         // Returns the component of Type type if the game object has one attached, null if it doesn't.
-        template<typename T>
+        template<typename T, std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
         std::shared_ptr<T> GetComponent() const
         {
             for (auto& comp : m_components)
@@ -83,8 +83,8 @@ namespace FishEngine
             return nullptr;
         }
 
-        template<typename T>
-        std::shared_ptr<T> GetScript() const
+        template<typename T, std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
+        std::shared_ptr<T> GetComponent() const
         {
             for (auto& s : m_scripts)
             {
@@ -112,11 +112,12 @@ namespace FishEngine
         }
 
         template<class T, std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
-        bool AddComponent(std::shared_ptr<T> component)
+        bool AddComponent(std::shared_ptr<T> script)
         {
             static_assert(std::is_base_of<Script, T>::value, "Script only");
-            component->m_gameObject = m_transform->gameObject();
-            m_scripts.push_back(component);
+            script->m_gameObject = m_transform->gameObject();
+            m_scripts.push_back(script);
+            script->Reset();
             return true;
         }
 
@@ -143,6 +144,7 @@ namespace FishEngine
             auto script = std::make_shared<T>();
             script->m_gameObject = m_transform->gameObject();
             m_scripts.push_back(script);
+            script->Reset();
             return script;
         }
 
@@ -175,9 +177,11 @@ namespace FishEngine
         void Start();
         void Update();
         void OnDrawGizmos();
+        void OnDrawGizmosSelected();
 
     private:
         friend class FishEditor::EditorGUI;
+        friend class FishEditor::EditorRenderSystem;
         std::list<PComponent> m_components;
         std::list<PScript> m_scripts;
 

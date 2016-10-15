@@ -124,8 +124,8 @@ namespace FishEditor
             glPolygonOffset(-1.0, -1.0f);
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             auto material = Material::builtinMaterial("SolidColor");
-            material->SetVector4("Color", Vector4(0, 1, 0, 1));
-            material->shader()->Use();
+            material->SetVector4("Color", Vector4(0.375f, 0.388f, 0.463f, 1));
+            
 
             std::list<std::shared_ptr<GameObject>> selections;
             auto go = Selection::selectedGameObjectInHierarchy();
@@ -141,13 +141,40 @@ namespace FishEditor
                     selections.push_back(c.lock()->gameObject());
                 }
                 auto meshFilter = go->GetComponent<MeshFilter>();
-                if (meshFilter != nullptr) {
+                if (meshFilter != nullptr)
+                {
+                    material->shader()->Use();
                     auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
                     Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
                     Pipeline::BindPerDrawUniforms();
                     material->Update();
                     material->shader()->CheckStatus();
                     meshFilter->mesh()->Render();
+                }
+                else
+                {
+                    auto skinnedMeshRenderer = go->GetComponent<SkinnedMeshRenderer>();
+                    if (skinnedMeshRenderer != nullptr)
+                    {
+                        auto mesh = skinnedMeshRenderer->sharedMesh();
+                        auto shader = material->shader();
+                        bool useSkinnedVersion = FishEditorWindow::InPlayMode();
+                        if (useSkinnedVersion)
+                        {
+                            shader = material->shader()->m_skinnedShader;
+                            shader->Use();
+                            shader->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_boneTransformation);
+                        }
+                        else {
+                            shader->Use();
+                        }
+                        auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+                        Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
+                        Pipeline::BindPerDrawUniforms();
+                        material->Update(useSkinnedVersion);
+                        shader->CheckStatus();
+                        mesh->Render();
+                    }
                 }
             }
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -195,6 +222,9 @@ namespace FishEditor
         if (m_isWireFrameMode)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        auto go = Selection::selectedGameObjectInHierarchy();
+        if (go != nullptr)
+            go->OnDrawGizmosSelected();
         Scene::OnDrawGizmos();
 
         if (m_showShadowMap) {

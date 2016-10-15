@@ -18,17 +18,20 @@ namespace FishEditor
 
         static void Clean();
 
-        static void AddApp(std::shared_ptr<FishEngine::App> app) {
+        static void AddApp(FishEngine::PApp app)
+        {
             m_apps.push_back(app);
         }
 
-        static GLFWwindow* window() {
+        static GLFWwindow* window()
+        {
             return m_window;
         }
 
         static void Play();
         static void Stop();
-        static bool InPlayMode() {
+        static bool InPlayMode()
+        {
             return m_inPlayMode;
         }
 
@@ -40,7 +43,7 @@ namespace FishEditor
         //    static float m_pixelScaleY;
 
         static GLFWwindow* m_window;
-        static std::vector<std::shared_ptr<FishEngine::App>> m_apps;
+        static std::vector<FishEngine::PApp> m_apps;
 
         static float m_fixedFrameRate;
         static bool m_inPlayMode;

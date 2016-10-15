@@ -23,17 +23,18 @@ BoxCollider(const Vector3& center,
 void FishEngine::BoxCollider::
 CreatePhysicsShape()
 {
-    if (m_physxShape == nullptr) {
+    //if (m_physxShape == nullptr) {
         const auto& s = transform()->lossyScale();
         m_physxShape = gPhysics->createShape(PxBoxGeometry(s.x*m_size.x*0.5f, s.y*m_size.y*0.5f, s.z*m_size.z*0.5f), *gMaterial);
         m_physxShape->setLocalPose(PxTransform(m_center.x, m_center.y, m_center.z));
-    }
+    //}
 }
 
 
 void FishEngine::BoxCollider::
-OnDrawGizmos()
+OnDrawGizmosSelected()
 {
     //const auto& s = transform()->lossyScale();
+    Gizmos::setColor(Color::green);
     Gizmos::DrawWireCube(m_center, m_size, transform()->localToWorldMatrix());
 }

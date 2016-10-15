@@ -16,7 +16,7 @@ namespace FishEngine
                         const float     height,
                         const float     radius);
         
-        virtual void OnDrawGizmos() override;
+        virtual void OnDrawGizmosSelected() override;
         
     private:
         friend class FishEditor::EditorGUI;

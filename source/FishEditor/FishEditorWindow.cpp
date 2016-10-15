@@ -79,7 +79,7 @@ namespace FishEditor
         Camera::m_mainCamera = SceneView::m_camera;
         EditorRenderSystem::Init();
 
-        PhysicsSystem::Init();
+        //PhysicsSystem::Init();
 
         for (auto& r : m_apps) {
             r->Init();
@@ -131,16 +131,20 @@ namespace FishEditor
         }
     }
 
-    void FishEditorWindow::Play() {
+    void FishEditorWindow::Play()
+    {
+        PhysicsSystem::Init();
         m_inPlayMode = true;
         Camera::m_mainCamera = nullptr;
         Scene::Start();
         //Camera::m_mainCamera = Scene::mainCamera();
     }
 
-    void FishEditorWindow::Stop() {
+    void FishEditorWindow::Stop()
+    {
         m_inPlayMode = false;
         Camera::m_mainCamera = SceneView::m_camera;
+        PhysicsSystem::Clean();
     }
 
 
@@ -152,7 +156,7 @@ namespace FishEditor
 
         EditorRenderSystem::Clean();
 
-        PhysicsSystem::Clean();
+        //PhysicsSystem::Clean();
 
         // Terminate GLFW, clearing any resources allocated by GLFW.
         glfwTerminate();

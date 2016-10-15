@@ -201,7 +201,7 @@ namespace FishEngine {
             mesh->m_boneIndexBuffer.resize(n_vertices);
             mesh->m_boneWeightBuffer.resize(n_vertices);
             mesh->bindposes().resize(assimp_mesh->mNumBones);
-            Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
+            //Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
             for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex)
             {
                 auto& bone = assimp_mesh->mBones[boneIndex];

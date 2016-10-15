@@ -266,7 +266,7 @@ namespace FishEditor
         }
     }
 
-    void FishEditor::EditorGUI::DrawHierarchyWindow()
+    void EditorGUI::DrawHierarchyWindow()
     {
         s_isAnyItemClicked = false;
         //auto selectedGO = Selection::activeGameObject();
@@ -319,7 +319,7 @@ namespace FishEditor
 
     }
 
-    void FishEditor::EditorGUI::DrawInspectorWindow()
+    void EditorGUI::DrawInspectorWindow()
     {
         auto selectedGO = Selection::activeGameObject();
 
@@ -424,7 +424,7 @@ namespace FishEditor
         }
 
         /************************************************************************/
-        /* Add Component                                                        */
+        /*                          Add Component                               */
         /************************************************************************/
         if (selectedGO != nullptr)
         {
@@ -469,7 +469,9 @@ namespace FishEditor
             if (ImGui::BeginPopupModal("SameComponentWarning", nullptr,
                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
             {
-                ImGui::Text("The Component %s can't be added \n because %s already contains the same component.", failedComponentName, selectedGO->name().c_str());
+                ImGui::Text("The Component %s can't be added \n because %s already contains the same component.",
+                    failedComponentName,
+                    selectedGO->name().c_str());
                 if (ImGui::Button("Cancel"))
                     ImGui::CloseCurrentPopup();
                 ImGui::EndPopup();
@@ -481,7 +483,7 @@ namespace FishEditor
     }
 
 
-    void FishEditor::EditorGUI::DrawMainMenu()
+    void EditorGUI::DrawMainMenu()
     {
         static float time_stamp = 0;
 
@@ -518,14 +520,14 @@ namespace FishEditor
         }
     }
 
-    void FishEditor::EditorGUI::DrawToolBar()
+    void EditorGUI::DrawToolBar()
     {
         ImGui::Begin("ToolBar");
         ImGui::Button("Play");
         ImGui::End();
     }
 
-    void FishEditor::EditorGUI::DrawTranslateGizmo()
+    void EditorGUI::DrawTranslateGizmo()
     {
         //Gizmos::DrawLine(Vector3(0, 0, 0), Vector3(1, 0, 0));
 
@@ -607,12 +609,12 @@ namespace FishEditor
     }
 
 
-    void FishEditor::EditorGUI::DrawRotateGizmo()
+    void EditorGUI::DrawRotateGizmo()
     {
     }
 
 
-    void FishEditor::EditorGUI::DrawScaleGizmo()
+    void EditorGUI::DrawScaleGizmo()
     {
 
     }

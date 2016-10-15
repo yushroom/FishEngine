@@ -13,8 +13,11 @@ namespace FishEngine
 
         virtual ~Component() = default;
 
+        // TODO: remove this
         virtual void OnInspectorGUI() {}
+
         virtual void OnDrawGizmos() {}
+        virtual void OnDrawGizmosSelected() {}
 
         // The game object this component is attached to. A component is always attached to a game object.
         PGameObject gameObject() const { return m_gameObject.lock(); }
@@ -41,6 +44,7 @@ namespace FishEngine
         friend class FishEditor::SceneView;
 
         std::weak_ptr<GameObject> m_gameObject;
+        bool m_isStartFunctionCalled = false;
 
         friend class boost::serialization::access;
         template<class Archive>

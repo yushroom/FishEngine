@@ -13,7 +13,7 @@ namespace FishEngine
         SphereCollider(const Vector3& center,
                        const float raduis);
         
-        virtual void OnDrawGizmos() override;
+        virtual void OnDrawGizmosSelected() override;
 
     private:
         friend class FishEditor::EditorGUI;

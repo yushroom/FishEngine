@@ -24,5 +24,5 @@ void FishEditor::SceneView::Init()
 
 void FishEditor::SceneView::Update()
 {
-    m_cameraGameObject->GetScript<CameraController>()->Update();
+    m_cameraGameObject->GetComponent<CameraController>()->Update();
 }

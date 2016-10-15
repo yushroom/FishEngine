@@ -59,5 +59,8 @@
     <ClInclude Include="..\..\source\FishEditor\EditorTime.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\FishEditor\TestScript.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

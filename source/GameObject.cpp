@@ -6,7 +6,7 @@ namespace FishEngine
 {
     //GameObject::PGameObject GameObject::m_root = std::make_shared<GameObject>("Root");
 
-    bool FishEngine::GameObject::activeInHierarchy() const
+    bool GameObject::activeInHierarchy() const
     {
         if (m_activeSelf && m_transform->parent() != nullptr) {
             return m_transform->parent()->gameObject()->activeInHierarchy();
@@ -14,7 +14,7 @@ namespace FishEngine
         return m_activeSelf;
     }
 
-    FishEngine::GameObject::GameObject(const std::string& name) : m_tag("Untagged")
+    GameObject::GameObject(const std::string& name) : m_tag("Untagged")
     {
         //m_transform->m_gameObject = this;
         m_transform = std::make_shared<Transform>();
@@ -26,19 +26,34 @@ namespace FishEngine
         return Scene::Find(name);
     }
 
-    void FishEngine::GameObject::Update()
+    void GameObject::Update()
     {
         m_transform->Update();
-        for (auto& s : m_scripts) {
+        for (auto& s : m_scripts)
+        {
+            if (!s->m_isStartFunctionCalled)
+            {
+                // TODO
+                s->Awake();
+                s->OnEnable();
+                s->Start();
+                s->m_isStartFunctionCalled = true;
+            }
             s->Update();
         }
 
-        for (auto& c : m_components) {
+        for (auto& c : m_components)
+        {
+            if (!c->m_isStartFunctionCalled)
+            {
+                c->Start();
+                c->m_isStartFunctionCalled = true;
+            }
             c->Update();
         }
     }
 
-    void FishEngine::GameObject::OnDrawGizmos()
+    void GameObject::OnDrawGizmos()
     {
         for (auto& c : m_components) {
             c->OnDrawGizmos();
@@ -51,13 +66,32 @@ namespace FishEngine
         }
     }
 
-    void FishEngine::GameObject::Start()
+    void GameObject::OnDrawGizmosSelected()
+    {
+        for (auto& c : m_components) {
+            c->OnDrawGizmosSelected();
+            Gizmos::setColor(Color::green);
+        }
+
+        for (auto& s : m_scripts) {
+            s->OnDrawGizmosSelected();
+            Gizmos::setColor(Color::green);
+        }
+    }
+
+    void GameObject::Start()
     {
         for (auto& c : m_components) {
             c->Start();
+            c->m_isStartFunctionCalled = true;
         }
+
+        // TODO:
         for (auto& s : m_scripts) {
+            s->Awake();
+            s->OnEnable();
             s->Start();
+            s->m_isStartFunctionCalled = true;
         }
     }
 }

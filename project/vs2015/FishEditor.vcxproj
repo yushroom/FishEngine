@@ -143,6 +143,7 @@
     <ClInclude Include="..\..\source\FishEditor\FishEditorWindow.hpp" />
     <ClInclude Include="..\..\source\FishEditor\SceneView.hpp" />
     <ClInclude Include="..\..\source\FishEditor\Selection.hpp" />
+    <ClInclude Include="..\..\source\FishEditor\TestScript.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

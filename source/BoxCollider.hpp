@@ -14,7 +14,7 @@ namespace FishEngine
         BoxCollider(const Vector3& center,
                     const Vector3& size);
         
-        virtual void OnDrawGizmos() override;
+        virtual void OnDrawGizmosSelected() override;
         
     private:
         friend class FishEditor::EditorGUI;

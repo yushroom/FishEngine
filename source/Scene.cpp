@@ -10,6 +10,7 @@
 #include "Pipeline.hpp"
 #include "SkinnedMeshRenderer.hpp"
 
+
 namespace FishEngine
 {
     std::list<PGameObject>      Scene::m_gameObjects;
@@ -34,7 +35,8 @@ namespace FishEngine
 
     void Scene::Start() {
         for (auto& go : m_gameObjects) {
-            go->Start();
+            if (go->activeInHierarchy())
+                go->Start();
         }
     }
 

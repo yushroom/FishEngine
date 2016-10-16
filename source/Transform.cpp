@@ -50,6 +50,20 @@ namespace FishEngine
         m_isDirty = false;
     }
 
+    void Transform::UpdateFast() const
+    {
+        //m_localEulerAngles = m_localRotation.eulerAngles();
+        //m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
+        Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale, m_localToWorldMatrix, m_worldToLocalMatrix);
+        if (!m_parent.expired()) {
+            m_localToWorldMatrix = m_parent.lock()->m_localToWorldMatrix * m_localToWorldMatrix;
+            m_worldToLocalMatrix = m_worldToLocalMatrix * m_parent.lock()->m_worldToLocalMatrix;
+        }
+        //m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
+        //m_rotation = m_localToWorldMatrix.ToRotation();
+        //m_isDirty = false;
+    }
+
     void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
     {
         auto m = Matrix4x4::LookAt(m_localPosition, target, worldUp);

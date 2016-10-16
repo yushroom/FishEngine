@@ -21,7 +21,7 @@ static const std::set<std::string> DummyNodeNames = { "Translation", "PreRotatio
 
 namespace FishEngine {
 
-    std::map<BuiltinModelType, PModel> Model::s_builtinModels;
+    std::map<PrimitiveType, PModel> Model::s_builtinModels;
 
     void Model::
     AddMesh(
@@ -38,17 +38,17 @@ namespace FishEngine {
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif
         ModelImporter importer;
-        s_builtinModels[BuiltinModelType::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
-        s_builtinModels[BuiltinModelType::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
-        s_builtinModels[BuiltinModelType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
-        s_builtinModels[BuiltinModelType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
-        s_builtinModels[BuiltinModelType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
+        s_builtinModels[PrimitiveType::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
+        s_builtinModels[PrimitiveType::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
+        s_builtinModels[PrimitiveType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
+        s_builtinModels[PrimitiveType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
+        s_builtinModels[PrimitiveType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
     }
     
 
     PModel Model::
     builtinModel(
-        const BuiltinModelType type) {
+        const PrimitiveType type) {
         return s_builtinModels[type];
     }
 

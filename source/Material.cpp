@@ -121,6 +121,11 @@ namespace FishEngine
     }
 
 
+    void Material::setMainTexture(PTexture& texture)
+    {
+        SetTexture("_MainTex", texture);
+    }
+
     PMaterial Material::builtinMaterial(const std::string& name)
     {
         auto shader = Shader::builtinShader(name);

@@ -41,6 +41,10 @@ namespace FishEngine
         // Set a named texture
         void SetTexture(const std::string& name, PTexture& texture);
 
+        // The material's texture.
+        // The same as using GetTexture or SetTexture with "_MainTex" name.
+        void setMainTexture(PTexture& texture);
+
         void BindTextures(const std::map<std::string, PTexture>& textures);
 
         //    auto uniforms() const {

@@ -1,6 +1,7 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "Gizmos.hpp"
+#include "ModelImporter.hpp"
 
 namespace FishEngine
 {
@@ -19,6 +20,12 @@ namespace FishEngine
         //m_transform->m_gameObject = this;
         m_transform = std::make_shared<Transform>();
         m_name = name;
+    }
+
+    FishEngine::PGameObject GameObject::CreatePrimitive(PrimitiveType type)
+    {
+        //abort();
+        return Model::builtinModel(type)->CreateGameObject();
     }
 
     PGameObject GameObject::Find(const std::string& name)

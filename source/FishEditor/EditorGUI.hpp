@@ -67,7 +67,9 @@ namespace FishEditor
         static void DrawScaleGizmo();
         static void DrawSceneGizmo();
 
+        // hierarchy
         static bool s_isAnyItemClicked;
+        static bool s_openMenuPopup;
 
         //static void ChangeCameraView();
 

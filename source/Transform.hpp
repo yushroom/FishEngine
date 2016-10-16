@@ -182,6 +182,7 @@ namespace FishEngine
         //}
 
         void Update() const;
+        void UpdateFast() const;
 
         // Rotates the transform so the forward vector points at /target/'s current position.
         void LookAt(const Vector3& target, const Vector3& worldUp = Vector3(0, 1, 0));

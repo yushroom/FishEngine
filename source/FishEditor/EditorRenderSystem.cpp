@@ -236,7 +236,7 @@ namespace FishEditor
             m->shader()->Use();
             m->shader()->BindTextures(textures);
             //Mesh::builtinMesh("quad")->Render();
-            Model::builtinModel(BuiltinModelType::Quad)->mainMesh()->Render();
+            Model::builtinModel(PrimitiveType::Quad)->mainMesh()->Render();
         }
         EditorGUI::Update();
 

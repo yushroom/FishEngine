@@ -92,7 +92,8 @@ namespace FishEngine
     //    glBindVertexArray(0);
     //}
 
-    void Mesh::GenerateBuffer(int vertexUsage) {
+    void Mesh::GenerateBuffer(int vertexUsage)
+    {
         // VAO
         glGenVertexArrays(1, &m_VAO);
 
@@ -124,6 +125,13 @@ namespace FishEngine
         }
 
         if (m_skinned) {
+            //glGenTransformFeedbacks(1, &m_TFBO);
+            ////glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
+            //glGenBuffers(1, &m_animationOutputVBO);
+            //glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputVBO);
+            //glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size() * 4, NULL, GL_DYNAMIC_COPY);
+            ////glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputVAO); //bind as TF output
+
             glGenBuffers(1, &m_boneIndexVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
             glBufferData(GL_ARRAY_BUFFER, m_boneIndexBuffer.size() * 4 * sizeof(int), m_boneIndexBuffer.data(), GL_STATIC_DRAW);
@@ -134,7 +142,6 @@ namespace FishEngine
     }
 
     void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
-        //glGenVertexArrays(1, &m_VAO);
         glBindVertexArray(m_VAO);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);

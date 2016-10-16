@@ -135,6 +135,10 @@ namespace FishEngine
         GLuint m_boneIndexVBO;
         GLuint m_boneWeightVBO;
 
+        GLuint m_TFBO;              // transform feedback buffer object, for Animation
+        GLuint m_animationOutputVAO;
+        GLuint m_animationOutputVBO; // animation output buffer object
+
         //static std::map<std::string, PMesh> m_meshes;
 
         void GenerateBuffer(int vertexUsage);

@@ -261,6 +261,7 @@ namespace FishEngine {
             assert(false);
             break;
         }
+        result.NormalizeSelf();
         return result;
     }
     

@@ -40,16 +40,16 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-    constexpr float translate_gizmo_length = 0.1f;
+    constexpr float translate_gizmo_length              = 0.1f;
+    constexpr float inspector_indent_width              = 4;
 
-    constexpr float inspector_indent_width = 4;
-
-    TransformToolType EditorGUI::m_transformToolType = TransformToolType::Translate;
-    int     EditorGUI::m_idCount = 0;
-    bool    EditorGUI::s_locked = false;
-    int     EditorGUI::m_selectedAxis = -1;
-    bool    EditorGUI::s_isAnyItemClicked = false;
-    bool    EditorGUI::m_showAssectSelectionDialogBox = false;
+    TransformToolType EditorGUI::m_transformToolType    = TransformToolType::Translate;
+    int     EditorGUI::m_idCount                        = 0;
+    bool    EditorGUI::s_locked                         = false;
+    int     EditorGUI::m_selectedAxis                   = -1;
+    bool    EditorGUI::s_isAnyItemClicked               = false;
+    bool    EditorGUI::s_openMenuPopup                  = false;
+    bool    EditorGUI::m_showAssectSelectionDialogBox   = false;
 
     std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
     PMaterial sceneGizmoMaterial = nullptr;
@@ -71,16 +71,21 @@ namespace FishEditor
         ImGuiStyle& style = g.Style;
         style.FrameRounding = 4.f;
         style.WindowRounding = 0.f;
-        //style.Colors[ImGuiCol_Text] = ImVec4(0, 0, 0, 1);
-        //style.Colors[ImGuiCol_Button] = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
-        //style.Colors[ImGuiCol_WindowBg] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+        style.Colors[ImGuiCol_Text]         = ImVec4(0, 0, 0, 1);
+        style.Colors[ImGuiCol_Button]       = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
+        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(190 / 255.f, 224 / 255.f, 262 / 255.f, 1.f);
+        style.Colors[ImGuiCol_ButtonActive] = ImVec4(181 / 255.f, 214 / 255.f, 232 / 255.f, 1.f);
+        style.Colors[ImGuiCol_WindowBg]     = ImVec4(0.8f, 0.8f, 0.8f, 0.6f);
+        style.Colors[ImGuiCol_MenuBarBg]    = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+        style.Colors[ImGuiCol_TitleBg]      = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
+        style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
         style.WindowMinSize = ImVec2(256, 256);
 
         sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
-        cubeMesh = Model::builtinModel(BuiltinModelType::Cube)->mainMesh();
-        coneMesh = Model::builtinModel(BuiltinModelType::Cone)->mainMesh();
+        cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
+        coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
     }
 
     void EditorGUI::Update()
@@ -234,34 +239,61 @@ namespace FishEditor
     {
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
         if (gameObject == Selection::selectedGameObjectInHierarchy())
+        {
             node_flags |= ImGuiTreeNodeFlags_Selected;
+        }
 
         bool is_leaf = (gameObject->transform()->childCount() == 0);
-        if (is_leaf) {// no children
+        if (is_leaf)
+        {
+            // no children
             node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
-        if (!gameObject->activeSelf()) {
+
+        if (!gameObject->activeSelf())
+        {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.20f, 0.20f, 0.20f, 1.00f));
         }
+
         bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
 
-        if (ImGui::IsItemClicked()) {
-            if (!s_locked) {
+        if (ImGui::IsItemClicked())
+        {
+            if (!s_locked)
+            {
                 Selection::setActiveGameObject(gameObject);
             }
             Selection::setSelectedGameObjectInHierarchy(gameObject);
             s_isAnyItemClicked = true;
         }
+
+        if (!s_openMenuPopup && ImGui::IsItemClicked(1))
+        {
+            if (!s_locked)
+            {
+                Selection::setActiveGameObject(gameObject);
+            }
+            Selection::setSelectedGameObjectInHierarchy(gameObject);
+            s_isAnyItemClicked = true;
+            Debug::LogWarning("Right button");
+            ImGui::OpenPopup("HierarchyItem.menu");
+            s_openMenuPopup = true;
+        }
+
+
         // child node
-        if (!is_leaf) {
-            if (node_open) {
+        if (!is_leaf)
+        {
+            if (node_open)
+            {
                 for (auto t : gameObject->transform()->m_children)
                     HierarchyItem(t.lock()->gameObject());
                 ImGui::TreePop();
             }
         }
         m_idCount++;
-        if (!gameObject->activeSelf()) {
+        if (!gameObject->activeSelf())
+        {
             ImGui::PopStyleColor();
         }
     }
@@ -274,6 +306,15 @@ namespace FishEditor
         // Hierarchy view
         //ImGui::BeginDock("Hierarchy");
         ImGui::Begin("Hierarchy");
+        //static ImGuiTextFilter filter;
+        //filter.Draw();
+        static char filterStr[128];
+        if (ImGui::InputText("Filter", filterStr, 127))
+        {
+            Debug::LogWarning("Filter changed");
+        }
+
+
         if (ImGui::Button("Create"))
         {
             s_isAnyItemClicked = true;
@@ -283,17 +324,6 @@ namespace FishEditor
                 go->transform()->SetParent(Selection::selectedGameObjectInHierarchy()->transform());
             }
         }
-
-        //if (selectedGO != nullptr)
-        //{
-        //    ImGui::SameLine();
-        //    if (ImGui::Button("Destroy"))
-        //    {
-        //        s_isAnyItemClicked = true;
-        //        Object::DestroyImmediate(selectedGO);
-        //        Selection::setActiveGameObject(nullptr);
-        //    }
-        //}
 
         m_idCount = 0;
         ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
@@ -306,8 +336,38 @@ namespace FishEditor
         }
         ImGui::PopStyleVar();
 
+        if (s_openMenuPopup)
+        {
+            ImGui::OpenPopup("HierarchyItem.menu");
+            s_openMenuPopup = false;
+        }
+        if (ImGui::BeginPopup("HierarchyItem.menu"))
+        {
+            ImGui::Selectable("Copy");
+            ImGui::Selectable("Paste");
+            ImGui::Separator();
+            ImGui::Selectable("Rename");
+            ImGui::Selectable("Duplicate");
+            if (ImGui::Selectable("Delete") && selectedGO != nullptr)
+            {
+                Object::DestroyImmediate(selectedGO);
+                s_openMenuPopup = false;
+            }
+            ImGui::Separator();
+            ImGui::Selectable("Select Prefab");
+            ImGui::Separator();
+            ImGui::Selectable("Create Empty");
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_Delete))
+        {
+            Debug::LogWarning("delete");
+        }
+
         // TODO: remove this
-        if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow()) {
+        if (!s_isAnyItemClicked && ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringWindow())
+        {
             Selection::setSelectedGameObjectInHierarchy(nullptr);
             if (!s_locked)
                 Selection::setActiveGameObject(nullptr);
@@ -902,7 +962,11 @@ namespace FishEditor
                     ImGui::InputFloat4(u.name.c_str(), material->m_uniforms.vec4s[u.name].data());
                 }
                 else if (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE) {
-                    ImGui::LabelText(u.name.c_str(), "%s", material->m_textures[u.name]->name().c_str());
+                    auto& tex = material->m_textures[u.name];
+                    ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
+                    ImGui::Image((void*)tex->GLTexuture(), ImVec2(64, 64));
+                    ImGui::SameLine();
+                    ImGui::Button("Select");
                 }
             }
             ImGui::Unindent();

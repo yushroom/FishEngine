@@ -5,7 +5,7 @@ in VS_OUT {
     vec2 uv;
 } vs_out;
 
-uniform sampler2D DiffuseMap;
+uniform sampler2D _MainTex;
 
 out vec4 color;
 
@@ -19,5 +19,5 @@ void main()
  //    float NDotL = saturate(dot(L, N));
 	// color.rgb = texture(DiffuseMap, vs_out.uv).rgb * NDotL;
 	// color.a = 1.0f;
-	color = texture(DiffuseMap, vs_out.uv);
+	color = texture(_MainTex, vs_out.uv);
 }

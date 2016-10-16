@@ -8,6 +8,17 @@
 
 namespace FishEngine
 {
+    enum class PrimitiveType
+    {
+        Sphere,
+        Capsule,
+        Cylinder,
+        Cube,
+        Plane,
+        Quad,
+        Cone,
+    };
+
     // Base class for all entities in Unity scenes.
     // http://docs.unity3d.com/ScriptReference/GameObject.html
     class GameObject : public Object
@@ -167,6 +178,9 @@ namespace FishEngine
         /************************************************************************/
         /*                    Static Functions                                  */
         /************************************************************************/
+
+        // Creates a game object with a primitive mesh renderer and appropriate collider.
+        static PGameObject CreatePrimitive(PrimitiveType type);
 
         // Finds a game object by name and returns it.
         static PGameObject Find(const std::string& name);

@@ -28,10 +28,7 @@ namespace FishEngine {
 
     typedef std::shared_ptr<ModelNode> PModelNode;
     
-    enum class BuiltinModelType {
-        Cube, Sphere, Capsule, Cylinder, Plane, Quad, Cone,
-    };
-    
+
     class Model : public Object
     {
     public:
@@ -55,7 +52,7 @@ namespace FishEngine {
         
         static void Init();
         
-        static Model::PModel builtinModel(const BuiltinModelType type);
+        static Model::PModel builtinModel(const PrimitiveType type);
         
     private:
         friend class ModelImporter;
@@ -77,7 +74,7 @@ namespace FishEngine {
         mutable std::weak_ptr<GameObject>   m_rootGameObject; // temp
         //mutable std::vector<std::weak_ptr<SkinnedMeshRenderer>> m_skinnedMeshRenderersToFindLCA;
         
-        static std::map<BuiltinModelType, PModel> s_builtinModels;
+        static std::map<PrimitiveType, PModel> s_builtinModels;
     };
 
     // Vertex normal generation options for ModelImporter.

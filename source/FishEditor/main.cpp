@@ -36,7 +36,7 @@ using namespace FishEditor;
 //        
 //        auto skyboxGO = Scene::CreateGameObject("SkyBox");
 //        skyboxGO->transform()->setLocalScale(20, 20, 20);
-//        auto meshFilter = make_shared<MeshFilter>(Model::builtinModel(BuiltinModelTyep::Sphere)->mainMesh());
+//        auto meshFilter = make_shared<MeshFilter>(GameObject::CreatePrimitive(BuiltinModelTyep::Sphere)->mainMesh());
 //        auto material = Material::builtinMaterial("SkyBox");
 //        material->BindTextures(textures);
 //        auto meshRenderer = make_shared<MeshRenderer>(material);
@@ -44,7 +44,7 @@ using namespace FishEditor;
 //        skyboxGO->AddComponent(meshRenderer);
 //        
 //        //textures.clear();
-//        //textures["diffuseMap"] = head_diffuse;
+//        //textures["_MainTex"] = head_diffuse;
 //        //textures["normalMap"] = head_normalmap;
 //
 ////        auto headGO = Scene::CreateGameObject();
@@ -116,7 +116,7 @@ using namespace FishEditor;
 ////        meshFilter = make_shared<MeshFilter>(plane);
 ////        material = Material::builtinMaterial("Diffuse");
 ////        textures.clear();
-////        textures["diffuseMap"] = checkboard_texture;
+////        textures["_MainTex"] = checkboard_texture;
 ////        material->BindTextures(textures);
 ////        meshRenderer = make_shared<MeshRenderer>(material);
 ////        go->AddComponent(meshFilter);
@@ -174,7 +174,7 @@ public:
         //const std::string chan_dir = models_dir + "UnityChan/";
         const std::string chan_root_dir = root_dir + "../example/UnityChan/assets/";
         
-        auto sphere = Model::builtinModel(BuiltinModelType::Sphere)->mainMesh();
+        auto sphere = Model::builtinModel(PrimitiveType::Sphere)->mainMesh();
         
         ModelImporter importer;
         importer.setFileScale(0.01f);
@@ -220,10 +220,10 @@ public:
         stageMaterial->SetTexture("_AlphaMask", stageMaskTexture);
 #else
         auto stageMaterial = Material::builtinMaterial("Diffuse");
-        stageMaterial->SetTexture("diffuseMap", stageBaseTexture);
+        stageMaterial->setMainTexture(stageBaseTexture);
 #endif
 
-        //Model::builtinModel(BuiltinModelType::Cube)->CreateGameObject();
+        //GameObject::CreatePrimitive(BuiltinModelType::Cube)->CreateGameObject();
         
         auto chanMainShader = make_shared<Shader>();
         chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
@@ -256,7 +256,7 @@ public:
 
         std::shared_ptr<GameObject> go;
         
-        go = Model::builtinModel(BuiltinModelType::Plane)->CreateGameObject();
+        go = GameObject::CreatePrimitive(PrimitiveType::Plane);
         go->transform()->GetChild(0)->gameObject()->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
         auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(10, 0.01f, 10));
         go->AddComponent(boxCollider);
@@ -280,17 +280,17 @@ public:
         material = Material::builtinMaterial("TextureDoubleSided");
         //material = bodyMaterial;
         //material = Material::builtinMaterial("SkinnedMesh");
-        material->SetTexture("DiffuseMap", bodyTexture);
+        material->SetTexture("_MainTex", bodyTexture);
         auto outline_material = Material::builtinMaterial("Outline");
         outline_material->setName("Outline");
         outline_material->SetVector4("_Color", Vector4(1, 1, 1, 1));
-        outline_material->SetTexture("_MainTex", bodyTexture);
+        outline_material->setMainTexture(bodyTexture);
         outline_material->SetFloat("_EdgeThickness", edgeThickness);
 
-        textures["DiffuseMap"] = bodyTexture;
+        textures["_MainTex"] = bodyTexture;
         material->BindTextures(textures);
         material->setName("body");
-        //material->BindTextures("DiffuseMap", )
+        //material->BindTextures("_MainTex", )
         for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK", "hair_accce"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -302,7 +302,7 @@ public:
         }
 
         material = Material::builtinMaterial("Texture");
-        material->SetTexture("DiffuseMap", skinTexture);
+        material->SetTexture("_MainTex", skinTexture);
         material->setName("skin");
         for (auto name : {"skin"}) {
             auto child = FindNamedChild(modelGO, name);
@@ -313,7 +313,7 @@ public:
 
         material = Material::builtinMaterial("Texture");
         material->setName("face");
-        material->SetTexture("DiffuseMap", faceTexture);
+        material->SetTexture("_MainTex", faceTexture);
         for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -323,7 +323,7 @@ public:
         
         material = Material::builtinMaterial("Texture");
         material->setName("hair");
-        material->SetTexture("DiffuseMap", hairTexture);
+        material->SetTexture("_MainTex", hairTexture);
         for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -333,7 +333,7 @@ public:
 
         material = Material::builtinMaterial("Transparent");
         material->setName("eye_L1");
-        material->SetTexture("DiffuseMap", eyeirisLTexture);
+        material->SetTexture("_MainTex", eyeirisLTexture);
         for (auto name : {"eye_L_old"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -343,7 +343,7 @@ public:
         
         material = Material::builtinMaterial("Transparent");
         material->setName("eye_R1");
-        material->SetTexture("DiffuseMap", eyeirisRTexture);
+        material->SetTexture("_MainTex", eyeirisRTexture);
         for (auto name : {"eye_R_old"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -351,7 +351,7 @@ public:
         }
         
         material = Material::builtinMaterial("Transparent");
-        material->SetTexture("DiffuseMap", eyelineTexture);
+        material->SetTexture("_MainTex", eyelineTexture);
         for (auto name : {"BLW_DEF", "EL_DEF"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -360,7 +360,7 @@ public:
         
         material = Material::builtinMaterial("Texture");
         material->setName("eyeline");
-        material->SetTexture("DiffuseMap", eyelineTexture);
+        material->SetTexture("_MainTex", eyelineTexture);
         for (auto name : {"eye_base_old"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -370,7 +370,7 @@ public:
 
         material = Material::builtinMaterial("Transparent");
         material->setName("mat_cheek");
-        material->SetTexture("DiffuseMap", cheekTexture);
+        material->SetTexture("_MainTex", cheekTexture);
         for (auto name : {"cheek"}) {
             auto child = FindNamedChild(modelGO, name);
             assert(child != nullptr);
@@ -402,30 +402,39 @@ public:
     virtual void Init() override
     {
         DefaultScene();
+
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "../../assets/";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+#endif
+        const std::string models_dir = root_dir + "models/";
+        const std::string textures_dir = root_dir + "textures/";
+        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
         
-        auto model = Model::builtinModel(BuiltinModelType::Cube);
-        auto go = model->CreateGameObject();
+        auto material = Material::builtinMaterial("Diffuse");
+        material->setMainTexture(checkboard_texture);
+
+        auto go = GameObject::CreatePrimitive(PrimitiveType::Cube);
         //go->transform()->setLocalEulerAngles(0, 0, 10);
         go->transform()->setPosition(0, -1.0f-0.1f*0.5f, 0);
         go->transform()->setLocalScale(10, 0.1f, 10);
         auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
         go->AddComponent(boxCollider);
-        //boxCollider->physicsShape();
+        auto renderer = go->transform()->children().front().lock()->gameObject()->GetComponent<MeshRenderer>();
+        renderer->SetMaterial(material);
         
-        auto sphereModel = Model::builtinModel(BuiltinModelType::Sphere);
-        auto sphereGO = sphereModel->CreateGameObject();
+        auto sphereGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
         sphereGO->transform()->setPosition(0, 0, 0);
         auto sphereCollider = make_shared<SphereCollider>(Vector3::zero, 0.5f);
         sphereGO->AddComponent(sphereCollider);
         sphereGO->AddComponent<Rigidbody>();
-        //sphereCollider->physicsShape();
-        
-        //auto cubeGO = CreateCube();
         
         auto cameraGO = Camera::mainGameCamera()->gameObject();
         cameraGO->transform()->setLocalPosition(0, 2, -10);
         cameraGO->transform()->setLocalEulerAngles(0, 0, 0);
-        //cameraGO->AddComponent(make_shared<TestGizmos>());
+        auto s = cameraGO->AddComponent<EditorRenderSettings>();
+        s->m_useGammaCorrection = false;
     }
 };
 

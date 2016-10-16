@@ -372,7 +372,7 @@ std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & r
 
 std::shared_ptr<GameObject> CreateCube()
 {
-    auto model = Model::builtinModel(BuiltinModelType::Cube);
+    auto model = Model::builtinModel(PrimitiveType::Cube);
     auto go = model->CreateGameObject();
     auto collider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
     go->AddComponent(collider);

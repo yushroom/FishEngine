@@ -1,7 +1,8 @@
 #include "Material.hpp"
-//#include <imgui/imgui.h>
-#include "Debug.hpp"
+
 #include <cassert>
+#include "Debug.hpp"
+#include "Color.hpp"
 
 namespace FishEngine
 {
@@ -124,6 +125,11 @@ namespace FishEngine
     void Material::setMainTexture(PTexture& texture)
     {
         SetTexture("_MainTex", texture);
+    }
+
+    void Material::setColor(const Color& color)
+    {
+        SetVector4("_Color", Vector4(color.r, color.g, color.b, color.a));
     }
 
     PMaterial Material::builtinMaterial(const std::string& name)

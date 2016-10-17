@@ -1,5 +1,5 @@
-#ifndef Model_hpp
-#define Model_hpp
+#ifndef Mesh_hpp
+#define Mesh_hpp
 
 #include "Object.hpp"
 #include "GLEnvironment.hpp"
@@ -166,4 +166,4 @@ namespace FishEngine
     };
 }
 
-#endif /* Model_hpp */
+#endif /* Mesh_hpp */

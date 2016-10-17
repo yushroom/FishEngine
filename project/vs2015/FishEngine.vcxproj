@@ -175,6 +175,7 @@
     <ClInclude Include="..\..\source\Script.hpp" />
     <ClInclude Include="..\..\source\Shader.hpp" />
     <ClInclude Include="..\..\source\SkinnedMeshRenderer.hpp" />
+    <ClInclude Include="..\..\source\Skybox.hpp" />
     <ClInclude Include="..\..\source\SphereCollider.hpp" />
     <ClInclude Include="..\..\source\Texture.hpp" />
     <ClInclude Include="..\..\source\Time.hpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\..\source\Screen.cpp" />
     <ClCompile Include="..\..\source\Shader.cpp" />
     <ClCompile Include="..\..\source\SkinnedMeshRenderer.cpp" />
+    <ClCompile Include="..\..\source\Skybox.cpp" />
     <ClCompile Include="..\..\source\SphereCollider.cpp" />
     <ClCompile Include="..\..\source\Texture.cpp" />
     <ClCompile Include="..\..\source\Time.cpp" />

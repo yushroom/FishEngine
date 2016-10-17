@@ -45,6 +45,10 @@ namespace FishEngine
         // The same as using GetTexture or SetTexture with "_MainTex" name.
         void setMainTexture(PTexture& texture);
 
+        // The main material's color.
+        // The same as using GetColor or SetColor with "_Color" name.
+        void setColor(const Color& color);
+
         void BindTextures(const std::map<std::string, PTexture>& textures);
 
         //    auto uniforms() const {

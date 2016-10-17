@@ -16,9 +16,9 @@ namespace FishEngine
     class Transform : public Component
     {
     public:
-        InjectClassName(Transform)
+        InjectClassName(Transform);
 
-            Transform();
+        Transform();
 
         ~Transform();
 

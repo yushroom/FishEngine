@@ -1,3 +1,5 @@
+#include <CG.inc>
+
 layout (location = PositionIndex) in vec3 position;
 layout (location = UVIndex) in vec2 uv;
 

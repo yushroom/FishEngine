@@ -216,7 +216,7 @@ namespace FishEngine
 
         friend class RenderSystem;
 
-        static std::string m_shaderVariables;
+        //static std::string m_shaderVariables;
         static std::map<std::string, PShader> m_builtinShaders;
     };
 }

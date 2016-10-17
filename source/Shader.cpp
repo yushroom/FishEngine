@@ -21,13 +21,13 @@ static const std::string include_dir = "/Users/yushroom/program/graphics/FishEng
 
 std::string readFile(const std::string& path)
 {
-    std::ifstream stream(path);
-    if (!stream.is_open()) {
+    std::ifstream fin(path);
+    if (!fin.is_open()) {
         FishEngine::Debug::LogError("Can not open shader header file: %s", path.c_str());
-        abort();
+        throw exception();
     }
     std::stringstream sstream;
-    sstream << stream.rdbuf();
+    sstream << fin.rdbuf();
     return sstream.str();
 }
 
@@ -45,6 +45,7 @@ std::string AddLineNumber(const std::string& str)
         pos = str.find('\n', last_pos);
         line_number++;
     };
+    ss << str.substr(last_pos);
     return ss.str();
 };
 
@@ -89,7 +90,7 @@ GLuint compileShader(GLenum shader_type,
         glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog.data());
         //std::cout << string(&infoLog[0]) << endl;
         FishEngine::Debug::LogError("%s", infoLog.data());
-        abort();
+        throw exception();
     }
     return shader;
 };
@@ -97,13 +98,12 @@ GLuint compileShader(GLenum shader_type,
 GLuint FishEngine::Shader::LoadShader(GLenum shaderType, const std::string& filePath)
 {
     auto shaderStr = readFile(filePath);
-    shaderStr = "#version 410\n" + m_shaderVariables + "\n" + processInclude(shaderStr);
+    shaderStr = "#version 410\n" + processInclude(shaderStr);
     return compileShader(shaderType, shaderStr);
 }
 
 namespace FishEngine {
 
-    std::string Shader::m_shaderVariables;
     std::map<std::string, PShader> Shader::m_builtinShaders;
 
     Shader::Shader(Shader&& s)
@@ -266,9 +266,9 @@ namespace FishEngine {
             || (vs_string.find("AppDataTan.inc") != std::string::npos);
 
         extractSettings(vs_string);
-        auto parsed_vs = m_shaderVariables + "\n" + processInclude(vs_string);
+        auto parsed_vs = processInclude(vs_string);
         extractSettings(fs_string);
-        auto parsed_fs = m_shaderVariables + "\n" + processInclude(fs_string);
+        auto parsed_fs = processInclude(fs_string);
 
         m_cullface = ToEnum<Cullface>(settings["Cull"]);
         m_ZWrite = settings["ZWrite"] == "On";
@@ -281,12 +281,12 @@ namespace FishEngine {
 
         // gs
         if (use_gs) {
-            gs = compileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + m_shaderVariables + gs_string);
+            gs = compileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + gs_string);
         }
         if (use_ts) {
             if (!tcs_string.empty())
-                tcs = compileShader(GL_TESS_CONTROL_SHADER, m_shaderVariables + tcs_string);
-            tes = compileShader(GL_TESS_EVALUATION_SHADER, m_shaderVariables + tes_string);
+                tcs = compileShader(GL_TESS_CONTROL_SHADER, tcs_string);
+            tes = compileShader(GL_TESS_EVALUATION_SHADER, tes_string);
         }
 
         m_program = LinkShader(vs, tcs, tes, gs, fs);
@@ -583,7 +583,6 @@ namespace FishEngine {
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif
-        m_shaderVariables = readFile(root_dir + "include/ShaderVariables.inc") + "\n";
         Debug::Log("Compile shader: VisualizeNormal");
         m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir + "VisualizeNormal.vert", root_dir + "VisualizeNormal.frag", root_dir + "VisualizeNormal.geom");
         for (auto& n : { "PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {

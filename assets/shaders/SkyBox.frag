@@ -1,5 +1,7 @@
 in vec3 uv;
-layout(location = PositionIndex) out vec4 color;
+
+out vec4 color;
+
 uniform float intensity;
 uniform samplerCube skyTex;
 void main()

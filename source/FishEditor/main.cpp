@@ -31,48 +31,19 @@ using namespace FishEditor;
 //        //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
 //        //auto head_normalmap = Texture::CreateFromFile(models_dir + "head/NormalMap_RG16f_1024_mipmaps.dds");
 //        
-//        map<string, Texture::PTexture> textures;
+//        map<string, PTexture> textures;
 //        textures["skyTex"] = sky_texture;
 //        
 //        auto skyboxGO = Scene::CreateGameObject("SkyBox");
 //        skyboxGO->transform()->setLocalScale(20, 20, 20);
-//        auto meshFilter = make_shared<MeshFilter>(GameObject::CreatePrimitive(BuiltinModelTyep::Sphere)->mainMesh());
+//        auto meshFilter = make_shared<MeshFilter>(Model::builtinModel(PrimitiveType::Sphere) ->mainMesh());
 //        auto material = Material::builtinMaterial("SkyBox");
 //        material->BindTextures(textures);
 //        auto meshRenderer = make_shared<MeshRenderer>(material);
 //        skyboxGO->AddComponent(meshFilter);
 //        skyboxGO->AddComponent(meshRenderer);
 //        
-//        //textures.clear();
-//        //textures["_MainTex"] = head_diffuse;
-//        //textures["normalMap"] = head_normalmap;
-//
-////        auto headGO = Scene::CreateGameObject();
-////        headGO->transform()->setScale(10, 10, 10);
-////        auto meshFilter1 = make_shared<MeshFilter>(headModel);
-////        auto material1 = Material::builtinMaterial("NormalMap");
-////        material1->BindTextures(textures);
-////        auto meshRenderer1 = make_shared<MeshRenderer>(material1);
-////        headGO->AddComponent(meshFilter1);
-////        headGO->AddComponent(meshRenderer1);
-////        headGO->AddScript(make_shared<VisualizeNormal>());
-////        //headGO->AddScript(make_shared<DeactiveSelf>());
 //        textures["AmbientCubemap"] = sky_texture;
-//        
-////        auto go = Scene::CreateGameObject("Sphere");
-////        //go->transform()->setScale(20, 20, 20);
-////        meshFilter = make_shared<MeshFilter>(mitsuba);
-////        material = Material::builtinMaterial("PBR");
-////        material->SetVector3("albedo", Vector3(0.972f, 0.960f, 0.915f));
-////        material->BindTextures(textures);
-////        meshRenderer = make_shared<MeshRenderer>(material);
-////        go->AddComponent(meshFilter);
-////        go->AddComponent(meshRenderer);
-////        go->AddScript(make_shared<VisualizeNormal>());
-//        //go->AddScript(make_shared<DisplayMatrix>());
-//        //go->AddScript(make_shared<DeactiveSelf>());
-//        //go->SetActive(false);
-//        //Scene::SelectGameObject(go.get());
 //
 //        
 //        auto group = Scene::CreateGameObject("Group");
@@ -95,7 +66,7 @@ using namespace FishEditor;
 //            auto meshRenderer = make_shared<MeshRenderer>(material);
 //            go->AddComponent(meshFilter);
 //            go->AddComponent(meshRenderer);
-//            //go->AddScript(make_shared<DisplayMatrix>());
+//            //go->AddComponent(make_shared<DisplayMatrix>());
 //            //go->transform()->SetParent(parent->transform());
 //            return go;
 //        };
@@ -121,20 +92,20 @@ using namespace FishEditor;
 ////        meshRenderer = make_shared<MeshRenderer>(material);
 ////        go->AddComponent(meshFilter);
 ////        go->AddComponent(meshRenderer);
-//        //go->AddScript(make_shared<VisualizeNormal>());
-//        //go->AddScript(make_shared<DisplayMatrix>());
+//        //go->AddComponent(make_shared<VisualizeNormal>());
+//        //go->AddComponent(make_shared<DisplayMatrix>());
 //        
-//        auto cameraGO = Scene::mainCamera()->gameObject();
+//        auto cameraGO = Camera::mainGameCamera()->gameObject();
 //        cameraGO->transform()->setPosition(6, 6, -12);
 //        cameraGO->transform()->LookAt(6, 6, 0);
 //        //cameraGO->transform()->setPosition(0, 0, -5);
 //        //cameraGO->transform()->LookAt(0, 0, 0);
 //        //cameraGO->transform()->LookAt(0, 0, 0);
-//        cameraGO->AddScript(make_shared<ShowFPS>());
-//        cameraGO->AddScript(make_shared<TakeScreenShot>());
-//        //cameraGO->AddScript(make_shared<RenderSettings>());
-//        //cameraGO->AddScript(make_shared<DisplayMatrix>());
-//        cameraGO->AddScript(make_shared<EditorRenderSettings>());
+//        cameraGO->AddComponent<ShowFPS>();
+//        cameraGO->AddComponent<TakeScreenShot>();
+//        //cameraGO->AddComponent(make_shared<RenderSettings>());
+//        //cameraGO->AddComponent(make_shared<DisplayMatrix>());
+//        cameraGO->AddComponent<EditorRenderSettings>();
 //        Selection::setActiveGameObject(cameraGO);
 //
 //        auto go = Scene::CreateGameObject("Directional Light");
@@ -143,15 +114,7 @@ using namespace FishEditor;
 //        //go->transform()->setPosition(6, 5, -10);
 //        //go->transform()->LookAt(0, 0, 0);
 //        go->AddComponent(Light::Create());
-//        go->AddScript(make_shared<Rotator>());
-//        
-//        
-//        //auto child0 = Scene::CreateGameObject("child0");
-//        //child0->transform()->SetParent(go->transform());
-//        //auto child1 = Scene::CreateGameObject("child1");
-//        //child1->transform()->SetParent(go->transform());
-//        //auto child3 = Scene::CreateGameObject("child3");
-//        //child3->transform()->SetParent(child0->transform());
+//        go->AddComponent<Rotator>();
 //    }
 //};
 
@@ -421,7 +384,7 @@ public:
         go->transform()->setLocalScale(10, 0.1f, 10);
         auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3::one);
         go->AddComponent(boxCollider);
-        auto renderer = go->transform()->children().front().lock()->gameObject()->GetComponent<MeshRenderer>();
+        auto renderer = go->GetComponent<MeshRenderer>();
         renderer->SetMaterial(material);
         
         auto sphereGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
@@ -442,6 +405,7 @@ public:
 int main()
 {
     //test();
+    //FishEditorWindow::AddApp(make_shared<TestPBR>());
     FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();

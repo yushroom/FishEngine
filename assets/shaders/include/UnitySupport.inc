@@ -3,18 +3,9 @@
 
 #include <CGSupport.inc>
 
+#define UNITY_PI	3.14159265359f
+
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-
-#define float2 vec2
-#define float3 vec3
-#define float4 vec4
-#define uint2 uvec2
-#define uint3 uvec3
-#define uint4 uvec4
-#define lerp(x, y, t) mix(x, y, t)
-#define frac(x) fract(x)
-#define saturate(x) clamp(x, 0.0, 1.0)
-
 #define glstate_matrix_mvp MATRIX_MVP
 
 // uniform mat4 UNITY_MATRIX_MVP;  // Current model * view * projection matrix.
@@ -47,6 +38,18 @@
 #define UNITY_MATRIX_I_V unity_MatrixInvV
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
+
+
+// Tranforms position from object to homogenous space
+float4 UnityObjectToClipPos( in float3 pos )
+{
+	return mul(UNITY_MATRIX_MVP, float4(pos, 1.0));
+}
+
+float4 UnityObjectToClipPos(float4 pos) // overload for float4; avoids "implicit truncation" warning for existing shaders
+{
+	return UnityObjectToClipPos(pos.xyz);
+}
 
 
 #endif // UnitySupport_inc

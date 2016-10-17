@@ -1,6 +1,8 @@
 #ifndef CG_inc
 #define CG_inc
 
+#include <ShaderVariables.inc>
+
 vec4 ObjectToClipPos( in vec3 pos )
 {
 	return MATRIX_MVP * vec4(pos, 1.0);

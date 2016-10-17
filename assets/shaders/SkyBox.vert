@@ -1,3 +1,5 @@
+#include <CG.inc>
+
 /// Cull Front
 /// ZWrite Off
 layout(location = 0) in vec3 position;

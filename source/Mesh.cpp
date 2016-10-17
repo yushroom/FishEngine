@@ -126,6 +126,9 @@ namespace FishEngine
 
         if (m_skinned) {
             //glGenTransformFeedbacks(1, &m_TFBO);
+
+            //glGenVertexArrays(1, &m_animationOutputVAO);
+
             ////glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
             //glGenBuffers(1, &m_animationOutputVBO);
             //glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputVBO);

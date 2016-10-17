@@ -1,6 +1,8 @@
 #ifndef SkinnedPass_inc
 #define SkinnedPass_inc
 
+#include <CG.inc>
+
 layout (location = PositionIndex) 	in vec3 InputPositon;
 //layout (location = NormalIndex) 	in vec3 InputNormal;
 layout (location = BoneIndexIndex) 	in ivec4 boneIndex;

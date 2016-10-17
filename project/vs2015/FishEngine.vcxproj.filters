@@ -201,6 +201,9 @@
     <ClInclude Include="..\..\source\Component_gen.hpp">
       <Filter>Generated</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Skybox.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -352,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Component_gen.cpp">
       <Filter>Generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Skybox.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

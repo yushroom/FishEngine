@@ -147,6 +147,15 @@ namespace FishEngine
             Update();
             return m_localToWorldMatrix;
         }
+        
+        Matrix4x4 localToWorldMatrixFast() const
+        {
+            m_localToWorldMatrix = Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale);
+            if (!m_parent.expired()) {
+                m_localToWorldMatrix = m_parent.lock()->m_localToWorldMatrix * m_localToWorldMatrix;
+            }
+            return m_localToWorldMatrix;
+        }
 
         void setLocalToWorldMatrix(const Matrix4x4& localToWorld) {
             m_localToWorldMatrix = localToWorld;

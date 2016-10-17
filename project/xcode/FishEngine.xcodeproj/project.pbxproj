@@ -102,6 +102,8 @@
 		BFDC74E81D8EDDF50082A6DC /* Time.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC74B81D8EDDF50082A6DC /* Time.hpp */; };
 		BFDC74E91D8EDDF50082A6DC /* Transform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC74B91D8EDDF50082A6DC /* Transform.cpp */; };
 		BFDC74EA1D8EDDF50082A6DC /* Transform.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */; };
+		BFDC7E6F1DB352C50019F869 /* Component_gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC7E6D1DB352C50019F869 /* Component_gen.cpp */; };
+		BFDC7E701DB352C50019F869 /* Component_gen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -201,6 +203,8 @@
 		BFDC74B81D8EDDF50082A6DC /* Time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Time.hpp; path = ../../source/Time.hpp; sourceTree = "<group>"; };
 		BFDC74B91D8EDDF50082A6DC /* Transform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Transform.cpp; path = ../../source/Transform.cpp; sourceTree = "<group>"; };
 		BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Transform.hpp; path = ../../source/Transform.hpp; sourceTree = "<group>"; };
+		BFDC7E6D1DB352C50019F869 /* Component_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Component_gen.cpp; path = ../../source/Component_gen.cpp; sourceTree = "<group>"; };
+		BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Component_gen.hpp; path = ../../source/Component_gen.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -346,6 +350,7 @@
 		BFDC748A1D8EDDD80082A6DC /* FishEngine */ = {
 			isa = PBXGroup;
 			children = (
+				BFDC7E6C1DB352B90019F869 /* Generate */,
 				BF3211F61D8EE55F00FA80E6 /* Component */,
 				BF9499721D964E8D001F65E4 /* Importer */,
 				BF3212181D9173F000FA80E6 /* Math */,
@@ -378,6 +383,15 @@
 				BFDC74B81D8EDDF50082A6DC /* Time.hpp */,
 			);
 			name = FishEngine;
+			sourceTree = "<group>";
+		};
+		BFDC7E6C1DB352B90019F869 /* Generate */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC7E6D1DB352C50019F869 /* Component_gen.cpp */,
+				BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */,
+			);
+			name = Generate;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -437,6 +451,7 @@
 				BFDC74C11D8EDDF50082A6DC /* CameraController.hpp in Headers */,
 				BFDC74CC1D8EDDF50082A6DC /* GameObject.hpp in Headers */,
 				BFAF11DF1D9930A100101DCD /* Ray.hpp in Headers */,
+				BFDC7E701DB352C50019F869 /* Component_gen.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,6 +540,7 @@
 				BFDC74D31D8EDDF50082A6DC /* Mesh.cpp in Sources */,
 				BFDC74BF1D8EDDF50082A6DC /* Camera.cpp in Sources */,
 				BFDC74D91D8EDDF50082A6DC /* Object.cpp in Sources */,
+				BFDC7E6F1DB352C50019F869 /* Component_gen.cpp in Sources */,
 				BFDC74E71D8EDDF50082A6DC /* Time.cpp in Sources */,
 				BFDC74BD1D8EDDF50082A6DC /* Behaviour.cpp in Sources */,
 				BFDC74CD1D8EDDF50082A6DC /* GLEnvironment.cpp in Sources */,

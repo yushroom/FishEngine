@@ -257,7 +257,7 @@ public:
         std::shared_ptr<GameObject> go;
         
         go = GameObject::CreatePrimitive(PrimitiveType::Plane);
-        go->transform()->GetChild(0)->gameObject()->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
+        go->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
         auto boxCollider = make_shared<BoxCollider>(Vector3::zero, Vector3(10, 0.01f, 10));
         go->AddComponent(boxCollider);
         //boxCollider->physicsShape();

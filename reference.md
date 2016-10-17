@@ -24,6 +24,8 @@ http://austinbrunkhorst.com/blog/category/reflection/
 
 http://baptiste-wicht.com/posts/2015/07/simulate-static_if-with-c11c14.html
 
+http://www.cnblogs.com/qicosmos/p/4480460.html
+
 
 
 ## OpenGL

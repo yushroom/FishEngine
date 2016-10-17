@@ -31,6 +31,24 @@ std::string readFile(const std::string& path)
     return sstream.str();
 }
 
+
+std::string AddLineNumber(const std::string& str)
+{
+    stringstream ss;
+    int line_number = 2;
+    ss << "#1 ";
+    string::size_type last_pos = 0;
+    auto pos = str.find('\n');
+    while (pos != string::npos) {
+        ss << str.substr(last_pos, pos - last_pos) << "\n#" << line_number << "\t";
+        last_pos = pos + 1;
+        pos = str.find('\n', last_pos);
+        line_number++;
+    };
+    return ss.str();
+};
+
+
 std::string processInclude(const std::string& str)
 {
     auto result(str);
@@ -53,6 +71,35 @@ std::string processInclude(const std::string& str)
     return result;
 }
 
+GLuint compileShader(GLenum shader_type,
+                     const std::string& shader_str)
+{
+    const GLchar* shader_c_str = shader_str.c_str();
+    GLuint shader = glCreateShader(shader_type);
+    glShaderSource(shader, 1, &shader_c_str, NULL);
+    glCompileShader(shader);
+    GLint success = GL_FALSE;
+    //GLchar infoLog[1024];
+    GLint infoLogLength = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+    if (!success) {
+        std::vector<char> infoLog(infoLogLength + 1);
+        std::cout << AddLineNumber(shader_str) << endl;
+        glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog.data());
+        //std::cout << string(&infoLog[0]) << endl;
+        FishEngine::Debug::LogError("%s", infoLog.data());
+        abort();
+    }
+    return shader;
+};
+
+GLuint FishEngine::Shader::LoadShader(GLenum shaderType, const std::string& filePath)
+{
+    auto shaderStr = readFile(filePath);
+    shaderStr = "#version 410\n" + m_shaderVariables + "\n" + processInclude(shaderStr);
+    return compileShader(shaderType, shaderStr);
+}
 
 namespace FishEngine {
 
@@ -178,7 +225,6 @@ namespace FishEngine {
 #endif
         assert(m_program == 0);
         assert(!vs_string.empty() && !fs_string.empty());
-        //assert(tcs_string.empty() || (!tcs_string.empty() && !tes_string.empty()));
         assert(!(!tcs_string.empty() && tes_string.empty()));
 
         bool use_gs = !gs_string.empty();
@@ -189,41 +235,6 @@ namespace FishEngine {
         GLuint gs = 0;
         GLuint tcs = 0;
         GLuint tes = 0;
-
-        auto add_line_number = [](const string& str) -> std::string {
-            stringstream ss;
-            int line_number = 2;
-            ss << "#1 ";
-            string::size_type last_pos = 0;
-            auto pos = str.find('\n');
-            while (pos != string::npos) {
-                ss << str.substr(last_pos, pos - last_pos) << "\n#" << line_number << " ";
-                last_pos = pos + 1;
-                pos = str.find('\n', last_pos);
-                line_number++;
-            };
-            return ss.str();
-        };
-
-        auto compileShader = [&add_line_number](GLuint& shader, GLenum shader_type, const std::string& shader_str) {
-            const GLchar* shader_c_str = shader_str.c_str();
-            shader = glCreateShader(shader_type);
-            glShaderSource(shader, 1, &shader_c_str, NULL);
-            glCompileShader(shader);
-            GLint success = GL_FALSE;
-            //GLchar infoLog[1024];
-            GLint infoLogLength = 0;
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-            if (!success) {
-                std::vector<char> infoLog(infoLogLength + 1);
-                std::cout << add_line_number(shader_str) << endl;
-                glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog.data());
-                //std::cout << string(&infoLog[0]) << endl;
-                Debug::LogError("%s", infoLog.data());
-                abort();
-            }
-        };
 
         map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
 
@@ -263,19 +274,19 @@ namespace FishEngine {
         m_ZWrite = settings["ZWrite"] == "On";
         m_blend = settings["Blend"] == "On";
 
-        compileShader(vs, GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
+        vs = compileShader(GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
         if (hasSkinnedVersion)
-            compileShader(vs_skinned, GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
-        compileShader(fs, GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
+            vs_skinned = compileShader(GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
+        fs = compileShader(GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
 
         // gs
         if (use_gs) {
-            compileShader(gs, GL_GEOMETRY_SHADER, "#version 410 core\n" + m_shaderVariables + gs_string);
+            gs = compileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + m_shaderVariables + gs_string);
         }
         if (use_ts) {
             if (!tcs_string.empty())
-                compileShader(tcs, GL_TESS_CONTROL_SHADER, m_shaderVariables + tcs_string);
-            compileShader(tes, GL_TESS_EVALUATION_SHADER, m_shaderVariables + tes_string);
+                tcs = compileShader(GL_TESS_CONTROL_SHADER, m_shaderVariables + tcs_string);
+            tes = compileShader(GL_TESS_EVALUATION_SHADER, m_shaderVariables + tes_string);
         }
 
         m_program = LinkShader(vs, tcs, tes, gs, fs);
@@ -586,5 +597,7 @@ namespace FishEngine {
         Debug::Log("Compile shader: Transparent");
         m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
         //m_builtinShaders["Diffuse"] = Shader::CreateFromFile(root_dir+"PBR.vert", root_dir + "Diffuse.frag");
+        
+        GLuint skinnVS = LoadShader(GL_VERTEX_SHADER, root_dir+"SkinnedPass.vert");
     }
 }

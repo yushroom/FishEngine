@@ -52,7 +52,7 @@ namespace FishEngine {
         
         static void Init();
         
-        static Model::PModel builtinModel(const PrimitiveType type);
+        static PModel builtinModel(const PrimitiveType type);
         
     private:
         friend class ModelImporter;

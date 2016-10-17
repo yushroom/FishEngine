@@ -4,21 +4,20 @@
 #include "FishEditor.hpp"
 #include <MeshFilter.hpp>
 
-NAMESPACE_FISHEDITOR_BEGIN
-
-template<typename T>
-class Editor
+namespace FishEditor
 {
-public:
-    virtual ~Editor() = default;
-    
-    virtual void OnInspectorGUI() {
+    template<typename T>
+    class Editor
+    {
+    public:
+        virtual ~Editor() = default;
         
-    }
-};
-
-typedef Editor<FishEngine::MeshFilter> MeshFilterEditor;
-
-NAMESPACE_FISHEDITOR_END
+        virtual void OnInspectorGUI() {
+            
+        }
+    };
+    
+    typedef Editor<FishEngine::MeshFilter> MeshFilterEditor;
+}
 
 #endif /* Editor_hpp */

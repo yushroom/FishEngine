@@ -163,7 +163,7 @@ namespace FishEditor
                         {
                             shader = material->shader()->m_skinnedShader;
                             shader->Use();
-                            shader->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_boneTransformation);
+                            shader->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_matrixPalette);
                         }
                         else {
                             shader->Use();

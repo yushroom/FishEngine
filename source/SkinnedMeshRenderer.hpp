@@ -56,7 +56,8 @@ namespace FishEngine {
         // The bones used to skin the mesh.
         std::vector<std::weak_ptr<Transform>> m_bones;  // to be done
         
-        mutable std::vector<Matrix4x4> m_boneTransformation;
+        mutable std::vector<Matrix4x4> m_matrixPalette;
+        void UpdateMatrixPalette() const;
     };
 
 }

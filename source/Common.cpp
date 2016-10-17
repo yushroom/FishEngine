@@ -1,5 +1,6 @@
 #include "Common.hpp"
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace FishEngine
 {
@@ -54,7 +55,7 @@ namespace FishEngine
     std::string getExtensionWithoutDot(const std::string& path)
     {
         boost::filesystem::path p(path);
-        return p.extension().string().substr(1);
+        return boost::to_lower_copy(p.extension().string().substr(1));
     }
 
 }

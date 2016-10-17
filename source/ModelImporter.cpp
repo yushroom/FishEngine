@@ -304,6 +304,7 @@ namespace FishEngine {
     LoadFromFile(
         const std::string&  path)
     {
+        auto fileExtention = getExtensionWithoutDot(path);
         Assimp::Importer importer;
         unsigned int load_option = aiProcess_Triangulate;
         load_option |= aiProcess_LimitBoneWeights;
@@ -325,6 +326,11 @@ namespace FishEngine {
         //load_option |= aiProcess_FixInfacingNormals;
         //load_option |= aiProcess_OptimizeGraph;
         //load_option |= aiProcess_FlipUVs;
+        
+        if (fileExtention == "obj")
+        {
+            load_option |= aiProcess_OptimizeGraph;
+        }
 
         //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
@@ -351,7 +357,7 @@ namespace FishEngine {
         
         m_model = std::make_shared<Model>();
         m_model->m_name = split(path, "/").back();
-        bool isFBX = boost::to_lower_copy(m_model->m_name.substr(m_model->m_name.size() - 3)) == "fbx";
+        bool isFBX = fileExtention == "fbx";
         
         bool loadAnimation = scene->HasAnimations();
         if (loadAnimation)
@@ -377,7 +383,8 @@ namespace FishEngine {
 #endif
             m_model->m_animations.push_back(animation);
         }
-
+        
+        m_model->setName(getFileNameWithoutExtension(path));
         return m_model;
     }
 
@@ -534,6 +541,7 @@ namespace FishEngine {
             animator->m_animation = m_animations.front();
             root->AddComponent(animator);
         }
+        root->setName(m_name);
         return root;
     }
 

@@ -27,6 +27,7 @@ namespace FishEngine
 
     std::string getFileNameWithoutExtension(const std::string& path);
 
+    // low case
     std::string getExtensionWithoutDot(const std::string& path);
 }
 

@@ -29,28 +29,38 @@ namespace FishEngine
 
 
     void RecursivelyGetTransformation(
-        const PTransform&     transform,
-        std::vector<Matrix4x4>&         transformation,
-        std::map<std::string, int>&     nameToIndex,
-        std::vector<Matrix4x4>&         bindposes,
-        const Matrix4x4& invGlobalTransform)
+        const PTransform&                   transform,
+        const std::map<std::string, int>&   nameToIndex,
+        std::vector<Matrix4x4>&             outMatrixPalette)
     {
         const auto& name = transform->name();
         const auto& it = nameToIndex.find(name);
         if (it != nameToIndex.end()) {
             const auto boneIndex = it->second;
-            transformation[boneIndex] = invGlobalTransform * transform->localToWorldMatrix() * bindposes[boneIndex];
+            outMatrixPalette[boneIndex] = transform->localToWorldMatrixFast();
+            //transformation[boneIndex] = transform->localToWorldMatrix();
         }
         for (auto& child : transform->children()) {
-            RecursivelyGetTransformation(child.lock(), transformation, nameToIndex, bindposes, invGlobalTransform);
+            RecursivelyGetTransformation(child.lock(), nameToIndex, outMatrixPalette);
         }
     }
 
-
+    void SkinnedMeshRenderer::UpdateMatrixPalette() const
+    {
+        m_matrixPalette.resize(m_sharedMesh->m_boneNameToIndex.size());
+        RecursivelyGetTransformation(m_rootBone.lock(), m_sharedMesh->m_boneNameToIndex, m_matrixPalette);
+        const auto& invGlobalTransform = gameObject()->transform()->worldToLocalMatrix();
+        const auto& bindposes = m_sharedMesh->bindposes();
+        for (int i = 0; i < m_matrixPalette.size(); ++i)
+        {
+            auto& m = m_matrixPalette[i];
+            m = invGlobalTransform * m * bindposes[i];
+        }
+    }
+    
     void SkinnedMeshRenderer::Update()
     {
-        m_boneTransformation.resize(m_sharedMesh->m_boneNameToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), m_boneTransformation, m_sharedMesh->m_boneNameToIndex, m_sharedMesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
+        UpdateMatrixPalette();
     }
 
 
@@ -81,9 +91,8 @@ namespace FishEngine
         // hack
         // TODO: remove this block
         bool skinned = m_avatar != nullptr;
-        if (skinned && m_boneTransformation.size() == 0) {
-            m_boneTransformation.resize(m_sharedMesh->m_boneNameToIndex.size());
-            RecursivelyGetTransformation(m_rootBone.lock(), m_boneTransformation, m_sharedMesh->m_boneNameToIndex, m_sharedMesh->bindposes(), gameObject()->transform()->worldToLocalMatrix());
+        if (skinned && m_matrixPalette.size() == 0) {
+            UpdateMatrixPalette();
         }
 
         for (auto& m : m_materials) {
@@ -95,7 +104,7 @@ namespace FishEngine
             shader->Use();
             shader->PreRender();
             if (m_avatar != nullptr)
-                shader->BindMatrixArray("BoneTransformations", m_boneTransformation);
+                shader->BindMatrixArray("BoneTransformations", m_matrixPalette);
             m->BindTextures(textures);
             m->Update(skinned);
             shader->CheckStatus();

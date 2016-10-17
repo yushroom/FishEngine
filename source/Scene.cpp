@@ -106,7 +106,7 @@ namespace FishEngine
                 Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
                 Pipeline::BindPerDrawUniforms();
                 if (renderer->m_avatar != nullptr)
-                    shader->m_skinnedShader->BindMatrixArray("BoneTransformations", renderer->m_boneTransformation);
+                    shader->m_skinnedShader->BindMatrixArray("BoneTransformations", renderer->m_matrixPalette);
                 shader->m_skinnedShader->CheckStatus();
                 mesh->Render();
             }

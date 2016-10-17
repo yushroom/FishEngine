@@ -190,6 +190,8 @@ namespace FishEngine
         }
 
         static PShader builtinShader(const std::string& name);
+        
+        static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
 
         bool IsTransparent() const {
             return m_blend;

@@ -6,10 +6,12 @@
 
 using namespace FishEngine;
 
-Color Gizmos::s_color{0, 1, 0, 1};
-std::shared_ptr<SimpleMesh> Gizmos::s_lineMesh = nullptr;
-std::shared_ptr<SimpleMesh> Gizmos::s_circleMesh = nullptr;
-std::shared_ptr<SimpleMesh> Gizmos::s_boxMesh = nullptr;
+Color       Gizmos::s_color         {0, 1, 0, 1};
+PSimpleMesh Gizmos::s_lineMesh      = nullptr;
+PSimpleMesh Gizmos::s_circleMesh    = nullptr;
+PSimpleMesh Gizmos::s_boxMesh       = nullptr;
+PSimpleMesh Gizmos::s_light         = nullptr;
+
 //std::shared_ptr<SimpleMesh> Gizmos::s_wiredSphereMesh = nullptr;
 
 constexpr int circleVertexCount = 64;
@@ -33,9 +35,7 @@ void Gizmos::Init()
         circle_vertex[j+1] = 0.f;
         circle_vertex[j+2] = std::sinf(rad);
     }
-    
     s_circleMesh = std::make_shared<SimpleMesh>(circle_vertex, circleVertexCount, GL_LINE_LOOP);
-
     
     float box_vertex[] = {
          0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,
@@ -55,6 +55,25 @@ void Gizmos::Init()
          0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
     };
     s_boxMesh = std::make_shared<SimpleMesh>(box_vertex, 24, GL_LINES);
+
+    float lightGizmoVertex[circleVertexCount * 3 + 8 * 2 * 3];
+    memcpy(lightGizmoVertex, circle_vertex, circleVertexCount * 3 * sizeof(float));
+    constexpr int   numLines    = 8;
+    constexpr float step        = Mathf::PI * 2.0f / numLines;
+    for (int i = 0; i < numLines; ++i)
+    {
+        int j = circleVertexCount * 3 + i * 2 * 3;
+        const float rad = step * i;
+        float s = std::sinf(rad);
+        float c = std::cosf(rad);
+        lightGizmoVertex[j]     = c;
+        lightGizmoVertex[j + 1] = 0;
+        lightGizmoVertex[j + 2] = s;
+        lightGizmoVertex[j + 3] = c;
+        lightGizmoVertex[j + 4] = 4;
+        lightGizmoVertex[j + 5] = s;
+    }
+    s_light = std::make_shared<SimpleMesh>(lightGizmoVertex, circleVertexCount + numLines * 2, GL_LINES);
     
     // wired sphere
     //constexpr float radStep = 2.0f * Mathf::PI / circleVertexCount;
@@ -210,4 +229,40 @@ DrawWireCapsule(const Vector3& center,
     DrawLine(c1+offset, c2+offset);
     offset.Set(0, 0, -radius);
     DrawLine(c1+offset, c2+offset);
+}
+
+void FishEngine::Gizmos::
+DrawCircle(
+    const Vector3&  center,
+    const float     radius,
+    const Vector3&  direction)
+{
+    const auto& shader = Shader::builtinShader("SolidColor");
+    shader->Use();
+    ShaderUniforms uniforms;
+    auto v = Camera::main()->worldToCameraMatrix();
+    auto p = Camera::main()->projectionMatrix();
+    uniforms.vec4s["Color"] = s_color;
+    shader->BindUniforms(uniforms);
+    Matrix4x4 m;
+    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3(radius, radius, radius));
+    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m;
+    Pipeline::BindPerDrawUniforms();
+    s_circleMesh->Render();
+}
+
+void FishEngine::Gizmos::DrawLight(const Vector3& center, const Vector3& direction)
+{
+    const auto& shader = Shader::builtinShader("SolidColor");
+    shader->Use();
+    ShaderUniforms uniforms;
+    auto v = Camera::main()->worldToCameraMatrix();
+    auto p = Camera::main()->projectionMatrix();
+    uniforms.vec4s["Color"] = s_color;
+    shader->BindUniforms(uniforms);
+    Matrix4x4 m;
+    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one);
+    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m;
+    Pipeline::BindPerDrawUniforms();
+    s_light->Render();
 }

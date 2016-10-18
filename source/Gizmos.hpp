@@ -51,6 +51,17 @@ namespace FishEngine
         
         
         static void
+        DrawCircle(
+            const Vector3&  center,
+            const float     radius,
+            const Vector3&  direction = Vector3::up);
+
+        static void
+        DrawLight(
+            const Vector3&  center,
+            const Vector3&  direction);
+        
+        static void
         DrawWireCube(const Vector3& center,
                      const Vector3& size,
                      const Matrix4x4& modelMatrix = Matrix4x4::identity);
@@ -82,6 +93,7 @@ namespace FishEngine
         static PSimpleMesh s_lineMesh;
         static PSimpleMesh s_circleMesh;
         static PSimpleMesh s_boxMesh;
+        static PSimpleMesh s_light;
         //static PSimpleMesh s_wiredSphereMesh;
     };
 }

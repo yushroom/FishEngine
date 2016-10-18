@@ -77,6 +77,9 @@ namespace FishEditor
         Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
         Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
         Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::main()->transform()->position();
+        float t = Time::time();
+        //Debug::Log("%f", t);
+        Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
         Pipeline::BindPerFrameUniforms();
 
         Vector4 lightDir(0, 0, 0, 0);

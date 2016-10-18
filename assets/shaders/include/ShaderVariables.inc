@@ -70,6 +70,9 @@ layout(std140, row_major) uniform PerFrame
 
 	//	 Vertex-lit rendering
 	//vec3 unity_LightPosition; // view space light position
+ 	
+ 	// Time (t = time since current level load) values from Unity
+ 	vec4 _Time; // (t/20, t, t*2, t*3)
 };
 
 

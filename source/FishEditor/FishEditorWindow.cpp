@@ -130,6 +130,9 @@ namespace FishEditor
             const float old_time = (float)glfwGetTime();
             EditorTime::m_deltaTime = old_time - EditorTime::m_time;
             Time::m_deltaTime = EditorTime::m_deltaTime;
+            if (m_inPlayMode) {
+                Time::m_time = old_time;
+            }
             EditorTime::m_time = old_time;
         }
     }

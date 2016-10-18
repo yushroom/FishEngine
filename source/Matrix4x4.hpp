@@ -218,6 +218,11 @@ public:
         Quaternion*         outRotation,
         Vector3*            outScale);
 
+    static Matrix4x4 Scale(float scale)
+    {
+        return Scale(scale, scale, scale);
+    }
+
     static Matrix4x4 Scale(float x, float y, float z)
     {
         return Matrix4x4(

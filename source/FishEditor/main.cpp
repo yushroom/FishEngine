@@ -411,12 +411,40 @@ public:
 };
 
 
+class Shadertoy : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "../../assets/";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+#endif
+        const std::string models_dir = root_dir + "models/";
+        const std::string textures_dir = root_dir + "textures/";
+        //auto checkboardTexture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+
+        auto planeGO = GameObject::CreatePrimitive(PrimitiveType::Quad);
+        
+        auto material = Material::CreateMaterial();
+        auto shader = Shader::CreateFromFile(root_dir + "../example/Shadertoy/assets/shaders/Sea.vsfs");
+        material->SetShader(shader);
+        //material->SetTexture("screenTexture", checkboardTexture);
+        planeGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    }
+};
+
+
 int main()
 {
     //test();
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    FishEditorWindow::AddApp(make_shared<TestAnimation>());
-    //FishEditorWindow::AddApp(make_shared<TestPhysics>());
+    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<Shadertoy>());
+    FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();

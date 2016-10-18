@@ -626,9 +626,9 @@ namespace FishEditor
         center = dir.normalized() + camera_pos;
 
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i)
+        {
             int j = 6 * i;
-            //t.setLocalScale(0.1f, 0.1f, 0.1f);
             t.setLocalScale(Vector3(1, 1.5, 1) * 0.015f);
             t.setLocalEulerAngles(f + j + 3);
             Vector3 pos = center + Vector3(f + j)*translate_gizmo_length;
@@ -637,8 +637,6 @@ namespace FishEditor
             Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
             Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
             Pipeline::BindPerDrawUniforms();
-            //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-            //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
             Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f + j);
             sceneGizmoMaterial->SetVector3("_Color", color);
             shader->Use();

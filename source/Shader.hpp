@@ -126,6 +126,14 @@ namespace FishEngine
         if (s == "Always") return ZTest::Always;
         abort();
     }
+    
+//    enum class ShaderType
+//    {
+//        VertexShader,
+//        FragmentShader,
+//        GeometryShader,
+//        VertexAndFragmentShader,
+//    };
 
     class Shader
     {
@@ -136,15 +144,18 @@ namespace FishEngine
         Shader(Shader&&);
 
         static void Init();
-
+        
         static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str);
 
         static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
 
+        static PShader CreateFromFile(const std::string& vsfs_path);
+        
         static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path);
 
         static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
 
+        void FromString(const std::string& vsfs_str);
         void FromString(const std::string& vs_str, const std::string& fs_str);
         void FromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
         void FromString(const std::string& vs_str,
@@ -152,6 +163,7 @@ namespace FishEngine
             const std::string& tes_str,
             const std::string& gs_str,
             const std::string& fs_str);
+        void FromFile(const std::string& vsfs_path);
         void FromFile(const std::string& vs_path, const std::string& fs_path);
         void FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
         //Shader(const std::string& vs_path, const std::string ps_path);
@@ -193,6 +205,8 @@ namespace FishEngine
         
         static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
 
+        static GLuint LoadShaderCombined(const std::string& filePath);
+        
         bool IsTransparent() const {
             return m_blend;
         }

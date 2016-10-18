@@ -8,6 +8,8 @@ namespace FishEngine
     class Debug
     {
     public:
+        Debug() = delete;
+        
         // Logs message to the Console.
         static void Log(const char *format, ...);
 
@@ -16,8 +18,16 @@ namespace FishEngine
 
         // A variant of Debug.Log that logs an error message to the console.
         static void LogError(const char *format, ...);
+        
+        static void setColorMode(bool value)
+        {
+            s_colorMode = value;
+        }
 
         static void Init();
+        
+    private:
+        static bool s_colorMode;
     };
 }
 

@@ -12,6 +12,7 @@
 #include "Pipeline.hpp"
 
 using namespace std;
+using namespace FishEngine;
 
 #if FISHENGINE_PLATFORM_WINDOWS
 static const std::string include_dir = "../../assets/shaders/include/";
@@ -36,7 +37,7 @@ std::string AddLineNumber(const std::string& str)
 {
     stringstream ss;
     int line_number = 2;
-    ss << "#1 ";
+    ss << "#1\t";
     string::size_type last_pos = 0;
     auto pos = str.find('\n');
     while (pos != string::npos) {
@@ -95,11 +96,64 @@ GLuint compileShader(GLenum shader_type,
     return shader;
 };
 
-GLuint FishEngine::Shader::LoadShader(GLenum shaderType, const std::string& filePath)
+GLuint
+LinkShader(GLuint vs,
+           GLuint tcs,
+           GLuint tes,
+           GLuint gs,
+           GLuint fs)
+{
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    if (gs != 0)
+        glAttachShader(program, gs);
+    if (tes != 0) {
+        if (tcs != 0) glAttachShader(program, tcs);
+        glAttachShader(program, tes);
+    }
+    glLinkProgram(program);
+    GLint success;
+    GLchar infoLog[1024];
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(program, 1024, NULL, infoLog);
+        Debug::LogError("%s", infoLog);
+        abort();
+    }
+    
+    glDetachShader(program, vs);
+    glDetachShader(program, fs);
+    if (gs != 0) {
+        glDetachShader(program, gs);
+    }
+    if (tes != 0) {
+        if (tcs != 0) glDetachShader(program, tcs);
+        glDetachShader(program, tes);
+    }
+    
+    glCheckError();
+    return program;
+}
+
+
+GLuint Shader::LoadShader(GLenum shaderType, const std::string& filePath)
 {
     auto shaderStr = readFile(filePath);
     shaderStr = "#version 410\n" + processInclude(shaderStr);
     return compileShader(shaderType, shaderStr);
+}
+
+GLuint Shader::LoadShaderCombined(const std::string& filePath)
+{
+    auto shaderStr = readFile(filePath);
+    auto vs_shader = "#version 410\n\#define VERTEX_SHADER 1\n" + processInclude(shaderStr);
+    auto fs_shader = "#version 410\n\#define FRAGMENT_SHADER 1\n" + processInclude(shaderStr);
+    Debug::Log("Compile vertex shader...");
+    GLuint vs = compileShader(GL_VERTEX_SHADER, vs_shader);
+    Debug::Log("Compile fragment shader...");
+    GLuint fs = compileShader(GL_FRAGMENT_SHADER, fs_shader);
+    return LinkShader(vs, 0, 0, 0, fs);
 }
 
 namespace FishEngine {
@@ -125,6 +179,13 @@ namespace FishEngine {
         return s;
     }
 
+    PShader Shader::CreateFromFile(const std::string& vsfs_path)
+    {
+        auto s = std::make_shared<Shader>();
+        s->FromFile(vsfs_path);
+        return s;
+    }
+    
     PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
     {
         auto s = std::make_shared<Shader>();
@@ -137,6 +198,18 @@ namespace FishEngine {
         auto s = std::make_shared<Shader>();
         s->FromFile(vs_path, fs_path, gs_path);
         return s;
+    }
+    
+    void Shader::FromString(const std::string& vsfs_str)
+    {
+        auto& shaderStr = vsfs_str;
+        auto vs_shader = "#version 410\n\#define VERTEX_SHADER 1\n" + processInclude(shaderStr);
+        auto fs_shader = "#version 410\n\#define FRAGMENT_SHADER 1\n" + processInclude(shaderStr);
+        Debug::Log("Compile vertex shader...");
+        GLuint vs = compileShader(GL_VERTEX_SHADER, vs_shader);
+        Debug::Log("Compile fragment shader...");
+        GLuint fs = compileShader(GL_FRAGMENT_SHADER, fs_shader);
+        m_program = LinkShader(vs, 0, 0, 0, fs);
     }
 
     void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
@@ -171,46 +244,6 @@ namespace FishEngine {
         }
     }
 
-    GLuint
-        LinkShader(
-            GLuint vs,
-            GLuint tcs,
-            GLuint tes,
-            GLuint gs,
-            GLuint fs)
-    {
-        GLuint program = glCreateProgram();
-        glAttachShader(program, vs);
-        glAttachShader(program, fs);
-        if (gs != 0)
-            glAttachShader(program, gs);
-        if (tes != 0) {
-            if (tcs != 0) glAttachShader(program, tcs);
-            glAttachShader(program, tes);
-        }
-        glLinkProgram(program);
-        GLint success;
-        GLchar infoLog[1024];
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(program, 1024, NULL, infoLog);
-            Debug::LogError("%s", infoLog);
-            abort();
-        }
-
-        glDetachShader(program, vs);
-        glDetachShader(program, fs);
-        if (gs != 0) {
-            glDetachShader(program, gs);
-        }
-        if (tes != 0) {
-            if (tcs != 0) glDetachShader(program, tcs);
-            glDetachShader(program, tes);
-        }
-
-        glCheckError();
-        return program;
-    }
 
     void Shader::FromString(const std::string& vs_string,
         const std::string& tcs_string,
@@ -238,23 +271,29 @@ namespace FishEngine {
 
         map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
 
-        auto extractSettings = [&settings](const string& shader_str) -> void {
+        auto extractSettings = [&settings](const string& shader_str) -> void
+        {
             auto lines = split(shader_str, "\n");
-            for (auto& line : lines) {
+            for (auto& line : lines)
+            {
                 boost::trim(line);
-                if (boost::starts_with(line, "///")) {
+                if (boost::starts_with(line, "///"))
+                {
                     line = line.substr(3);
                     boost::trim(line);
                     auto s = split(line, " ");
-                    if (s.size() > 2) {
+                    if (s.size() > 2)
+                    {
                         Debug::LogWarning("Incorrect shader setting format: %s", line.c_str());
                     }
                     auto res = settings.find(s[0]);
-                    if (res != settings.end()) {
+                    if (res != settings.end())
+                    {
                         Debug::Log("\tOverride shader setting: %s", line.c_str());
                         settings[s[0]] = s[1];
                     }
-                    else {
+                    else
+                    {
                         Debug::LogWarning("Unknown shader setting: %s", line.c_str());
                     }
                 }
@@ -310,6 +349,13 @@ namespace FishEngine {
             if (tcs != 0) glDeleteShader(tcs);
             glDeleteShader(tes);
         }
+    }
+    
+    void Shader::FromFile(const std::string& vsfs_path)
+    {
+        assert(m_program == 0);
+        //FromString(readFile(vs_path), readFile(fs_path));
+        FromString(readFile(vsfs_path));
     }
 
     void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)

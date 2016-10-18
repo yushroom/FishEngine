@@ -5,7 +5,7 @@
 #error You can inclue only *one* header from AppDataBase.h and AppDataTan.h
 #endif
 
-#include "CG.inc"
+#include <CG.inc>
 
 layout (location = PositionIndex) 	in vec3 InputPositon;
 layout (location = NormalIndex) 	in vec3 InputNormal;

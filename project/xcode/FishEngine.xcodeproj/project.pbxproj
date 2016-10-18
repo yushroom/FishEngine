@@ -104,6 +104,7 @@
 		BFDC74EA1D8EDDF50082A6DC /* Transform.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */; };
 		BFDC7E6F1DB352C50019F869 /* Component_gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC7E6D1DB352C50019F869 /* Component_gen.cpp */; };
 		BFDC7E701DB352C50019F869 /* Component_gen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */; };
+		BFDC7E981DB506A00019F869 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFDC7E971DB506A00019F869 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -205,6 +206,7 @@
 		BFDC74BA1D8EDDF50082A6DC /* Transform.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Transform.hpp; path = ../../source/Transform.hpp; sourceTree = "<group>"; };
 		BFDC7E6D1DB352C50019F869 /* Component_gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Component_gen.cpp; path = ../../source/Component_gen.cpp; sourceTree = "<group>"; };
 		BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Component_gen.hpp; path = ../../source/Component_gen.hpp; sourceTree = "<group>"; };
+		BFDC7E971DB506A00019F869 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,6 +214,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFDC7E981DB506A00019F869 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +339,7 @@
 			children = (
 				BFDC748A1D8EDDD80082A6DC /* FishEngine */,
 				BFDC741D1D8EDD6C0082A6DC /* Products */,
+				BFDC7E961DB5069F0019F869 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -392,6 +396,14 @@
 				BFDC7E6E1DB352C50019F869 /* Component_gen.hpp */,
 			);
 			name = Generate;
+			sourceTree = "<group>";
+		};
+		BFDC7E961DB5069F0019F869 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC7E971DB506A00019F869 /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

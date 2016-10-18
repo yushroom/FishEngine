@@ -13,6 +13,13 @@
 #define float3x3 mat3
 #define float4x4 mat4
 
+#define half float4
+#define half2 vec2
+#define half3 vec3
+#define half4 vec4
+
+#define samplerCUBE samplerCube
+
 // http://http.developer.nvidia.com/Cg/lit.html
 float4 lit(float NdotL, float NdotH, float m)
 {
@@ -37,6 +44,7 @@ void sincos(float a, out float s, out float c)
 
 // http://http.developer.nvidia.com/Cg/tex2D.html
 #define tex2D texture
+#define texCUBE texture
 
 #define mul(M, V) ((M) * (V))
 

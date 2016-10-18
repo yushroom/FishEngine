@@ -35,7 +35,6 @@ out float4 color;
 #define float2_t float2
 #define float3_t float3
 #define float4_t float4
-#define half3 float3
 
 // Overlay blend
 float3_t GetOverlayColor( float3_t inUpper, float3_t inLower )

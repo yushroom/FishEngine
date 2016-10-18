@@ -59,6 +59,13 @@
 			remoteGlobalIDString = BFDC741C1D8EDD6C0082A6DC;
 			remoteInfo = FishEngine;
 		};
+		BFDC7E921DB505370019F869 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDC7E8D1DB505370019F869 /* ShaderCompiler.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BFDC7E7A1DB504870019F869;
+			remoteInfo = ShaderCompiler;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -128,6 +135,7 @@
 		BFDC75321D8EE3D00082A6DC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		BFDC75371D8EE4110082A6DC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		BFDC7E8D1DB505370019F869 /* ShaderCompiler.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ShaderCompiler.xcodeproj; sourceTree = "<group>"; };
 		BFF192E21DA558BA008634D8 /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneView.cpp; path = ../../source/FishEditor/SceneView.cpp; sourceTree = "<group>"; };
 		BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfbxsdk.a; path = ../../external/libs/osx/libfbxsdk.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -208,7 +216,8 @@
 		BFDC74EB1D8EDEEC0082A6DC = {
 			isa = PBXGroup;
 			children = (
-				BFDC75121D8EE0330082A6DC /* main.cpp */,
+				BFDC7E8D1DB505370019F869 /* ShaderCompiler.xcodeproj */,
+				BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */,
 				BFDC751B1D8EE0B90082A6DC /* ImGui */,
 				BFDC750A1D8EE01B0082A6DC /* FishEditor */,
 				BFDC752B1D8EE1330082A6DC /* lib */,
@@ -236,6 +245,7 @@
 		BFDC750A1D8EE01B0082A6DC /* FishEditor */ = {
 			isa = PBXGroup;
 			children = (
+				BFDC75121D8EE0330082A6DC /* main.cpp */,
 				BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */,
 				BF3211FE1D8EFB1E00FA80E6 /* Editor.hpp */,
 				BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */,
@@ -275,7 +285,6 @@
 		BFDC752B1D8EE1330082A6DC /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */,
 				BFB361AC1DAA32CE00CD0DCB /* physx */,
 				BFB361AB1DAA32C600CD0DCB /* boost */,
 				BFDC75251D8EE1250082A6DC /* libassimp.a */,
@@ -296,6 +305,14 @@
 				BFDC752D1D8EE28A0082A6DC /* OpenGL.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFDC7E8E1DB505370019F869 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BFDC7E931DB505370019F869 /* ShaderCompiler */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -348,6 +365,10 @@
 					ProductGroup = BFDC75051D8EE0040082A6DC /* Products */;
 					ProjectRef = BFDC75041D8EE0040082A6DC /* FishEngine.xcodeproj */;
 				},
+				{
+					ProductGroup = BFDC7E8E1DB505370019F869 /* Products */;
+					ProjectRef = BFDC7E8D1DB505370019F869 /* ShaderCompiler.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -362,6 +383,13 @@
 			fileType = archive.ar;
 			path = libFishEngine.a;
 			remoteRef = BFDC75081D8EE0040082A6DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		BFDC7E931DB505370019F869 /* ShaderCompiler */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = ShaderCompiler;
+			remoteRef = BFDC7E921DB505370019F869 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

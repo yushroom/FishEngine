@@ -8,6 +8,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    Debug::Init();
+    Debug::setColorMode(false);
     glfwInit();
     // Set all the required options for GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -30,25 +32,36 @@ int main(int argc, char* argv[])
     glCheckError();
 
     //assert(argc == 3);
+    if (argc != 3)
+        return 1;
+    
     GLenum shaderType = GL_VERTEX_SHADER;
-    std::string path;
-    if (argc == 3)
+    std::string path = argv[2];;
+    const int type = std::stoi(std::string(argv[1]));
+    
+    if (type == 3)
     {
-        const int type = std::stoi(std::string(argv[1]));
-        switch (type)
+        try
         {
-        case 0: shaderType = GL_VERTEX_SHADER; break;
-        case 1: shaderType = GL_FRAGMENT_SHADER; break;
-        case 2: shaderType = GL_GEOMETRY_SHADER; break;
-        default: Debug::LogError("Unknown shader type %d", type);
+            Shader::LoadShaderCombined(path);
         }
-        path = argv[2];
-        //Debug::Log(path.c_str());
+        catch(exception)
+        {
+            return 1;
+        }
+        Debug::Log("OK");
+        return 0;
     }
-    else
+    
+    switch (type)
     {
-        path = "./a.vert";
+    case 0: shaderType = GL_VERTEX_SHADER; break;
+    case 1: shaderType = GL_FRAGMENT_SHADER; break;
+    case 2: shaderType = GL_GEOMETRY_SHADER; break;
+    default: Debug::LogError("Unknown shader type %d", type);
     }
+    
+    //Debug::Log(path.c_str());
 
     try
     {

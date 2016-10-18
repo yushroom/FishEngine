@@ -31,7 +31,7 @@ float3 RotateAroundYInDegrees (float3 vertex, float degrees)
 
 void main()
 {
-	float3 rotated = RotateAroundYInDegrees(InputPositon, _Rotation);
+	float3 rotated = RotateAroundYInDegrees(InputPositon, _Rotation)
 	gl_Position = UnityObjectToClipPos(rotated);
 	texcoord = InputUV;
 }

@@ -20,7 +20,7 @@ static const std::string include_dir = "../../assets/shaders/include/";
 static const std::string include_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/include/";
 #endif
 
-std::string readFile(const std::string& path)
+std::string ReadFile(const std::string& path)
 {
     std::ifstream fin(path);
     if (!fin.is_open()) {
@@ -51,7 +51,7 @@ std::string AddLineNumber(const std::string& str)
 };
 
 
-std::string processInclude(const std::string& str)
+std::string ProcessInclude(const std::string& str)
 {
     auto result(str);
     std::set<std::string> loaded_headers;
@@ -63,7 +63,7 @@ std::string processInclude(const std::string& str)
         std::string filename = result.substr(pos+8+2, pos2-pos-8-2-1);
         if (loaded_headers.find(filename) == loaded_headers.end()) {
             loaded_headers.insert(filename);
-            auto include_file = readFile(include_dir + filename);
+            auto include_file = ReadFile(include_dir + filename);
             result = result.substr(0, pos) + include_file + result.substr(pos2);
         } else {
             result = result.substr(0, pos) + result.substr(pos2);
@@ -73,7 +73,41 @@ std::string processInclude(const std::string& str)
     return result;
 }
 
-GLuint compileShader(GLenum shader_type,
+
+void
+ExtractSettings(
+    const string& shaderString, 
+    map<std::string, std::string>& outSettings)
+{
+    auto lines = split(shaderString, "\n");
+    for (auto& line : lines)
+    {
+        boost::trim(line);
+        if (boost::starts_with(line, "///"))
+        {
+            line = line.substr(3);
+            boost::trim(line);
+            auto s = split(line, " ");
+            if (s.size() > 2)
+            {
+                Debug::LogWarning("Incorrect shader setting format: %s", line.c_str());
+            }
+            auto res = outSettings.find(s[0]);
+            if (res != outSettings.end())
+            {
+                Debug::Log("\tOverride shader setting: %s", line.c_str());
+                outSettings[s[0]] = s[1];
+            }
+            else
+            {
+                Debug::LogWarning("Unknown shader setting: %s", line.c_str());
+            }
+        }
+    }
+};
+
+
+GLuint CompileShader(GLenum shader_type,
                      const std::string& shader_str)
 {
     const GLchar* shader_c_str = shader_str.c_str();
@@ -95,6 +129,7 @@ GLuint compileShader(GLenum shader_type,
     }
     return shader;
 };
+
 
 GLuint
 LinkShader(GLuint vs,
@@ -137,24 +172,49 @@ LinkShader(GLuint vs,
 }
 
 
+
 GLuint Shader::LoadShader(GLenum shaderType, const std::string& filePath)
 {
-    auto shaderStr = readFile(filePath);
-    shaderStr = "#version 410\n" + processInclude(shaderStr);
-    return compileShader(shaderType, shaderStr);
+    auto shaderStr = ReadFile(filePath);
+    shaderStr = "#version 410\n" + ProcessInclude(shaderStr);
+    return CompileShader(shaderType, shaderStr);
 }
+
 
 GLuint Shader::LoadShaderCombined(const std::string& filePath)
 {
-    auto shaderStr = readFile(filePath);
-    auto vs_shader = "#version 410\n\#define VERTEX_SHADER 1\n" + processInclude(shaderStr);
-    auto fs_shader = "#version 410\n\#define FRAGMENT_SHADER 1\n" + processInclude(shaderStr);
+    auto shaderStr = ReadFile(filePath);
+    auto vs_shader = "#version 410\n#define VERTEX_SHADER 1\n" + ProcessInclude(shaderStr);
+    auto fs_shader = "#version 410\n#define FRAGMENT_SHADER 1\n" + ProcessInclude(shaderStr);
     Debug::Log("Compile vertex shader...");
-    GLuint vs = compileShader(GL_VERTEX_SHADER, vs_shader);
+    GLuint vs = CompileShader(GL_VERTEX_SHADER, vs_shader);
     Debug::Log("Compile fragment shader...");
-    GLuint fs = compileShader(GL_FRAGMENT_SHADER, fs_shader);
+    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fs_shader);
     return LinkShader(vs, 0, 0, 0, fs);
 }
+
+
+const char* GLenumToString(GLenum e)
+{
+    switch (e) {
+    case GL_FLOAT:
+        return "GL_FLOAT";
+    case GL_FLOAT_VEC3:
+        return "GL_FLOAT_VEC3";
+    case GL_FLOAT_MAT4:
+        return "GL_FLOAT_MAT4";
+    case GL_SAMPLER_2D:
+        return "GL_SAMPLER_2D";
+    case GL_SAMPLER_3D:
+        return "GL_SAMPLER_3D";
+    case GL_SAMPLER_CUBE:
+        return "GL_SAMPLER_CUBE";
+    default:
+        return "UNKNOWN";
+        break;
+    }
+}
+
 
 namespace FishEngine {
 
@@ -203,13 +263,22 @@ namespace FishEngine {
     void Shader::FromString(const std::string& vsfs_str)
     {
         auto& shaderStr = vsfs_str;
-        auto vs_shader = "#version 410\n\#define VERTEX_SHADER 1\n" + processInclude(shaderStr);
-        auto fs_shader = "#version 410\n\#define FRAGMENT_SHADER 1\n" + processInclude(shaderStr);
+        auto vs_shader = "#version 410\n#define VERTEX_SHADER 1\n" + ProcessInclude(shaderStr);
+        auto fs_shader = "#version 410\n#define FRAGMENT_SHADER 1\n" + ProcessInclude(shaderStr);
+        
         Debug::Log("Compile vertex shader...");
-        GLuint vs = compileShader(GL_VERTEX_SHADER, vs_shader);
+        GLuint vs = CompileShader(GL_VERTEX_SHADER, vs_shader);
         Debug::Log("Compile fragment shader...");
-        GLuint fs = compileShader(GL_FRAGMENT_SHADER, fs_shader);
+        GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fs_shader);
         m_program = LinkShader(vs, 0, 0, 0, fs);
+        GetAllUniforms();
+        map<string, string> settings = { { "Cull", "Back" },{ "ZWrite", "On" },{ "Blend", "Off" },{ "ZTest", "Less" } };
+        ExtractSettings(vsfs_str, settings);
+        m_cullface = ToEnum<Cullface>(settings["Cull"]);
+        m_ZWrite = settings["ZWrite"] == "On";
+        m_blend = settings["Blend"] == "On";
+        glDeleteShader(vs);
+        glDeleteShader(fs);
     }
 
     void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
@@ -221,29 +290,6 @@ namespace FishEngine {
     {
         FromString(vs_string, "", "", gs_string, fs_string);
     }
-
-
-    const char* GLenumToString(GLenum e)
-    {
-        switch (e) {
-        case GL_FLOAT:
-            return "GL_FLOAT";
-        case GL_FLOAT_VEC3:
-            return "GL_FLOAT_VEC3";
-        case GL_FLOAT_MAT4:
-            return "GL_FLOAT_MAT4";
-        case GL_SAMPLER_2D:
-            return "GL_SAMPLER_2D";
-        case GL_SAMPLER_3D:
-            return "GL_SAMPLER_3D";
-        case GL_SAMPLER_CUBE:
-            return "GL_SAMPLER_CUBE";
-        default:
-            return "UNKNOWN";
-            break;
-        }
-    }
-
 
     void Shader::FromString(const std::string& vs_string,
         const std::string& tcs_string,
@@ -271,61 +317,32 @@ namespace FishEngine {
 
         map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
 
-        auto extractSettings = [&settings](const string& shader_str) -> void
-        {
-            auto lines = split(shader_str, "\n");
-            for (auto& line : lines)
-            {
-                boost::trim(line);
-                if (boost::starts_with(line, "///"))
-                {
-                    line = line.substr(3);
-                    boost::trim(line);
-                    auto s = split(line, " ");
-                    if (s.size() > 2)
-                    {
-                        Debug::LogWarning("Incorrect shader setting format: %s", line.c_str());
-                    }
-                    auto res = settings.find(s[0]);
-                    if (res != settings.end())
-                    {
-                        Debug::Log("\tOverride shader setting: %s", line.c_str());
-                        settings[s[0]] = s[1];
-                    }
-                    else
-                    {
-                        Debug::LogWarning("Unknown shader setting: %s", line.c_str());
-                    }
-                }
-            }
-        };
-
         bool hasSkinnedVersion =
             (vs_string.find("AppDataBase.inc") != std::string::npos)
             || (vs_string.find("AppDataTan.inc") != std::string::npos);
 
-        extractSettings(vs_string);
-        auto parsed_vs = processInclude(vs_string);
-        extractSettings(fs_string);
-        auto parsed_fs = processInclude(fs_string);
+        ExtractSettings(vs_string, settings);
+        auto parsed_vs = ProcessInclude(vs_string);
+        ExtractSettings(fs_string, settings);
+        auto parsed_fs = ProcessInclude(fs_string);
 
         m_cullface = ToEnum<Cullface>(settings["Cull"]);
         m_ZWrite = settings["ZWrite"] == "On";
         m_blend = settings["Blend"] == "On";
 
-        vs = compileShader(GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
+        vs = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
         if (hasSkinnedVersion)
-            vs_skinned = compileShader(GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
-        fs = compileShader(GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
+            vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
+        fs = CompileShader(GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
 
         // gs
         if (use_gs) {
-            gs = compileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + gs_string);
+            gs = CompileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + gs_string);
         }
         if (use_ts) {
             if (!tcs_string.empty())
-                tcs = compileShader(GL_TESS_CONTROL_SHADER, tcs_string);
-            tes = compileShader(GL_TESS_EVALUATION_SHADER, tes_string);
+                tcs = CompileShader(GL_TESS_CONTROL_SHADER, tcs_string);
+            tes = CompileShader(GL_TESS_EVALUATION_SHADER, tes_string);
         }
 
         m_program = LinkShader(vs, tcs, tes, gs, fs);
@@ -355,19 +372,19 @@ namespace FishEngine {
     {
         assert(m_program == 0);
         //FromString(readFile(vs_path), readFile(fs_path));
-        FromString(readFile(vsfs_path));
+        FromString(ReadFile(vsfs_path));
     }
 
     void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)
     {
         assert(m_program == 0);
-        FromString(readFile(vs_path), readFile(fs_path));
+        FromString(ReadFile(vs_path), ReadFile(fs_path));
     }
 
     void Shader::FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
     {
         assert(m_program == 0);
-        FromString(readFile(vs_path), readFile(fs_path), readFile(gs_path));
+        FromString(ReadFile(vs_path), ReadFile(fs_path), ReadFile(gs_path));
     }
 
     Shader::~Shader()
@@ -525,7 +542,8 @@ namespace FishEngine {
     PShader Shader::builtinShader(const std::string& name)
     {
         auto it = m_builtinShaders.find(name);
-        if (it != m_builtinShaders.end()) {
+        if (it != m_builtinShaders.end())
+        {
             return it->second;
         }
         Debug::LogWarning("No built-in shader called %s", name.c_str());
@@ -533,19 +551,8 @@ namespace FishEngine {
         return nullptr;
     }
 
-    //static const char* PerDrawUniformNames[] =
-    //{
-    //    "MATRIX_MVP",
-    //    "MATRIX_MV",
-    //    "MATRIX_M",
-    //    "MATRIX_V",
-    //    "MATRIX_P",
-    //    "MATRIX_VP",
-    //    "MATRIX_IT_MV",
-    //    "MATRIX_IT_M",
-    //};
 
-    void FishEngine::Shader::GetAllUniforms()
+    void Shader::GetAllUniforms()
     {
         //{
         //    GLuint perDrawUBO = glGetUniformBlockIndex(m_program, "PerDraw");
@@ -602,7 +609,8 @@ namespace FishEngine {
         //Debug::Log("Program %u, Active Uniforms: %d", m_program, count);
         m_uniforms.clear();
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             glGetActiveUniform(m_program, (GLuint)i, bufSize, &length, &size, &type, name);
             //GLint location = glGetUniformLocation(m_program, name);
             GLint loc = glGetUniformLocation(m_program, name);
@@ -612,7 +620,9 @@ namespace FishEngine {
         }
     }
 
-    GLint Shader::GetUniformLocation(const char* name) const {
+
+    GLint Shader::GetUniformLocation(const char* name) const
+    {
         GLint loc = glGetUniformLocation(m_program, name);
         if (loc == -1) {
             Debug::LogWarning("uniform[%s] not found\n", name);
@@ -623,7 +633,8 @@ namespace FishEngine {
 
     //========== Static Region ==========
 
-    void Shader::Init() {
+    void Shader::Init()
+    {
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "../../assets/shaders/";
 #else
@@ -631,7 +642,7 @@ namespace FishEngine {
 #endif
         Debug::Log("Compile shader: VisualizeNormal");
         m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir + "VisualizeNormal.vert", root_dir + "VisualizeNormal.frag", root_dir + "VisualizeNormal.geom");
-        for (auto& n : { "PBR", "VertexLit", "SkyBox", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {
+        for (auto& n : { "PBR", "VertexLit", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {
             Debug::Log("Compile shader: %s", n);
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".vert", root_dir + n + ".frag");
         }
@@ -641,8 +652,10 @@ namespace FishEngine {
         m_builtinShaders["TextureDoubleSided"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "TextureDoubleSided.frag");
         Debug::Log("Compile shader: Transparent");
         m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
-        //m_builtinShaders["Diffuse"] = Shader::CreateFromFile(root_dir+"PBR.vert", root_dir + "Diffuse.frag");
         
+        m_builtinShaders["SkyboxCubed"] = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
+        m_builtinShaders["SkyboxProcedural"] = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
+
         GLuint skinnVS = LoadShader(GL_VERTEX_SHADER, root_dir+"SkinnedPass.vert");
     }
 }

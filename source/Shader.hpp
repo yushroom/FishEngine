@@ -158,7 +158,8 @@ namespace FishEngine
         void FromString(const std::string& vsfs_str);
         void FromString(const std::string& vs_str, const std::string& fs_str);
         void FromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
-        void FromString(const std::string& vs_str,
+        void FromString(
+            const std::string& vs_str,
             const std::string& tcs_str,
             const std::string& tes_str,
             const std::string& gs_str,
@@ -171,7 +172,8 @@ namespace FishEngine
 
         void Use() const;
 
-        GLuint program() const {
+        GLuint program() const
+        {
             return m_program;
         }
 

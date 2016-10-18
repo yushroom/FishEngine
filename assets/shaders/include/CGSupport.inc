@@ -13,7 +13,7 @@
 #define float3x3 mat3
 #define float4x4 mat4
 
-#define half float4
+#define half float
 #define half2 vec2
 #define half3 vec3
 #define half4 vec4
@@ -34,7 +34,44 @@ void sincos(float a, out float s, out float c)
 }
 
 // http://http.developer.nvidia.com/Cg/lerp.html
-#define lerp(x, y, t) mix(x, y, t)
+//#define lerp(x, y, t) mix(x, y, t)
+float lerp(float a, float b, float w)
+{
+	return a + w*(b-a);
+}
+
+float2 lerp(float2 a, float2 b, float2 w)
+{
+	return a + w*(b-a);
+}
+
+float3 lerp(float3 a, float3 b, float3 w)
+{
+	return a + w*(b-a);
+}
+
+float4 lerp(float4 a, float4 b, float4 w)
+{
+	return a + w*(b-a);
+}
+
+
+float2 lerp(float2 a, float2 b, float w)
+{
+	return a + w*(b-a);
+}
+
+float3 lerp(float3 a, float3 b, float w)
+{
+	return a + w*(b-a);
+}
+
+float4 lerp(float4 a, float4 b, float w)
+{
+	return a + w*(b-a);
+}
+
+
 
 // http://http.developer.nvidia.com/Cg/saturate.html
 #define saturate(x) clamp(x, 0.0, 1.0)

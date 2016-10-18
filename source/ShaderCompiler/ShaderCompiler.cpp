@@ -8,8 +8,10 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    Debug::Init();
+    //Debug::Init();
     Debug::setColorMode(false);
+    Debug::Log("Compiling...");
+
     glfwInit();
     // Set all the required options for GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

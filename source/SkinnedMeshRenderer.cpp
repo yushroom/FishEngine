@@ -38,7 +38,7 @@ namespace FishEngine
         if (it != nameToIndex.end()) {
             const auto boneIndex = it->second;
             outMatrixPalette[boneIndex] = transform->localToWorldMatrixFast();
-            //transformation[boneIndex] = transform->localToWorldMatrix();
+            outMatrixPalette[boneIndex] = transform->localToWorldMatrix();
         }
         for (auto& child : transform->children()) {
             RecursivelyGetTransformation(child.lock(), nameToIndex, outMatrixPalette);
@@ -51,7 +51,7 @@ namespace FishEngine
         RecursivelyGetTransformation(m_rootBone.lock(), m_sharedMesh->m_boneNameToIndex, m_matrixPalette);
         const auto& invGlobalTransform = gameObject()->transform()->worldToLocalMatrix();
         const auto& bindposes = m_sharedMesh->bindposes();
-        for (int i = 0; i < m_matrixPalette.size(); ++i)
+        for (uint32_t i = 0; i < m_matrixPalette.size(); ++i)
         {
             auto& m = m_matrixPalette[i];
             m = invGlobalTransform * m * bindposes[i];

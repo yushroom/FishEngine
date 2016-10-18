@@ -152,7 +152,7 @@ namespace FishEngine
         {
             m_localToWorldMatrix = Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale);
             if (!m_parent.expired()) {
-                m_localToWorldMatrix = m_parent.lock()->m_localToWorldMatrix * m_localToWorldMatrix;
+                m_localToWorldMatrix = m_parent.lock()->localToWorldMatrix() * m_localToWorldMatrix;
             }
             return m_localToWorldMatrix;
         }

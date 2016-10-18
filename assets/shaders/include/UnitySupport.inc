@@ -39,6 +39,9 @@
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
 
+#define _WorldSpaceLightPos0 WorldSpaceLightPos0
+#define _LightColor0 LightColor0
+
 
 // Tranforms position from object to homogenous space
 float4 UnityObjectToClipPos( in float3 pos )

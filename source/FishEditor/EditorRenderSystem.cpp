@@ -92,6 +92,7 @@ namespace FishEditor
                 lightDir = Vector4(-l->transform()->forward(), 0);
                 auto view = l->gameObject()->transform()->worldToLocalMatrix();
                 auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
+                //auto proj = Camera::main()->projectionMatrix();
                 lightVP = proj * view;
                 //textures["shadowMap"] = l->m_shadowMap;
             }

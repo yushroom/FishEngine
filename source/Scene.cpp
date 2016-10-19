@@ -72,8 +72,9 @@ namespace FishEngine
         auto shader = m->shader();
         //shader->Use();
         //ShaderUniforms uniforms;
-        auto view = light->gameObject()->transform()->worldToLocalMatrix();
+        auto view = light->transform()->worldToLocalMatrix();
         auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);
+        //auto proj = Camera::main()->projectionMatrix();
 
         auto shadowMap = light->m_shadowMap;
         glViewport(0, 0, shadowMap->width(), shadowMap->height());
@@ -84,7 +85,9 @@ namespace FishEngine
             if (!go->activeInHierarchy()) continue;
 
             // TODO: remove this line
-            if ("SkyBox" == go->name()) continue;
+            if ("Skybox" == go->name()) {
+                Debug::Log("here");
+            }
 
             PMesh mesh;
             if (go->GetComponent<MeshRenderer>()) {

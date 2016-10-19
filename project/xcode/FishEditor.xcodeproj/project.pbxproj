@@ -136,6 +136,7 @@
 		BFDC75351D8EE3DB0082A6DC /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		BFDC75371D8EE4110082A6DC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		BFDC7E8D1DB505370019F869 /* ShaderCompiler.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ShaderCompiler.xcodeproj; sourceTree = "<group>"; };
+		BFDC7EB51DB660140019F869 /* TestScript.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TestScript.hpp; path = ../../source/FishEditor/TestScript.hpp; sourceTree = "<group>"; };
 		BFF192E21DA558BA008634D8 /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneView.cpp; path = ../../source/FishEditor/SceneView.cpp; sourceTree = "<group>"; };
 		BFF192E61DA7CBEA008634D8 /* libfbxsdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfbxsdk.a; path = ../../external/libs/osx/libfbxsdk.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -245,7 +246,6 @@
 		BFDC750A1D8EE01B0082A6DC /* FishEditor */ = {
 			isa = PBXGroup;
 			children = (
-				BFDC75121D8EE0330082A6DC /* main.cpp */,
 				BF3211FD1D8EFB1E00FA80E6 /* Editor.cpp */,
 				BF3211FE1D8EFB1E00FA80E6 /* Editor.hpp */,
 				BFDC750B1D8EE0330082A6DC /* EditorGUI.cpp */,
@@ -257,10 +257,12 @@
 				BFDC750F1D8EE0330082A6DC /* FishEditor.hpp */,
 				BFDC75101D8EE0330082A6DC /* FishEditorWindow.cpp */,
 				BFDC75111D8EE0330082A6DC /* FishEditorWindow.hpp */,
+				BFDC75121D8EE0330082A6DC /* main.cpp */,
 				BFF192E21DA558BA008634D8 /* SceneView.cpp */,
 				BFDC75131D8EE0330082A6DC /* SceneView.hpp */,
 				BFDC75141D8EE0330082A6DC /* Selection.cpp */,
 				BFDC75151D8EE0330082A6DC /* Selection.hpp */,
+				BFDC7EB51DB660140019F869 /* TestScript.hpp */,
 			);
 			name = FishEditor;
 			sourceTree = "<group>";

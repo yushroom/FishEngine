@@ -534,7 +534,7 @@ namespace FishEngine {
     {
         for (auto& u : m_uniforms) {
             if (!u.binded) {
-                Debug::LogWarning("Uniform %s not binded!", u.name.c_str());
+                Debug::LogWarning("Uniform %s[%s] not binded!", u.name.c_str(), GLenumToString(u.type));
             }
         }
     }

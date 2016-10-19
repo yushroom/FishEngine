@@ -206,9 +206,26 @@ public:
         map<string, PTexture> textures;
         //textures["skyTex"] = sky_texture;
         
-        auto skyboxGO = Scene::CreateGameObject("SkyBox");
+//        auto skyboxGO = Scene::CreateGameObject("SkyBox");
+//        skyboxGO->transform()->setLocalScale(100, 100, 100);
+//        auto meshFilter = make_shared<MeshFilter>(sphere);
+//        auto material = Material::builtinMaterial("SkyboxProcedural");
+//        material->SetFloat("_AtmosphereThickness", 1.0);
+//        material->SetFloat("_SunDisk", 2);
+//        material->SetFloat("_SunSize", 0.04f);
+//        material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+//        material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+//        material->SetFloat("_Exposure", 1.3f);
+//        //material->SetTexture("_Tex", sky_texture);
+//        //material->SetFloat("_Exposure", 1.3);
+//        //material->SetFloat("_Rotation", 0);
+//        //material->SetVector4("_Tint", Vector4(0.5f, 0.5f, 0.5f, 0.5f));
+//        auto meshRenderer = make_shared<MeshRenderer>(material);
+//        skyboxGO->AddComponent(meshFilter);
+//        skyboxGO->AddComponent(meshRenderer);
+        auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+        skyboxGO->setName("Skybox");
         skyboxGO->transform()->setLocalScale(100, 100, 100);
-        auto meshFilter = make_shared<MeshFilter>(sphere);
         auto material = Material::builtinMaterial("SkyboxProcedural");
         material->SetFloat("_AtmosphereThickness", 1.0);
         material->SetFloat("_SunDisk", 2);
@@ -216,13 +233,8 @@ public:
         material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
         material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
         material->SetFloat("_Exposure", 1.3f);
-        //material->SetTexture("_Tex", sky_texture);
-        //material->SetFloat("_Exposure", 1.3);
-        //material->SetFloat("_Rotation", 0);
-        //material->SetVector4("_Tint", Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-        auto meshRenderer = make_shared<MeshRenderer>(material);
-        skyboxGO->AddComponent(meshFilter);
-        skyboxGO->AddComponent(meshRenderer);
+        skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+
 
         textures["AmbientCubemap"] = sky_texture;
 
@@ -249,7 +261,7 @@ public:
 #endif
         
         constexpr float edgeThickness = 0.5f;
-        material = Material::builtinMaterial("TextureDoubleSided");
+         material = Material::builtinMaterial("TextureDoubleSided");
         //material = bodyMaterial;
         //material = Material::builtinMaterial("SkinnedMesh");
         material->SetTexture("_MainTex", bodyTexture);
@@ -442,9 +454,9 @@ int main()
 {
     //test();
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
-    FishEditorWindow::AddApp(make_shared<TestPhysics>());
+    //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::Init();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();

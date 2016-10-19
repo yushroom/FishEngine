@@ -307,14 +307,14 @@ namespace FishEngine {
         result.m[3][2] = 1.f;
 
 //#		if GLM_DEPTH_CLIP_SPACE == GLM_DEPTH_ZERO_TO_ONE
-        result.m[2][2] = zFar / (zFar - zNear);
-        result.m[2][3] = -(zFar * zNear) / (zFar - zNear);
-        result.m[3][3] = 0.f;
-//#		else
-//        result.m[2][2] = (zFar + zNear) / (zFar - zNear);
-//        result.m[2][3] = -(2.f * zFar * zNear) / (zFar - zNear);
-//#		endif
+//        result.m[2][2] = zFar / (zFar - zNear);
+//        result.m[2][3] = -(zFar * zNear) / (zFar - zNear);
 
+//#		else
+        result.m[2][2] = (zFar + zNear) / (zFar - zNear);
+        result.m[2][3] = -(2.f * zFar * zNear) / (zFar - zNear);
+//#		endif
+        result.m[3][3] = 0.f;
         return result;
     }
 
@@ -328,11 +328,11 @@ namespace FishEngine {
         result.m[1][3] = -(top + bottom) / (top - bottom);
 
 //#		if GLM_DEPTH_CLIP_SPACE == GLM_DEPTH_ZERO_TO_ONE
-        result.m[2][2] = 1.f / (zFar - zNear);
-        result.m[2][3] = -zNear / (zFar - zNear);
+//        result.m[2][2] = 1.f / (zFar - zNear);
+//        result.m[2][3] = -zNear / (zFar - zNear);
 //#		else
-//        result.m[2][2] = 2.f / (zFar - zNear);
-//        result.m[2][3] = -(zFar + zNear) / (zFar - zNear);
+        result.m[2][2] = 2.f / (zFar - zNear);
+        result.m[2][3] = -(zFar + zNear) / (zFar - zNear);
 //#		endif
 
         return result;

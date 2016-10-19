@@ -81,18 +81,16 @@ namespace FishEngine
         glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->depthBufferFBO());
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        for (auto& go : m_gameObjects) {
+        for (auto& go : m_gameObjects)
+        {
             if (!go->activeInHierarchy()) continue;
 
-            // TODO: remove this line
-            if ("Skybox" == go->name()) {
-                Debug::Log("here");
-            }
-
             PMesh mesh;
-            if (go->GetComponent<MeshRenderer>()) {
+            if (go->GetComponent<MeshRenderer>())
+            {
                 auto meshFilter = go->GetComponent<MeshFilter>();
-                if (meshFilter != nullptr) {
+                if (meshFilter != nullptr)
+                {
                     mesh = meshFilter->mesh();
                     shader->Use();
                     Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
@@ -102,8 +100,10 @@ namespace FishEngine
                     continue;
                 }
             }
+
             auto renderer = go->GetComponent<SkinnedMeshRenderer>();
-            if (renderer != nullptr) {
+            if (renderer != nullptr)
+            {
                 mesh = renderer->sharedMesh();
                 shader->m_skinnedShader->Use();
                 Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();

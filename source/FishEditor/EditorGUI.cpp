@@ -118,10 +118,7 @@ namespace FishEditor
         //DrawToolBar();
         DrawHierarchyWindow();
         DrawInspectorWindow();
-
-        // Project view
-        //ImGui::BeginDock("Project");
-        //ImGui::EndDock();
+        DrawProjectWindow();
 
     //    if (m_showAssectSelectionDialogBox) {
     //        ImGui::OpenPopup("Select ...");
@@ -542,6 +539,11 @@ namespace FishEditor
         ImGui::End();
     }
 
+    void EditorGUI::DrawProjectWindow()
+    {
+        ImGui::Begin("Project");
+        ImGui::End();
+    }
 
     void EditorGUI::DrawMainMenu()
     {

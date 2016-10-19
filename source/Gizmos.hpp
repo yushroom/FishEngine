@@ -14,11 +14,14 @@ namespace FishEngine
     public:
         Gizmos() = delete;
         
-        static Color color() {
+        static Color color()
+        {
             return s_color;
         }
         
-        static void setColor(const Color& c) {
+        static void
+        setColor(const Color& c)
+        {
             s_color = c;
         }
         
@@ -62,6 +65,14 @@ namespace FishEngine
             const Vector3&  direction);
         
         static void
+        DrawFrustum(
+            const Matrix4x4&    localToWorld,
+            const float         zNear,
+            const float         zFar,
+            const float         fovy,
+            const float         aspect);
+
+        static void
         DrawWireCube(const Vector3& center,
                      const Vector3& size,
                      const Matrix4x4& modelMatrix = Matrix4x4::identity);
@@ -89,8 +100,9 @@ namespace FishEngine
         static Color s_color;
 
         static void Init();
+
+        static PShader s_solidColorShader;
         
-        static PSimpleMesh s_lineMesh;
         static PSimpleMesh s_circleMesh;
         static PSimpleMesh s_boxMesh;
         static PSimpleMesh s_light;

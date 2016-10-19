@@ -14,6 +14,11 @@ void Light::OnInspectorGUI()
     ImGui::DragFloat("Range", &m_range);
 }
 
+void FishEngine::Light::OnDrawGizmos()
+{
+    Gizmos::DrawIcon(transform()->position(), "Light");
+}
+
 void FishEngine::Light::OnDrawGizmosSelected()
 {
     Gizmos::setColor(Color::yellow);

@@ -39,6 +39,7 @@ namespace FishEngine
         }
 
         virtual void OnInspectorGUI() override;
+        virtual void OnDrawGizmos() override;
         virtual void OnDrawGizmosSelected() override;
 
     private:

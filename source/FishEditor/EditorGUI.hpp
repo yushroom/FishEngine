@@ -52,6 +52,7 @@ namespace FishEditor
         // https://docs.unity3d.com/Manual/LearningtheInterface.html
         static void DrawInspectorWindow();
         static void DrawHierarchyWindow();
+        static void DrawProjectWindow();
         static void DrawSceneView();
         static void DrawToolbar();
         static void DrawProjectWindwo();

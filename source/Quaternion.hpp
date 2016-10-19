@@ -92,6 +92,11 @@ public:
         return Quaternion(-rotation.x * num, -rotation.y * num, -rotation.z*num, rotation.w*num);
     }
 
+    Quaternion inverse() const
+    {
+        return Inverse(*this);
+    }
+
     static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
     static Quaternion LerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
 

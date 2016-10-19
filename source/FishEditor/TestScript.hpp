@@ -341,17 +341,17 @@ void DefaultScene()
     light_go->AddComponent<Rotator>();
     
     
-//    auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-//    skyboxGO->setName("Skybox");
-//    skyboxGO->transform()->setLocalScale(100, 100, 100);
-//    auto material = Material::builtinMaterial("SkyboxProcedural");
-//    material->SetFloat("_AtmosphereThickness", 1.0);
-//    material->SetFloat("_SunDisk", 2);
-//    material->SetFloat("_SunSize", 0.04f);
-//    material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
-//    material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
-//    material->SetFloat("_Exposure", 1.3f);
-//    skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+    skyboxGO->setName("Skybox");
+    skyboxGO->transform()->setLocalScale(100, 100, 100);
+    auto material = Material::builtinMaterial("SkyboxProcedural");
+    material->SetFloat("_AtmosphereThickness", 1.0);
+    //material->SetFloat("_SunDisk", 2);
+    material->SetFloat("_SunSize", 0.04f);
+    material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+    material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+    material->SetFloat("_Exposure", 1.3f);
+    skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
 }
             
 

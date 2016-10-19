@@ -118,6 +118,63 @@ using namespace FishEditor;
 //    }
 //};
 
+class SimpleTest : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "../../assets/";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+#endif
+        const std::string models_dir = root_dir + "models/";
+        const std::string textures_dir = root_dir + "textures/";
+        auto checkboardTexture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+
+        auto checkboardMaterial = Material::builtinMaterial("Diffuse");
+        checkboardMaterial->setMainTexture(checkboardTexture);
+
+        auto ground = GameObject::CreatePrimitive(PrimitiveType::Cube);
+        ground->transform()->setLocalScale(20, 1, 20);
+        ground->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        ground->AddComponent<TestGizmos>();
+
+        {
+            auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);
+            box->transform()->setLocalPosition(-0.47f, 1, -5.16f);
+            box->transform()->setLocalEulerAngles(0, -50, 0);
+            box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        }
+        {
+            auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);
+            box->transform()->setLocalPosition(2.62f, 1, 0.66f);
+            box->transform()->setLocalEulerAngles(0, 45.314f, 0);
+            box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        }
+        {
+            auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);
+            box->transform()->setLocalPosition(-6.9f, 1, -0.62f);
+            box->transform()->setLocalEulerAngles(0, 19.311f, 0);
+            box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        }
+        {
+            auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);
+            box->transform()->setLocalPosition(-2.97f, 1, -2.25f);
+            box->transform()->setLocalEulerAngles(0, -99, 0);
+            box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        }
+        {
+            auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);
+            box->transform()->setLocalPosition(-0.77f, 1, 4.77f);
+            box->transform()->setLocalEulerAngles(0, -35.547f, 0);
+            box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
+        }
+    }
+};
+
 
 class TestAnimation : public App
 {
@@ -223,17 +280,17 @@ public:
 //        auto meshRenderer = make_shared<MeshRenderer>(material);
 //        skyboxGO->AddComponent(meshFilter);
 //        skyboxGO->AddComponent(meshRenderer);
-        auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-        skyboxGO->setName("Skybox");
-        skyboxGO->transform()->setLocalScale(100, 100, 100);
-        auto material = Material::builtinMaterial("SkyboxProcedural");
-        material->SetFloat("_AtmosphereThickness", 1.0);
-        material->SetFloat("_SunDisk", 2);
-        material->SetFloat("_SunSize", 0.04f);
-        material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
-        material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
-        material->SetFloat("_Exposure", 1.3f);
-        skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+        //auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+        //skyboxGO->setName("Skybox");
+        //skyboxGO->transform()->setLocalScale(100, 100, 100);
+        //auto material = Material::builtinMaterial("SkyboxProcedural");
+        //material->SetFloat("_AtmosphereThickness", 1.0);
+        //material->SetFloat("_SunDisk", 2);
+        //material->SetFloat("_SunSize", 0.04f);
+        //material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+        //material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+        //material->SetFloat("_Exposure", 1.3f);
+        //skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
 
 
         textures["AmbientCubemap"] = sky_texture;
@@ -261,7 +318,7 @@ public:
 #endif
         
         constexpr float edgeThickness = 0.5f;
-         material = Material::builtinMaterial("TextureDoubleSided");
+        auto material = Material::builtinMaterial("TextureDoubleSided");
         //material = bodyMaterial;
         //material = Material::builtinMaterial("SkinnedMesh");
         material->SetTexture("_MainTex", bodyTexture);
@@ -454,9 +511,10 @@ int main()
 {
     //test();
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
+    FishEditorWindow::AddApp(make_shared<SimpleTest>());
     FishEditorWindow::Init();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();

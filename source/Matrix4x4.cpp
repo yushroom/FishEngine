@@ -294,7 +294,7 @@ namespace FishEngine {
         return result;
     }
 
-    Matrix4x4 Matrix4x4::Perspective(float fovy, float aspect, float zNear, float zFar)
+    FishEngine::Matrix4x4 Matrix4x4::Perspective(const float fovy, const float aspect, const float zNear, const float zFar)
     {
         //return glm::perspectiveLH(glm::radians(fovy), aspect, zNear, zFar);
         assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
@@ -318,7 +318,7 @@ namespace FishEngine {
         return result;
     }
 
-    FishEngine::Matrix4x4 Matrix4x4::Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
+    FishEngine::Matrix4x4 Matrix4x4::Ortho(const float left, const float right, const float bottom, const float top, const float zNear, const float zFar)
     {
         //return glm::orthoLH(left, right, bottom, top, zNear, zFar);
         Matrix4x4 result;

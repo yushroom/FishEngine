@@ -182,12 +182,15 @@ namespace FishEngine
         //void BindUniformFloat(const char* name, const float value) const;
         //void BindUniformVec3(const char* name, const glm::vec3& value) const;
         //void BindUniformMat3(const char* name, const glm::mat3& value) const;
-        //void BindUniformMat4(const char* name, const glm::mat4& value) const;
+        void BindUniformVec4(const char* name, const Vector4& value);
+        void BindUniformMat4(const char* name, const Matrix4x4& value);
 
         //void BindUniformTexture(const char* name, const GLuint texture, const GLuint id, GLenum textureType = GL_TEXTURE_2D) const;
 
         void BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray);
         void BindUniforms(const ShaderUniforms& uniforms);
+
+        void BindTexture(const std::string& name, PTexture& texture);
         void BindTextures(const std::map<std::string, std::shared_ptr<Texture>>& textures);
 
         void PreRender() const;

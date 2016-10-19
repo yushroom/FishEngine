@@ -154,12 +154,27 @@ namespace FishEngine
         SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
         //SimpleMesh(std::vector<float> positionBuffer);
 
+        void BindNewBuffer(const float* positionBuffer, uint32_t vertexCount);
+
         void Render() const;
 
     private:
         friend class Gizmos;
         std::vector<float> m_positionBuffer;
 
+        GLenum m_drawMode = GL_LINES;   // mode in glDrawArrays
+        GLuint m_VAO = 0;
+        GLuint m_VBO = 0;
+    };
+
+    class DynamicMesh : public Object
+    {
+    public:
+        DynamicMesh() = default;
+
+        void Render(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
+
+    private:
         GLenum m_drawMode = GL_LINES;   // mode in glDrawArrays
         GLuint m_VAO = 0;
         GLuint m_VBO = 0;

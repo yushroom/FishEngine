@@ -1,13 +1,27 @@
 #include "Camera.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
-//#include <imgui/imgui.h>
 #include "Screen.hpp"
+#include "Gizmos.hpp"
 
 namespace FishEngine
 {
     PCamera Camera::m_mainCamera = nullptr;
     std::vector<PCamera> Camera::m_allCameras;
+
+
+    PCamera Camera::Create(
+        float fov, 
+        float aspect, 
+        float nearClipPlane, 
+        float farClipPlane, 
+        CameraType type /*= CameraType::Game*/)
+    {
+        auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
+        camera->m_cameraType = type;
+        m_allCameras.push_back(camera);
+        return camera;
+    }
 
     Camera::Camera(float fov, float aspect, float zNear, float zFar)
         : m_fieldOfView(fov), m_aspect(aspect), m_nearClipPlane(zNear), m_farClipPlane(zFar)
@@ -31,39 +45,7 @@ namespace FishEngine
         return m_projectMatrix;
     }
 
-    //void Camera::OnInspectorGUI()
-    //{
-    //    const char* listbox_items[] = {
-    //        "Perspective", "Orthographic"
-    //    };
-    //    int list_item_current = m_orthographic ? 1 : 0;
-    //    ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
-    //    if (m_orthographic != (list_item_current == 1)) {
-    //        m_orthographic = !m_orthographic;
-    //        m_isDirty = true;
-    //    }
-    //    //m_orthographic = list_item_current == 1;
-    //    
-    //    if (m_orthographic) {
-    //        if (ImGui::InputFloat("Size", &m_orthographicSize)) {
-    //            m_isDirty = true;
-    //        }
-    //    }
-    //    else {
-    //        if (ImGui::SliderFloat("Field of View", &m_fieldOfView, 1, 179)) {
-    //            m_isDirty = true;
-    //        }
-    //    }
-    //
-    //    if (ImGui::InputFloat("Clipping Planes(Near)", &m_nearClipPlane)) {
-    //        m_isDirty = true;
-    //    }
-    //    if (ImGui::InputFloat("Clipping Planes(Far)", &m_farClipPlane)) {
-    //        m_isDirty = true;
-    //    }
-    //    ImGui::InputFloat4("Viewport Rect", m_viewport.data());
-    //}
-    //
+
     FishEngine::Ray FishEngine::Camera::ScreenPointToRay(const Vector3& position)
     {
         //http://antongerdelan.net/opengl/raycasting.html
@@ -85,6 +67,16 @@ namespace FishEngine
     Matrix4x4 Camera::worldToCameraMatrix() const
     {
         return transform()->worldToLocalMatrix();
+    }
+
+    void Camera::OnDrawGizmos()
+    {
+        Gizmos::DrawIcon(transform()->position(), "Camera");
+    }
+
+    void Camera::OnDrawGizmosSelected()
+    {
+        Gizmos::DrawFrustum(transform()->localToWorldMatrix(), m_nearClipPlane, m_farClipPlane, m_fieldOfView, m_aspect);
     }
 
     std::shared_ptr<Camera> Camera::main()

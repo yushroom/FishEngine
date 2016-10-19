@@ -241,6 +241,7 @@ namespace FishEngine {
 
     PShader Shader::CreateFromFile(const std::string& vsfs_path)
     {
+        Debug::Log("Compiling %s", vsfs_path.c_str());
         auto s = std::make_shared<Shader>();
         s->FromFile(vsfs_path);
         return s;
@@ -396,9 +397,33 @@ namespace FishEngine {
         glUseProgram(this->m_program);
     }
 
-    //GLuint Shader::getAttribLocation(const char* name) const {
-    //    return glGetAttribLocation(m_program, name);
-    //}
+    void Shader::BindUniformVec4(const char* name, const Vector4& value)
+    {
+        for (auto& u : m_uniforms)
+        {
+            if (boost::starts_with(u.name, name))
+            {
+                glUniform4fv(u.location, 1, value.data());
+                glCheckError();
+                u.binded = true;
+                return;
+            }
+        }
+        Debug::LogWarning("Uniform %s not found!", name);
+    }
+
+    void Shader::BindUniformMat4(const char* name, const Matrix4x4& value)
+    {
+        for (auto& u : m_uniforms) {
+            if (boost::starts_with(u.name, name)) {
+                glUniformMatrix4fv(u.location, 1, GL_TRUE, value.data());
+                glCheckError();
+                u.binded = true;
+                return;
+            }
+        }
+        Debug::LogWarning("Uniform %s not found!", name);
+    }
 
     void Shader::BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray)
     {
@@ -415,33 +440,6 @@ namespace FishEngine {
         }
         Debug::LogWarning("Uniform %s not found!", name.c_str());
     }
-
-    //void Shader::BindUniformFloat(const char* name, const float value) const {
-    //    GLint loc = GetUniformLocation(name);
-    //    glUniform1f(loc, value);
-    //}
-    //
-    //void Shader::BindUniformVec3(const char* name, const glm::vec3& value) const {
-    //    GLint loc = GetUniformLocation(name);
-    //    glUniform3fv(loc, 1, glm::value_ptr(value));
-    //}
-    //
-    //void Shader::BindUniformMat4(const char* name, const glm::mat4& value) const {
-    //    GLint loc = GetUniformLocation(name);
-    //    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
-    //}
-    //
-    //void Shader::BindUniformMat3(const char* name, const glm::mat3& value) const {
-    //    GLint loc = GetUniformLocation(name);
-    //    glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(value));
-    //}
-    //
-    //void Shader::BindUniformTexture(const char* name, const GLuint texture, const GLuint id, GLenum textureType /*= GL_TEXTURE_2D*/) const {
-    //    glActiveTexture(GLenum(GL_TEXTURE0+id));
-    //    glBindTexture(textureType, texture);
-    //    GLuint loc = GetUniformLocation(name);
-    //    glUniform1i(loc, id);
-    //}
 
     void Shader::BindUniforms(const ShaderUniforms& uniforms)
     {

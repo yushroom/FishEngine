@@ -8,10 +8,6 @@
 
 using namespace FishEngine;
 
-
-PShader     Gizmos::s_solidColorShader;
-static PShader     alphaShader;
-
 Color       Gizmos::s_color         = Color::green;
 PSimpleMesh Gizmos::s_circleMesh    = nullptr;
 PSimpleMesh Gizmos::s_boxMesh       = nullptr;
@@ -25,6 +21,7 @@ static PTexture lightGizmoTexture;
 
 constexpr int circleVertexCount = 64;
 
+
 void Gizmos::Init()
 {
 #if FISHENGINE_PLATFORM_WINDOWS
@@ -32,8 +29,6 @@ void Gizmos::Init()
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
-    s_solidColorShader = Shader::CreateFromFile(root_dir + "shaders/Editor/SolidColor.vsfs");
-    alphaShader = Shader::CreateFromFile(root_dir + "shaders/Editor/Alpha.vsfs");
     
     cameraGizmoTexture = Texture::CreateFromFile(root_dir + "textures/Gizmos/camera.png");
     lightGizmoTexture  = Texture::CreateFromFile(root_dir + "textures/Gizmos/light.png");
@@ -104,8 +99,10 @@ void Gizmos::Init()
 //    s_wiredSphereMesh = std::make_shared<SimpleMesh>(wiredSphereVertex, circleVertexCount*3, GL_LINE_STRIP);
 }
 
+
 void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
 {
+    auto shader = Shader::builtinShader("SolidColor-Internal");
     static DynamicMesh lineMesh;
     float vertices[6];
     vertices[0] = from.x;
@@ -117,20 +114,22 @@ void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
     //glLineWidth(50);  // TODO, no effect
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
-    s_solidColorShader->Use();
-    s_solidColorShader->BindUniformMat4("MATRIX_MVP", proj*view);
-    s_solidColorShader->BindUniformVec4("_Color", s_color);
+    shader->Use();
+    shader->BindUniformMat4("MATRIX_MVP", proj*view);
+    shader->BindUniformVec4("_Color", s_color);
     lineMesh.Render(vertices, 2, GL_LINES);
 }
 
+
 void Gizmos::
 DrawIcon(
-    Vector3               center,
+    const Vector3&        center,
     const std::string&    name,
     bool                  allowScaling)
 {
+    auto shader = Shader::builtinShader("Alpha-Internal");
     static PModel quad = Model::builtinModel(PrimitiveType::Quad);
-    alphaShader->Use();
+    shader->Use();
     auto cameraPos = Camera::main()->transform()->position();
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
@@ -145,68 +144,73 @@ DrawIcon(
         m.SetTRS(cameraPos + dir, view.ToRotation().inverse(), Vector3::one*0.05f);
     }
 
-    alphaShader->BindUniformMat4("MATRIX_MVP", proj*view*m);
+    shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
     std::map<std::string, PTexture> textures;
     if (name == "Camera")
         textures["_MainTex"] = cameraGizmoTexture;
     else
         textures["_MainTex"] = lightGizmoTexture;
-    alphaShader->BindTextures(textures);
-    alphaShader->PreRender();
+    shader->BindTextures(textures);
+    shader->PreRender();
     quad->mainMesh()->Render();
-    alphaShader->PostRender();
+    shader->PostRender();
 }
 
-void Gizmos::DrawWireSphere(const Vector3& center,
-                            float radius,
-                            const Matrix4x4& modelMatrix)
+
+void Gizmos::
+DrawWireSphere(
+    const Vector3&      center,
+    const float         radius,
+    const Matrix4x4&    modelMatrix)
 {
     Matrix4x4 m;
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
-    s_solidColorShader->Use();
-    s_solidColorShader->BindUniformVec4("_Color", s_color);
+    auto shader = Shader::builtinShader("SolidColor-Internal");
+    shader->Use();
+    shader->BindUniformVec4("_Color", s_color);
     
-    float euler_angles[] = {
+    float euler_angles[] =
+    {
         0, 0, 90,
         0, 0, 0,
         90, 0, 0,
     };
     
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         float* e = euler_angles + i*3;
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
-        s_solidColorShader->BindUniformMat4("MATRIX_MVP", proj*view*m);
+        shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
         s_circleMesh->Render();
     }
 }
 
+
 void Gizmos::
-DrawHalfWireSphere(const Vector3& center,
-                   const float radius,
-                   const Matrix4x4& modelMatrix)
+DrawHalfWireSphere(
+    const Vector3&      center,
+    const float         radius,
+    const Matrix4x4&    modelMatrix)
 {
-    const auto& shader = Shader::builtinShader("SolidColor");
-    shader->Use();
+    auto shader = Shader::builtinShader("SolidColor-Internal");
     Matrix4x4 m;
-    //m.SetTRS(center, Quaternion::identity, Vector3::one * radius);
-    ShaderUniforms uniforms;
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
-    uniforms.vec4s["Color"] = s_color;
-    shader->BindUniforms(uniforms);
-    
+
     float euler_angles[] = {
         0, 0, 90,
         0, 0, 0,
         0, 90, 90,
     };
     
-    for (int i = 0; i < 3; ++i) {
+    shader->Use();
+    shader->BindUniformVec4("_Color", s_color);
+    for (int i = 0; i < 3; ++i)
+    {
         float* e = euler_angles + i*3;
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
-        Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m * modelMatrix;
-        Pipeline::BindPerDrawUniforms();
+        shader->BindUniformMat4("MATRIX_MVP", p * v * m * modelMatrix);
         glBindVertexArray(s_circleMesh->m_VAO);
         int count = s_circleMesh->m_positionBuffer.size()/3;
         if (i == 1) {
@@ -221,37 +225,35 @@ DrawHalfWireSphere(const Vector3& center,
 
 }
 
+
 void Gizmos::
-DrawWireCube(const Vector3& center,
-             const Vector3& size,
-             const Matrix4x4& modelMatrix)
+DrawWireCube(
+    const Vector3& center,
+    const Vector3& size,
+    const Matrix4x4& modelMatrix)
 {
-    const auto& shader = Shader::builtinShader("SolidColor");
+    auto shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     Matrix4x4 m;
     m.SetTRS(center, Quaternion::identity, size);
     ShaderUniforms uniforms;
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
-    uniforms.vec4s["Color"] = s_color;
-    //uniforms.mat4s["MATRIX_MVP"] = p * v * modelMatrix * m;
-    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * modelMatrix * m;
-    Pipeline::BindPerDrawUniforms();
-    shader->BindUniforms(uniforms);
+    shader->BindUniformVec4("_Color", s_color);
+    shader->BindUniformMat4("MATRIX_MVP", p * v * modelMatrix * m);
     s_boxMesh->Render();
 }
 
+
 void Gizmos::
-DrawWireCapsule(const Vector3& center,
-                const float radius,
-                const float height,
-                const Matrix4x4& modelMatrix)
+DrawWireCapsule(
+    const Vector3&      center,
+    const float         radius,
+    const float         height,
+    const Matrix4x4&    modelMatrix)
 {
     Vector3 c1 = center+Vector3(0, height*0.5f-radius, 0);
     Vector3 c2 = center-Vector3(0, height*0.5f-radius, 0);
-//    glBindVertexArray(s_circleMesh->m_VAO);
-//    glDrawArrays(GL_LINE, 0, s_circleMesh->m_positionBuffer.size()/3/2+1);
-//    glBindVertexArray(0);
     DrawHalfWireSphere(c1, radius);
     DrawHalfWireSphere(c2, radius, Matrix4x4::Scale(-1, 1, 1));
     
@@ -265,47 +267,70 @@ DrawWireCapsule(const Vector3& center,
     DrawLine(c1+offset, c2+offset);
 }
 
+
+void FishEngine::Gizmos::
+DrawHalfCircle(
+    const Vector3&  center,
+    const float     radius,
+    const Vector3   dir1,
+    const Vector3   dir2)
+{
+    const auto& shader = Shader::builtinShader("SolidColor-Internal");
+    shader->Use();
+    auto v = Camera::main()->worldToCameraMatrix();
+    auto p = Camera::main()->projectionMatrix();
+    Matrix4x4 m;
+    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, dir1) * Quaternion::FromToRotation(Vector3::right, dir2), Vector3(radius, radius, radius));
+    shader->BindUniformMat4("MATRIX_MVP", p * v * m);
+    shader->BindUniformVec4("_Color", s_color);
+    glBindVertexArray(s_circleMesh->m_VAO);
+    int count = s_circleMesh->m_positionBuffer.size() / 3;
+    count = count / 2 + 1;
+    glDrawArrays(GL_LINE_STRIP, 0, count);
+    glBindVertexArray(0);
+}
+
+
 void FishEngine::Gizmos::
 DrawCircle(
     const Vector3&  center,
     const float     radius,
     const Vector3&  direction)
 {
-    const auto& shader = Shader::builtinShader("SolidColor");
+    const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
-    ShaderUniforms uniforms;
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
-    uniforms.vec4s["Color"] = s_color;
-    shader->BindUniforms(uniforms);
     Matrix4x4 m;
     m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3(radius, radius, radius));
-    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m;
-    Pipeline::BindPerDrawUniforms();
+    shader->BindUniformMat4("MATRIX_MVP", p * v * m);
+    shader->BindUniformVec4("_Color", s_color);
     s_circleMesh->Render();
 }
 
+
 void FishEngine::Gizmos::
-DrawLight(const Vector3& center, const Vector3& direction)
+DrawLight(
+    const Vector3& center,
+    const Vector3& direction)
 {
-    const auto& shader = s_solidColorShader;
+    const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     auto cameraPos = Camera::main()->transform()->position();
-    auto v = Camera::main()->worldToCameraMatrix();
-    auto p = Camera::main()->projectionMatrix();
-    //float dist = Vector3::Distance(center, Camera::main()->transform()->position());
     Vector3 dir = Vector3::Normalize(center - cameraPos);
     Matrix4x4 m;
     m.SetTRS(cameraPos + dir, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one*0.02f);
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
-    s_solidColorShader->Use();
-    s_solidColorShader->BindUniformMat4("MATRIX_MVP", proj*view*m);
-    s_solidColorShader->BindUniformVec4("_Color", s_color);
+    shader->Use();
+    shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
+    shader->BindUniformVec4("_Color", s_color);
     s_light->Render();
 }
 
-void FishEngine::Gizmos::DrawFrustum(
+
+void FishEngine::Gizmos::
+DrawFrustum(
     const Matrix4x4&    localToWorld,
     const float         zNear,
     const float         zFar,
@@ -352,8 +377,9 @@ void FishEngine::Gizmos::DrawFrustum(
 
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
-    s_solidColorShader->Use();
-    s_solidColorShader->BindUniformMat4("MATRIX_MVP", proj*view);
-    s_solidColorShader->BindUniformVec4("_Color", s_color);
+    auto& shader = Shader::builtinShader("SolidColor-Internal");
+    shader->Use();
+    shader->BindUniformMat4("MATRIX_MVP", proj*view);
+    shader->BindUniformVec4("_Color", s_color);
     frustumMesh.Render(vertices, numLines * 2, GL_LINES);
 }

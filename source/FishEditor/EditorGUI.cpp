@@ -143,61 +143,6 @@ namespace FishEditor
         ImGui_ImplGlfwGL3_Shutdown();
     }
 
-
-    //void GUI::OnKey(int key, int action)
-    //{
-    //}
-    //
-    //void GUI::OnWindowSizeChanged(int width, int height)
-    //{
-    //}
-    //
-    //void GUI::OnMouse(double xpos, double ypos)
-    //{
-    //}
-
-    bool EditorGUI::OnMouseButton(MouseButtonCode button, MouseButtonState action)
-    {
-        if (button == MouseButtonCode::Left &&
-            action == MouseButtonState::Down)
-        {
-            auto selectedGO = Selection::selectedGameObjectInHierarchy();
-            if (selectedGO == nullptr)
-                return false;
-
-            Vector3 center = selectedGO->transform()->position();
-            Vector3 camera_pos = Camera::main()->transform()->position();
-            center = Vector3::Normalize(center - camera_pos) + camera_pos;
-
-            constexpr float d = 0.03f;
-            Bounds aabb[3];
-            for (int i = 0; i < 3; ++i) {
-                Vector3 v(0, 0, 0);
-                v[i] = translate_gizmo_length / 2.f;
-                aabb[i].setCenter(center + v);
-                v.Set(d, d, d);
-                v[i] = translate_gizmo_length;
-                aabb[i].setSize(v);
-            }
-
-            m_selectedAxis = -1;
-            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-            for (int i = 0; i < 3; ++i) {
-                if (aabb[i].IntersectRay(ray)) {
-                    //Debug::Log("%c axis", "xyz"[i]);
-                    m_selectedAxis = i;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    //bool GUI::OnMouseScroll(double yoffset)
-    //{
-    //    return false;
-    //}
-
     bool EditorGUI::Button(const char* text)
     {
         ImGuiContext& g = *GImGui;
@@ -558,6 +503,8 @@ namespace FishEditor
             if (ImGui::BeginMenu("Edit")) {
                 ImGui::EndMenu();
             }
+
+            ImGui::SameLine();
             if (FishEditorWindow::InPlayMode()) {
                 if (ImGui::Button("Stop")) {
                     FishEditorWindow::Stop();
@@ -569,15 +516,28 @@ namespace FishEditor
                 }
             }
 
+            ImGui::SameLine();
+            if (ImGui::Button("Translate")) {
+                m_transformToolType = TransformToolType::Translate;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Rotate")) {
+                m_transformToolType = TransformToolType::Rotate;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Scale")) {
+                m_transformToolType = TransformToolType::Scale;
+            }
+
             float new_time = (float)glfwGetTime();
             int fps = (int)roundf(1.f / float(new_time - time_stamp));
             time_stamp = new_time;
-            std::ostringstream sout;
-            sout << "FPS: " << fps;
-            const char* s = sout.str().c_str();
-            auto fps_stats_size = ImGui::CalcTextSize(s);
+            std::string fps_str = "FPS: " + std::to_string(fps);
+            auto fps_stats_size = ImGui::CalcTextSize(fps_str.c_str());
             ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
-            ImGui::Text("%s", s);
+            ImGui::Text("%s", fps_str.c_str());
             ImGui::EndMainMenuBar();
         }
     }
@@ -589,8 +549,11 @@ namespace FishEditor
         ImGui::End();
     }
 
+
     void EditorGUI::DrawTranslateGizmo()
     {
+        static Vector3 lastMousePosition;
+        static Vector3 lastCenter;
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
@@ -600,10 +563,42 @@ namespace FishEditor
         if (selectedGO == nullptr)
             return;
 
+        auto camera = Camera::main();
+        Vector3 center = selectedGO->transform()->position();
+        Vector3 camera_pos = camera->transform()->position();
+        Vector3 dir = center - camera_pos;
+        center = dir.normalized() + camera_pos;
+
+        // check if any axis is selected by mouse
+        if (Input::GetMouseButtonDown(0))
+        {
+            constexpr float d = 0.03f;
+            Bounds aabb[3];
+            for (int i = 0; i < 3; ++i)
+            {
+                Vector3 v(0, 0, 0);
+                v[i] = translate_gizmo_length / 2.f;
+                aabb[i].setCenter(center + v);
+                v.Set(d, d, d);
+                v[i] = translate_gizmo_length;
+                aabb[i].setSize(v);
+            }
+
+            m_selectedAxis = -1;
+            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            for (int i = 0; i < 3; ++i)
+            {
+                if (aabb[i].IntersectRay(ray))
+                {
+                    m_selectedAxis = i;
+                    break;
+                }
+            }
+        }
+
         auto shader = sceneGizmoMaterial->shader();
         shader->Use();
         sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
-        auto camera = Camera::main();
         auto view = camera->worldToCameraMatrix();
         auto proj = camera->projectionMatrix();
         auto vp = proj * view;
@@ -615,11 +610,6 @@ namespace FishEditor
             0,  1,  0,   0, 0,   0,    // green axis, +y
             0,  0,  1,  90, 0,   0,    // blue axis, +z
         };
-
-        Vector3 center = selectedGO->transform()->position();
-        Vector3 camera_pos = camera->transform()->position();
-        Vector3 dir = center - camera_pos;
-        center = dir.normalized() + camera_pos;
         
         FishEngine::Matrix4x4 model;
 
@@ -646,49 +636,112 @@ namespace FishEditor
         if (m_selectedAxis < 0)
             return;
 
+        // handle mouse movement event
         if (Input::GetMouseButton(0))
         {
-            center = selectedGO->transform()->position();
-            Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
-            Vector3 p = Input::mousePosition(); // new mouse position
-            Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
-            Vector3 axis(0, 0, 0);
-            axis[m_selectedAxis] = 1.f;
-            Vector3 axis_on_plane = vp.MultiplyVector(axis);
-            axis_on_plane.z = 0;
-            axis_on_plane.Normalize(); // axis on the near clip plane
-            p -= Vector3::Project(mouse_movement, axis_on_plane);  // old mouse position
-            Vector3 old_view_dir = Camera::main()->ScreenPointToRay(p).direction;
-            
             // get intersected point of two Rays
-            // solve: o1 + t1 * dir1 = o2 + t2 * dir2
-            // return t2
+            // solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
             auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
             {
                 float x = dir1.x;
                 float y = dir1.y;
                 float z = dir1.z;
-                float test = dir2.z*y-dir2.y*z;
+                float test = dir2.z*y - dir2.y*z;
                 if (!Mathf::Approximately(test, 0.0f))
-                    return ((o1.z*y-o1.y*z)-(o2.z*y-o2.y*z)) / test;
+                    return ((o1.z*y - o1.y*z) - (o2.z*y - o2.y*z)) / test;
                 else
-                    return ((o1.z*x-o1.x*z)-(o2.z*x-o2.x*z)) / (dir2.z*x-dir2.x*z);
+                    return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
             };
+
+            center = selectedGO->transform()->position();
+            Vector3 axis(0, 0, 0);
+            axis[m_selectedAxis] = 1.f;
+
+            if (Input::GetMouseButtonDown(0))
+            {
+                //lastMousePosition = Input::mousePosition();
+                lastCenter = center;
+                Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+                float t = solve(camera_pos, ray.direction, center, axis);
+                lastMousePosition = ray.GetPoint(t);
+                return;
+            }
+
+            Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
+            Vector3 p = Input::mousePosition() - mouse_movement;    // old mouse position
+            Vector3 old_view_dir = Camera::main()->ScreenPointToRay(p).direction;
+            Vector3 axis_on_plane = vp.MultiplyVector(axis);
+            axis_on_plane.z = 0;
+            axis_on_plane.Normalize();                              // axis on the near clip plane
+            p += Vector3::Project(mouse_movement, axis_on_plane);   // new mouse position(along the axis)
+            Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
             
             // solve: camera_pos + t1 * new_view_dir = center + t2 * axis
-            float t  = solve(camera_pos, new_view_dir, center, axis);
-            float tt = solve(camera_pos, old_view_dir, center, axis);
-            tt = 0;
-            Debug::Log("t = %lf, tt = %lf, t-tt = %lf", t, tt, t-tt);
-            selectedGO->transform()->Translate(axis * (t-tt), Space::World);
+            float t  = solve(camera_pos, new_view_dir, lastMousePosition, axis);
+            //float tt = solve(camera_pos, old_view_dir, center, axis);
+            // TODO: (t-tt) is not exactly accurate.
+            // t alone is accurate enough but not suitable for interaction (the first mouse click will move the object to the mouse's position)
+            //t -= tt;
+            //selectedGO->transform()->Translate(axis * t, Space::World);
+            selectedGO->transform()->setPosition(lastCenter + t*axis);
         }
     }
 
-
     void EditorGUI::DrawRotateGizmo()
     {
-    }
+        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        if (m_lastSelectedGameObject.lock() != selectedGO)
+        {
+            m_selectedAxis = -1;
+            m_lastSelectedGameObject = selectedGO;
+        }
+        if (selectedGO == nullptr)
+            return;
 
+        auto camera = Camera::main();
+        auto view = camera->worldToCameraMatrix();
+        auto proj = camera->projectionMatrix();
+        auto vp = proj * view;
+        Vector3 center = selectedGO->transform()->position();
+        Vector3 camera_pos = camera->transform()->position();
+        Vector3 dir = center - camera_pos;
+        center = dir.normalized() + camera_pos;
+
+        constexpr float radius = 0.1f;
+
+        // check if any axis is selected by mouse
+        if (Input::GetMouseButtonDown(0))
+        {
+            m_selectedAxis = -1;
+            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            float t;
+            if (ray.IntersectSphere(center, radius, &t))
+            {
+                auto p = ray.GetPoint(t);
+                for (int i = 0; i < 3; ++i)
+                    if (std::fabsf(p[i] - center[i]) < 0.01f)
+                        m_selectedAxis = i;
+            }
+        }
+
+        //Gizmos::DrawWireSphere(center, 0.1f);
+        Gizmos::setColor(m_selectedAxis == 0 ? Color::yellow : Color::red);
+        Gizmos::DrawCircle(center, radius, Vector3::right);
+        Gizmos::setColor(m_selectedAxis == 1 ? Color::yellow : Color::green);
+        Gizmos::DrawCircle(center, radius, Vector3::up);
+        Gizmos::setColor(m_selectedAxis == 2 ? Color::yellow : Color::blue);
+        Gizmos::DrawCircle(center, radius, Vector3::forward);
+        Gizmos::setColor(Color::black);
+        Gizmos::DrawCircle(center, radius, camera->transform()->forward());
+
+        if (m_selectedAxis < 0)
+            return;
+
+        if (Input::GetMouseButton(0))
+        {
+            
+        }
+    }
 
     void EditorGUI::DrawScaleGizmo()
     {

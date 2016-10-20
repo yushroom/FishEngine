@@ -140,7 +140,7 @@ public:
         auto ground = GameObject::CreatePrimitive(PrimitiveType::Cube);
         ground->transform()->setLocalScale(20, 1, 20);
         ground->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
-        ground->AddComponent<TestGizmos>();
+        //ground->AddComponent<TestGizmos>();
 
         {
             auto box = GameObject::CreatePrimitive(PrimitiveType::Cube);

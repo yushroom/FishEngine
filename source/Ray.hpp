@@ -19,6 +19,8 @@ namespace FishEngine
         {
             return origin + direction * distance;
         }
+
+        bool IntersectSphere(const Vector3& center, const float radius, float* t) const;
     };
 }
 

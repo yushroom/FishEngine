@@ -61,7 +61,7 @@ namespace FishEngine
 
         Vector4 ray_world_h = transform()->localToWorldMatrix() * ray_eye;
         Vector3 ray_world(ray_world_h.x, ray_world_h.y, ray_world_h.z);
-        return Ray(transform()->position(), ray_world.normalized());
+        return Ray(transform()->position(), ray_world.normalized()); 
     }
 
     Matrix4x4 Camera::worldToCameraMatrix() const

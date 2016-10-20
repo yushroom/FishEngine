@@ -149,10 +149,9 @@ public:
     virtual void OnInspectorGUI() override {
         if (EditorGUI::Button("Screen shot")) {
             auto tm = time(nullptr);
-            ostringstream ss;
-            ss << "./" << int(tm) << ".png";
-            EditorRenderSystem::SaveScreenShot(ss.str());
-            Debug::Log("Screen shot saved to %s", ss.str().c_str());
+            std::string path = "./" + std::to_string(int(tm)) + ".png";
+            EditorRenderSystem::SaveScreenShot(path);
+            Debug::Log("Screen shot saved to %s", path.c_str());
         }
     }
 };

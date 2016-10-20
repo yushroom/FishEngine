@@ -205,7 +205,7 @@ namespace FishEditor
         ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
         if (!ImGui::GetIO().WantCaptureMouse) {
             MouseButtonState s = action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up;
-            bool done = EditorGUI::OnMouseButton((MouseButtonCode)button, s);
+            //bool done = EditorGUI::OnMouseButton((MouseButtonCode)button, s);
             //if (done) return;
             Input::UpdateMouseButtonState(button, s);
         }

@@ -36,8 +36,6 @@ namespace FishEditor
 
         static void Clean();
 
-        static bool OnMouseButton(FishEngine::MouseButtonCode button, FishEngine::MouseButtonState action);
-
         static bool Button(const char* text);
 
         static void Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat);

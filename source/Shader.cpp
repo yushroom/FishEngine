@@ -651,9 +651,10 @@ namespace FishEngine {
         Debug::Log("Compile shader: Transparent");
         m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
         
-        m_builtinShaders["SkyboxCubed"] = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
-        m_builtinShaders["SkyboxProcedural"] = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
-
+        m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
+        m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
+        m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.vsfs");
+        m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir + "Editor/Alpha.vsfs");
         GLuint skinnVS = LoadShader(GL_VERTEX_SHADER, root_dir+"SkinnedPass.vert");
     }
 }

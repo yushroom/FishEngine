@@ -26,22 +26,26 @@ namespace FishEngine
         }
         
         static void
-        DrawCube(Vector3 center,
-                 Vector3 size);
+        DrawCube(
+            Vector3 center,
+            Vector3 size);
         
         static void
-        DrawIcon(Vector3 center,
-                 const std::string& name,
-                 bool allowScaling = true);
+        DrawIcon(
+            const Vector3&      center,
+            const std::string&  name,
+            bool                allowScaling = true);
         
         static void
-        DrawLine(const Vector3& from,
-                 const Vector3& to);
+        DrawLine(
+            const Vector3& from,
+            const Vector3& to);
         
         
         static void
-        DrawSphere(const Vector3& center,
-                   const float radius);
+        DrawSphere(
+            const Vector3& center,
+            const float radius);
         
         
         static void
@@ -49,10 +53,17 @@ namespace FishEngine
         
         
         static void
-        DrawRay(const Vector3& from,
-                const Vector3& direction);
-        
-        
+        DrawRay(
+            const Vector3& from,
+            const Vector3& direction);
+
+        static void
+        DrawHalfCircle(
+            const Vector3&  center,
+            const float     radius,
+            const Vector3   dir1,
+            const Vector3   dir2);
+
         static void
         DrawCircle(
             const Vector3&  center,
@@ -63,7 +74,7 @@ namespace FishEngine
         DrawLight(
             const Vector3&  center,
             const Vector3&  direction);
-        
+
         static void
         DrawFrustum(
             const Matrix4x4&    localToWorld,
@@ -73,35 +84,37 @@ namespace FishEngine
             const float         aspect);
 
         static void
-        DrawWireCube(const Vector3& center,
-                     const Vector3& size,
-                     const Matrix4x4& modelMatrix = Matrix4x4::identity);
-        
+        DrawWireCube(
+            const Vector3&      center,
+            const Vector3&      size,
+            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+
         static void
-        DrawWireSphere(const Vector3& center,
-                       const float radius,
-                       const Matrix4x4& modelMatrix = Matrix4x4::identity);
-        
+        DrawWireSphere(
+            const Vector3&      center,
+            const float         radius,
+            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+
         static void
-        DrawWireCapsule(const Vector3& center,
-                        const float radius,
-                        const float height,
-                        const Matrix4x4& modelMatrix = Matrix4x4::identity);
-        
+        DrawWireCapsule(
+            const Vector3&      center,
+            const float         radius,
+            const float         height,
+            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+
     private:
         friend FishEditor::EditorRenderSystem;
         friend FishEditor::EditorGUI;
         
         static void
-        DrawHalfWireSphere(const Vector3& center,
-                           const float radius,
-                           const Matrix4x4& modelMatrix = Matrix4x4::identity);
+        DrawHalfWireSphere(
+            const Vector3& center,
+            const float radius,
+            const Matrix4x4& modelMatrix = Matrix4x4::identity);
         
         static Color s_color;
 
         static void Init();
-
-        static PShader s_solidColorShader;
         
         static PSimpleMesh s_circleMesh;
         static PSimpleMesh s_boxMesh;

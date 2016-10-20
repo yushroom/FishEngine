@@ -108,14 +108,15 @@
 
 - [ ] PBR
 - [ ] Shadow（简单的shadow map，pcf）=>VSM
-- [ ] expose更多的shader uniform给Editor
+- [x] expose更多的shader uniform给Editor
 - [ ] 渲染优化：渲染前按父子关系将transform更新完，渲染时按批次重组draw call batching
-- [ ] uniform buffer
+- [x] uniform buffer
 - [ ] Gbuffer结构和deferred shading
 - [ ] tone mapping
 - [ ] 复杂场景的渲染，如sponza
 - [ ] 更完善的shader include，现在是单纯的查找替换，没有语义，会把注释里面的替换掉，甚至中间不能加空格。区分<>和""，系统目录和当前目录
-- [ ] skinned mesh运动时的线框显示问题
+- [x] skinned mesh运动时的线框显示问题（以后考虑用transform feedback加速动画）
+- [ ] Directional Light 抖动的问题
 
 ## 物理
 

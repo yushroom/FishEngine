@@ -192,6 +192,7 @@ public: // Static
         }
     }
 
+    // Projects a vector onto another vector.
     static Vector3 Project(const Vector3& vector, const Vector3& onNormal)
     {
         float num = Dot(onNormal, onNormal);

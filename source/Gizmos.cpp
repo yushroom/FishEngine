@@ -83,7 +83,7 @@ void Gizmos::Init()
         lightGizmoVertex[j + 1] = 0;
         lightGizmoVertex[j + 2] = s;
         lightGizmoVertex[j + 3] = c;
-        lightGizmoVertex[j + 4] = 4;
+        lightGizmoVertex[j + 4] = 8;
         lightGizmoVertex[j + 5] = s;
     }
     s_light = std::make_shared<SimpleMesh>(lightGizmoVertex, circleVertexCount + numLines * 2, GL_LINES);
@@ -135,15 +135,15 @@ DrawIcon(
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
     Matrix4x4 m;
-    //if (allowScaling)
-    //{
+    if (allowScaling)
+    {
         m.SetTRS(center, view.ToRotation().inverse(), Vector3::one);
-    //}
-    //else
-    //{
-    //    //Vector3 dir = Vector3::Normalize(center - cameraPos);
-    //    m.SetTRS(cameraPos + dir*20, view.ToRotation().inverse(), Vector3::one);
-    //}
+    }
+    else
+    {
+        Vector3 dir = Vector3::Normalize(center - cameraPos);
+        m.SetTRS(cameraPos + dir, view.ToRotation().inverse(), Vector3::one*0.05f);
+    }
 
     alphaShader->BindUniformMat4("MATRIX_MVP", proj*view*m);
     std::map<std::string, PTexture> textures;
@@ -285,20 +285,23 @@ DrawCircle(
     s_circleMesh->Render();
 }
 
-void FishEngine::Gizmos::DrawLight(const Vector3& center, const Vector3& direction)
+void FishEngine::Gizmos::
+DrawLight(const Vector3& center, const Vector3& direction)
 {
-    const auto& shader = Shader::builtinShader("SolidColor");
+    const auto& shader = s_solidColorShader;
     shader->Use();
-    ShaderUniforms uniforms;
+    auto cameraPos = Camera::main()->transform()->position();
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
-    float dist = Vector3::Distance(center, Camera::main()->transform()->position());
-    uniforms.vec4s["Color"] = s_color;
-    shader->BindUniforms(uniforms);
+    //float dist = Vector3::Distance(center, Camera::main()->transform()->position());
+    Vector3 dir = Vector3::Normalize(center - cameraPos);
     Matrix4x4 m;
-    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one * 5.f / dist);
-    Pipeline::perDrawUniformData.MATRIX_MVP = p * v * m;
-    Pipeline::BindPerDrawUniforms();
+    m.SetTRS(cameraPos + dir, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one*0.02f);
+    auto view = Camera::main()->worldToCameraMatrix();
+    auto proj = Camera::main()->projectionMatrix();
+    s_solidColorShader->Use();
+    s_solidColorShader->BindUniformMat4("MATRIX_MVP", proj*view*m);
+    s_solidColorShader->BindUniformVec4("_Color", s_color);
     s_light->Render();
 }
 

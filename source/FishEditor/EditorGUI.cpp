@@ -591,10 +591,9 @@ namespace FishEditor
 
     void EditorGUI::DrawTranslateGizmo()
     {
-        //Gizmos::DrawLine(Vector3(0, 0, 0), Vector3(1, 0, 0));
-
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        if (m_lastSelectedGameObject.lock() != selectedGO) {
+        if (m_lastSelectedGameObject.lock() != selectedGO)
+        {
             m_selectedAxis = -1;
             m_lastSelectedGameObject = selectedGO;
         }
@@ -603,7 +602,6 @@ namespace FishEditor
 
         auto shader = sceneGizmoMaterial->shader();
         shader->Use();
-        //auto camera_pos = Vector3(0, 0, -5);
         sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
         auto camera = Camera::main();
         auto view = camera->worldToCameraMatrix();
@@ -611,9 +609,6 @@ namespace FishEditor
         auto vp = proj * view;
 
         ShaderUniforms uniforms;
-
-        static Transform t;
-        //t.setLocalScale(Vector3(1, 1.5, 1) * 0.15f);
 
         float f[] = {
             1,  0,  0,   0, 0, -90,    // red axis, +x
@@ -624,18 +619,15 @@ namespace FishEditor
         Vector3 center = selectedGO->transform()->position();
         Vector3 camera_pos = camera->transform()->position();
         Vector3 dir = center - camera_pos;
-        float distance = dir.magnitude();
         center = dir.normalized() + camera_pos;
-
+        
+        FishEngine::Matrix4x4 model;
 
         for (int i = 0; i < 3; ++i)
         {
             int j = 6 * i;
-            t.setLocalScale(Vector3(1, 1.5, 1) * 0.015f);
-            t.setLocalEulerAngles(f + j + 3);
             Vector3 pos = center + Vector3(f + j)*translate_gizmo_length;
-            t.setLocalPosition(pos);
-            auto model = t.localToWorldMatrix();
+            model.SetTRS(pos, Quaternion::Euler(Vector3(f+j+3)), Vector3(1, 1.5, 1) * 0.015f);
             Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
             Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
             Pipeline::BindPerDrawUniforms();
@@ -656,15 +648,39 @@ namespace FishEditor
 
         if (Input::GetMouseButton(0))
         {
-            float m_dragSpeed = distance / Camera::main()->nearClipPlane() * 0.5f;
-            float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
-            float y = m_dragSpeed * Input::GetAxis(Axis::MouseY);
-            Vector3 mouse_movement(x, y, 0);
-            Vector3 axis_base(0, 0, 0);
-            axis_base[m_selectedAxis] = 1.f;
-            Vector3 axis_base_view = vp * Vector4(axis_base, 0);
-            float d = Vector3::Dot(mouse_movement, axis_base_view.normalized());
-            selectedGO->transform()->Translate(axis_base * d, Space::World);
+            center = selectedGO->transform()->position();
+            Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
+            Vector3 p = Input::mousePosition(); // new mouse position
+            Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
+            Vector3 axis(0, 0, 0);
+            axis[m_selectedAxis] = 1.f;
+            Vector3 axis_on_plane = vp.MultiplyVector(axis);
+            axis_on_plane.z = 0;
+            axis_on_plane.Normalize(); // axis on the near clip plane
+            p -= Vector3::Project(mouse_movement, axis_on_plane);  // old mouse position
+            Vector3 old_view_dir = Camera::main()->ScreenPointToRay(p).direction;
+            
+            // get intersected point of two Rays
+            // solve: o1 + t1 * dir1 = o2 + t2 * dir2
+            // return t2
+            auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
+            {
+                float x = dir1.x;
+                float y = dir1.y;
+                float z = dir1.z;
+                float test = dir2.z*y-dir2.y*z;
+                if (!Mathf::Approximately(test, 0.0f))
+                    return ((o1.z*y-o1.y*z)-(o2.z*y-o2.y*z)) / test;
+                else
+                    return ((o1.z*x-o1.x*z)-(o2.z*x-o2.x*z)) / (dir2.z*x-dir2.x*z);
+            };
+            
+            // solve: camera_pos + t1 * new_view_dir = center + t2 * axis
+            float t  = solve(camera_pos, new_view_dir, center, axis);
+            float tt = solve(camera_pos, old_view_dir, center, axis);
+            tt = 0;
+            Debug::Log("t = %lf, tt = %lf, t-tt = %lf", t, tt, t-tt);
+            selectedGO->transform()->Translate(axis * (t-tt), Space::World);
         }
     }
 

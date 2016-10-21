@@ -377,7 +377,7 @@ DrawFrustum(
 
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
-    auto& shader = Shader::builtinShader("SolidColor-Internal");
+    auto shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     shader->BindUniformMat4("MATRIX_MVP", proj*view);
     shader->BindUniformVec4("_Color", s_color);

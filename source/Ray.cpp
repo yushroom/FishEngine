@@ -31,6 +31,17 @@ namespace FishEngine
         float t1;
         return Quadraic(A, B, C, t, &t1);
     }
-
+    
+    bool Ray::IntersectPlane(const Vector3& normal, const Vector3& point, float* t) const
+    {
+        // Dot((p-point), normal) = 0
+        // p = origin + t*direction
+        float test = Vector3::Dot(normal, direction);
+        if (Mathf::Approximately(test, 0))
+            return false;
+        *t = Vector3::Dot(point, normal) - Vector3::Dot(normal, origin);
+        *t /= test;
+        return true;
+    }
 }
 

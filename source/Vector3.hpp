@@ -97,7 +97,7 @@ public: // Static
 
     static float Angle(const Vector3& from, const Vector3& to)
     {
-        return Mathf::Acos(Dot(Normalize(from), Normalize(to)));
+        return ::std::acosf(Dot(Normalize(from), Normalize(to))) * Mathf::Rad2Deg;
     }
 
     static float Magnitude(const Vector3& a)

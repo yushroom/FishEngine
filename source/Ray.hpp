@@ -21,6 +21,8 @@ namespace FishEngine
         }
 
         bool IntersectSphere(const Vector3& center, const float radius, float* t) const;
+        
+        bool IntersectPlane(const Vector3& normal, const Vector3& point, float* t) const;
     };
 }
 

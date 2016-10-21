@@ -40,10 +40,10 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-    constexpr float translate_gizmo_length              = 0.1f;
     constexpr float inspector_indent_width              = 4;
 
     TransformToolType EditorGUI::m_transformToolType    = TransformToolType::Translate;
+    TransformSpace    EditorGUI::m_transformSpace       = TransformSpace::Local;
     int     EditorGUI::m_idCount                        = 0;
     bool    EditorGUI::s_locked                         = false;
     int     EditorGUI::m_selectedAxis                   = -1;
@@ -55,6 +55,14 @@ namespace FishEditor
     PMaterial sceneGizmoMaterial = nullptr;
     PMesh cubeMesh = nullptr;
     PMesh coneMesh = nullptr;
+    
+    const char* ToString(TransformSpace& space)
+    {
+        if (space == TransformSpace::Global)
+            return "Global";
+        else
+            return "Local";
+    }
 
     void EditorGUI::Init()
     {
@@ -98,6 +106,20 @@ namespace FishEditor
 
         glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
+        
+        if (Input::GetKeyDown(KeyCode::W))
+        {
+            m_transformToolType = TransformToolType::Translate;
+        }
+        else if (Input::GetKeyDown(KeyCode::E))
+        {
+            m_transformToolType = TransformToolType::Rotate;
+        }
+        else if (Input::GetKeyDown(KeyCode::R))
+        {
+            m_transformToolType = TransformToolType::Scale;
+        }
+        
         if (selectedGO != nullptr)
         {
             if (m_transformToolType == TransformToolType::Translate)
@@ -530,6 +552,13 @@ namespace FishEditor
             if (ImGui::Button("Scale")) {
                 m_transformToolType = TransformToolType::Scale;
             }
+            
+            ImGui::SameLine();
+            if (ImGui::Button(ToString(m_transformSpace)))
+            {
+                m_transformSpace = m_transformSpace==TransformSpace::Global ?
+                    TransformSpace::Local : TransformSpace::Global;
+            }
 
             float new_time = (float)glfwGetTime();
             int fps = (int)roundf(1.f / float(new_time - time_stamp));
@@ -552,8 +581,10 @@ namespace FishEditor
 
     void EditorGUI::DrawTranslateGizmo()
     {
+        constexpr float translate_gizmo_length = 0.1f;
         static Vector3 lastMousePosition;
         static Vector3 lastCenter;
+        
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
@@ -569,26 +600,52 @@ namespace FishEditor
         Vector3 dir = center - camera_pos;
         center = dir.normalized() + camera_pos;
 
+        Vector3 axis[3];
+        if (m_transformSpace == TransformSpace::Local)
+        {
+            axis[0] = selectedGO->transform()->right();     // +x
+            axis[1] = selectedGO->transform()->up();        // +y
+            axis[2] = selectedGO->transform()->forward();   // +z
+        }
+        else
+        {
+            axis[0] = Vector3::right;   // +x
+            axis[1] = Vector3::up;      // +y
+            axis[2] = Vector3::forward; // +z
+        }
+        
         // check if any axis is selected by mouse
         if (Input::GetMouseButtonDown(0))
         {
-            constexpr float d = 0.03f;
-            Bounds aabb[3];
-            for (int i = 0; i < 3; ++i)
-            {
-                Vector3 v(0, 0, 0);
-                v[i] = translate_gizmo_length / 2.f;
-                aabb[i].setCenter(center + v);
-                v.Set(d, d, d);
-                v[i] = translate_gizmo_length;
-                aabb[i].setSize(v);
-            }
-
             m_selectedAxis = -1;
-            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            Ray view = camera->ScreenPointToRay(Input::mousePosition());
+            float t[3];
+            view.IntersectPlane(axis[0], center, t);
+            view.IntersectPlane(axis[1], center, t+1);
+            view.IntersectPlane(axis[2], center, t+2);
+            float tmid;
+            if (t[0] >= t[1])
+            {
+                if (t[1] >= t[2])
+                    tmid = t[1];
+                else if (t[0] >= t[2])
+                    tmid = t[2];
+                else
+                    tmid = t[0];
+            } else
+            {
+                if (t[0] >= t[2])
+                    tmid = t[0];
+                else if (t[1] >= t[2])
+                    tmid = t[2];
+                else
+                    tmid = t[1];
+            }
+            Vector3 p = view.GetPoint(tmid);
+            Vector3 d = Vector3::Normalize(p-center);
             for (int i = 0; i < 3; ++i)
             {
-                if (aabb[i].IntersectRay(ray))
+                if (Vector3::Dot(d, axis[i]) > 0.96f)
                 {
                     m_selectedAxis = i;
                     break;
@@ -605,6 +662,9 @@ namespace FishEditor
 
         ShaderUniforms uniforms;
 
+
+        Color colors[3] = {Color::red, Color::green, Color::blue};
+        
         float f[] = {
             1,  0,  0,   0, 0, -90,    // red axis, +x
             0,  1,  0,   0, 0,   0,    // green axis, +y
@@ -616,8 +676,9 @@ namespace FishEditor
         for (int i = 0; i < 3; ++i)
         {
             int j = 6 * i;
-            Vector3 pos = center + Vector3(f + j)*translate_gizmo_length;
-            model.SetTRS(pos, Quaternion::Euler(Vector3(f+j+3)), Vector3(1, 1.5, 1) * 0.015f);
+            Vector3 pos = center + axis[i]*translate_gizmo_length;
+            Quaternion rot = Quaternion::FromToRotation(Vector3::up, axis[i]);
+            model.SetTRS(pos, rot, Vector3(1, 1.5, 1) * 0.015f);
             Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
             Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
             Pipeline::BindPerDrawUniforms();
@@ -635,60 +696,54 @@ namespace FishEditor
 
         if (m_selectedAxis < 0)
             return;
+        
+        // get intersected point of two Rays
+        // solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
+        auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
+        {
+            float x = dir1.x;
+            float y = dir1.y;
+            float z = dir1.z;
+            float test = dir2.z*y - dir2.y*z;
+            if (!Mathf::Approximately(test, 0.0f))
+                return ((o1.z*y - o1.y*z) - (o2.z*y - o2.y*z)) / test;
+            else
+                return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
+        };
+        
+        center = selectedGO->transform()->position();
+        
+        auto& axis_selected = axis[m_selectedAxis];
+        
+        if (Input::GetMouseButtonDown(0))
+        {
+            lastCenter = center;
+            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            float t = solve(center, axis_selected, camera_pos, ray.direction);
+            lastMousePosition = ray.GetPoint(t);
+            return;
+        }
 
         // handle mouse movement event
         if (Input::GetMouseButton(0))
         {
-            // get intersected point of two Rays
-            // solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
-            auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
-            {
-                float x = dir1.x;
-                float y = dir1.y;
-                float z = dir1.z;
-                float test = dir2.z*y - dir2.y*z;
-                if (!Mathf::Approximately(test, 0.0f))
-                    return ((o1.z*y - o1.y*z) - (o2.z*y - o2.y*z)) / test;
-                else
-                    return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
-            };
-
-            center = selectedGO->transform()->position();
-            Vector3 axis(0, 0, 0);
-            axis[m_selectedAxis] = 1.f;
-
-            if (Input::GetMouseButtonDown(0))
-            {
-                //lastMousePosition = Input::mousePosition();
-                lastCenter = center;
-                Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-                float t = solve(camera_pos, ray.direction, center, axis);
-                lastMousePosition = ray.GetPoint(t);
-                return;
-            }
-
             Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
-            Vector3 p = Input::mousePosition() - mouse_movement;    // old mouse position
-            Vector3 old_view_dir = Camera::main()->ScreenPointToRay(p).direction;
-            Vector3 axis_on_plane = vp.MultiplyVector(axis);
+            Vector3 axis_on_plane = vp.MultiplyVector(axis_selected);
             axis_on_plane.z = 0;
             axis_on_plane.Normalize();                              // axis on the near clip plane
-            p += Vector3::Project(mouse_movement, axis_on_plane);   // new mouse position(along the axis)
+            Vector3 p = Input::mousePosition() - mouse_movement + Vector3::Project(mouse_movement, axis_on_plane);   // new mouse position(along the axis)
             Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
             
-            // solve: camera_pos + t1 * new_view_dir = center + t2 * axis
-            float t  = solve(camera_pos, new_view_dir, lastMousePosition, axis);
-            //float tt = solve(camera_pos, old_view_dir, center, axis);
-            // TODO: (t-tt) is not exactly accurate.
-            // t alone is accurate enough but not suitable for interaction (the first mouse click will move the object to the mouse's position)
-            //t -= tt;
-            //selectedGO->transform()->Translate(axis * t, Space::World);
-            selectedGO->transform()->setPosition(lastCenter + t*axis);
+            // solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
+            float t  = solve(camera_pos, new_view_dir, lastMousePosition, axis_selected);
+            selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
         }
     }
 
     void EditorGUI::DrawRotateGizmo()
     {
+        static Vector3 lastFromDir;
+        static Quaternion lastRotation;
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
@@ -699,15 +754,29 @@ namespace FishEditor
             return;
 
         auto camera = Camera::main();
-        auto view = camera->worldToCameraMatrix();
-        auto proj = camera->projectionMatrix();
-        auto vp = proj * view;
+        //auto view = camera->worldToCameraMatrix();
+        //auto proj = camera->projectionMatrix();
+        //auto vp = proj * view;
         Vector3 center = selectedGO->transform()->position();
         Vector3 camera_pos = camera->transform()->position();
         Vector3 dir = center - camera_pos;
-        center = dir.normalized() + camera_pos;
+        Vector3 gizmo_center = dir.normalized() + camera_pos;
 
         constexpr float radius = 0.1f;
+        
+        Vector3 axis[3];
+        if (m_transformSpace == TransformSpace::Local)
+        {
+            axis[0] = selectedGO->transform()->right();     // +x
+            axis[1] = selectedGO->transform()->up();        // +y
+            axis[2] = selectedGO->transform()->forward();   // +z
+        }
+        else
+        {
+            axis[0] = Vector3::right;   // +x
+            axis[1] = Vector3::up;      // +y
+            axis[2] = Vector3::forward; // +z
+        }
 
         // check if any axis is selected by mouse
         if (Input::GetMouseButtonDown(0))
@@ -715,31 +784,62 @@ namespace FishEditor
             m_selectedAxis = -1;
             auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             float t;
-            if (ray.IntersectSphere(center, radius, &t))
+            if (ray.IntersectSphere(gizmo_center, radius, &t))
             {
                 auto p = ray.GetPoint(t);
                 for (int i = 0; i < 3; ++i)
-                    if (std::fabsf(p[i] - center[i]) < 0.01f)
+                {
+                    auto dir = Vector3::Normalize(p - gizmo_center);
+                    if ( std::fabsf(Vector3::Dot(axis[i], dir)) < 0.1f )
+                    {
                         m_selectedAxis = i;
+                        lastFromDir = Vector3::Cross(axis[i], Vector3::Cross(dir, axis[i]));
+                        lastFromDir.Normalize();
+                        lastRotation = selectedGO->transform()->localRotation();
+                    }
+                }
             }
         }
 
         //Gizmos::DrawWireSphere(center, 0.1f);
-        Gizmos::setColor(m_selectedAxis == 0 ? Color::yellow : Color::red);
-        Gizmos::DrawCircle(center, radius, Vector3::right);
-        Gizmos::setColor(m_selectedAxis == 1 ? Color::yellow : Color::green);
-        Gizmos::DrawCircle(center, radius, Vector3::up);
-        Gizmos::setColor(m_selectedAxis == 2 ? Color::yellow : Color::blue);
-        Gizmos::DrawCircle(center, radius, Vector3::forward);
-        Gizmos::setColor(Color::black);
-        Gizmos::DrawCircle(center, radius, camera->transform()->forward());
+        Color colors[3] = {Color::red, Color::green, Color::blue};
+        for (int i = 0; i < 3; ++i)
+        {
+            Gizmos::setColor(colors[i]);
+            Gizmos::DrawLine(gizmo_center, gizmo_center+axis[i] * radius);
+            if (m_selectedAxis == i)
+                Gizmos::setColor(Color::yellow);
+            Gizmos::DrawCircle(gizmo_center, radius, axis[i]);
+        }
+
+        Gizmos::setColor(Color::white);
+        Gizmos::DrawCircle(gizmo_center, radius, camera->transform()->forward());
+        Gizmos::DrawCircle(gizmo_center, radius*1.1f, camera->transform()->forward());
 
         if (m_selectedAxis < 0)
             return;
-
+        
         if (Input::GetMouseButton(0))
         {
+            Ray view = camera->ScreenPointToRay(Input::mousePosition());
+            auto& face_normal = axis[m_selectedAxis];
+            float t;
+            if (!view.IntersectPlane(face_normal, center, &t))
+            {
+                return;
+            }
+//            if (t >= Vector3::Distance(center, camera_pos) + 0.001f)
+//            {
+//                return;
+//            }
+            Vector3 intersected_p = view.GetPoint(t);
+            Vector3 dir_to = Vector3::Normalize(intersected_p - center);
+            auto rot = Quaternion::FromToRotation(lastFromDir, dir_to) * lastRotation;
+            selectedGO->transform()->setLocalRotation(rot);
             
+            Gizmos::setColor(Color::yellow);
+            Gizmos::DrawLine(gizmo_center, gizmo_center + lastFromDir * radius);
+            Gizmos::DrawLine(gizmo_center, gizmo_center + dir_to * radius);
         }
     }
 

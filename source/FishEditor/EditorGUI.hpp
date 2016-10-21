@@ -24,6 +24,12 @@ namespace FishEditor
         Rotate,
         Scale,
     };
+    
+    enum class TransformSpace
+    {
+        Global,
+        Local,
+    };
 
     class EditorGUI
     {
@@ -44,6 +50,7 @@ namespace FishEditor
 
     private:
         static TransformToolType m_transformToolType;
+        static TransformSpace m_transformSpace;
         static int m_idCount;   // temp
         static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
 

@@ -232,7 +232,7 @@ public:
 
     static float Acos(float f)
     {
-        return ::std::acos(f*Deg2Rad);
+        return ::std::acos(f*Deg2Rad) * Rad2Deg;
     }
 
     static float Asin(float f)

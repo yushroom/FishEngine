@@ -38,7 +38,9 @@
 
 - [ ] basic model用NEF代替：http://assimp.sourceforge.net/howtoBasicShapes.html
 
-- [ ] eulerangles数值不自然
+- [x] eulerangles数值不自然（暂时解决）
+
+- [ ] 用bsp或八叉树之类的结构来组织场景，相交测试等等
 
 - [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
 
@@ -80,7 +82,9 @@
 
 - [x] 相机旋转时transform反应不正常，会越退越远
 
-- [ ] 场景中物体的平移（完成，相机需要在任何scale下面都有一样的translation，selection改变时清空selected axis暂时搞定，用球代替Bounds求交？）、旋转、缩放等操作
+- [ ] 场景中物体的平移（完成，相机需要在任何scale下面都有一样的translation，selection改变时清空selected axis暂时搞定，用球代替Bounds求交？）、旋转(改成半圆, 绘制扫过的扇形等)、缩放等操作
+
+      区分global和local
 
 - [ ] GUI样式美化
 

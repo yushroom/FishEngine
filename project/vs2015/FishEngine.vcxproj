@@ -221,6 +221,7 @@
     <ClCompile Include="..\..\source\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Ray.cpp" />
     <ClCompile Include="..\..\source\Renderer.cpp" />
+    <ClCompile Include="..\..\source\RenderSettings.cpp" />
     <ClCompile Include="..\..\source\RenderSystem.cpp" />
     <ClCompile Include="..\..\source\RenderTexture.cpp" />
     <ClCompile Include="..\..\source\Rigidbody.cpp" />

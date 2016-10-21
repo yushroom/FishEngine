@@ -1,16 +1,32 @@
 #ifndef RenderSettings_hpp
 #define RenderSettings_hpp
 
-#include "Script.hpp"
+#include "Object.hpp"
 #include "RenderSystem.hpp"
-#include <imgui/imgui.h>
 
 namespace FishEngine
 {
-    class RenderSettings : public Script
+    class RenderSettings : public Object
     {
     public:
-        InjectClassName(RenderSettings);
+        //InjectClassName(RenderSettings);
+
+        RenderSettings() = delete;
+
+        static PMaterial skybox()
+        {
+            return m_skybox;
+        }
+
+        static void setSkybox(PMaterial& skybox)
+        {
+            m_skybox = skybox;
+        }
+
+    private:
+
+        // The global skybox to use.
+        static PMaterial m_skybox;
     };
 }
 

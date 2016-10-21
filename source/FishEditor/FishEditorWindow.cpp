@@ -220,7 +220,10 @@ namespace FishEditor
         Screen::m_width = w;
         Screen::m_height = h;
         if (w != 0 && h != 0)
+        {
             EditorRenderSystem::OnWindowSizeChanged(w, h);
+            EditorGUI::OnWindowSizeChanged(w, h);
+        }
         //glViewport(0, 0, width, height);
         //GUI::OnWindowSizeChanged(width, height);
     }

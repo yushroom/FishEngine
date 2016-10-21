@@ -30,6 +30,7 @@
 #include <SkinnedMeshRenderer.hpp>
 #include <Camera.hpp>
 #include <Component_gen.hpp>
+#include <Light.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -41,6 +42,7 @@ using namespace FishEngine;
 namespace FishEditor
 {
     constexpr float inspector_indent_width              = 4;
+    constexpr float menuBarHeight = 20;
 
     TransformToolType EditorGUI::m_transformToolType    = TransformToolType::Translate;
     TransformSpace    EditorGUI::m_transformSpace       = TransformSpace::Local;
@@ -51,10 +53,21 @@ namespace FishEditor
     bool    EditorGUI::s_openMenuPopup                  = false;
     bool    EditorGUI::m_showAssectSelectionDialogBox   = false;
 
+    bool    EditorGUI::s_windowResized                  = true;
+
     std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
     PMaterial sceneGizmoMaterial = nullptr;
     PMesh cubeMesh = nullptr;
     PMesh coneMesh = nullptr;
+
+    ImVec2 inspectorWindowPos;
+    ImVec2 inspectorWindowSize;
+    ImVec2 hierarchyWindowPos;
+    ImVec2 hierarchyWindowSize;
+    ImVec2 projectWindowPos;
+    ImVec2 projectWindowSize;
+
+    ImGuiWindowFlags globalWindowFlags = 0;
     
     const char* ToString(TransformSpace& space)
     {
@@ -74,6 +87,7 @@ namespace FishEditor
 
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->AddFontFromFileTTF((root_dir + "fonts/DroidSans.ttf").c_str(), 14.0f);
+        io.IniFilename = nullptr;
 
         ImGuiContext& g = *GImGui;
         ImGuiStyle& style = g.Style;
@@ -89,12 +103,18 @@ namespace FishEditor
         style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
-        style.WindowMinSize = ImVec2(256, 256);
+        style.WindowMinSize = ImVec2(128, 128);
 
         sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
         cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
+
+        globalWindowFlags |= ImGuiWindowFlags_NoCollapse;
+        //globalWindowFlags |= ImGuiWindowFlags_NoResize;
+        globalWindowFlags |= ImGuiWindowFlags_ShowBorders;
+        CalculateWindowSizeAndPosition();
     }
+
 
     void EditorGUI::Update()
     {
@@ -130,12 +150,6 @@ namespace FishEditor
                 DrawScaleGizmo();
         }
 
-        //ImGuiContext& g = *GImGui;
-        //ImGuiStyle& style = g.Style;
-
-        //ImGui::BeginDock("Dock");
-        //ImGui::EndDock();
-
         DrawMainMenu();
         //DrawToolBar();
         DrawHierarchyWindow();
@@ -158,6 +172,7 @@ namespace FishEditor
     //    }
 
         ImGui::Render();
+        s_windowResized = false;
     }
 
     void EditorGUI::Clean()
@@ -197,6 +212,11 @@ namespace FishEditor
         //        ImGui::Separator();
         //        ImGui::EndPopup();
         //    }
+    }
+
+    void EditorGUI::OnWindowSizeChanged(const int width, const int height)
+    {
+        CalculateWindowSizeAndPosition();
     }
 
     void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
@@ -269,7 +289,13 @@ namespace FishEditor
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         // Hierarchy view
         //ImGui::BeginDock("Hierarchy");
-        ImGui::Begin("Hierarchy");
+
+        if (s_windowResized)
+        {
+            ImGui::SetNextWindowPos(hierarchyWindowPos);
+            ImGui::SetNextWindowSize(hierarchyWindowSize);
+        }
+        ImGui::Begin("Hierarchy", nullptr, globalWindowFlags);
         //static ImGuiTextFilter filter;
         //filter.Draw();
         static char filterStr[128];
@@ -343,13 +369,20 @@ namespace FishEditor
 
     }
 
+
     void EditorGUI::DrawInspectorWindow()
     {
         auto selectedGO = Selection::activeGameObject();
 
         // Inspector Editor
         //ImGui::BeginDock("Inspector", nullptr);
-        ImGui::Begin("Inspector", nullptr);
+
+        if (s_windowResized)
+        {
+            ImGui::SetNextWindowPos(inspectorWindowPos);
+            ImGui::SetNextWindowSize(inspectorWindowSize);
+        }
+        ImGui::Begin("Inspector", nullptr, globalWindowFlags);
         ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
         if (selectedGO == nullptr) {
             //ImGui::EndDock(); // Inspector Editor
@@ -506,9 +539,15 @@ namespace FishEditor
         ImGui::End();
     }
 
+
     void EditorGUI::DrawProjectWindow()
     {
-        ImGui::Begin("Project");
+        if (s_windowResized)
+        {
+            ImGui::SetNextWindowPos(projectWindowPos);
+            ImGui::SetNextWindowSize(projectWindowSize);
+        }
+        ImGui::Begin("Project", nullptr, globalWindowFlags);
         ImGui::End();
     }
 
@@ -1223,6 +1262,18 @@ namespace FishEditor
         ImGui::Combo("Direction", &capsuleCollider->m_direction, listbox_items, 3);
     }
 
+    template<>
+    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Light>& light)
+    {
+        int index = ToIndex(light->m_type);
+        if (ImGui::Combo("Type", &index, LightTypeStrings, EnumCount<LightType>()))
+        {
+            light->m_type = ToEnum<LightType>(index);
+        }
+        ImGui::ColorEdit4("Color", light->m_color.m);
+        Float("Intensity", &light->m_intensity);
+        ImGui::DragFloat("Range", &light->m_range);
+    }
 
     template<>
     void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component)
@@ -1241,6 +1292,30 @@ namespace FishEditor
         Case(CapsuleCollider)
         Case(Rigidbody)
         Case(SkinnedMeshRenderer)
+        Case(Light)
 #undef Case
+    }
+
+
+    void EditorGUI::CalculateWindowSizeAndPosition()
+    {
+        int w = Screen::width();
+        int h = Screen::height();
+
+        hierarchyWindowPos.x = 0;
+        hierarchyWindowPos.y = menuBarHeight;
+        hierarchyWindowSize.x = 200;
+        hierarchyWindowSize.y = h - menuBarHeight - 200;
+
+        projectWindowPos.x = 0;
+        projectWindowPos.y = static_cast<float>(h - 200);
+        projectWindowSize.x = static_cast<float>(w - 256);
+        projectWindowSize.y = 200;
+
+        inspectorWindowPos.x = static_cast<float>(w - 256);
+        inspectorWindowPos.y = menuBarHeight;
+        inspectorWindowSize.x = 256;
+        inspectorWindowSize.y = h - menuBarHeight;
+        s_windowResized = true;
     }
 }

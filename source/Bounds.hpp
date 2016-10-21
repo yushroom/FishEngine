@@ -8,19 +8,23 @@ namespace FishEngine
 {
     struct Bounds
     {
+        // The center of the bounding box.
         Vector3 center() const { return m_center; }
         void setCenter(const Vector3& center) { m_center = center; }
 
-
+        // The total size of the box. This is always twice as large as the extents.
         Vector3 size() const { return m_extents * 2.f; }
         void setSize(const Vector3& size) { m_extents = size * 0.5f; }
 
+        // The extents of the box. This is always half of the size.
         Vector3 extents() const { return m_extents; }
         void setExtents(const Vector3& extents) { m_extents = extents; }
 
+        // The minimal point of the box. This is always equal to center-extents.
         Vector3 min() const { return m_center - m_extents; }
         void setMin(const Vector3& min) { SetMinMax(min, max()); }
 
+        // The maximal point of the box. This is always equal to center+extents.
         Vector3 max() const { return m_center + m_extents; }
         void setMax(const Vector3& max) { SetMinMax(min(), max); }
 

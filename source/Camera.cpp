@@ -10,23 +10,36 @@ namespace FishEngine
     std::vector<PCamera> Camera::m_allCameras;
 
 
+    void Camera::OnWindowSizeChanged(const int width, const int height)
+    {
+        const float aspect = float(width) / height;
+        for (auto& cam : m_allCameras)
+        {
+            if (!cam->m_isAspectSet)
+            {
+                cam->m_aspect = aspect;
+                cam->m_isDirty = true;
+            }
+        }
+    }
+
     PCamera Camera::Create(
         float fov, 
-        float aspect, 
         float nearClipPlane, 
         float farClipPlane, 
         CameraType type /*= CameraType::Game*/)
     {
-        auto camera = std::make_shared<Camera>(fov, aspect, nearClipPlane, farClipPlane);
+        auto camera = std::make_shared<Camera>(fov, nearClipPlane, farClipPlane);
         camera->m_cameraType = type;
         m_allCameras.push_back(camera);
         return camera;
     }
 
-    Camera::Camera(float fov, float aspect, float zNear, float zFar)
-        : m_fieldOfView(fov), m_aspect(aspect), m_nearClipPlane(zNear), m_farClipPlane(zFar)
+    Camera::Camera(float fov, float zNear, float zFar)
+        : m_fieldOfView(fov), m_nearClipPlane(zNear), m_farClipPlane(zFar)
     {
         //m_focusPoint = transform()->position() + transform()->forward() * 5.f;
+        ResetAspect();
     }
 
 
@@ -46,7 +59,13 @@ namespace FishEngine
     }
 
 
-    FishEngine::Ray FishEngine::Camera::ScreenPointToRay(const Vector3& position)
+    void Camera::ResetAspect()
+    {
+        m_aspect = Screen::aspect();
+        m_isAspectSet = false;
+    }
+
+    Ray Camera::ScreenPointToRay(const Vector3& position)
     {
         //http://antongerdelan.net/opengl/raycasting.html
 
@@ -76,7 +95,10 @@ namespace FishEngine
 
     void Camera::OnDrawGizmosSelected()
     {
-        Gizmos::DrawFrustum(transform()->localToWorldMatrix(), m_nearClipPlane, m_farClipPlane, m_fieldOfView, m_aspect);
+        Gizmos::setColor(Color::white);
+        Gizmos::setMatrix(transform()->localToWorldMatrix());
+        Gizmos::DrawFrustum(transform()->position(), m_fieldOfView, m_farClipPlane, m_nearClipPlane, m_aspect);
+        Gizmos::setMatrix(Matrix4x4::identity);
     }
 
     std::shared_ptr<Camera> Camera::main()
@@ -97,7 +119,7 @@ namespace FishEngine
 
 
     std::shared_ptr<Camera> Camera::
-        mainGameCamera()
+    mainGameCamera()
     {
         for (auto& c : m_allCameras)
         {
@@ -110,7 +132,8 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Camera::FrameSelected(std::shared_ptr<GameObject>& selected)
+    void Camera::
+    FrameSelected(std::shared_ptr<GameObject>& selected)
     {
         auto camera = Camera::main()->transform();
         float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);

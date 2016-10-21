@@ -2,6 +2,9 @@
 #include "Scene.hpp"
 #include "Gizmos.hpp"
 #include "ModelImporter.hpp"
+#include "BoxCollider.hpp"
+#include "SphereCollider.hpp"
+#include "CapsuleCollider.hpp"
 
 namespace FishEngine
 {
@@ -24,8 +27,14 @@ namespace FishEngine
 
     FishEngine::PGameObject GameObject::CreatePrimitive(PrimitiveType type)
     {
-        //abort();
-        return Model::builtinModel(type)->CreateGameObject();
+        auto go = Model::builtinModel(type)->CreateGameObject();
+        if (type == PrimitiveType::Cube)
+            go->AddComponent<BoxCollider>();
+        else if (type == PrimitiveType::Sphere)
+            go->AddComponent<SphereCollider>();
+        else if (type == PrimitiveType::Capsule)
+            go->AddComponent<CapsuleCollider>();
+        return go;
     }
 
     PGameObject GameObject::Find(const std::string& name)

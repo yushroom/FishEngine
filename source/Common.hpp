@@ -20,6 +20,12 @@ namespace FishEngine
     template<typename T>
     inline T ToEnum(const std::string& s);
 
+    template<typename T>
+    inline T ToEnum(const int index);
+
+    template<typename T>
+    constexpr int EnumCount();
+
     //template<typename T>
     //inline T TryUpdate()
     //{

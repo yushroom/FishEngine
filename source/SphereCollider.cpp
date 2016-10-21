@@ -30,5 +30,7 @@ void FishEngine::SphereCollider::
 OnDrawGizmosSelected()
 {
     Gizmos::setColor(Color::green);
-    Gizmos::DrawWireSphere(m_center, m_radius, transform()->localToWorldMatrix());
+    Gizmos::setMatrix(transform()->localToWorldMatrix());
+    Gizmos::DrawWireSphere(m_center, m_radius);
+    Gizmos::setMatrix(Matrix4x4::identity);
 }

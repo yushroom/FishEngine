@@ -21,6 +21,7 @@ static const std::set<std::string> DummyNodeNames = { "Translation", "PreRotatio
 
 namespace FishEngine {
 
+
     std::map<PrimitiveType, PModel> Model::s_builtinModels;
 
     void Model::
@@ -50,6 +51,13 @@ namespace FishEngine {
     builtinModel(
         const PrimitiveType type) {
         return s_builtinModels[type];
+    }
+
+    PMesh Model::
+    builtinMesh(
+        const PrimitiveType type)
+    {
+        return s_builtinModels[type]->mainMesh();
     }
 
 

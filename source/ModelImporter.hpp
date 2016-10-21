@@ -53,6 +53,7 @@ namespace FishEngine {
         static void Init();
         
         static PModel builtinModel(const PrimitiveType type);
+        static PMesh builtinMesh(const PrimitiveType type);
         
     private:
         friend class ModelImporter;

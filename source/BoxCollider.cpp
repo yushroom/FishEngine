@@ -36,5 +36,7 @@ OnDrawGizmosSelected()
 {
     //const auto& s = transform()->lossyScale();
     Gizmos::setColor(Color::green);
-    Gizmos::DrawWireCube(m_center, m_size, transform()->localToWorldMatrix());
+    Gizmos::setMatrix(transform()->localToWorldMatrix());
+    Gizmos::DrawWireCube(m_center, m_size);
+    Gizmos::setMatrix(Matrix4x4::identity);
 }

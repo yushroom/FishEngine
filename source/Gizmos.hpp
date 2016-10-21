@@ -9,6 +9,7 @@
 
 namespace FishEngine
 {
+    // Gizmos are used to give visual debugging or setup aids in the scene view.
     class Gizmos
     {
     public:
@@ -20,9 +21,15 @@ namespace FishEngine
         }
         
         static void
-        setColor(const Color& c)
+        setColor(const Color& color)
         {
-            s_color = c;
+            s_color = color;
+        }
+
+        static void
+        setMatrix(const Matrix4x4& matrix)
+        {
+            s_matrix = matrix;
         }
         
         static void
@@ -75,32 +82,33 @@ namespace FishEngine
             const Vector3&  center,
             const Vector3&  direction);
 
+
+        /*! brief Draw a camera frustum using the currently set Gizmos.matrix for it's location and rotation.
+         * @parm[center] The apex of the truncated pyramid. NOT used here!
+         */
         static void
         DrawFrustum(
-            const Matrix4x4&    localToWorld,
-            const float         zNear,
-            const float         zFar,
-            const float         fovy,
+            const Vector3&      center,
+            const float         fov,
+            const float         maxRange,
+            const float         minRange,
             const float         aspect);
 
         static void
         DrawWireCube(
             const Vector3&      center,
-            const Vector3&      size,
-            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+            const Vector3&      size);
 
         static void
         DrawWireSphere(
             const Vector3&      center,
-            const float         radius,
-            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+            const float         radius);
 
         static void
         DrawWireCapsule(
             const Vector3&      center,
             const float         radius,
-            const float         height,
-            const Matrix4x4&    modelMatrix = Matrix4x4::identity);
+            const float         height);
 
     private:
         friend FishEditor::EditorRenderSystem;
@@ -112,7 +120,11 @@ namespace FishEngine
             const float radius,
             const Matrix4x4& modelMatrix = Matrix4x4::identity);
         
-        static Color s_color;
+        // Sets the color for the gizmos that will be drawn next.
+        static Color        s_color;
+
+        // Set the gizmo matrix used to draw all gizmos.
+        static Matrix4x4    s_matrix;
 
         static void Init();
         

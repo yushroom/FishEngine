@@ -38,6 +38,7 @@ using namespace FishEditor;
 #include <boost/archive/xml_iarchive.hpp>
 #include <Serialization.hpp>
 #include <CapsuleCollider.hpp>
+#include <RenderSettings.hpp>
 
 using namespace std;
 using namespace FishEngine;
@@ -323,7 +324,7 @@ SCRIPT_END
 
 void DefaultScene()
 {
-    auto camera = Camera::Create(60.0f, Screen::aspect(), 0.3f, 1000.f);
+    auto camera = Camera::Create(60.0f, 0.3f, 1000.f);
     auto camera_go = Scene::CreateGameObject("Main Camera");
     camera_go->AddComponent(camera);
     camera_go->AddComponent<CameraController>();
@@ -335,14 +336,12 @@ void DefaultScene()
     auto light_go = Scene::CreateGameObject("Directional Light");
     light_go->transform()->setPosition(0, 3, 0);
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
-    //auto euler = light_go->transform()->localEulerAngles();
     light_go->AddComponent(Light::Create());
-    light_go->AddComponent<Rotator>();
     
     
-    auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-    skyboxGO->setName("Skybox");
-    skyboxGO->transform()->setLocalScale(100, 100, 100);
+    //auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+    //skyboxGO->setName("Skybox");
+    //skyboxGO->transform()->setLocalScale(100, 100, 100);
     auto material = Material::builtinMaterial("SkyboxProcedural");
     material->SetFloat("_AtmosphereThickness", 1.0);
     //material->SetFloat("_SunDisk", 2);
@@ -350,7 +349,8 @@ void DefaultScene()
     material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
     material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
     material->SetFloat("_Exposure", 1.3f);
-    skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    //skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    RenderSettings::setSkybox(material);
 }
             
 
@@ -429,7 +429,7 @@ void test()
         boost::archive::xml_oarchive oa(ss);
         boost::archive::xml_iarchive ia(ss);
         
-        Camera camera2(60.0f, Screen::aspect(), 0.3f, 1000.f);
+        Camera camera2(60.0f, 0.3f, 1000.f);
         oa << BOOST_SERIALIZATION_NVP(camera2);
         auto xml = ss.str();
         cout << xml << endl;

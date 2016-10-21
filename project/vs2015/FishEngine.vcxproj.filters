@@ -359,5 +359,8 @@
     <ClCompile Include="..\..\source\Skybox.cpp">
       <Filter>Render</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\RenderSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

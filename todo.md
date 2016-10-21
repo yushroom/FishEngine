@@ -14,7 +14,7 @@
 
 - [ ] SceneView按F选中的物体会自动居中，并且按boundingbox调整相机距离
 
-- [ ] 高分屏的处理（尤其是高分屏移动到普通屏）
+- [x] 高分屏的处理（尤其是高分屏移动到普通屏）
 
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
@@ -34,13 +34,13 @@
 
 - [ ] transform父子关系改变时的操作，应该维持子节点在world space下的T、R、S都不变
 
-- [ ] assimp导入的fbx动画有冗余的（骨骼？）结点（~~done，导入时加参数~~），解析每个节点的local transformation。
+- [x] assimp导入的fbx动画有冗余的（骨骼？）结点（~~done，导入时加参数~~），解析每个节点的local transformation。
 
 - [ ] basic model用NEF代替：http://assimp.sourceforge.net/howtoBasicShapes.html
 
 - [x] eulerangles数值不自然（暂时解决）
 
-- [ ] 用bsp或八叉树之类的结构来组织场景，相交测试等等
+- [ ] 用bsp或八叉树之类的结构来组织场景，相交测试，鼠标选取物体等等
 
 - [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
 

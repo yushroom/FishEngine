@@ -48,6 +48,8 @@ namespace FishEditor
 
         static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
 
+        static void OnWindowSizeChanged(const int width, const int height);
+
     private:
         static TransformToolType m_transformToolType;
         static TransformSpace m_transformSpace;
@@ -83,6 +85,9 @@ namespace FishEditor
 
         template<class T>
         static void OnInspectorGUI(const std::shared_ptr<T>& component);
+
+        static bool s_windowResized;
+        static void CalculateWindowSizeAndPosition();
     };
 
     template<>

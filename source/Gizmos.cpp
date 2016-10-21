@@ -9,6 +9,7 @@
 using namespace FishEngine;
 
 Color       Gizmos::s_color         = Color::green;
+Matrix4x4   Gizmos::s_matrix        = Matrix4x4::identity;
 PSimpleMesh Gizmos::s_circleMesh    = nullptr;
 PSimpleMesh Gizmos::s_boxMesh       = nullptr;
 PSimpleMesh Gizmos::s_light         = nullptr;
@@ -21,6 +22,19 @@ static PTexture lightGizmoTexture;
 
 constexpr int circleVertexCount = 64;
 
+
+/************************************************************************/
+/* helper functions                                                     */
+/************************************************************************/
+
+float getScaleForConstantSizeGeometry(const Vector3& center, float targetScale)
+{
+    // http://gamedev.stackexchange.com/questions/24968/constant-size-geometries
+    auto camera = Camera::main();
+    float camera_object_distance = Vector3::Distance(camera->transform()->position(), center);
+    float worldSize = 2.0f * Mathf::Tan(camera->fieldOfView() * 0.5f) * camera_object_distance;
+    return targetScale * worldSize;
+}
 
 void Gizmos::Init()
 {
@@ -134,15 +148,10 @@ DrawIcon(
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
     Matrix4x4 m;
-    if (allowScaling)
-    {
-        m.SetTRS(center, view.ToRotation().inverse(), Vector3::one);
-    }
-    else
-    {
-        Vector3 dir = Vector3::Normalize(center - cameraPos);
-        m.SetTRS(cameraPos + dir, view.ToRotation().inverse(), Vector3::one*0.05f);
-    }
+    float scale = 0.5f;
+    if (!allowScaling)
+        scale = getScaleForConstantSizeGeometry(center, 0.05f);
+    m.SetTRS(center, view.ToRotation().inverse(), Vector3::one*scale);
 
     shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
     std::map<std::string, PTexture> textures;
@@ -160,8 +169,7 @@ DrawIcon(
 void Gizmos::
 DrawWireSphere(
     const Vector3&      center,
-    const float         radius,
-    const Matrix4x4&    modelMatrix)
+    const float         radius)
 {
     Matrix4x4 m;
     auto view = Camera::main()->worldToCameraMatrix();
@@ -229,8 +237,7 @@ DrawHalfWireSphere(
 void Gizmos::
 DrawWireCube(
     const Vector3& center,
-    const Vector3& size,
-    const Matrix4x4& modelMatrix)
+    const Vector3& size)
 {
     auto shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
@@ -240,7 +247,7 @@ DrawWireCube(
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
     shader->BindUniformVec4("_Color", s_color);
-    shader->BindUniformMat4("MATRIX_MVP", p * v * modelMatrix * m);
+    shader->BindUniformMat4("MATRIX_MVP", p * v * s_matrix * m);
     s_boxMesh->Render();
 }
 
@@ -249,8 +256,7 @@ void Gizmos::
 DrawWireCapsule(
     const Vector3&      center,
     const float         radius,
-    const float         height,
-    const Matrix4x4&    modelMatrix)
+    const float         height)
 {
     Vector3 c1 = center+Vector3(0, height*0.5f-radius, 0);
     Vector3 c2 = center-Vector3(0, height*0.5f-radius, 0);
@@ -316,10 +322,9 @@ DrawLight(
 {
     const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
-    auto cameraPos = Camera::main()->transform()->position();
-    Vector3 dir = Vector3::Normalize(center - cameraPos);
+    float scale = getScaleForConstantSizeGeometry(center, 0.02f);
     Matrix4x4 m;
-    m.SetTRS(cameraPos + dir, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one*0.02f);
+    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one*scale);
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
     shader->Use();
@@ -329,35 +334,35 @@ DrawLight(
 }
 
 
-void FishEngine::Gizmos::
+void Gizmos::
 DrawFrustum(
-    const Matrix4x4&    localToWorld,
-    const float         zNear,
-    const float         zFar,
-    const float         fovy,
-    const float         aspect)
+    const Vector3&  center,
+    const float     fov,
+    const float     maxRange,
+    const float     minRange,
+    const float     aspect)
 {
     static DynamicMesh frustumMesh;
     constexpr int numLines = 4 * 3;
-    float vertices[numLines*2*3];
-    float tan2 = Mathf::Tan(fovy * 0.5f);
-    float h1 = tan2 * zNear;
+    float vertices[numLines * 2 * 3];
+    float tan2 = Mathf::Tan(fov * 0.5f);
+    float h1 = tan2 * minRange;
     float w1 = h1 * aspect;
-    float h2 = tan2 * zFar;
+    float h2 = tan2 * maxRange;
     float w2 = h2 * aspect;
 
     Vector3 v[8];
-    v[0].Set(-w1,  h1, zNear);
-    v[1].Set( w1,  h1, zNear);
-    v[2].Set( w1, -h1, zNear);
-    v[3].Set(-w1, -h1, zNear);
-    v[4].Set(-w2,  h2, zFar);
-    v[5].Set( w2,  h2, zFar);
-    v[6].Set( w2, -h2, zFar);
-    v[7].Set(-w2, -h2, zFar);
+    v[0].Set(-w1, h1, minRange);
+    v[1].Set(w1, h1, minRange);
+    v[2].Set(w1, -h1, minRange);
+    v[3].Set(-w1, -h1, minRange);
+    v[4].Set(-w2, h2, maxRange);
+    v[5].Set(w2, h2, maxRange);
+    v[6].Set(w2, -h2, maxRange);
+    v[7].Set(-w2, -h2, maxRange);
     for (int i = 0; i < 8; ++i)
     {
-        v[i] = localToWorld.MultiplyPoint(v[i]);
+        v[i] = s_matrix.MultiplyPoint(v[i]);
     }
 
     const int indices[numLines * 2] = {
@@ -383,3 +388,4 @@ DrawFrustum(
     shader->BindUniformVec4("_Color", s_color);
     frustumMesh.Render(vertices, numLines * 2, GL_LINES);
 }
+

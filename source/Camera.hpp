@@ -22,12 +22,17 @@ namespace FishEngine
 
         //private:
         Camera() = default;
-        Camera(float fov, float aspect, float nearClipPlane, float farClipPlane);
+        Camera(float fov, float nearClipPlane, float farClipPlane);
 
         // The aspect ratio (width divided by height).
         float aspect() const
         {
             return m_aspect;
+        }
+
+        float fieldOfView() const
+        {
+            return m_fieldOfView;
         }
 
         float orthographicSize() const
@@ -49,6 +54,13 @@ namespace FishEngine
         void setAspect(float aspect)
         {
             m_aspect = aspect;
+            m_isDirty = true;
+            m_isAspectSet = true;
+        }
+
+        void setFieldOfView(float fieldOfView)
+        {
+            m_fieldOfView = fieldOfView;
             m_isDirty = true;
         }
 
@@ -73,7 +85,7 @@ namespace FishEngine
             return m_viewport;
         }
 
-        //virtual void OnInspectorGUI() override;
+        void ResetAspect();
 
         // Returns a ray going from camera through a screen point.
         Ray ScreenPointToRay(const Vector3& position);
@@ -87,11 +99,11 @@ namespace FishEngine
 
         static PCamera mainGameCamera();
 
+        static void OnWindowSizeChanged(const int width, const int height);
 
         static PCamera
         Create(
             float       fov,
-            float       aspect,
             float       nearClipPlane,
             float       farClipPlane,
             CameraType  type = CameraType::Game);
@@ -107,7 +119,8 @@ namespace FishEngine
         float m_orthographicSize    = 5.f;
 
         // The aspect ratio (width divided by height).
-        float m_aspect              = 1.0f; 
+        float m_aspect              = 1.0f;
+        bool m_isAspectSet         = false;
 
         float m_farClipPlane        = 0.3f;
         float m_nearClipPlane       = 100.f;

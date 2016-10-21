@@ -24,6 +24,7 @@
 #include <Gizmos.hpp>
 #include "SceneView.hpp"
 #include <Pipeline.hpp>
+#include <RenderSettings.hpp>
 
 using namespace FishEngine;
 
@@ -69,6 +70,8 @@ namespace FishEditor
     {
         ImGui_ImplGlfwGL3_NewFrame();
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
         auto camera = Camera::main();
         auto proj = camera->projectionMatrix();
         auto view = camera->worldToCameraMatrix();
@@ -81,6 +84,32 @@ namespace FishEditor
         //Debug::Log("%f", t);
         Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
         Pipeline::BindPerFrameUniforms();
+
+
+        /************************************************************************/
+        /* Skybox                                                               */
+        /************************************************************************/
+        Matrix4x4 model = Matrix4x4::Scale(100);
+        auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
+        Pipeline::perDrawUniformData.MATRIX_MVP = Pipeline::perFrameUniformData.MATRIX_VP * model;
+        Pipeline::perDrawUniformData.MATRIX_MV = mv;
+        Pipeline::perDrawUniformData.MATRIX_M = model;
+        Pipeline::perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
+        Pipeline::perDrawUniformData.MATRIX_IT_M = model.transpose().inverse();
+        Pipeline::BindPerDrawUniforms();
+        static auto sphere = Model::builtinMesh(PrimitiveType::Sphere);
+        auto skybox_material = RenderSettings::skybox();
+        auto shader = skybox_material->shader();
+        shader->Use();
+        //glCullFace(GL_BACK);
+        //glDisable(GL_DEPTH_TEST);
+        shader->PreRender();
+        skybox_material->Update();
+        shader->CheckStatus();
+        sphere->Render();
+        shader->PostRender();
+        //glEnable(GL_DEPTH_TEST);
+        //glCullFace(GL_BACK);
 
         Vector4 lightDir(0, 0, 0, 0);
         //std::map<std::string, Texture::PTexture> textures;
@@ -101,24 +130,22 @@ namespace FishEditor
         Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
         Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
 
-        // Shadow
 
-        //auto lights = Light::lights();
+        /************************************************************************/
+        /* Shadow                                                               */
+        /************************************************************************/
         for (auto& l : lights) {
             Scene::RenderShadow(l);
         }
-
-        // Render
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
         const int h = Screen::height();
         glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
 
-        // Selection
-
+        /************************************************************************/
+        /* Selection                                                            */
+        /************************************************************************/
         if (m_highlightSelections) {
             auto camera = Camera::main();
             auto view = camera->worldToCameraMatrix();
@@ -195,6 +222,10 @@ namespace FishEditor
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
 
+
+        /************************************************************************/
+        /* Scene                                                                */
+        /************************************************************************/
         //Scene::Render();
         std::vector<std::shared_ptr<GameObject>> transparentQueue;
         for (auto& go : Scene::m_gameObjects) {
@@ -213,6 +244,9 @@ namespace FishEditor
             renderer->Render();
         }
 
+        /************************************************************************/
+        /* Transparent                                                          */
+        /************************************************************************/
         for (auto& go : transparentQueue) {
             std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
             if (renderer == nullptr) {
@@ -223,13 +257,24 @@ namespace FishEditor
 
         transparentQueue.clear();
 
+
         if (m_isWireFrameMode)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        /************************************************************************/
+        /* Gizmos                                                               */
+        /************************************************************************/
+        //glEnable(GL_POLYGON_OFFSET_LINE);
+        //glPolygonOffset(-1.0, -1.0f);
+        glDepthFunc(GL_LEQUAL);
+        //glDisable(GL_DEPTH_TEST);
         auto go = Selection::selectedGameObjectInHierarchy();
         if (go != nullptr)
             go->OnDrawGizmosSelected();
         Scene::OnDrawGizmos();
+        glDepthFunc(GL_LESS);
+        //glEnable(GL_DEPTH_TEST);
+        //glDisable(GL_POLYGON_OFFSET_LINE);
 
         if (m_showShadowMap) {
             auto& l = Light::lights().front();
@@ -273,10 +318,9 @@ namespace FishEditor
         delete[] pixels;
     }
 
-    void EditorRenderSystem::OnWindowSizeChanged(const int width, const int height) {
+    void EditorRenderSystem::OnWindowSizeChanged(const int width, const int height)
+    {
         //glViewport(0, 0, m_width, m_height);
-        //Scene::mainCamera()->setAspect(float(width)/height);
-        SceneView::m_camera->setAspect(float(width) / height);
-        Camera::main()->setAspect(float(width) / height);
+        Camera::OnWindowSizeChanged(width, height);
     }
 }

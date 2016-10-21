@@ -42,6 +42,8 @@ namespace FishEngine {
             m_sharedMesh = sharedMesh;
         }
 
+        virtual void OnDrawGizmosSelected() override;
+
     private:
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;

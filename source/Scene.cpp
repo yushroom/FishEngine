@@ -18,9 +18,6 @@ namespace FishEngine
     std::vector<PScript>        Scene::m_scriptsToBeDestroyed;
     std::vector<PComponent>     Scene::m_componentsToBeDestroyed;
 
-    //PGameObject> Scene::m_activeGameObject = nullptr;
-    //GameObject* Scene::m_activeGameObject = nullptr;
-
     PGameObject FishEngine::Scene::CreateGameObject(const std::string& name)
     {
         auto go = std::make_shared<GameObject>(name);
@@ -53,11 +50,11 @@ namespace FishEngine
         }
         m_scriptsToBeDestroyed.clear();
 
-        // Destroy gameobjcets
+        // Destroy game objects
         for (auto& g : m_gameObjectsToBeDestroyed) {
             DestroyImmediate(g);
         }
-        m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, gameobjects should be destroyed automatically.
+        m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, game objects should be destroyed automatically.
 
         for (auto& go : m_gameObjects) {
             if (!go->activeInHierarchy()) continue;

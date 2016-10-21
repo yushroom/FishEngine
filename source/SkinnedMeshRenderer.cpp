@@ -5,12 +5,12 @@
 #include "GameObject.hpp"
 #include "Debug.hpp"
 #include "Scene.hpp"
-#include "MeshFilter.hpp"
 #include "Mesh.hpp"
 #include "Light.hpp"
 #include "Animator.hpp"
 #include "Pipeline.hpp"
 #include "Camera.hpp"
+#include "Gizmos.hpp"
 
 namespace FishEngine
 {
@@ -111,5 +111,13 @@ namespace FishEngine
             m_sharedMesh->Render();
             shader->PostRender();
         }
+    }
+
+    void SkinnedMeshRenderer::OnDrawGizmosSelected()
+    {
+        Gizmos::setColor(Color::white);
+        Gizmos::setMatrix(transform()->localToWorldMatrix());
+        Bounds b = localBounds();
+        Gizmos::DrawWireCube(b.center(), b.size());
     }
 }

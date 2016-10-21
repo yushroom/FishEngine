@@ -8,11 +8,6 @@
 
 using namespace FishEngine;
 
-void Light::OnInspectorGUI()
-{
-    ImGui::ColorEdit4("Color", m_color.m);
-    ImGui::DragFloat("Range", &m_range);
-}
 
 void FishEngine::Light::OnDrawGizmos()
 {
@@ -24,8 +19,6 @@ void FishEngine::Light::OnDrawGizmosSelected()
     Gizmos::setColor(Color::yellow);
     Vector3 center = transform()->position();
     Vector3 dir = transform()->forward();
-    //Gizmos::DrawLine(center, center + dir);
-    //Gizmos::DrawCircle(center, 1.0f, dir);
     Gizmos::DrawLight(center, dir);
 }
 

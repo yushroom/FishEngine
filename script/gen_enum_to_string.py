@@ -1,12 +1,9 @@
 cpp_enum_code = '''
-enum class ZTest {
-    Less        = GL_LESS,
-    Greater     = GL_GREATER,
-    LEqual      = GL_LEQUAL,
-    GEqual      = GL_GEQUAL,
-    Equal       = GL_EQUAL,
-    NotEqual    = GL_NOTEQUAL,
-    Always      = GL_ALWAYS,
+enum class LightType {
+    Directional,
+    Point,
+    Spot,
+    Area,
 };
 '''
 
@@ -28,27 +25,61 @@ for line in lines[1:-1]:
 	enum_elements.append(var.strip())
 
 print enum_elements
+print ''
+
+# count
+template = "template<>\nconstexpr int EnumCount<{0}>() {{ return {1}; }}".format(enum_name, len(enum_elements))
+print("// enum count")
+print(template)
+print ''
+
+# String array
+template = "constexpr const char* {}Strings[] = {{\n".format(enum_name)
+for e in enum_elements:
+	template += '    "{}", \n'.format(e)
+template += '};'
+print("// string array")
+print(template)
+print ''
+
+
+# index to enum
+template = 'template<>\n'.format(enum_name)
+template += 'inline {0} ToEnum<{0}>(const int index)\n{{\n    switch (index) {{ \n'.format(enum_name)
+for idx, e in enumerate(enum_elements):
+	template += '        case {2}: return {0}::{1}; break; \n'.format(enum_name, e, idx)
+
+print("// index to enum")
+template += '        default: abort(); break;\n    }\n}'
+print template
+print ''
+
+
+# enum to index
+template = 'inline int ToIndex({} e)\n{{\n    switch (e) {{ \n'.format(enum_name)
+for idx, e in enumerate(enum_elements):
+	template += '        case {0}::{1}: return {2}; break; \n'.format(enum_name, e, idx)
+template += '        default: abort(); break;\n    }\n}'
+print("// enum to index")
+print template
+print ''
 
 
 # enum to string
 template = 'inline const char* ToString({} e)\n{{\n    switch (e) {{ \n'.format(enum_name)
-
 for e in enum_elements:
 	template += '        case {0}::{1}: return "{1}"; break; \n'.format(enum_name, e)
-
 template += '        default: abort(); break;\n    }\n}'
-
+print("// enum to string");
 print template
-
 print ''
+
 
 # string to enum
 template = 'template<>\n'.format(enum_name)
 template += 'inline {0} ToEnum<{0}>(const std::string& s)\n{{\n'.format(enum_name)
-
 for e in enum_elements:
 	template += '    if (s == "{0}") return {1}::{0};\n'.format(e, enum_name)
-
+print("// string to enum")
 template += '    abort();\n}'
-
 print template

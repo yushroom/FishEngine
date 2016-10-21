@@ -10,9 +10,9 @@ namespace FishEngine
     class Renderer : public Component
     {
     public:
-        InjectClassName(Renderer)
+        InjectClassName(Renderer);
 
-            Renderer() = default;
+        Renderer() = default;
 
         Renderer(PMaterial material)
         {
@@ -38,7 +38,10 @@ namespace FishEngine
             m_materials.push_back(material);
         }
 
+        Bounds bounds() const;
+
         //virtual void OnInspectorGUI() override;
+        virtual void OnDrawGizmosSelected() override;
 
     protected:
         friend class FishEditor::EditorGUI;

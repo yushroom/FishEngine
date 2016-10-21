@@ -4,6 +4,7 @@
 #include "Behaviour.hpp"
 #include "Color.hpp"
 #include "RenderTexture.hpp"
+#include "Common.hpp"
 
 // reference:
 // https://docs.unity3d.com/Manual/Lighting.html
@@ -18,6 +19,65 @@ namespace FishEngine
         Spot,
         Area,
     };
+
+    template<>
+    constexpr int EnumCount<LightType>() { return 4; }
+
+    // string array
+    static const char* LightTypeStrings[] = {
+        "Directional",
+        "Point",
+        "Spot",
+        "Area",
+    };
+
+    // index to enum
+    template<>
+    inline LightType ToEnum<LightType>(const int index)
+    {
+        switch (index) {
+        case 0: return LightType::Directional; break;
+        case 1: return LightType::Point; break;
+        case 2: return LightType::Spot; break;
+        case 3: return LightType::Area; break;
+        default: abort(); break;
+        }
+    }
+
+    // enum to index
+    inline int ToIndex(LightType e)
+    {
+        switch (e) {
+        case LightType::Directional: return 0; break;
+        case LightType::Point: return 1; break;
+        case LightType::Spot: return 2; break;
+        case LightType::Area: return 3; break;
+        default: abort(); break;
+        }
+    }
+
+    // enum to string
+    inline const char* ToString(LightType e)
+    {
+        switch (e) {
+        case LightType::Directional: return "Directional"; break;
+        case LightType::Point: return "Point"; break;
+        case LightType::Spot: return "Spot"; break;
+        case LightType::Area: return "Area"; break;
+        default: abort(); break;
+        }
+    }
+
+    // string to enum
+    template<>
+    inline LightType ToEnum<LightType>(const std::string& s)
+    {
+        if (s == "Directional") return LightType::Directional;
+        if (s == "Point") return LightType::Point;
+        if (s == "Spot") return LightType::Spot;
+        if (s == "Area") return LightType::Area;
+        abort();
+    }
 
     class Light : public Behaviour
     {
@@ -38,17 +98,17 @@ namespace FishEngine
             return m_shadowNearPlane;
         }
 
-        virtual void OnInspectorGUI() override;
         virtual void OnDrawGizmos() override;
         virtual void OnDrawGizmosSelected() override;
 
     private:
         friend class Scene;
         friend class FishEditor::EditorRenderSystem;
+        friend class FishEditor::EditorGUI;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
         // The current type of light. Possible values are Directional, Point, Spot and Area
-        LightType m_type;
+        LightType m_type = LightType::Directional;
 
         // How far light is emitted from the center of the object (Point and Spot lights only).
         float m_range;

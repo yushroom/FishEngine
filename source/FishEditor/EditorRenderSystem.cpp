@@ -83,6 +83,26 @@ namespace FishEditor
         float t = Time::time();
         //Debug::Log("%f", t);
         Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
+        
+        Vector4 lightDir(0, 0, 0, 0);
+        //std::map<std::string, Texture::PTexture> textures;
+        Matrix4x4 lightVP;
+        auto& lights = Light::lights();
+        if (lights.size() > 0) {
+            auto& l = lights.front();
+            if (l->transform() != nullptr) {
+                lightDir = Vector4(-l->transform()->forward(), 0);
+                //auto view = l->gameObject()->transform()->worldToLocalMatrix();
+                //auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
+                //lightVP = proj * view;
+                lightVP = l->m_projectMatrixForShadowMap * l->m_viewMatrixForShadowMap;
+                //textures["shadowMap"] = l->m_shadowMap;
+            }
+            Pipeline::perFrameUniformData.LightColor0 = l->m_color;
+        }
+        Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
+        Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
+        
         Pipeline::BindPerFrameUniforms();
 
 
@@ -111,24 +131,7 @@ namespace FishEditor
         //glEnable(GL_DEPTH_TEST);
         //glCullFace(GL_BACK);
 
-        Vector4 lightDir(0, 0, 0, 0);
-        //std::map<std::string, Texture::PTexture> textures;
-        Matrix4x4 lightVP;
-        auto& lights = Light::lights();
-        if (lights.size() > 0) {
-            auto& l = lights.front();
-            if (l->transform() != nullptr) {
-                lightDir = Vector4(-l->transform()->forward(), 0);
-                auto view = l->gameObject()->transform()->worldToLocalMatrix();
-                auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
-                //auto proj = Camera::main()->projectionMatrix();
-                lightVP = proj * view;
-                //textures["shadowMap"] = l->m_shadowMap;
-            }
-            Pipeline::perFrameUniformData.LightColor0 = l->m_color;
-        }
-        Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
-        Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
+
 
 
         /************************************************************************/

@@ -338,9 +338,9 @@ namespace FishEngine {
         return result;
     }
 
-    Matrix4x4 Matrix4x4::LookAt(const Vector3& eye, const Vector3& center, const Vector3 up)
+    Matrix4x4 Matrix4x4::LookAt(const Vector3& eye, const Vector3& target, const Vector3& up)
     {
-        Vector3 f = Vector3::Normalize(center - eye);
+        Vector3 f = Vector3::Normalize(target - eye);
         Vector3 s = Vector3::Normalize(Vector3::Cross(up, f));
         Vector3 u = Vector3::Cross(f, s);
 

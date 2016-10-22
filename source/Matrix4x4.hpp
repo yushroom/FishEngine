@@ -265,10 +265,16 @@ public:
         const float zNear,
         const float zFar);
 
+    
+    /// Build a left handed look at view matrix(world space to local space).
+    ///
+    /// @param eye Position of the camera
+    /// @param center Position where the camera is looking at
+    /// @param up Normalized up vector, how the camera is oriented. Typically (0, 0, 1)
     static Matrix4x4 LookAt(
         const Vector3& eye, 
-        const Vector3& center, 
-        const Vector3 up);
+        const Vector3& target,
+        const Vector3& up);
 
 public:
     static const Matrix4x4 identity;

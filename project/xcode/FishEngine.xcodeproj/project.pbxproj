@@ -54,6 +54,7 @@
 		BFB361BA1DAD11DC00CD0DCB /* Pipeline.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */; };
 		BFBF36FB1DBA593A006F4E82 /* RenderSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF36F91DBA593A006F4E82 /* RenderSettings.cpp */; };
 		BFBF36FC1DBA593A006F4E82 /* RenderSettings.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF36FA1DBA593A006F4E82 /* RenderSettings.hpp */; };
+		BFBF36FE1DBB8A82006F4E82 /* Frustum.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF36FD1DBB8A82006F4E82 /* Frustum.hpp */; };
 		BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */; };
 		BFD20AC91D9D52AD00DB88E1 /* Animator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
@@ -157,6 +158,7 @@
 		BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Pipeline.hpp; path = ../../source/Pipeline.hpp; sourceTree = "<group>"; };
 		BFBF36F91DBA593A006F4E82 /* RenderSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderSettings.cpp; path = ../../source/RenderSettings.cpp; sourceTree = "<group>"; };
 		BFBF36FA1DBA593A006F4E82 /* RenderSettings.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderSettings.hpp; path = ../../source/RenderSettings.hpp; sourceTree = "<group>"; };
+		BFBF36FD1DBB8A82006F4E82 /* Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Frustum.hpp; path = ../../source/Frustum.hpp; sourceTree = "<group>"; };
 		BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Animator.cpp; path = ../../source/Animator.cpp; sourceTree = "<group>"; };
 		BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Animator.hpp; path = ../../source/Animator.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -299,6 +301,7 @@
 			children = (
 				BFAF11D61D9930A100101DCD /* Bounds.cpp */,
 				BFAF11D71D9930A100101DCD /* Bounds.hpp */,
+				BFBF36FD1DBB8A82006F4E82 /* Frustum.hpp */,
 				BF3212191D9173FF00FA80E6 /* Mathf.hpp */,
 				BF32121A1D9173FF00FA80E6 /* Matrix4x4.cpp */,
 				BF32121B1D9173FF00FA80E6 /* Matrix4x4.hpp */,
@@ -445,6 +448,7 @@
 				BFAF11E11D9930A100101DCD /* Screen.hpp in Headers */,
 				BFDC74DC1D8EDDF50082A6DC /* Renderer.hpp in Headers */,
 				BFDC74EA1D8EDDF50082A6DC /* Transform.hpp in Headers */,
+				BFBF36FE1DBB8A82006F4E82 /* Frustum.hpp in Headers */,
 				BFDC74BC1D8EDDF50082A6DC /* App.hpp in Headers */,
 				BFDC74D61D8EDDF50082A6DC /* MeshFilter.hpp in Headers */,
 				BFDC74C01D8EDDF50082A6DC /* Camera.hpp in Headers */,

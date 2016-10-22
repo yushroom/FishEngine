@@ -9,6 +9,8 @@
 #include "MeshFilter.hpp"
 #include "Pipeline.hpp"
 #include "SkinnedMeshRenderer.hpp"
+#include "Frustum.hpp"
+#include "Gizmos.hpp"
 
 
 namespace FishEngine
@@ -66,25 +68,93 @@ namespace FishEngine
             go->Update();
         }
         
-        UpdateBounds();
+        //UpdateBounds();
     }
 
     void Scene::RenderShadow(PLight& light)
     {
+        // get compact light frustum
+        auto    camera          = Camera::mainGameCamera();
+        //auto    world_to_camera = camera->transform()->worldToLocalMatrix();
+        auto    camera_to_world = camera->transform()->localToWorldMatrix();
+        Vector3 camera_pos      = camera->transform()->position();
+        Vector3 light_dir       = light->transform()->forward();
+        
+//        Frustum view_frustum;  // in camera's local space
+//        //view_frustrum.center    = camera_pos;
+//        view_frustrum.aspect    = camera->aspect();
+//        view_frustrum.fov       = camera->fieldOfView();
+//        view_frustrum.minRange  = camera->nearClipPlane();
+//        view_frustrum.maxRange  = camera->farClipPlane();
+        
+        Frustum view_frustum = camera->frustum();
+        
+        UpdateBounds(); // get bounding box of the whole scene
+        Bounds bound_in_camera_space = camera->transform()->InverseTransformBounds(m_bounds);
+        auto pmin = bound_in_camera_space.min();
+        auto pmax = bound_in_camera_space.max();
+        if (view_frustum.minRange < pmin.z)
+        {
+            view_frustum.minRange = pmin.z;
+        }
+        if (view_frustum.maxRange > pmax.z)
+        {
+            view_frustum.maxRange = pmax.z;
+        }
+        
+        Gizmos::setMatrix(camera_to_world);
+        Gizmos::setColor(Color::cyan);
+        Gizmos::DrawFrustum(view_frustum);
+        Gizmos::setMatrix(Matrix4x4::identity);
+        
+        Matrix4x4 light_view_matrix = Matrix4x4::LookAt(camera_pos, camera_pos+light_dir, camera->transform()->up());
+        Vector3 local_corners_of_view_frustum[8];
+        view_frustum.getLocalCorners(local_corners_of_view_frustum);
+        auto& world_to_light = light_view_matrix;
+        auto light_to_world = light_view_matrix.inverse();
+        Bounds aabb;    // the bounding box of view frustum in light's local space
+        for (auto corner : local_corners_of_view_frustum)
+        {
+            corner = camera_to_world.MultiplyPoint(corner); // -> world space
+            corner = world_to_light.MultiplyPoint(corner);  // -> light's local space
+            aabb.Encapsulate(corner);
+        }
+        
+        // light frustum
+        Gizmos::setMatrix(light_to_world);
+        Gizmos::setColor(Color::magenta);
+        Gizmos::DrawWireCube(aabb.center(), aabb.size());
+        Gizmos::DrawLine(aabb.center(), aabb.center()+Vector3(0, 0, 1)*aabb.extents());
+        //Gizmos::DrawLine(Vector3::zero, Vector3(0, 0, 1));
+        //Gizmos::DrawWireSphere(Vector3::zero, 1.0f);
+        Gizmos::setMatrix(Matrix4x4::identity);
+        
+        
+        Vector3 new_light_position = aabb.center();
+        new_light_position.z -= aabb.extents().z + light->shadowNearPlane();
+        new_light_position = light_to_world.MultiplyPoint(new_light_position);
+        
+        Gizmos::DrawWireSphere(new_light_position, 0.5f);
+        
+        light->m_viewMatrixForShadowMap = Matrix4x4::LookAt(new_light_position, new_light_position+light_dir, camera->transform()->up());
+        //auto dir = light->m_viewMatrixForShadowMap.MultiplyVector(0, 0, 1);
+        const auto& ext = aabb.extents();
+        light->m_projectMatrixForShadowMap = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
+        
+        
         //glCullFace(GL_FRONT);
-        auto m = Material::builtinMaterial("ShadowMap");
-        auto shader = m->shader();
-        //shader->Use();
-        //ShaderUniforms uniforms;
-        auto view = light->transform()->worldToLocalMatrix();
-        auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, light->shadowNearPlane(), 100.f);
-        //auto proj = Camera::main()->projectionMatrix();
+        auto shadow_map_material = Material::builtinMaterial("ShadowMap");
+        auto& view = light->m_viewMatrixForShadowMap;
+        auto& proj = light->m_projectMatrixForShadowMap;
 
         auto shadowMap = light->m_shadowMap;
         glViewport(0, 0, shadowMap->width(), shadowMap->height());
         glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->depthBufferFBO());
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        //shader->Use();
+        auto light_vp = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
+        
         for (auto& go : m_gameObjects)
         {
             if (!go->activeInHierarchy()) continue;
@@ -96,9 +166,12 @@ namespace FishEngine
                 if (meshFilter != nullptr)
                 {
                     mesh = meshFilter->mesh();
+                    auto shader = shadow_map_material->shader();
                     shader->Use();
-                    Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
-                    Pipeline::BindPerDrawUniforms();
+                    //Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
+                    //Pipeline::BindPerDrawUniforms();
+                    auto mvp = light_vp * go->transform()->localToWorldMatrix();
+                    shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
                     shader->CheckStatus();
                     mesh->Render();
                     continue;
@@ -109,12 +182,15 @@ namespace FishEngine
             if (renderer != nullptr)
             {
                 mesh = renderer->sharedMesh();
-                shader->m_skinnedShader->Use();
-                Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
-                Pipeline::BindPerDrawUniforms();
+                auto shader = shadow_map_material->shader()->m_skinnedShader;
+                shader->Use();
+                //Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
+                //Pipeline::BindPerDrawUniforms();
+                auto mvp = light_vp * go->transform()->localToWorldMatrix();
+                shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
                 if (renderer->m_avatar != nullptr)
                     shader->m_skinnedShader->BindMatrixArray("BoneTransformations", renderer->m_matrixPalette);
-                shader->m_skinnedShader->CheckStatus();
+                shader->CheckStatus();
                 mesh->Render();
             }
         }

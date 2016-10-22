@@ -129,7 +129,7 @@ void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
     shader->Use();
-    shader->BindUniformMat4("MATRIX_MVP", proj*view);
+    shader->BindUniformMat4("MATRIX_MVP", proj*view*s_matrix);
     shader->BindUniformVec4("_Color", s_color);
     lineMesh.Render(vertices, 2, GL_LINES);
 }
@@ -189,7 +189,7 @@ DrawWireSphere(
     {
         float* e = euler_angles + i*3;
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
-        shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
+        shader->BindUniformMat4("MATRIX_MVP", proj*view*s_matrix*m);
         s_circleMesh->Render();
     }
 }
@@ -387,5 +387,12 @@ DrawFrustum(
     shader->BindUniformMat4("MATRIX_MVP", proj*view);
     shader->BindUniformVec4("_Color", s_color);
     frustumMesh.Render(vertices, numLines * 2, GL_LINES);
+}
+
+void Gizmos::DrawFrustum(
+    const Frustum&      frustum)
+{
+    // TODO: remove Vector3::zero
+    DrawFrustum(Vector3::zero, frustum.fov, frustum.maxRange, frustum.minRange, frustum.aspect);
 }
 

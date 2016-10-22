@@ -66,9 +66,10 @@ namespace FishEngine
 
     void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
     {
-        auto m = Matrix4x4::LookAt(m_localPosition, target, worldUp);
-        m_localRotation = m.inverse().ToRotation();
-        MakeDirty();
+        auto m = Matrix4x4::LookAt(position(), target, worldUp);
+        setRotation(m.inverse().ToRotation());
+        //m_localRotation = m.inverse().ToRotation();
+        //MakeDirty();
     }
 
     Vector3 Transform::TransformDirection(const Vector3& direction) const
@@ -81,6 +82,41 @@ namespace FishEngine
     {
         Update();
         return m_worldToLocalMatrix.MultiplyVector(direction);
+    }
+    
+    Bounds Transform::TransformBounds(const Bounds& bounds) const
+    {
+        //Update();
+        auto l2w = localToWorldMatrix();
+        auto center = bounds.center();
+        auto extents = bounds.extents();
+        float weights[] = { 1, 1, 1,  1, 1, -1,  1, -1, 1,  -1, 1, 1,
+            1, -1, -1,  -1, 1, -1,  -1, -1, 1,  -1, -1, -1};
+        Bounds result;
+        for (int i = 0; i < 8; ++i)
+        {
+            Vector3 corner = center + extents * Vector3(weights+i*3);
+            corner = l2w.MultiplyPoint(corner);
+            result.Encapsulate(corner);
+        }
+        return result;
+    }
+    
+    Bounds Transform::InverseTransformBounds(const Bounds& bounds) const
+    {
+        auto w2l = worldToLocalMatrix();
+        auto center = bounds.center();
+        auto extents = bounds.extents();
+        float weights[] = { 1, 1, 1,  1, 1, -1,  1, -1, 1,  -1, 1, 1,
+            1, -1, -1,  -1, 1, -1,  -1, -1, 1,  -1, -1, -1};
+        Bounds result;
+        for (int i = 0; i < 8; ++i)
+        {
+            Vector3 corner = center + extents * Vector3(weights+i*3);
+            corner = w2l.MultiplyPoint(corner);
+            result.Encapsulate(corner);
+        }
+        return result;
     }
 
     void Transform::Translate(const Vector3& translation, Space relativeTo /*= Space::Self*/)

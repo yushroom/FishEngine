@@ -5,6 +5,7 @@
 #include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
 #include "Ray.hpp"
+#include "Frustum.hpp"
 
 namespace FishEngine 
 {
@@ -72,6 +73,11 @@ namespace FishEngine
         float farClipPlane() const
         {
             return m_farClipPlane;
+        }
+        
+        Frustum frustum() const
+        {
+            return {m_fieldOfView, m_farClipPlane, m_nearClipPlane, m_aspect};
         }
 
         // Matrix that transforms from world to camera space (i.e. view matrix).

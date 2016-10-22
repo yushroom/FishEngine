@@ -5,7 +5,8 @@
 #include "Color.hpp"
 #include "Vector3.hpp"
 #include "Matrix4x4.hpp"
-#include "GLEnvironment.hpp"
+#include "Frustum.hpp"
+//#include "GLEnvironment.hpp"
 
 namespace FishEngine
 {
@@ -93,6 +94,10 @@ namespace FishEngine
             const float         maxRange,
             const float         minRange,
             const float         aspect);
+        
+        static void
+        DrawFrustum(
+            const Frustum&      frustum);
 
         static void
         DrawWireCube(

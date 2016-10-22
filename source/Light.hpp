@@ -5,6 +5,7 @@
 #include "Color.hpp"
 #include "RenderTexture.hpp"
 #include "Common.hpp"
+#include "Matrix4x4.hpp"
 
 // reference:
 // https://docs.unity3d.com/Manual/Lighting.html
@@ -129,6 +130,8 @@ namespace FishEngine
         float m_shadowNearPlane     = 0.2f;
 
         PRenderTexture m_shadowMap;
+        Matrix4x4 m_viewMatrixForShadowMap;
+        Matrix4x4 m_projectMatrixForShadowMap;
 
         static std::list<PLight> m_lights;
     };

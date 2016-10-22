@@ -5,6 +5,7 @@
 #include "Component.hpp"
 #include "Quaternion.hpp"
 #include "Matrix4x4.hpp"
+#include "Bounds.hpp"
 
 namespace FishEngine
 {
@@ -206,6 +207,13 @@ namespace FishEngine
         // Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
         Vector3 InverseTransformDirection(const Vector3& direction) const;
 
+        // Transforms bounds(AABB) from local space to world space.
+        Bounds TransformBounds(const Bounds& bounds) const;
+        
+        // Transforms bounds(AABB) from world space to local space. The opposite of TransformBounds.
+        Bounds InverseTransformBounds(const Bounds& bounds) const;
+        
+        
         void Translate(const Vector3& translation, Space relativeTo = Space::Self);
 
         void Translate(float x, float y, float z, Space relativeTo = Space::Self) {

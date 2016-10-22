@@ -332,6 +332,7 @@ void DefaultScene()
     camera_go->transform()->setLocalPosition(0, 1, -10);
     //camera_go->transform()->LookAt(0, 0, 0);
     camera_go->setTag("MainCamera");
+    camera_go->AddComponent<TakeScreenShot>();
     
     auto light_go = Scene::CreateGameObject("Directional Light");
     light_go->transform()->setPosition(0, 3, 0);

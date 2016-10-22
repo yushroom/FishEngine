@@ -1302,7 +1302,7 @@ namespace FishEditor
         ImGui::DragFloat("Range", &light->m_range);
         Float("Bias", &light->m_shadowBias);
         Float("Normal Bias", &light->m_shadowNormalBias);
-        Float("Shadow Near Plane", &light->m_shadowNormalBias);
+        Float("Shadow Near Plane", &light->m_shadowNearPlane);
     }
 
     template<>

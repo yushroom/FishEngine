@@ -2,9 +2,11 @@
 
 #include "AppDataBase.inc"
 
+uniform mat4 MATRIX_LIGHT_MVP;
+
 void vs_main(AppData appdata)
 {
-    gl_Position = MATRIX_MVP * appdata.position;
+    gl_Position = MATRIX_LIGHT_MVP * appdata.position;
 }
 
 #include "AppDataBaseMain.inc"

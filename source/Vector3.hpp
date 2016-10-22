@@ -134,6 +134,10 @@ public: // Static
         return Magnitude(a-b);
     }
 
+    static float DistanceSquared(const Vector3& a, const Vector3& b)
+    {
+        return SqrMagnitude(a-b);
+    }
     
     // a*(1-t) + b*t
     static Vector3 Lerp(const Vector3& a, const Vector3& b, float t)

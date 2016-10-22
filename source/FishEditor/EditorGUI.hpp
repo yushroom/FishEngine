@@ -88,6 +88,8 @@ namespace FishEditor
 
         static bool s_windowResized;
         static void CalculateWindowSizeAndPosition();
+        
+        static bool s_mouseEventHandled;
     };
 
     template<>

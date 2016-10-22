@@ -45,7 +45,7 @@ namespace FishEditor
     constexpr float menuBarHeight = 20;
 
     TransformToolType EditorGUI::m_transformToolType    = TransformToolType::Translate;
-    TransformSpace    EditorGUI::m_transformSpace       = TransformSpace::Local;
+    TransformSpace    EditorGUI::m_transformSpace       = TransformSpace::Global;
     int     EditorGUI::m_idCount                        = 0;
     bool    EditorGUI::s_locked                         = false;
     int     EditorGUI::m_selectedAxis                   = -1;
@@ -54,6 +54,7 @@ namespace FishEditor
     bool    EditorGUI::m_showAssectSelectionDialogBox   = false;
 
     bool    EditorGUI::s_windowResized                  = true;
+    bool    EditorGUI::s_mouseEventHandled              = false;
 
     std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
     PMaterial sceneGizmoMaterial = nullptr;
@@ -101,6 +102,7 @@ namespace FishEditor
         style.Colors[ImGuiCol_MenuBarBg]    = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
         style.Colors[ImGuiCol_TitleBg]      = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
         style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        style.Colors[ImGuiCol_ComboBg]      = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
         style.WindowMinSize = ImVec2(128, 128);
@@ -118,6 +120,7 @@ namespace FishEditor
 
     void EditorGUI::Update()
     {
+        s_mouseEventHandled = false;
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
 
         if (Input::GetKeyDown(KeyCode::F)) {
@@ -173,6 +176,13 @@ namespace FishEditor
 
         ImGui::Render();
         s_windowResized = false;
+        
+        if (!s_mouseEventHandled && Input::GetMouseButtonDown(0))
+        {
+            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            auto go = Scene::IntersectRay(ray);
+            Selection::setSelectedGameObjectInHierarchy(go);
+        }
     }
 
     void EditorGUI::Clean()
@@ -681,13 +691,18 @@ namespace FishEditor
                     tmid = t[1];
             }
             Vector3 p = view.GetPoint(tmid);
-            Vector3 d = Vector3::Normalize(p-center);
-            for (int i = 0; i < 3; ++i)
+            Vector3 d = p-center;
+            if (d.magnitude() <= translate_gizmo_length * 1.3f)
             {
-                if (Vector3::Dot(d, axis[i]) > 0.96f)
+                d.Normalize();
+                for (int i = 0; i < 3; ++i)
                 {
-                    m_selectedAxis = i;
-                    break;
+                    if (Vector3::Dot(d, axis[i]) > 0.96f)
+                    {
+                        m_selectedAxis = i;
+                        s_mouseEventHandled = true;
+                        break;
+                    }
                 }
             }
         }
@@ -831,6 +846,7 @@ namespace FishEditor
                     auto dir = Vector3::Normalize(p - gizmo_center);
                     if ( std::fabsf(Vector3::Dot(axis[i], dir)) < 0.1f )
                     {
+                        s_mouseEventHandled = true;
                         m_selectedAxis = i;
                         lastFromDir = Vector3::Cross(axis[i], Vector3::Cross(dir, axis[i]));
                         lastFromDir.Normalize();
@@ -1055,6 +1071,23 @@ namespace FishEditor
     {
         ImGui::InputFloat3(label, value.data(), -1, ImGuiInputTextFlags_ReadOnly);
     }
+    
+    template<typename T>
+    void Enum(const char* label, const T& e)
+    {
+        int index = ToIndex(e);
+        ImGui::Combo(label, &index, LightTypeStrings, EnumCount<T>());
+    }
+    
+    template<typename T>
+    void Enum(const char* label, T* e)
+    {
+        int index = ToIndex(*e);
+        if (ImGui::Combo(label, &index, LightTypeStrings, EnumCount<T>()))
+        {
+            *e = ToEnum<T>(index);
+        }
+    }
 
     template<>
     void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
@@ -1080,10 +1113,8 @@ namespace FishEditor
         int list_item_current = camera->m_orthographic ? 1 : 0;
         ImGui::Combo("Projection", &list_item_current, listbox_items, 2);
         if (camera->m_orthographic != (list_item_current == 1)) {
-            camera->m_orthographic = !camera->m_orthographic;
-            camera->m_isDirty = true;
+            camera->setOrthographic(!camera->m_orthographic);
         }
-        //m_orthographic = list_item_current == 1;
 
         if (camera->m_orthographic) {
             if (Float("Size", &camera->m_orthographicSize)) {
@@ -1265,14 +1296,13 @@ namespace FishEditor
     template<>
     void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Light>& light)
     {
-        int index = ToIndex(light->m_type);
-        if (ImGui::Combo("Type", &index, LightTypeStrings, EnumCount<LightType>()))
-        {
-            light->m_type = ToEnum<LightType>(index);
-        }
+        Enum<LightType>("Type", &light->m_type);
         ImGui::ColorEdit4("Color", light->m_color.m);
         Float("Intensity", &light->m_intensity);
         ImGui::DragFloat("Range", &light->m_range);
+        Float("Bias", &light->m_shadowBias);
+        Float("Normal Bias", &light->m_shadowNormalBias);
+        Float("Shadow Near Plane", &light->m_shadowNormalBias);
     }
 
     template<>
@@ -1301,6 +1331,9 @@ namespace FishEditor
     {
         int w = Screen::width();
         int h = Screen::height();
+        float scale = 1.0f / Screen::pixelsPerPoint();
+        w *= scale;
+        h *= scale;
 
         hierarchyWindowPos.x = 0;
         hierarchyWindowPos.y = menuBarHeight;

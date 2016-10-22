@@ -29,7 +29,7 @@ namespace FishEngine {
         }
         
         // AABB of this Skinned Mesh in its local space.
-        Bounds localBounds() const;
+        virtual Bounds localBounds() const override;
         
         // The mesh used for skinning.
         PMesh sharedMesh()

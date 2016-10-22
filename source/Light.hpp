@@ -9,6 +9,8 @@
 // reference:
 // https://docs.unity3d.com/Manual/Lighting.html
 // https://docs.unity3d.com/Manual/class-Light.html
+// https://docs.unity3d.com/Manual/LightPerformance.html
+// https://docs.unity3d.com/Manual/DirLightShadows.html
 
 namespace FishEngine
 {
@@ -120,11 +122,11 @@ namespace FishEngine
         Color m_color;
 
         // Brightness of the light. The default value for a Point, Spot or Area light is 1 but for a Directional light, it is 0.5.
-        float m_intensity;
+        float m_intensity           = 1.0f;
 
-        float m_shadowBias = 0.2f;
-        float m_shadowNormalBias = 0.4f;
-        float m_shadowNearPlane = 0.2f;
+        float m_shadowBias          = 0.2f;
+        float m_shadowNormalBias    = 0.4f;
+        float m_shadowNearPlane     = 0.2f;
 
         PRenderTexture m_shadowMap;
 

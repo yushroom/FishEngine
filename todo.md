@@ -42,6 +42,10 @@
 
 - [ ] 用bsp或八叉树之类的结构来组织场景，相交测试，鼠标选取物体等等
 
+- [ ] Layers and Tags
+
+- [ ] component::Reset依赖序列化
+
 - [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
 
 - [ ] quaternion*vector3
@@ -103,6 +107,8 @@
 - [ ] ToolBar
 
 - [x] 区分read-only的属性 ImGuiInputTextFlags_ReadOnly
+
+- [ ] 退出play mode之后全部复原，依赖序列化
 
       ​
 

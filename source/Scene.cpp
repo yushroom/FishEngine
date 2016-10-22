@@ -17,8 +17,10 @@ namespace FishEngine
     std::vector<PGameObject>    Scene::m_gameObjectsToBeDestroyed;
     std::vector<PScript>        Scene::m_scriptsToBeDestroyed;
     std::vector<PComponent>     Scene::m_componentsToBeDestroyed;
+    Bounds                      Scene::m_bounds;
+    SceneOctree                 Scene::m_octree(Bounds(), 16);
 
-    PGameObject FishEngine::Scene::CreateGameObject(const std::string& name)
+    PGameObject Scene::CreateGameObject(const std::string& name)
     {
         auto go = std::make_shared<GameObject>(name);
         go->transform()->m_gameObject = go;
@@ -35,6 +37,7 @@ namespace FishEngine
             if (go->activeInHierarchy())
                 go->Start();
         }
+        UpdateBounds();
     }
 
     void Scene::Update() {
@@ -56,10 +59,14 @@ namespace FishEngine
         }
         m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, game objects should be destroyed automatically.
 
+        //m_bounds = Bounds();
+        
         for (auto& go : m_gameObjects) {
             if (!go->activeInHierarchy()) continue;
             go->Update();
         }
+        
+        UpdateBounds();
     }
 
     void Scene::RenderShadow(PLight& light)
@@ -122,25 +129,25 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Scene::Destroy(PGameObject obj, const float t /*= 0.0f*/)
+    void Scene::Destroy(PGameObject obj, const float t /*= 0.0f*/)
     {
         m_gameObjectsToBeDestroyed.push_back(obj);
     }
 
 
-    void FishEngine::Scene::Destroy(PScript s, const float t /*= 0.0f*/)
+    void Scene::Destroy(PScript s, const float t /*= 0.0f*/)
     {
         m_scriptsToBeDestroyed.push_back(s);
     }
 
 
-    void FishEngine::Scene::Destroy(PComponent c, const float t /*= 0.0f*/)
+    void Scene::Destroy(PComponent c, const float t /*= 0.0f*/)
     {
         m_componentsToBeDestroyed.push_back(c);
     }
 
 
-    void FishEngine::Scene::DestroyImmediate(PGameObject g)
+    void Scene::DestroyImmediate(PGameObject g)
     {
         auto t = g->transform();
         // remove children
@@ -154,13 +161,13 @@ namespace FishEngine
         m_gameObjects.remove(g);
     }
 
-    void FishEngine::Scene::DestroyImmediate(PComponent c)
+    void Scene::DestroyImmediate(PComponent c)
     {
         c->gameObject()->RemoveComponent(c);
     }
 
 
-    void FishEngine::Scene::DestroyImmediate(PScript s)
+    void Scene::DestroyImmediate(PScript s)
     {
         s->gameObject()->RemoveScript(s);
     }
@@ -177,7 +184,7 @@ namespace FishEngine
     //    }
     //}
 
-    PGameObject FishEngine::Scene::Find(const std::string& name)
+    PGameObject Scene::Find(const std::string& name)
     {
         for (auto& go : m_gameObjects) {
             if (go->name() == name) {
@@ -185,6 +192,70 @@ namespace FishEngine
             }
         }
         return nullptr;
+    }
+    
+    void Scene::UpdateBounds()
+    {
+        m_bounds = Bounds();
+        for (auto& go : m_gameObjects)
+        {
+            if (go->transform()->parent() == nullptr)
+            {
+                Bounds bound;
+                auto rend = go->GetComponent<MeshRenderer>();
+                if (rend == nullptr)
+                {
+                    auto srend = go->GetComponent<SkinnedMeshRenderer>();
+                    if (srend == nullptr)
+                        continue;
+                    bound = srend->bounds();
+                }
+                else {
+                    bound = rend->bounds();
+                }
+                m_bounds.Encapsulate(bound);
+            }
+        }
+    }
+    
+    PGameObject Scene::IntersectRay(const Ray& ray)
+    {
+        if (!m_bounds.IntersectRay(ray))
+            return nullptr;
+        
+        PGameObject selected = nullptr;
+        for (auto& go : m_gameObjects)
+        {
+            if (go->transform()->parent() == nullptr)
+            {
+                Bounds bound;
+                auto rend = go->GetComponent<MeshRenderer>();
+                if (rend == nullptr)
+                {
+                    auto srend = go->GetComponent<SkinnedMeshRenderer>();
+                    if (srend == nullptr)
+                        continue;
+                    bound = srend->bounds();
+                }
+                else {
+                    bound = rend->bounds();
+                }
+                //m_bounds.Encapsulate(bound);
+
+                float tmin = Mathf::Infinity;
+                float t = Mathf::Infinity;
+                if (bound.IntersectRay(ray, &t))
+                {
+                    if (t < tmin)
+                    {
+                        tmin = t;
+                        selected = go;
+                    }
+                }
+            }
+        }
+        
+        return selected;
     }
 }
 

@@ -38,6 +38,7 @@ namespace FishEngine
             m_materials.push_back(material);
         }
 
+        virtual Bounds localBounds() const = 0;
         Bounds bounds() const;
 
         //virtual void OnInspectorGUI() override;

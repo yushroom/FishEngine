@@ -96,9 +96,23 @@ public:
 
     static int ClosestPowerOfTwo(int value);
 
-    static bool IsPowerOfTwo(int value);
+    inline bool IsPowerOfTwo(uint32_t value)
+    {
+        return (value & (value-1)) == 0;
+    }
 
-    static int NextPowerOfTwo(int value);
+    static uint32_t NextPowerOfTwo(uint32_t v)
+    {
+        // http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+        // PBRT P1031 RoundUpPow2
+        v--;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        return v+1;
+    }
 
     static float Sqrt(float f)
     {

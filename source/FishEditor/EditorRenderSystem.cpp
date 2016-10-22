@@ -275,18 +275,24 @@ namespace FishEditor
         glDepthFunc(GL_LESS);
         //glEnable(GL_DEPTH_TEST);
         //glDisable(GL_POLYGON_OFFSET_LINE);
+        
+        Gizmos::setColor(Color::red);
+        auto& b = Scene::m_bounds;
+        Gizmos::DrawWireCube(b.center(), b.size());
 
-        if (m_showShadowMap) {
-            auto& l = Light::lights().front();
-            std::map<std::string, PTexture> textures;
-            textures["screenTexture"] = l->m_shadowMap;
-            glViewport(200, 200, 400, 400);
-            auto m = Material::builtinMaterial("ScreenTexture");
-            m->shader()->Use();
-            m->shader()->BindTextures(textures);
-            //Mesh::builtinMesh("quad")->Render();
-            Model::builtinModel(PrimitiveType::Quad)->mainMesh()->Render();
-        }
+        
+//        if (m_showShadowMap) {
+//            auto& l = Light::lights().front();
+//            std::map<std::string, PTexture> textures;
+//            textures["screenTexture"] = l->m_shadowMap;
+//            glViewport(200, 200, 400, 400);
+//            auto m = Material::builtinMaterial("ScreenTexture");
+//            m->shader()->Use();
+//            m->shader()->BindTextures(textures);
+//            //Mesh::builtinMesh("quad")->Render();
+//            Model::builtinModel(PrimitiveType::Quad)->mainMesh()->Render();
+//        }
+        
         EditorGUI::Update();
 
         // Swap the screen buffers

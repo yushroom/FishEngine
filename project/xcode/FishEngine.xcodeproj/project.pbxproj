@@ -52,6 +52,8 @@
 		BFAF11E11D9930A100101DCD /* Screen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11DB1D9930A100101DCD /* Screen.hpp */; };
 		BFB361B91DAD11DC00CD0DCB /* Pipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */; };
 		BFB361BA1DAD11DC00CD0DCB /* Pipeline.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */; };
+		BFBF36FB1DBA593A006F4E82 /* RenderSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF36F91DBA593A006F4E82 /* RenderSettings.cpp */; };
+		BFBF36FC1DBA593A006F4E82 /* RenderSettings.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF36FA1DBA593A006F4E82 /* RenderSettings.hpp */; };
 		BFD20AC81D9D52AD00DB88E1 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */; };
 		BFD20AC91D9D52AD00DB88E1 /* Animator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */; };
 		BFDC74BB1D8EDDF50082A6DC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDC748B1D8EDDF50082A6DC /* App.cpp */; };
@@ -153,6 +155,8 @@
 		BFAF11DB1D9930A100101DCD /* Screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Screen.hpp; path = ../../source/Screen.hpp; sourceTree = "<group>"; };
 		BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Pipeline.cpp; path = ../../source/Pipeline.cpp; sourceTree = "<group>"; };
 		BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Pipeline.hpp; path = ../../source/Pipeline.hpp; sourceTree = "<group>"; };
+		BFBF36F91DBA593A006F4E82 /* RenderSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderSettings.cpp; path = ../../source/RenderSettings.cpp; sourceTree = "<group>"; };
+		BFBF36FA1DBA593A006F4E82 /* RenderSettings.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderSettings.hpp; path = ../../source/RenderSettings.hpp; sourceTree = "<group>"; };
 		BFD20AC61D9D52AD00DB88E1 /* Animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Animator.cpp; path = ../../source/Animator.cpp; sourceTree = "<group>"; };
 		BFD20AC71D9D52AD00DB88E1 /* Animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Animator.hpp; path = ../../source/Animator.hpp; sourceTree = "<group>"; };
 		BFDC741C1D8EDD6C0082A6DC /* libFishEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFishEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -267,6 +271,8 @@
 				BFDC74A41D8EDDF50082A6DC /* Mesh.hpp */,
 				BFB361B71DAD11DC00CD0DCB /* Pipeline.cpp */,
 				BFB361B81DAD11DC00CD0DCB /* Pipeline.hpp */,
+				BFBF36F91DBA593A006F4E82 /* RenderSettings.cpp */,
+				BFBF36FA1DBA593A006F4E82 /* RenderSettings.hpp */,
 				BFDC74AE1D8EDDF50082A6DC /* RenderSystem.cpp */,
 				BFDC74AF1D8EDDF50082A6DC /* RenderSystem.hpp */,
 				BF26B4E81D940F9A00237680 /* RenderTexture.cpp */,
@@ -434,6 +440,7 @@
 				BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */,
 				BF51E5F61D9FF96200AF948A /* Gizmos.hpp in Headers */,
 				BFDC74E81D8EDDF50082A6DC /* Time.hpp in Headers */,
+				BFBF36FC1DBA593A006F4E82 /* RenderSettings.hpp in Headers */,
 				BF26B4E41D94001400237680 /* Color.hpp in Headers */,
 				BFAF11E11D9930A100101DCD /* Screen.hpp in Headers */,
 				BFDC74DC1D8EDDF50082A6DC /* Renderer.hpp in Headers */,
@@ -566,6 +573,7 @@
 				BF51E5F51D9FF96200AF948A /* Gizmos.cpp in Sources */,
 				BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */,
 				BF51E6731DA1665000AF948A /* Rigidbody.cpp in Sources */,
+				BFBF36FB1DBA593A006F4E82 /* RenderSettings.cpp in Sources */,
 				BFDC74E31D8EDDF50082A6DC /* Shader.cpp in Sources */,
 				BFDC74DE1D8EDDF50082A6DC /* RenderSystem.cpp in Sources */,
 				BF51E6861DA2AC2B00AF948A /* MeshCollider.cpp in Sources */,

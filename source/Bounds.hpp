@@ -8,6 +8,12 @@ namespace FishEngine
 {
     struct Bounds
     {
+        Bounds() : m_center(0, 0, 0), m_extents(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity) {}
+        
+        Bounds(const Vector3& center, const Vector3& size) : m_center(center), m_extents(size*0.5f)
+        {
+        }
+        
         // The center of the bounding box.
         Vector3 center() const { return m_center; }
         void setCenter(const Vector3& center) { m_center = center; }
@@ -33,11 +39,6 @@ namespace FishEngine
             m_center = min + m_extents;
         } 
 
-        Bounds() : m_center(0, 0, 0), m_extents(0, 0, 0) {}
-        
-        Bounds(const Vector3& center, const Vector3& size) : m_center(center), m_extents(size*0.5f)
-        {
-        }
 
         // Grows the Bounds to include the point.
         void Encapsulate(const Vector3& point)
@@ -74,6 +75,18 @@ namespace FishEngine
             auto bpmax = bounds.max();
             return pmin.x <= bpmax.x && pmax.x >= bpmin.x && pmin.y <= bpmax.y && pmax.y >= bpmin.y && pmin.z <= bpmax.z && pmax.z >= bpmin.z;
         }
+        
+//        bool Overlaps(const Bounds& b) const
+//        {
+//            auto pMin = min();
+//            auto pMax = max();
+//            auto bpMin = b.min();
+//            auto bpMax = b.max();
+//            bool x = (pMax.x >= bpMin.x) && (pMin.x <= bpMax.x);
+//            bool y = (pMax.y >= bpMin.y) && (pMin.y <= bpMax.y);
+//            bool z = (pMax.z >= bpMin.z) && (pMin.z <= bpMax.z);
+//            return (x && y && z);
+//        }
 
         // Is point contained in the bounding box?
         bool Contains(const Vector3& point)
@@ -94,6 +107,11 @@ namespace FishEngine
         // param point Arbitrary point.
         // return The point on the bounding box or inside the bounding box.
         Vector3 ClosestPoint(const Vector3& point);
+        
+        bool IsEmpty() const
+        {
+            return m_extents.x < 0 || m_extents.y < 0 || m_extents.z < 0;
+        }
 
     private:
         Vector3 m_center;

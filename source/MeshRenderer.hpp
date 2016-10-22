@@ -16,6 +16,9 @@ namespace FishEngine
 
         //protected:
         virtual void Render() const override;
+        
+        virtual Bounds localBounds() const override;
+        virtual void OnDrawGizmosSelected() override;
 
     private:
         friend class FishEditor::EditorGUI;

@@ -18,6 +18,7 @@
 #include "EditorRenderSystem.hpp"
 #include "EditorGUI.hpp"
 #include "EditorTime.hpp"
+#include "Selection.hpp"
 
 const uint32_t WIDTH = 1280, HEIGHT = 960;
 
@@ -70,13 +71,11 @@ namespace FishEditor
 
         glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
-        int w, h;
-        glfwGetFramebufferSize(m_window, &w, &h);
-        //m_pixelScaleX = float(w) / m_windowWidth;
-        //m_pixelScaleY = float(h) / m_windowHeight;
-        //glViewport(0, 0, w, h);
-        Screen::m_width = w;
-        Screen::m_height = h;
+//        int w, h;
+//        glfwGetFramebufferSize(m_window, &w, &h);
+//        Screen::m_width = w;
+//        Screen::m_height = h;
+        WindowSizeCallback(m_window, m_windowWidth, m_windowHeight);
 
         SceneView::Init();
         Camera::m_mainCamera = SceneView::m_camera;
@@ -117,6 +116,14 @@ namespace FishEditor
             else {
                 SceneView::Update();
             }
+            
+            //Scene::UpdateBounds();
+//            if (Input::GetMouseButtonDown(0))
+//            {
+//                Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+//                auto go = Scene::IntersectRay(ray);
+//                Selection::setSelectedGameObjectInHierarchy(go);
+//            }
 
             EditorRenderSystem::Render();
 
@@ -213,12 +220,14 @@ namespace FishEditor
 
     void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
+        //Debug::Log("window size changed");
         m_windowWidth = width;
         m_windowHeight = height;
         int w, h;
         glfwGetFramebufferSize(window, &w, &h);
         Screen::m_width = w;
         Screen::m_height = h;
+        Screen::m_pixelsPerPoint = static_cast<float>(w) / width;
         if (w != 0 && h != 0)
         {
             EditorRenderSystem::OnWindowSizeChanged(w, h);

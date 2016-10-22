@@ -16,17 +16,17 @@ namespace FishEditor
         }
 
         static void
-            setActiveGameObject(std::shared_ptr<FishEngine::GameObject> gameObject) {
+        setActiveGameObject(FishEngine::PGameObject gameObject) {
             m_activeGameObject = gameObject;
         }
 
-        static std::shared_ptr<FishEngine::GameObject>
+        static FishEngine::PGameObject
             selectedGameObjectInHierarchy() {
             return m_selectedGameObjectInHierarchy.lock();
         }
 
         static void
-            setSelectedGameObjectInHierarchy(std::shared_ptr<FishEngine::GameObject> gameObject) {
+            setSelectedGameObjectInHierarchy(FishEngine::PGameObject gameObject) {
             m_selectedGameObjectInHierarchy = gameObject;
         }
 

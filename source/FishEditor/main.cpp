@@ -509,13 +509,13 @@ public:
  
 int main()
 {
-    //test();
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     FishEditorWindow::AddApp(make_shared<SimpleTest>());
     FishEditorWindow::Init();
+    test();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();
     return 0;

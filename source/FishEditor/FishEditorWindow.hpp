@@ -27,6 +27,31 @@ namespace FishEditor
         {
             return m_window;
         }
+        
+        static int windowWidth()
+        {
+            return m_windowWidth;
+        }
+        
+        static int windowHeight()
+        {
+            return m_windowHeight;
+        }
+        
+        static int windowWidthPixels()
+        {
+            return m_windowWidth * m_pixelsPerPoint;
+        }
+        
+        static int windowHeightPixels()
+        {
+            return m_windowHeight * m_pixelsPerPoint;
+        }
+        
+        static float pixelsPerPoint()
+        {
+            return m_pixelsPerPoint;
+        }
 
         static void Play();
         static void Stop();
@@ -39,8 +64,9 @@ namespace FishEditor
 
         static int m_windowWidth;
         static int m_windowHeight;
-        //    static float m_pixelScaleX;
-        //    static float m_pixelScaleY;
+        
+        // This value is the number of screen pixels per point of interface space. For instance, 2.0 on retina displays.
+        static float m_pixelsPerPoint;
 
         static GLFWwindow* m_window;
         static std::vector<FishEngine::PApp> m_apps;

@@ -4,6 +4,7 @@
 #include "FishEditor.hpp"
 #include <functional>
 
+#include <Vector3.hpp>
 #include <Input.hpp>
 
 namespace FishEditor
@@ -49,6 +50,10 @@ namespace FishEditor
         static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
 
         static void OnWindowSizeChanged(const int width, const int height);
+        
+        // return Vector4(x, y, w, h), in pixels
+        // the origin is at the left-bottom corner of the window(opengl)
+        static FishEngine::Vector4 sceneViewPositionAndSize();
 
     private:
         static TransformToolType m_transformToolType;
@@ -87,6 +92,8 @@ namespace FishEditor
         static void OnInspectorGUI(const std::shared_ptr<T>& component);
 
         static bool s_windowResized;
+        
+        // the origin is at the left-top corner of the window(imgui)
         static void CalculateWindowSizeAndPosition();
         
         static bool s_mouseEventHandled;

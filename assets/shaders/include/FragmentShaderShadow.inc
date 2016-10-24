@@ -4,7 +4,7 @@
 #include "CG.inc"
 
 uniform sampler2D shadowMap;
-const float bias = 0.0002f;
+const float bias = 0.002f;
 
 in VS_OUT {
     vec3 position;      // in world space

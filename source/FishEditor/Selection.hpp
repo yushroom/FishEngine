@@ -11,7 +11,7 @@ namespace FishEditor
     public:
         // Returns the active game object. (The one shown in the inspector).
         static std::shared_ptr<FishEngine::GameObject>
-            activeGameObject() {
+        activeGameObject() {
             return m_activeGameObject.lock();
         }
 
@@ -21,12 +21,12 @@ namespace FishEditor
         }
 
         static FishEngine::PGameObject
-            selectedGameObjectInHierarchy() {
+        selectedGameObjectInHierarchy() {
             return m_selectedGameObjectInHierarchy.lock();
         }
 
         static void
-            setSelectedGameObjectInHierarchy(FishEngine::PGameObject gameObject) {
+        setSelectedGameObjectInHierarchy(FishEngine::PGameObject gameObject) {
             m_selectedGameObjectInHierarchy = gameObject;
         }
 

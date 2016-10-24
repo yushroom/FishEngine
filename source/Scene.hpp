@@ -126,7 +126,7 @@ namespace FishEngine
         static void Update();
         static void RenderShadow(PLight& light);
         static void OnDrawGizmos();
-        //static void Render();
+        static void Render();
 
         static PGameObject Find(const std::string& name);
 

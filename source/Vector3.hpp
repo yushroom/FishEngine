@@ -319,6 +319,15 @@ public:
     {
         return Vector4(lhs.x*rhs, lhs.y*rhs, lhs.z*rhs, lhs.w*rhs);
     }
+    
+    void operator*=(const float rhs)
+    {
+        x *= rhs;
+        y *= rhs;
+        z *= rhs;
+        w *= rhs;
+    }
+
 
     friend Vector4 operator+(const Vector4& lhs, const Vector4& rhs)
     {

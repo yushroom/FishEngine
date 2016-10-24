@@ -75,33 +75,29 @@ namespace FishEditor
         auto camera = Camera::main();
         auto proj = camera->projectionMatrix();
         auto view = camera->worldToCameraMatrix();
-        Pipeline::perFrameUniformData.MATRIX_P = proj;
-        Pipeline::perFrameUniformData.MATRIX_V = view;
-        Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
-        Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
-        Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::main()->transform()->position();
+        Pipeline::perFrameUniformData.MATRIX_P              = proj;
+        Pipeline::perFrameUniformData.MATRIX_V              = view;
+        Pipeline::perFrameUniformData.MATRIX_I_V            = view.inverse();
+        Pipeline::perFrameUniformData.MATRIX_VP             = proj * view;
+        Pipeline::perFrameUniformData.WorldSpaceCameraPos   = Camera::main()->transform()->position();
         float t = Time::time();
-        //Debug::Log("%f", t);
         Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
         
         Vector4 lightDir(0, 0, 0, 0);
-        //std::map<std::string, Texture::PTexture> textures;
         Matrix4x4 lightVP;
         auto& lights = Light::lights();
-        if (lights.size() > 0) {
+        if (lights.size() > 0)
+        {
             auto& l = lights.front();
-            if (l->transform() != nullptr) {
+            if (l->transform() != nullptr)
+            {
                 lightDir = Vector4(-l->transform()->forward(), 0);
-                //auto view = l->gameObject()->transform()->worldToLocalMatrix();
-                //auto proj = Matrix4x4::Ortho(-10.f, 10.f, -10.f, 10.f, l->shadowNearPlane(), 100.f);
-                //lightVP = proj * view;
                 lightVP = l->m_projectMatrixForShadowMap * l->m_viewMatrixForShadowMap;
-                //textures["shadowMap"] = l->m_shadowMap;
             }
             Pipeline::perFrameUniformData.LightColor0 = l->m_color;
         }
-        Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
-        Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
+        Pipeline::perFrameUniformData.WorldSpaceLightPos0   = lightDir;
+        Pipeline::perFrameUniformData.LightMatrix0          = lightVP;
         
         Pipeline::BindPerFrameUniforms();
 
@@ -132,8 +128,6 @@ namespace FishEditor
         //glCullFace(GL_BACK);
 
 
-
-
         /************************************************************************/
         /* Shadow                                                               */
         /************************************************************************/
@@ -141,15 +135,11 @@ namespace FishEditor
             Scene::RenderShadow(l);
         }
 
-        auto v = Camera::main()->viewport();
-        const int w = Screen::width();
-        const int h = Screen::height();
-        glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
-
         /************************************************************************/
         /* Selection                                                            */
         /************************************************************************/
-        if (m_highlightSelections) {
+        if (m_highlightSelections)
+        {
             auto camera = Camera::main();
             auto view = camera->worldToCameraMatrix();
             auto proj = camera->projectionMatrix();
@@ -229,36 +219,46 @@ namespace FishEditor
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
-        //Scene::Render();
-        std::vector<std::shared_ptr<GameObject>> transparentQueue;
-        for (auto& go : Scene::m_gameObjects) {
-            if (!go->activeInHierarchy()) continue;
-            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr) {
-                renderer = go->GetComponent<SkinnedMeshRenderer>();
-                if (renderer == nullptr)
-                    continue;
-            }
-            bool isTransparent = renderer->material()->shader()->IsTransparent();
-            if (isTransparent) {
-                transparentQueue.push_back(go);
-                continue;
-            }
-            renderer->Render();
-        }
-
-        /************************************************************************/
-        /* Transparent                                                          */
-        /************************************************************************/
-        for (auto& go : transparentQueue) {
-            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr) {
-                renderer = go->GetComponent<SkinnedMeshRenderer>();
-            }
-            renderer->Render();
-        }
-
-        transparentQueue.clear();
+        //const int w = Screen::width();
+        //const int h = Screen::height();
+        //auto v = Camera::main()->viewport();
+        //auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
+        //glViewport(GLint(scene_view_pos_size.x), GLint(scene_view_pos_size.y), GLsizei(scene_view_pos_size.z), GLsizei(scene_view_pos_size.w));
+        auto v = Camera::main()->viewport();
+        const int w = Screen::width();
+        const int h = Screen::height();
+        glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
+        Scene::Render();
+        
+//        std::vector<std::shared_ptr<GameObject>> transparentQueue;
+//        for (auto& go : Scene::m_gameObjects) {
+//            if (!go->activeInHierarchy()) continue;
+//            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+//            if (renderer == nullptr) {
+//                renderer = go->GetComponent<SkinnedMeshRenderer>();
+//                if (renderer == nullptr)
+//                    continue;
+//            }
+//            bool isTransparent = renderer->material()->shader()->IsTransparent();
+//            if (isTransparent) {
+//                transparentQueue.push_back(go);
+//                continue;
+//            }
+//            renderer->Render();
+//        }
+//
+//        /************************************************************************/
+//        /* Transparent                                                          */
+//        /************************************************************************/
+//        for (auto& go : transparentQueue) {
+//            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+//            if (renderer == nullptr) {
+//                renderer = go->GetComponent<SkinnedMeshRenderer>();
+//            }
+//            renderer->Render();
+//        }
+//
+//        transparentQueue.clear();
 
 
         if (m_isWireFrameMode)
@@ -282,6 +282,40 @@ namespace FishEditor
         Gizmos::setColor(Color::red);
         auto& b = Scene::m_bounds;
         Gizmos::DrawWireCube(b.center(), b.size());
+        
+        
+        
+        // render camera preview
+        glClear(GL_DEPTH_BUFFER_BIT);
+        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        auto camera_preview = selectedGO == nullptr ? nullptr : selectedGO->GetComponent<Camera>();
+        if (camera_preview != nullptr)
+        {
+            //auto v = camera_preview->viewport();
+            const int preview_width  = w * 0.25f;
+            const int preview_height = h * 0.25f;
+            constexpr int padding = 20;
+            const int preview_pos_x  = w - preview_width - padding;
+            const int preview_pos_y  = padding;
+            glViewport(preview_pos_x, preview_pos_y, preview_width, preview_height);
+            auto main_camera = Camera::main();
+            Screen::m_width = w*0.25f;
+            Screen::m_height = h*0.25f;
+            Camera::m_mainCamera = camera_preview;
+            
+            auto proj = camera_preview->projectionMatrix();
+            auto view = camera_preview->worldToCameraMatrix();
+            Pipeline::perFrameUniformData.MATRIX_P = proj;
+            Pipeline::perFrameUniformData.MATRIX_V = view;
+            Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
+            Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
+            Pipeline::perFrameUniformData.WorldSpaceCameraPos = camera_preview->transform()->position();
+            Pipeline::BindPerFrameUniforms();
+            Scene::Render();
+            Camera::m_mainCamera = main_camera;
+            Screen::m_width = w;
+            Screen::m_height = h;
+        }
 
         
 //        if (m_showShadowMap) {

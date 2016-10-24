@@ -28,6 +28,7 @@ namespace FishEditor
 {
     int FishEditorWindow::m_windowWidth = WIDTH;
     int FishEditorWindow::m_windowHeight = HEIGHT;
+    float FishEditorWindow::m_pixelsPerPoint = 1.0f;
 
     GLFWwindow* FishEditorWindow::m_window = nullptr;
     std::vector<std::shared_ptr<App>> FishEditorWindow::m_apps;
@@ -228,10 +229,14 @@ namespace FishEditor
         Screen::m_width = w;
         Screen::m_height = h;
         Screen::m_pixelsPerPoint = static_cast<float>(w) / width;
+        m_pixelsPerPoint = static_cast<float>(w) / width;
         if (w != 0 && h != 0)
         {
             EditorRenderSystem::OnWindowSizeChanged(w, h);
             EditorGUI::OnWindowSizeChanged(w, h);
+            auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
+            //Screen::m_width = scene_view_pos_size.z;
+            //Screen::m_height = scene_view_pos_size.w;
         }
         //glViewport(0, 0, width, height);
         //GUI::OnWindowSizeChanged(width, height);

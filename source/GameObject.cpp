@@ -74,11 +74,13 @@ namespace FishEngine
         for (auto& c : m_components) {
             c->OnDrawGizmos();
             Gizmos::setColor(Color::green);
+            Gizmos::setMatrix(Matrix4x4::identity);
         }
 
         for (auto& s : m_scripts) {
             s->OnDrawGizmos();
             Gizmos::setColor(Color::green);
+            Gizmos::setMatrix(Matrix4x4::identity);
         }
     }
 
@@ -87,11 +89,13 @@ namespace FishEngine
         for (auto& c : m_components) {
             c->OnDrawGizmosSelected();
             Gizmos::setColor(Color::green);
+            Gizmos::setMatrix(Matrix4x4::identity);
         }
 
         for (auto& s : m_scripts) {
             s->OnDrawGizmosSelected();
             Gizmos::setColor(Color::green);
+            Gizmos::setMatrix(Matrix4x4::identity);
         }
     }
 

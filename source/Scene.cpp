@@ -125,8 +125,6 @@ namespace FishEngine
         Gizmos::setColor(Color::magenta);
         Gizmos::DrawWireCube(aabb.center(), aabb.size());
         Gizmos::DrawLine(aabb.center(), aabb.center()+Vector3(0, 0, 1)*aabb.extents());
-        //Gizmos::DrawLine(Vector3::zero, Vector3(0, 0, 1));
-        //Gizmos::DrawWireSphere(Vector3::zero, 1.0f);
         Gizmos::setMatrix(Matrix4x4::identity);
         
         
@@ -249,16 +247,38 @@ namespace FishEngine
     }
 
 
-    //void Scene::Render()
-    //{
-    //    for (auto& go : m_gameObjects) {
-    //        if (!go->activeInHierarchy()) continue;
-    //        auto renderer = go->GetComponent<MeshRenderer>();
-    //        if (renderer != nullptr) {
-    //            renderer->Render();
-    //        }
-    //    }
-    //}
+    void Scene::Render()
+    {
+        std::vector<std::shared_ptr<GameObject>> transparentQueue;
+        for (auto& go : Scene::m_gameObjects) {
+            if (!go->activeInHierarchy()) continue;
+            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+            if (renderer == nullptr) {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+                if (renderer == nullptr)
+                    continue;
+            }
+            bool isTransparent = renderer->material()->shader()->IsTransparent();
+            if (isTransparent) {
+                transparentQueue.push_back(go);
+                continue;
+            }
+            renderer->Render();
+        }
+        
+        /************************************************************************/
+        /* Transparent                                                          */
+        /************************************************************************/
+        for (auto& go : transparentQueue) {
+            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+            if (renderer == nullptr) {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+            }
+            renderer->Render();
+        }
+        
+        transparentQueue.clear();
+    }
 
     PGameObject Scene::Find(const std::string& name)
     {

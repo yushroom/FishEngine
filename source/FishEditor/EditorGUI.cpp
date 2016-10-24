@@ -112,8 +112,9 @@ namespace FishEditor
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
 
         globalWindowFlags |= ImGuiWindowFlags_NoCollapse;
-        //globalWindowFlags |= ImGuiWindowFlags_NoResize;
+        globalWindowFlags |= ImGuiWindowFlags_NoResize;
         globalWindowFlags |= ImGuiWindowFlags_ShowBorders;
+        globalWindowFlags |= ImGuiWindowFlags_NoMove;
         CalculateWindowSizeAndPosition();
     }
 
@@ -1329,9 +1330,9 @@ namespace FishEditor
 
     void EditorGUI::CalculateWindowSizeAndPosition()
     {
-        int w = Screen::width();
-        int h = Screen::height();
-        float scale = 1.0f / Screen::pixelsPerPoint();
+        int w = FishEditorWindow::windowWidth();
+        int h = FishEditorWindow::windowHeight();
+        float scale = 1.0f / FishEditorWindow::pixelsPerPoint();
         w *= scale;
         h *= scale;
 
@@ -1350,5 +1351,19 @@ namespace FishEditor
         inspectorWindowSize.x = 256;
         inspectorWindowSize.y = h - menuBarHeight;
         s_windowResized = true;
+    }
+    
+    FishEngine::Vector4 EditorGUI::sceneViewPositionAndSize()
+    {
+        Vector4 result;
+        //int w = FishEditorWindow::windowWidth();
+        int h = FishEditorWindow::windowHeight();
+        result.x = hierarchyWindowPos.x + hierarchyWindowSize.x;
+        result.y = menuBarHeight;
+        result.y = h - result.y;
+        result.z = inspectorWindowPos.x - result.x;
+        result.w = hierarchyWindowSize.y;
+        result *= FishEditorWindow::pixelsPerPoint();
+        return result;
     }
 }

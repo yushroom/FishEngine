@@ -104,6 +104,9 @@ namespace FishEngine
     
     Bounds Transform::InverseTransformBounds(const Bounds& bounds) const
     {
+        // TODO: hack for empty scene
+        if (bounds.IsEmpty())
+            return bounds;
         auto w2l = worldToLocalMatrix();
         auto center = bounds.center();
         auto extents = bounds.extents();

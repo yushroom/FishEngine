@@ -173,6 +173,7 @@
     <ClInclude Include="..\..\source\Scene.hpp" />
     <ClInclude Include="..\..\source\Screen.hpp" />
     <ClInclude Include="..\..\source\Script.hpp" />
+    <ClInclude Include="..\..\source\Serialization.hpp" />
     <ClInclude Include="..\..\source\Shader.hpp" />
     <ClInclude Include="..\..\source\SkinnedMeshRenderer.hpp" />
     <ClInclude Include="..\..\source\Skybox.hpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\..\source\Rigidbody.cpp" />
     <ClCompile Include="..\..\source\Scene.cpp" />
     <ClCompile Include="..\..\source\Screen.cpp" />
+    <ClCompile Include="..\..\source\Serialization.cpp" />
     <ClCompile Include="..\..\source\Shader.cpp" />
     <ClCompile Include="..\..\source\SkinnedMeshRenderer.cpp" />
     <ClCompile Include="..\..\source\Skybox.cpp" />

@@ -278,15 +278,28 @@ void FishEngine::Gizmos::
 DrawHalfCircle(
     const Vector3&  center,
     const float     radius,
-    const Vector3   dir1,
-    const Vector3   dir2)
+    const Vector3&  dir1,
+    const Vector3&  dir2)
 {
     const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     auto v = Camera::main()->worldToCameraMatrix();
     auto p = Camera::main()->projectionMatrix();
-    Matrix4x4 m;
-    m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, dir1) * Quaternion::FromToRotation(Vector3::right, dir2), Vector3(radius, radius, radius));
+
+    Vector3 y = Vector3::Normalize(dir1);
+    Vector3 x = Vector3::Normalize(dir2);
+    Vector3 z = Vector3::Normalize(Vector3::Cross(x, y));
+    Matrix4x4 m;    // local to world
+    m.rows[0] = Vector4{ x.x, y.x, z.x, 0};
+    m.rows[1] = Vector4{ x.y, y.y, z.y, 0};
+    m.rows[2] = Vector4{ x.z, y.z, z.z, 0};
+    m.rows[3] = Vector4{ 0, 0, 0, 1 };
+    m *= Matrix4x4::Scale(radius);
+    m.rows[0][3] = center.x;
+    m.rows[1][3] = center.y;
+    m.rows[2][3] = center.z;
+    //Matrix4x4 m;
+    //m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, dir1), Vector3(radius, radius, radius));
     shader->BindUniformMat4("MATRIX_MVP", p * v * m);
     shader->BindUniformVec4("_Color", s_color);
     glBindVertexArray(s_circleMesh->m_VAO);

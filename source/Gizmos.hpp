@@ -35,8 +35,8 @@ namespace FishEngine
         
         static void
         DrawCube(
-            Vector3 center,
-            Vector3 size);
+            const Vector3& center,
+            const Vector3& size);
         
         static void
         DrawIcon(
@@ -69,8 +69,8 @@ namespace FishEngine
         DrawHalfCircle(
             const Vector3&  center,
             const float     radius,
-            const Vector3   dir1,
-            const Vector3   dir2);
+            const Vector3&  dir1,
+            const Vector3&  dir2);
 
         static void
         DrawCircle(

@@ -56,11 +56,20 @@ namespace FishEngine
         Serialization() = delete;
         
         template<typename T>
-        static void Serialize(T object);
+        static void Serialize(const T& object);
         
 //        template<typename T>
 //        void Deserialize();
     };
+
+    template<>
+    void Serialization::Serialize(const Vector3& v);
+
+    template<>
+    void Serialization::Serialize(const Quaternion& v);
+
+    template<>
+    void Serialization::Serialize(const Vector4& v);
 }
 
 #endif //Serialization_hpp

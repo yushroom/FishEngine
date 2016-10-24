@@ -153,6 +153,13 @@ namespace FishEngine
         static SceneOctree              m_octree;
         
         static void UpdateBounds();
+
+        friend class boost::serialization::access;
+        template<class Archive>
+        inline void serialize(Archive& ar, const unsigned int version)
+        {
+            //ar & 
+        }
     };
 }
 

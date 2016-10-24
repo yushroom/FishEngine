@@ -858,14 +858,18 @@ namespace FishEditor
         }
 
         //Gizmos::DrawWireSphere(center, 0.1f);
+        Vector3 view_inverse = -camera->transform()->forward();
         Color colors[3] = {Color::red, Color::green, Color::blue};
         for (int i = 0; i < 3; ++i)
         {
             Gizmos::setColor(colors[i]);
-            Gizmos::DrawLine(gizmo_center, gizmo_center+axis[i] * radius);
+            //Gizmos::DrawLine(gizmo_center, gizmo_center+axis[i] * radius);
             if (m_selectedAxis == i)
                 Gizmos::setColor(Color::yellow);
-            Gizmos::DrawCircle(gizmo_center, radius, axis[i]);
+            Vector3 dir2 = Vector3::ProjectOnPlane(view_inverse, axis[i]);
+            dir2.Normalize();
+            Gizmos::DrawHalfCircle(gizmo_center, radius, axis[i], dir2);
+            //Gizmos::DrawCircle(gizmo_center, radius, axis[i]);
         }
 
         Gizmos::setColor(Color::white);
@@ -1333,8 +1337,8 @@ namespace FishEditor
         int w = FishEditorWindow::windowWidth();
         int h = FishEditorWindow::windowHeight();
         float scale = 1.0f / FishEditorWindow::pixelsPerPoint();
-        w *= scale;
-        h *= scale;
+        w = static_cast<int>(w*scale);
+        h = static_cast<int>(h*scale);
 
         hierarchyWindowPos.x = 0;
         hierarchyWindowPos.y = menuBarHeight;

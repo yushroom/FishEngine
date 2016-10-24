@@ -162,16 +162,7 @@ public: // Static
         return Vector3(std::min(lhs.x, rhs.x), std::min(lhs.y, rhs.y), std::min(lhs.z, rhs.z));
     }
     
-    static Vector3 MoveTowards(const Vector3& current, const Vector3& target, float maxDistanceDelta)
-    {
-        Vector3 a = target - current;
-        float magnitude = a.magnitude();
-        if (magnitude <= maxDistanceDelta || magnitude == 0.f)
-        {
-            return target;
-        }
-        return current + a / magnitude * maxDistanceDelta;
-    }
+    static Vector3 MoveTowards(const Vector3& current, const Vector3& target, float maxDistanceDelta);
     
     static Vector3 Normalize(const Vector3& value)
     {
@@ -197,20 +188,13 @@ public: // Static
     }
 
     // Projects a vector onto another vector.
-    static Vector3 Project(const Vector3& vector, const Vector3& onNormal)
-    {
-        float num = Dot(onNormal, onNormal);
-        if (num < 1e-5f)
-        {
-            return Vector3::zero;
-        }
-        return onNormal * Vector3::Dot(vector, onNormal) / num;
-    }
+    static Vector3 Project(const Vector3& vector, const Vector3& onNormal);
 
     //std::string ToString() const;
 
     //static void OrthoNormalize(ref Vector3 normal, ref Vector3 tangent);
 
+    // Projects a vector onto a plane defined by a normal orthogonal to the plane.
     static Vector3 ProjectOnPlane(const Vector3& vector, const Vector3& planeNormal);
     
     static Vector3 Reflect(const Vector3& inDirection, const Vector3& inNormal);
@@ -232,27 +216,7 @@ public: // Static
     //    return Vector3::SmoothDamp(current, target, currentVelocity, smoothTime, maxSpeed, deltaTime);
     //}
 
-    static Vector3 SmoothDamp(const Vector3& current, const Vector3& target, Vector3& currentVelocity/*ref*/, float smoothTime, float maxSpeed, float deltaTime)
-    {
-        smoothTime = Mathf::Max(0.0001f, smoothTime);
-        float num = 2.f / smoothTime;
-        float num2 = num * deltaTime;
-        float d = 1.f / (1.f + num2 + 0.48f * num2 * num2 + 0.235f * num2 * num2 * num2);
-        Vector3 vector = current - target;
-        Vector3 vector2 = target;
-        float maxLength = maxSpeed * smoothTime;
-        vector = Vector3::ClampMagnitude(vector, maxLength);
-        Vector3 newTarget = current - vector;
-        Vector3 vector3 = (currentVelocity + num * vector) * deltaTime;
-        currentVelocity = (currentVelocity - num * vector3) * d;
-        Vector3 vector4 = newTarget + (vector + vector3) * d;
-        if (Vector3::Dot(vector2 - current, vector4 - vector2) > 0.f)
-        {
-            vector4 = vector2;
-            currentVelocity = (vector4 - vector2) / deltaTime;
-        }
-        return vector4;
-    }
+    static Vector3 SmoothDamp(const Vector3& current, const Vector3& target, Vector3& currentVelocity/*ref*/, float smoothTime, float maxSpeed, float deltaTime);
 
     const static Vector3 back;    // (0, 0, -1)
     const static Vector3 down;    // (0, -1, 0)

@@ -204,6 +204,9 @@
     <ClInclude Include="..\..\source\Skybox.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Serialization.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\RenderSystem.cpp">
@@ -360,6 +363,9 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\RenderSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Serialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

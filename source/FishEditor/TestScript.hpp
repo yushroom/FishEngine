@@ -322,6 +322,22 @@ public:
 #undef TEST
 SCRIPT_END
 
+SCRIPT_BEGIN(Serialize)
+public:
+    virtual void OnInspectorGUI() override
+    {
+        if (ImGui::Button("serialize"))
+        {
+            std::stringstream ss;
+            boost::archive::xml_oarchive oa(ss);
+            GameObject go("test");
+            oa << BOOST_SERIALIZATION_NVP(*gameObject().get());
+            auto xml = ss.str();
+            cout << xml << endl;
+        }
+    }
+SCRIPT_END
+
 void DefaultScene()
 {
     auto camera = Camera::Create(60.0f, 0.3f, 1000.f);

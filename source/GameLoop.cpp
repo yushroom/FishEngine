@@ -111,19 +111,19 @@ namespace FishEngine
     }
 
 
-    void GameLoop::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
-    {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, GL_TRUE);
+    //void GameLoop::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
+    //{
+    //    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    //        glfwSetWindowShouldClose(window, GL_TRUE);
 
-        if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-            Input::UpdateKeyState((KeyCode)key, (KeyState)action);
-        }
+    //    if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
+    //        Input::UpdateKeyState((KeyCode)key, (KeyState)action);
+    //    }
 
-        //TwEventKeyGLFW(key, action);
-        //GUI::OnKey(key, action);
-        ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
-    }
+    //    //TwEventKeyGLFW(key, action);
+    //    //GUI::OnKey(key, action);
+    //    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
+    //}
 
     void GameLoop::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {

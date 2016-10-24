@@ -40,12 +40,12 @@ namespace FishEditor
         
         static int windowWidthPixels()
         {
-            return m_windowWidth * m_pixelsPerPoint;
+            return static_cast<int>(m_windowWidth * m_pixelsPerPoint);
         }
         
         static int windowHeightPixels()
         {
-            return m_windowHeight * m_pixelsPerPoint;
+            return static_cast<int>(m_windowHeight * m_pixelsPerPoint);
         }
         
         static float pixelsPerPoint()

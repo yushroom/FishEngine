@@ -91,15 +91,18 @@ namespace FishEngine
         
         UpdateBounds(); // get bounding box of the whole scene
         Bounds bound_in_camera_space = camera->transform()->InverseTransformBounds(m_bounds);
-        auto pmin = bound_in_camera_space.min();
-        auto pmax = bound_in_camera_space.max();
-        if (view_frustum.minRange < pmin.z)
+        if (!bound_in_camera_space.IsEmpty())   // TODO: hack for empty scene
         {
-            view_frustum.minRange = pmin.z;
-        }
-        if (view_frustum.maxRange > pmax.z)
-        {
-            view_frustum.maxRange = pmax.z;
+            auto pmin = bound_in_camera_space.min();
+            auto pmax = bound_in_camera_space.max();
+            if (view_frustum.minRange < pmin.z)
+            {
+                view_frustum.minRange = pmin.z;
+            }
+            if (view_frustum.maxRange > pmax.z)
+            {
+                view_frustum.maxRange = pmax.z;
+            }
         }
         
         Gizmos::setMatrix(camera_to_world);

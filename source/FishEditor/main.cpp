@@ -172,6 +172,8 @@ public:
             box->transform()->setLocalEulerAngles(0, -35.547f, 0);
             box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
         }
+        auto cameraGO = Camera::mainGameCamera()->gameObject();
+        cameraGO->AddComponent<Serialize>();
     }
 };
 
@@ -506,6 +508,24 @@ public:
     }
 };
 
+class TestSerialization : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+
+        auto cameraGO = Camera::mainGameCamera()->gameObject();
+        //cameraGO->AddComponent<Serialize>();
+        std::stringstream ss;
+        boost::archive::xml_oarchive oa(ss);
+        GameObject go("test");
+        oa << boost::serialization::make_nvp("MainCamera", *cameraGO.get());
+        auto xml = ss.str();
+        cout << xml << endl;
+    }
+};
+
  
 int main()
 {
@@ -513,7 +533,8 @@ int main()
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    FishEditorWindow::AddApp(make_shared<TestSerialization>());
     FishEditorWindow::Init();
     test();
     FishEditorWindow::Run();

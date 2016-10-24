@@ -26,6 +26,7 @@ xcuserdata/
 /external/PhysXSDK/
 /external/libs/
 /external/fbxsdk/
+/external/cereal/
 
 # assets
 /assets/models/

@@ -1,3 +1,13 @@
+## Roadmap
+
+1.reflection/serialization
+
+2.terrain->csm->vsm
+
+3.undo/redo
+
+
+
 
 
 ## Engine
@@ -42,10 +52,6 @@
 
 - [ ] 用bsp或八叉树之类的结构来组织场景，相交测试，鼠标选取物体等等
 
-- [ ] Layers and Tags
-
-- [ ] component::Reset依赖序列化
-
 - [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
 
 - [ ] quaternion*vector3
@@ -71,6 +77,8 @@
 ## Editor
 
 - [x] GameObject inactive时在Hierarchy中颜色变灰色
+
+- [x] ​
 
 - [x] skybox遮挡了（写depth buffer的问题？）
 
@@ -108,7 +116,7 @@
 
 - [x] 区分read-only的属性 ImGuiInputTextFlags_ReadOnly
 
-- [ ] 退出play mode之后全部复原，依赖序列化
+- [x] undo/redo
 
       ​
 
@@ -117,7 +125,7 @@
 ## 渲染
 
 - [ ] PBR
-- [ ] Shadow（简单的shadow map，pcf）=>VSM
+- [ ] Shadow: standard shadow map with PSF => CSM/VSM
 - [x] expose更多的shader uniform给Editor
 - [ ] 渲染优化：渲染前按父子关系将transform更新完，渲染时按批次重组draw call batching
 - [x] uniform buffer
@@ -127,14 +135,18 @@
 - [ ] 更完善的shader include，现在是单纯的查找替换，没有语义，会把注释里面的替换掉，甚至中间不能加空格。区分<>和""，系统目录和当前目录
 - [x] skinned mesh运动时的线框显示问题（以后考虑用transform feedback加速动画）
 - [ ] Directional Light 抖动的问题
+- [ ] Terrain/height map
+
+
 
 ## 物理
 
 - [ ] PhysX（WIP）
+- [ ] ​
 
 
 
 ## Asset
 
-- [ ] Texture里面加入sampler2D之类的类型标识
+- [ ] Texture里面加入sampler2D/samplerCube之类的类型标识
 

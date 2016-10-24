@@ -292,15 +292,15 @@ namespace FishEditor
         if (camera_preview != nullptr)
         {
             //auto v = camera_preview->viewport();
-            const int preview_width  = w * 0.25f;
-            const int preview_height = h * 0.25f;
+            const int preview_width  = static_cast<int>(w * 0.25f);
+            const int preview_height = static_cast<int>(h * 0.25f);
             constexpr int padding = 20;
             const int preview_pos_x  = w - preview_width - padding;
             const int preview_pos_y  = padding;
             glViewport(preview_pos_x, preview_pos_y, preview_width, preview_height);
             auto main_camera = Camera::main();
-            Screen::m_width = w*0.25f;
-            Screen::m_height = h*0.25f;
+            Screen::m_width = static_cast<int>(w*0.25f);
+            Screen::m_height = static_cast<int>(h*0.25f);
             Camera::m_mainCamera = camera_preview;
             
             auto proj = camera_preview->projectionMatrix();

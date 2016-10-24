@@ -188,9 +188,10 @@ namespace FishEditor
         if (ImGui::GetIO().WantCaptureKeyboard)
             return;
 
-        if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-            Input::UpdateKeyState((KeyCode)key, (KeyState)action);
-        }
+        //if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
+        //    Input::UpdateKeyState(key, (KeyState)action);
+        //}
+        Input::UpdateKeyState(key, (KeyState)action);
     }
 
     void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)

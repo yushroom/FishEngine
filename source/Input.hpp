@@ -9,7 +9,8 @@ namespace FishEngine
 {
     enum class KeyCode {
         Alpha0 = GLFW_KEY_0, Alpha1, Alpha2, Alpha3, Alpha4, Alpha5, Alpha6, Alpha7, Alpha8, Alpha9,
-        A = GLFW_KEY_A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+        A = GLFW_KEY_A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+        LeftControl = GLFW_KEY_LEFT_CONTROL, RightControl = GLFW_KEY_RIGHT_CONTROL,
     };
 
     enum class KeyState {
@@ -47,6 +48,8 @@ namespace FishEngine
         AxisCount,
     };
 
+    constexpr int keyCount = 512;
+
     class Input {
     public:
         Input() = delete;
@@ -54,16 +57,19 @@ namespace FishEngine
         // The current mouse position in pixel coordinates. (Read Only)
         // bottom-left of the screen <==> (0, 0)
         // top-right of the screen <==> (Screen::width, Screen::height)
-        static Vector3 mousePosition() {
+        static Vector3 mousePosition()
+        {
             return Vector3(m_mousePositionX*Screen::width(), m_mousePositionY*Screen::height(), 0);
         }
 
-        static Vector3 normalizedMousePosition() {
+        static Vector3 normalizedMousePosition()
+        {
             return Vector3(m_mousePositionX, m_mousePositionX, 0);
         }
 
         // Returns the value of the virtual axis identified by axisName.
-        static float GetAxis(Axis axis) {
+        static float GetAxis(Axis axis)
+        {
             return m_axis[(int)axis];
         }
 
@@ -88,18 +94,20 @@ namespace FishEngine
         // button values are 0 for left button, 1 for right button, 2 for the middle button.
         static bool GetMouseButtonUp(int button);
 
+    private:
         static void Init();
         static void Update();
 
         static void UpdateAxis(Axis axis, float value);
         static void UpdateMousePosition(float xpos, float ypos);
-        static void UpdateKeyState(KeyCode key, KeyState state);
+        static void UpdateKeyState(int key, KeyState state);
         static void UpdateMouseButtonState(int button, MouseButtonState state);
 
     private:
         friend class GameLoop;
+        friend class FishEditor::FishEditorWindow;
 
-        static KeyState m_keyStates[1024];
+        static KeyState m_keyStates[keyCount];
 
         // button values are 0 for left button, 1 for right button, 2 for the middle button.
         static MouseButtonState m_mouseButtonStates[3];

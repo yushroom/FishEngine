@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    KeyState Input::m_keyStates[1024] = { KeyState::None };
+    KeyState Input::m_keyStates[keyCount] = { KeyState::None };
     MouseButtonState Input::m_mouseButtonStates[3] = { MouseButtonState::None };
 
     float Input::m_mousePositionX = 0;
@@ -103,9 +103,10 @@ namespace FishEngine
         m_mousePositionY = ypos;
     }
 
-    void Input::UpdateKeyState(KeyCode key, KeyState state)
+    void Input::UpdateKeyState(int key, KeyState state)
     {
-        m_keyStates[(int)key] = state;
+        assert(key >= 0 && key < keyCount);
+        m_keyStates[key] = state;
     }
 
     void Input::UpdateMouseButtonState(int button, MouseButtonState state)

@@ -119,6 +119,7 @@ namespace FishEngine
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::FishEditorWindow;
+        friend class Serialization;
 
         float m_fieldOfView         = 60.f;
 
@@ -147,21 +148,21 @@ namespace FishEngine
         static PCamera m_mainCamera;
         static std::vector<PCamera> m_allCameras;
 
-        friend class boost::serialization::access;
-        template<class Archive>
-        inline void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Behaviour);
-            ar & BOOST_SERIALIZATION_NVP(m_fieldOfView);
-            ar & BOOST_SERIALIZATION_NVP(m_orthographicSize);
-            ar & BOOST_SERIALIZATION_NVP(m_aspect);
-            ar & BOOST_SERIALIZATION_NVP(m_farClipPlane);
-            ar & BOOST_SERIALIZATION_NVP(m_nearClipPlane);
-            ar & BOOST_SERIALIZATION_NVP(m_viewport);
-            ar & BOOST_SERIALIZATION_NVP(m_isDirty);
-            ar & BOOST_SERIALIZATION_NVP(m_cameraType);
-            ar & BOOST_SERIALIZATION_NVP(m_orthographic);
-        }
+        //friend class boost::serialization::access;
+        //template<class Archive>
+        //inline void serialize(Archive& ar, const unsigned int version)
+        //{
+        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Behaviour);
+        //    ar & BOOST_SERIALIZATION_NVP(m_fieldOfView);
+        //    ar & BOOST_SERIALIZATION_NVP(m_orthographicSize);
+        //    ar & BOOST_SERIALIZATION_NVP(m_aspect);
+        //    ar & BOOST_SERIALIZATION_NVP(m_farClipPlane);
+        //    ar & BOOST_SERIALIZATION_NVP(m_nearClipPlane);
+        //    ar & BOOST_SERIALIZATION_NVP(m_viewport);
+        //    ar & BOOST_SERIALIZATION_NVP(m_isDirty);
+        //    ar & BOOST_SERIALIZATION_NVP(m_cameraType);
+        //    ar & BOOST_SERIALIZATION_NVP(m_orthographic);
+        //}
     };
 }
 

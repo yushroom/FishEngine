@@ -6,7 +6,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
-#include "Serialization.hpp"
+//#include <boost/serialization/nvp.hpp>
+//#include <boost/serialization/base_object.hpp>
 
 namespace FishEngine
 {
@@ -42,14 +43,16 @@ namespace FishEngine
         std::string m_name;
         UUID        m_uuid;
 
-    private:
-        friend class boost::serialization::access;
-        template<class Archive>
-        inline void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & BOOST_SERIALIZATION_NVP(m_name);
-            ar & BOOST_SERIALIZATION_NVP(m_uuid);
-        }
+        friend class Serialization;
+
+    //private:
+    //    friend class boost::serialization::access;
+    //    template<class Archive>
+    //    inline void serialize(Archive& ar, const unsigned int version)
+    //    {
+    //        ar & BOOST_SERIALIZATION_NVP(m_name);
+    //        ar & BOOST_SERIALIZATION_NVP(m_uuid);
+    //    }
     };
 }
 

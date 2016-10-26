@@ -33,9 +33,9 @@ using namespace FishEditor;
 #include <SphereCollider.hpp>
 #include <Rigidbody.hpp>
 //#include <boost/type_traits.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
+//#include <boost/serialization/serialization.hpp>
+//#include <boost/archive/xml_oarchive.hpp>
+//#include <boost/archive/xml_iarchive.hpp>
 #include <Serialization.hpp>
 #include <CapsuleCollider.hpp>
 #include <RenderSettings.hpp>
@@ -329,9 +329,10 @@ public:
         if (ImGui::Button("serialize"))
         {
             std::stringstream ss;
-            boost::archive::xml_oarchive oa(ss);
-            GameObject go("test");
-            oa << BOOST_SERIALIZATION_NVP(*gameObject().get());
+            {
+                cereal::JSONOutputArchive oa(ss);
+                oa << *gameObject();
+            }
             auto xml = ss.str();
             cout << xml << endl;
         }
@@ -348,7 +349,7 @@ void DefaultScene()
     camera_go->transform()->setLocalPosition(0, 1, -10);
     //camera_go->transform()->LookAt(0, 0, 0);
     camera_go->setTag("MainCamera");
-    camera_go->AddComponent<TakeScreenShot>();
+    //camera_go->AddComponent<TakeScreenShot>();
     
     auto light_go = Scene::CreateGameObject("Directional Light");
     light_go->transform()->setPosition(0, 3, 0);
@@ -413,7 +414,7 @@ std::shared_ptr<GameObject> CreateCube()
             
 void test()
 {
-    cout << std::is_base_of<Component, Mesh>::value;
+    /*cout << std::is_base_of<Component, Mesh>::value;
     {
         Vector3 v(1, 2, 3);
         Vector3 v2;
@@ -450,5 +451,33 @@ void test()
         oa << BOOST_SERIALIZATION_NVP(camera2);
         auto xml = ss.str();
         cout << xml << endl;
+    }*/
+    {
+        std::stringstream ss;
+        Vector3 v(1, 2, 3);
+        {
+            cereal::JSONOutputArchive json_out(ss);
+            json_out << cereal::make_nvp("v", v);
+        }
+        cout << ss.str();
+    }
+    {
+        std::stringstream ss;
+        Transform t;
+        t.setLocalPosition(1, 2, 3);
+        t.setLocalEulerAngles(10, 15, 27);
+        t.setLocalScale(1.1f, 2.2f, 3.3f);
+        t.setName("test transform");
+        {
+            cereal::JSONOutputArchive json_out(ss);
+            json_out << cereal::make_nvp("t", t);
+        }
+        cout << ss.str();
+        {
+            Transform t2;
+            cereal::JSONInputArchive json_in(ss);
+            json_in >> t2;
+            Debug::LogWarning("%s", t2.name().c_str());
+        }
     }
 }

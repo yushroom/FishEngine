@@ -518,9 +518,17 @@ public:
         auto cameraGO = Camera::mainGameCamera()->gameObject();
         //cameraGO->AddComponent<Serialize>();
         std::stringstream ss;
-        boost::archive::xml_oarchive oa(ss);
-        GameObject go("test");
-        oa << boost::serialization::make_nvp("MainCamera", *cameraGO.get());
+        {
+            cereal::JSONOutputArchive oa(ss);
+            oa << *cameraGO;
+        }
+        {
+            cereal::JSONInputArchive ia(ss);
+            GameObject go("lll");
+            ia >> go;
+            cereal::JSONOutputArchive oa(ss);
+            oa << *cameraGO;
+        }
         auto xml = ss.str();
         cout << xml << endl;
     }
@@ -536,7 +544,7 @@ int main()
     //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     FishEditorWindow::AddApp(make_shared<TestSerialization>());
     FishEditorWindow::Init();
-    test();
+    //test();
     FishEditorWindow::Run();
     FishEditorWindow::Clean();
     return 0;

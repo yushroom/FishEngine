@@ -144,6 +144,8 @@ namespace FishEngine
         friend class RenderSystem;
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
+        friend class Serialization;
+
         static std::list<PGameObject>   m_gameObjects;
         static std::vector<PGameObject> m_gameObjectsToBeDestroyed;
         static std::vector<PComponent>  m_componentsToBeDestroyed;
@@ -154,12 +156,12 @@ namespace FishEngine
         
         static void UpdateBounds();
 
-        friend class boost::serialization::access;
-        template<class Archive>
-        inline void serialize(Archive& ar, const unsigned int version)
-        {
-            //ar & 
-        }
+        //friend class boost::serialization::access;
+        //template<class Archive>
+        //inline void serialize(Archive& ar, const unsigned int version)
+        //{
+        //    //ar & 
+        //}
     };
 }
 

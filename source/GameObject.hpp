@@ -5,6 +5,10 @@
 #include "Script.hpp"
 #include "Object.hpp"
 #include "Component_gen.hpp"
+//#include <boost/serialization/nvp.hpp>
+//#include <boost/serialization/base_object.hpp>
+//#include <boost/serialization/nvp.hpp>
+//#include <boost/serialization/base_object.hpp>
 
 namespace FishEngine
 {
@@ -196,6 +200,8 @@ namespace FishEngine
     private:
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
+        friend class Serialization;
+
         std::list<PComponent> m_components;
         std::list<PScript> m_scripts;
 
@@ -208,28 +214,28 @@ namespace FishEngine
         //static GameObject m_root;
         //static PGameObject> m_root;
 
-        friend class boost::serialization::access;
+        //friend class boost::serialization::access;
 
-        template<class Archive>
-        inline void save(Archive& ar, const unsigned int version) const
-        {
-            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-            ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
-            ar & BOOST_SERIALIZATION_NVP(m_layer);
-            ar & BOOST_SERIALIZATION_NVP(m_tag);
-            //for (auto& m_components : )
-        }
+        //template<class Archive>
+        //inline void save(Archive& ar, const unsigned int version) const
+        //{
+        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
+        //    ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
+        //    ar & BOOST_SERIALIZATION_NVP(m_layer);
+        //    ar & BOOST_SERIALIZATION_NVP(m_tag);
+        //    //for (auto& m_components : )
+        //}
 
-        template<class Archive>
-        inline void load(Archive& ar, const unsigned int version)
-        {
-            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-            ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
-            ar & BOOST_SERIALIZATION_NVP(m_layer);
-            ar & BOOST_SERIALIZATION_NVP(m_tag);
-        }
+        //template<class Archive>
+        //inline void load(Archive& ar, const unsigned int version)
+        //{
+        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
+        //    ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
+        //    ar & BOOST_SERIALIZATION_NVP(m_layer);
+        //    ar & BOOST_SERIALIZATION_NVP(m_tag);
+        //}
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
+        //BOOST_SERIALIZATION_SPLIT_MEMBER();
     };
 }
 

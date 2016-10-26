@@ -11,7 +11,7 @@ namespace FishEngine
     public:
         InjectClassName(CameraController)
 
-            bool m_isRotating = false;
+        bool m_isRotating = false;
         bool m_lookAtMode = true;
         float m_rotateSpeed = 200;
         float m_dragSpeed = 10;

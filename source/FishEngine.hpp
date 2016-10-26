@@ -59,6 +59,7 @@ namespace FishEngine
     class SphereCollider;
     class MeshCollider;
     class Pipeline;
+    class Serialization;
     struct Avatar;
     struct Ray;
     struct Bounds;

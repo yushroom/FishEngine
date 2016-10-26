@@ -266,6 +266,7 @@ namespace FishEngine
     private:
         friend class FishEditor::EditorGUI;
         friend class Scene;
+        friend class Serialization;
 
         Vector3         m_localPosition;
         Vector3         m_localScale;
@@ -283,14 +284,14 @@ namespace FishEngine
         bool dirtyInHierarchy() const;
         void MakeDirty() const;
 
-        friend class boost::serialization::access;
-        template<class Archive>
-        inline void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & BOOST_SERIALIZATION_NVP(m_localPosition)
-                & BOOST_SERIALIZATION_NVP(m_localRotation)
-                & BOOST_SERIALIZATION_NVP(m_localScale);
-        }
+        //friend class boost::serialization::access;
+        //template<class Archive>
+        //inline void serialize(Archive& ar, const unsigned int version)
+        //{
+        //    ar & BOOST_SERIALIZATION_NVP(m_localPosition)
+        //        & BOOST_SERIALIZATION_NVP(m_localRotation)
+        //        & BOOST_SERIALIZATION_NVP(m_localScale);
+        //}
     };
 }
 

@@ -541,8 +541,8 @@ int main()
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
-    FishEditorWindow::AddApp(make_shared<TestSerialization>());
+    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     FishEditorWindow::Init();
     //test();
     shared_ptr<Object> p = make_shared<Camera>();

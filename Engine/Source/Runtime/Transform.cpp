@@ -213,7 +213,7 @@ namespace FishEngine
     //}
 
     std::shared_ptr<Transform> Transform::GetChild(const size_t index) {
-        if (index < 0 || index >= m_children.size()) {
+        if (index >= m_children.size()) {
             Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
             return nullptr;
         }

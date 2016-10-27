@@ -28,6 +28,11 @@ xcuserdata/
 /external/fbxsdk/
 /external/cereal/
 /external/
+/Engine/ThirdParty/boost*
+/Engine/ThirdParty/cereal/
+/Engine/ThirdParty/PhysXSDK/
+/Engine/ThirdParty/libs/
+/Engine/ThirdParty/assimp-3.3.1*
 
 # assets
 /assets/models/
@@ -40,6 +45,10 @@ xcuserdata/
 *.meta
 *.md5anim
 *.md5mesh
+
+# cmake build
+/Engine/[Bb]uild
+[Bb]uild
 
 # vscode
 /.vscode/

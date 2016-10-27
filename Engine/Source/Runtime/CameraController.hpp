@@ -2,7 +2,6 @@
 #define CameraController_hpp
 
 #include "Input.hpp"
-#include <imgui/imgui.h>
 
 namespace FishEngine
 {
@@ -27,18 +26,18 @@ namespace FishEngine
             m_originalScale = transform()->localScale();
         }
 
-        virtual void OnInspectorGUI() override {
-            ImGui::Checkbox("rotate camera", &m_isRotating);
-            ImGui::Checkbox("lookat mode", &m_lookAtMode);
-            if (ImGui::Button("reset")) {
-                //transform()->setLocalPosition(0, 0, -5);
-                //transform()->LookAt(Vector3(0, 0, 0));
-                //transform()->setLocalEulerAngles(0, 0, 0);
-                transform()->setLocalPosition(m_originalPosition);
-                transform()->setLocalRotation(m_originalRotation);
-                transform()->setLocalScale(m_originalScale);
-            }
-        }
+        // virtual void OnInspectorGUI() override {
+        //     ImGui::Checkbox("rotate camera", &m_isRotating);
+        //     ImGui::Checkbox("lookat mode", &m_lookAtMode);
+        //     if (ImGui::Button("reset")) {
+        //         //transform()->setLocalPosition(0, 0, -5);
+        //         //transform()->LookAt(Vector3(0, 0, 0));
+        //         //transform()->setLocalEulerAngles(0, 0, 0);
+        //         transform()->setLocalPosition(m_originalPosition);
+        //         transform()->setLocalRotation(m_originalRotation);
+        //         transform()->setLocalScale(m_originalScale);
+        //     }
+        // }
 
         virtual void Update() override
         {

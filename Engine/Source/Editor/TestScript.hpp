@@ -2,6 +2,8 @@
 #include <map>
 #include <sstream>
 
+#include <imgui/imgui.h>
+
 #include "FishEditorWindow.hpp"
 
 using namespace FishEditor;

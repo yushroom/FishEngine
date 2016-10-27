@@ -11,7 +11,7 @@
 #define mat4 FishEngine::Matrix4x4
 #define vec3 FishEngine::Vector3
 #define vec4 FishEngine::Vector4
-#include "../assets/shaders/include/ShaderVariables.inc"
+#include "../../Shaders/include/ShaderVariables.inc"
 #undef uniform
 #undef vec4
 #undef vec3

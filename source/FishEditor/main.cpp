@@ -545,6 +545,9 @@ int main()
     FishEditorWindow::AddApp(make_shared<TestSerialization>());
     FishEditorWindow::Init();
     //test();
+    shared_ptr<Object> p = make_shared<Camera>();
+    Debug::LogWarning("%s", typeid(p).name());
+    Debug::LogWarning("%s", typeid(Camera).name());
     FishEditorWindow::Run();
     FishEditorWindow::Clean();
     return 0;

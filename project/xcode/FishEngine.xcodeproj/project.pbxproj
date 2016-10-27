@@ -42,6 +42,8 @@
 		BF9499711D964E85001F65E4 /* AssetImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF94996F1D964E85001F65E4 /* AssetImporter.hpp */; };
 		BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF9499771D96AB68001F65E4 /* ModelImporter.cpp */; };
 		BF94997A1D96AB68001F65E4 /* ModelImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF9499781D96AB68001F65E4 /* ModelImporter.hpp */; };
+		BF9B4FFA1DBF76C9002AFA36 /* TextureImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF9B4FF81DBF76C9002AFA36 /* TextureImporter.cpp */; };
+		BF9B4FFB1DBF76C9002AFA36 /* TextureImporter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF9B4FF91DBF76C9002AFA36 /* TextureImporter.hpp */; };
 		BFAF11D31D9838A100101DCD /* SkinnedMeshRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */; };
 		BFAF11D41D9838A100101DCD /* SkinnedMeshRenderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */; };
 		BFAF11DC1D9930A100101DCD /* Bounds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAF11D61D9930A100101DCD /* Bounds.cpp */; };
@@ -146,6 +148,8 @@
 		BF94996F1D964E85001F65E4 /* AssetImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AssetImporter.hpp; path = ../../source/AssetImporter.hpp; sourceTree = "<group>"; };
 		BF9499771D96AB68001F65E4 /* ModelImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelImporter.cpp; path = ../../source/ModelImporter.cpp; sourceTree = "<group>"; };
 		BF9499781D96AB68001F65E4 /* ModelImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ModelImporter.hpp; path = ../../source/ModelImporter.hpp; sourceTree = "<group>"; };
+		BF9B4FF81DBF76C9002AFA36 /* TextureImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureImporter.cpp; path = ../../source/TextureImporter.cpp; sourceTree = "<group>"; };
+		BF9B4FF91DBF76C9002AFA36 /* TextureImporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureImporter.hpp; path = ../../source/TextureImporter.hpp; sourceTree = "<group>"; };
 		BFAF11D11D9838A100101DCD /* SkinnedMeshRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkinnedMeshRenderer.cpp; path = ../../source/SkinnedMeshRenderer.cpp; sourceTree = "<group>"; };
 		BFAF11D21D9838A100101DCD /* SkinnedMeshRenderer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SkinnedMeshRenderer.hpp; path = ../../source/SkinnedMeshRenderer.hpp; sourceTree = "<group>"; };
 		BFAF11D61D9930A100101DCD /* Bounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Bounds.cpp; path = ../../source/Bounds.cpp; sourceTree = "<group>"; };
@@ -339,6 +343,8 @@
 				BF94996F1D964E85001F65E4 /* AssetImporter.hpp */,
 				BF9499771D96AB68001F65E4 /* ModelImporter.cpp */,
 				BF9499781D96AB68001F65E4 /* ModelImporter.hpp */,
+				BF9B4FF81DBF76C9002AFA36 /* TextureImporter.cpp */,
+				BF9B4FF91DBF76C9002AFA36 /* TextureImporter.hpp */,
 			);
 			name = Importer;
 			sourceTree = "<group>";
@@ -464,6 +470,7 @@
 				BF51E6811DA2AC2B00AF948A /* BoxCollider.hpp in Headers */,
 				BFDC74C51D8EDDF50082A6DC /* Component.hpp in Headers */,
 				BFDC74E41D8EDDF50082A6DC /* Shader.hpp in Headers */,
+				BF9B4FFB1DBF76C9002AFA36 /* TextureImporter.hpp in Headers */,
 				BFDC74E61D8EDDF50082A6DC /* Texture.hpp in Headers */,
 				BFDC74DF1D8EDDF50082A6DC /* RenderSystem.hpp in Headers */,
 				BFB361BA1DAD11DC00CD0DCB /* Pipeline.hpp in Headers */,
@@ -574,6 +581,7 @@
 				BF51E5F91DA15D7100AF948A /* PhysicsSystem.cpp in Sources */,
 				BFDC74C61D8EDDF50082A6DC /* Debug.cpp in Sources */,
 				BF51E6881DA2AC2B00AF948A /* SphereCollider.cpp in Sources */,
+				BF9B4FFA1DBF76C9002AFA36 /* TextureImporter.cpp in Sources */,
 				BF51E5F51D9FF96200AF948A /* Gizmos.cpp in Sources */,
 				BF9499791D96AB68001F65E4 /* ModelImporter.cpp in Sources */,
 				BF51E6731DA1665000AF948A /* Rigidbody.cpp in Sources */,

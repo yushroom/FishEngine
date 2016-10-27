@@ -9,7 +9,8 @@
 
 using Path = boost::filesystem::path;
 
-namespace FishEngine {
+namespace FishEngine
+{
     class AssetImporter : public Object
     {
     public:
@@ -18,7 +19,8 @@ namespace FishEngine {
         
         //static PAssetImporter GetAtPath(const std::string& path);
         
-        static Path assetsRootDirectory() {
+        static Path assetsRootDirectory()
+        {
             return s_assetsRootDirectory;
         }
         

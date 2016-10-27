@@ -76,9 +76,7 @@
 
 ## Editor
 
-- [x] GameObject inactive时在Hierarchy中颜色变灰色
-
-- [x] ​
+- [x] GameObject inactive时在Hierarchy中颜色变灰色​
 
 - [x] skybox遮挡了（写depth buffer的问题？）
 

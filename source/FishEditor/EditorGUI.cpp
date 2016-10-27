@@ -559,6 +559,61 @@ namespace FishEditor
             ImGui::SetNextWindowSize(projectWindowSize);
         }
         ImGui::Begin("Project", nullptr, globalWindowFlags);
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+        ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.1f, 0));
+        
+        static int selected = -1;
+        if (ImGui::Selectable("Textures", selected==0))
+        {
+            selected = 0;
+        }
+        if (ImGui::Selectable("Materials", selected==1))
+        {
+            selected = 1;
+        }
+        if (ImGui::Selectable("Shaders", selected==2))
+        {
+            selected = 2;
+        }
+        if (ImGui::Selectable("Scripts", selected==3))
+        {
+            selected = 3;
+        }
+        if (ImGui::Selectable("Models", selected==4))
+        {
+            selected = 4;
+        }
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+        
+        ImGui::SameLine();
+        
+        
+//        ImGui::BeginChild("Sub2", ImVec2(0,0), true);
+//        //ImGui::Text("With border");
+//        ImGui::Columns(2);
+//        for (int i = 0; i < 100; i++)
+//        {
+//            if (i == 50)
+//                ImGui::NextColumn();
+//            char buf[32];
+//            sprintf(buf, "%08x", i*5731);
+//            ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
+//        }
+//        ImGui::EndChild();
+        
+        ImGui::BeginChild("Sub2", ImVec2(0,0), true);
+        if (selected == 2)
+        {
+            for (const auto& m : Shader::allShaders())
+            {
+                ImGui::Selectable(m.first.c_str());
+            }
+        }
+        ImGui::EndChild();
+
+        
         ImGui::End();
     }
 
@@ -621,7 +676,7 @@ namespace FishEditor
         }
     }
 
-    void EditorGUI::DrawToolBar()
+    void EditorGUI::DrawToolbar()
     {
         ImGui::Begin("ToolBar");
         ImGui::Button("Play");
@@ -1336,9 +1391,9 @@ namespace FishEditor
     {
         int w = FishEditorWindow::windowWidth();
         int h = FishEditorWindow::windowHeight();
-        float scale = 1.0f / FishEditorWindow::pixelsPerPoint();
-        w = static_cast<int>(w*scale);
-        h = static_cast<int>(h*scale);
+        //float scale = 1.0f / FishEditorWindow::pixelsPerPoint();
+        //w = static_cast<int>(w*scale);
+        //h = static_cast<int>(h*scale);
 
         hierarchyWindowPos.x = 0;
         hierarchyWindowPos.y = menuBarHeight;

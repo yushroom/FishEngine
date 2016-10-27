@@ -208,6 +208,12 @@ namespace FishEngine
 
         static PShader builtinShader(const std::string& name);
         
+        static const std::map<std::string, PShader>& allShaders()
+        {
+            // TODO
+            return m_builtinShaders;
+        }
+        
         static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
 
         static GLuint LoadShaderCombined(const std::string& filePath);

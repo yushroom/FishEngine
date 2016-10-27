@@ -24,6 +24,7 @@
 #include "Transform.hpp"
 #include "Camera.hpp"
 #include "CameraController.hpp"
+#include "Scene.hpp"
 
 //CEREAL_REGISTER_POLYMORPHIC_RELATION(BaseClass, DerivedClassOne);
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Object, "Object");
@@ -48,12 +49,18 @@ namespace FishEngine
     public:
         Serialization() = delete;
         
+        template<typename Archive, typename T>
+        static void Serialize(Archive& archive, T& v)
+        {
+            Debug::LogError("Serialization for %s not implemented", T::StaticClassName().c_str());
+        }
+        
         template<typename Archive>
         static void Serialize(Archive& archive, Vector3& v)
         {
             archive(cereal::make_nvp("x", v.x),
-                cereal::make_nvp("y", v.y),
-                cereal::make_nvp("z", v.z));
+                    cereal::make_nvp("y", v.y),
+                    cereal::make_nvp("z", v.z));
         }
 
         template<typename Archive>

@@ -67,9 +67,7 @@ namespace FishEditor
         static void DrawProjectWindow();
         static void DrawSceneView();
         static void DrawToolbar();
-        static void DrawProjectWindwo();
         static void DrawMainMenu();
-        static void DrawToolBar();
 
         static bool s_locked;       // temp
 

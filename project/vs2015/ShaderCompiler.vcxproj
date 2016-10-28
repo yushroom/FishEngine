@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\ShaderCompiler\ShaderCompiler.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Tool\ShaderCompiler\ShaderCompiler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EF4A4D9D-417D-4966-94A2-03534BCA3BD7}</ProjectGuid>
@@ -72,14 +72,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;D:\program\FishEngine\external\libs\win32;D:\program\FishEngine\external\libs\win32\debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\Engine\Source\Runtime;..\..\Engine\ThirdParty;..\..\Engine\ThirdParty\glew;..\..\Engine\ThirdParty\boost_1_61_0;..\..\Engine\ThirdParty\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;..\..\Engine\ThirdParty\libs\win32;..\..\Engine\ThirdParty\libs\win32\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>..\..\Engine\Source\Runtime;..\..\Engine\ThirdParty;..\..\Engine\ThirdParty\glew;..\..\Engine\ThirdParty\boost_1_61_0;..\..\Engine\ThirdParty\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\program\FishEngine\project\vs2015\Release;D:\program\FishEngine\external\libs\win32;D:\program\FishEngine\external\libs\win32\release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Release;..\..\Engine\ThirdParty\libs\win32;..\..\Engine\ThirdParty\libs\win32\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

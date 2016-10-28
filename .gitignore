@@ -34,6 +34,9 @@ xcuserdata/
 /Engine/ThirdParty/libs/
 /Engine/ThirdParty/assimp-3.3.1*
 
+# binary
+/Engine/Binary/
+
 # assets
 /assets/models/
 /assets/textures/

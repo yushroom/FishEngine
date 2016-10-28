@@ -39,7 +39,7 @@ float getScaleForConstantSizeGeometry(const Vector3& center, float targetScale)
 void Gizmos::Init()
 {
 #if FISHENGINE_PLATFORM_WINDOWS
-    const std::string root_dir = "../../assets/";
+    const std::string root_dir = "../../../../assets/";
 #else
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif

@@ -15,7 +15,7 @@ using namespace std;
 using namespace FishEngine;
 
 #if FISHENGINE_PLATFORM_WINDOWS
-static const std::string include_dir = "../../assets/shaders/include/";
+static const std::string include_dir = "../../../Shaders/include/";
 #else
 static const std::string include_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/include/";
 #endif
@@ -634,7 +634,7 @@ namespace FishEngine {
     void Shader::Init()
     {
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../assets/shaders/";
+        const std::string root_dir = "../../../Shaders/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
 #endif

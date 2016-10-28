@@ -69,14 +69,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;D:\program\FishEngine\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\Engine\Source\Runtime;..\..\Engine\ThirdParty;..\..\Engine\ThirdParty\glew;..\..\Engine\ThirdParty\boost_1_61_0;..\..\Engine\ThirdParty\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;D:\program\FishEngine\external\libs\win32;D:\program\FishEngine\external\libs\win32\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Debug;..\..\Engine\ThirdParty\libs\win32;..\..\Engine\ThirdParty\libs\win32\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\program\FishEngine\source;D:\program\FishEngine\external;D:\program\FishEngine\external\glew;D:\program\FishEngine\external\boost_1_61_0;D:\program\FishEngine\external\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\Engine\Source\Runtime;..\..\Engine\ThirdParty;..\..\Engine\ThirdParty\glew;..\..\Engine\ThirdParty\boost_1_61_0;..\..\Engine\ThirdParty\PhysXSDK\Include;$(IncludePath)</IncludePath>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>D:\program\FishEngine\project\vs2015\Release;D:\program\FishEngine\external\libs\win32;D:\program\FishEngine\external\libs\win32\release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\program\FishEngine\project\vs2015\Release;..\..\Engine\ThirdParty\libs\win32;..\..\Engine\ThirdParty\libs\win32\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,23 +127,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\EditorRenderSystem.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\EditorTime.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\FishEditorWindow.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\main.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\SceneView.cpp" />
-    <ClCompile Include="..\..\source\FishEditor\Selection.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorGUI.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorRenderSystem.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorTime.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\FishEditorWindow.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\main.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\SceneView.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Editor\Selection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\FishEditor\EditorGUI.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\EditorRenderSystem.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\EditorTime.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\FishEditor.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\FishEditorWindow.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\SceneView.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\Selection.hpp" />
-    <ClInclude Include="..\..\source\FishEditor\TestScript.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorGUI.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorRenderSystem.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorTime.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\FishEditor.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\FishEditorWindow.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\SceneView.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\Selection.hpp" />
+    <ClInclude Include="..\..\Engine\Source\Editor\TestScript.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

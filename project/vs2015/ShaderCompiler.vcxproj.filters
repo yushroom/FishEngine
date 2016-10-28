@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\ShaderCompiler\ShaderCompiler.cpp">
+    <ClCompile Include="..\..\Engine\Source\Tool\ShaderCompiler\ShaderCompiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

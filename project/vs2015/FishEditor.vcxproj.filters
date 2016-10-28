@@ -15,51 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\FishEditor\main.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\EditorRenderSystem.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\FishEditorWindow.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\FishEditorWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\Selection.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\Selection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\EditorGUI.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\EditorTime.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\EditorTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\FishEditor\SceneView.cpp">
+    <ClCompile Include="..\..\Engine\Source\Editor\SceneView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\FishEditor\SceneView.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\SceneView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\EditorRenderSystem.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorRenderSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\FishEditorWindow.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\FishEditorWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\Selection.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\Selection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\EditorGUI.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorGUI.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\FishEditor.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\FishEditor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\EditorTime.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\EditorTime.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEditor\TestScript.hpp">
+    <ClInclude Include="..\..\Engine\Source\Editor\TestScript.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

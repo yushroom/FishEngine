@@ -36,337 +36,343 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\RenderSettings.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\RenderSettings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\RenderSystem.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\RenderSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Scene.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Time.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Time.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\App.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\App.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Common.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Common.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Debug.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Debug.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\FishEngine.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\FishEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\GameLoop.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\GameLoop.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\GameObject.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\GameObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Input.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Object.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Transform.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Transform.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Renderer.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Renderer.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\MeshRenderer.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\MeshRenderer.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\MeshFilter.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\MeshFilter.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Component.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Component.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\CameraController.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\CameraController.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Behaviour.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Behaviour.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Camera.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Camera.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Script.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Script.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Matrix4x4.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Matrix4x4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Quaternion.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Quaternion.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Vector3.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Vector3.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Mathf.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Mathf.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\external\imgui\imgui_dock.h">
+    <ClInclude Include="..\..\Engine\ThirdParty\imgui\imgui_dock.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Light.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Light.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\GLEnvironment.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\GLEnvironment.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Mesh.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Mesh.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Material.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Material.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Shader.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Shader.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Texture.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Texture.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Color.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Color.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\RenderTexture.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\RenderTexture.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\external\imgui\imconfig.h">
+    <ClInclude Include="..\..\Engine\ThirdParty\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\external\imgui\imgui.h">
+    <ClInclude Include="..\..\Engine\ThirdParty\imgui\imgui.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\external\imgui\imgui_impl_glfw_gl3.h">
+    <ClInclude Include="..\..\Engine\ThirdParty\imgui\imgui_impl_glfw_gl3.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\external\imgui\imgui_internal.h">
+    <ClInclude Include="..\..\Engine\ThirdParty\imgui\imgui_internal.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\AssetImporter.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\AssetImporter.hpp">
       <Filter>Importer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\ModelImporter.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\ModelImporter.hpp">
       <Filter>Importer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Ray.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Ray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Screen.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Screen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Animator.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Animator.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\SkinnedMeshRenderer.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\SkinnedMeshRenderer.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Gizmos.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Gizmos.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Collider.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Collider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\BoxCollider.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\BoxCollider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\SphereCollider.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\SphereCollider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\CapsuleCollider.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\CapsuleCollider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\MeshCollider.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\MeshCollider.hpp">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\PhysicsSystem.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\PhysicsSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Pipeline.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Pipeline.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Rigidbody.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Rigidbody.hpp">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Bounds.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Bounds.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Component_gen.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Component_gen.hpp">
       <Filter>Generated</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Skybox.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Skybox.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Serialization.hpp">
+    <ClInclude Include="..\..\Engine\Source\Runtime\Serialization.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Runtime\TextureImporter.hpp">
+      <Filter>Importer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\RenderSystem.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\RenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Scene.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Time.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\App.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Common.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Debug.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\GameLoop.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\GameLoop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\GameObject.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Input.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Object.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\external\imgui\imgui_draw.cpp">
+    <ClCompile Include="..\..\Engine\ThirdParty\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\external\imgui\imgui_impl_glfw_gl3.cpp">
+    <ClCompile Include="..\..\Engine\ThirdParty\imgui\imgui_impl_glfw_gl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\external\imgui\imgui.cpp">
+    <ClCompile Include="..\..\Engine\ThirdParty\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\external\imgui\imgui_demo.cpp">
+    <ClCompile Include="..\..\Engine\ThirdParty\imgui\imgui_demo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Behaviour.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Behaviour.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Camera.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Camera.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Component.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Component.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Transform.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Transform.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Renderer.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Renderer.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\MeshRenderer.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\MeshRenderer.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\MeshFilter.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\MeshFilter.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Matrix4x4.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Matrix4x4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Quaternion.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Quaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Vector3.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Vector3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\external\imgui\imgui_dock.cpp">
+    <ClCompile Include="..\..\Engine\ThirdParty\imgui\imgui_dock.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Light.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Light.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Texture.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Texture.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Shader.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Shader.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Mesh.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Mesh.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Material.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Material.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\GLEnvironment.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\GLEnvironment.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Color.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Color.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\RenderTexture.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\RenderTexture.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\AssetImporter.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\AssetImporter.cpp">
       <Filter>Importer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\ModelImporter.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\ModelImporter.cpp">
       <Filter>Importer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Ray.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Ray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Screen.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Animator.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Animator.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\SkinnedMeshRenderer.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\SkinnedMeshRenderer.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Gizmos.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Gizmos.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Collider.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Collider.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\BoxCollider.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\BoxCollider.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\SphereCollider.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\SphereCollider.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\CapsuleCollider.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\CapsuleCollider.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\MeshCollider.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\MeshCollider.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Rigidbody.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Rigidbody.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\PhysicsSystem.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Pipeline.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Pipeline.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Bounds.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Bounds.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Component_gen.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Component_gen.cpp">
       <Filter>Generated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Skybox.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Skybox.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\RenderSettings.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\RenderSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Serialization.cpp">
+    <ClCompile Include="..\..\Engine\Source\Runtime\Serialization.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Runtime\TextureImporter.cpp">
+      <Filter>Importer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -43,9 +43,9 @@ namespace FishEditor
     void FishEditorWindow::Init()
     {
         Debug::Init();
-#if FISHENGINE_PLATFORM_APPLE
-        Debug::setColorMode(false);
-#endif
+// #if FISHENGINE_PLATFORM_APPLE
+//         Debug::setColorMode(false);
+// #endif
         Input::Init();
 
         Debug::Log("Starting GLFW context, OpenGL 4.1");

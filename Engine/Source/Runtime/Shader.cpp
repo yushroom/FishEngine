@@ -10,15 +10,11 @@
 #include "Common.hpp"
 #include "Debug.hpp"
 #include "Pipeline.hpp"
+#include "Resources.hpp"
 
 using namespace std;
 using namespace FishEngine;
 
-#if FISHENGINE_PLATFORM_WINDOWS
-static const std::string include_dir = "../../../Shaders/include/";
-#else
-static const std::string include_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/include/";
-#endif
 
 std::string ReadFile(const std::string& path)
 {
@@ -53,6 +49,7 @@ std::string AddLineNumber(const std::string& str)
 
 std::string ProcessInclude(const std::string& str)
 {
+    const auto& include_dir = Resources::shaderRootDirectory() + "include/";
     auto result(str);
     std::set<std::string> loaded_headers;
     auto pos = result.find("#include", 0);
@@ -298,11 +295,6 @@ namespace FishEngine {
         const std::string& gs_string,
         const std::string& fs_string)
     {
-#if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../assets/shaders/";
-#else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
-#endif
         assert(m_program == 0);
         assert(!vs_string.empty() && !fs_string.empty());
         assert(!(!tcs_string.empty() && tes_string.empty()));
@@ -633,11 +625,7 @@ namespace FishEngine {
 
     void Shader::Init()
     {
-#if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../../Shaders/";
-#else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/shaders/";
-#endif
+        const auto& root_dir = Resources::shaderRootDirectory();
         Debug::Log("Compile shader: VisualizeNormal");
         m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir + "VisualizeNormal.vert", root_dir + "VisualizeNormal.frag", root_dir + "VisualizeNormal.geom");
         for (auto& n : { "PBR", "VertexLit", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {

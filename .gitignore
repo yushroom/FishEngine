@@ -22,17 +22,13 @@ xcuserdata/
 *.DS_Store
 
 # external libs
-/external/boost*
-/external/PhysXSDK/
-/external/libs/
-/external/fbxsdk/
-/external/cereal/
-/external/
-/Engine/ThirdParty/boost*
 /Engine/ThirdParty/cereal/
 /Engine/ThirdParty/PhysXSDK/
-/Engine/ThirdParty/libs/
+/Engine/ThirdParty/boost*
 /Engine/ThirdParty/assimp-3.3.1*
+/Engine/ThirdParty/glew-2.0.0*
+/Engine/ThirdParty/glfw-3.2.1*
+/Engine/ThirdParty/clang*
 
 # binary
 /Engine/Binary/
@@ -52,6 +48,9 @@ xcuserdata/
 # cmake build
 /Engine/[Bb]uild
 [Bb]uild
+build-*
+CMakeLists.txt.user
+
 
 # vscode
 /.vscode/

@@ -1,0 +1,15 @@
+aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+add_executable (Test ${SRCS})
+target_compile_options(Test PUBLIC -std=c++14)
+target_link_libraries(Test ${Boost_LIBRARIES})
+target_link_libraries(Test FishEngine)
+if (MSVC)
+    target_link_libraries(Test opengl32.lib)
+else()
+
+    set_target_properties(Test PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+endif()
+
+target_link_libraries(Test glfw)
+target_link_libraries(Test glew_s)
+target_link_libraries(Test assimp)

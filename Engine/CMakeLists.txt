@@ -15,30 +15,42 @@ find_package(Boost 1.59 REQUIRED
     filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 
-message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
+#message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
 
 include_directories(./Source/Runtime)
 include_directories(./ThirdParty/boost_1_61_0/)
 include_directories(./ThirdParty/)
 include_directories(./ThirdParty/PhysXSDK/Include/)
-include_directories(./ThirdParty/glew)
+include_directories(./ThirdParty/glew-2.0.0/include)
+include_directories(./ThirdParty/glfw-3.2.1/include)
+include_directories(./ThirdParty/assimp-3.3.1/include)
 
 if (MSVC)
-	link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/win32/)
-	link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/win32/debug)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 else()
-	link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
+        #link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
 endif()
 
-aux_source_directory(./ThirdParty/imgui imgui_SRCS)
+add_subdirectory(./ThirdParty/imgui)
 
-add_library(imgui ${imgui_SRCS})
-target_compile_options(imgui PUBLIC -std=c++14)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(./ThirdParty/glfw-3.2.1/)
+
+set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
+add_subdirectory(./ThirdParty/glew-2.0.0/build/cmake)
+
+set(ASSIMP_NO_EXPORT OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(./ThirdParty/assimp-3.3.1)
 
 add_subdirectory(./Source/Runtime)
 add_subdirectory(./Source/Editor)
 add_subdirectory(./Source/Tool/ShaderCompiler)
+add_subdirectory(./Source/Test)
 
 #target_link_libraries(FishEditor FishEngine)

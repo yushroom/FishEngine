@@ -624,7 +624,11 @@ namespace FishEditor
         // Main menu bar
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
-                ImGui::MenuItem("New Scene", "Ctrl+N");
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+                {
+                    //Debug::LogWarning("New");
+                    //std::files
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit")) {

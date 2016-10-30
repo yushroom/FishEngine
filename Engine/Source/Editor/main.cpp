@@ -534,6 +534,34 @@ public:
     }
 };
 
+class TestParallaxMap : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+        auto quadGO = GameObject::CreatePrimitive(PrimitiveType::Quad);
+        quadGO->transform()->setLocalScale(4);
+        quadGO->transform()->setLocalPosition(0, 1, 0);
+        auto shader = Shader::CreateFromFile(Resources::shaderRootDirectory() + "ParallaxMap.vsfs");
+        auto material = Material::CreateMaterial();
+        material->SetShader(shader);
+        const std::string sample_root_dir = "../../Example/ParallaxMapping/";
+        const std::string texture_dir = sample_root_dir + "textures/";
+
+        auto texture_bricks2_disp = Texture::CreateFromFile(texture_dir + "bricks2_disp.jpg");
+        auto texture_bricks2_normal = Texture::CreateFromFile(texture_dir + "bricks2_normal.jpg");
+        auto texture_bricks2 = Texture::CreateFromFile(texture_dir + "bricks2.jpg");
+
+        material->SetTexture("diffuseMap", texture_bricks2);
+        material->SetTexture("normalMap", texture_bricks2_normal);
+        material->SetTexture("depthMap", texture_bricks2_disp);
+        material->SetFloat("heightScale", 0.1f);
+
+        quadGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    }
+};
+
  
 int main()
 {
@@ -541,13 +569,14 @@ int main()
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
+    FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     FishEditorWindow::Init();
     //test();
     shared_ptr<Object> p = make_shared<Camera>();
-    Debug::LogWarning("%s", typeid(p).name());
-    Debug::LogWarning("%s", typeid(Camera).name());
+    //Debug::LogWarning("%s", typeid(p).name());
+    //Debug::LogWarning("%s", typeid(Camera).name());
     FishEditorWindow::Run();
     FishEditorWindow::Clean();
     return 0;

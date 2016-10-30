@@ -41,6 +41,7 @@ using namespace FishEditor;
 #include <Serialization.hpp>
 #include <CapsuleCollider.hpp>
 #include <RenderSettings.hpp>
+#include <Resources.hpp>
 
 using namespace std;
 using namespace FishEngine;

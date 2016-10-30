@@ -90,6 +90,12 @@ namespace FishEngine
             MakeDirty();
         }
 
+        void setLocalScale(const float scale)
+        {
+            m_localScale.x = m_localScale.y = m_localScale.z = scale;
+            MakeDirty();
+        }
+
         // The rotation of the transform relative to the parent transform's rotation.
         Quaternion localRotation() const {
             return m_localRotation;

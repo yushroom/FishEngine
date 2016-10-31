@@ -2,9 +2,9 @@
 #define PhysicsSystem_hpp
 
 #include "FishEngine.hpp"
-#ifndef _DEBUG
-#define NDEBUG
-#endif
+//#ifndef _DEBUG
+//#define NDEBUG
+//#endif
 #include <PhysXSDK/Include/PxPhysicsAPI.h>
 
 namespace FishEngine

@@ -161,7 +161,7 @@ namespace FishEditor
         PhysicsSystem::Clean();
     }
 
-
+     
     void FishEditorWindow::Clean()
     {
         //    for (auto& r : m_apps) {

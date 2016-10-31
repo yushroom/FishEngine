@@ -118,6 +118,7 @@ namespace FishEngine
     private:
         friend FishEditor::EditorRenderSystem;
         friend FishEditor::EditorGUI;
+        friend FishEngine::RenderSystem;
         
         static void
         DrawHalfWireSphere(

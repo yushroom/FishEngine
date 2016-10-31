@@ -35,8 +35,6 @@ struct VS_OUT
         vs_out.viewDirInTangent  = normalize(TBN * WorldSpaceViewDir(vs_out.positionInWorld)); 
         gl_Position = MATRIX_MVP * appdata.position;
     }
-
-    #include "AppDataTanMain.inc"
 #endif
 
 #ifdef FRAGMENT_SHADER

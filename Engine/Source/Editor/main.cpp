@@ -546,7 +546,9 @@ public:
         auto shader = Shader::CreateFromFile(Resources::shaderRootDirectory() + "ParallaxMap.vsfs");
         auto material = Material::CreateMaterial();
         material->SetShader(shader);
-        const std::string sample_root_dir = "../../Example/ParallaxMapping/";
+        auto current_path = boost::filesystem::current_path();
+        cout << current_path << endl;
+        const std::string sample_root_dir = "../../../../Example/ParallaxMapping/";
         const std::string texture_dir = sample_root_dir + "textures/";
 
         auto texture_bricks2_disp = Texture::CreateFromFile(texture_dir + "bricks2_disp.jpg");
@@ -559,6 +561,8 @@ public:
         material->SetFloat("heightScale", 0.1f);
 
         quadGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+
+        auto cubeGO = GameObject::CreatePrimitive(PrimitiveType::Cube);
     }
 };
 
@@ -574,7 +578,7 @@ int main()
     FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     FishEditorWindow::Init();
     //test();
-    shared_ptr<Object> p = make_shared<Camera>();
+    //shared_ptr<Object> p = make_shared<Camera>();
     //Debug::LogWarning("%s", typeid(p).name());
     //Debug::LogWarning("%s", typeid(Camera).name());
     FishEditorWindow::Run();

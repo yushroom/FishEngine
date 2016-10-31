@@ -10,7 +10,7 @@ class Resources
 public:
     Resources() = delete;
 
-    static Object Load(const std::string path);
+    //static Object Load(const std::string path);
 
     static const std::string& shaderRootDirectory()
     {

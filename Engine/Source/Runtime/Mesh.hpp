@@ -154,7 +154,7 @@ namespace FishEngine
         SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
         //SimpleMesh(std::vector<float> positionBuffer);
 
-        void BindNewBuffer(const float* positionBuffer, uint32_t vertexCount);
+        //void BindNewBuffer(const float* positionBuffer, uint32_t vertexCount);
 
         void Render() const;
 

@@ -2,29 +2,24 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb/stb_image_write.h>
-
-#include "Debug.hpp"
-#include "Input.hpp"
-#include "EditorGUI.hpp"
-#include "Camera.hpp"
-#include "Time.hpp"
-#include <MeshRenderer.hpp>
-#include <SkinnedMeshRenderer.hpp>
-#include "Scene.hpp"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
-#include "FishEditorWindow.hpp"
-#include <RenderSystem.hpp>
-#include <Light.hpp>
+
+#include <Camera.hpp>
+#include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
+#include <Scene.hpp>
 #include <Mesh.hpp>
 #include <MeshFilter.hpp>
-#include <Screen.hpp>
-#include "Selection.hpp"
-#include <ModelImporter.hpp>
-#include <Gizmos.hpp>
-#include "SceneView.hpp"
 #include <Pipeline.hpp>
-#include <RenderSettings.hpp>
+#include <GameObject.hpp>
+#include <RenderSystem.hpp>
+#include <Material.hpp>
+#include <Color.hpp>
+
+#include "FishEditorWindow.hpp"
+#include "EditorGUI.hpp"
+#include "Selection.hpp"
 
 using namespace FishEngine;
 
@@ -49,91 +44,56 @@ namespace FishEditor
 
         ImGui_ImplGlfwGL3_Init(window, false);
 
-        Pipeline::Init();
-        Shader::Init();
-        Material::Init();
-        Model::Init();
-        Gizmos::Init();
+        RenderSystem::Init();
         EditorGUI::Init();
-        Scene::Init();
-        //#ifdef GLM_FORCE_LEFT_HANDED
-        glFrontFace(GL_CW);
-        //#endif
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-        //glEnable(GL_LINE_SMOOTH);
     }
 
     void EditorRenderSystem::Render()
     {
         ImGui_ImplGlfwGL3_NewFrame();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        RenderSystem::Render();
 
-        auto camera = Camera::main();
-        auto proj = camera->projectionMatrix();
-        auto view = camera->worldToCameraMatrix();
-        Pipeline::perFrameUniformData.MATRIX_P              = proj;
-        Pipeline::perFrameUniformData.MATRIX_V              = view;
-        Pipeline::perFrameUniformData.MATRIX_I_V            = view.inverse();
-        Pipeline::perFrameUniformData.MATRIX_VP             = proj * view;
-        Pipeline::perFrameUniformData.WorldSpaceCameraPos   = Camera::main()->transform()->position();
-        float t = Time::time();
-        Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
-        
-        Vector4 lightDir(0, 0, 0, 0);
-        Matrix4x4 lightVP;
-        auto& lights = Light::lights();
-        if (lights.size() > 0)
+        /************************************************************************/
+        /* Grid                                                                 */
+        /************************************************************************/
+        static std::shared_ptr<SimpleMesh> grid;
+        static bool grid_initialized = false;
+        if (!grid_initialized)
         {
-            auto& l = lights.front();
-            if (l->transform() != nullptr)
+            constexpr int rows = 10;
+            constexpr int vertex_count = (rows*2 + 1) * 2 * 2;
+            float grid_vertex[vertex_count * 3];
+            constexpr int step = 1;
+            float* p = grid_vertex;
+            for (int i = -rows; i <= rows; i++)
             {
-                lightDir = Vector4(-l->transform()->forward(), 0);
-                lightVP = l->m_projectMatrixForShadowMap * l->m_viewMatrixForShadowMap;
+                float x = static_cast<float>(i*step);
+                *p = x; p++;
+                *p = 0; p++;
+                *p = -rows; p++;
+                *p = x; p++;
+                *p = 0; p++;
+                *p = rows; p++;
+
+                *p = -rows; p++;
+                *p = 0; p++;
+                *p = x; p++;
+                *p = rows; p++;
+                *p = 0; p++;
+                *p = x; p++;
             }
-            Pipeline::perFrameUniformData.LightColor0 = l->m_color;
+            grid = std::make_shared<SimpleMesh>(grid_vertex, vertex_count, GL_LINES);
+            grid_initialized = true;
         }
-        Pipeline::perFrameUniformData.WorldSpaceLightPos0   = lightDir;
-        Pipeline::perFrameUniformData.LightMatrix0          = lightVP;
-        
-        Pipeline::BindPerFrameUniforms();
-
-
-        /************************************************************************/
-        /* Skybox                                                               */
-        /************************************************************************/
-        Matrix4x4 model = Matrix4x4::Scale(100);
-        auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
-        Pipeline::perDrawUniformData.MATRIX_MVP = Pipeline::perFrameUniformData.MATRIX_VP * model;
-        Pipeline::perDrawUniformData.MATRIX_MV = mv;
-        Pipeline::perDrawUniformData.MATRIX_M = model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
-        Pipeline::perDrawUniformData.MATRIX_IT_M = model.transpose().inverse();
-        Pipeline::BindPerDrawUniforms();
-        static auto sphere = Model::builtinMesh(PrimitiveType::Sphere);
-        auto skybox_material = RenderSettings::skybox();
-        auto shader = skybox_material->shader();
+        auto view = Camera::main()->worldToCameraMatrix();
+        auto proj = Camera::main()->projectionMatrix();
+        auto shader = Shader::builtinShader("SolidColor-Internal");
         shader->Use();
-        //glCullFace(GL_BACK);
-        //glDisable(GL_DEPTH_TEST);
-        shader->PreRender();
-        skybox_material->Update();
-        shader->CheckStatus();
-        sphere->Render();
-        shader->PostRender();
-        //glEnable(GL_DEPTH_TEST);
-        //glCullFace(GL_BACK);
+        shader->BindUniformVec4("_Color", Color::gray);
+        shader->BindUniformMat4("MATRIX_MVP", proj*view);
+        grid->Render();
 
-
-        /************************************************************************/
-        /* Shadow                                                               */
-        /************************************************************************/
-        for (auto& l : lights) {
-            Scene::RenderShadow(l);
-        }
 
         /************************************************************************/
         /* Selection                                                            */
@@ -215,82 +175,26 @@ namespace FishEditor
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
 
-
-        /************************************************************************/
-        /* Scene                                                                */
-        /************************************************************************/
-        //const int w = Screen::width();
-        //const int h = Screen::height();
-        //auto v = Camera::main()->viewport();
-        //auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
-        //glViewport(GLint(scene_view_pos_size.x), GLint(scene_view_pos_size.y), GLsizei(scene_view_pos_size.z), GLsizei(scene_view_pos_size.w));
-        auto v = Camera::main()->viewport();
-        const int w = Screen::width();
-        const int h = Screen::height();
-        glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
-        Scene::Render();
-        
-//        std::vector<std::shared_ptr<GameObject>> transparentQueue;
-//        for (auto& go : Scene::m_gameObjects) {
-//            if (!go->activeInHierarchy()) continue;
-//            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-//            if (renderer == nullptr) {
-//                renderer = go->GetComponent<SkinnedMeshRenderer>();
-//                if (renderer == nullptr)
-//                    continue;
-//            }
-//            bool isTransparent = renderer->material()->shader()->IsTransparent();
-//            if (isTransparent) {
-//                transparentQueue.push_back(go);
-//                continue;
-//            }
-//            renderer->Render();
-//        }
-//
-//        /************************************************************************/
-//        /* Transparent                                                          */
-//        /************************************************************************/
-//        for (auto& go : transparentQueue) {
-//            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-//            if (renderer == nullptr) {
-//                renderer = go->GetComponent<SkinnedMeshRenderer>();
-//            }
-//            renderer->Render();
-//        }
-//
-//        transparentQueue.clear();
-
-
         if (m_isWireFrameMode)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         /************************************************************************/
-        /* Gizmos                                                               */
+        /* Selection Gizmos                                                     */
         /************************************************************************/
-        //glEnable(GL_POLYGON_OFFSET_LINE);
-        //glPolygonOffset(-1.0, -1.0f);
-        glDepthFunc(GL_LEQUAL);
-        //glDisable(GL_DEPTH_TEST);
         auto go = Selection::selectedGameObjectInHierarchy();
         if (go != nullptr)
             go->OnDrawGizmosSelected();
-        Scene::OnDrawGizmos();
-        glDepthFunc(GL_LESS);
-        //glEnable(GL_DEPTH_TEST);
-        //glDisable(GL_POLYGON_OFFSET_LINE);
         
-        Gizmos::setColor(Color::red);
-        auto& b = Scene::m_bounds;
-        Gizmos::DrawWireCube(b.center(), b.size());
-        
-        
-        
-        // render camera preview
+        /************************************************************************/
+        /* Camera Preview                                                       */
+        /************************************************************************/
         glClear(GL_DEPTH_BUFFER_BIT);
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         auto camera_preview = selectedGO == nullptr ? nullptr : selectedGO->GetComponent<Camera>();
         if (camera_preview != nullptr)
         {
+            const int w = Screen::width();
+            const int h = Screen::height();
             //auto v = camera_preview->viewport();
             const int preview_width  = static_cast<int>(w * 0.25f);
             const int preview_height = static_cast<int>(h * 0.25f);
@@ -316,19 +220,6 @@ namespace FishEditor
             Screen::m_width = w;
             Screen::m_height = h;
         }
-
-        
-//        if (m_showShadowMap) {
-//            auto& l = Light::lights().front();
-//            std::map<std::string, PTexture> textures;
-//            textures["screenTexture"] = l->m_shadowMap;
-//            glViewport(200, 200, 400, 400);
-//            auto m = Material::builtinMaterial("ScreenTexture");
-//            m->shader()->Use();
-//            m->shader()->BindTextures(textures);
-//            //Mesh::builtinMesh("quad")->Render();
-//            Model::builtinModel(PrimitiveType::Quad)->mainMesh()->Render();
-//        }
         
         EditorGUI::Update();
 
@@ -338,6 +229,7 @@ namespace FishEditor
 
     void EditorRenderSystem::Clean()
     {
+        RenderSystem::Clean();
         EditorGUI::Clean();
     }
 

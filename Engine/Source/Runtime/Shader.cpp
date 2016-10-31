@@ -628,7 +628,7 @@ namespace FishEngine {
         const auto& root_dir = Resources::shaderRootDirectory();
         Debug::Log("Compile shader: VisualizeNormal");
         m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir + "VisualizeNormal.vert", root_dir + "VisualizeNormal.frag", root_dir + "VisualizeNormal.geom");
-        for (auto& n : { "PBR", "VertexLit", "NormalMap", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {
+        for (auto& n : { "PBR", "VertexLit", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {
             Debug::Log("Compile shader: %s", n);
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".vert", root_dir + n + ".frag");
         }
@@ -639,6 +639,7 @@ namespace FishEngine {
         Debug::Log("Compile shader: Transparent");
         m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
         
+        m_builtinShaders["NormalMap"]           = Shader::CreateFromFile(root_dir + "NormalMap.vsfs");
         m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
         m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.vsfs");

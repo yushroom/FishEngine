@@ -21,7 +21,7 @@ xcuserdata/
 
 *.DS_Store
 
-# external libs
+# 3rd parth libs
 /Engine/ThirdParty/cereal/
 /Engine/ThirdParty/PhysXSDK/
 /Engine/ThirdParty/boost*
@@ -29,6 +29,7 @@ xcuserdata/
 /Engine/ThirdParty/glew-2.0.0*
 /Engine/ThirdParty/glfw-3.2.1*
 /Engine/ThirdParty/clang*
+/Engine/ThirdParty/fbxsdk*
 
 # binary
 /Engine/Binary/

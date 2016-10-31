@@ -221,14 +221,14 @@ namespace FishEngine
         glEnableVertexAttribArray(PositionIndex);
     }
 
-    void SimpleMesh::BindNewBuffer(const float* positionBuffer, uint32_t vertexCount)
-    {
-        glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount*3*sizeof(GLfloat), positionBuffer, GL_DYNAMIC_DRAW);
-        //glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-        //glEnableVertexAttribArray(PositionIndex);
-    }
+    //void SimpleMesh::BindNewBuffer(const float* positionBuffer, uint32_t vertexCount)
+    //{
+    //    glBindVertexArray(m_VAO);
+    //    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    //    glBufferData(GL_ARRAY_BUFFER, vertexCount*3*sizeof(GLfloat), positionBuffer, GL_DYNAMIC_DRAW);
+    //    //glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    //    //glEnableVertexAttribArray(PositionIndex);
+    //}
 
     void SimpleMesh::Render() const
     {

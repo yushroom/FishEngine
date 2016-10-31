@@ -1,6 +1,7 @@
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
 
-add_executable (FishEditor ${SRCS})
+add_executable (FishEditor ${SRCS} ${HEADERS})
 target_compile_options(FishEditor PUBLIC -std=c++14)
 target_link_libraries(FishEditor ${Boost_LIBRARIES})
 

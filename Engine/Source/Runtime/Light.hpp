@@ -106,7 +106,8 @@ namespace FishEngine
 
     private:
         friend class Scene;
-        friend class FishEditor::EditorRenderSystem;
+        //friend class FishEditor::EditorRenderSystem;
+        friend class FishEngine::RenderSystem;
         friend class FishEditor::EditorGUI;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;

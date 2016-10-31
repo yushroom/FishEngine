@@ -60,6 +60,8 @@ namespace FishEngine
     class MeshCollider;
     class Pipeline;
     class Serialization;
+    class RenderSystem;
+
     struct Avatar;
     struct Ray;
     struct Bounds;

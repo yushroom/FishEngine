@@ -18,7 +18,7 @@ struct VS_OUT {
 
 #endif // VERTEX_SHADER
 
-#ifdef FRAGMENT_SHDER
+#ifdef FRAGMENT_SHADER
 	const vec3 lightDir = normalize(vec3(1, 1, 1));
 	const float bumpiness = 0.2;
 	uniform sampler2D diffuseMap;
@@ -43,4 +43,4 @@ struct VS_OUT {
 	    //color.rgb = vec3(c,c,c);
 	    color.a = 1.0f;
 	}
-#endif // FRAGMENT_SHDER
+#endif // FRAGMENT_SHADER

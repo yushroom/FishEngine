@@ -9,7 +9,7 @@
 #endif
 #include <GL/glew.h>
 // GLFW
-#include <glfw/glfw3.h>
+//#include <glfw/glfw3.h>
 
 //#ifdef _DEBUG
 #define glCheckError() _checkOpenGLError(__FILE__,__LINE__)

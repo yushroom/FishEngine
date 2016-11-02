@@ -5,6 +5,11 @@
 //#ifndef _DEBUG
 //#define NDEBUG
 //#endif
+#ifndef _DEBUG
+#ifndef NDEBUG
+#define NDEBUG
+#endif
+#endif
 #include <PhysXSDK/Include/PxPhysicsAPI.h>
 
 namespace FishEngine

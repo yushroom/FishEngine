@@ -143,6 +143,20 @@ namespace FishEditor
         {
             m_transformToolType = TransformToolType::Scale;
         }
+
+        if (Input::GetKeyDown(KeyCode::LeftControl) && Input::GetKeyDown(KeyCode::Z))
+        {
+            if (Input::GetKeyDown(KeyCode::LeftShift))
+            {
+                Debug::LogWarning("Ctrl+Shift+Z");
+                CommandManager::Redo();
+            }
+            else
+            {
+                Debug::LogWarning("Ctrl+Z");
+                CommandManager::Undo();
+            }
+        }
         
         if (selectedGO != nullptr)
         {
@@ -829,17 +843,23 @@ namespace FishEditor
         
         auto& axis_selected = axis[m_selectedAxis];
         
-        if (Input::GetMouseButtonDown(0))
+        static std::function<void(void)> undo_function;
+        static std::function<void(void)> redo_function;
+
+        // handle mouse movement event
+        if (Input::GetMouseButtonDown(0))   // start
         {
             lastCenter = center;
             Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             float t = solve(center, axis_selected, camera_pos, ray.direction);
             lastMousePosition = ray.GetPoint(t);
-            return;
+            const auto position = selectedGO->transform()->position();
+            undo_function = [selectedGO, position]() {
+                Debug::LogWarning("Undo translation");
+                selectedGO->transform()->setPosition(position);
+            };
         }
-
-        // handle mouse movement event
-        if (Input::GetMouseButton(0))
+        else if (Input::GetMouseButton(0))       // moving
         {
             Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
             Vector3 axis_on_plane = vp.MultiplyVector(axis_selected);
@@ -851,6 +871,15 @@ namespace FishEditor
             // solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
             float t  = solve(camera_pos, new_view_dir, lastMousePosition, axis_selected);
             selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
+        }
+        else if (Input::GetMouseButtonUp(0))    // end
+        {
+            const auto position = selectedGO->transform()->position();
+            redo_function = [selectedGO, position]() {
+                Debug::LogWarning("Redo translation");
+                selectedGO->transform()->setPosition(position);
+            };
+            CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
         }
     }
 

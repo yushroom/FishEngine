@@ -6,6 +6,7 @@
 
 #include <Vector3.hpp>
 #include <Input.hpp>
+#include <Command.hpp>
 
 #include "SceneViewEditor.hpp"
 

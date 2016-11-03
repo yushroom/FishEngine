@@ -4,6 +4,7 @@
 #include "FishEditor.hpp"
 #include "FishEngine.hpp"
 #include "GLEnvironment.hpp"
+#include <glfw/glfw3.h>
 
 namespace FishEditor
 {
@@ -75,7 +76,7 @@ namespace FishEditor
         static bool m_inPlayMode;
 
         // glfw callback
-        static void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode);
+        static void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);

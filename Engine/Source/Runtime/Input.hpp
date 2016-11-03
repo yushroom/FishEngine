@@ -4,13 +4,17 @@
 #include "GLEnvironment.hpp"
 #include "Vector3.hpp"
 #include "Screen.hpp"
+#include <glfw/glfw3.h>
 
 namespace FishEngine
 {
     enum class KeyCode {
         Alpha0 = GLFW_KEY_0, Alpha1, Alpha2, Alpha3, Alpha4, Alpha5, Alpha6, Alpha7, Alpha8, Alpha9,
         A = GLFW_KEY_A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-        LeftControl = GLFW_KEY_LEFT_CONTROL, RightControl = GLFW_KEY_RIGHT_CONTROL,
+        LeftControl = GLFW_KEY_LEFT_CONTROL,    RightControl = GLFW_KEY_RIGHT_CONTROL,
+        LeftShift = GLFW_KEY_LEFT_SHIFT,        RightShift = GLFW_KEY_RIGHT_SHIFT,
+        LeftAlt = GLFW_KEY_LEFT_ALT,            RightAlt = GLFW_KEY_RIGHT_ALT,
+        LeftSuper = GLFW_KEY_LEFT_SUPER,        RightSuper = GLFW_KEY_RIGHT_SUPER,
     };
 
     enum class KeyState {

@@ -91,6 +91,8 @@ namespace FishEditor
         for (auto& r : m_apps) {
             r->Init();
         }
+
+        CommandManager::Init();
     }
 
     void FishEditorWindow::Run()
@@ -170,21 +172,51 @@ namespace FishEditor
     }
 
 
-    void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
+    void FishEditorWindow::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
         //TwEventKeyGLFW(key, action);
         //GUI::OnKey(key, action);
-        ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
+        ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
         if (ImGui::GetIO().WantCaptureKeyboard)
             return;
 
         //if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
         //    Input::UpdateKeyState(key, (KeyState)action);
         //}
+//        if (key == GLFW_KEY_LEFT_CONTROL)
+//        {
+//            Debug::LogWarning("left ctrl");
+//        }
+//        if (key == GLFW_KEY_Z && mods == GLFW_MOD_CONTROL)
+//        {
+//            Debug::LogWarning("Ctrl+Z");
+//        }
         Input::UpdateKeyState(key, (KeyState)action);
+        if (mods & GLFW_MOD_ALT)
+        {
+            Input::UpdateKeyState(GLFW_KEY_LEFT_ALT, (KeyState)action);
+            Input::UpdateKeyState(GLFW_KEY_RIGHT_ALT, (KeyState)action);
+        }
+        if (mods & GLFW_MOD_CONTROL)
+        {
+            //Debug::LogWarning("Control");
+            Input::UpdateKeyState(GLFW_KEY_LEFT_CONTROL, (KeyState)action);
+            Input::UpdateKeyState(GLFW_KEY_RIGHT_CONTROL, (KeyState)action);
+        }
+        if (mods & GLFW_MOD_SUPER)
+        {
+            Input::UpdateKeyState(GLFW_KEY_LEFT_SUPER, (KeyState)action);
+            Input::UpdateKeyState(GLFW_KEY_RIGHT_SUPER, (KeyState)action);
+        }
+        if (mods & GLFW_MOD_SHIFT)
+        {
+            Input::UpdateKeyState(GLFW_KEY_LEFT_SHIFT, (KeyState)action);
+            Input::UpdateKeyState(GLFW_KEY_RIGHT_SHIFT, (KeyState)action);
+        }
+
     }
 
     void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)

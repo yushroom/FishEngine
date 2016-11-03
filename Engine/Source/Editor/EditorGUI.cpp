@@ -126,6 +126,34 @@ namespace FishEditor
         if (Input::GetKeyDown(KeyCode::F)) {
             Camera::main()->FrameSelected(selectedGO);
         }
+        
+        if (Input::GetKeyDown(KeyCode::W))
+        {
+            m_mainSceneViewEditor->m_transformToolType = TransformToolType::Translate;
+        }
+        else if (Input::GetKeyDown(KeyCode::E))
+        {
+            m_mainSceneViewEditor->m_transformToolType = TransformToolType::Rotate;
+        }
+        else if (Input::GetKeyDown(KeyCode::R))
+        {
+            m_mainSceneViewEditor->m_transformToolType = TransformToolType::Scale;
+        }
+
+        if (Input::GetKeyDown(KeyCode::LeftControl) && Input::GetKeyDown(KeyCode::Z))
+        {
+            if (Input::GetKeyDown(KeyCode::LeftShift))
+            {
+                Debug::LogWarning("Ctrl+Shift+Z");
+                CommandManager::Redo();
+            }
+            else
+            {
+                Debug::LogWarning("Ctrl+Z");
+                CommandManager::Undo();
+            }
+        }
+        
 
         DrawMainMenu();
         DrawMainToolbar();

@@ -2,6 +2,7 @@
 #include <Shader.hpp>
 #include <Debug.hpp>
 #include <string>
+#include <glfw/glfw3.h>
 
 using namespace FishEngine;
 using namespace std;

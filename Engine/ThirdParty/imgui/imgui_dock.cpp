@@ -1,4 +1,8 @@
 #include "imgui.h"
+#include <ostream>
+#include <cereal/cereal.hpp>
+#include <cereal/archives/json.hpp>
+
 #define IMGUI_DEFINE_PLACEMENT_NEW
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -6,6 +10,15 @@
 //#include <lua.hpp>
 #include <cassert>
 #define ASSERT(exp) assert(exp)
+
+namespace cereal
+{
+    template<typename Archive>
+    static void serialize(Archive& archive, ImVec2& v)
+    {
+        archive(cereal::make_nvp("x", v.x), cereal::make_nvp("y", v.y));
+    }
+}
 
 namespace ImGui
 {
@@ -179,6 +192,36 @@ struct DockContext
 			setChildrenPosSize(_pos, _size);
 		}
 
+        template<class Archive>
+        void save(Archive& archive) const
+        {
+            archive(cereal::make_nvp("label", std::string(label)));
+            archive(cereal::make_nvp("pos", pos));
+            archive(cereal::make_nvp("size", size));
+            archive(cereal::make_nvp("status", status));
+            archive(cereal::make_nvp("active", active));
+            archive(cereal::make_nvp("location", std::string(location)));
+            archive(cereal::make_nvp("opened", opened));
+        }
+
+        template<class Archive>
+        void load(Archive& archive)
+        {
+            last_frame = 0;
+            invalid_frames = 0;
+            std::string temp_label;
+            archive(cereal::make_nvp("label", temp_label));
+            label = ImStrdup(temp_label.c_str());
+            id = ImHash(label, 0);
+            archive(cereal::make_nvp("pos", pos));
+            archive(cereal::make_nvp("size", size));
+            archive(cereal::make_nvp("status", status));
+            archive(cereal::make_nvp("active", active));
+            std::string temp_location;
+            archive(cereal::make_nvp("location", temp_location));
+            strcpy(location, temp_location.c_str());
+            archive(cereal::make_nvp("opened", opened));
+        }
 
 		char* label;
 		ImU32 id;
@@ -1017,7 +1060,7 @@ struct DockContext
 	}
 
 
-	int getDockIndex(Dock* dock)
+	int getDockIndex(const Dock* dock) const
 	{
 		if (!dock) return -1;
 
@@ -1064,6 +1107,59 @@ struct DockContext
 
 //	Dock* getDockByIndex(lua_Integer idx) { return idx < 0 ? nullptr : m_docks[(int)idx]; }
 
+    Dock* getDockByIndex(int idx)
+    {
+        return idx < 0 ? nullptr : m_docks[idx];
+    }
+
+    template <class Archive>
+    void save(Archive & ar) const
+    {
+        ar(cereal::make_nvp("count", m_docks.size()));
+        //ar(m_docks.size());
+        for (int i = 0; i < m_docks.size(); ++i)
+        {
+            auto d = m_docks[i];
+            //ar(cereal::make_nvp("id", i));
+            ar(*d);
+            ar(cereal::make_nvp("prev", getDockIndex(d->prev_tab)));
+            ar(cereal::make_nvp("next", getDockIndex(d->next_tab)));
+            ar(cereal::make_nvp("child0", getDockIndex(d->children[0])));
+            ar(cereal::make_nvp("child1", getDockIndex(d->children[1])));
+            ar(cereal::make_nvp("parent", getDockIndex(d->parent)));
+        }
+    }
+
+    template <class Archive>
+    void load(Archive & ar)
+    {
+        for (int i = 0; i < m_docks.size(); ++i)
+        {
+        	m_docks[i]->~Dock();
+        	MemFree(m_docks[i]);
+        }
+        m_docks.clear();
+
+        int count = 0;
+        ar(count);
+        for (int i = 0; i < count; ++i)
+        {
+			Dock* new_dock = (Dock*)MemAlloc(sizeof(Dock));
+			m_docks.push_back(IM_PLACEMENT_NEW(new_dock) Dock());
+        }
+        for (int i = 0; i < count; ++i)
+        {
+            Dock* d = m_docks[i];
+            ar(*d);
+            int prev, next, child0, child1, parent;
+            ar(prev, next, child0, child1, parent);
+            d->prev_tab = getDockByIndex(prev);
+            d->next_tab = getDockByIndex(next);
+            d->children[0] = getDockByIndex(child0);
+            d->children[1] = getDockByIndex(child1);
+            d->parent = getDockByIndex(parent);
+        }
+    }
 
 //	void load(lua_State* L)
 //	{
@@ -1201,6 +1297,37 @@ void EndDock()
 //	g_dock.save(file);
 //}
 //
+
+void SaveDock(std::ostream& file)
+{
+    cereal::JSONOutputArchive oa(file);
+    oa << g_dock;
+}
+
+void LoadDock(std::istream& file)
+{
+    cereal::JSONInputArchive ia(file);
+    ia >> g_dock;
+}
+
+bool GetNamedDockPositionAndSize(const char* name, float* out_x, float* out_y, float* out_size_x, float* out_size_y)
+{
+    for (int i = 0; i < g_dock.m_docks.size(); ++i)
+    {
+        auto d = g_dock.m_docks[i];
+        if (strcmp(d->label, name) == 0)
+        {
+            *out_x = d->pos.x;
+            *out_y = d->pos.y;
+            *out_size_x = d->size.x;
+            *out_size_y = d->size.y;
+            //printf("[%s] %lf %lf %lf %lf", d->label,  out_x, out_y, out_size_x, out_size_y);
+            return true;
+        }
+    }
+    return false;
+}
+
 //
 //void LoadDock(lua_State* L)
 //{

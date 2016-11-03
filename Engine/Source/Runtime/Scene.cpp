@@ -149,8 +149,11 @@ namespace FishEngine
         auto& proj = light->m_projectMatrixForShadowMap;
 
         auto shadowMap = light->m_shadowMap;
+        GLint previous_fbo = 0;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
+        //Debug::LogWarning("%d", previous_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->FBO());
         glViewport(0, 0, shadowMap->width(), shadowMap->height());
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->depthBufferFBO());
         glClear(GL_DEPTH_BUFFER_BIT);
 
         //shader->Use();
@@ -195,7 +198,7 @@ namespace FishEngine
                 mesh->Render();
             }
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
     }
 
     void Scene::OnDrawGizmos()
@@ -253,16 +256,19 @@ namespace FishEngine
     void Scene::Render()
     {
         std::vector<std::shared_ptr<GameObject>> transparentQueue;
-        for (auto& go : Scene::m_gameObjects) {
+        for (auto& go : Scene::m_gameObjects)
+        {
             if (!go->activeInHierarchy()) continue;
             std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr) {
+            if (renderer == nullptr)
+            {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
                 if (renderer == nullptr)
                     continue;
             }
             bool isTransparent = renderer->material()->shader()->IsTransparent();
-            if (isTransparent) {
+            if (isTransparent)
+            {
                 transparentQueue.push_back(go);
                 continue;
             }
@@ -272,9 +278,11 @@ namespace FishEngine
         /************************************************************************/
         /* Transparent                                                          */
         /************************************************************************/
-        for (auto& go : transparentQueue) {
+        for (auto& go : transparentQueue)
+        {
             std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr) {
+            if (renderer == nullptr)
+            {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
             }
             renderer->Render();
@@ -285,8 +293,10 @@ namespace FishEngine
 
     PGameObject Scene::Find(const std::string& name)
     {
-        for (auto& go : m_gameObjects) {
-            if (go->name() == name) {
+        for (auto& go : m_gameObjects)
+        {
+            if (go->name() == name)
+            {
                 return go;
             }
         }

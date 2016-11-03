@@ -393,7 +393,8 @@ namespace FishEngine {
     {
         for (auto& u : m_uniforms)
         {
-            if (boost::starts_with(u.name, name))
+            //if (boost::starts_with(u.name, name))
+            if (u.name == name)
             {
                 glUniform4fv(u.location, 1, value.data());
                 glCheckError();

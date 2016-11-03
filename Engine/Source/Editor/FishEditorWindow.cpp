@@ -1,6 +1,10 @@
 #include "FishEditorWindow.hpp"
 
 #include <thread>
+#include <fstream>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+#include <imgui/imgui_dock.h>
 
 #include "Debug.hpp"
 #include "EditorRenderSystem.hpp"
@@ -9,11 +13,9 @@
 #include "Material.hpp"
 #include "Time.hpp"
 #include "Scene.hpp"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
 #include "App.hpp"
 #include <PhysicsSystem.hpp>
-#include "SceneView.hpp"
+#include <Camera.hpp>
 
 #include "EditorRenderSystem.hpp"
 #include "EditorGUI.hpp"
@@ -72,15 +74,17 @@ namespace FishEditor
 
         glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
-//        int w, h;
-//        glfwGetFramebufferSize(m_window, &w, &h);
-//        Screen::m_width = w;
-//        Screen::m_height = h;
+        std::ifstream fin("./FishEditorLayout.json");
+        if (fin.good())
+            ImGui::LoadDock(fin);
+        else
+            Debug::LogWarning("Layout file not found.");
+
         WindowSizeCallback(m_window, m_windowWidth, m_windowHeight);
 
-        SceneView::Init();
-        Camera::m_mainCamera = SceneView::m_camera;
+        //Camera::m_mainCamera = SceneView::m_camera;
         EditorRenderSystem::Init();
+        Camera::m_mainCamera = EditorGUI::m_mainSceneViewEditor->camera();
 
         //PhysicsSystem::Init();
 
@@ -91,11 +95,7 @@ namespace FishEditor
 
     void FishEditorWindow::Run()
     {
-        //Scene::Start();
-        //PhysicsSystem::Start();
-
         const float fixed_delta_time = 1.0f / m_fixedFrameRate;
-        //float old_time = 0;
         EditorTime::m_time = (float)glfwGetTime();
 
         // Game loop
@@ -110,21 +110,15 @@ namespace FishEditor
             Input::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
 
 
-            if (m_inPlayMode) {
+            if (m_inPlayMode)
+            {
                 Scene::Update();
                 PhysicsSystem::FixedUpdate();
             }
             else {
-                SceneView::Update();
+                //SceneView::Update();
+                EditorGUI::m_mainSceneViewEditor->Update();
             }
-            
-            //Scene::UpdateBounds();
-//            if (Input::GetMouseButtonDown(0))
-//            {
-//                Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-//                auto go = Scene::IntersectRay(ray);
-//                Selection::setSelectedGameObjectInHierarchy(go);
-//            }
 
             EditorRenderSystem::Render();
 
@@ -151,13 +145,12 @@ namespace FishEditor
         m_inPlayMode = true;
         Camera::m_mainCamera = nullptr;
         Scene::Start();
-        //Camera::m_mainCamera = Scene::mainCamera();
     }
 
     void FishEditorWindow::Stop()
     {
         m_inPlayMode = false;
-        Camera::m_mainCamera = SceneView::m_camera;
+        Camera::m_mainCamera = EditorGUI::m_mainSceneViewEditor->camera();
         PhysicsSystem::Clean();
     }
 
@@ -196,9 +189,6 @@ namespace FishEditor
 
     void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
-        //    bool handled = GUI::OnMouseScroll(yoffset);
-        //    if (handled)
-        //        return;
         ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
         if (!ImGui::GetIO().WantCaptureMouse)
             Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
@@ -209,15 +199,14 @@ namespace FishEditor
 
     void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
-        //    if (GUI::OnMouseButton(button, action))
-        //        return;
         ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-        if (!ImGui::GetIO().WantCaptureMouse) {
+        //if (!ImGui::GetIO().WantCaptureMouse)
+        //{
             MouseButtonState s = action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up;
             //bool done = EditorGUI::OnMouseButton((MouseButtonCode)button, s);
             //if (done) return;
             Input::UpdateMouseButtonState(button, s);
-        }
+        //}
     }
 
     void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)
@@ -227,25 +216,22 @@ namespace FishEditor
         m_windowHeight = height;
         int w, h;
         glfwGetFramebufferSize(window, &w, &h);
-        Screen::m_width = w;
-        Screen::m_height = h;
+        //Screen::m_width = w;
+        //Screen::m_height = h;
         Screen::m_pixelsPerPoint = static_cast<float>(w) / width;
         m_pixelsPerPoint = static_cast<float>(w) / width;
         if (w != 0 && h != 0)
         {
+            auto size = EditorGUI::sceneViewSize();
+            Screen::m_width = size.x;
+            Screen::m_height = size.y;
             EditorRenderSystem::OnWindowSizeChanged(w, h);
             EditorGUI::OnWindowSizeChanged(w, h);
-            auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
-            //Screen::m_width = scene_view_pos_size.z;
-            //Screen::m_height = scene_view_pos_size.w;
         }
-        //glViewport(0, 0, width, height);
-        //GUI::OnWindowSizeChanged(width, height);
     }
 
     void FishEditorWindow::MouseCallback(GLFWwindow* window, double xpos, double ypos)
     {
-        //GUI::OnMouse(xpos, ypos);
     }
 
     void FishEditorWindow::CharacterCallback(GLFWwindow* window, unsigned int codepoint)

@@ -384,16 +384,19 @@ private:
     bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z) || isnan(w); }
 };
     
-struct Int2{
-    int m[2];
+struct Int2
+{
+    int x, y;
 };
     
 struct Int3{
-    int m[3];
+    //int m[3];
+    int x, y, z;
 };
     
 struct Int4{
-    int m[4];
+    //int m[4];
+    int x, y, z, w;
 };
 
 }

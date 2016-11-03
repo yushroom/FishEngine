@@ -1,11 +1,14 @@
 #include "EditorGUI.hpp"
 
 #include <sstream>
+#include <iostream>
+#include <fstream>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include <imgui/imgui_internal.h>
-//#include <imgui/imgui_dock.h>
+#include <imgui/imgui_dock.h>
+#include <imgui/imgui_user.h>
 #include <boost/lexical_cast.hpp>
 
 #include <GameObject.hpp>
@@ -42,34 +45,23 @@ using namespace FishEngine;
 namespace FishEditor
 {
     constexpr float inspector_indent_width              = 4;
-    constexpr float menuBarHeight = 20;
 
-    TransformToolType EditorGUI::m_transformToolType    = TransformToolType::Translate;
-    TransformSpace    EditorGUI::m_transformSpace       = TransformSpace::Global;
     int     EditorGUI::m_idCount                        = 0;
-    bool    EditorGUI::s_locked                         = false;
-    int     EditorGUI::m_selectedAxis                   = -1;
+
+    PSceneViewEditor EditorGUI::m_mainSceneViewEditor;
+
+    bool    EditorGUI::s_locked = false;
+    //int     EditorGUI::m_selectedAxis                   = -1;
     bool    EditorGUI::s_isAnyItemClicked               = false;
     bool    EditorGUI::s_openMenuPopup                  = false;
     bool    EditorGUI::m_showAssectSelectionDialogBox   = false;
 
-    bool    EditorGUI::s_windowResized                  = true;
     bool    EditorGUI::s_mouseEventHandled              = false;
-
-    std::weak_ptr<FishEngine::GameObject> FishEditor::EditorGUI::m_lastSelectedGameObject;
-    PMaterial sceneGizmoMaterial = nullptr;
-    PMesh cubeMesh = nullptr;
-    PMesh coneMesh = nullptr;
-
-    ImVec2 inspectorWindowPos;
-    ImVec2 inspectorWindowSize;
-    ImVec2 hierarchyWindowPos;
-    ImVec2 hierarchyWindowSize;
-    ImVec2 projectWindowPos;
-    ImVec2 projectWindowSize;
 
     ImGuiWindowFlags globalWindowFlags = 0;
     
+    FishEngine::Int2 EditorGUI::m_sceneSize{1, 1};
+
     const char* ToString(TransformSpace& space)
     {
         if (space == TransformSpace::Global)
@@ -77,6 +69,15 @@ namespace FishEditor
         else
             return "Local";
     }
+
+    struct EditoGUISettings
+    {
+        float mainMenubarHeight;
+        float mainToolbarHeight;
+    };
+
+    EditoGUISettings g_editorGUISettings;
+
 
     void EditorGUI::Init()
     {
@@ -105,17 +106,15 @@ namespace FishEditor
         style.Colors[ImGuiCol_ComboBg]      = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
-        style.WindowMinSize = ImVec2(128, 128);
-
-        sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
-        cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
-        coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
+        //style.WindowMinSize = ImVec2(128, 128);
 
         globalWindowFlags |= ImGuiWindowFlags_NoCollapse;
         globalWindowFlags |= ImGuiWindowFlags_NoResize;
         globalWindowFlags |= ImGuiWindowFlags_ShowBorders;
         globalWindowFlags |= ImGuiWindowFlags_NoMove;
-        CalculateWindowSizeAndPosition();
+        //CalculateWindowSizeAndPosition();
+        m_mainSceneViewEditor = std::make_shared<SceneViewEditor>();
+        m_mainSceneViewEditor->Init();
     }
 
 
@@ -128,37 +127,17 @@ namespace FishEditor
             Camera::main()->FrameSelected(selectedGO);
         }
 
-        glClear(GL_DEPTH_BUFFER_BIT);
-        DrawSceneGizmo();
-        
-        if (Input::GetKeyDown(KeyCode::W))
-        {
-            m_transformToolType = TransformToolType::Translate;
-        }
-        else if (Input::GetKeyDown(KeyCode::E))
-        {
-            m_transformToolType = TransformToolType::Rotate;
-        }
-        else if (Input::GetKeyDown(KeyCode::R))
-        {
-            m_transformToolType = TransformToolType::Scale;
-        }
-        
-        if (selectedGO != nullptr)
-        {
-            if (m_transformToolType == TransformToolType::Translate)
-                DrawTranslateGizmo();
-            else if (m_transformToolType == TransformToolType::Rotate)
-                DrawRotateGizmo();
-            else if (m_transformToolType == TransformToolType::Scale)
-                DrawScaleGizmo();
-        }
-
         DrawMainMenu();
-        //DrawToolBar();
+        DrawMainToolbar();
         DrawHierarchyWindow();
         DrawInspectorWindow();
         DrawProjectWindow();
+        DrawSceneView();
+
+        auto size = ImGui::GetIO().DisplaySize;
+        float pos_y = g_editorGUISettings.mainMenubarHeight + g_editorGUISettings.mainToolbarHeight;
+        size.y -= pos_y;
+        ImGui::RootDock(ImVec2(0, pos_y), size);
 
     //    if (m_showAssectSelectionDialogBox) {
     //        ImGui::OpenPopup("Select ...");
@@ -176,7 +155,6 @@ namespace FishEditor
     //    }
 
         ImGui::Render();
-        s_windowResized = false;
         
         if (!s_mouseEventHandled && Input::GetMouseButtonDown(0))
         {
@@ -184,10 +162,25 @@ namespace FishEditor
             auto go = Scene::IntersectRay(ray);
             Selection::setSelectedGameObjectInHierarchy(go);
         }
+
+        //if (Input::GetKeyDown(KeyCode::P))
+        //{
+        //    Debug::Log("save layout");
+        //    std::ofstream fout("./FishEditorLayout.json");
+        //    ImGui::SaveDock(fout);
+        //}
+
+        //if (Input::GetKeyDown(KeyCode::O))
+        //{
+        //    Debug::Log("load layout");
+        //    std::ifstream fin("./FishEditorLayout.json");
+        //    ImGui::LoadDock(fin);
+        //}
     }
 
     void EditorGUI::Clean()
     {
+        ImGui::ShutdownDock();
         ImGui_ImplGlfwGL3_Shutdown();
     }
 
@@ -227,7 +220,7 @@ namespace FishEditor
 
     void EditorGUI::OnWindowSizeChanged(const int width, const int height)
     {
-        CalculateWindowSizeAndPosition();
+        //CalculateWindowSizeAndPosition();
     }
 
     void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
@@ -301,12 +294,13 @@ namespace FishEditor
         // Hierarchy view
         //ImGui::BeginDock("Hierarchy");
 
-        if (s_windowResized)
-        {
-            ImGui::SetNextWindowPos(hierarchyWindowPos);
-            ImGui::SetNextWindowSize(hierarchyWindowSize);
-        }
-        ImGui::Begin("Hierarchy", nullptr, globalWindowFlags);
+        //if (s_windowResized)
+        //{
+        //    ImGui::SetNextWindowPos(hierarchyWindowPos);
+        //    ImGui::SetNextWindowSize(hierarchyWindowSize);
+        //}
+        //ImGui::Begin("Hierarchy", nullptr, globalWindowFlags);
+        ImGui::BeginDock("Hierarchy", nullptr);
         //static ImGuiTextFilter filter;
         //filter.Draw();
         static char filterStr[128];
@@ -375,9 +369,8 @@ namespace FishEditor
             Selection::setSelectedGameObjectInHierarchy(nullptr);
         }
 
-        //ImGui::EndDock();
-        ImGui::End();
-
+        ImGui::EndDock();
+        //ImGui::End();
     }
 
 
@@ -388,16 +381,17 @@ namespace FishEditor
         // Inspector Editor
         //ImGui::BeginDock("Inspector", nullptr);
 
-        if (s_windowResized)
-        {
-            ImGui::SetNextWindowPos(inspectorWindowPos);
-            ImGui::SetNextWindowSize(inspectorWindowSize);
-        }
-        ImGui::Begin("Inspector", nullptr, globalWindowFlags);
+        //if (s_windowResized)
+        //{
+        //    ImGui::SetNextWindowPos(inspectorWindowPos);
+        //    ImGui::SetNextWindowSize(inspectorWindowSize);
+        //}
+        ImGui::BeginDock("Inspector", nullptr);
+        //ImGui::Begin("Inspector", nullptr, globalWindowFlags);
         ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
         if (selectedGO == nullptr) {
-            //ImGui::EndDock(); // Inspector Editor
-            ImGui::End();
+            ImGui::EndDock(); // Inspector Editor
+            //ImGui::End();
             return;
         }
         if (ImGui::Checkbox("Lock", &s_locked)) {
@@ -546,19 +540,20 @@ namespace FishEditor
             }
         }
 
-        //ImGui::EndDock(); // Inspector Editor
-        ImGui::End();
+        ImGui::EndDock(); // Inspector Editor
+        //ImGui::End();
     }
 
 
     void EditorGUI::DrawProjectWindow()
     {
-        if (s_windowResized)
-        {
-            ImGui::SetNextWindowPos(projectWindowPos);
-            ImGui::SetNextWindowSize(projectWindowSize);
-        }
-        ImGui::Begin("Project", nullptr, globalWindowFlags);
+        //if (s_windowResized)
+        //{
+        //    ImGui::SetNextWindowPos(projectWindowPos);
+        //    ImGui::SetNextWindowSize(projectWindowSize);
+        //}
+        //ImGui::Begin("Project", nullptr, globalWindowFlags);
+        ImGui::BeginDock("Project", nullptr);
         
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
         ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.1f, 0));
@@ -614,16 +609,37 @@ namespace FishEditor
         ImGui::EndChild();
 
         
-        ImGui::End();
+        //ImGui::End();
+        ImGui::EndDock();
+    }
+
+    void EditorGUI::DrawSceneView()
+    {
+        ImGui::BeginDock("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse);
+        auto size = ImGui::GetContentRegionAvail();
+        m_sceneSize.x = static_cast<int>(size.x);
+        m_sceneSize.y = static_cast<int>(size.y);
+        //Debug::LogWarning("%lf %lf", size.x, size.y);
+        m_mainSceneViewEditor->Render();
+        auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
+        //size.x = m_mainSceneViewEditor->m_size.x;
+        //size.y = m_mainSceneViewEditor->m_size.y;
+        //size = ImVec2(m_sceneSize.x, m_sceneSize.y);
+        ImGui::Image((void*)rt->GLTexuture(), size, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::EndDock();
     }
 
     void EditorGUI::DrawMainMenu()
     {
         static float time_stamp = 0;
 
+        float menu_height = 0;
+
         // Main menu bar
-        if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
                 if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                 {
                     //Debug::LogWarning("New");
@@ -631,42 +647,9 @@ namespace FishEditor
                 }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Edit")) {
-                ImGui::EndMenu();
-            }
-
-            ImGui::SameLine();
-            if (FishEditorWindow::InPlayMode()) {
-                if (ImGui::Button("Stop")) {
-                    FishEditorWindow::Stop();
-                }
-            }
-            else {
-                if (ImGui::Button("Play")) {
-                    FishEditorWindow::Play();
-                }
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Translate")) {
-                m_transformToolType = TransformToolType::Translate;
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Rotate")) {
-                m_transformToolType = TransformToolType::Rotate;
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Scale")) {
-                m_transformToolType = TransformToolType::Scale;
-            }
-            
-            ImGui::SameLine();
-            if (ImGui::Button(ToString(m_transformSpace)))
+            if (ImGui::BeginMenu("Edit"))
             {
-                m_transformSpace = m_transformSpace==TransformSpace::Global ?
-                    TransformSpace::Local : TransformSpace::Global;
+                ImGui::EndMenu();
             }
 
             float new_time = (float)glfwGetTime();
@@ -676,422 +659,63 @@ namespace FishEditor
             auto fps_stats_size = ImGui::CalcTextSize(fps_str.c_str());
             ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);
             ImGui::Text("%s", fps_str.c_str());
+            g_editorGUISettings.mainMenubarHeight = ImGui::GetWindowSize().y;
             ImGui::EndMainMenuBar();
         }
     }
 
-    void EditorGUI::DrawToolbar()
+    void EditorGUI::DrawMainToolbar()
     {
-        ImGui::Begin("ToolBar");
-        ImGui::Button("Play");
-        ImGui::End();
-    }
-
-
-    void EditorGUI::DrawTranslateGizmo()
-    {
-        constexpr float translate_gizmo_length = 0.1f;
-        static Vector3 lastMousePosition;
-        static Vector3 lastCenter;
-        
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        if (m_lastSelectedGameObject.lock() != selectedGO)
+        auto frame_padding = ImGui::GetStyle().FramePadding;
+        float padding = frame_padding.y * 2;
+        float height = 24 + padding;
+        ImVec2 toolbar_size(ImGui::GetIO().DisplaySize.x, height);
+        //auto size = ImGui::GetIO().DisplaySize;
+        if (ImGui::BeginToolbar("MainToolBar", ImVec2(1, g_editorGUISettings.mainMenubarHeight), toolbar_size))
         {
-            m_selectedAxis = -1;
-            m_lastSelectedGameObject = selectedGO;
-        }
-        if (selectedGO == nullptr)
-            return;
-
-        auto camera = Camera::main();
-        Vector3 center = selectedGO->transform()->position();
-        Vector3 camera_pos = camera->transform()->position();
-        Vector3 dir = center - camera_pos;
-        center = dir.normalized() + camera_pos;
-
-        Vector3 axis[3];
-        if (m_transformSpace == TransformSpace::Local)
-        {
-            axis[0] = selectedGO->transform()->right();     // +x
-            axis[1] = selectedGO->transform()->up();        // +y
-            axis[2] = selectedGO->transform()->forward();   // +z
-        }
-        else
-        {
-            axis[0] = Vector3::right;   // +x
-            axis[1] = Vector3::up;      // +y
-            axis[2] = Vector3::forward; // +z
-        }
-        
-        // check if any axis is selected by mouse
-        if (Input::GetMouseButtonDown(0))
-        {
-            m_selectedAxis = -1;
-            Ray view = camera->ScreenPointToRay(Input::mousePosition());
-            float t[3];
-            view.IntersectPlane(axis[0], center, t);
-            view.IntersectPlane(axis[1], center, t+1);
-            view.IntersectPlane(axis[2], center, t+2);
-            float tmid;
-            if (t[0] >= t[1])
+            ImGui::SameLine();
+            if (FishEditorWindow::InPlayMode())
             {
-                if (t[1] >= t[2])
-                    tmid = t[1];
-                else if (t[0] >= t[2])
-                    tmid = t[2];
-                else
-                    tmid = t[0];
-            } else
-            {
-                if (t[0] >= t[2])
-                    tmid = t[0];
-                else if (t[1] >= t[2])
-                    tmid = t[2];
-                else
-                    tmid = t[1];
-            }
-            Vector3 p = view.GetPoint(tmid);
-            Vector3 d = p-center;
-            if (d.magnitude() <= translate_gizmo_length * 1.3f)
-            {
-                d.Normalize();
-                for (int i = 0; i < 3; ++i)
+                if (ImGui::Button("Stop"))
                 {
-                    if (Vector3::Dot(d, axis[i]) > 0.96f)
-                    {
-                        m_selectedAxis = i;
-                        s_mouseEventHandled = true;
-                        break;
-                    }
+                    FishEditorWindow::Stop();
                 }
             }
-        }
-
-        auto shader = sceneGizmoMaterial->shader();
-        shader->Use();
-        sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
-        auto view = camera->worldToCameraMatrix();
-        auto proj = camera->projectionMatrix();
-        auto vp = proj * view;
-
-        ShaderUniforms uniforms;
-
-
-        Color colors[3] = {Color::red, Color::green, Color::blue};
-        
-        float f[] = {
-            1,  0,  0,   0, 0, -90,    // red axis, +x
-            0,  1,  0,   0, 0,   0,    // green axis, +y
-            0,  0,  1,  90, 0,   0,    // blue axis, +z
-        };
-        
-        FishEngine::Matrix4x4 model;
-
-        for (int i = 0; i < 3; ++i)
-        {
-            int j = 6 * i;
-            Vector3 pos = center + axis[i]*translate_gizmo_length;
-            Quaternion rot = Quaternion::FromToRotation(Vector3::up, axis[i]);
-            model.SetTRS(pos, rot, Vector3(1, 1.5, 1) * 0.015f);
-            Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
-            Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
-            Pipeline::BindPerDrawUniforms();
-            Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f + j);
-            sceneGizmoMaterial->SetVector3("_Color", color);
-            shader->Use();
-            shader->PreRender();
-            sceneGizmoMaterial->Update();
-            shader->CheckStatus();
-            coneMesh->Render();
-
-            Gizmos::setColor(Color(color.x, color.y, color.z, 1.0f));
-            Gizmos::DrawLine(center, pos);
-        }
-
-        if (m_selectedAxis < 0)
-            return;
-        
-        // get intersected point of two Rays
-        // solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
-        auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
-        {
-            float x = dir1.x;
-            float y = dir1.y;
-            float z = dir1.z;
-            float test = dir2.z*y - dir2.y*z;
-            if (!Mathf::Approximately(test, 0.0f))
-                return ((o1.z*y - o1.y*z) - (o2.z*y - o2.y*z)) / test;
             else
-                return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
-        };
-        
-        center = selectedGO->transform()->position();
-        
-        auto& axis_selected = axis[m_selectedAxis];
-        
-        if (Input::GetMouseButtonDown(0))
-        {
-            lastCenter = center;
-            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-            float t = solve(center, axis_selected, camera_pos, ray.direction);
-            lastMousePosition = ray.GetPoint(t);
-            return;
-        }
-
-        // handle mouse movement event
-        if (Input::GetMouseButton(0))
-        {
-            Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
-            Vector3 axis_on_plane = vp.MultiplyVector(axis_selected);
-            axis_on_plane.z = 0;
-            axis_on_plane.Normalize();                              // axis on the near clip plane
-            Vector3 p = Input::mousePosition() - mouse_movement + Vector3::Project(mouse_movement, axis_on_plane);   // new mouse position(along the axis)
-            Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
-            
-            // solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
-            float t  = solve(camera_pos, new_view_dir, lastMousePosition, axis_selected);
-            selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
-        }
-    }
-
-    void EditorGUI::DrawRotateGizmo()
-    {
-        static Vector3 lastFromDir;
-        static Quaternion lastRotation;
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        if (m_lastSelectedGameObject.lock() != selectedGO)
-        {
-            m_selectedAxis = -1;
-            m_lastSelectedGameObject = selectedGO;
-        }
-        if (selectedGO == nullptr)
-            return;
-
-        auto camera = Camera::main();
-        //auto view = camera->worldToCameraMatrix();
-        //auto proj = camera->projectionMatrix();
-        //auto vp = proj * view;
-        Vector3 center = selectedGO->transform()->position();
-        Vector3 camera_pos = camera->transform()->position();
-        Vector3 dir = center - camera_pos;
-        Vector3 gizmo_center = dir.normalized() + camera_pos;
-
-        constexpr float radius = 0.1f;
-        
-        Vector3 axis[3];
-        if (m_transformSpace == TransformSpace::Local)
-        {
-            axis[0] = selectedGO->transform()->right();     // +x
-            axis[1] = selectedGO->transform()->up();        // +y
-            axis[2] = selectedGO->transform()->forward();   // +z
-        }
-        else
-        {
-            axis[0] = Vector3::right;   // +x
-            axis[1] = Vector3::up;      // +y
-            axis[2] = Vector3::forward; // +z
-        }
-
-        // check if any axis is selected by mouse
-        if (Input::GetMouseButtonDown(0))
-        {
-            m_selectedAxis = -1;
-            auto ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-            float t;
-            if (ray.IntersectSphere(gizmo_center, radius, &t))
             {
-                auto p = ray.GetPoint(t);
-                for (int i = 0; i < 3; ++i)
+                if (ImGui::Button("Play"))
                 {
-                    auto dir = Vector3::Normalize(p - gizmo_center);
-                    if ( std::fabsf(Vector3::Dot(axis[i], dir)) < 0.1f )
-                    {
-                        s_mouseEventHandled = true;
-                        m_selectedAxis = i;
-                        lastFromDir = Vector3::Cross(axis[i], Vector3::Cross(dir, axis[i]));
-                        lastFromDir.Normalize();
-                        lastRotation = selectedGO->transform()->localRotation();
-                    }
+                    FishEditorWindow::Play();
                 }
             }
-        }
 
-        //Gizmos::DrawWireSphere(center, 0.1f);
-        Vector3 view_inverse = -camera->transform()->forward();
-        Color colors[3] = {Color::red, Color::green, Color::blue};
-        for (int i = 0; i < 3; ++i)
-        {
-            Gizmos::setColor(colors[i]);
-            //Gizmos::DrawLine(gizmo_center, gizmo_center+axis[i] * radius);
-            if (m_selectedAxis == i)
-                Gizmos::setColor(Color::yellow);
-            Vector3 dir2 = Vector3::ProjectOnPlane(view_inverse, axis[i]);
-            dir2.Normalize();
-            Gizmos::DrawHalfCircle(gizmo_center, radius, axis[i], dir2);
-            //Gizmos::DrawCircle(gizmo_center, radius, axis[i]);
-        }
-
-        Gizmos::setColor(Color::white);
-        Gizmos::DrawCircle(gizmo_center, radius, camera->transform()->forward());
-        Gizmos::DrawCircle(gizmo_center, radius*1.1f, camera->transform()->forward());
-
-        if (m_selectedAxis < 0)
-            return;
-        
-        if (Input::GetMouseButton(0))
-        {
-            Ray view = camera->ScreenPointToRay(Input::mousePosition());
-            auto& face_normal = axis[m_selectedAxis];
-            float t;
-            if (!view.IntersectPlane(face_normal, center, &t))
+            ImGui::SameLine();
+            if (ImGui::Button("Translate"))
             {
-                return;
+                m_mainSceneViewEditor->m_transformToolType = TransformToolType::Translate;
             }
-//            if (t >= Vector3::Distance(center, camera_pos) + 0.001f)
-//            {
-//                return;
-//            }
-            Vector3 intersected_p = view.GetPoint(t);
-            Vector3 dir_to = Vector3::Normalize(intersected_p - center);
-            auto rot = Quaternion::FromToRotation(lastFromDir, dir_to) * lastRotation;
-            selectedGO->transform()->setLocalRotation(rot);
-            
-            Gizmos::setColor(Color::yellow);
-            Gizmos::DrawLine(gizmo_center, gizmo_center + lastFromDir * radius);
-            Gizmos::DrawLine(gizmo_center, gizmo_center + dir_to * radius);
-        }
-    }
 
-    void EditorGUI::DrawScaleGizmo()
-    {
-
-    }
-
-    void EditorGUI::DrawSceneGizmo()
-    {
-        int w = int(Screen::width()*0.06f);
-        int margin = 20;
-        glViewport(margin, margin, GLsizei(w), GLsizei(w));
-
-        auto shader = sceneGizmoMaterial->shader();
-        shader->Use();
-
-        Vector3 camera_pos(0, 0, -5);
-        sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
-        auto camera = Camera::main();
-        auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-        auto proj = camera->m_orthographic ? Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10) : Matrix4x4::Perspective(45, 1, 0.3f, 10.f);
-        auto vp = proj * view;
-        auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
-
-        auto inv_model = model.inverse();
-
-        auto mousePos = Input::mousePosition();
-        bool inRegion = false;
-        float x = mousePos.x - margin;
-        float y = mousePos.y - margin;
-        Ray ray(Vector3::zero, Vector3::zero);
-        if (x > 0 && x < w && y > 0 && y < w) {
-            inRegion = true;
-            //Debug::Log("In SceneGizmo region");
-            //ray = Ray(camera_pos, ray_world.normalized()); // world space
-            ray.origin = inv_model * Vector4(2.0f*x / w - 1.f, 2.0f*y / w - 1.0f, -5, 1);
-            ray.direction = inv_model * Vector4(0, 0, 1, 0);
-        }
-
-        auto s = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
-
-        float f[] = {
-            -1,  0,  0,    0, 0, -90,
-             0, -1,  0,    0, 0,   0,
-             0,  0, -1,   90, 0,   0,
-             1,  0,  0,    0, 0,  90,
-             0,  1,  0,  180, 0,   0,
-             0,  0,  1,  -90, 0,   0,
-        };
-
-        ShaderUniforms uniforms;
-        bool interested = false;
-        int hoverIndex = -1;
-
-        static Transform t;
-        for (int i = 0; i < 6; ++i) {
-            int j = i * 6;
-            Vector3 pos(f + j);
-            Vector3 color(1, 1, 1);
-            if (i >= 3)
-                color = Vector3(f + j);
-            if (inRegion && !interested) {
-                Bounds aabb(pos*0.7f, Vector3::one*0.5f);
-                if (aabb.IntersectRay(ray)) {
-                    interested = true;
-                    hoverIndex = i;
-                    color.Set(1, 1, 0); // yellow
-                }
+            ImGui::SameLine();
+            if (ImGui::Button("Rotate"))
+            {
+                m_mainSceneViewEditor->m_transformToolType = TransformToolType::Rotate;
             }
-            t.setLocalPosition(pos);
-            t.setLocalEulerAngles(f[j + 3], f[j + 4], f[j + 5]);
-            auto modelMat = model * t.localToWorldMatrix() * s;
-            //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
-            //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
-            Pipeline::perDrawUniformData.MATRIX_MVP = vp*modelMat;
-            Pipeline::perDrawUniformData.MATRIX_IT_MV = (view * modelMat).transpose().inverse();
-            Pipeline::BindPerDrawUniforms();
-            //if (i >= 3)
-            sceneGizmoMaterial->SetVector3("_Color", color);
-            sceneGizmoMaterial->Update();
-            coneMesh->Render();
-        }
 
-        Bounds aabb(Vector3::zero, Vector3::one*0.5f);
-        bool interested6 = false;
-        if (inRegion && !interested) {
-            interested6 = aabb.IntersectRay(ray);
-            if (interested6)
-                hoverIndex = 6;
-        }
-        interested = interested || interested6;
-
-        Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
-        Pipeline::BindPerDrawUniforms();
-        //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
-        //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
-        sceneGizmoMaterial->SetVector3("_Color", interested6 ? Vector3(1, 1, 0) : Vector3(1, 1, 1));
-        shader->PreRender();
-        sceneGizmoMaterial->Update();
-        shader->CheckStatus();
-        cubeMesh->Render();
-
-        shader->PostRender();
-
-        if (interested && Input::GetMouseButtonDown(0))
-        {
-            Debug::Log("%d", hoverIndex);
-            if (hoverIndex == 6) {
-                camera->setOrthographic(!camera->orghographic());
-                //camera->m_orthographic = !camera->m_orthographic;
+            ImGui::SameLine();
+            if (ImGui::Button("Scale"))
+            {
+                m_mainSceneViewEditor->m_transformToolType = TransformToolType::Scale;
             }
-            else {
-                Vector3 offset(f + hoverIndex * 6);
-                Vector3 up(0, 1, 0);
-                if (offset.y == 1) {
-                    up.Set(0, 0, -1);
-                }
-                else if (offset.y == -1) {
-                    up.Set(0, 0, 1);
-                }
-                camera->transform()->setLocalPosition(camera->m_focusPoint + offset * 4);
-                camera->transform()->LookAt(camera->m_focusPoint, up);
-                //camera->transform()->setLocalEulerAngles(Vector3(f + hoverIndex * 6 + 3));
-                //camera->FrameSelected(Selection::activeGameObject());
+
+            ImGui::SameLine();
+            if (ImGui::Button(ToString(m_mainSceneViewEditor->m_transformSpace)))
+            {
+                m_mainSceneViewEditor->m_transformSpace = m_mainSceneViewEditor->m_transformSpace == TransformSpace::Global ?
+                    TransformSpace::Local : TransformSpace::Global;
             }
         }
-
-        auto v = camera->viewport();
-        w = Screen::width();
-        int h = Screen::height();
-        glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
+        ImGui::EndToolbar();
+        g_editorGUISettings.mainToolbarHeight = height;
     }
 
     // read-write
@@ -1389,44 +1013,9 @@ namespace FishEditor
         Case(Light)
 #undef Case
     }
-
-
-    void EditorGUI::CalculateWindowSizeAndPosition()
-    {
-        int w = FishEditorWindow::windowWidth();
-        int h = FishEditorWindow::windowHeight();
-        //float scale = 1.0f / FishEditorWindow::pixelsPerPoint();
-        //w = static_cast<int>(w*scale);
-        //h = static_cast<int>(h*scale);
-
-        hierarchyWindowPos.x = 0;
-        hierarchyWindowPos.y = menuBarHeight;
-        hierarchyWindowSize.x = 200;
-        hierarchyWindowSize.y = h - menuBarHeight - 200;
-
-        projectWindowPos.x = 0;
-        projectWindowPos.y = static_cast<float>(h - 200);
-        projectWindowSize.x = static_cast<float>(w - 256);
-        projectWindowSize.y = 200;
-
-        inspectorWindowPos.x = static_cast<float>(w - 256);
-        inspectorWindowPos.y = menuBarHeight;
-        inspectorWindowSize.x = 256;
-        inspectorWindowSize.y = h - menuBarHeight;
-        s_windowResized = true;
-    }
     
-    FishEngine::Vector4 EditorGUI::sceneViewPositionAndSize()
+    FishEngine::Int2 EditorGUI::sceneViewSize()
     {
-        Vector4 result;
-        //int w = FishEditorWindow::windowWidth();
-        int h = FishEditorWindow::windowHeight();
-        result.x = hierarchyWindowPos.x + hierarchyWindowSize.x;
-        result.y = menuBarHeight;
-        result.y = h - result.y;
-        result.z = inspectorWindowPos.x - result.x;
-        result.w = hierarchyWindowSize.y;
-        result *= FishEditorWindow::pixelsPerPoint();
-        return result;
+        return m_sceneSize;
     }
 }

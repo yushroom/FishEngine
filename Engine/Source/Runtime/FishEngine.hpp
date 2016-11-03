@@ -103,6 +103,7 @@ namespace FishEditor {
     class EditorRenderSystem;
     class FishEditorWindow;
     class SceneView;
+    class SceneViewEditor;
 }
 
 namespace boost {

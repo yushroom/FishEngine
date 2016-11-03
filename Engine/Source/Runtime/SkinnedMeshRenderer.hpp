@@ -47,6 +47,7 @@ namespace FishEngine {
     private:
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
+        friend class FishEditor::SceneViewEditor;
         friend class Scene;
         
         // The mesh used for skinning.

@@ -7,9 +7,12 @@
 #include <Vector3.hpp>
 #include <Input.hpp>
 
+#include "SceneViewEditor.hpp"
+
 namespace FishEditor
 {
-    enum class AssetType {
+    enum class AssetType
+    {
         Model,
         Material,
         Texture,
@@ -17,19 +20,6 @@ namespace FishEditor
         Font,
         Script,
         Shader,
-    };
-
-    enum class TransformToolType {
-        None,
-        Translate,
-        Rotate,
-        Scale,
-    };
-    
-    enum class TransformSpace
-    {
-        Global,
-        Local,
     };
 
     class EditorGUI
@@ -52,13 +42,15 @@ namespace FishEditor
         static void OnWindowSizeChanged(const int width, const int height);
         
         // return Vector4(x, y, w, h), in pixels
-        // the origin is at the left-bottom corner of the window(opengl)
-        static FishEngine::Vector4 sceneViewPositionAndSize();
+        // the origin is at the left-bottom corner of the window(OpenGL)
+        static FishEngine::Int2 sceneViewSize();
 
     private:
-        static TransformToolType m_transformToolType;
-        static TransformSpace m_transformSpace;
+        friend class FishEditorWindow;
         static int m_idCount;   // temp
+
+        static PSceneViewEditor m_mainSceneViewEditor;
+
         static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
 
         // https://docs.unity3d.com/Manual/LearningtheInterface.html
@@ -66,35 +58,23 @@ namespace FishEditor
         static void DrawHierarchyWindow();
         static void DrawProjectWindow();
         static void DrawSceneView();
-        static void DrawToolbar();
+        static void DrawMainToolbar();
         static void DrawMainMenu();
 
         static bool s_locked;       // temp
 
-        static int m_selectedAxis; // temp
-        static std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
-        static void DrawTranslateGizmo();
-        static void DrawRotateGizmo();
-        static void DrawScaleGizmo();
-        static void DrawSceneGizmo();
-
         // hierarchy
         static bool s_isAnyItemClicked;
         static bool s_openMenuPopup;
-
-        //static void ChangeCameraView();
 
         static bool m_showAssectSelectionDialogBox;
 
         template<class T>
         static void OnInspectorGUI(const std::shared_ptr<T>& component);
 
-        static bool s_windowResized;
-        
-        // the origin is at the left-top corner of the window(imgui)
-        static void CalculateWindowSizeAndPosition();
-        
         static bool s_mouseEventHandled;
+
+        static FishEngine::Int2 m_sceneSize;
     };
 
     template<>

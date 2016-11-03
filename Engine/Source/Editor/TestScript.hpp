@@ -190,25 +190,25 @@ public:
     bool m_highlightSelections = true;
     
     virtual void Start() override {
-        EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
-        EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
-        EditorRenderSystem::setShowShadowMap(m_showShadowMap);
-        EditorRenderSystem::setHightlightSelections(m_highlightSelections);
+        //EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
+        //EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
+        //EditorRenderSystem::setShowShadowMap(m_showShadowMap);
+        //EditorRenderSystem::setHightlightSelections(m_highlightSelections);
     }
 
     virtual void OnInspectorGUI() override {
-        if (ImGui::Checkbox("Wire Frame", &m_isWireFrameMode)) {
-            EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
-        }
-        if (ImGui::Checkbox("Gamma Correction", &m_useGammaCorrection)) {
-            EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
-        }
-        if (ImGui::Checkbox("Show ShadowMap", &m_showShadowMap)) {
-            EditorRenderSystem::setShowShadowMap(m_showShadowMap);
-        }
-        if (ImGui::Checkbox("Highlight Selections", &m_highlightSelections)) {
-            EditorRenderSystem::setHightlightSelections(m_highlightSelections);
-        }
+        //if (ImGui::Checkbox("Wire Frame", &m_isWireFrameMode)) {
+        //    EditorRenderSystem::setWireFrameMode(m_isWireFrameMode);
+        //}
+        //if (ImGui::Checkbox("Gamma Correction", &m_useGammaCorrection)) {
+        //    EditorRenderSystem::setGammaCorrection(m_useGammaCorrection);
+        //}
+        //if (ImGui::Checkbox("Show ShadowMap", &m_showShadowMap)) {
+        //    EditorRenderSystem::setShowShadowMap(m_showShadowMap);
+        //}
+        //if (ImGui::Checkbox("Highlight Selections", &m_highlightSelections)) {
+        //    EditorRenderSystem::setHightlightSelections(m_highlightSelections);
+        //}
     }
 };
             

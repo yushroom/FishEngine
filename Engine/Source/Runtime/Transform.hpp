@@ -271,6 +271,7 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
+        //friend class FishEditor::SceneViewEditor;
         friend class Scene;
         friend class Serialization;
 

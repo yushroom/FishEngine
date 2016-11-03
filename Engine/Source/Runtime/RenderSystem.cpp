@@ -95,18 +95,14 @@ namespace FishEngine
         /************************************************************************/
         /* Shadow                                                               */
         /************************************************************************/
-        for (auto& l : lights) {
+        for (auto& l : lights)
+        {
             Scene::RenderShadow(l);
         }
 
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
-        //const int w = Screen::width();
-        //const int h = Screen::height();
-        //auto v = Camera::main()->viewport();
-        //auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
-        //glViewport(GLint(scene_view_pos_size.x), GLint(scene_view_pos_size.y), GLsizei(scene_view_pos_size.z), GLsizei(scene_view_pos_size.w));
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
         const int h = Screen::height();

@@ -17,26 +17,45 @@ namespace FishEngine {
     {
     public:
         RenderTexture() = default;
+        ~RenderTexture();
         
         static PRenderTexture CreateShadowMap();
-        
-        int width() const {
+
+        static PRenderTexture CreateColorMap(const int width, const int height);
+
+        int width() const
+        {
             return m_width;
         }
         
-        int height() const {
+        int height() const
+        {
             return m_height;
         }
         
-        GLuint depthBufferFBO() const {
-            return m_depthMapFBO;
+        GLuint FBO() const
+        {
+            return m_FBO;
+        }
+
+        GLuint depthBuffer() const
+        {
+            return m_depthBuffer;
+        }
+
+        GLuint colorBuffer() const
+        {
+            return m_texture;
         }
         
+        void Resize(const int newWidth, const int newHeight);
+
     private:
         RenderTextureFormat m_format;
         int m_width;
         int m_height;
-        GLuint m_depthMapFBO;
+        GLuint m_FBO = 0;
+        GLuint m_depthBuffer = 0;
     };
 }
 

@@ -200,6 +200,7 @@ namespace FishEngine
     private:
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
+        friend class FishEditor::SceneViewEditor;
         friend class Serialization;
 
         std::list<PComponent> m_components;

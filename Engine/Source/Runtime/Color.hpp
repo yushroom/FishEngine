@@ -16,7 +16,7 @@ namespace FishEngine
         };
 
         Color() : r(1.f), g(1.f), b(1.f), a(1.f) {}
-        Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b) {}
+        Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {}
         Color(const Vector4& v) : r(v.x), g(v.y), b(v.z), a(v.w) {}
 
         operator Vector4() const {

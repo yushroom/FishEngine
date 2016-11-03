@@ -41,7 +41,6 @@ namespace FishEngine
     private:
         friend class GameObject;
         friend class Scene;
-        friend class FishEditor::SceneView;
         friend class FishEditor::SceneViewEditor;
         friend class Serialization;
 

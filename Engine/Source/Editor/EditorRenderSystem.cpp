@@ -17,6 +17,7 @@
 #include <Material.hpp>
 #include <Color.hpp>
 #include <RenderTexture.hpp>
+#include <Screen.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "EditorGUI.hpp"

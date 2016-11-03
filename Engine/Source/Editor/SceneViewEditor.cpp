@@ -88,8 +88,8 @@ namespace FishEditor
         if (tsize.x != m_size.x || tsize.y != m_size.y)
         {
             m_size = tsize;
-            const int ix = m_size.x;
-            const int iy = m_size.y;
+            const int ix = m_size.x * Screen::pixelsPerPoint();
+            const int iy = m_size.y * Screen::pixelsPerPoint();
             m_sceneViewRenderTexture->Resize(ix, iy);
             Camera::OnWindowSizeChanged(ix, iy);
             Screen::m_width = ix;
@@ -244,18 +244,18 @@ namespace FishEditor
         glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
 
-        if (Input::GetKeyDown(KeyCode::W))
-        {
-            m_transformToolType = TransformToolType::Translate;
-        }
-        else if (Input::GetKeyDown(KeyCode::E))
-        {
-            m_transformToolType = TransformToolType::Rotate;
-        }
-        else if (Input::GetKeyDown(KeyCode::R))
-        {
-            m_transformToolType = TransformToolType::Scale;
-        }
+        //if (Input::GetKeyDown(KeyCode::W))
+        //{
+        //    m_transformToolType = TransformToolType::Translate;
+        //}
+        //else if (Input::GetKeyDown(KeyCode::E))
+        //{
+        //    m_transformToolType = TransformToolType::Rotate;
+        //}
+        //else if (Input::GetKeyDown(KeyCode::R))
+        //{
+        //    m_transformToolType = TransformToolType::Scale;
+        //}
 
         if (selectedGO != nullptr)
         {
@@ -343,7 +343,7 @@ namespace FishEditor
                     if (Vector3::Dot(d, axis[i]) > 0.96f)
                     {
                         m_selectedAxis = i;
-                        s_mouseEventHandled = true;
+                        m_mouseEventHandled = true;
                         break;
                     }
                 }
@@ -504,7 +504,7 @@ namespace FishEditor
                     auto dir = Vector3::Normalize(p - gizmo_center);
                     if (std::fabsf(Vector3::Dot(axis[i], dir)) < 0.1f)
                     {
-                        s_mouseEventHandled = true;
+                        m_mouseEventHandled = true;
                         m_selectedAxis = i;
                         lastFromDir = Vector3::Cross(axis[i], Vector3::Cross(dir, axis[i]));
                         lastFromDir.Normalize();

@@ -38,7 +38,7 @@
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
-
+#include "EditorInput.hpp"
 
 using namespace FishEngine;
 
@@ -123,26 +123,26 @@ namespace FishEditor
         s_mouseEventHandled = false;
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
 
-        if (Input::GetKeyDown(KeyCode::F)) {
+        if (EditorInput::GetKeyDown(KeyCode::F)) {
             Camera::main()->FrameSelected(selectedGO);
         }
         
-        if (Input::GetKeyDown(KeyCode::W))
+        if (EditorInput::GetKeyDown(KeyCode::W))
         {
             m_mainSceneViewEditor->m_transformToolType = TransformToolType::Translate;
         }
-        else if (Input::GetKeyDown(KeyCode::E))
+        else if (EditorInput::GetKeyDown(KeyCode::E))
         {
             m_mainSceneViewEditor->m_transformToolType = TransformToolType::Rotate;
         }
-        else if (Input::GetKeyDown(KeyCode::R))
+        else if (EditorInput::GetKeyDown(KeyCode::R))
         {
             m_mainSceneViewEditor->m_transformToolType = TransformToolType::Scale;
         }
 
-        if (Input::GetKeyDown(KeyCode::LeftControl) && Input::GetKeyDown(KeyCode::Z))
+        if (EditorInput::GetKeyDown(KeyCode::LeftControl) && EditorInput::GetKeyDown(KeyCode::Z))
         {
-            if (Input::GetKeyDown(KeyCode::LeftShift))
+            if (EditorInput::GetKeyDown(KeyCode::LeftShift))
             {
                 Debug::LogWarning("Ctrl+Shift+Z");
                 CommandManager::Redo();
@@ -184,21 +184,21 @@ namespace FishEditor
 
         ImGui::Render();
         
-        if (!s_mouseEventHandled && Input::GetMouseButtonDown(0))
-        {
-            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-            auto go = Scene::IntersectRay(ray);
-            Selection::setSelectedGameObjectInHierarchy(go);
-        }
+        //if (!s_mouseEventHandled && Input::GetMouseButtonDown(0))
+        //{
+        //    Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+        //    auto go = Scene::IntersectRay(ray);
+        //    Selection::setSelectedGameObjectInHierarchy(go);
+        //}
 
-        //if (Input::GetKeyDown(KeyCode::P))
+        //if (EditorInput::GetKeyDown(KeyCode::P))
         //{
         //    Debug::Log("save layout");
         //    std::ofstream fout("./FishEditorLayout.json");
         //    ImGui::SaveDock(fout);
         //}
 
-        //if (Input::GetKeyDown(KeyCode::O))
+        //if (EditorInput::GetKeyDown(KeyCode::O))
         //{
         //    Debug::Log("load layout");
         //    std::ifstream fin("./FishEditorLayout.json");
@@ -644,15 +644,17 @@ namespace FishEditor
     void EditorGUI::DrawSceneView()
     {
         ImGui::BeginDock("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse);
+        m_mainSceneViewEditor->m_focused = ImGui::IsWindowFocused();
+        m_mainSceneViewEditor->m_isMouseHovered = ImGui::IsWindowHovered();
+        auto position = ImGui::GetCurrentWindow()->DC.CursorPos;
+        m_mainSceneViewEditor->m_position.x = position.x;
+        m_mainSceneViewEditor->m_position.y = position.y;
         auto size = ImGui::GetContentRegionAvail();
         m_sceneSize.x = static_cast<int>(size.x);
         m_sceneSize.y = static_cast<int>(size.y);
-        //Debug::LogWarning("%lf %lf", size.x, size.y);
+        //EditorInput::CopyToInput();
         m_mainSceneViewEditor->Render();
         auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
-        //size.x = m_mainSceneViewEditor->m_size.x;
-        //size.y = m_mainSceneViewEditor->m_size.y;
-        //size = ImVec2(m_sceneSize.x, m_sceneSize.y);
         ImGui::Image((void*)rt->GLTexuture(), size, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::EndDock();
     }

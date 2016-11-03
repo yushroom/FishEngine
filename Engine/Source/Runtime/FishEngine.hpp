@@ -102,14 +102,8 @@ namespace FishEditor {
     class EditorGUI;
     class EditorRenderSystem;
     class FishEditorWindow;
-    class SceneView;
     class SceneViewEditor;
-}
-
-namespace boost {
-    namespace serialization {
-        class access;
-    }
+    class EditorInput;
 }
 
 #endif /* FishEngine_h */

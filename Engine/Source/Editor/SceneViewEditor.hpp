@@ -22,6 +22,7 @@ namespace FishEditor
     class SceneViewEditor
     {
     public:
+        FishEngine::Vector2 m_position;
         FishEngine::Int2 m_size{128, 128};
         FishEngine::PRenderTexture m_sceneViewRenderTexture;
 
@@ -38,6 +39,17 @@ namespace FishEditor
             return m_camera;
         }
 
+        // this scene view is focused, so it may receive keyboard event.
+        bool focused() const
+        {
+            return m_focused;
+        }
+
+        bool isMouseHovered() const
+        {
+            return m_isMouseHovered;
+        }
+
     private:
         friend class EditorGUI;
 
@@ -49,7 +61,13 @@ namespace FishEditor
         bool m_showShadowMap;
         bool m_highlightSelections;
 
-        bool s_mouseEventHandled;
+        bool m_mouseEventHandled;
+
+        // this scene view is focused, so it may receive keyboard event.
+        bool m_focused;
+
+        // mouse position is inside of this scene view, so it may receive mouse event;
+        bool m_isMouseHovered;
 
         TransformToolType m_transformToolType = TransformToolType::Translate;
         TransformSpace m_transformSpace = TransformSpace::Global;

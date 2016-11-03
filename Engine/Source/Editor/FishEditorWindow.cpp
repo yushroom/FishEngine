@@ -8,7 +8,6 @@
 
 #include "Debug.hpp"
 #include "EditorRenderSystem.hpp"
-#include "Input.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
 #include "Time.hpp"
@@ -21,6 +20,7 @@
 #include "EditorGUI.hpp"
 #include "EditorTime.hpp"
 #include "Selection.hpp"
+#include "EditorInput.hpp"
 
 const uint32_t WIDTH = 1280, HEIGHT = 960;
 
@@ -48,7 +48,7 @@ namespace FishEditor
 // #if FISHENGINE_PLATFORM_APPLE
 //         Debug::setColorMode(false);
 // #endif
-        Input::Init();
+        EditorInput::Init();
 
         Debug::Log("Starting GLFW context, OpenGL 4.1");
         glfwSetErrorCallback(GlfwErrorCallback);
@@ -104,12 +104,17 @@ namespace FishEditor
         while (!glfwWindowShouldClose(m_window))
         {
             //auto start_time = std::chrono::high_resolution_clock::now();
+            EditorInput::Update();
             Input::Update();
             // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response functions
             glfwPollEvents();
             double xpos, ypos;
             glfwGetCursorPos(m_window, &xpos, &ypos);
-            Input::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
+            EditorInput::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
+            if (EditorGUI::m_mainSceneViewEditor->isMouseHovered())
+            {
+                Input::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
+            }
 
 
             if (m_inPlayMode)
@@ -180,41 +185,29 @@ namespace FishEditor
         //TwEventKeyGLFW(key, action);
         //GUI::OnKey(key, action);
         ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
-        if (ImGui::GetIO().WantCaptureKeyboard)
-            return;
+        //if (ImGui::GetIO().WantCaptureKeyboard)
+        //    return;
 
-        //if ((key >= GLFW_KEY_0 && key <= GLFW_KEY_9) || (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)) {
-        //    Input::UpdateKeyState(key, (KeyState)action);
-        //}
-//        if (key == GLFW_KEY_LEFT_CONTROL)
-//        {
-//            Debug::LogWarning("left ctrl");
-//        }
-//        if (key == GLFW_KEY_Z && mods == GLFW_MOD_CONTROL)
-//        {
-//            Debug::LogWarning("Ctrl+Z");
-//        }
-        Input::UpdateKeyState(key, (KeyState)action);
+        EditorInput::UpdateKeyState(key, (KeyState)action);
         if (mods & GLFW_MOD_ALT)
         {
-            Input::UpdateKeyState(GLFW_KEY_LEFT_ALT, (KeyState)action);
-            Input::UpdateKeyState(GLFW_KEY_RIGHT_ALT, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_LEFT_ALT, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_RIGHT_ALT, (KeyState)action);
         }
         if (mods & GLFW_MOD_CONTROL)
         {
-            //Debug::LogWarning("Control");
-            Input::UpdateKeyState(GLFW_KEY_LEFT_CONTROL, (KeyState)action);
-            Input::UpdateKeyState(GLFW_KEY_RIGHT_CONTROL, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_LEFT_CONTROL, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_RIGHT_CONTROL, (KeyState)action);
         }
         if (mods & GLFW_MOD_SUPER)
         {
-            Input::UpdateKeyState(GLFW_KEY_LEFT_SUPER, (KeyState)action);
-            Input::UpdateKeyState(GLFW_KEY_RIGHT_SUPER, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_LEFT_SUPER, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_RIGHT_SUPER, (KeyState)action);
         }
         if (mods & GLFW_MOD_SHIFT)
         {
-            Input::UpdateKeyState(GLFW_KEY_LEFT_SHIFT, (KeyState)action);
-            Input::UpdateKeyState(GLFW_KEY_RIGHT_SHIFT, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_LEFT_SHIFT, (KeyState)action);
+            EditorInput::UpdateKeyState(GLFW_KEY_RIGHT_SHIFT, (KeyState)action);
         }
 
     }
@@ -222,23 +215,22 @@ namespace FishEditor
     void FishEditorWindow::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
         ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-        if (!ImGui::GetIO().WantCaptureMouse)
+        EditorInput::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
+        if (EditorGUI::m_mainSceneViewEditor->isMouseHovered())
+        {
             Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
+        }
     }
-
-    //GLfloat lastX = 400, lastY = 300;
-    //bool firstMouse = true;
 
     void FishEditorWindow::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
-        //if (!ImGui::GetIO().WantCaptureMouse)
-        //{
-            MouseButtonState s = action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up;
-            //bool done = EditorGUI::OnMouseButton((MouseButtonCode)button, s);
-            //if (done) return;
+        MouseButtonState s = action == GLFW_PRESS ? MouseButtonState::Down : MouseButtonState::Up;
+        EditorInput::UpdateMouseButtonState(button, s);
+        if (EditorGUI::m_mainSceneViewEditor->isMouseHovered())
+        {
             Input::UpdateMouseButtonState(button, s);
-        //}
+        }
     }
 
     void FishEditorWindow::WindowSizeCallback(GLFWwindow* window, int width, int height)

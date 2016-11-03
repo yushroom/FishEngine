@@ -12,6 +12,15 @@
 
 namespace FishEngine{
 
+class Vector2
+{
+public:
+    union {
+        struct { float x, y; };
+        float m[2];
+    };
+};
+
 class Vector3
 {
 public:

@@ -110,6 +110,7 @@ namespace FishEngine
     private:
         friend class GameLoop;
         friend class FishEditor::FishEditorWindow;
+        friend class FishEditor::EditorInput;
 
         static KeyState m_keyStates[keyCount];
 

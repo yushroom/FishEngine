@@ -96,7 +96,7 @@ namespace FishEditor
             Screen::m_height = iy;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, m_sceneViewRenderTexture->FBO());
-        glViewport(0, 0, m_size.x, m_size.y);
+        glViewport(0, 0, Screen::m_width, Screen::m_height);
 
         RenderSystem::Render();
          
@@ -234,8 +234,9 @@ namespace FishEditor
             Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
             Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
             Pipeline::perFrameUniformData.WorldSpaceCameraPos = camera_preview->transform()->position();
-            Pipeline::BindPerFrameUniforms();
+            //Pipeline::BindPerFrameUniforms();
             Scene::Render();
+            //RenderSystem::Render();
             Camera::m_mainCamera = main_camera;
             Screen::m_width = w;
             Screen::m_height = h;
@@ -243,19 +244,6 @@ namespace FishEditor
 
         glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
-
-        //if (Input::GetKeyDown(KeyCode::W))
-        //{
-        //    m_transformToolType = TransformToolType::Translate;
-        //}
-        //else if (Input::GetKeyDown(KeyCode::E))
-        //{
-        //    m_transformToolType = TransformToolType::Rotate;
-        //}
-        //else if (Input::GetKeyDown(KeyCode::R))
-        //{
-        //    m_transformToolType = TransformToolType::Scale;
-        //}
 
         if (selectedGO != nullptr)
         {
@@ -266,6 +254,14 @@ namespace FishEditor
             else if (m_transformToolType == TransformToolType::Scale)
                 DrawScaleGizmo();
         }
+        
+        if (!m_mouseEventHandled && Input::GetMouseButtonDown(0))
+        {
+            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            auto go = Scene::IntersectRay(ray);
+            Selection::setSelectedGameObjectInHierarchy(go);
+        }
+        
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -343,7 +339,7 @@ namespace FishEditor
                     if (Vector3::Dot(d, axis[i]) > 0.96f)
                     {
                         m_selectedAxis = i;
-                        m_mouseEventHandled = true;
+                        //m_mouseEventHandled = true;
                         break;
                     }
                 }
@@ -418,6 +414,7 @@ namespace FishEditor
         // handle mouse movement event
         if (Input::GetMouseButtonDown(0))   // start
         {
+            m_mouseEventHandled = true;
             lastCenter = center;
             Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             float t = solve(center, axis_selected, camera_pos, ray.direction);
@@ -443,6 +440,7 @@ namespace FishEditor
         }
         else if (Input::GetMouseButtonUp(0))    // end
         {
+            m_mouseEventHandled = false;
             const auto position = selectedGO->transform()->position();
             redo_function = [selectedGO, position]() {
                 Debug::LogWarning("Redo translation");
@@ -466,9 +464,6 @@ namespace FishEditor
             return;
 
         auto camera = Camera::main();
-        //auto view = camera->worldToCameraMatrix();
-        //auto proj = camera->projectionMatrix();
-        //auto vp = proj * view;
         Vector3 center = selectedGO->transform()->position();
         Vector3 camera_pos = camera->transform()->position();
         Vector3 dir = center - camera_pos;
@@ -489,6 +484,9 @@ namespace FishEditor
             axis[1] = Vector3::up;      // +y
             axis[2] = Vector3::forward; // +z
         }
+        
+        static std::function<void(void)> undo_function;
+        static std::function<void(void)> redo_function;
 
         // check if any axis is selected by mouse
         if (Input::GetMouseButtonDown(0))
@@ -509,6 +507,13 @@ namespace FishEditor
                         lastFromDir = Vector3::Cross(axis[i], Vector3::Cross(dir, axis[i]));
                         lastFromDir.Normalize();
                         lastRotation = selectedGO->transform()->localRotation();
+                        
+                        const auto rotation = selectedGO->transform()->rotation();
+                        undo_function = [selectedGO, rotation]() {
+                            Debug::LogWarning("Undo rotation");
+                            selectedGO->transform()->setRotation(rotation);
+                        };
+
                     }
                 }
             }
@@ -536,7 +541,8 @@ namespace FishEditor
         if (m_selectedAxis < 0)
             return;
 
-        if (Input::GetMouseButton(0))
+
+        if (Input::GetMouseButton(0)) // rotating
         {
             Ray view = camera->ScreenPointToRay(Input::mousePosition());
             auto& face_normal = axis[m_selectedAxis];
@@ -545,10 +551,6 @@ namespace FishEditor
             {
                 return;
             }
-            //            if (t >= Vector3::Distance(center, camera_pos) + 0.001f)
-            //            {
-            //                return;
-            //            }
             Vector3 intersected_p = view.GetPoint(t);
             Vector3 dir_to = Vector3::Normalize(intersected_p - center);
             auto rot = Quaternion::FromToRotation(lastFromDir, dir_to) * lastRotation;
@@ -557,6 +559,16 @@ namespace FishEditor
             Gizmos::setColor(Color::yellow);
             Gizmos::DrawLine(gizmo_center, gizmo_center + lastFromDir * radius);
             Gizmos::DrawLine(gizmo_center, gizmo_center + dir_to * radius);
+        }
+        else if (Input::GetMouseButtonUp(0)) // end
+        {
+            m_mouseEventHandled = false;
+            const auto rotation = selectedGO->transform()->rotation();
+            redo_function = [selectedGO, rotation]() {
+                Debug::LogWarning("Redo rotation");
+                selectedGO->transform()->setRotation(rotation);
+            };
+            CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
         }
     }
 
@@ -567,11 +579,10 @@ namespace FishEditor
 
     void SceneViewEditor::DrawSceneGizmo()
     {
-        //int w = int(Screen::width()*0.06f);
-        constexpr int vp_width = 64;
+        const int vp_width = 64*Screen::pixelsPerPoint();
         constexpr int margin = 20;
-        const int vp_x = m_size.x - vp_width - margin;
-        const int vp_y = m_size.y - vp_width - margin;
+        const int vp_x = Screen::width() - vp_width - margin;
+        const int vp_y = Screen::height() - vp_width - margin;
         glViewport(vp_x, vp_y, vp_width, vp_width);
 
         auto shader = sceneGizmoMaterial->shader();
@@ -583,27 +594,29 @@ namespace FishEditor
         auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
         auto proj = camera->m_orthographic ? Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10) : Matrix4x4::Perspective(45, 1, 0.3f, 10.f);
         auto vp = proj * view;
-        auto model = FishEngine::Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
+        
+        // world to camera;
+        auto model = Matrix4x4::FromRotation(Quaternion::Inverse(camera->transform()->rotation()));
 
+        // camera to world
         auto inv_model = model.inverse();
 
         auto mousePos = Input::mousePosition();
         bool inRegion = false;
-        float x = mousePos.x - margin;
-        float y = mousePos.y - margin;
+        float x = mousePos.x - vp_x;
+        float y = mousePos.y - vp_y;
         Ray ray(Vector3::zero, Vector3::zero);
-        if (x > 0 && x < vp_width && y > 0 && y < vp_width) {
+        if (x > 0 && x < vp_width && y > 0 && y < vp_width)
+        {
             inRegion = true;
-            //Debug::Log("In SceneGizmo region");
-            //ray = Ray(camera_pos, ray_world.normalized()); // world space
-            ray.origin = inv_model * Vector4(2.0f*x / vp_width - 1.f, 2.0f*y / vp_width - 1.0f, -5, 1);
-            ray.direction = inv_model * Vector4(0, 0, 1, 0);
+            ray.origin = inv_model.MultiplyPoint(2.0f*x / vp_width - 1.f, 2.0f*y / vp_width - 1.0f, -5);
+            ray.direction = inv_model.MultiplyVector(Vector3::forward);
         }
 
         auto s = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
 
         float f[] = {
-            -1,  0,  0,    0, 0, -90,
+            -1,  0,  0,   0, 0, -90,
             0, -1,  0,    0, 0,   0,
             0,  0, -1,   90, 0,   0,
             1,  0,  0,    0, 0,  90,
@@ -616,15 +629,19 @@ namespace FishEditor
         int hoverIndex = -1;
 
         static Transform t;
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 6; ++i)
+        {
             int j = i * 6;
             Vector3 pos(f + j);
+            //pos*=1.5f;
             Vector3 color(1, 1, 1);
             if (i >= 3)
                 color = Vector3(f + j);
-            if (inRegion && !interested) {
+            if (inRegion && !interested)
+            {
                 Bounds aabb(pos*0.7f, Vector3::one*0.5f);
-                if (aabb.IntersectRay(ray)) {
+                if (aabb.IntersectRay(ray))
+                {
                     interested = true;
                     hoverIndex = i;
                     color.Set(1, 1, 0); // yellow
@@ -638,7 +655,6 @@ namespace FishEditor
             Pipeline::perDrawUniformData.MATRIX_MVP = vp*modelMat;
             Pipeline::perDrawUniformData.MATRIX_IT_MV = (view * modelMat).transpose().inverse();
             Pipeline::BindPerDrawUniforms();
-            //if (i >= 3)
             sceneGizmoMaterial->SetVector3("_Color", color);
             sceneGizmoMaterial->Update();
             coneMesh->Render();
@@ -646,7 +662,8 @@ namespace FishEditor
 
         Bounds aabb(Vector3::zero, Vector3::one*0.5f);
         bool interested6 = false;
-        if (inRegion && !interested) {
+        if (inRegion && !interested)
+        {
             interested6 = aabb.IntersectRay(ray);
             if (interested6)
                 hoverIndex = 6;
@@ -669,23 +686,21 @@ namespace FishEditor
         if (interested && Input::GetMouseButtonDown(0))
         {
             Debug::Log("%d", hoverIndex);
-            if (hoverIndex == 6) {
+            if (hoverIndex == 6)
+            {
                 camera->setOrthographic(!camera->orghographic());
-                //camera->m_orthographic = !camera->m_orthographic;
             }
-            else {
+            else
+            {
                 Vector3 offset(f + hoverIndex * 6);
                 Vector3 up(0, 1, 0);
                 if (offset.y == 1) {
                     up.Set(0, 0, -1);
-                }
-                else if (offset.y == -1) {
+                } else if (offset.y == -1) {
                     up.Set(0, 0, 1);
                 }
                 camera->transform()->setLocalPosition(camera->m_focusPoint + offset * 4);
                 camera->transform()->LookAt(camera->m_focusPoint, up);
-                //camera->transform()->setLocalEulerAngles(Vector3(f + hoverIndex * 6 + 3));
-                //camera->FrameSelected(Selection::activeGameObject());
             }
         }
 

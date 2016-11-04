@@ -184,24 +184,17 @@ namespace FishEditor
 
         ImGui::Render();
         
-        //if (!s_mouseEventHandled && Input::GetMouseButtonDown(0))
-        //{
-        //    Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
-        //    auto go = Scene::IntersectRay(ray);
-        //    Selection::setSelectedGameObjectInHierarchy(go);
-        //}
-
         //if (EditorInput::GetKeyDown(KeyCode::P))
         //{
         //    Debug::Log("save layout");
-        //    std::ofstream fout("./FishEditorLayout.json");
+        //    std::ofstream fout("./FishEditorLayout.xml");
         //    ImGui::SaveDock(fout);
         //}
 
         //if (EditorInput::GetKeyDown(KeyCode::O))
         //{
         //    Debug::Log("load layout");
-        //    std::ifstream fin("./FishEditorLayout.json");
+        //    std::ifstream fin("./FishEditorLayout.xml");
         //    ImGui::LoadDock(fin);
         //}
     }
@@ -663,8 +656,6 @@ namespace FishEditor
     {
         static float time_stamp = 0;
 
-        float menu_height = 0;
-
         // Main menu bar
         if (ImGui::BeginMainMenuBar())
         {
@@ -701,7 +692,7 @@ namespace FishEditor
         float height = 24 + padding;
         ImVec2 toolbar_size(ImGui::GetIO().DisplaySize.x, height);
         //auto size = ImGui::GetIO().DisplaySize;
-        if (ImGui::BeginToolbar("MainToolBar", ImVec2(1, g_editorGUISettings.mainMenubarHeight), toolbar_size))
+        if (ImGui::BeginToolbar("MainToolBar", ImVec2(0, g_editorGUISettings.mainMenubarHeight), toolbar_size))
         {
             ImGui::SameLine();
             if (FishEditorWindow::InPlayMode())

@@ -1,7 +1,7 @@
 #include "imgui.h"
 #include <ostream>
 #include <cereal/cereal.hpp>
-#include <cereal/archives/json.hpp>
+#include <cereal/archives/xml.hpp>
 
 #define IMGUI_DEFINE_PLACEMENT_NEW
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -1300,13 +1300,13 @@ void EndDock()
 
 void SaveDock(std::ostream& file)
 {
-    cereal::JSONOutputArchive oa(file);
+    cereal::XMLOutputArchive oa(file);
     oa << g_dock;
 }
 
 void LoadDock(std::istream& file)
 {
-    cereal::JSONInputArchive ia(file);
+    cereal::XMLInputArchive ia(file);
     ia >> g_dock;
 }
 

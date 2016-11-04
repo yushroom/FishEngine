@@ -48,6 +48,7 @@ xcuserdata/
 
 # cmake build
 /Engine/[Bb]uild
+/Engine/build_xcode/
 [Bb]uild
 build-*
 CMakeLists.txt.user

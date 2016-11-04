@@ -548,7 +548,11 @@ public:
         material->SetShader(shader);
         auto current_path = boost::filesystem::current_path();
         cout << current_path << endl;
-        const std::string sample_root_dir = "../../../../Example/ParallaxMapping/";
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string sample_root_dir = "../../Example/ParallaxMapping/";
+#else
+        const std::string sample_root_dir = "/Users/yushroom/program/graphics/FishEngine/Example/ParallaxMapping/";
+#endif
         const std::string texture_dir = sample_root_dir + "textures/";
 
         auto texture_bricks2_disp = Texture::CreateFromFile(texture_dir + "bricks2_disp.jpg");
@@ -573,9 +577,9 @@ int main()
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
-    FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
+    //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     FishEditorWindow::Init();
     //test();
     //shared_ptr<Object> p = make_shared<Camera>();

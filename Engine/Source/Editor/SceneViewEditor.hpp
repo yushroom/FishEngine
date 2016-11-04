@@ -45,6 +45,7 @@ namespace FishEditor
             return m_focused;
         }
 
+        // mouse position is inside of this scene view, so it may receive mouse event.
         bool isMouseHovered() const
         {
             return m_isMouseHovered;
@@ -64,10 +65,10 @@ namespace FishEditor
         bool m_mouseEventHandled;
 
         // this scene view is focused, so it may receive keyboard event.
-        bool m_focused;
+        bool m_focused  = false;
 
-        // mouse position is inside of this scene view, so it may receive mouse event;
-        bool m_isMouseHovered;
+        // mouse position is inside of this scene view, so it may receive mouse event.
+        bool m_isMouseHovered = false;
 
         TransformToolType m_transformToolType = TransformToolType::Translate;
         TransformSpace m_transformSpace = TransformSpace::Global;

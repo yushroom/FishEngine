@@ -74,8 +74,8 @@ namespace FishEditor
 
         glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
-        std::ifstream fin("./FishEditorLayout.json");
-        if (fin.good())
+        std::ifstream fin("./FishEditorLayout.xml");
+        if (fin.is_open())
             ImGui::LoadDock(fin);
         else
             Debug::LogWarning("Layout file not found.");
@@ -110,10 +110,17 @@ namespace FishEditor
             glfwPollEvents();
             double xpos, ypos;
             glfwGetCursorPos(m_window, &xpos, &ypos);
-            EditorInput::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
+            float x = static_cast<float>(xpos);
+            float y = static_cast<float>(ypos);
+            EditorInput::UpdateMousePosition(x / m_windowWidth, 1.0f - y / m_windowHeight);
             if (EditorGUI::m_mainSceneViewEditor->isMouseHovered())
             {
-                Input::UpdateMousePosition(float(xpos) / m_windowWidth, 1.0f - float(ypos) / m_windowHeight);
+                auto& p = EditorGUI::m_mainSceneViewEditor->m_position;
+                auto& s = EditorGUI::m_mainSceneViewEditor->m_size;
+                float px = (x-p.x)/(float)s.x;
+                float py = 1.0f - (y-p.y)/(float)s.y;
+                //Debug::Log("%lf %lf", px, py);
+                Input::UpdateMousePosition(px, py);
             }
 
 

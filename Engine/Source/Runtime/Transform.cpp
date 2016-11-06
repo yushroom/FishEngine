@@ -15,30 +15,15 @@ namespace FishEngine
     {
         //Debug::Log("~Transform");
         SetParent(nullptr); // remove from parent
-        for (auto child : m_children) {
-            //Scene::des
-        }
+        //for (auto child : m_children) {
+        //}
     }
-
-    //void Transform::OnInspectorGUI()
-    //{
-    //    if (ImGui::InputFloat3("Position", m_localPosition.data())) {
-    //        MakeDirty();
-    //    }
-    //    if (ImGui::InputFloat3("Rotation", m_localEulerAngles.data())) {
-    //        m_localRotation.setEulerAngles(m_localEulerAngles);
-    //        MakeDirty();
-    //    }
-    //    if (ImGui::InputFloat3("Scale", m_localScale.data())) {
-    //        MakeDirty();
-    //    }
-    //}
 
     void Transform::Update() const
     {
-        if (!dirtyInHierarchy())
+        if (!m_isDirty)
             return;
-        m_localEulerAngles = m_localRotation.eulerAngles();
+        //m_localEulerAngles = m_localRotation.eulerAngles();
         //m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
         Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale, m_localToWorldMatrix, m_worldToLocalMatrix);
         if (!m_parent.expired()) {
@@ -46,7 +31,7 @@ namespace FishEngine
             m_worldToLocalMatrix = m_worldToLocalMatrix * m_parent.lock()->worldToLocalMatrix();
         }
         //m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
-        m_rotation = m_localToWorldMatrix.ToRotation();
+        //m_rotation = m_localToWorldMatrix.ToRotation();
         m_isDirty = false;
     }
 
@@ -226,19 +211,22 @@ namespace FishEngine
     }
 
 
-    bool Transform::dirtyInHierarchy() const
-    {
-        if (!m_isDirty && !m_parent.expired()) { // not dirty and has a parent
-            return m_parent.lock()->dirtyInHierarchy();
-        }
-        return m_isDirty;
-    }
+    // bool Transform::dirtyInHierarchy() const
+    // {
+    //     if (!m_isDirty && !m_parent.expired()) // not dirty and has a parent
+    //     {
+    //         return m_parent.lock()->dirtyInHierarchy();
+    //     }
+    //     return m_isDirty;
+    // }
 
 
     void FishEngine::Transform::MakeDirty() const
     {
-        if (!m_isDirty) {
-            for (auto& c : m_children) {
+        if (!m_isDirty)
+        {
+            for (auto& c : m_children)
+            {
                 c.lock()->MakeDirty();
             }
             m_isDirty = true;

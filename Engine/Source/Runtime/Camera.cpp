@@ -101,7 +101,7 @@ namespace FishEngine
         Gizmos::setMatrix(Matrix4x4::identity);
     }
 
-    std::shared_ptr<Camera> Camera::main()
+    PCamera Camera::main()
     {
         if (m_mainCamera == nullptr)
         {
@@ -118,7 +118,7 @@ namespace FishEngine
     }
 
 
-    std::shared_ptr<Camera> Camera::
+    PCamera Camera::
     mainGameCamera()
     {
         for (auto& c : m_allCameras)
@@ -133,7 +133,7 @@ namespace FishEngine
 
 
     void Camera::
-    FrameSelected(std::shared_ptr<GameObject>& selected)
+    FrameSelected(PGameObject& selected)
     {
         auto camera = Camera::main()->transform();
         float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);

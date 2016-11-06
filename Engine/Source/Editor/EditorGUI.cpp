@@ -804,9 +804,11 @@ namespace FishEditor
         if (Float3("Position", &transform->m_localPosition)) {
             transform->MakeDirty();
         }
-        if (Float3("Rotation", &transform->m_localEulerAngles)) {
-            transform->m_localRotation.setEulerAngles(transform->m_localEulerAngles);
-            transform->MakeDirty();
+        Vector3 localEulerAngles = transform->m_localRotation.eulerAngles();
+        if (Float3("Rotation", &localEulerAngles)) {
+            transform->setLocalEulerAngles(localEulerAngles);
+            //transform->m_localRotation.setEulerAngles(localEulerAngles);
+            //transform->MakeDirty();
         }
         if (Float3("Scale", &transform->m_localScale)) {
             transform->MakeDirty();

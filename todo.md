@@ -100,17 +100,17 @@
 
 - [ ] 资源管理 WIP
 
-- [ ] 场景中的网格平面
+- [x] 场景中的网格平面
 
 - [ ] 场景的序列化和反序列化（~~要依赖反射~~，内部的component可以不依赖反射，直接手写序列化，但是user defined的类需要反射来做自动序列化和反序列化）
 
-- [ ] Docking GUI
+- [x] Docking GUI
 
 - [ ] hierarchy中的方向键的移动
 
 - [ ] hierarchy中过滤器（名字，类型。。。）
 
-- [ ] ToolBar
+- [x] ToolBar
 
 - [x] 区分read-only的属性 ImGuiInputTextFlags_ReadOnly
 

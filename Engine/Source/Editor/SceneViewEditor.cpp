@@ -88,8 +88,8 @@ namespace FishEditor
         if (tsize.x != m_size.x || tsize.y != m_size.y)
         {
             m_size = tsize;
-            const int ix = m_size.x * Screen::pixelsPerPoint();
-            const int iy = m_size.y * Screen::pixelsPerPoint();
+            const int ix = static_cast<int>(m_size.x * Screen::pixelsPerPoint());
+            const int iy = static_cast<int>(m_size.y * Screen::pixelsPerPoint());
             m_sceneViewRenderTexture->Resize(ix, iy);
             Camera::OnWindowSizeChanged(ix, iy);
             Screen::m_width = ix;
@@ -579,7 +579,7 @@ namespace FishEditor
 
     void SceneViewEditor::DrawSceneGizmo()
     {
-        const int vp_width = 64*Screen::pixelsPerPoint();
+        const int vp_width = static_cast<int>(64*Screen::pixelsPerPoint());
         constexpr int margin = 20;
         const int vp_x = Screen::width() - vp_width - margin;
         const int vp_y = Screen::height() - vp_width - margin;

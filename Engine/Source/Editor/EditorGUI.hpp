@@ -72,9 +72,7 @@ namespace FishEditor
         template<class T>
         static void OnInspectorGUI(const std::shared_ptr<T>& component);
 
-        static bool s_mouseEventHandled;
-
-        static FishEngine::Int2 m_sceneSize;
+        static FishEngine::Int2 m_sceneViewSize;
     };
 
     template<>

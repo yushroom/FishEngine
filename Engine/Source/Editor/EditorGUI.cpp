@@ -56,11 +56,9 @@ namespace FishEditor
     bool    EditorGUI::s_openMenuPopup                  = false;
     bool    EditorGUI::m_showAssectSelectionDialogBox   = false;
 
-    bool    EditorGUI::s_mouseEventHandled              = false;
-
     ImGuiWindowFlags globalWindowFlags = 0;
     
-    FishEngine::Int2 EditorGUI::m_sceneSize{1, 1};
+    FishEngine::Int2 EditorGUI::m_sceneViewSize{1, 1};
 
     const char* ToString(TransformSpace& space)
     {
@@ -93,24 +91,35 @@ namespace FishEditor
 
         ImGuiContext& g = *GImGui;
         ImGuiStyle& style = g.Style;
-        style.FrameRounding = 4.f;
+        style.FrameRounding = 0.f;
         style.WindowRounding = 0.f;
-        style.Colors[ImGuiCol_Text]         = ImVec4(0, 0, 0, 1);
-        style.Colors[ImGuiCol_Button]       = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
-        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(190 / 255.f, 224 / 255.f, 262 / 255.f, 1.f);
+        //style.Colors[ImGuiCol_Text]         = ImVec4(0, 0, 0, 1);
+        //style.Colors[ImGuiCol_Button]       = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
+        //style.Colors[ImGuiCol_ButtonHovered] = ImVec4(190 / 255.f, 224 / 255.f, 262 / 255.f, 1.f);
+        //style.Colors[ImGuiCol_ButtonActive] = ImVec4(181 / 255.f, 214 / 255.f, 232 / 255.f, 1.f);
+        //style.Colors[ImGuiCol_WindowBg]     = ImVec4(0.8f, 0.8f, 0.8f, 0.6f);
+        //style.Colors[ImGuiCol_MenuBarBg]    = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+        //style.Colors[ImGuiCol_TitleBg]      = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
+        //style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        //style.Colors[ImGuiCol_ComboBg]      = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+
+        style.Colors[ImGuiCol_Text] = ImVec4(1, 1, 1, 1);
+        style.Colors[ImGuiCol_Button] = ImVec4(0, 0, 0, 1.f);
+        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(40 / 255.f, 40 / 255.f, 40 / 255.f, 1.f);
         style.Colors[ImGuiCol_ButtonActive] = ImVec4(181 / 255.f, 214 / 255.f, 232 / 255.f, 1.f);
-        style.Colors[ImGuiCol_WindowBg]     = ImVec4(0.8f, 0.8f, 0.8f, 0.6f);
-        style.Colors[ImGuiCol_MenuBarBg]    = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
-        style.Colors[ImGuiCol_TitleBg]      = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
-        style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
-        style.Colors[ImGuiCol_ComboBg]      = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+        style.Colors[ImGuiCol_WindowBg] = ImVec4(64 / 255.f, 64 / 255.f, 64 / 255.f, 1.0f);
+        style.Colors[ImGuiCol_MenuBarBg] = ImVec4(45 / 255.f, 45 / 255.f, 45 / 255.f, 1.0f);
+        style.Colors[ImGuiCol_TitleBg] = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
+        style.Colors[ImGuiCol_PopupBg] = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        style.Colors[ImGuiCol_ComboBg] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+        //style.Colors[ImGuiCol_Border] = ImVec4(0, 0, 0, 1);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
         //style.WindowMinSize = ImVec2(128, 128);
 
         globalWindowFlags |= ImGuiWindowFlags_NoCollapse;
         globalWindowFlags |= ImGuiWindowFlags_NoResize;
-        globalWindowFlags |= ImGuiWindowFlags_ShowBorders;
+        //globalWindowFlags |= ImGuiWindowFlags_ShowBorders;
         globalWindowFlags |= ImGuiWindowFlags_NoMove;
         //CalculateWindowSizeAndPosition();
         m_mainSceneViewEditor = std::make_shared<SceneViewEditor>();
@@ -120,7 +129,6 @@ namespace FishEditor
 
     void EditorGUI::Update()
     {
-        s_mouseEventHandled = false;
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
 
         if (EditorInput::GetKeyDown(KeyCode::F)) {
@@ -643,8 +651,8 @@ namespace FishEditor
         m_mainSceneViewEditor->m_position.x = position.x;
         m_mainSceneViewEditor->m_position.y = position.y;
         auto size = ImGui::GetContentRegionAvail();
-        m_sceneSize.x = static_cast<int>(size.x);
-        m_sceneSize.y = static_cast<int>(size.y);
+        m_sceneViewSize.x = static_cast<int>(size.x);
+        m_sceneViewSize.y = static_cast<int>(size.y);
         //EditorInput::CopyToInput();
         m_mainSceneViewEditor->Render();
         auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
@@ -1037,6 +1045,6 @@ namespace FishEditor
     
     FishEngine::Int2 EditorGUI::sceneViewSize()
     {
-        return m_sceneSize;
+        return m_sceneViewSize;
     }
 }

@@ -106,4 +106,11 @@ namespace FishEditor {
     class EditorInput;
 }
 
+#if defined(_DEBUG) || defined(DEBUG)
+#include <cassert>
+#define Assert(exp) assert(exp)
+#else
+#define Assert(exp) (void(0))
+#endif
+
 #endif /* FishEngine_h */

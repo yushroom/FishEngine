@@ -6,6 +6,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui_dock.h>
 #include <imgui/imgui_user.h>
@@ -39,6 +40,7 @@
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
 #include "EditorInput.hpp"
+#include "MaterialEditor.hpp"
 
 using namespace FishEngine;
 
@@ -91,7 +93,7 @@ namespace FishEditor
 
         ImGuiContext& g = *GImGui;
         ImGuiStyle& style = g.Style;
-        style.FrameRounding = 0.f;
+        style.FrameRounding = 2.f;
         style.WindowRounding = 0.f;
         //style.Colors[ImGuiCol_Text]         = ImVec4(0, 0, 0, 1);
         //style.Colors[ImGuiCol_Button]       = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
@@ -112,6 +114,8 @@ namespace FishEditor
         style.Colors[ImGuiCol_TitleBg] = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
         style.Colors[ImGuiCol_PopupBg] = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
         style.Colors[ImGuiCol_ComboBg] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+        style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(28 / 255.0f, 151 / 255.f, 234 / 255.0f, 1.f);
+        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0, 122/255.0f, 204/255.0f, 1.0f);
         //style.Colors[ImGuiCol_Border] = ImVec4(0, 0, 0, 1);
         //style.GrabRounding = 0.f;
         //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
@@ -169,6 +173,8 @@ namespace FishEditor
         DrawInspectorWindow();
         DrawProjectWindow();
         DrawSceneView();
+        //MaterialEditor::Show();
+
 
         auto size = ImGui::GetIO().DisplaySize;
         float pos_y = g_editorGUISettings.mainMenubarHeight + g_editorGUISettings.mainToolbarHeight;
@@ -189,6 +195,11 @@ namespace FishEditor
     //            ImGui::EndPopup();
     //        }
     //    }
+
+        //if (EditorInput::GetKeyDown(KeyCode::G))
+        //{
+        //    GUIStyleTweakWindow();
+        //}
 
         ImGui::Render();
         
@@ -691,6 +702,66 @@ namespace FishEditor
             g_editorGUISettings.mainMenubarHeight = ImGui::GetWindowSize().y;
             ImGui::EndMainMenuBar();
         }
+    }
+
+    constexpr const char* ImGuiCol_Strings[] = {
+        "ImGuiCol_Text",
+        "ImGuiCol_TextDisabled",
+        "ImGuiCol_WindowBg",
+        "ImGuiCol_ChildWindowBg",
+        "ImGuiCol_PopupBg",
+        "ImGuiCol_Border",
+        "ImGuiCol_BorderShadow",
+        "ImGuiCol_FrameBg",
+        "ImGuiCol_FrameBgHovered",
+        "ImGuiCol_FrameBgActive",
+        "ImGuiCol_TitleBg",
+        "ImGuiCol_TitleBgCollapsed",
+        "ImGuiCol_TitleBgActive",
+        "ImGuiCol_MenuBarBg",
+        "ImGuiCol_ScrollbarBg",
+        "ImGuiCol_ScrollbarGrab",
+        "ImGuiCol_ScrollbarGrabHovered",
+        "ImGuiCol_ScrollbarGrabActive",
+        "ImGuiCol_ComboBg",
+        "ImGuiCol_CheckMark",
+        "ImGuiCol_SliderGrab",
+        "ImGuiCol_SliderGrabActive",
+        "ImGuiCol_Button",
+        "ImGuiCol_ButtonHovered",
+        "ImGuiCol_ButtonActive",
+        "ImGuiCol_Header",
+        "ImGuiCol_HeaderHovered",
+        "ImGuiCol_HeaderActive",
+        "ImGuiCol_Column",
+        "ImGuiCol_ColumnHovered",
+        "ImGuiCol_ColumnActive",
+        "ImGuiCol_ResizeGrip",
+        "ImGuiCol_ResizeGripHovered",
+        "ImGuiCol_ResizeGripActive",
+        "ImGuiCol_CloseButton",
+        "ImGuiCol_CloseButtonHovered",
+        "ImGuiCol_CloseButtonActive",
+        "ImGuiCol_PlotLines",
+        "ImGuiCol_PlotLinesHovered",
+        "ImGuiCol_PlotHistogram",
+        "ImGuiCol_PlotHistogramHovered",
+        "ImGuiCol_TextSelectedBg",
+        "ImGuiCol_ModalWindowDarkening",
+        "ImGuiCol_COUNT",
+    };
+
+    void EditorGUI::GUIStyleTweakWindow()
+    {
+        ImGuiContext& g = *GImGui;
+        ImGuiStyle& style = g.Style;
+        ImGui::Begin("style tweak");
+        for (int i = 0; i < ImGuiCol_COUNT; ++i)
+        {
+            //const std::string label = "color-" + std::to_string(i);
+            ImGui::ColorEdit4(ImGuiCol_Strings[i], &style.Colors[i].x);
+        }
+        ImGui::End();
     }
 
     void EditorGUI::DrawMainToolbar()

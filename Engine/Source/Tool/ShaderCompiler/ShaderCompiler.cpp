@@ -35,36 +35,42 @@ int main(int argc, char* argv[])
     glCheckError();
 
     //assert(argc == 3);
-    if (argc != 3)
+    if (argc != 2)
         return 1;
     
     GLenum shaderType = GL_VERTEX_SHADER;
-    std::string path = argv[2];;
-    const int type = std::stoi(std::string(argv[1]));
-    
-    if (type == 3)
+    std::string path = argv[1];
+    auto ext = FishEngine::getExtensionWithoutDot(path);
+
+    if (ext == "vsfs")
     {
         try
         {
             Shader::LoadShaderCombined(path);
         }
-        catch(exception)
+        catch (exception)
         {
             return 1;
         }
         Debug::Log("OK");
         return 0;
     }
-    
-    switch (type)
+    else if (ext == "vert")
     {
-    case 0: shaderType = GL_VERTEX_SHADER; break;
-    case 1: shaderType = GL_FRAGMENT_SHADER; break;
-    case 2: shaderType = GL_GEOMETRY_SHADER; break;
-    default: Debug::LogError("Unknown shader type %d", type);
+        shaderType = GL_VERTEX_SHADER;
     }
-    
-    //Debug::Log(path.c_str());
+    else if (ext == "frag")
+    {
+        shaderType = GL_FRAGMENT_SHADER;
+    }
+    else if (ext == "geom")
+    {
+        shaderType = GL_GEOMETRY_SHADER;
+    }
+    else
+    {
+        Debug::LogError("Unknown shader type %d", ext.c_str());
+    }
 
     try
     {

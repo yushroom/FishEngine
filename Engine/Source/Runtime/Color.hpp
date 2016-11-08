@@ -3,6 +3,7 @@
 
 #include "Mathf.hpp"
 #include "Vector3.hpp"
+#include "Vector4.hpp"
 
 namespace FishEngine
 {
@@ -19,7 +20,8 @@ namespace FishEngine
         Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {}
         Color(const Vector4& v) : r(v.x), g(v.y), b(v.z), a(v.w) {}
 
-        operator Vector4() const {
+        operator Vector4() const
+        {
             return Vector4(r, g, b, a);
         }
 
@@ -49,7 +51,7 @@ namespace FishEngine
             return Color(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
         }
 
-        static Color LerpUnclamped(Color a, Color b, float t)
+        static Color LerpUnclamped(const Color& a, const Color& b, float t)
         {
             return Color(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
         }
@@ -64,22 +66,22 @@ namespace FishEngine
             return Color(r, g, b, a * multiplier);
         }
 
-        Color RGBMultiplied(Color multiplier)
+        Color RGBMultiplied(const Color& multiplier)
         {
             return Color(r * multiplier.r, g * multiplier.g, b * multiplier.b, a);
         }
 
-        friend Color operator *(Color a, float b)
+        friend Color operator *(const Color& a, float b)
         {
             return Color(a.r * b, a.g * b, a.b * b, a.a * b);
         }
 
-        friend Color operator *(float b, Color a)
+        friend Color operator *(float b, const Color& a)
         {
             return Color(a.r * b, a.g * b, a.b * b, a.a * b);
         }
 
-        friend Color operator /(Color a, float b)
+        friend Color operator /(const Color& a, float b)
         {
             return Color(a.r / b, a.g / b, a.b / b, a.a / b);
         }
@@ -93,7 +95,17 @@ namespace FishEngine
         //{
         //    return !(lhs == rhs);
         //}
-        
+
+        static void RGBToHSV(const Color& rgbColor, float* H, float* S, float* V);
+
+        // Creates an RGB color from HSV input.
+        // param H Hue [0..1].
+        // param S Saturation [0..1].
+        // param V Value [0..1].
+        // param hdr Output HDR colors. If true, the returned color will not be clamped to [0..1].
+        // return An opaque color with HSV matching the input.
+        static Color HSVToRGB(float H, float S, float V, bool hdr = true);
+
 
         static const Color red;
         static const Color green;
@@ -106,6 +118,9 @@ namespace FishEngine
         static const Color gray;
         static const Color grey;
         static const Color clear;
+
+    private:
+        static void RGBToHSVHelper(float offset, float dominantcolor, float colorone, float colortwo, float* H, float* S, float* V);
     };
 }
 

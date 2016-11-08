@@ -42,6 +42,51 @@ namespace FishEditor
         Debug::LogError("Error %d: %s\n", error, description);
     }
 
+    class WindowManager
+    {
+    public:
+        WindowManager() = delete;
+        
+        static void NewWindow(const char* title, const int width = 512, const int height = 256)
+        {
+            auto window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+            s_windows.push_back(window);
+            //return window;
+        }
+
+        static void Update()
+        {
+            s_windows.remove_if([](GLFWwindow* window) { return window == nullptr; });
+            for (auto& window : s_windows)
+            {
+                if (glfwWindowShouldClose(window))
+                {
+                    glfwDestroyWindow(window);
+                    window = nullptr;
+                }
+                else
+                {
+                    glClear(GL_COLOR_BUFFER_BIT);
+                }
+            }
+        }
+
+        static GLFWwindow* firstWindow()
+        {
+            return s_windows.front();
+        }
+
+        static GLFWwindow* secondWindow()
+        {
+            return *(++s_windows.begin());
+        }
+
+    private:
+        static std::list<GLFWwindow*> s_windows;
+    };
+
+    std::list<GLFWwindow*> WindowManager::s_windows;
+
     void FishEditorWindow::Init()
     {
         Debug::Init();
@@ -62,6 +107,9 @@ namespace FishEditor
 
         // Create a GLFWwindow object that we can use for GLFW's functions
         m_window = glfwCreateWindow(WIDTH, HEIGHT, "FishEngine", nullptr, nullptr);
+        //WindowManager::NewWindow("FishEngine", WIDTH, HEIGHT);
+        //WindowManager::NewWindow("Another window", WIDTH/2, HEIGHT/2);
+        //m_window = WindowManager::firstWindow();
         glfwMakeContextCurrent(m_window);
 
         // Set the required callback functions
@@ -103,6 +151,8 @@ namespace FishEditor
         // Game loop
         while (!glfwWindowShouldClose(m_window))
         {
+            WindowManager::Update();
+
             //auto start_time = std::chrono::high_resolution_clock::now();
             EditorInput::Update();
             Input::Update();
@@ -150,6 +200,14 @@ namespace FishEditor
                 Time::m_time = old_time;
             }
             EditorTime::m_time = old_time;
+
+            //auto window = WindowManager::secondWindow();
+            //glfwMakeContextCurrent(window);
+            //glClearColor(1, 0, 0, 1);
+            //glClear(GL_COLOR_BUFFER_BIT);
+            //glfwSwapBuffers(window);
+            //
+            //glfwMakeContextCurrent(m_window);
         }
     }
 

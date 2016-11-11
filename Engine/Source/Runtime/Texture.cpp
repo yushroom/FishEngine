@@ -14,16 +14,16 @@ namespace FishEngine
 
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed
-    GLuint create_texture(char const* Filename)
+    GLuint CreateTextureFromDDS(char const* Filename)
     {
         glCheckError();
 
         gli::texture Texture = gli::load(Filename);
-        if (Texture.empty()) {
+        if (Texture.empty())
+        {
             Debug::LogError("Texture %s not found", Filename);
             abort();
         }
-        //assert(!Texture.empty());
 
         gli::gl GL(gli::gl::PROFILE_GL33);
         gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
@@ -38,6 +38,11 @@ namespace FishEngine
         glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
         glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
         glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+
+        glTexParameteri(Target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(Target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glm::tvec3<GLsizei> const Extent(Texture.extent());
         //GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
@@ -68,7 +73,9 @@ namespace FishEngine
         }
 
         for (std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+        {
             for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
+            {
                 for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
                 {
                     GLsizei const LayerGL = static_cast<GLsizei>(Layer);
@@ -135,67 +142,18 @@ namespace FishEngine
                     default: assert(0); break;
                     }
                 }
+            }
+        }
         glCheckError();
         return TextureName;
     }
 
-    //Texture& Texture::GetSimpleTexutreCubeMap()
-    //{
-    //    GLuint texture_id;
-    //    // Six 1x1 RGB faces
-    //    GLubyte cubePixels[6][3] =
-    //    {
-    //        // Face 0 - Red
-    //        255, 0, 0,
-    //        // Face 1 - Green,
-    //        0, 255, 0,
-    //        // Face 2 - Blue
-    //        0, 0, 255,
-    //        // Face 3 - Yellow
-    //        255, 255, 0,
-    //        // Face 4 - Purple
-    //        255, 0, 255,
-    //        // Face 5 - White
-    //        255, 255, 255
-    //    };
-    //    
-    //    // Generate a texture object
-    //    glGenTextures(1, &texture_id);
-    //    
-    //    // Bind the texture object
-    //    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
-    //    // Load the cube face - Positive X
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[0]);
-    //    // Load the cube face - Negative X
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[1]);
-    //    // Load the cube face - Positive Y
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[2]);
-    //    // Load the cube face - Negative Y
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[3]);
-    //    // Load the cube face - Positive Z
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[4]);
-    //    // Load the cube face - Negative Z
-    //    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, 1, 1, 0,
-    //                 GL_RGB, GL_UNSIGNED_BYTE, &cubePixels[5]);
-    //    // Set the filtering mode
-    //    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    //    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    //    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    //    
-    //    glCheckError();
-    //    static Texture t(texture_id);
-    //    return t;
-    //}
-
-    GLuint CreateTexture(const std::string& path) {
+    GLuint CreateTexture(const std::string& path)
+    {
         int width, height, n;
         unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 4);
-        if (data == nullptr) {
+        if (data == nullptr)
+        {
             Debug::LogError("Texture not found, path: %s", path.c_str());
             abort();
         }
@@ -227,19 +185,23 @@ namespace FishEngine
     void Texture::FromFile(const std::string& path)
     {
         auto ext = getExtensionWithoutDot(path);
-        if (ext == "dds") {
-            m_texture = create_texture(path.c_str());
+        if (ext == "dds")
+        {
+            m_texture = CreateTextureFromDDS(path.c_str());
         }
-        else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga") {
+        else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga") 
+        {
             m_texture = CreateTexture(path);
         }
-        else {
+        else
+        {
             Debug::LogError("texture type[%s] not supported\n", ext.c_str());
             abort();
         }
     }
 
-    Texture::Texture(const std::string& path) {
+    Texture::Texture(const std::string& path)
+    {
         FromFile(path);
     }
 }

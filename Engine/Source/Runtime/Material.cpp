@@ -163,8 +163,9 @@ namespace FishEngine
         s_defaultMaterial = CreateMaterial();
         s_defaultMaterial->name() = "DefaultMaterial";
         s_defaultMaterial->SetShader(Shader::builtinShader("PBR"));
-        s_defaultMaterial->SetFloat("metallic", 0.5f);
-        s_defaultMaterial->SetFloat("roughness", 0.5f);
-        s_defaultMaterial->SetVector3("albedo", Vector3(1, 1, 1));
+        s_defaultMaterial->SetFloat("Metallic", 0);
+        s_defaultMaterial->SetFloat("Roughness", 0.5f);
+        s_defaultMaterial->SetFloat("Specular", 0.5f);
+        s_defaultMaterial->SetVector3("BaseColor", Vector3(1, 1, 1));
     }
 }

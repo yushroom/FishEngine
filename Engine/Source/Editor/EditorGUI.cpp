@@ -88,23 +88,14 @@ namespace FishEditor
 #endif
 
         ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->AddFontFromFileTTF((root_dir + "fonts/DroidSans.ttf").c_str(), 14.0f);
+        io.Fonts->AddFontFromFileTTF((root_dir + "fonts/DroidSans.ttf").c_str(), 15.0f);
         io.IniFilename = nullptr;
 
         ImGuiContext& g = *GImGui;
         ImGuiStyle& style = g.Style;
+#if 0
         style.FrameRounding = 2.f;
         style.WindowRounding = 0.f;
-        //style.Colors[ImGuiCol_Text]         = ImVec4(0, 0, 0, 1);
-        //style.Colors[ImGuiCol_Button]       = ImVec4(171/255.f, 204/255.f, 242/255.f, 1.f);
-        //style.Colors[ImGuiCol_ButtonHovered] = ImVec4(190 / 255.f, 224 / 255.f, 262 / 255.f, 1.f);
-        //style.Colors[ImGuiCol_ButtonActive] = ImVec4(181 / 255.f, 214 / 255.f, 232 / 255.f, 1.f);
-        //style.Colors[ImGuiCol_WindowBg]     = ImVec4(0.8f, 0.8f, 0.8f, 0.6f);
-        //style.Colors[ImGuiCol_MenuBarBg]    = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
-        //style.Colors[ImGuiCol_TitleBg]      = ImVec4(0.5f, 0.5f, 0.5f, 0.8f);
-        //style.Colors[ImGuiCol_PopupBg]      = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
-        //style.Colors[ImGuiCol_ComboBg]      = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
-
         style.Colors[ImGuiCol_Text] = ImVec4(1, 1, 1, 1);
         style.Colors[ImGuiCol_Button] = ImVec4(0, 0, 0, 1.f);
         style.Colors[ImGuiCol_ButtonHovered] = ImVec4(40 / 255.f, 40 / 255.f, 40 / 255.f, 1.f);
@@ -115,11 +106,70 @@ namespace FishEditor
         style.Colors[ImGuiCol_PopupBg] = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
         style.Colors[ImGuiCol_ComboBg] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
         style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(28 / 255.0f, 151 / 255.f, 234 / 255.0f, 1.f);
-        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0, 122/255.0f, 204/255.0f, 1.0f);
-        //style.Colors[ImGuiCol_Border] = ImVec4(0, 0, 0, 1);
-        //style.GrabRounding = 0.f;
-        //style.WindowTitleAlign = ImGuiAlign_Left | ImGuiAlign_VCenter;
-        //style.WindowMinSize = ImVec2(128, 128);
+        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0, 122 / 255.0f, 204 / 255.0f, 1.0f);
+#else
+        // dark theme, adapted from Cinder
+        //style.WindowMinSize = ImVec2(160, 20);
+        style.FramePadding = ImVec2(4, 2);
+        style.ItemSpacing = ImVec2(6, 2);
+        style.ItemInnerSpacing = ImVec2(6, 4);
+        style.Alpha = 0.95f;
+        //mStyle.WindowFillAlphaDefault = 1.0f;
+        style.WindowRounding = 4.0f;
+        style.FrameRounding = 2.0f;
+        style.IndentSpacing = 6.0f;
+        style.ItemInnerSpacing = ImVec2(2, 4);
+        style.ColumnsMinSpacing = 50.0f;
+        style.GrabMinSize = 14.0f;
+        style.GrabRounding = 16.0f;
+        style.ScrollbarSize = 12.0f;
+        style.ScrollbarRounding = 16.0f;
+
+        //style.Colors[ImGuiCol_Text] = ImVec4(0.86f, 0.93f, 0.89f, 0.61f);
+        style.Colors[ImGuiCol_Text] = ImVec4(1, 1, 1, 1);
+        style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.86f, 0.93f, 0.89f, 0.28f);
+        style.Colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.17f, 1.00f);
+        style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.20f, 0.22f, 0.27f, 0.58f);
+        style.Colors[ImGuiCol_Border] = ImVec4(0.31f, 0.31f, 1.00f, 0.00f);
+        style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        style.Colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+        style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_TitleBg] = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+        style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.20f, 0.22f, 0.27f, 0.75f);
+        style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.20f, 0.22f, 0.27f, 0.47f);
+        style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+        style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.47f, 0.77f, 0.83f, 0.21f);
+        style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+        style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_ComboBg] = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+        style.Colors[ImGuiCol_CheckMark] = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+        style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+        style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_Button] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.86f);
+        style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_Header] = ImVec4(0.92f, 0.18f, 0.29f, 0.76f);
+        style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.86f);
+        style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_Column] = ImVec4(0.47f, 0.77f, 0.83f, 0.32f);
+        style.Colors[ImGuiCol_ColumnHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+        style.Colors[ImGuiCol_ColumnActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.47f, 0.77f, 0.83f, 0.04f);
+        style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+        style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_CloseButton] = ImVec4(0.86f, 0.93f, 0.89f, 0.16f);
+        style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.86f, 0.93f, 0.89f, 0.39f);
+        style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+        style.Colors[ImGuiCol_PlotLines] = ImVec4(0.86f, 0.93f, 0.89f, 0.63f);
+        style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.86f, 0.93f, 0.89f, 0.63f);
+        style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+        style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.92f, 0.18f, 0.29f, 0.43f);
+        //style.Colors[ImGuiCol_TooltipBg] = ImVec4(0.47f, 0.77f, 0.83f, 0.72f);
+        style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.20f, 0.22f, 0.27f, 0.73f);
+#endif
 
         globalWindowFlags |= ImGuiWindowFlags_NoCollapse;
         globalWindowFlags |= ImGuiWindowFlags_NoResize;
@@ -977,20 +1027,26 @@ namespace FishEditor
     template<>
     void EditorGUI::OnInspectorGUI(const std::shared_ptr<Material>& material)
     {
-        if (ImGui::CollapsingHeader(material->m_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader(material->m_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+        {
             ImGui::Indent();
             auto& uniforms = material->m_shader->uniforms();
-            for (auto& u : uniforms) {
-                if (u.type == GL_FLOAT) {
+            for (auto& u : uniforms)
+            {
+                if (u.type == GL_FLOAT)
+                {
                     ImGui::SliderFloat(u.name.c_str(), &material->m_uniforms.floats[u.name], 0, 1);
                 }
-                else if (u.type == GL_FLOAT_VEC3) {
+                else if (u.type == GL_FLOAT_VEC3)
+                {
                     ImGui::InputFloat3(u.name.c_str(), material->m_uniforms.vec3s[u.name].data());
                 }
-                else if (u.type == GL_FLOAT_VEC4) {
+                else if (u.type == GL_FLOAT_VEC4)
+                {
                     ImGui::InputFloat4(u.name.c_str(), material->m_uniforms.vec4s[u.name].data());
                 }
-                else if (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE) {
+                else if (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE)
+                {
                     auto& tex = material->m_textures[u.name];
                     ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
                     ImGui::Image((void*)tex->GLTexuture(), ImVec2(64, 64));

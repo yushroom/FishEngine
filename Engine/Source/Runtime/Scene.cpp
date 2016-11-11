@@ -73,19 +73,13 @@ namespace FishEngine
 
     void Scene::RenderShadow(PLight& light)
     {
+#define DEBUG_SHADOW 0
         // get compact light frustum
         auto    camera          = Camera::mainGameCamera();
         //auto    world_to_camera = camera->transform()->worldToLocalMatrix();
         auto    camera_to_world = camera->transform()->localToWorldMatrix();
         Vector3 camera_pos      = camera->transform()->position();
         Vector3 light_dir       = light->transform()->forward();
-        
-//        Frustum view_frustum;  // in camera's local space
-//        //view_frustrum.center    = camera_pos;
-//        view_frustrum.aspect    = camera->aspect();
-//        view_frustrum.fov       = camera->fieldOfView();
-//        view_frustrum.minRange  = camera->nearClipPlane();
-//        view_frustrum.maxRange  = camera->farClipPlane();
         
         Frustum view_frustum = camera->frustum();
         
@@ -105,11 +99,13 @@ namespace FishEngine
             }
         }
         
+#if DEBUG_SHADOW
         Gizmos::setMatrix(camera_to_world);
         Gizmos::setColor(Color::cyan);
         Gizmos::DrawFrustum(view_frustum);
         Gizmos::setMatrix(Matrix4x4::identity);
-        
+#endif
+
         Matrix4x4 light_view_matrix = Matrix4x4::LookAt(camera_pos, camera_pos+light_dir, camera->transform()->up());
         Vector3 local_corners_of_view_frustum[8];
         view_frustum.getLocalCorners(local_corners_of_view_frustum);
@@ -123,25 +119,27 @@ namespace FishEngine
             aabb.Encapsulate(corner);
         }
         
+#if DEBUG_SHADOW
         // light frustum
         Gizmos::setMatrix(light_to_world);
         Gizmos::setColor(Color::magenta);
         Gizmos::DrawWireCube(aabb.center(), aabb.size());
         Gizmos::DrawLine(aabb.center(), aabb.center()+Vector3(0, 0, 1)*aabb.extents());
         Gizmos::setMatrix(Matrix4x4::identity);
-        
+#endif
         
         Vector3 new_light_position = aabb.center();
         new_light_position.z -= aabb.extents().z + light->shadowNearPlane();
         new_light_position = light_to_world.MultiplyPoint(new_light_position);
         
+#if DEBUG_SHADOW
         Gizmos::DrawWireSphere(new_light_position, 0.5f);
-        
+#endif
+
         light->m_viewMatrixForShadowMap = Matrix4x4::LookAt(new_light_position, new_light_position+light_dir, camera->transform()->up());
         //auto dir = light->m_viewMatrixForShadowMap.MultiplyVector(0, 0, 1);
         const auto& ext = aabb.extents();
         light->m_projectMatrixForShadowMap = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
-        
         
         //glCullFace(GL_FRONT);
         auto shadow_map_material = Material::builtinMaterial("ShadowMap");
@@ -199,6 +197,7 @@ namespace FishEngine
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+#undef DEBUG_SHADOW
     }
 
     void Scene::OnDrawGizmos()
@@ -335,7 +334,8 @@ namespace FishEngine
         PGameObject selected = nullptr;
         for (auto& go : m_gameObjects)
         {
-            if (go->transform()->parent() == nullptr)
+            //if (go->transform()->parent() == nullptr)
+            if (true)
             {
                 Bounds bound;
                 auto rend = go->GetComponent<MeshRenderer>();

@@ -259,7 +259,7 @@ namespace FishEditor
         {
             Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             auto go = Scene::IntersectRay(ray);
-            Selection::setSelectedGameObjectInHierarchy(go);
+            Selection::setActiveGameObject(go);
         }
         
 

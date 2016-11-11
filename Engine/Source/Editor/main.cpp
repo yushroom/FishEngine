@@ -5,118 +5,82 @@ using namespace std;
 using namespace FishEngine;
 using namespace FishEditor;
 
-//class TestPBR : public App
-//{
-//public:
-//
-//    virtual void Init() override {
-//        glCheckError();
-//#if FISHENGINE_PLATFORM_WINDOWS
-//        const std::string root_dir = "../../assets/";
-//#else
-//        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
-//#endif
-//        const std::string models_dir = root_dir + "models/";
-//        const std::string textures_dir = root_dir + "textures/";
-//        
-//        //auto mitsuba = Mesh::CreateFromObjFile(models_dir + "mitsuba-sphere.obj");
-//        ModelImporter importer;
-//        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
-//        mitsuba->CreateGameObject();
-//        //auto boblampclean = Mesh::CreateFromObjFile(models_dir + "boblampclean.md5mesh");
-//
-//        auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
-//        //auto sky_texture = Texture::CreateFromFile(textures_dir + "uffizi_cross_filtered_y.dds");
-//        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
-//        //auto head_diffuse = Texture::CreateFromFile(models_dir + "head/lambertian.jpg");
-//        //auto head_normalmap = Texture::CreateFromFile(models_dir + "head/NormalMap_RG16f_1024_mipmaps.dds");
-//        
-//        map<string, PTexture> textures;
-//        textures["skyTex"] = sky_texture;
-//        
-//        auto skyboxGO = Scene::CreateGameObject("SkyBox");
-//        skyboxGO->transform()->setLocalScale(20, 20, 20);
-//        auto meshFilter = make_shared<MeshFilter>(Model::builtinModel(PrimitiveType::Sphere) ->mainMesh());
-//        auto material = Material::builtinMaterial("SkyBox");
-//        material->BindTextures(textures);
-//        auto meshRenderer = make_shared<MeshRenderer>(material);
-//        skyboxGO->AddComponent(meshFilter);
-//        skyboxGO->AddComponent(meshRenderer);
-//        
-//        textures["AmbientCubemap"] = sky_texture;
-//
-//        
-//        auto group = Scene::CreateGameObject("Group");
-//        
-//        auto create_sphere = [&sphere, &textures, &group](
-//                                                //std::shared_ptr<GameObject>& parent,
-//                                                int x, int y) {
-//            auto go = Scene::CreateGameObject("Sphere");
-//            go->transform()->SetParent(group->transform());
-//            go->transform()->setLocalPosition(x*1.2f, y*1.2f, 0);
-//            //go->transform()->setPosition(0, 0, 2);
-//            go->transform()->setLocalEulerAngles(0, 30, 0);
-//            go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-//            auto meshFilter = make_shared<MeshFilter>(sphere);
-//            auto material = Material::builtinMaterial("PBR");
-//            material->BindTextures(textures);
-//            material->SetFloat("metallic", 0.1f*x);
-//            material->SetFloat("roughness", 0.1f*y);
-//            material->SetVector3("albedo", Vector3(1.f, 0.6f, 0.6f));
-//            auto meshRenderer = make_shared<MeshRenderer>(material);
-//            go->AddComponent(meshFilter);
-//            go->AddComponent(meshRenderer);
-//            //go->AddComponent(make_shared<DisplayMatrix>());
-//            //go->transform()->SetParent(parent->transform());
-//            return go;
-//        };
-//
-//        
-//        for (int x = 0; x < 11; ++x) {
-//            for (int y = 0; y < 11; y++) {
-//                create_sphere(x, y);
-//            }
-//        }
-//        //create_sphere(0, 0);
-//
-////        auto child0 = create_cube(go);
-////        auto child1 = create_cube(child0);
-////        auto child2 = create_cube(child1);
-//
-////        go = Scene::CreateGameObject("Plane");
-////        meshFilter = make_shared<MeshFilter>(plane);
-////        material = Material::builtinMaterial("Diffuse");
-////        textures.clear();
-////        textures["_MainTex"] = checkboard_texture;
-////        material->BindTextures(textures);
-////        meshRenderer = make_shared<MeshRenderer>(material);
-////        go->AddComponent(meshFilter);
-////        go->AddComponent(meshRenderer);
-//        //go->AddComponent(make_shared<VisualizeNormal>());
-//        //go->AddComponent(make_shared<DisplayMatrix>());
-//        
-//        auto cameraGO = Camera::mainGameCamera()->gameObject();
-//        cameraGO->transform()->setPosition(6, 6, -12);
-//        cameraGO->transform()->LookAt(6, 6, 0);
-//        //cameraGO->transform()->setPosition(0, 0, -5);
-//        //cameraGO->transform()->LookAt(0, 0, 0);
-//        //cameraGO->transform()->LookAt(0, 0, 0);
-//        cameraGO->AddComponent<ShowFPS>();
-//        cameraGO->AddComponent<TakeScreenShot>();
-//        //cameraGO->AddComponent(make_shared<RenderSettings>());
-//        //cameraGO->AddComponent(make_shared<DisplayMatrix>());
-//        cameraGO->AddComponent<EditorRenderSettings>();
-//        Selection::setActiveGameObject(cameraGO);
-//
-//        auto go = Scene::CreateGameObject("Directional Light");
-//        go->transform()->setPosition(6, 5, -10);
-//        go->transform()->LookAt(6, 0, 0);
-//        //go->transform()->setPosition(6, 5, -10);
-//        //go->transform()->LookAt(0, 0, 0);
-//        go->AddComponent(Light::Create());
-//        go->AddComponent<Rotator>();
-//    }
-//};
+class TestPBR : public App
+{
+public:
+
+    virtual void Init() override
+    {
+        DefaultScene();
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = "D:/program/FishEngine/Assets/";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+#endif
+        const std::string models_dir = root_dir + "models/";
+        const std::string textures_dir = root_dir + "textures/";
+        
+        //ModelImporter importer;
+        //importer.setImportNormals(ModelImporterNormals::Calculate);
+        //auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
+        //mitsuba->CreateGameObject();
+
+        auto radiance_map = Texture::CreateFromFile(R"(D:\program\github\Cinder-Experiments\common\textures\BolongaRadiance.dds)");
+        auto irradiance_map = Texture::CreateFromFile(R"(D:\program\github\Cinder-Experiments\common\textures\BolongaIrradiance.dds)");
+        
+        auto material = Material::defaultMaterial();
+        material->SetTexture("RadianceMap", radiance_map);
+        material->SetTexture("IrradianceMap", irradiance_map);
+
+        material = Material::builtinMaterial("SkyboxCubed");
+        material->SetTexture("_Tex", radiance_map);
+        material->SetVector4("_Tint", Vector4::one);
+        material->SetFloat("_Exposure", 1);
+        material->SetFloat("_Rotation", 0);
+        RenderSettings::setSkybox(material);
+        
+        auto group = Scene::CreateGameObject("Group");
+
+        for (int x = -5; x <= 5; ++x)
+        {
+            for (int y = -5; y <= 5; y++)
+            {
+                auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+                go->transform()->SetParent(group->transform());
+                go->transform()->setLocalPosition(x*1.2f, y*1.2f, 0);
+                go->transform()->setLocalEulerAngles(0, 30, 0);
+                go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+                auto material = Material::builtinMaterial("PBR");
+                material->SetFloat("Metallic", 0.1f*(x+5));
+                material->SetFloat("Roughness", 0.1f*(y+5));
+                material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
+                material->SetTexture("RadianceMap", radiance_map);
+                material->SetTexture("IrradianceMap", irradiance_map);
+                go->GetComponent<MeshRenderer>()->SetMaterial(material);
+            }
+        }
+    }
+};
+
+class TestCSM : public App
+{
+    virtual void Init() override
+    {
+        DefaultScene();
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string root_dir = R"(D:\program\FishEngine\Example\CascadedShadowMapping\)";
+#else
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+#endif
+        ModelImporter importer;
+        auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
+        auto terrainGO = model->CreateGameObject();
+        auto material = Material::builtinMaterial("Diffuse");
+        auto bakedAO = Texture::CreateFromFile(root_dir + "bakedAO.jpg");
+        material->setMainTexture(bakedAO);
+        terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    }
+};
 
 class SimpleTest : public App
 {
@@ -592,14 +556,15 @@ public:
  
 int main()
 {
-    //FishEditorWindow::AddApp(make_shared<TestPBR>());
+    FishEditorWindow::AddApp(make_shared<TestPBR>());
+    //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
-    FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());
+    //FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());
     FishEditorWindow::Init();
     //test();
     //shared_ptr<Object> p = make_shared<Camera>();

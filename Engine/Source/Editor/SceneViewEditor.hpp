@@ -2,6 +2,7 @@
 
 #include "FishEditor.hpp"
 #include "Vector3.hpp"
+#include "Vector2.hpp"
 
 namespace FishEditor
 {

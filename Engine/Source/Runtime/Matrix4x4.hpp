@@ -2,6 +2,7 @@
 #define Matrix4x4_hpp
 
 #include "Vector3.hpp"
+#include "Vector4.hpp"
 #include "Quaternion.hpp"
 
 namespace FishEngine {

@@ -570,6 +570,25 @@ public:
     }
 };
 
+
+class CharacterThirdPerson : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+        cout << "current working dir: " << boost::filesystem::current_path() << endl;
+#if FISHENGINE_PLATFORM_WINDOWS
+        const std::string sample_root_dir = "D:/program/FishEngine/Example/CharacterThirdPerson/";
+#else
+        const std::string sample_root_dir = "/Users/yushroom/program/graphics/FishEngine/Example/CharacterThirdPerson/";
+#endif
+        ModelImporter importer;
+        importer.setFileScale(0.01f);
+        auto model = importer.LoadFromFile(sample_root_dir + "Models/Ethan.fbx");
+        auto modelGO = model->CreateGameObject();
+    }
+};
  
 int main()
 {
@@ -577,9 +596,10 @@ int main()
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
+    FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());
     FishEditorWindow::Init();
     //test();
     //shared_ptr<Object> p = make_shared<Camera>();

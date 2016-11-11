@@ -61,6 +61,8 @@ namespace FishEditor
         static void DrawMainToolbar();
         static void DrawMainMenu();
 
+        static void GUIStyleTweakWindow();
+
         static bool s_locked;       // temp
 
         // hierarchy

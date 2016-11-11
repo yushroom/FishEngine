@@ -153,12 +153,12 @@ public:
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "../../assets/";
 #else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/Assets/";
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
         //const std::string chan_dir = models_dir + "UnityChan/";
-        const std::string chan_root_dir = root_dir + "../example/UnityChan/assets/";
+        const std::string chan_root_dir = root_dir + "../Example/UnityChan/assets/";
         
         auto sphere = Model::builtinModel(PrimitiveType::Sphere)->mainMesh();
         

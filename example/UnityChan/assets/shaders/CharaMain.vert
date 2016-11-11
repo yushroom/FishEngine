@@ -65,5 +65,3 @@ void vs_main(AppData appdata)
 
     vs_out.lightDir = WorldSpaceLightDir(appdata.position);
 }
-
-#include "AppDataTanMain.inc"

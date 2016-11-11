@@ -10,7 +10,8 @@ namespace FishEngine
 class Vector3
 {
 public:
-    union {
+    union
+    {
         struct { float x, y, z; };
         float m[3];
     };
@@ -22,39 +23,51 @@ public:
         Assert(!hasNaNs());
     }
     
-    Vector3(float* array) : x(array[0]), y(array[1]), z(array[2]) {}
+    Vector3(float* array)
+        : x(array[0]), y(array[1]), z(array[2])
+    {
+    }
 
-    Vector3() : Vector3(0, 0, 0) {
+    Vector3()
+        : Vector3(0, 0, 0)
+    {
 
     }
 
-    const float* data() const {
+    const float* data() const
+    {
         return m;
     }
 
-    float* data() {
+    float* data()
+    {
         return m;
     }
 
-    Vector3 normalized() const {
+    Vector3 normalized() const
+    {
         return Normalize(*this);
     }
 
-    float magnitude() const {
+    float magnitude() const
+    {
         return ::std::sqrtf(x*x + y*y + z*z);
     }
 
-    float sqrMagnitude() const {
+    float sqrMagnitude() const
+    {
         return x*x + y*y + z*z;
     }
 
-    void Set(float new_x, float new_y, float new_z) {
-        x = new_x;
-        y = new_y;
-        z = new_z;
+    void Set(float newX, float newY, float newZ)
+    {
+        x = newX;
+        y = newY;
+        z = newZ;
     }
 
-    void Scale(const Vector3& scale) {
+    void Scale(const Vector3& scale)
+    {
         x *= scale.x;
         y *= scale.y;
         z *= scale.z;

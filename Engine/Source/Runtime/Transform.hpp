@@ -41,7 +41,7 @@ namespace FishEngine
         // The global scale of the object(Read Only).
         Vector3 lossyScale() const
         {
-            auto p = m_parent.lock();
+            auto p = parent();
             if (p != nullptr)
                 return m_localScale * p->lossyScale();
             return m_localScale;
@@ -176,31 +176,36 @@ namespace FishEngine
             return m_localToWorldMatrix;
         }
 
-        void setLocalToWorldMatrix(const Matrix4x4& localToWorld) {
+        void setLocalToWorldMatrix(const Matrix4x4& localToWorld)
+        {
             m_localToWorldMatrix = localToWorld;
             Matrix4x4::Decompose(localToWorld, &m_localPosition, &m_localRotation, &m_localScale);
             MakeDirty();
         }
 
-        Matrix4x4 worldToLocalMatrix() const {
+        Matrix4x4 worldToLocalMatrix() const
+        {
             Update();
             return m_worldToLocalMatrix;
         }
 
 
         // direction (1, 0, 0) in world space.
-        Vector3 right() const {
-            return Vector3::Normalize(rotation() * Vector3(1, 0, 0));
+        Vector3 right() const
+        {
+            return Vector3::Normalize(rotation() * Vector3::right);
         }
 
         // direction (0, 1, 0) in world space
-        Vector3 up() const {
-            return Vector3::Normalize(rotation() * Vector3(0, 1, 0));
+        Vector3 up() const
+        {
+            return Vector3::Normalize(rotation() * Vector3::up);
         }
 
         // direction (0, 0, 1) in world space.
-        Vector3 forward() const {
-            return Vector3::Normalize(rotation() * Vector3(0, 0, 1));
+        Vector3 forward() const
+        {
+            return Vector3::Normalize(rotation() * Vector3::forward);
         }
 
         //void setForward(const Vector3& forward) {
@@ -213,9 +218,10 @@ namespace FishEngine
         void UpdateFast() const;
 
         // Rotates the transform so the forward vector points at /target/'s current position.
-        void LookAt(const Vector3& target, const Vector3& worldUp = Vector3(0, 1, 0));
+        void LookAt(const Vector3& target, const Vector3& worldUp = Vector3::up);
 
-        void LookAt(float x, float y, float z) {
+        void LookAt(float x, float y, float z)
+        {
             LookAt(Vector3(x, y, z));
         }
 

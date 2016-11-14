@@ -42,7 +42,20 @@ int main(int argc, char* argv[])
     std::string path = argv[1];
     auto ext = FishEngine::getExtensionWithoutDot(path);
 
-    if (ext == "vsfs")
+    if (ext == "surf")
+    {
+        try
+        {
+            Shader::LoadShaderSurface(path);
+        }
+        catch (exception)
+        {
+            return 1;
+        }
+        Debug::Log("OK");
+        return 0;
+    }
+    else if (ext == "vsfs")
     {
         try
         {
@@ -69,7 +82,8 @@ int main(int argc, char* argv[])
     }
     else
     {
-        Debug::LogError("Unknown shader type %d", ext.c_str());
+        Debug::LogError("Unknown shader type %s", ext.c_str());
+        return 1;
     }
 
     try

@@ -1,0 +1,121 @@
+#include <UnrealSupport.inc>
+#include <BRDF.inc>
+
+uniform vec3 BaseColor;
+uniform float Metallic;
+uniform float Roughness;
+uniform float Specular;
+
+uniform samplerCube RadianceMap;
+uniform samplerCube IrradianceMap;
+
+// http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+vec3 fix_cube_lookup( vec3 v, float cube_size, float lod )
+{
+    float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+    float scale = 1 - exp2(lod) / cube_size;
+    if (abs(v.x) != M) v.x *= scale;
+    if (abs(v.y) != M) v.y *= scale;
+    if (abs(v.z) != M) v.z *= scale;
+    return v;
+}
+
+
+float4 ImportanceSampleGGX( float2 E, float Roughness )
+{
+    float m = Roughness * Roughness;
+    float m2 = m * m;
+
+    float Phi = 2 * PI * E.x;
+    float CosTheta = sqrt( (1 - E.y) / ( 1 + (m2 - 1) * E.y ) );
+    float SinTheta = sqrt( 1 - CosTheta * CosTheta );
+
+    float3 H;
+    H.x = SinTheta * cos( Phi );
+    H.y = SinTheta * sin( Phi );
+    H.z = CosTheta;
+    
+    float d = ( CosTheta * m2 - CosTheta ) * CosTheta + 1;
+    float D = m2 / ( PI*d*d );
+    float PDF = D * CosTheta;
+
+    return float4( H, PDF );
+}
+
+
+float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 N, float3 V )
+{
+    float3 SpecularLighting = vec3(0);
+
+    const uint NumSamples = 32;
+    for( uint i = 0; i < NumSamples; i++ )
+    {
+        float2 E = Hammersley( i, NumSamples, Random );
+        float3 H = TangentToWorld( ImportanceSampleGGX( E, Roughness ).xyz, N );
+        float3 L = 2 * dot( V, H ) * H - V;
+
+        float NoV = saturate( dot( N, V ) );
+        float NoL = saturate( dot( N, L ) );
+        float NoH = saturate( dot( N, H ) );
+        float VoH = saturate( dot( V, H ) );
+        
+        if( NoL > 0 )
+        {
+            //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
+            float3 SampleColor = texture(RadianceMap, L).rgb;
+
+            float Vis = Vis_SmithJointApprox( Roughness, NoV, NoL );
+            float Fc = pow( 1 - VoH, 5 );
+            float3 F = (1 - Fc) * SpecularColor + Fc;
+
+            // Incident light = SampleColor * NoL
+            // Microfacet specular = D*G*F / (4*NoL*NoV) = D*Vis*F
+            // pdf = D * NoH / (4 * VoH)
+            SpecularLighting += SampleColor * F * ( NoL * Vis * (4 * VoH / NoH) );
+        }
+    }
+
+    return SpecularLighting / NumSamples;
+}
+
+// /*
+//  * Pseudo random number generator, based on "TEA, a tiny Encrytion Algorithm"
+//  * http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf
+//  * http://www.umbc.edu/~olano/papers/index.html#GPUTEA
+//  * @param v - old seed (full 32bit range)
+//  * @param IterationCount - >=1, bigger numbers cost more performance but improve quality
+//  * @return new seed
+//  */
+// uint2 ScrambleTEA(uint2 v, uint IterationCount = 3)
+// {
+//     // Start with some random data (numbers can be arbitrary but those have been used by others and seem to work well)
+//     uint k[4] ={ 0xA341316Cu , 0xC8013EA4u , 0xAD90777Du , 0x7E95761Eu };
+    
+//     uint y = v[0];
+//     uint z = v[1];
+//     uint sum = 0;
+    
+//     UNROLL for(uint i = 0; i < IterationCount; ++i)
+//     {
+//         sum += 0x9e3779b9;
+//         y += ((z << 4u) + k[0]) ^ (z + sum) ^ ((z >> 5u) + k[1]);
+//         z += ((y << 4u) + k[2]) ^ (y + sum) ^ ((y >> 5u) + k[3]);
+//     }
+
+//     return uint2(y, z);
+// }
+
+vec4 ps_main(SurfaceData surfaceData)
+{
+    vec4 outColor;
+    vec3 L = surfaceData.L;
+    vec3 V = surfaceData.V;
+    vec3 N = surfaceData.N;
+    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
+    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
+    float NoL = saturate( dot(N, L) );
+    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness, Roughness, Roughness), vec3(1), L, V, N, vec2(1));
+    outColor.rgb += SpecularIBL(uint2(311010, 3671), SpecularColor, Roughness, N, V);
+    outColor.a = 1;
+    return outColor;
+}

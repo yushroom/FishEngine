@@ -84,7 +84,7 @@ namespace FishEngine
         if (lights.size() > 0) {
             auto& l = lights.front();
             if (l->transform() != nullptr) {
-                textures["shadowMap"] = l->m_shadowMap;
+                textures["ShadowMap"] = l->m_shadowMap;
             }
         }
 

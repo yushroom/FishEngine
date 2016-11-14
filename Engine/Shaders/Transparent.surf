@@ -1,0 +1,7 @@
+/// Blend On
+uniform sampler2D _MainTex;
+
+vec4 ps_main(SurfaceData surfaceData)
+{
+    return texture(_MainTex, surfaceData.uv);
+}

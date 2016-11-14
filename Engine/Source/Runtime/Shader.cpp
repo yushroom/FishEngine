@@ -51,20 +51,25 @@ std::string ProcessInclude(const std::string& str)
 {
     const auto& include_dir = Resources::shaderRootDirectory() + "include/";
     auto result(str);
-    std::set<std::string> loaded_headers;
+    //std::set<std::string> loaded_headers;
     auto pos = result.find("#include", 0);
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         auto pos2 = result.find("\n", pos);
         if (pos2 == std::string::npos)
             pos2 = result.size();
         std::string filename = result.substr(pos+8+2, pos2-pos-8-2-1);
-        if (loaded_headers.find(filename) == loaded_headers.end()) {
-            loaded_headers.insert(filename);
-            auto include_file = ReadFile(include_dir + filename);
-            result = result.substr(0, pos) + include_file + result.substr(pos2);
-        } else {
-            result = result.substr(0, pos) + result.substr(pos2);
-        }
+//        if (loaded_headers.find(filename) == loaded_headers.end())
+//        {
+//            loaded_headers.insert(filename);
+//            auto include_file = ReadFile(include_dir + filename);
+//            result = result.substr(0, pos) + include_file + result.substr(pos2);
+//        } else
+//        {
+//            result = result.substr(0, pos) + result.substr(pos2);
+//        }
+        auto include_file = ReadFile(include_dir + filename);
+        result = result.substr(0, pos) + include_file + result.substr(pos2);
         pos = result.find("#include", pos);
     }
     return result;
@@ -190,6 +195,31 @@ GLuint Shader::LoadShaderCombined(const std::string& filePath)
     return LinkShader(vs, 0, 0, 0, fs);
 }
 
+const static std::string SurfaceShaderVSTemplate = R"(
+#include <CGSupport.inc>
+#define USE_DEFAULT_VS
+#include "AppData.inc"
+)";
+
+const static std::string SurfaceShaderPSTemplate = R"(
+#include <CGSupport.inc>
+#include <FragmentShaderShadow.inc>
+//uniform sampler2D _MainTex;
+)";
+
+
+GLuint Shader::LoadShaderSurface(const std::string& filePath)
+{
+    auto shaderStr = ProcessInclude(ReadFile(filePath));
+    Debug::Log("Compile vertex shader...");
+    auto vs_str = ProcessInclude(SurfaceShaderVSTemplate);
+    auto vs = CompileShader(GL_VERTEX_SHADER, vs_str);
+    Debug::Log("Compile fragment shader...");
+    auto ps_str = ProcessInclude(SurfaceShaderPSTemplate) + "\n" + shaderStr;
+    auto ps = CompileShader(GL_FRAGMENT_SHADER, ps_str);
+    return LinkShader(vs, 0, 0, 0, ps);
+}
+
 
 const char* GLenumToString(GLenum e)
 {
@@ -236,11 +266,11 @@ namespace FishEngine {
         return s;
     }
 
-    PShader Shader::CreateFromFile(const std::string& vsfs_path)
+    PShader Shader::CreateFromFile(const std::string& path)
     {
-        Debug::Log("Compiling %s", vsfs_path.c_str());
+        Debug::Log("Compiling %s", path.c_str());
         auto s = std::make_shared<Shader>();
-        s->FromFile(vsfs_path);
+        s->FromFile(path);
         return s;
     }
     
@@ -260,23 +290,12 @@ namespace FishEngine {
     
     void Shader::FromString(const std::string& vsfs_str)
     {
-        auto& shaderStr = vsfs_str;
-        auto vs_shader = "#version 410\n#define VERTEX_SHADER 1\n" + ProcessInclude(shaderStr);
-        auto fs_shader = "#version 410\n#define FRAGMENT_SHADER 1\n" + ProcessInclude(shaderStr);
-        
-        Debug::Log("Compile vertex shader...");
-        GLuint vs = CompileShader(GL_VERTEX_SHADER, vs_shader);
-        Debug::Log("Compile fragment shader...");
-        GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fs_shader);
-        m_program = LinkShader(vs, 0, 0, 0, fs);
-        GetAllUniforms();
-        map<string, string> settings = { { "Cull", "Back" },{ "ZWrite", "On" },{ "Blend", "Off" },{ "ZTest", "Less" } };
-        ExtractSettings(vsfs_str, settings);
-        m_cullface = ToEnum<Cullface>(settings["Cull"]);
-        m_ZWrite = settings["ZWrite"] == "On";
-        m_blend = settings["Blend"] == "On";
-        glDeleteShader(vs);
-        glDeleteShader(fs);
+        FromString(vsfs_str, vsfs_str);
+    }
+    
+    void Shader::FromSurfaceShaderString(const std::string& surfaceShaderString)
+    {
+        FromString(SurfaceShaderVSTemplate, SurfaceShaderPSTemplate+"\n"+surfaceShaderString);
     }
 
     void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
@@ -323,10 +342,10 @@ namespace FishEngine {
         m_ZWrite = settings["ZWrite"] == "On";
         m_blend = settings["Blend"] == "On";
 
-        vs = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n" + parsed_vs);
+        vs = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n" + parsed_vs);
         if (hasSkinnedVersion)
-            vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define SKINNED\n" + parsed_vs);
-        fs = CompileShader(GL_FRAGMENT_SHADER, "#version 410 core\n" + parsed_fs);
+            vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n#define SKINNED\n" + parsed_vs);
+        fs = CompileShader(GL_FRAGMENT_SHADER, "#version 410\n#define FRAGMENT_SHADER 1\n" + parsed_fs);
 
         // gs
         if (use_gs) {
@@ -361,11 +380,19 @@ namespace FishEngine {
         }
     }
     
-    void Shader::FromFile(const std::string& vsfs_path)
+    void Shader::FromFile(const std::string& path)
     {
         assert(m_program == 0);
         //FromString(readFile(vs_path), readFile(fs_path));
-        FromString(ReadFile(vsfs_path));
+        auto ext = getExtensionWithoutDot(path);
+        const auto& str = ReadFile(path);
+        if (ext == "vsfs")
+            FromString(str);
+        else if (ext == "surf")
+            FromSurfaceShaderString(str);
+        else {
+            Debug::LogError("Unknown shader type: %s", path.c_str());
+        }
     }
 
     void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)
@@ -629,22 +656,21 @@ namespace FishEngine {
         const auto& root_dir = Resources::shaderRootDirectory();
         Debug::Log("Compile shader: VisualizeNormal");
         m_builtinShaders["VisualizeNormal"] = Shader::CreateFromFile(root_dir + "VisualizeNormal.vert", root_dir + "VisualizeNormal.frag", root_dir + "VisualizeNormal.geom");
-        for (auto& n : { "PBR", "VertexLit", "ShadowMap", "Diffuse", "ScreenTexture", "SolidColor", "Outline" }) {
+        for (auto& n : { "VertexLit", "ShadowMap", "ScreenTexture", "SolidColor", "Outline" })
+        {
             Debug::Log("Compile shader: %s", n);
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".vert", root_dir + n + ".frag");
         }
-        Debug::Log("Compile shader: Texture");
-        m_builtinShaders["Texture"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Texture.frag");
-        Debug::Log("Compile shader: TextureDoubleSided");
-        m_builtinShaders["TextureDoubleSided"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "TextureDoubleSided.frag");
-        Debug::Log("Compile shader: Transparent");
-        m_builtinShaders["Transparent"] = Shader::CreateFromFile(root_dir + "PBR.vert", root_dir + "Transparent.frag");
-        
+        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse" })
+        {
+            Debug::Log("Compile shader: %s", n);
+            m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".surf");
+        }
+
         m_builtinShaders["NormalMap"]           = Shader::CreateFromFile(root_dir + "NormalMap.vsfs");
         m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
         m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.vsfs");
         m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir + "Editor/Alpha.vsfs");
-        GLuint skinnVS = LoadShader(GL_VERTEX_SHADER, root_dir+"SkinnedPass.vert");
     }
 }

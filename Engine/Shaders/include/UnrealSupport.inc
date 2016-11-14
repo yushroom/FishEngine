@@ -2,7 +2,6 @@
 #define UnrealSupport_inc
 
 #include <CGSupport.inc>
-#include <HLSLSupport.inc>
 
 #define ReverseBits32(x) bitfieldReverse(x)
 
@@ -66,6 +65,5 @@ float Pow5(float x)
 float rcp(float x) {
     return 1.0f / x;
 }
-
 
 #endif // UnrealSupport_inc

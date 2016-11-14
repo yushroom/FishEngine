@@ -1,12 +1,11 @@
+#ifndef BRDF_inc
+#define BRDF_inc
+
+#include <UnrealSupport.inc>
+
 float3 Diffuse_Lambert( float3 DiffuseColor )
 {
     return DiffuseColor * (1 / PI);
-}
-
-float Pow5(float Value)
-{
-    float Value2 = Value*Value;
-    return Value2*Value2*Value;
 }
 
 // [Burley 2012, "Physically-Based Shading at Disney"]
@@ -59,14 +58,14 @@ float3 Diffuse_Gotanda( float3 DiffuseColor, float Roughness, float NoV, float N
 #endif
 }
 
-// [Blinn 1977, "Models of light reflection for computer synthesized pictures"]
-float D_Blinn( float Roughness, float NoH )
-{
-    float a = Roughness * Roughness;
-    float a2 = a * a;
-    float n = 2 / a2 - 2;
-    return (n+2) / (2*PI) * PhongShadingPow( NoH, n );      // 1 mad, 1 exp, 1 mul, 1 log
-}
+// // [Blinn 1977, "Models of light reflection for computer synthesized pictures"]
+// float D_Blinn( float Roughness, float NoH )
+// {
+//     float a = Roughness * Roughness;
+//     float a2 = a * a;
+//     float n = 2 / a2 - 2;
+//     return (n+2) / (2*PI) * PhongShadingPow( NoH, n );      // 1 mad, 1 exp, 1 mul, 1 log
+// }
 
 // [Beckmann 1963, "The scattering of electromagnetic waves from rough surfaces"]
 float D_Beckmann( float Roughness, float NoH )
@@ -179,35 +178,35 @@ float3 F_Fresnel( float3 SpecularColor, float VoH )
 // EnvBRDF
 //---------------
 
-Texture2D       PreIntegratedGF;
-SamplerState    PreIntegratedGFSampler;
+// Texture2D       PreIntegratedGF;
+// SamplerState    PreIntegratedGFSampler;
 
-half3 EnvBRDF( half3 SpecularColor, half Roughness, half NoV )
-{
-    // Importance sampled preintegrated G * F
-    float2 AB = Texture2DSampleLevel( PreIntegratedGF, PreIntegratedGFSampler, float2( NoV, Roughness ), 0 ).rg;
+// half3 EnvBRDF( half3 SpecularColor, half Roughness, half NoV )
+// {
+//     // Importance sampled preintegrated G * F
+//     float2 AB = Texture2DSampleLevel( PreIntegratedGF, PreIntegratedGFSampler, float2( NoV, Roughness ), 0 ).rg;
 
-    // Anything less than 2% is physically impossible and is instead considered to be shadowing 
-    float3 GF = SpecularColor * AB.x + saturate( 50.0 * SpecularColor.g ) * AB.y;
-    return GF;
-}
+//     // Anything less than 2% is physically impossible and is instead considered to be shadowing 
+//     float3 GF = SpecularColor * AB.x + saturate( 50.0 * SpecularColor.g ) * AB.y;
+//     return GF;
+// }
 
 half3 EnvBRDFApprox( half3 SpecularColor, half Roughness, half NoV )
 {
     // [ Lazarov 2013, "Getting More Physical in Call of Duty: Black Ops II" ]
     // Adaptation to fit our G term.
-    const half4 c0 = { -1, -0.0275, -0.572, 0.022 };
-    const half4 c1 = { 1, 0.0425, 1.04, -0.04 };
+    const half4 c0 = half4( -1, -0.0275, -0.572, 0.022 );
+    const half4 c1 = half4( 1, 0.0425, 1.04, -0.04 );
     half4 r = Roughness * c0 + c1;
     half a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
     half2 AB = half2( -1.04, 1.04 ) * a004 + r.zw;
 
-#if !(ES2_PROFILE || ES3_1_PROFILE)
+//#if !(ES2_PROFILE || ES3_1_PROFILE)
     // Anything less than 2% is physically impossible and is instead considered to be shadowing
     // In ES2 this is skipped for performance as the impact can be small
     // Note: this is needed for the 'specular' show flag to work, since it uses a SpecularColor of 0
     AB.y *= saturate( 50.0 * SpecularColor.g );
-#endif
+//#endif
 
     return SpecularColor * AB.x + AB.y;
 }
@@ -215,45 +214,32 @@ half3 EnvBRDFApprox( half3 SpecularColor, half Roughness, half NoV )
 half EnvBRDFApproxNonmetal( half Roughness, half NoV )
 {
     // Same as EnvBRDFApprox( 0.04, Roughness, NoV )
-    const half2 c0 = { -1, -0.0275 };
-    const half2 c1 = { 1, 0.0425 };
+    const half2 c0 = half2( -1, -0.0275 );
+    const half2 c1 = half2( 1, 0.0425 );
     half2 r = Roughness * c0 + c1;
     return min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
 }
 
 
-float D_InvBlinn( float Roughness, float NoH )
+// @param DiffSpecMask .r: diffuse, .g:specular e.g. float2(1,1) for both, float2(1,0) for diffuse only
+float3 StandardShading( float3 DiffuseColor, float3 SpecularColor, float3 LobeRoughness, float3 LobeEnergy, float3 L, float3 V, half3 N, float2 DiffSpecMask )
 {
-    float m = Roughness * Roughness;
-    float m2 = m * m;
-    float A = 4;
-    float Cos2h = NoH * NoH;
-    float Sin2h = 1 - Cos2h;
-    //return rcp( PI * (1 + A*m2) ) * ( 1 + A * ClampedPow( Sin2h, 1 / m2 - 1 ) );
-    return rcp( PI * (1 + A*m2) ) * ( 1 + A * exp( -Cos2h / m2 ) );
+    float3 H = normalize(V + L);
+    float NoL = saturate( dot(N, L) );
+    float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
+    float NoH = saturate( dot(N, H) );
+    float VoH = saturate( dot(V, H) );
+    
+    // Generalized microfacet specular
+    float D = D_GGX( LobeRoughness[1], NoH ) * LobeEnergy[1];
+    float Vis = Vis_SmithJointApprox( LobeRoughness[1], NoV, NoL );
+    float3 F = F_Schlick( SpecularColor, VoH );
+
+    float3 Diffuse = Diffuse_Lambert( DiffuseColor );
+    //float3 Diffuse = Diffuse_Burley( DiffuseColor, LobeRoughness[1], NoV, NoL, VoH );
+    //float3 Diffuse = Diffuse_OrenNayar( DiffuseColor, LobeRoughness[1], NoV, NoL, VoH );
+    
+    return Diffuse * (LobeEnergy[2] * DiffSpecMask.r) + (D * Vis * DiffSpecMask.g) * F;
 }
 
-float D_InvBeckmann( float Roughness, float NoH )
-{
-    float m = Roughness * Roughness;
-    float m2 = m * m;
-    float A = 4;
-    float Cos2h = NoH * NoH;
-    float Sin2h = 1 - Cos2h;
-    float Sin4h = Sin2h * Sin2h;
-    return rcp( PI * (1 + A*m2) * Sin4h ) * ( Sin4h + A * exp( -Cos2h / (m2 * Sin2h) ) );
-}
-
-float D_InvGGX( float Roughness, float NoH )
-{
-    float a = Roughness * Roughness;
-    float a2 = a * a;
-    float A = 4;
-    float d = ( NoH - a2 * NoH ) * NoH + a2;
-    return rcp( PI * (1 + A*a2) ) * ( 1 + 4 * a2*a2 / ( d*d ) );
-}
-
-float Vis_Cloth( float NoV, float NoL )
-{
-    return rcp( 4 * ( NoL + NoV - NoL * NoV ) );
-}
+#endif // BRDF_inc

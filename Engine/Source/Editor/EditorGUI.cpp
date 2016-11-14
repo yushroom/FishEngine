@@ -1045,7 +1045,7 @@ namespace FishEditor
                 {
                     ImGui::InputFloat4(u.name.c_str(), material->m_uniforms.vec4s[u.name].data());
                 }
-                else if (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE)
+                else if (u.type == GL_SAMPLER_2D)
                 {
                     auto& tex = material->m_textures[u.name];
                     ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());

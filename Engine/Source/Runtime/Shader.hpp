@@ -149,13 +149,14 @@ namespace FishEngine
 
         static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
 
-        static PShader CreateFromFile(const std::string& vsfs_path);
+        static PShader CreateFromFile(const std::string& path);
         
         static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path);
 
         static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
 
         void FromString(const std::string& vsfs_str);
+        void FromSurfaceShaderString(const std::string& surfaceShaderString);
         void FromString(const std::string& vs_str, const std::string& fs_str);
         void FromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
         void FromString(
@@ -164,7 +165,8 @@ namespace FishEngine
             const std::string& tes_str,
             const std::string& gs_str,
             const std::string& fs_str);
-        void FromFile(const std::string& vsfs_path);
+        // vsfs or surface
+        void FromFile(const std::string& path);
         void FromFile(const std::string& vs_path, const std::string& fs_path);
         void FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
         //Shader(const std::string& vs_path, const std::string ps_path);
@@ -217,6 +219,7 @@ namespace FishEngine
         static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
 
         static GLuint LoadShaderCombined(const std::string& filePath);
+        static GLuint LoadShaderSurface(const std::string& filePath);
         
         bool IsTransparent() const {
             return m_blend;

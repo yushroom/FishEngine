@@ -14,44 +14,48 @@ public:
         DefaultScene();
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "D:/program/FishEngine/Assets/";
+        const std::string skybox_dir = R"(D:\program\github\Cinder-Experiments\common\textures\)";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+        const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-        
-        //ModelImporter importer;
-        //importer.setImportNormals(ModelImporterNormals::Calculate);
-        //auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
-        //mitsuba->CreateGameObject();
-
-        auto radiance_map = Texture::CreateFromFile(R"(D:\program\github\Cinder-Experiments\common\textures\BolongaRadiance.dds)");
-        auto irradiance_map = Texture::CreateFromFile(R"(D:\program\github\Cinder-Experiments\common\textures\BolongaIrradiance.dds)");
+                
+        auto radiance_map = Texture::CreateFromFile(skybox_dir+"BolongaRadiance.dds");
+        auto irradiance_map = Texture::CreateFromFile(skybox_dir+"BolongaIrradiance.dds");
         
         auto material = Material::defaultMaterial();
         material->SetTexture("RadianceMap", radiance_map);
         material->SetTexture("IrradianceMap", irradiance_map);
-
+        
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
         material->SetVector4("_Tint", Vector4::one);
         material->SetFloat("_Exposure", 1);
         material->SetFloat("_Rotation", 0);
         RenderSettings::setSkybox(material);
-        
+
+//        ModelImporter importer;
+//        importer.setImportNormals(ModelImporterNormals::Calculate);
+//        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
+//        mitsuba->CreateGameObject();
+#if 0
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = -5; x <= 5; ++x)
+        for (int x = 0; x <= 1; ++x)
         {
             for (int y = -5; y <= 5; y++)
             {
                 auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
                 go->transform()->SetParent(group->transform());
-                go->transform()->setLocalPosition(x*1.2f, y*1.2f, 0);
+                go->transform()->setLocalPosition(y*1.2f, x*1.2f, 0);
                 go->transform()->setLocalEulerAngles(0, 30, 0);
                 go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-                auto material = Material::builtinMaterial("PBR");
-                material->SetFloat("Metallic", 0.1f*(x+5));
+                auto material = (x == 0) ?
+                    Material::builtinMaterial("PBR") :
+                    Material::builtinMaterial("PBR-Reference");
+                //material->SetFloat("Metallic", x);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
                 material->SetTexture("RadianceMap", radiance_map);
@@ -59,6 +63,26 @@ public:
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
+#endif
+        const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
+        
+        auto albedo_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_alb.tga");
+        auto mask_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_mask.tga");
+        auto gloss_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_g.tga");
+        auto normal_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_n.tga");
+
+        auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
+        material = Material::CreateMaterial();
+        material->SetShader(shader);
+        material->SetFloat("Specular", 0.5f);
+        material->SetTexture("AlbedoMap", albedo_map);
+        material->SetTexture("GlossMap", gloss_map);
+        material->SetTexture("MaskMap", mask_map);
+        material->SetTexture("NormalMap", normal_map);
+        material->SetTexture("RadianceMap", radiance_map);
+        material->SetTexture("IrradianceMap", irradiance_map);
+        auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+        go->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 };
 

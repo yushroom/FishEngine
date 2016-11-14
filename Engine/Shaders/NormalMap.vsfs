@@ -1,4 +1,5 @@
-struct VS_OUT {
+struct VS_OUT
+{
     vec3 normal;
     vec3 tangent;
     vec2 uv;

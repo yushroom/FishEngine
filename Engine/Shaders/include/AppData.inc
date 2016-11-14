@@ -1,10 +1,11 @@
 #ifndef AppData_inc
 #define AppData_inc
 
-#include "CG.inc"
+#include <CG.inc>
 
 layout (location = PositionIndex) 	in vec3 InputPositon;
 layout (location = NormalIndex) 	in vec3 InputNormal;
+layout (location = TangentIndex)    in vec3 InputTangent;
 layout (location = UVIndex) 		in vec2 InputUV;
 #ifdef SKINNED
 	layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
@@ -14,20 +15,35 @@ layout (location = UVIndex) 		in vec2 InputUV;
 	uniform mat4 BoneTransformations[MAX_BONE_SIZE];
 #endif
 
-struct AppData {
+struct AppData
+{
     vec4 position;
     vec3 normal;
+    vec3 tangent;
     vec2 uv;
 };
 
-out VS_OUT {
+out VS_OUT
+{
 	vec3 position;		// in world space
 	vec3 normal;		// in world space
+    vec3 tangent;
 	vec2 uv;
-	vec4 positionInLightSpace; // light space
+	//vec4 positionInLightSpace; // light space
 } vs_out;
 
-void vs_main(AppData appdata);
+#ifdef USE_DEFAULT_VS
+    void vs_main(AppData appdata)
+    {
+        gl_Position     = MATRIX_MVP * appdata.position;
+        vs_out.position = (MATRIX_M * appdata.position).xyz;
+        vs_out.normal   = normalize(mat3(MATRIX_IT_M) * appdata.normal);
+        vs_out.tangent  = normalize(mat3(MATRIX_IT_M) * appdata.tangent);
+        vs_out.uv       = appdata.uv;
+    }
+#else   // !USE_DEFAULT_VS
+    void vs_main(AppData appdata);
+#endif  // USE_DEFAULT_VS
 
 void main()
 {
@@ -39,19 +55,21 @@ void main()
 	boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
     appdata.position	= boneTransformation * vec4(InputPositon, 1);
     appdata.normal      = mat3(boneTransformation) * InputNormal;
-#else
+    appdata.tangent     = mat3(boneTransformation) * InputTangent;
+#else // !SKINNED
 	appdata.position	= vec4(InputPositon, 1);
     appdata.normal      = InputNormal;
-#endif
+    appdata.tangent     = InputTangent;
+#endif // SKINNED
     appdata.uv			= InputUV;
 
-    vec4 posW			= MATRIX_M * appdata.position;
-    vs_out.position     = posW.xyz;
-    vs_out.positionInLightSpace = LightMatrix0 * posW;
+    //vec4 posW			= MATRIX_M * appdata.position;
+    //vs_out.position     = posW.xyz;
+    //vs_out.positionInLightSpace = LightMatrix0 * posW;
 
     vs_main(appdata);
 }
 
-#endif //AppData_inc
+#endif // AppData_inc
 
 // your implementation of vs_main

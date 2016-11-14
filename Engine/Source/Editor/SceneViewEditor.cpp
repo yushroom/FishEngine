@@ -45,7 +45,7 @@ namespace FishEditor
         m_cameraGameObject->transform()->LookAt(0, 0, 0);
         //m_cameraGameObject->SetTag("MainCamera");
 
-        sceneGizmoMaterial = Material::builtinMaterial("VertexLit");
+        sceneGizmoMaterial = Material::builtinMaterial("VertexLit-Internal");
         cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
@@ -348,7 +348,7 @@ namespace FishEditor
 
         auto shader = sceneGizmoMaterial->shader();
         shader->Use();
-        sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
+        //sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
         auto view = camera->worldToCameraMatrix();
         auto proj = camera->projectionMatrix();
         auto vp = proj * view;
@@ -372,11 +372,14 @@ namespace FishEditor
             Vector3 pos = center + axis[i] * translate_gizmo_length;
             Quaternion rot = Quaternion::FromToRotation(Vector3::up, axis[i]);
             model.SetTRS(pos, rot, Vector3(1, 1.5, 1) * 0.015f);
-            Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
-            Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
-            Pipeline::BindPerDrawUniforms();
+            //Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
+            //Pipeline::perDrawUniformData.MATRIX_IT_MV = (view*model).inverse().transpose();
+            //Pipeline::perDrawUniformData.MATRIX_M = model;
+            //Pipeline::BindPerDrawUniforms();
             Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f + j);
             sceneGizmoMaterial->SetVector3("_Color", color);
+            sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * model);
+            sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view*model).inverse().transpose());
             shader->Use();
             shader->PreRender();
             sceneGizmoMaterial->Update();
@@ -589,7 +592,7 @@ namespace FishEditor
         shader->Use();
 
         Vector3 camera_pos(0, 0, -5);
-        sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
+        //sceneGizmoMaterial->SetVector3("unity_LightPosition", camera_pos.normalized());
         auto camera = Camera::main();
         auto view = Matrix4x4::LookAt(camera_pos, Vector3(0, 0, 0), Vector3(0, 1, 0));
         auto proj = camera->m_orthographic ? Matrix4x4::Ortho(-2, 2, -2, 2, 1, 10) : Matrix4x4::Perspective(45, 1, 0.3f, 10.f);
@@ -652,9 +655,13 @@ namespace FishEditor
             auto modelMat = model * t.localToWorldMatrix() * s;
             //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*modelMat);
             //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view * modelMat).transpose().inverse());
-            Pipeline::perDrawUniformData.MATRIX_MVP = vp*modelMat;
-            Pipeline::perDrawUniformData.MATRIX_IT_MV = (view * modelMat).transpose().inverse();
-            Pipeline::BindPerDrawUniforms();
+            //Pipeline::perDrawUniformData.MATRIX_MVP = vp*modelMat;
+            //Pipeline::perDrawUniformData.MATRIX_IT_MV = (view * modelMat).inverse().transpose();
+            //Pipeline::perDrawUniformData.MATRIX_M = modelMat;
+            //Pipeline::BindPerDrawUniforms();
+            sceneGizmoMaterial->SetVector3("_Color", color);
+            sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * modelMat);
+            sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view*modelMat).inverse().transpose());
             sceneGizmoMaterial->SetVector3("_Color", color);
             sceneGizmoMaterial->Update();
             coneMesh->Render();
@@ -670,9 +677,13 @@ namespace FishEditor
         }
         interested = interested || interested6;
 
-        Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = view*model;
-        Pipeline::BindPerDrawUniforms();
+        //Pipeline::perDrawUniformData.MATRIX_MVP = vp*model;
+        //Pipeline::perDrawUniformData.MATRIX_IT_MV = (view*model).inverse().transpose();
+        //Pipeline::perDrawUniformData.MATRIX_M = model;
+        //Pipeline::BindPerDrawUniforms();
+        //sceneGizmoMaterial->SetVector3("_Color", color);
+        sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * model);
+        sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view*model).inverse().transpose());
         //sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp*model);
         //sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", view*model);
         sceneGizmoMaterial->SetVector3("_Color", interested6 ? Vector3(1, 1, 0) : Vector3(1, 1, 1));

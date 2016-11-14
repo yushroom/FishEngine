@@ -145,7 +145,7 @@ float Vis_SmithJointApprox( float Roughness, float NoV, float NoL )
     float a = Square( Roughness );
     float Vis_SmithV = NoL * ( NoV * ( 1 - a ) + a );
     float Vis_SmithL = NoV * ( NoL * ( 1 - a ) + a );
-    return 0.5 * rcp( Vis_SmithV + Vis_SmithL );
+    return 0.5 * rcp( Vis_SmithV + Vis_SmithL + 1e-5);
 }
 
 float3 F_None( float3 SpecularColor )

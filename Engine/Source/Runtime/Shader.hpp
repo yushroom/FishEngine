@@ -241,11 +241,15 @@ namespace FishEngine
         Cullface m_cullface = Cullface::Back;
         bool m_ZWrite = true;
         bool m_blend = false;
+        bool m_applyNormalMap = false;
+        bool m_receiveShadow = true;
 
         friend class RenderSystem;
 
         //static std::string m_shaderVariables;
         static std::map<std::string, PShader> m_builtinShaders;
+
+        //static std::map<std::string, std::string> m_fileToShaderString;
     };
 }
 

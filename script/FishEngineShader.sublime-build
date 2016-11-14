@@ -1,5 +1,5 @@
 {
-	"shell_cmd": "D:/program/FishEngine/project/vs2015/Debug/ShaderCompiler.exe 0 \"$file\"",
+	"shell_cmd": "D:/program/FishEngine/Engine/Binary/Release/ShaderCompiler.exe \"$file\"",
 	"selector": "source.vert",
 	"encoding": "UTF-8"
 }

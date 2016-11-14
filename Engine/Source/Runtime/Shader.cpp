@@ -16,8 +16,15 @@ using namespace std;
 using namespace FishEngine;
 
 
+std::map<std::string, std::string> pathToShaderString;
+
 std::string ReadFile(const std::string& path)
 {
+    auto it = pathToShaderString.find(path);
+    if (it != pathToShaderString.end())
+    {
+        return it->second;
+    }
     std::ifstream fin(path);
     if (!fin.is_open()) {
         FishEngine::Debug::LogError("Can not open shader header file: %s", path.c_str());
@@ -25,7 +32,9 @@ std::string ReadFile(const std::string& path)
     }
     std::stringstream sstream;
     sstream << fin.rdbuf();
-    return sstream.str();
+    const auto& str = sstream.str();
+    pathToShaderString[path] = str;
+    return str;
 }
 
 
@@ -212,10 +221,10 @@ GLuint Shader::LoadShaderSurface(const std::string& filePath)
 {
     auto shaderStr = ProcessInclude(ReadFile(filePath));
     Debug::Log("Compile vertex shader...");
-    auto vs_str = ProcessInclude(SurfaceShaderVSTemplate);
+    auto vs_str = ProcessInclude("#version 410\n#define VERTEX_SHADER 1\n" + SurfaceShaderVSTemplate);
     auto vs = CompileShader(GL_VERTEX_SHADER, vs_str);
     Debug::Log("Compile fragment shader...");
-    auto ps_str = ProcessInclude(SurfaceShaderPSTemplate) + "\n" + shaderStr;
+    auto ps_str = ProcessInclude("#version 410\n#define FRAGMENT_SHADER 1\n" + SurfaceShaderPSTemplate) + "\n" + shaderStr;
     auto ps = CompileShader(GL_FRAGMENT_SHADER, ps_str);
     return LinkShader(vs, 0, 0, 0, ps);
 }
@@ -327,7 +336,7 @@ namespace FishEngine {
         GLuint tcs = 0;
         GLuint tes = 0;
 
-        map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"} };
+        map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"}, {"Normalmap", "Off"}, {"Shadow", "On"} };
 
         bool hasSkinnedVersion =
             (vs_string.find("AppDataBase.inc") != std::string::npos)
@@ -341,11 +350,18 @@ namespace FishEngine {
         m_cullface = ToEnum<Cullface>(settings["Cull"]);
         m_ZWrite = settings["ZWrite"] == "On";
         m_blend = settings["Blend"] == "On";
+        m_applyNormalMap = settings["Normalmap"] == "On";
+        m_receiveShadow = settings["Shadow"] == "On";
 
         vs = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n" + parsed_vs);
         if (hasSkinnedVersion)
             vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n#define SKINNED\n" + parsed_vs);
-        fs = CompileShader(GL_FRAGMENT_SHADER, "#version 410\n#define FRAGMENT_SHADER 1\n" + parsed_fs);
+        std::string fs_macro = "#version 410\n#define FRAGMENT_SHADER 1\n";
+        if (m_applyNormalMap)
+            fs_macro += "#define _NORMALMAP\n";
+        if (m_receiveShadow)
+            fs_macro += "#define _SHADOW\n";
+        fs = CompileShader(GL_FRAGMENT_SHADER, fs_macro + parsed_fs);
 
         // gs
         if (use_gs) {

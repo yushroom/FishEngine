@@ -29,6 +29,7 @@ out vec4 color;
 // http://learnopengl.com/#!Advanced-Lighting/Shadows/Shadow-Mapping
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
 {
+#ifdef _SHADOW
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // Transform to [0,1] range
@@ -43,7 +44,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
     float bias = max(0.0002 * (1.0 - dot(N, lightDir)), bias);
     // Check whether current frag pos is in shadow
     //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-    
+
     // PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
@@ -62,6 +63,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
         shadow = 0.0;
         
     return shadow;
+#else
+    return 1;
+#endif
 }
 
 vec3 UnpackNormalMap(vec4 TextureSample)
@@ -76,7 +80,7 @@ vec3 UnpackNormalMap(vec4 TextureSample)
 #endif
 }
 
-#define _NORMALMAP
+//#define _NORMALMAP
 
 vec3 GetNormal()
 {
@@ -117,9 +121,11 @@ void main()
 
     color = ps_main(surfaceData);
 
+#ifdef _SHADOW
     vec4 positionInLightSpace = LightMatrix0 * vec4(vs_out.position, 1);
     float shadowFactor = ShadowCalculation(positionInLightSpace, L, N);
-    //color.rgb *= (1.f-shadowFactor);
+    color.rgb *= (1.f-shadowFactor);
+#endif
     //color.a = 1.0f;
 }
 

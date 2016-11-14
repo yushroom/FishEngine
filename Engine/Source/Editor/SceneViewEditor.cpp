@@ -103,13 +103,16 @@ namespace FishEditor
         /************************************************************************/
         /* Grid                                                                 */
         /************************************************************************/
-        auto view = Camera::main()->worldToCameraMatrix();
-        auto proj = Camera::main()->projectionMatrix();
-        auto shader = Shader::builtinShader("SolidColor-Internal");
-        shader->Use();
-        shader->BindUniformVec4("_Color", Color::gray);
-        shader->BindUniformMat4("MATRIX_MVP", proj*view);
-        gridMesh->Render();
+        if (false)
+        {
+            auto view = Camera::main()->worldToCameraMatrix();
+            auto proj = Camera::main()->projectionMatrix();
+            auto shader = Shader::builtinShader("SolidColor-Internal");
+            shader->Use();
+            shader->BindUniformVec4("_Color", Color::gray);
+            shader->BindUniformMat4("MATRIX_MVP", proj*view);
+            gridMesh->Render();
+        }
 
 
         /************************************************************************/

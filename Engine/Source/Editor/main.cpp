@@ -15,7 +15,11 @@ public:
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = "D:/program/FishEngine/Assets/";
         const std::string skybox_dir = R"(D:\program\github\Cinder-Experiments\common\textures\)";
+        const std::string concrete_texture_dir = R"(D:\program\FishEngine\Example\PBR\concrete_rebarconcrete_pbr\TGA\concrete_rebarconcrete_1k_TGA\)";
+        auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
 #else
+        auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
+        const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
         const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
 #endif
@@ -36,14 +40,10 @@ public:
         material->SetFloat("_Rotation", 0);
         RenderSettings::setSkybox(material);
 
-//        ModelImporter importer;
-//        importer.setImportNormals(ModelImporterNormals::Calculate);
-//        auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
-//        mitsuba->CreateGameObject();
 #if 0
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = 0; x <= 1; ++x)
+        for (int x = 0; x <= 3; ++x)
         {
             for (int y = -5; y <= 5; y++)
             {
@@ -52,10 +52,10 @@ public:
                 go->transform()->setLocalPosition(y*1.2f, x*1.2f, 0);
                 go->transform()->setLocalEulerAngles(0, 30, 0);
                 go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-                auto material = (x == 0) ?
+                auto material = (x%2 == 0) ?
                     Material::builtinMaterial("PBR") :
                     Material::builtinMaterial("PBR-Reference");
-                //material->SetFloat("Metallic", x);
+                material->SetFloat("Metallic", x >= 2 ? 1.0f : 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
                 material->SetTexture("RadianceMap", radiance_map);
@@ -63,15 +63,13 @@ public:
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
-#endif
-        const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
-        
+#else
         auto albedo_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_alb.tga");
         auto mask_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_mask.tga");
         auto gloss_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_g.tga");
         auto normal_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_n.tga");
 
-        auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
+        
         material = Material::CreateMaterial();
         material->SetShader(shader);
         material->SetFloat("Specular", 0.5f);
@@ -81,8 +79,14 @@ public:
         material->SetTexture("NormalMap", normal_map);
         material->SetTexture("RadianceMap", radiance_map);
         material->SetTexture("IrradianceMap", irradiance_map);
-        auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+        auto go = GameObject::CreatePrimitive(PrimitiveType::Plane);
         go->GetComponent<MeshRenderer>()->SetMaterial(material);
+
+        //ModelImporter importer;
+        //importer.setImportNormals(ModelImporterNormals::Calculate);
+        //auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
+        //mitsuba->CreateGameObject()->GetComponent<MeshRenderer>()->SetMaterial(material);
+#endif
     }
 };
 

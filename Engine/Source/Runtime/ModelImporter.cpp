@@ -39,9 +39,11 @@ namespace FishEngine {
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif
         ModelImporter importer;
-        importer.setImportNormals(ModelImporterNormals::Calculate);
+        //importer.setImportNormals(ModelImporterNormals::Calculate);
         s_builtinModels[PrimitiveType::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
+        importer.setImportNormals(ModelImporterNormals::Calculate);
         s_builtinModels[PrimitiveType::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
+        importer.setImportNormals(ModelImporterNormals::Import);
         s_builtinModels[PrimitiveType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
         s_builtinModels[PrimitiveType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
         s_builtinModels[PrimitiveType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");

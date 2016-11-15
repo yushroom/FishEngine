@@ -688,5 +688,6 @@ namespace FishEngine {
         m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.vsfs");
         m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir + "Editor/Alpha.vsfs");
+        m_builtinShaders["VertexLit-Internal"] = Shader::CreateFromFile(root_dir + "Editor/VertexLit.vsfs");
     }
 }

@@ -112,6 +112,8 @@ namespace FishEditor
         //m_window = WindowManager::firstWindow();
         glfwMakeContextCurrent(m_window);
 
+        //WindowManager::NewWindow("Material Editor", 1024, 768);
+
         // Set the required callback functions
         glfwSetKeyCallback(m_window, FishEditorWindow::KeyCallBack);
         glfwSetCursorPosCallback(m_window, FishEditorWindow::MouseCallback);

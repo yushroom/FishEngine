@@ -33,4 +33,5 @@ vec3 WorldSpaceViewDir( in vec3 worldPos )
     return WorldSpaceCameraPos.xyz - worldPos;
 }
 
-#endif // CG_inc
+#endif /* CG_inc */
+

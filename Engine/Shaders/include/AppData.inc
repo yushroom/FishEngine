@@ -70,6 +70,6 @@ void main()
     vs_main(appdata);
 }
 
-#endif // AppData_inc
+#endif /* AppData_inc */
 
-// your implementation of vs_main
+/* your implementation of vs_main */

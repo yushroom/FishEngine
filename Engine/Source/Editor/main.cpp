@@ -40,7 +40,7 @@ public:
         material->SetFloat("_Rotation", 0);
         RenderSettings::setSkybox(material);
 
-#if 0
+#if 1
         auto group = Scene::CreateGameObject("Group");
 
         for (int x = 0; x <= 3; ++x)
@@ -179,7 +179,7 @@ public:
         
         glCheckError();
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../assets/";
+        const std::string root_dir = R"(D:\program\FishEngine\assets\)";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/Assets/";
 #endif
@@ -311,6 +311,7 @@ public:
         animator->m_animation = jump00Model->mainAnimation();
 #endif
         
+#if 1
         constexpr float edgeThickness = 0.5f;
         auto material = Material::builtinMaterial("TextureDoubleSided");
         //material = bodyMaterial;
@@ -412,6 +413,7 @@ public:
             child->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
         }
         
+#endif
         // Camera
         
         auto cameraGO = Camera::mainGameCamera()->gameObject();

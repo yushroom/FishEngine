@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     {
         try
         {
-            Shader::LoadShaderSurface(path);
+            Shader::CreateFromFile(path);
         }
         catch (exception)
         {
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     {
         try
         {
-            Shader::LoadShaderCombined(path);
+            Shader::CreateFromFile(path);
         }
         catch (exception)
         {

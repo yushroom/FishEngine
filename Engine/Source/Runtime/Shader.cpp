@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cassert>
 #include <set>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 
 #include "Texture.hpp"
@@ -14,7 +15,6 @@
 
 using namespace std;
 using namespace FishEngine;
-
 
 std::map<std::string, std::string> pathToShaderString;
 
@@ -118,8 +118,9 @@ ExtractSettings(
 };
 
 
-GLuint CompileShader(GLenum shader_type,
-                     const std::string& shader_str)
+GLuint CompileShader(
+    GLenum             shader_type,
+    const std::string& shader_str)
 {
     const GLchar* shader_c_str = shader_str.c_str();
     GLuint shader = glCreateShader(shader_type);
@@ -130,7 +131,8 @@ GLuint CompileShader(GLenum shader_type,
     GLint infoLogLength = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (!success) {
+    if (!success)
+    {
         std::vector<char> infoLog(infoLogLength + 1);
         std::cout << AddLineNumber(shader_str) << endl;
         glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog.data());
@@ -192,17 +194,17 @@ GLuint Shader::LoadShader(GLenum shaderType, const std::string& filePath)
 }
 
 
-GLuint Shader::LoadShaderCombined(const std::string& filePath)
-{
-    auto shaderStr = ReadFile(filePath);
-    auto vs_shader = "#version 410\n#define VERTEX_SHADER 1\n" + ProcessInclude(shaderStr);
-    auto fs_shader = "#version 410\n#define FRAGMENT_SHADER 1\n" + ProcessInclude(shaderStr);
-    Debug::Log("Compile vertex shader...");
-    GLuint vs = CompileShader(GL_VERTEX_SHADER, vs_shader);
-    Debug::Log("Compile fragment shader...");
-    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fs_shader);
-    return LinkShader(vs, 0, 0, 0, fs);
-}
+//GLuint Shader::LoadShaderCombined(const std::string& filePath)
+//{
+//    auto shaderStr = ReadFile(filePath);
+//    auto vs_shader = "#version 410\n#define VERTEX_SHADER 1\n" + ProcessInclude(shaderStr);
+//    auto fs_shader = "#version 410\n#define FRAGMENT_SHADER 1\n" + ProcessInclude(shaderStr);
+//    Debug::Log("Compile vertex shader...");
+//    GLuint vs = CompileShader(GL_VERTEX_SHADER, vs_shader);
+//    Debug::Log("Compile fragment shader...");
+//    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fs_shader);
+//    return LinkShader(vs, 0, 0, 0, fs);
+//}
 
 const static std::string SurfaceShaderVSTemplate = R"(
 #include <CGSupport.inc>
@@ -217,17 +219,17 @@ const static std::string SurfaceShaderPSTemplate = R"(
 )";
 
 
-GLuint Shader::LoadShaderSurface(const std::string& filePath)
-{
-    auto shaderStr = ProcessInclude(ReadFile(filePath));
-    Debug::Log("Compile vertex shader...");
-    auto vs_str = ProcessInclude("#version 410\n#define VERTEX_SHADER 1\n" + SurfaceShaderVSTemplate);
-    auto vs = CompileShader(GL_VERTEX_SHADER, vs_str);
-    Debug::Log("Compile fragment shader...");
-    auto ps_str = ProcessInclude("#version 410\n#define FRAGMENT_SHADER 1\n" + SurfaceShaderPSTemplate) + "\n" + shaderStr;
-    auto ps = CompileShader(GL_FRAGMENT_SHADER, ps_str);
-    return LinkShader(vs, 0, 0, 0, ps);
-}
+//GLuint Shader::LoadShaderSurface(const std::string& filePath)
+//{
+//    auto shaderStr = ProcessInclude(ReadFile(filePath));
+//    Debug::Log("Compile vertex shader...");
+//    auto vs_str = ProcessInclude("#version 410\n#define VERTEX_SHADER 1\n" + SurfaceShaderVSTemplate);
+//    auto vs = CompileShader(GL_VERTEX_SHADER, vs_str);
+//    Debug::Log("Compile fragment shader...");
+//    auto ps_str = ProcessInclude("#version 410\n#define FRAGMENT_SHADER 1\n" + SurfaceShaderPSTemplate) + "\n" + shaderStr;
+//    auto ps = CompileShader(GL_FRAGMENT_SHADER, ps_str);
+//    return LinkShader(vs, 0, 0, 0, ps);
+//}
 
 
 const char* GLenumToString(GLenum e)
@@ -304,7 +306,8 @@ namespace FishEngine {
     
     void Shader::FromSurfaceShaderString(const std::string& surfaceShaderString)
     {
-        FromString(SurfaceShaderVSTemplate, SurfaceShaderPSTemplate+"\n"+surfaceShaderString);
+        const std::string& full_shader_str = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n" + surfaceShaderString + "\n#endif";
+        FromString(full_shader_str, full_shader_str);
     }
 
     void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
@@ -338,9 +341,9 @@ namespace FishEngine {
 
         map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"}, {"Normalmap", "Off"}, {"Shadow", "On"} };
 
-        bool hasSkinnedVersion =
-            (vs_string.find("AppDataBase.inc") != std::string::npos)
-            || (vs_string.find("AppDataTan.inc") != std::string::npos);
+        //bool hasSkinnedVersion =
+        //    (vs_string.find("AppDataBase.inc") != std::string::npos)
+        //    || (vs_string.find("AppDataTan.inc") != std::string::npos);
 
         ExtractSettings(vs_string, settings);
         auto parsed_vs = ProcessInclude(vs_string);
@@ -353,10 +356,10 @@ namespace FishEngine {
         m_applyNormalMap = settings["Normalmap"] == "On";
         m_receiveShadow = settings["Shadow"] == "On";
 
-        vs = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n" + parsed_vs);
-        if (hasSkinnedVersion)
-            vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410\n#define VERTEX_SHADER 1\n#define SKINNED\n" + parsed_vs);
-        std::string fs_macro = "#version 410\n#define FRAGMENT_SHADER 1\n";
+        vs = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define VERTEX_SHADER 1\n" + parsed_vs);
+        //if (hasSkinnedVersion)
+        vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define VERTEX_SHADER 1\n#define SKINNED\n" + parsed_vs);
+        std::string fs_macro = "#version 410 core\n#define FRAGMENT_SHADER 1\n";
         if (m_applyNormalMap)
             fs_macro += "#define _NORMALMAP\n";
         if (m_receiveShadow)
@@ -376,13 +379,13 @@ namespace FishEngine {
         m_program = LinkShader(vs, tcs, tes, gs, fs);
         GetAllUniforms();
 
-        if (hasSkinnedVersion) {
+        //if (hasSkinnedVersion) {
             m_skinnedShader = std::make_shared<Shader>();
             *m_skinnedShader = *this;
             m_skinnedShader->m_program = LinkShader(vs_skinned, tcs, tes, gs, fs);
             m_skinnedShader->GetAllUniforms();
-            assert(m_uniforms.size() + 1 == m_skinnedShader->m_uniforms.size());
-        }
+            //assert(m_uniforms.size() + 1 == m_skinnedShader->m_uniforms.size());
+        //}
 
         glDeleteShader(vs);
         glDeleteShader(vs_skinned);
@@ -585,6 +588,13 @@ namespace FishEngine {
         return nullptr;
     }
 
+
+    void Shader::Compile()
+    {
+        glDeleteProgram(m_program);
+        
+        
+    }
 
     void Shader::GetAllUniforms()
     {

@@ -225,7 +225,6 @@ namespace FishEditor
         DrawSceneView();
         //MaterialEditor::Show();
 
-
         auto size = ImGui::GetIO().DisplaySize;
         float pos_y = g_editorGUISettings.mainMenubarHeight + g_editorGUISettings.mainToolbarHeight;
         size.y -= pos_y;

@@ -3,39 +3,70 @@
 #include <UnrealSupport.inc>
 #include <BRDF.inc>
 
-uniform vec3 BaseColor;
+#define UniformTexture2D(tex) uniform sampler2D tex; uniform float4 tex##Value;
+
+uniform vec3  BaseColor;
 uniform float Metallic;
 uniform float Roughness;
 uniform float Specular;
 
-uniform samplerCube RadianceMap;
-uniform samplerCube IrradianceMap;
+#define Sample(tex, uv) texture(tex##val, uv)
 
-// http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
-vec3 fix_cube_lookup( vec3 v, float cube_size, float lod )
+#ifdef AMBIENT_IBL
+    uniform samplerCube RadianceMap;
+    uniform samplerCube IrradianceMap;
+#endif
+
+struct PixelMaterialInputs
 {
-    float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
-    float scale = 1 - exp2(lod) / cube_size;
-    if (abs(v.x) != M) v.x *= scale;
-    if (abs(v.y) != M) v.y *= scale;
-    if (abs(v.z) != M) v.z *= scale;
-    return v;
-}
+    vec3 BaseColor;
+    float Metallic;
+    float Roughness;
+    float Specular;
+};
+
+#ifdef NO_DEFAULT_MATERIAL 
+    PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s);
+#else
+    PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s)
+    {
+        PixelMaterialInputs inputs;
+
+        inputs.BaseColor = BaseColor;
+        inputs.Metallic = Metallic;
+        inputs.Roughness = Roughness;
+        inputs.Specular = Specular;
+        return inputs;
+    }
+#endif
+
+// // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+// vec3 fix_cube_lookup( vec3 v, float cube_size, float lod )
+// {
+//     float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+//     float scale = 1 - exp2(lod) / cube_size;
+//     if (abs(v.x) != M) v.x *= scale;
+//     if (abs(v.y) != M) v.y *= scale;
+//     if (abs(v.z) != M) v.z *= scale;
+//     return v;
+// }
 
 vec4 ps_main(SurfaceData surfaceData)
 {
+    PixelMaterialInputs i = CalcPixelMaterialInputs(surfaceData);
     vec4 outColor;
     vec3 L = surfaceData.L;
     vec3 V = surfaceData.V;
     vec3 N = surfaceData.N;
-    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
-    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
+    vec3 DiffuseColor = i.BaseColor - i.BaseColor * i.Metallic;
+    vec3 SpecularColor = mix( vec3(0.08 * i.Specular), i.BaseColor, i.Metallic);
     float NoL = saturate( dot(N, L) );
-    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness, Roughness, Roughness), vec3(1), L, V, N, vec2(1));
+    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(i.Roughness), vec3(1), L, V, N, vec2(1));
     float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
 
+#ifdef AMBIENT_IBL
     const int numMips   = 6;
-    float mip           = numMips - 1 + log2(Roughness);
+    float mip           = numMips - 1 + log2(i.Roughness);
     vec3 lookup         = -reflect(V, N);
     //lookup              = fix_cube_lookup(lookup, 512, mip);
     //vec3 radiance       = pow(textureLod(RadianceMap, lookup, mip).rgb, vec3(2.2));
@@ -43,7 +74,7 @@ vec4 ps_main(SurfaceData surfaceData)
     vec3 radiance       = textureLod(RadianceMap, lookup, mip).rgb;
     vec3 irradiance     = texture(IrradianceMap, N).rgb;
 
-    vec3 reflectance    = EnvBRDFApprox(SpecularColor, Roughness, NoV);
+    vec3 reflectance    = EnvBRDFApprox(SpecularColor, i.Roughness, NoV);
     vec3 diffuse        = DiffuseColor * irradiance;
     vec3 specular       = radiance * reflectance;
     //outColor.rgb       += pow(diffuse + specular, vec3(1.0/2.2));
@@ -51,7 +82,7 @@ vec4 ps_main(SurfaceData surfaceData)
     outColor.rgb        += diffuse + specular;
     //SpecularColor = EnvBRDFApprox(SpecularColor, Roughness, NoV);
     //vec3 diffuse = Diffuse
-
+#endif
     //color.rgb = StandardShading(DiffuseColor, SpecularColor, vec3(Roughness, Roughness, Roughness), vec3(1), L, V, N, vec2(1));
     //color.rgb = pow(color.rgb, vec3(1.0 / 2.2));
     outColor.a = 1.0f;

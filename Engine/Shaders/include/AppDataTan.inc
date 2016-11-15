@@ -46,6 +46,6 @@ void main()
     vs_main(appdata);
 }
 
-#endif //AppDataTan_inc
+#endif /*AppDataTan_inc*/
 
-// implementation of vs_main
+/* implementation of vs_main */

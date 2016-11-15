@@ -2,8 +2,121 @@
 #include <algorithm>
 #include <imgui/imgui.h>
 
+#include <Vector4.hpp>
+#include <Debug.hpp>
+
+using namespace FishEngine;
+
 namespace FishEditor
 {
+    enum class MaterialValueType
+    {
+        Float1,
+        Float2,
+        Float3,
+        Float4,
+    };
+
+    enum class MaterialExpressionType
+    {
+        Constant4Vector,
+        VectorParameter,
+        Lerp,
+    };
+
+    uint8_t GetPinCount(MaterialValueType type)
+    {
+        switch (type)
+        {
+        case MaterialValueType::Float1:
+            return 1;
+            break;
+        case MaterialValueType::Float2:
+            return 3;
+            break;
+        case MaterialValueType::Float3:
+            return 4;
+            break;
+        case MaterialValueType::Float4:
+            return 5;
+            break;
+        default:
+            Debug::LogError("Unknown MaterialValueType");
+            abort();
+            break;
+        }
+    }
+
+    class MaterialGraphNode
+    {
+    public:
+        int32_t x;
+        int32_t y;
+
+        int32_t inputPinCount;
+        int32_t outputPinCount;
+
+        MaterialGraphNode(int32_t inputPinCount, int32_t outputPintCount)
+            : inputPinCount(inputPinCount), outputPinCount(outputPinCount)
+        {
+
+        }
+
+        MaterialValueType GetInputPinType(uint8_t index)
+        {
+
+        }
+
+        MaterialValueType GetOutputPinType(uint8_t index)
+        {
+
+        }
+    };
+
+    typedef std::shared_ptr<MaterialGraphNode> MaterialGraphNodePtr;
+
+    class MaterialExpression
+    {
+    public:
+        int32_t m_editorX = 0;
+        int32_t m_editorY = 0;
+
+        int32_t m_inputCount = 0;
+        //int32_t m_outputCount;    == 1
+
+        virtual MaterialValueType GetInputType(uint8_t index) = 0;
+        virtual MaterialValueType GetOutputType() = 0;
+
+        MaterialGraphNodePtr m_graphNode = nullptr;
+
+        MaterialGraphNodePtr GetGraphNode()
+        {
+            if (m_graphNode == nullptr)
+            {
+                uint8_t inputPinCount = 0;
+                for (uint8_t i = 0; i < m_inputCount; ++i)
+                {
+                    inputPinCount += GetPinCount(GetInputType(i));
+                }
+                m_graphNode = std::make_shared<MaterialGraphNode>(inputPinCount, GetPinCount(GetOutputType()));
+            }
+            return m_graphNode;
+        }
+    };
+
+    struct MaterialExpressionConstant4Vector : public MaterialExpression
+    {
+    public:
+        Vector4 m_value;
+
+        virtual MaterialValueType GetOutputType() override
+        {
+            return MaterialValueType::Float4;
+        }
+    };
+
+
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define sizeof_array(t) (sizeof(t) / sizeof(t[0]))
@@ -203,7 +316,7 @@ namespace FishEditor
             inputTextSize.y += 4.0f;		// size between text entries
         }
 
-        // calculate the size of the node depending on nuber of connections
+        // calculate the size of the node depending on number of connections
 
         return node;
     }
@@ -749,6 +862,7 @@ namespace FishEditor
     void MaterialEditor::Show()
     {
         static bool show_test_window = true;
-        ShowExampleAppCustomNodeGraph(&show_test_window);
+        if (show_test_window)
+            ShowExampleAppCustomNodeGraph(&show_test_window);
     }
 }

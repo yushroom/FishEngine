@@ -135,6 +135,12 @@ namespace FishEngine
 //        VertexAndFragmentShader,
 //    };
 
+    enum class ShaderFeature
+    {
+        NormalMap,
+        Shadow,
+    };
+
     class Shader
     {
     public:
@@ -142,6 +148,8 @@ namespace FishEngine
         Shader(const Shader&) = delete;
         //Shader& operator=(const Shader&) = delete;
         Shader(Shader&&);
+
+        ~Shader();
 
         static void Init();
         
@@ -170,7 +178,6 @@ namespace FishEngine
         void FromFile(const std::string& vs_path, const std::string& fs_path);
         void FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
         //Shader(const std::string& vs_path, const std::string ps_path);
-        ~Shader();
 
         void Use() const;
 
@@ -218,8 +225,8 @@ namespace FishEngine
         
         static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
 
-        static GLuint LoadShaderCombined(const std::string& filePath);
-        static GLuint LoadShaderSurface(const std::string& filePath);
+        //static GLuint LoadShaderCombined(const std::string& filePath);
+        //static GLuint LoadShaderSurface(const std::string& filePath);
         
         bool IsTransparent() const {
             return m_blend;
@@ -227,11 +234,25 @@ namespace FishEngine
 
         std::shared_ptr<Shader> m_skinnedShader = nullptr;
 
+        void Enable(ShaderFeature feature)
+        {
+            SetFeature(feature, true);
+        }
+
+        void Disable(ShaderFeature feature)
+        {
+            SetFeature(feature, false);
+        }
+
+        void Compile();
+
     private:
         friend class Material;
+
         Shader& operator=(const Shader&) = default;
 
         GLuint m_program = 0;
+        std::string m_shaderString;
 
         void GetAllUniforms();
         GLint GetUniformLocation(const char* name) const;
@@ -250,6 +271,14 @@ namespace FishEngine
         static std::map<std::string, PShader> m_builtinShaders;
 
         //static std::map<std::string, std::string> m_fileToShaderString;
+
+        void SetFeature(ShaderFeature feature, bool enabled)
+        {
+            if (feature == ShaderFeature::NormalMap)
+                m_applyNormalMap = enabled;
+            else if (feature == ShaderFeature::Shadow)
+                m_receiveShadow = enabled;
+        }
     };
 }
 

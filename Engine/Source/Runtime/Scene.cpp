@@ -11,6 +11,7 @@
 #include "SkinnedMeshRenderer.hpp"
 #include "Frustum.hpp"
 #include "Gizmos.hpp"
+#include "Shader.hpp"
 
 
 namespace FishEngine

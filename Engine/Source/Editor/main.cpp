@@ -240,7 +240,7 @@ public:
         //GameObject::CreatePrimitive(BuiltinModelType::Cube)->CreateGameObject();
         
         auto chanMainShader = make_shared<Shader>();
-        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.vert", chan_root_dir+"shaders/CharaMain.frag");
+        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.shader");
         auto bodyMaterial = Material::CreateMaterial();
         bodyMaterial->setName("body");
         bodyMaterial->SetShader(chanMainShader);

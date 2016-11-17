@@ -2,8 +2,9 @@
 #define Material_hpp
 
 #include "Object.hpp"
-#include "Shader.hpp"
-#include "Texture.hpp"
+#include "ShaderProperty.hpp"
+//#include "Shader.hpp"
+//#include "Texture.hpp"
 
 namespace FishEngine
 {
@@ -14,13 +15,15 @@ namespace FishEngine
 
         }
 
-        Material(PShader shader) {
+        Material(PShader shader)
+        {
             SetShader(shader);
         }
 
         void SetShader(PShader shader);
 
-        PShader shader() const {
+        PShader shader() const
+        {
             return m_shader;
         }
 

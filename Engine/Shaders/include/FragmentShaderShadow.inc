@@ -3,13 +3,15 @@
 
 #include "CG.inc"
 
-// NormalMap
-uniform sampler2D NormalMap;
-const float bumpiness = 0.2;
+#ifdef _NORMALMAP
+    uniform sampler2D NormalMap;
+    const float bumpiness = 0.2;
+#endif
 
-// ShadowMap
-uniform sampler2D ShadowMap;
-const float bias = 0.002f;
+#ifdef _SHADOW
+    uniform sampler2D ShadowMap;
+    const float bias = 0.002f;
+#endif
 
 // ambient: IBL lighting
 // uniform samplerCube RadianceMap;
@@ -129,4 +131,4 @@ void main()
     //color.a = 1.0f;
 }
 
-#endif // FragmentShaderShadow_inc
+#endif /* FragmentShaderShadow_inc */

@@ -41,6 +41,7 @@
 #include "EditorRenderSystem.hpp"
 #include "EditorInput.hpp"
 #include "MaterialEditor.hpp"
+#include "Shader.hpp"
 
 using namespace FishEngine;
 

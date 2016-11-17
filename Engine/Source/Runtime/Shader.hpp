@@ -6,6 +6,7 @@
 #include "Vector3.hpp"
 #include "Matrix4x4.hpp"
 #include "Common.hpp"
+#include "ShaderProperty.hpp"
 
 #define PositionIndex 0
 #define NormalIndex 1
@@ -24,22 +25,7 @@ namespace FishEngine
     //    "_Object2World", "_WorldSpaceCameraPos"
     //};
 
-    struct ShaderUniforms
-    {
-        std::map<std::string, Matrix4x4> mat4s;
-        std::map<std::string, Vector3> vec3s;
-        std::map<std::string, Vector4> vec4s;
-        std::map<std::string, float> floats;
-    };
 
-    struct UniformInfo {
-        //GLint size; // size of the variable
-        GLenum type; // type of the variable (float, vec3 or mat4, etc)
-        //GLchar name[32];
-        std::string name;  // variable name in GLSL
-        GLuint location;
-        bool binded;
-    };
 
     // https://docs.unity3d.com/Manual/SL-CullAndDepth.html
     enum class Cullface {
@@ -146,38 +132,15 @@ namespace FishEngine
     public:
         Shader() = default;
         Shader(const Shader&) = delete;
-        //Shader& operator=(const Shader&) = delete;
+        Shader& operator=(const Shader&) = delete;
         Shader(Shader&&);
 
         ~Shader();
 
         static void Init();
         
-        static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str);
-
-        static PShader CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
-
         static PShader CreateFromFile(const std::string& path);
-        
-        static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path);
-
-        static PShader CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
-
-        void FromString(const std::string& vsfs_str);
-        void FromSurfaceShaderString(const std::string& surfaceShaderString);
-        void FromString(const std::string& vs_str, const std::string& fs_str);
-        void FromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str);
-        void FromString(
-            const std::string& vs_str,
-            const std::string& tcs_str,
-            const std::string& tes_str,
-            const std::string& gs_str,
-            const std::string& fs_str);
-        // vsfs or surface
-        void FromFile(const std::string& path);
-        void FromFile(const std::string& vs_path, const std::string& fs_path);
-        void FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path);
-        //Shader(const std::string& vs_path, const std::string ps_path);
+        bool FromFile(const std::string& path);
 
         void Use() const;
 
@@ -207,11 +170,13 @@ namespace FishEngine
 
         void CheckStatus() const;
 
-        const std::vector<UniformInfo>& uniforms() const {
+        const std::vector<UniformInfo>& uniforms() const
+        {
             return m_uniforms;
         }
 
-        std::vector<UniformInfo>& uniforms() {
+        std::vector<UniformInfo>& uniforms()
+        {
             return m_uniforms;
         }
 
@@ -223,12 +188,8 @@ namespace FishEngine
             return m_builtinShaders;
         }
         
-        static GLuint LoadShader(GLenum shaderType, const std::string& filePath);
-
-        //static GLuint LoadShaderCombined(const std::string& filePath);
-        //static GLuint LoadShaderSurface(const std::string& filePath);
-        
-        bool IsTransparent() const {
+        bool IsTransparent() const
+        {
             return m_blend;
         }
 
@@ -249,7 +210,7 @@ namespace FishEngine
     private:
         friend class Material;
 
-        Shader& operator=(const Shader&) = default;
+        //Shader& operator=(const Shader&) = default;
 
         GLuint m_program = 0;
         std::string m_shaderString;
@@ -267,7 +228,6 @@ namespace FishEngine
 
         friend class RenderSystem;
 
-        //static std::string m_shaderVariables;
         static std::map<std::string, PShader> m_builtinShaders;
 
         //static std::map<std::string, std::string> m_fileToShaderString;

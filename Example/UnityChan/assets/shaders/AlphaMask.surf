@@ -1,0 +1,12 @@
+#pragma Blend On
+
+uniform sampler2D _MainTex;
+uniform sampler2D _AlphaMask;
+
+vec4 ps_main(SurfaceData surfaceData)
+{
+	vec4 color;
+    color.rgb = texture(_MainTex, surfaceData.uv*5).rgb;
+    color.a = texture(_AlphaMask, surfaceData.uv).a;
+    return color;
+}

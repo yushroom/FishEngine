@@ -11,7 +11,7 @@ static HANDLE hstdout;
 #else
 #endif
 
-#define SPRINT_BUF_SIZE 4096
+constexpr int SPRINT_BUF_SIZE = 4096 * 8;
 static char sprint_buf[SPRINT_BUF_SIZE];
 
 using std::cout;

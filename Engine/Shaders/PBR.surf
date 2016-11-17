@@ -1,16 +1,12 @@
-///Normalmap Off
-///Shadow Off
+#pragma Normalmap Off
+#pragma Shadow Off
 #include <UnrealSupport.inc>
 #include <BRDF.inc>
-
-#define UniformTexture2D(tex) uniform sampler2D tex; uniform float4 tex##Value;
 
 uniform vec3  BaseColor;
 uniform float Metallic;
 uniform float Roughness;
 uniform float Specular;
-
-#define Sample(tex, uv) texture(tex##val, uv)
 
 #ifdef AMBIENT_IBL
     uniform samplerCube RadianceMap;

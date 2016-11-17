@@ -4,20 +4,7 @@
 #include "FishEngine.hpp"
 #include "Matrix4x4.hpp"
 #include "GLEnvironment.hpp"
-
-#define CPP
-#define layout(...)
-#define uniform struct
-#define mat4 FishEngine::Matrix4x4
-#define vec3 FishEngine::Vector3
-#define vec4 FishEngine::Vector4
-#include "../../Shaders/include/ShaderVariables.inc"
-#undef uniform
-#undef vec4
-#undef vec3
-#undef mat4
-#undef layout
-#undef CPP
+#include "ShaderVariables_gen.hpp"
 
 namespace FishEngine
 {

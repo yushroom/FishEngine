@@ -12,6 +12,7 @@
 #include "Pipeline.hpp"
 #include "Camera.hpp"
 #include "Gizmos.hpp"
+#include "Shader.hpp"
 
 
 namespace FishEngine

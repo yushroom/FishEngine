@@ -35,6 +35,15 @@ namespace FishEngine
 
     // low case
     std::string getExtensionWithoutDot(const std::string& path);
+
+    template<typename KeyType, typename ValueType>
+    ValueType getValueOrDefault(const std::map<KeyType, ValueType>& m, const KeyType& key, const ValueType& defaultValue)
+    {
+        auto it = m.find(key);
+        if (it != m.end())
+            return it->second;
+        return defaultValue;
+    };
 }
 
 #endif

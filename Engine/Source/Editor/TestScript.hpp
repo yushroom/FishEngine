@@ -42,6 +42,7 @@ using namespace FishEditor;
 #include <CapsuleCollider.hpp>
 #include <RenderSettings.hpp>
 #include <Resources.hpp>
+#include <Shader.hpp>
 
 using namespace std;
 using namespace FishEngine;

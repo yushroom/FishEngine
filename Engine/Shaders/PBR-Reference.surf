@@ -1,5 +1,5 @@
-///Normalmap Off
-///Shadow Off
+#pragma Normalmap Off
+#pragma Shadow Off
 #include <UnrealSupport.inc>
 #include <BRDF.inc>
 

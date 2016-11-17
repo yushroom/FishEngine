@@ -30,6 +30,7 @@ include_directories(./ThirdParty/glfw-3.2.1/include)
 include_directories(./ThirdParty/assimp-3.3.1/include)
 
 if (MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")

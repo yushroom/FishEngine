@@ -1,8 +1,10 @@
 #include "Material.hpp"
 
 #include <cassert>
+
 #include "Debug.hpp"
 #include "Color.hpp"
+#include "Shader.hpp"
 
 namespace FishEngine
 {

@@ -12,7 +12,7 @@ layout (location = UVIndex) 		in vec2 InputUV;
 	layout (location = BoneWeightIndex) in vec4 boneWeight;
 	
 	#define MAX_BONE_SIZE 100
-	uniform mat4 BoneTransformations[MAX_BONE_SIZE];
+	InternalUniform mat4 BoneTransformations[MAX_BONE_SIZE];
 #endif
 
 struct AppData
@@ -23,6 +23,9 @@ struct AppData
     vec2 uv;
 };
 
+
+#ifdef USE_DEFAULT_VS
+
 out VS_OUT
 {
 	vec3 position;		// in world space
@@ -32,7 +35,6 @@ out VS_OUT
 	//vec4 positionInLightSpace; // light space
 } vs_out;
 
-#ifdef USE_DEFAULT_VS
     void vs_main(AppData appdata)
     {
         gl_Position     = MATRIX_MVP * appdata.position;

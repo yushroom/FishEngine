@@ -1,7 +1,7 @@
 #include <UnitySupport.inc>
 
-/// Cull Front
-/// ZWrite Off
+#pragma Cull Front
+#pragma ZWrite Off
 
 uniform samplerCube _Tex;
 uniform vec4        _Tint;

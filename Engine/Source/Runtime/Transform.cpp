@@ -150,7 +150,7 @@ namespace FishEngine
     }
 
 
-    void Transform::SetParent(std::shared_ptr<Transform> parent)
+    void Transform::SetParent(TransformPtr parent)
     {
         auto p = m_parent.lock();
         if (parent == p) {
@@ -197,7 +197,8 @@ namespace FishEngine
     //    return nullptr;
     //}
 
-    std::shared_ptr<Transform> Transform::GetChild(const size_t index) {
+    TransformPtr Transform::GetChild(const size_t index)
+    {
         if (index >= m_children.size()) {
             Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
             return nullptr;

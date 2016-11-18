@@ -32,6 +32,7 @@ public:
         auto material = Material::defaultMaterial();
         material->SetTexture("RadianceMap", radiance_map);
         material->SetTexture("IrradianceMap", irradiance_map);
+        material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
@@ -57,6 +58,7 @@ public:
                     Material::builtinMaterial("PBR-Reference");
                 material->SetFloat("Metallic", x >= 2 ? 1.0f : 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
+                material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
                 material->SetTexture("RadianceMap", radiance_map);
                 material->SetTexture("IrradianceMap", irradiance_map);
@@ -239,8 +241,7 @@ public:
 
         //GameObject::CreatePrimitive(BuiltinModelType::Cube)->CreateGameObject();
         
-        auto chanMainShader = make_shared<Shader>();
-        chanMainShader->FromFile(chan_root_dir+"shaders/CharaMain.shader");
+        auto chanMainShader = Shader::CreateFromFile(chan_root_dir+"shaders/CharaMain.shader");
         auto bodyMaterial = Material::CreateMaterial();
         bodyMaterial->setName("body");
         bodyMaterial->SetShader(chanMainShader);
@@ -254,7 +255,7 @@ public:
         bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
         
         
-        map<string, PTexture> textures;
+        map<string, TexturePtr> textures;
         //textures["skyTex"] = sky_texture;
         
 //        auto skyboxGO = Scene::CreateGameObject("SkyBox");
@@ -289,7 +290,7 @@ public:
 
         textures["AmbientCubemap"] = sky_texture;
 
-        std::shared_ptr<GameObject> go;
+        GameObjectPtr go;
         
         go = GameObject::CreatePrimitive(PrimitiveType::Plane);
         go->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);
@@ -311,7 +312,7 @@ public:
         animator->m_animation = jump00Model->mainAnimation();
 #endif
         
-#if 1
+#if 0
         constexpr float edgeThickness = 0.5f;
         auto material = Material::builtinMaterial("TextureDoubleSided");
         //material = bodyMaterial;

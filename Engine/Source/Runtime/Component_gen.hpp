@@ -24,10 +24,10 @@ namespace FishEngine
         return true;
     }
 
-    std::shared_ptr<Component>
+    ComponentPtr
     AddComponentToGameObject(
         const std::string&  componentClassName,
-        PGameObject&        gameObject);
+        GameObjectPtr&        gameObject);
 }
 
 #endif // Component_gen_hpp

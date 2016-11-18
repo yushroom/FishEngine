@@ -7,7 +7,7 @@ layout (location = PositionIndex) 	in vec3 InputPositon;
 layout (location = NormalIndex) 	in vec3 InputNormal;
 layout (location = TangentIndex)    in vec3 InputTangent;
 layout (location = UVIndex) 		in vec2 InputUV;
-#ifdef SKINNED
+#ifdef _SKINNED
 	layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
 	layout (location = BoneWeightIndex) in vec4 boneWeight;
 	
@@ -50,7 +50,7 @@ out VS_OUT
 void main()
 {
     AppData appdata;
-#ifdef SKINNED
+#ifdef _SKINNED
 	mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
 	boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
 	boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
@@ -58,11 +58,11 @@ void main()
     appdata.position	= boneTransformation * vec4(InputPositon, 1);
     appdata.normal      = mat3(boneTransformation) * InputNormal;
     appdata.tangent     = mat3(boneTransformation) * InputTangent;
-#else // !SKINNED
+#else // !_SKINNED
 	appdata.position	= vec4(InputPositon, 1);
     appdata.normal      = InputNormal;
     appdata.tangent     = InputTangent;
-#endif // SKINNED
+#endif // _SKINNED
     appdata.uv			= InputUV;
 
     //vec4 posW			= MATRIX_M * appdata.position;

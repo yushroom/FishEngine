@@ -23,4 +23,15 @@ namespace FishEngine
         GLuint location;
         bool binded;
     };
+
+    enum ShaderKeyword
+    {
+        None = 0,
+        Shadow = 1,
+        SkinnedAnimation = 2,
+        AmbientIBL = 4,
+        All = Shadow & SkinnedAnimation & AmbientIBL,
+    };
+
+    typedef std::uint32_t ShaderKeywords;
 }

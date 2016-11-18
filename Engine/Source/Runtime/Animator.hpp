@@ -45,7 +45,7 @@ namespace FishEngine {
         std::map<std::string, AnimationNode> channels;
     };
 
-    typedef std::shared_ptr<Animation> PAnimation;
+    typedef std::shared_ptr<Animation> AnimationPtr;
     
     struct Avatar
     {
@@ -63,7 +63,7 @@ namespace FishEngine {
         bool m_playingOnce = false;
         bool m_playOneFrame = false;
         int m_currentFrame = 0;
-        std::shared_ptr<Animation> m_animation;
+        AnimationPtr m_animation;
         
         //virtual void OnInspectorGUI() override;
         
@@ -82,17 +82,17 @@ namespace FishEngine {
         
         virtual void Update() override;
 
-        std::shared_ptr<Avatar>& avatar() {
+        AvatarPtr& avatar() {
             return m_avatar;
         }
 
-        void setAvatar(std::shared_ptr<Avatar> avatar) {
+        void setAvatar(const AvatarPtr& avatar) {
             m_avatar = avatar;
         }
         
     private:
-        std::shared_ptr<Avatar> m_avatar;
-        void RecursivelyUpdate(const std::shared_ptr<GameObject>& go);
+        AvatarPtr m_avatar;
+        void RecursivelyUpdate(const GameObjectPtr& go);
         //void RecursivelyUpdate2(const std::shared_ptr<GameObject>& go);
         std::map<std::string, std::weak_ptr<GameObject>> m_nameToGameObject;
     };

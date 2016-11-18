@@ -17,15 +17,7 @@
 
 namespace FishEngine
 {
-
-    // Unity Built-in shader variables
-    // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-    //static std::set<std::string> builtinUniformNames{
-    //"MATRIX_MVP", "MATRIX_V", "MATRIX_P", "MATRIX_VP", "MATRIX_IT_MV", "MATRIX_IT_M"
-    //    "_Object2World", "_WorldSpaceCameraPos"
-    //};
-
-
+    class ShaderImpl;
 
     // https://docs.unity3d.com/Manual/SL-CullAndDepth.html
     enum class Cullface {
@@ -121,33 +113,28 @@ namespace FishEngine
 //        VertexAndFragmentShader,
 //    };
 
-    enum class ShaderFeature
-    {
-        NormalMap,
-        Shadow,
-    };
 
     class Shader
     {
     public:
-        Shader() = default;
+        Shader();
         Shader(const Shader&) = delete;
         Shader& operator=(const Shader&) = delete;
-        Shader(Shader&&);
+        //Shader(Shader&&);
 
         ~Shader();
 
         static void Init();
         
-        static PShader CreateFromFile(const std::string& path);
-        bool FromFile(const std::string& path);
+        static ShaderPtr CreateFromFile(const std::string& path);
+
 
         void Use() const;
 
-        GLuint program() const
-        {
-            return m_program;
-        }
+        //GLuint program() const
+        //{
+        //    return m_program;
+        //}
 
         //GLuint getAttribLocation(const char* name) const;
 
@@ -162,8 +149,8 @@ namespace FishEngine
         void BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray);
         void BindUniforms(const ShaderUniforms& uniforms);
 
-        void BindTexture(const std::string& name, PTexture& texture);
-        void BindTextures(const std::map<std::string, std::shared_ptr<Texture>>& textures);
+        void BindTexture(const std::string& name, TexturePtr& texture);
+        void BindTextures(const std::map<std::string, TexturePtr>& textures);
 
         void PreRender() const;
         void PostRender() const;
@@ -180,9 +167,9 @@ namespace FishEngine
             return m_uniforms;
         }
 
-        static PShader builtinShader(const std::string& name);
+        static ShaderPtr builtinShader(const std::string& name);
         
-        static const std::map<std::string, PShader>& allShaders()
+        static const std::map<std::string, ShaderPtr>& allShaders()
         {
             // TODO
             return m_builtinShaders;
@@ -193,31 +180,30 @@ namespace FishEngine
             return m_blend;
         }
 
-        std::shared_ptr<Shader> m_skinnedShader = nullptr;
+        //std::shared_ptr<Shader> m_skinnedShader = nullptr;
 
-        void Enable(ShaderFeature feature)
+        bool IsKeywordEnabled(ShaderKeyword keyword)
         {
-            SetFeature(feature, true);
+            return (m_keywords & static_cast<ShaderKeywords>(keyword)) != 0;
         }
 
-        void Disable(ShaderFeature feature)
-        {
-            SetFeature(feature, false);
-        }
+        void EnableLocalKeyword(ShaderKeyword keyword);
 
-        void Compile();
+        void DisableLocalKeyword(ShaderKeyword keyword);
 
     private:
         friend class Material;
 
-        //Shader& operator=(const Shader&) = default;
+        //GLuint m_program = 0;
+        std::unique_ptr<ShaderImpl> m_impl;
+        //std::string m_shaderString;
 
+        //void GetAllUniforms();
+        bool FromFile(const std::string& path);
+
+        // cache
         GLuint m_program = 0;
-        std::string m_shaderString;
-
-        void GetAllUniforms();
-        GLint GetUniformLocation(const char* name) const;
-
+        //std::map<std::string, UniformInfo>* m_uniforms;
         std::vector<UniformInfo> m_uniforms;
 
         Cullface m_cullface = Cullface::Back;
@@ -228,17 +214,9 @@ namespace FishEngine
 
         friend class RenderSystem;
 
-        static std::map<std::string, PShader> m_builtinShaders;
+        static std::map<std::string, ShaderPtr> m_builtinShaders;
 
-        //static std::map<std::string, std::string> m_fileToShaderString;
-
-        void SetFeature(ShaderFeature feature, bool enabled)
-        {
-            if (feature == ShaderFeature::NormalMap)
-                m_applyNormalMap = enabled;
-            else if (feature == ShaderFeature::Shadow)
-                m_receiveShadow = enabled;
-        }
+        ShaderKeywords m_keywords = ShaderKeyword::Shadow;
     };
 }
 

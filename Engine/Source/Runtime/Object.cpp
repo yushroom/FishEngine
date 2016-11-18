@@ -14,35 +14,35 @@ namespace FishEngine
     
     Object::~Object() = default;
 
-    void Object::Destroy(PGameObject obj, const float t /*= 0.0f*/) {
+    void Object::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/) {
         
         Scene::Destroy(obj, t);
     }
 
 
-    void Object::Destroy(PComponent component, float t /*= 0.0f*/)
+    void Object::Destroy(ComponentPtr component, float t /*= 0.0f*/)
     {
         Scene::Destroy(component, t);
     }
 
 
-    void Object::Destroy(PScript script, float t /*= 0.0f*/)
+    void Object::Destroy(ScriptPtr script, float t /*= 0.0f*/)
     {
         Scene::Destroy(script, t);
     }
 
 
-    void Object::DestroyImmediate(PScript script)
+    void Object::DestroyImmediate(ScriptPtr script)
     {
         Scene::DestroyImmediate(script);
     }
 
-    void Object::DestroyImmediate(PComponent component)
+    void Object::DestroyImmediate(ComponentPtr component)
     {
         Scene::DestroyImmediate(component);
     }
 
-    void Object::DestroyImmediate(PGameObject obj)
+    void Object::DestroyImmediate(GameObjectPtr obj)
     {
         Scene::DestroyImmediate(obj);
     }

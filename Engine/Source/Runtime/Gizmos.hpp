@@ -134,9 +134,9 @@ namespace FishEngine
 
         static void Init();
         
-        static PSimpleMesh s_circleMesh;
-        static PSimpleMesh s_boxMesh;
-        static PSimpleMesh s_light;
+        static SimpleMeshPtr s_circleMesh;
+        static SimpleMeshPtr s_boxMesh;
+        static SimpleMeshPtr s_light;
         //static PSimpleMesh s_wiredSphereMesh;
     };
 }

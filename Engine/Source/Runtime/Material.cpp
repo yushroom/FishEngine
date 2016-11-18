@@ -8,8 +8,8 @@
 
 namespace FishEngine
 {
-    std::map<std::string, PMaterial> Material::m_builtinMaterial;
-    PMaterial Material::s_defaultMaterial = nullptr;
+    std::map<std::string, MaterialPtr> Material::m_builtinMaterial;
+    MaterialPtr Material::s_defaultMaterial = nullptr;
 
     // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
     template<typename T>
@@ -54,32 +54,36 @@ namespace FishEngine
         return false;
     }
 
-    void FishEngine::Material::SetShader(std::shared_ptr<Shader> shader)
+    void Material::SetShader(ShaderPtr shader)
     {
         m_shader = shader;
-        for (auto& u : m_shader->uniforms()) {
-            if (u.type == GL_FLOAT) {
-                m_uniforms.floats[u.name] = 0.5f;
-            }
-            else if (u.type == GL_FLOAT_VEC3) {
-                //m_uniforms.vec3s[u.name] = Vector3(1, 1, 1);
-            }
-        }
+        //for (auto& u : m_shader->uniforms()) {
+        //    if (u.type == GL_FLOAT) {
+        //        m_uniforms.floats[u.name] = 0.5f;
+        //    }
+        //    else if (u.type == GL_FLOAT_VEC3) {
+        //        //m_uniforms.vec3s[u.name] = Vector3(1, 1, 1);
+        //    }
+        //}
     }
 
-    void FishEngine::Material::Update(bool skinned /* = false*/)
+    void Material::DisableKeyword(ShaderKeyword keyword)
     {
-        if (skinned) {
-            m_shader->m_skinnedShader->BindUniforms(m_uniforms);
-            m_shader->m_skinnedShader->BindTextures(m_textures);
-        }
-        else {
-            m_shader->BindUniforms(m_uniforms);
-            m_shader->BindTextures(m_textures);
-        }
+        m_shader->DisableLocalKeyword(keyword);
     }
 
-    void FishEngine::Material::SetFloat(const std::string& name, const float value)
+    void Material::EnableKeyword(ShaderKeyword keyword)
+    {
+        m_shader->EnableLocalKeyword(keyword);
+    }
+
+    void Material::Update()
+    {
+        m_shader->BindUniforms(m_uniforms);
+        m_shader->BindTextures(m_textures);
+    }
+
+    void Material::SetFloat(const std::string& name, const float value)
     {
         if (FindUniformInShader<float>(m_shader->m_uniforms, name)) {
             m_uniforms.floats[name] = value;
@@ -89,7 +93,7 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Material::SetVector3(const std::string& name, const Vector3& value)
+    void Material::SetVector3(const std::string& name, const Vector3& value)
     {
         //m_shader->BindUniformVec3(name.c_str(), value);
         if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name)) {
@@ -100,7 +104,7 @@ namespace FishEngine
     }
 
 
-    void FishEngine::Material::SetVector4(const std::string& name, const Vector4& value)
+    void Material::SetVector4(const std::string& name, const Vector4& value)
     {
         if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name)) {
             m_uniforms.vec4s[name] = value;
@@ -110,7 +114,7 @@ namespace FishEngine
     }
 
 
-    void Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& texture)
+    void Material::SetTexture(const std::string& name, TexturePtr& texture)
     {
         for (auto& u : m_shader->m_uniforms)
         {
@@ -124,7 +128,7 @@ namespace FishEngine
     }
 
 
-    void Material::setMainTexture(PTexture& texture)
+    void Material::setMainTexture(TexturePtr& texture)
     {
         SetTexture("_MainTex", texture);
     }
@@ -134,7 +138,7 @@ namespace FishEngine
         SetVector4("_Color", Vector4(color.r, color.g, color.b, color.a));
     }
 
-    PMaterial Material::builtinMaterial(const std::string& name)
+    MaterialPtr Material::builtinMaterial(const std::string& name)
     {
         auto shader = Shader::builtinShader(name);
         assert(shader != nullptr);
@@ -145,7 +149,7 @@ namespace FishEngine
     }
 
 
-    void Material::BindTextures(const std::map<std::string, PTexture>& textures)
+    void Material::BindTextures(const std::map<std::string, TexturePtr>& textures)
     {
         //m_textures = textures;
         for (auto& pair : textures) {
@@ -154,7 +158,7 @@ namespace FishEngine
     }
 
 
-    PMaterial Material::defaultMaterial()
+    MaterialPtr Material::defaultMaterial()
     {
         return s_defaultMaterial;
     }

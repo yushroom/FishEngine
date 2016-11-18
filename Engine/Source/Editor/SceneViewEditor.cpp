@@ -28,10 +28,10 @@ using namespace FishEngine;
 namespace FishEditor
 {
 
-    PMaterial sceneGizmoMaterial = nullptr;
-    PMesh cubeMesh = nullptr;
-    PMesh coneMesh = nullptr;
-    std::shared_ptr<SimpleMesh> gridMesh = nullptr;
+    MaterialPtr sceneGizmoMaterial = nullptr;
+    MeshPtr cubeMesh = nullptr;
+    MeshPtr coneMesh = nullptr;
+    SimpleMeshPtr gridMesh = nullptr;
 
     void SceneViewEditor::Init()
     {
@@ -131,7 +131,7 @@ namespace FishEditor
             material->SetVector4("Color", Vector4(0.375f, 0.388f, 0.463f, 1));
 
 
-            std::list<std::shared_ptr<GameObject>> selections;
+            std::list<GameObjectPtr> selections;
             auto go = Selection::selectedGameObjectInHierarchy();
             selections.push_back(go);
             while (!selections.empty())
@@ -148,41 +148,37 @@ namespace FishEditor
                     selections.push_back(c.lock()->gameObject());
                 }
                 auto meshFilter = go->GetComponent<MeshFilter>();
+                MeshPtr mesh;
                 if (meshFilter != nullptr)
                 {
+                    mesh = meshFilter->mesh();
                     material->shader()->Use();
-                    auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-                    Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
-                    Pipeline::BindPerDrawUniforms();
-                    material->Update();
-                    material->shader()->CheckStatus();
-                    meshFilter->mesh()->Render();
                 }
                 else
                 {
                     auto skinnedMeshRenderer = go->GetComponent<SkinnedMeshRenderer>();
                     if (skinnedMeshRenderer != nullptr)
                     {
-                        auto mesh = skinnedMeshRenderer->sharedMesh();
-                        auto shader = material->shader();
+                        mesh = skinnedMeshRenderer->sharedMesh();
                         bool useSkinnedVersion = FishEditorWindow::InPlayMode();
                         if (useSkinnedVersion)
                         {
-                            shader = material->shader()->m_skinnedShader;
-                            shader->Use();
-                            shader->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_matrixPalette);
+                            material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+                            material->shader()->Use();
+                            material->shader()->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_matrixPalette);
                         }
-                        else {
-                            shader->Use();
-                        }
-                        auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-                        Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
-                        Pipeline::BindPerDrawUniforms();
-                        material->Update(useSkinnedVersion);
-                        shader->CheckStatus();
-                        mesh->Render();
+                    }
+                    else    // no Meshfilter and SkinnedMeshRenderer
+                    {
+                        continue;
                     }
                 }
+                auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+                Pipeline::perDrawUniformData.MATRIX_MVP = vp * model;
+                Pipeline::BindPerDrawUniforms();
+                material->Update();
+                material->shader()->CheckStatus();
+                mesh->Render();
             }
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glDisable(GL_POLYGON_OFFSET_LINE);

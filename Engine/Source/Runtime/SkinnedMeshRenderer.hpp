@@ -13,14 +13,14 @@ namespace FishEngine {
 
         SkinnedMeshRenderer() = default;
 
-        SkinnedMeshRenderer(PMaterial material);
+        SkinnedMeshRenderer(MaterialPtr material);
 
         virtual void Update() override;
         
         //protected:
         virtual void Render() const override;
 
-        void setAvatar(PAvatar avatar) {
+        void setAvatar(AvatarPtr avatar) {
             m_avatar = avatar;
         }
 
@@ -32,12 +32,12 @@ namespace FishEngine {
         virtual Bounds localBounds() const override;
         
         // The mesh used for skinning.
-        PMesh sharedMesh()
+        MeshPtr sharedMesh()
         {
             return m_sharedMesh;
         }
         
-        void setSharedMesh(PMesh sharedMesh)
+        void setSharedMesh(MeshPtr sharedMesh)
         {
             m_sharedMesh = sharedMesh;
         }
@@ -51,9 +51,9 @@ namespace FishEngine {
         friend class Scene;
         
         // The mesh used for skinning.
-        PMesh m_sharedMesh = nullptr;
+        MeshPtr m_sharedMesh = nullptr;
         
-        PAvatar m_avatar = nullptr;
+        AvatarPtr m_avatar = nullptr;
         std::weak_ptr<Transform> m_rootBone;
         
         // The bones used to skin the mesh.

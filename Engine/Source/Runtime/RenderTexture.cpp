@@ -9,7 +9,7 @@ namespace FishEngine
         glDeleteFramebuffers(1, &m_FBO);
     }
 
-    PRenderTexture RenderTexture::CreateShadowMap()
+    RenderTexturePtr RenderTexture::CreateShadowMap()
     {
         auto rt = std::make_shared<RenderTexture>();
         rt->m_width = 4096;
@@ -35,7 +35,7 @@ namespace FishEngine
         return rt;
     }
 
-    PRenderTexture RenderTexture::CreateColorMap(const int width, const int height)
+    RenderTexturePtr RenderTexture::CreateColorMap(const int width, const int height)
     {
         auto rt = std::make_shared<RenderTexture>();
         rt->m_width = width;

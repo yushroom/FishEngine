@@ -51,7 +51,7 @@ namespace FishEditor
 
     int     EditorGUI::m_idCount                        = 0;
 
-    PSceneViewEditor EditorGUI::m_mainSceneViewEditor;
+    SceneViewEditorPtr EditorGUI::m_mainSceneViewEditor;
 
     bool    EditorGUI::s_locked = false;
     //int     EditorGUI::m_selectedAxis                   = -1;
@@ -290,7 +290,7 @@ namespace FishEditor
         ImGui::InputFloat4((label + "##row4").c_str(), mat.rows[3].data());
     }
 
-    void EditorGUI::SelectMeshDialogBox(std::function<void(std::shared_ptr<Mesh>)> callback)
+    void EditorGUI::SelectMeshDialogBox(std::function<void(MeshPtr)> callback)
     {
         //    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
         //    bool is_open = true;
@@ -313,7 +313,7 @@ namespace FishEditor
         //CalculateWindowSizeAndPosition();
     }
 
-    void EditorGUI::HierarchyItem(std::shared_ptr<GameObject> gameObject)
+    void EditorGUI::HierarchyItem(GameObjectPtr gameObject)
     {
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
         if (gameObject == Selection::selectedGameObjectInHierarchy())
@@ -525,7 +525,7 @@ namespace FishEditor
         //    return camelCaseToReadable(className) + "##header" + boost::lexical_cast<std::string>(local_id++);
         //};
 
-        std::shared_ptr<Component> componentToBeDestroyed = nullptr;
+        ComponentPtr componentToBeDestroyed = nullptr;
         for (auto c : selectedGO->m_components)
         {
             ImGui::PushID(local_id++);
@@ -550,7 +550,7 @@ namespace FishEditor
         }
 
 
-        std::shared_ptr<Script> scriptToBeDestroyed = nullptr;
+        ScriptPtr scriptToBeDestroyed = nullptr;
         for (auto s : selectedGO->m_scripts)
         {
             ImGui::PushID(local_id++);
@@ -928,7 +928,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform)
+    void EditorGUI::OnInspectorGUI(const FishEngine::TransformPtr& transform)
     {
         if (Float3("Position", &transform->m_localPosition)) {
             transform->MakeDirty();
@@ -945,7 +945,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Camera>& camera)
+    void EditorGUI::OnInspectorGUI(const FishEngine::CameraPtr& camera)
     {
         const char* listbox_items[] = {
             "Perspective", "Orthographic"
@@ -977,7 +977,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Animator>& animator)
+    void EditorGUI::OnInspectorGUI(const FishEngine::AnimatorPtr& animator)
     {
         if (animator->m_animation != nullptr) {
             int channels = (int)animator->m_animation->channels.size();
@@ -1005,12 +1005,12 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshFilter>& meshFilter)
+    void EditorGUI::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
     {
         if (ImGui::Button("Change")) {
             ImGui::OpenPopup("Select ...");
         }
-        EditorGUI::SelectMeshDialogBox([&meshFilter](PMesh mesh)->void {
+        EditorGUI::SelectMeshDialogBox([&meshFilter](MeshPtr mesh)->void {
             meshFilter->SetMesh(mesh);
         });
         //ImGui::SameLine();
@@ -1025,7 +1025,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<Material>& material)
+    void EditorGUI::OnInspectorGUI(const MaterialPtr& material)
     {
         if (ImGui::CollapsingHeader(material->m_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -1059,7 +1059,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<Renderer>& renderer)
+    void EditorGUI::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
     {
         if (ImGui::CollapsingHeader("Materials", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -1074,14 +1074,14 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::MeshRenderer>& renderer)
+    void EditorGUI::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
     {
         OnInspectorGUI<Renderer>(renderer);
     }
 
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SkinnedMeshRenderer>& renderer)
+    void EditorGUI::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& renderer)
     {
         OnInspectorGUI<Renderer>(renderer);
 
@@ -1098,7 +1098,7 @@ namespace FishEditor
 
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Rigidbody>& rigidBody)
+    void EditorGUI::OnInspectorGUI(const FishEngine::RigidbodyPtr& rigidBody)
     {
         Float("Mass", &rigidBody->m_mass);
         Float("Drag", &rigidBody->m_drag);
@@ -1109,7 +1109,7 @@ namespace FishEditor
 
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::BoxCollider>& boxCollider)
+    void EditorGUI::OnInspectorGUI(const FishEngine::BoxColliderPtr& boxCollider)
     {
         Bool("Is Trigger", &boxCollider->m_isTrigger);
         Float3("Center", &boxCollider->m_center);
@@ -1117,7 +1117,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::SphereCollider>& sphereCollider)
+    void EditorGUI::OnInspectorGUI(const FishEngine::SphereColliderPtr& sphereCollider)
     {
         Bool("Is Trigger", &sphereCollider->m_isTrigger);
         Float3("Center", &sphereCollider->m_center);
@@ -1126,7 +1126,7 @@ namespace FishEditor
 
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::CapsuleCollider>& capsuleCollider)
+    void EditorGUI::OnInspectorGUI(const FishEngine::CapsuleColliderPtr& capsuleCollider)
     {
         Bool("Is Trigger", &capsuleCollider->m_isTrigger);
         Float3("Center", &capsuleCollider->m_center);
@@ -1140,7 +1140,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Light>& light)
+    void EditorGUI::OnInspectorGUI(const FishEngine::LightPtr& light)
     {
         Enum<LightType>("Type", &light->m_type);
         ImGui::ColorEdit4("Color", light->m_color.m);
@@ -1152,7 +1152,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component)
+    void EditorGUI::OnInspectorGUI(const FishEngine::ComponentPtr& component)
     {
 #define Case(T) else if (component->ClassName() == FishEngine::T::StaticClassName()) { OnInspectorGUI(std::static_pointer_cast<FishEngine::T>(component)); }
 

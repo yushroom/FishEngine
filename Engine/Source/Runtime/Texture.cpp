@@ -174,7 +174,7 @@ namespace FishEngine
         return t;
     }
 
-    PTexture Texture::CreateFromFile(const std::string& path)
+    TexturePtr Texture::CreateFromFile(const std::string& path)
     {
         auto t = std::make_shared<Texture>();
         t->m_name = getFileNameWithoutExtension(path);

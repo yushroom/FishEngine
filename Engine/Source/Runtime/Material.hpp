@@ -3,29 +3,33 @@
 
 #include "Object.hpp"
 #include "ShaderProperty.hpp"
-//#include "Shader.hpp"
-//#include "Texture.hpp"
 
 namespace FishEngine
 {
     class Material : public Object
     {
     public:
-        Material() {
+        Material() = default;
 
-        }
-
-        Material(PShader shader)
+        Material(ShaderPtr shader)
         {
             SetShader(shader);
         }
 
-        void SetShader(PShader shader);
+        Color color() const;
 
-        PShader shader() const
+        // The shader used by the material.
+        ShaderPtr shader() const
         {
             return m_shader;
         }
+
+        // The shader used by the material.
+        void SetShader(ShaderPtr shader);
+
+        void DisableKeyword(ShaderKeyword keyword);
+
+        void EnableKeyword(ShaderKeyword keyword);
 
 
         // Set a named float value.
@@ -42,17 +46,17 @@ namespace FishEngine
         }
 
         // Set a named texture
-        void SetTexture(const std::string& name, PTexture& texture);
+        void SetTexture(const std::string& name, TexturePtr& texture);
 
         // The material's texture.
         // The same as using GetTexture or SetTexture with "_MainTex" name.
-        void setMainTexture(PTexture& texture);
+        void setMainTexture(TexturePtr& texture);
 
         // The main material's color.
         // The same as using GetColor or SetColor with "_Color" name.
         void setColor(const Color& color);
 
-        void BindTextures(const std::map<std::string, PTexture>& textures);
+        void BindTextures(const std::map<std::string, TexturePtr>& textures);
 
         //    auto uniforms() const {
         //        return m_uniforms;
@@ -62,7 +66,7 @@ namespace FishEngine
         //        return m_uniforms;
         //    }
 
-        void Update(bool skinned = false);
+        void Update();
 
         //void OnInspectorGUI();
 
@@ -70,23 +74,23 @@ namespace FishEngine
 
         static void Init();
 
-        static PMaterial CreateMaterial() {
+        static MaterialPtr CreateMaterial() {
             return std::make_shared<Material>();
         }
 
-        static PMaterial builtinMaterial(const std::string& name);
+        static MaterialPtr builtinMaterial(const std::string& name);
 
-        static PMaterial defaultMaterial();
+        static MaterialPtr defaultMaterial();
 
     private:
         friend class FishEditor::EditorGUI;
-        PShader m_shader = nullptr;
-        std::map<std::string, PTexture> m_textures;
+        ShaderPtr m_shader = nullptr;
+        std::map<std::string, TexturePtr> m_textures;
 
         ShaderUniforms m_uniforms;
 
-        static std::map<std::string, PMaterial> m_builtinMaterial;
-        static PMaterial s_defaultMaterial;
+        static std::map<std::string, MaterialPtr> m_builtinMaterial;
+        static MaterialPtr s_defaultMaterial;
     };
 }
 

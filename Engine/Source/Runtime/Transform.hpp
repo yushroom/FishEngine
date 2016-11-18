@@ -258,12 +258,12 @@ namespace FishEngine
         void RotateAround(const Vector3& point, const Vector3& axis, float angle);
 
         // The parent of the transform.
-        PTransform parent() const
+        TransformPtr parent() const
         {
             return m_parent.lock();
         }
 
-        void SetParent(PTransform parent);
+        void SetParent(TransformPtr parent);
 
         //========== Public Functions ==========//
 
@@ -271,13 +271,13 @@ namespace FishEngine
         void DetachChildren();
 
         // Finds a child by name and returns it.
-        PTransform Find(const std::string& name) const;
+        TransformPtr Find(const std::string& name) const;
 
         /* Returns a transform child by index.
          * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
          * @return: Transform Transform child by index.
          */
-        PTransform GetChild(const size_t index);
+        TransformPtr GetChild(const size_t index);
 
 
         const std::list<std::weak_ptr<Transform>>& children() const

@@ -12,7 +12,7 @@ namespace FishEngine
 
         MeshRenderer() = default;
 
-        MeshRenderer(PMaterial material);
+        MeshRenderer(MaterialPtr material);
 
         //protected:
         virtual void Render() const override;

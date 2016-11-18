@@ -17,7 +17,7 @@
 
 namespace FishEngine
 {
-    MeshRenderer::MeshRenderer(PMaterial material) : Renderer(material)
+    MeshRenderer::MeshRenderer(MaterialPtr material) : Renderer(material)
     {
         
     }
@@ -32,13 +32,11 @@ namespace FishEngine
     
     void MeshRenderer::Render() const
     {
-        //Debug::Log("Rendere %s", m_gameObject->name().c_str());
         auto meshFilter = gameObject()->GetComponent<MeshFilter>();
         if (meshFilter == nullptr) {
             Debug::LogWarning("This GameObject has no MeshFilter");
             return;
         }
-        
         
         auto model = transform()->localToWorldMatrix();
         auto camera = Camera::main();
@@ -53,7 +51,7 @@ namespace FishEngine
         
         Pipeline::BindPerDrawUniforms();
         
-        std::map<std::string, PTexture> textures;
+        std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
         if (lights.size() > 0) {
             auto& l = lights.front();

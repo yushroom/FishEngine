@@ -113,8 +113,8 @@ class VisualizeNormal : public Script
 {
 private:
     bool m_added = false;
-    PMeshRenderer m_meshRenderer = nullptr;
-    PMaterial m_material = nullptr;
+    MeshRendererPtr m_meshRenderer = nullptr;
+    MaterialPtr m_material = nullptr;
 
 public:
     InjectClassName(VisualizeNormal);
@@ -377,7 +377,7 @@ void DefaultScene()
             
 
 template<typename T>
-void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
+void RecursivelyAddScript(const FishEngine::TransformPtr& t)
 {
     t->gameObject()->AddComponent<T>();
     for (auto& c : t->children()) {
@@ -386,7 +386,7 @@ void RecursivelyAddScript(const std::shared_ptr<FishEngine::Transform>& t)
 }
 
 
-std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & root, const std::string& name)
+GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 {
     auto& children = root->transform()->children();
     for (auto& c : children) {
@@ -404,7 +404,7 @@ std::shared_ptr<GameObject> FindNamedChild(const std::shared_ptr<GameObject> & r
 }
 
 
-std::shared_ptr<GameObject> CreateCube()
+GameObjectPtr CreateCube()
 {
     auto model = Model::builtinModel(PrimitiveType::Cube);
     auto go = model->CreateGameObject();

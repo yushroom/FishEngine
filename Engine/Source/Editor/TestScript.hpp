@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -334,7 +336,7 @@ public:
         {
             std::stringstream ss;
             {
-                cereal::JSONOutputArchive oa(ss);
+                cereal::XMLOutputArchive oa(ss);
                 oa << *gameObject();
             }
             auto xml = ss.str();

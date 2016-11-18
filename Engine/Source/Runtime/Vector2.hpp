@@ -19,7 +19,7 @@ namespace FishEngine
         {
         }
 
-        Vector2(const float x, float y)
+        Vector2(const float x, const float y)
             : x(x), y(y)
         {
         }
@@ -30,7 +30,7 @@ namespace FishEngine
             return m[index];
         }
 
-        void Set(float newX, float newY)
+        void Set(const float newX, const float newY)
         {
             x = newX;
             y = newY;

@@ -134,6 +134,23 @@ LinkShader(GLuint vs,
     return program;
 }
 
+std::string AddLineNumber(const std::string& str)
+{
+    stringstream ss;
+    int line_number = 2;
+    ss << "#1\t";
+    string::size_type last_pos = 0;
+    auto pos = str.find('\n');
+    while (pos != string::npos) {
+        ss << str.substr(last_pos, pos - last_pos) << "\n#" << line_number << "\t";
+        last_pos = pos + 1;
+        pos = str.find('\n', last_pos);
+        line_number++;
+    };
+    ss << str.substr(last_pos);
+    return ss.str();
+};
+
 
 const char* GLenumToString(GLenum e)
 {
@@ -232,6 +249,9 @@ namespace FishEngine
             return m_shaderTextRaw;
         }
 
+        std::string m_vertexShaderText;
+        std::string m_fragmentShaderText;
+        std::string m_geometryShaderText;
         std::map<std::string, std::string>  m_settings;
 
     private:
@@ -246,9 +266,18 @@ namespace FishEngine
             std::string text = Preprocess(type, keywords);
             GLenum t = GL_VERTEX_SHADER;
             if (type == ShaderType::FragmentShader)
+            {
                 t = GL_FRAGMENT_SHADER;
+                m_fragmentShaderText = text;
+            }
             else if (type == ShaderType::GeometryShader)
+            {
                 t = GL_GEOMETRY_SHADER;
+                m_geometryShaderText = text;
+            }
+            else {
+                m_vertexShaderText = text;
+            }
             return CompileShader(t, "#version 410 core\n" + text);
         }
 
@@ -258,7 +287,9 @@ namespace FishEngine
             //auto text = DecorateShaderText(type, m_shaderTextRaw);
             auto& text = m_shaderTextRaw;
             context_type ctx(text.begin(), text.end(), m_filePath.c_str());
-            ctx.set_language(boost::wave::language_support::support_normal);
+#if FISHENGINE_PLATFORM_APPLE
+            ctx.set_language(boost::wave::language_support::support_option_emit_pragma_directives);
+#endif
             ctx.add_sysinclude_path(include_dir.c_str());
 
             if (type == ShaderType::VertexShader)
@@ -388,22 +419,20 @@ namespace FishEngine
             return parsed_text;
         }
 
-        static std::string DecorateShaderText(ShaderFileType type, std::string& shaderText)
+        static std::string DecorateShaderText(ShaderFileType type, std::string& shaderText) noexcept
         {
             std::string left = "", right = "\n";
 
-            switch (type)
+            if (type == FishEngine::ShaderFileType::Surface)
             {
-            case FishEngine::ShaderFileType::Surface:
                 left = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n";
                 right = "#endif\n";
-                break;
             }
 
             return left + "#line 1\n" + shaderText + right;
         }
 
-        void GetAllUniforms(GLuint program)
+        void GetAllUniforms(GLuint program) noexcept
         {
             std::vector<UniformInfo> uniforms;
             GLuint blockID = glGetUniformBlockIndex(program, "PerDraw");
@@ -413,7 +442,7 @@ namespace FishEngine
             {
                 glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(Pipeline::s_perDrawUniformData));
+                assert(blockSize == sizeof(PerDraw));
             }
 
             blockID = glGetUniformBlockIndex(program, "PerFrame");
@@ -422,7 +451,7 @@ namespace FishEngine
             {
                 glUniformBlockBinding(program, blockID, Pipeline::PerFrameUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(Pipeline::s_perFrameUniformData));
+                assert(blockSize == sizeof(PerFrame));
             }
 
             //    blockID = glGetUniformBlockIndex(m_program, "Bones");
@@ -460,7 +489,8 @@ namespace FishEngine
 
 
 
-namespace FishEngine {
+namespace FishEngine
+{
 
     std::map<std::string, ShaderPtr> Shader::m_builtinShaders;
 
@@ -486,7 +516,7 @@ namespace FishEngine {
             auto shader_text = ReadFile(path);
             auto t = ext == "surf" ? ShaderFileType::Surface : ShaderFileType::Combined;
             m_impl->set(shader_text, t, path);
-            m_impl->CompileAndLink(static_cast<ShaderKeywords>(ShaderKeyword::All));
+            m_impl->CompileAndLink(m_keywords);
             m_program = m_impl->glslProgram(m_keywords, m_uniforms);
             m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(m_impl->m_settings, "Cull", "Back"));
             m_ZWrite = getValueOrDefault<string, string>(m_impl->m_settings, "ZWrite", "On") == "On";
@@ -497,6 +527,7 @@ namespace FishEngine {
         catch (const boost::wave::preprocess_exception& e)
         {
             printf("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
+            //printf(m_impl->m_shaderTextRaw);
             return false;
         }
         catch (const boost::wave::cpplexer::lexing_exception& e)
@@ -506,11 +537,12 @@ namespace FishEngine {
         }
         catch (const std::exception& e)
         {
+            printf("VERTEX\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_vertexShaderText).c_str());
+            printf("Geometry\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_geometryShaderText).c_str());
+            printf("FRAGMENT\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_fragmentShaderText).c_str());
             printf("%s", e.what());
             return false;
         }
-
-        //GetAllUniforms();
         return true;
     }
 
@@ -689,21 +721,20 @@ namespace FishEngine {
     void Shader::Init()
     {
         const auto& root_dir = Resources::shaderRootDirectory();
-        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse" })
+        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".surf");
         }
 
-        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap", "SolidColor", "VertexLit", "VisualizeNormal" })
+        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap", "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir + n + ".shader");
         }
 
-        m_builtinShaders["NormalMap"]           = Shader::CreateFromFile(root_dir + "NormalMap.vsfs");
-        m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir + "Skybox-Cubed.vsfs");
-        m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.vsfs");
-        m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.vsfs");
-        m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir + "Editor/Alpha.vsfs");
-        m_builtinShaders["VertexLit-Internal"]  = Shader::CreateFromFile(root_dir + "Editor/VertexLit.vsfs");
+        m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir + "Skybox-Cubed.shader");
+        m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir + "Skybox-Procedural.shader");
+        m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir + "Editor/SolidColor.shader");
+        m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir + "Editor/Alpha.shader");
+        m_builtinShaders["VertexLit-Internal"]  = Shader::CreateFromFile(root_dir + "Editor/VertexLit.shader");
     }
 }

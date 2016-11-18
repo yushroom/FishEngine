@@ -119,7 +119,7 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
  * @param IterationCount - >=1, bigger numbers cost more performance but improve quality
  * @return new seed
  */
-uint2 ScrambleTEA(uint2 v, uint IterationCount = 3)
+uint2 ScrambleTEA(uint2 v, uint IterationCount)
 {
     // Start with some random data (numbers can be arbitrary but those have been used by others and seem to work well)
     uint k[4] = uint[4]( 0xA341316Cu , 0xC8013EA4u , 0xAD90777Du , 0x7E95761Eu );
@@ -137,6 +137,12 @@ uint2 ScrambleTEA(uint2 v, uint IterationCount = 3)
 
     return uint2(y, z);
 }
+
+uint2 ScrambleTEA(uint2 v)
+{
+    return ScrambleTEA(v, 3);
+}
+
 
 vec4 ps_main(SurfaceData surfaceData)
 {

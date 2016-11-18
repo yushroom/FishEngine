@@ -101,14 +101,12 @@ namespace FishEngine
 
         //GLuint m_program = 0;
         std::unique_ptr<ShaderImpl> m_impl;
-        //std::string m_shaderString;
 
         //void GetAllUniforms();
         bool FromFile(const std::string& path);
 
         // cache
         GLuint m_program = 0;
-        //std::map<std::string, UniformInfo>* m_uniforms;
         std::vector<UniformInfo> m_uniforms;
 
         Cullface m_cullface = Cullface::Back;

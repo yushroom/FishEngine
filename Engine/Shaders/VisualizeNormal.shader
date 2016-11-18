@@ -1,13 +1,15 @@
 #pragma GeometryShader On
 
-struct VS_OUT {
-    vec3 normal;
-};
+// struct VS_OUT {
+//     vec3 normal;
+// };
 
 #ifdef VERTEX_SHADER
 	#include "AppData.inc"
 
-	out VS_OUT vs_out;
+	out VS_OUT {
+		vec3 normal;
+	} vs_out;
 
 	void vs_main(AppData appdata)
 	{
@@ -21,7 +23,9 @@ struct VS_OUT {
 	layout (triangles) in;
 	layout (line_strip, max_vertices = 6) out;
 
-	in VS_OUT gs_in[];
+	in VS_OUT {
+		vec3 normal;
+	} gs_in[];
 
 	const float MAGNITUDE = 0.01f;
 

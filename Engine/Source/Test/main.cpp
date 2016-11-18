@@ -13,6 +13,8 @@
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>
 #include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
 #include <boost/wave/preprocessing_hooks.hpp>
+#include <boost/wave/grammars/cpp_grammar.hpp>
+#include <boost/wave/grammars/cpp_defined_grammar.hpp>
 
 using namespace std;
 using namespace FishEngine;

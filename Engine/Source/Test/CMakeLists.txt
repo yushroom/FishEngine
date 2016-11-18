@@ -6,8 +6,7 @@ target_link_libraries(Test FishEngine)
 if (MSVC)
     target_link_libraries(Test opengl32.lib)
 else()
-
-    set_target_properties(Test PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+    #set_target_properties(Test PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 endif()
 
 target_link_libraries(Test glfw)

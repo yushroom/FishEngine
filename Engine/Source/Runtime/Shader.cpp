@@ -13,6 +13,8 @@
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>
 #include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
 #include <boost/wave/preprocessing_hooks.hpp>
+#include <boost/wave/grammars/cpp_grammar.hpp>
+#include <boost/wave/grammars/cpp_defined_grammar.hpp>
 
 #include "Texture.hpp"
 #include "Common.hpp"
@@ -160,7 +162,7 @@ GLuint CompileShader(
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
         std::vector<char> infoLog(infoLogLength + 1);
         glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog.data());
-        throw exception(infoLog.data());
+        throw std::runtime_error(infoLog.data());
     }
     return shader;
 };
@@ -191,7 +193,7 @@ LinkShader(GLuint vs,
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
         std::vector<char> infoLog(infoLogLength + 1);
         glGetProgramInfoLog(program, infoLogLength, NULL, infoLog.data());
-        throw std::exception(infoLog.data());
+        throw std::runtime_error(infoLog.data());
     }
 
     glDetachShader(program, vs);
@@ -270,6 +272,7 @@ namespace FishEngine
             auto text = DecorateShaderText(type, m_shaderTextRaw);
             //auto& text = m_shaderTextRaw;
             context_type ctx(text.begin(), text.end(), m_filePath.c_str());
+            ctx.set_language(boost::wave::language_support::support_normal);
             ctx.add_sysinclude_path(include_dir.c_str());
 
             auto first = ctx.begin();
@@ -621,18 +624,18 @@ namespace FishEngine {
         catch (const boost::wave::preprocess_exception& e)
         {
             //cout.flush();
-            printf("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
+            printf("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const boost::wave::cpplexer::lexing_exception& e)
         {
             //cout.flush();
-            printf("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
+            printf("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const std::exception& e)
         {
-            printf(e.what());
+            printf("%s", e.what());
             //abort();
             return false;
         }

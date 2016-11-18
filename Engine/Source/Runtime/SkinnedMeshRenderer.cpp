@@ -98,19 +98,18 @@ namespace FishEngine
 
         for (auto& m : m_materials) {
             auto shader = m->shader();
-            if (skinned) {
-                shader = shader->m_skinnedShader;
-            }
             assert(shader != nullptr);
+            m->EnableKeyword(ShaderKeyword::SkinnedAnimation);
             shader->Use();
             shader->PreRender();
             if (m_avatar != nullptr)
                 shader->BindMatrixArray("BoneTransformations", m_matrixPalette);
             m->BindTextures(textures);
-            m->Update(skinned);
+            m->Update();
             shader->CheckStatus();
             m_sharedMesh->Render();
             shader->PostRender();
+            m->DisableKeyword(ShaderKeyword::SkinnedAnimation);
         }
     }
 

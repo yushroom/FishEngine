@@ -3,29 +3,33 @@
 
 #include "Object.hpp"
 #include "ShaderProperty.hpp"
-//#include "Shader.hpp"
-//#include "Texture.hpp"
 
 namespace FishEngine
 {
     class Material : public Object
     {
     public:
-        Material() {
+        Material() = default;
 
-        }
-
-        Material(PShader shader)
+        Material(ShaderPtr shader)
         {
             SetShader(shader);
         }
 
-        void SetShader(PShader shader);
+        Color color() const;
 
-        PShader shader() const
+        // The shader used by the material.
+        ShaderPtr shader() const
         {
             return m_shader;
         }
+
+        // The shader used by the material.
+        void SetShader(ShaderPtr shader);
+
+        void DisableKeyword(ShaderKeyword keyword);
+
+        void EnableKeyword(ShaderKeyword keyword);
 
 
         // Set a named float value.
@@ -62,7 +66,7 @@ namespace FishEngine
         //        return m_uniforms;
         //    }
 
-        void Update(bool skinned = false);
+        void Update();
 
         //void OnInspectorGUI();
 
@@ -80,7 +84,7 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        PShader m_shader = nullptr;
+        ShaderPtr m_shader = nullptr;
         std::map<std::string, PTexture> m_textures;
 
         ShaderUniforms m_uniforms;

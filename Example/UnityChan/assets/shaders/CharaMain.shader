@@ -1,6 +1,6 @@
 #ifdef VERTEX_SHADER
     #include "UnitySupport.inc"
-    #include "AppDataTan.inc"
+    #include "AppData.inc"
 
     // Transforms 2D UV by scale/bias property
     #define TRANSFORM_TEX(tex,name) (tex.xy * name##_ST.xy + name##_ST.zw)

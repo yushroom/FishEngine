@@ -15,7 +15,7 @@ struct VS_OUT
 
 #ifdef VERTEX_SHADER
 
-    #include "AppDataTan.inc"
+    #include "AppData.inc"
     #include "CG.inc"
 
     out VS_OUT vs_out;

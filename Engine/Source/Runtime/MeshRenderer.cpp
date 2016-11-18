@@ -32,13 +32,11 @@ namespace FishEngine
     
     void MeshRenderer::Render() const
     {
-        //Debug::Log("Rendere %s", m_gameObject->name().c_str());
         auto meshFilter = gameObject()->GetComponent<MeshFilter>();
         if (meshFilter == nullptr) {
             Debug::LogWarning("This GameObject has no MeshFilter");
             return;
         }
-        
         
         auto model = transform()->localToWorldMatrix();
         auto camera = Camera::main();

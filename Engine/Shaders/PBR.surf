@@ -8,7 +8,7 @@ uniform float Metallic;
 uniform float Roughness;
 uniform float Specular;
 
-#ifdef AMBIENT_IBL
+#ifdef _AMBIENT_IBL
     uniform samplerCube RadianceMap;
     uniform samplerCube IrradianceMap;
 #endif
@@ -60,7 +60,7 @@ vec4 ps_main(SurfaceData surfaceData)
     outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(i.Roughness), vec3(1), L, V, N, vec2(1));
     float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
 
-#ifdef AMBIENT_IBL
+#ifdef _AMBIENT_IBL
     const int numMips   = 6;
     float mip           = numMips - 1 + log2(i.Roughness);
     vec3 lookup         = -reflect(V, N);

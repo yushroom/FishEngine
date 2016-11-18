@@ -1025,7 +1025,7 @@ namespace FishEditor
     }
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<Material>& material)
+    void EditorGUI::OnInspectorGUI(const PMaterial& material)
     {
         if (ImGui::CollapsingHeader(material->m_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
         {

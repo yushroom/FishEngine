@@ -1,4 +1,4 @@
-/// Blend On
+#pragma Blend On
 layout(location = 0)	in vec3 InputPositon;
 layout(location = 2)	in vec2 InputUV;
 

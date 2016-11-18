@@ -82,7 +82,7 @@ namespace FishEngine
     typedef std::shared_ptr<Animator> PAnimator;
     typedef std::shared_ptr<Mesh> PMesh;
     typedef std::shared_ptr<SimpleMesh> PSimpleMesh;
-    typedef std::shared_ptr<Shader> PShader;
+    typedef std::shared_ptr<Shader> ShaderPtr;
     typedef std::shared_ptr<Texture> PTexture;
     typedef std::shared_ptr<App> PApp;
     typedef std::shared_ptr<Light> PLight;

@@ -171,8 +171,6 @@ namespace FishEngine
                     mesh = meshFilter->mesh();
                     auto shader = shadow_map_material->shader();
                     shader->Use();
-                    //Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
-                    //Pipeline::BindPerDrawUniforms();
                     auto mvp = light_vp * go->transform()->localToWorldMatrix();
                     shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
                     shader->CheckStatus();
@@ -185,16 +183,22 @@ namespace FishEngine
             if (renderer != nullptr)
             {
                 mesh = renderer->sharedMesh();
-                auto shader = shadow_map_material->shader()->m_skinnedShader;
+                if (renderer->m_avatar != nullptr)
+                {
+                    shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+                    shadow_map_material->shader()->Use();
+                    shadow_map_material->shader()->BindMatrixArray("BoneTransformations", renderer->m_matrixPalette);
+                }
+                else {
+                    shadow_map_material->shader()->Use();
+                }
+                auto shader = shadow_map_material->shader();
                 shader->Use();
-                //Pipeline::perDrawUniformData.MATRIX_MVP = proj * view * go->transform()->localToWorldMatrix();
-                //Pipeline::BindPerDrawUniforms();
                 auto mvp = light_vp * go->transform()->localToWorldMatrix();
                 shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
-                if (renderer->m_avatar != nullptr)
-                    shader->m_skinnedShader->BindMatrixArray("BoneTransformations", renderer->m_matrixPalette);
                 shader->CheckStatus();
                 mesh->Render();
+                shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);

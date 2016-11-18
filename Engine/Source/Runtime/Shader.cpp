@@ -46,7 +46,7 @@ std::string ReadFile(const std::string& path)
 #endif
     std::ifstream fin(path);
     if (!fin.is_open()) {
-        FishEngine::Debug::LogError("Can not open shader header file: %s", path.c_str());
+        FishEngine::Debug::LogError("Can not open shader file: %s", path.c_str());
         throw exception();
     }
 
@@ -62,87 +62,6 @@ std::string ReadFile(const std::string& path)
         std::istreambuf_iterator<char>());
 #endif
 }
-
-
-//std::string AddLineNumber(const std::string& str)
-//{
-//    stringstream ss;
-//    int line_number = 2;
-//    ss << "#1\t";
-//    string::size_type last_pos = 0;
-//    auto pos = str.find('\n');
-//    while (pos != string::npos) {
-//        ss << str.substr(last_pos, pos - last_pos) << "\n#" << line_number << "\t";
-//        last_pos = pos + 1;
-//        pos = str.find('\n', last_pos);
-//        line_number++;
-//    };
-//    ss << str.substr(last_pos);
-//    return ss.str();
-//};
-
-
-//std::string ProcessInclude(const std::string& str)
-//{
-//    const auto& include_dir = Resources::shaderRootDirectory() + "include/";
-//    auto result(str);
-//    //std::set<std::string> loaded_headers;
-//    auto pos = result.find("#include", 0);
-//    while (pos != std::string::npos)
-//    {
-//        auto pos2 = result.find("\n", pos);
-//        if (pos2 == std::string::npos)
-//            pos2 = result.size();
-//        std::string filename = result.substr(pos+8+2, pos2-pos-8-2-1);
-////        if (loaded_headers.find(filename) == loaded_headers.end())
-////        {
-////            loaded_headers.insert(filename);
-////            auto include_file = ReadFile(include_dir + filename);
-////            result = result.substr(0, pos) + include_file + result.substr(pos2);
-////        } else
-////        {
-////            result = result.substr(0, pos) + result.substr(pos2);
-////        }
-//        auto include_file = ReadFile(include_dir + filename);
-//        result = result.substr(0, pos) + include_file + result.substr(pos2);
-//        pos = result.find("#include", pos);
-//    }
-//    return result;
-//}
-
-
-//void
-//ExtractSettings(
-//    const string& shaderString, 
-//    map<std::string, std::string>& outSettings)
-//{
-//    auto lines = split(shaderString, "\n");
-//    for (auto& line : lines)
-//    {
-//        boost::trim(line);
-//        if (boost::starts_with(line, "#pragma"))
-//        {
-//            line = line.substr(7);
-//            boost::trim(line);
-//            auto s = split(line, " ");
-//            if (s.size() > 2)
-//            {
-//                Debug::LogWarning("Incorrect shader setting format: %s", line.c_str());
-//            }
-//            auto res = outSettings.find(s[0]);
-//            if (res != outSettings.end())
-//            {
-//                Debug::Log("\tOverride shader setting: %s", line.c_str());
-//                outSettings[s[0]] = s[1];
-//            }
-//            else
-//            {
-//                Debug::LogWarning("Unknown shader setting: %s", line.c_str());
-//            }
-//        }
-//    }
-//};
-
 
 GLuint CompileShader(
     GLenum             shader_type,
@@ -173,6 +92,7 @@ LinkShader(GLuint vs,
     GLuint gs,
     GLuint fs)
 {
+    glCheckError();
     GLuint program = glCreateProgram();
     glAttachShader(program, vs);
     glAttachShader(program, fs);
@@ -209,15 +129,6 @@ LinkShader(GLuint vs,
 }
 
 
-
-//GLuint Shader::LoadShader(GLenum shaderType, const std::string& filePath)
-//{
-//    auto shaderStr = ReadFile(filePath);
-//    shaderStr = "#version 410\n" + ProcessInclude(shaderStr);
-//    return CompileShader(shaderType, shaderStr);
-//}
-
-
 namespace FishEngine
 {
     enum class ShaderType
@@ -235,27 +146,74 @@ namespace FishEngine
 
         ShaderImpl() = default;
 
-        ShaderImpl(std::string shaderText, ShaderType type, std::string filePath = "placeholder.surf")
-            : m_shaderTextRaw(shaderText + "\n"), m_filePath(filePath)
+        ~ShaderImpl()
         {
+            for (auto& e : m_keywordToGLPrograms)
+            {
+                glDeleteProgram(e.second);
+            }
+        }
+
+        void set(std::string shaderText, ShaderType type, std::string filePath = "placeholder.surf")
+        {
+            m_shaderTextRaw = shaderText + "\n";
+            m_filePath = filePath;
             if (type == ShaderType::SurfaceShader)
                 m_shaderTextRaw = DecorateShaderText(ShaderType::SurfaceShader, m_shaderTextRaw);
-            //m_shaderTextRaw = DecorateShaderText(type, shaderText);
         }
 
-        GLuint CompileAndLink()
+        GLuint CompileAndLink(ShaderKeywords keywords)
         {
-            auto vs = Compile(ShaderType::VertexShader);
+            Debug::Log("CompileAndLink %s", m_filePath.c_str());
+            auto vs = Compile(ShaderType::VertexShader, keywords);
             GLuint gs = 0;
             if (getValueOrDefault<string, string>(m_settings, "GeometryShader", "Off") == "On")
-                gs = Compile(ShaderType::GeometryShader);
-            auto fs = Compile(ShaderType::FragmentShader);
-            return LinkShader(vs, 0, 0, gs, fs);
+                gs = Compile(ShaderType::GeometryShader, keywords);
+            auto fs = Compile(ShaderType::FragmentShader, keywords);
+            auto glsl_program = LinkShader(vs, 0, 0, gs, fs);
+            m_keywordToGLPrograms[keywords] = glsl_program;
+            GetAllUniforms(glsl_program);
+            glDeleteShader(vs);
+            glDeleteShader(fs);
+            if (gs != 0) glDeleteShader(gs);
+            glCheckError();
+            return glsl_program;
         }
 
-        GLuint Compile(ShaderType type)
+        GLuint glslProgram(ShaderKeywords keywords, std::vector<UniformInfo>& uniforms)
         {
-            std::string text = Preprocess(type);
+            GLuint program = 0;
+            auto it = m_keywordToGLPrograms.find(keywords);
+            if (it != m_keywordToGLPrograms.end())
+            {
+                program = it->second;
+            }
+            else
+            {
+                program = CompileAndLink(keywords);
+            }
+            uniforms = m_GLProgramToUniforms[program];
+            return program;
+        }
+
+        const std::string& shaderTextRaw() const
+        {
+            return m_shaderTextRaw;
+        }
+
+        //std::map<std::string, UniformInfo>  m_uniforms;
+        std::map<std::string, std::string>  m_settings;
+
+    private:
+        std::string                         m_filePath;
+        std::string                         m_shaderTextRaw;
+        std::map<ShaderKeywords, GLuint>    m_keywordToGLPrograms;
+        std::map<GLuint, std::vector<UniformInfo>>
+                                            m_GLProgramToUniforms;
+
+        GLuint Compile(ShaderType type, ShaderKeywords keywords)
+        {
+            std::string text = Preprocess(type, keywords);
             GLenum t = GL_VERTEX_SHADER;
             if (type == ShaderType::FragmentShader)
                 t = GL_FRAGMENT_SHADER;
@@ -264,13 +222,39 @@ namespace FishEngine
             return CompileShader(t, "#version 410 core\n" + text);
         }
 
-        std::string Preprocess(ShaderType type)
+        std::string Preprocess(ShaderType type, ShaderKeywords keywords)
         {
             const auto& include_dir = Resources::shaderRootDirectory() + "include/";
-            auto text = DecorateShaderText(type, m_shaderTextRaw);
-            //auto& text = m_shaderTextRaw;
+            //auto text = DecorateShaderText(type, m_shaderTextRaw);
+            auto& text = m_shaderTextRaw;
             context_type ctx(text.begin(), text.end(), m_filePath.c_str());
             ctx.add_sysinclude_path(include_dir.c_str());
+
+            if (type == ShaderType::VertexShader)
+            {
+                ctx.add_macro_definition("VERTEX_SHADER");
+            }
+            else if (type == ShaderType::FragmentShader)
+            {
+                ctx.add_macro_definition("FRAGMENT_SHADER");
+            }
+            else if (type == ShaderType::GeometryShader)
+            {
+                ctx.add_macro_definition("GEOMETRY_SHADER");
+            }
+
+            if (keywords & ShaderKeyword::Shadow)
+            {
+                ctx.add_macro_definition("_SHADOW");
+            }
+            if (keywords & ShaderKeyword::SkinnedAnimation)
+            {
+                ctx.add_macro_definition("_SKINNED");
+            }
+            if (keywords & ShaderKeyword::AmbientIBL)
+            {
+                ctx.add_macro_definition("_AMBIENT_IBL");
+            }
 
             auto first = ctx.begin();
             auto last = ctx.end();
@@ -379,39 +363,66 @@ namespace FishEngine
 
             switch (type)
             {
-            case FishEngine::ShaderType::VertexShader:
-                left = "#define VERTEX_SHADER 1\n";
-                break;
-            case FishEngine::ShaderType::FragmentShader:
-                left = "#define FRAGMENT_SHADER 1\n";
-                break;
-            case FishEngine::ShaderType::GeometryShader:
-                left = "#define GEOMETRY_SHADER 1\n";
-                break;
             case FishEngine::ShaderType::SurfaceShader:
                 left = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n";
                 right = "#endif\n";
-                break;
-            default:
-                abort();
                 break;
             }
 
             return left + "#line 1\n" + shaderText + right;
         }
 
-        const std::string& shaderTextRaw() const
+        void GetAllUniforms(GLuint program)
         {
-            return m_shaderTextRaw;
+            std::vector<UniformInfo> uniforms;
+            GLuint blockID = glGetUniformBlockIndex(program, "PerDraw");
+            GLint blockSize = 0;
+            //assert(blockID != GL_INVALID_INDEX);
+            if (blockID != GL_INVALID_INDEX)
+            {
+                glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
+                glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+                assert(blockSize == sizeof(Pipeline::perDrawUniformData));
+            }
+
+            blockID = glGetUniformBlockIndex(program, "PerFrame");
+            //assert(blockID != GL_INVALID_INDEX);
+            if (blockID != GL_INVALID_INDEX)
+            {
+                glUniformBlockBinding(program, blockID, Pipeline::PerFrameUBOBindingPoint);
+                glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+                assert(blockSize == sizeof(Pipeline::perFrameUniformData));
+            }
+
+            //    blockID = glGetUniformBlockIndex(m_program, "Bones");
+            //    //assert(blockID != GL_INVALID_INDEX);
+            //    if (blockID != GL_INVALID_INDEX)
+            //    {
+            //        glUniformBlockBinding(m_program, blockID, Pipeline::BonesUBOBindingPoint);
+            //        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+            //        assert(blockSize == sizeof(Pipeline::bonesUniformData));
+            //    }
+
+            GLint count;
+            GLint size; // size of the variable
+            GLenum type; // type of the variable (float, vec3 or mat4, etc)
+            const GLsizei bufSize = 32; // maximum name length
+            GLchar name[bufSize]; // variable name in GLSL
+            GLsizei length; // name length
+
+            glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
+
+            for (int i = 0; i < count; i++)
+            {
+                glGetActiveUniform(program, (GLuint)i, bufSize, &length, &size, &type, name);
+                //GLint location = glGetUniformLocation(m_program, name);
+                GLint loc = glGetUniformLocation(program, name);
+                //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type).c_str(), name, loc);
+                if (loc != GL_INVALID_INDEX)
+                    uniforms.push_back(UniformInfo{ type, string(name), (GLuint)loc, false });
+            }
+            m_GLProgramToUniforms[program] = uniforms;
         }
-
-        std::map<std::string, UniformInfo> m_uniforms;
-        std::map<std::string, std::string> m_settings;
-
-    private:
-        std::string m_filePath;
-        std::string m_shaderTextRaw;
-        //std::string m_shaderTextPreprocessed;
     };
 
 } /* FishEngine */
@@ -441,28 +452,14 @@ const char* GLenumToString(GLenum e)
 
 namespace FishEngine {
 
-    std::map<std::string, PShader> Shader::m_builtinShaders;
+    std::map<std::string, ShaderPtr> Shader::m_builtinShaders;
 
-    Shader::Shader(Shader&& s)
+    Shader::Shader()
     {
-        m_program = s.m_program;
+        m_impl = std::make_unique<ShaderImpl>();
     }
 
-    //PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str, const std::string& gs_str)
-    //{
-    //    auto s = std::make_shared<Shader>();
-    //    s->FromString(vs_str, fs_str, gs_str);
-    //    return s;
-    //}
-
-    //PShader Shader::CreateFromString(const std::string& vs_str, const std::string& fs_str)
-    //{
-    //    auto s = std::make_shared<Shader>();
-    //    s->FromString(vs_str, fs_str);
-    //    return s;
-    //}
-
-    PShader Shader::CreateFromFile(const std::string& path)
+    ShaderPtr Shader::CreateFromFile(const std::string& path)
     {
         Debug::Log("Compiling %s", path.c_str());
         auto s = std::make_shared<Shader>();
@@ -471,195 +468,49 @@ namespace FishEngine {
         return nullptr;
     }
     
-    //PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path)
-    //{
-    //    auto s = std::make_shared<Shader>();
-    //    s->FromFile(vs_path, fs_path);
-    //    return s;
-    //}
-
-    //PShader Shader::CreateFromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
-    //{
-    //    auto s = std::make_shared<Shader>();
-    //    s->FromFile(vs_path, fs_path, gs_path);
-    //    return s;
-    //}
-    //
-    //void Shader::FromString(const std::string& vsfs_str)
-    //{
-    //    FromString(vsfs_str, vsfs_str);
-    //}
-    //
-    //void Shader::FromSurfaceShaderString(const std::string& surfaceShaderString)
-    //{
-    //    const std::string& full_shader_str = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n" + surfaceShaderString + "\n#endif";
-    //    FromString(full_shader_str, full_shader_str);
-    //}
-
-    //void Shader::FromString(const std::string &vs_string, const std::string &fs_string)
-    //{
-    //    FromString(vs_string, "", "", "", fs_string);
-    //}
-
-    //void Shader::FromString(const std::string& vs_string, const std::string& fs_string, const std::string& gs_string)
-    //{
-    //    FromString(vs_string, "", "", gs_string, fs_string);
-    //}
-
-    //void Shader::FromString(const std::string& vs_string,
-    //    const std::string& tcs_string,
-    //    const std::string& tes_string,
-    //    const std::string& gs_string,
-    //    const std::string& fs_string)
-    //{
-    //    assert(m_program == 0);
-    //    assert(!vs_string.empty() && !fs_string.empty());
-    //    assert(!(!tcs_string.empty() && tes_string.empty()));
-
-    //    bool use_gs = !gs_string.empty();
-    //    bool use_ts = !tes_string.empty();
-    //    GLuint vs = 0;
-    //    GLuint vs_skinned = 0;
-    //    GLuint fs = 0;
-    //    GLuint gs = 0;
-    //    GLuint tcs = 0;
-    //    GLuint tes = 0;
-
-    //    map<string, string> settings = { {"Cull", "Back"},{"ZWrite", "On"},{"Blend", "Off"}, {"ZTest", "Less"}, {"Normalmap", "Off"}, {"Shadow", "On"} };
-
-    //    //bool hasSkinnedVersion =
-    //    //    (vs_string.find("AppDataBase.inc") != std::string::npos)
-    //    //    || (vs_string.find("AppDataTan.inc") != std::string::npos);
-
-    //    ExtractSettings(vs_string, settings);
-    //    auto parsed_vs = ProcessInclude(vs_string);
-    //    ExtractSettings(fs_string, settings);
-    //    auto parsed_fs = ProcessInclude(fs_string);
-
-    //    m_cullface = ToEnum<Cullface>(settings["Cull"]);
-    //    m_ZWrite = settings["ZWrite"] == "On";
-    //    m_blend = settings["Blend"] == "On";
-    //    m_applyNormalMap = settings["Normalmap"] == "On";
-    //    m_receiveShadow = settings["Shadow"] == "On";
-
-    //    vs = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define VERTEX_SHADER 1\n" + parsed_vs);
-    //    //if (hasSkinnedVersion)
-    //    vs_skinned = CompileShader(GL_VERTEX_SHADER, "#version 410 core\n#define VERTEX_SHADER 1\n#define SKINNED\n" + parsed_vs);
-    //    std::string fs_macro = "#version 410 core\n#define FRAGMENT_SHADER 1\n";
-    //    if (m_applyNormalMap)
-    //        fs_macro += "#define _NORMALMAP\n";
-    //    if (m_receiveShadow)
-    //        fs_macro += "#define _SHADOW\n";
-    //    fs = CompileShader(GL_FRAGMENT_SHADER, fs_macro + parsed_fs);
-
-    //    // gs
-    //    if (use_gs) {
-    //        gs = CompileShader(GL_GEOMETRY_SHADER, "#version 410 core\n" + gs_string);
-    //    }
-    //    if (use_ts) {
-    //        if (!tcs_string.empty())
-    //            tcs = CompileShader(GL_TESS_CONTROL_SHADER, tcs_string);
-    //        tes = CompileShader(GL_TESS_EVALUATION_SHADER, tes_string);
-    //    }
-
-    //    m_program = LinkShader(vs, tcs, tes, gs, fs);
-    //    GetAllUniforms();
-
-    //    //if (hasSkinnedVersion) {
-    //        m_skinnedShader = std::make_shared<Shader>();
-    //        *m_skinnedShader = *this;
-    //        m_skinnedShader->m_program = LinkShader(vs_skinned, tcs, tes, gs, fs);
-    //        m_skinnedShader->GetAllUniforms();
-    //        //assert(m_uniforms.size() + 1 == m_skinnedShader->m_uniforms.size());
-    //    //}
-
-    //    glDeleteShader(vs);
-    //    glDeleteShader(vs_skinned);
-    //    glDeleteShader(fs);
-    //    if (gs != 0) {
-    //        glDeleteShader(gs);
-    //    }
-    //    if (tes != 0) {
-    //        if (tcs != 0) glDeleteShader(tcs);
-    //        glDeleteShader(tes);
-    //    }
-    //}
-    
     bool Shader::FromFile(const std::string& path)
     {
-        assert(m_program == 0);
-
         try
         {
             auto ext = getExtensionWithoutDot(path);
             auto shader_text = ReadFile(path);
             auto t = ext == "surf" ? ShaderType::SurfaceShader : ShaderType::CombinedShader;
-            ShaderImpl impl(shader_text, t, path);
-            m_program = impl.CompileAndLink();
-            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(impl.m_settings, "Cull", "Back"));
-            m_ZWrite = getValueOrDefault<string, string>(impl.m_settings, "ZWrite", "On") == "On";
-            m_blend = getValueOrDefault<string, string>(impl.m_settings, "Blend", "Off") == "On";
-            m_applyNormalMap = getValueOrDefault<string, string>(impl.m_settings, "Normalmap", "Off") == "On";
-            m_receiveShadow = getValueOrDefault<string, string>(impl.m_settings, "Shadow", "On") == "On";
-            //else {
-            //    Debug::LogError("Unknown shader type: %s", path.c_str());
-            //    throw std::exception(("Unknown shader type: " + path).c_str());
-            //}
-            //else if (ext == "geom")
-            //{
-            //    auto t = ShaderType::GeometryShader;
-            //    ShaderImpl impl(shader_text, t, path);
-            //    impl.Compile(t);
-            //}
-            //else
-            //{
-            //    auto t = ext == "vert" ? ShaderType::VertexShader : ShaderType::FragmentShader;
-            //    ShaderImpl impl(shader_text, t, path);
-            //    impl.Compile(t);
-            //}
+            m_impl->set(shader_text, t, path);
+            m_impl->CompileAndLink(ShaderKeyword::All);
+            m_program = m_impl->glslProgram(m_keywords, m_uniforms);
+            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(m_impl->m_settings, "Cull", "Back"));
+            m_ZWrite = getValueOrDefault<string, string>(m_impl->m_settings, "ZWrite", "On") == "On";
+            m_blend = getValueOrDefault<string, string>(m_impl->m_settings, "Blend", "Off") == "On";
+            m_applyNormalMap = getValueOrDefault<string, string>(m_impl->m_settings, "Normalmap", "Off") == "On";
+            m_receiveShadow = getValueOrDefault<string, string>(m_impl->m_settings, "Shadow", "On") == "On";
         }
         catch (const boost::wave::preprocess_exception& e)
         {
-            //cout.flush();
             printf("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const boost::wave::cpplexer::lexing_exception& e)
         {
-            //cout.flush();
             printf("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const std::exception& e)
         {
             printf(e.what());
-            //abort();
             return false;
         }
 
-        GetAllUniforms();
+        //GetAllUniforms();
         return true;
     }
 
-    //void Shader::FromFile(const std::string& vs_path, const std::string& fs_path)
-    //{
-    //    assert(m_program == 0);
-    //    FromString(ReadFile(vs_path), ReadFile(fs_path));
-    //}
-
-    //void Shader::FromFile(const std::string& vs_path, const std::string& fs_path, const std::string& gs_path)
-    //{
-    //    assert(m_program == 0);
-    //    FromString(ReadFile(vs_path), ReadFile(fs_path), ReadFile(gs_path));
-    //}
-
     Shader::~Shader()
     {
-        glDeleteProgram(m_program);
     }
 
-    void Shader::Use() const {
-        glUseProgram(this->m_program);
+    void Shader::Use() const
+    {
+        glUseProgram(m_program);
     }
 
     void Shader::BindUniformVec4(const char* name, const Vector4& value)
@@ -670,7 +521,6 @@ namespace FishEngine {
             if (u.name == name)
             {
                 glUniform4fv(u.location, 1, value.data());
-                glCheckError();
                 u.binded = true;
                 return;
             }
@@ -683,7 +533,6 @@ namespace FishEngine {
         for (auto& u : m_uniforms) {
             if (boost::starts_with(u.name, name)) {
                 glUniformMatrix4fv(u.location, 1, GL_TRUE, value.data());
-                glCheckError();
                 u.binded = true;
                 return;
             }
@@ -695,11 +544,9 @@ namespace FishEngine {
     {
         //auto loc = GetUniformLocation(name.c_str());
         //glUniformMatrix4fv(loc, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
-        //glCheckError();
         for (auto& u : m_uniforms) {
             if (boost::starts_with(u.name, name)) {
                 glUniformMatrix4fv(u.location, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
-                glCheckError();
                 u.binded = true;
                 return;
             }
@@ -803,7 +650,7 @@ namespace FishEngine {
         }
     }
 
-    PShader Shader::builtinShader(const std::string& name)
+    ShaderPtr Shader::builtinShader(const std::string& name)
     {
         auto it = m_builtinShaders.find(name);
         if (it != m_builtinShaders.end())
@@ -815,90 +662,17 @@ namespace FishEngine {
         return nullptr;
     }
 
-
-    void Shader::Compile()
+    void Shader::EnableLocalKeyword(ShaderKeyword keyword)
     {
-        glDeleteProgram(m_program);
+        m_keywords |= static_cast<ShaderKeywords>(keyword);
+        m_program = m_impl->glslProgram(m_keywords, m_uniforms);
     }
 
-    void Shader::GetAllUniforms()
+    void Shader::DisableLocalKeyword(ShaderKeyword keyword)
     {
-        //{
-        //    GLuint perDrawUBO = glGetUniformBlockIndex(m_program, "PerDraw");
-        //    GLint ubo_size = 0;
-        //    glGetActiveUniformBlockiv(m_program, perDrawUBO, GL_UNIFORM_BLOCK_DATA_SIZE, &ubo_size);
-        //    const int perDrawUBOCount = 8;
-        //    GLuint indices[perDrawUBOCount];
-        //    GLint size[perDrawUBOCount];
-        //    GLint offset[perDrawUBOCount];
-        //    GLint type[perDrawUBOCount];
-        //    glGetUniformIndices(m_program, perDrawUBOCount, PerDrawUniformNames, indices);
-        //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_OFFSET, offset);
-        //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_SIZE, size);
-        //    glGetActiveUniformsiv(m_program, perDrawUBOCount, indices, GL_UNIFORM_TYPE, type);
-        //    Debug::Log("here");
-        //}
-
-        GLuint blockID = glGetUniformBlockIndex(m_program, "PerDraw");
-        GLint blockSize = 0;
-        //assert(blockID != GL_INVALID_INDEX);
-        if (blockID != GL_INVALID_INDEX)
-        {
-            glUniformBlockBinding(m_program, blockID, Pipeline::PerDrawUBOBindingPoint);
-            glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-            assert(blockSize == sizeof(Pipeline::perDrawUniformData));
-        }
-
-        blockID = glGetUniformBlockIndex(m_program, "PerFrame");
-        //assert(blockID != GL_INVALID_INDEX);
-        if (blockID != GL_INVALID_INDEX)
-        {
-            glUniformBlockBinding(m_program, blockID, Pipeline::PerFrameUBOBindingPoint);
-            glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-            assert(blockSize == sizeof(Pipeline::perFrameUniformData));
-        }
-
-        //    blockID = glGetUniformBlockIndex(m_program, "Bones");
-        //    //assert(blockID != GL_INVALID_INDEX);
-        //    if (blockID != GL_INVALID_INDEX)
-        //    {
-        //        glUniformBlockBinding(m_program, blockID, Pipeline::BonesUBOBindingPoint);
-        //        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-        //        assert(blockSize == sizeof(Pipeline::bonesUniformData));
-        //    }
-
-        GLint count;
-        GLint size; // size of the variable
-        GLenum type; // type of the variable (float, vec3 or mat4, etc)
-        const GLsizei bufSize = 32; // maximum name length
-        GLchar name[bufSize]; // variable name in GLSL
-        GLsizei length; // name length
-
-        glGetProgramiv(m_program, GL_ACTIVE_UNIFORMS, &count);
-        //Debug::Log("Program %u, Active Uniforms: %d", m_program, count);
-        m_uniforms.clear();
-
-        for (int i = 0; i < count; i++)
-        {
-            glGetActiveUniform(m_program, (GLuint)i, bufSize, &length, &size, &type, name);
-            //GLint location = glGetUniformLocation(m_program, name);
-            GLint loc = glGetUniformLocation(m_program, name);
-            //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type).c_str(), name, loc);
-            if (loc >= 0)
-                m_uniforms.push_back(UniformInfo{ type, string(name), (GLuint)loc, false });
-        }
+        m_keywords &= ~(static_cast<ShaderKeywords>(keyword));
+        m_program = m_impl->glslProgram(m_keywords, m_uniforms);
     }
-
-
-    GLint Shader::GetUniformLocation(const char* name) const
-    {
-        GLint loc = glGetUniformLocation(m_program, name);
-        if (loc == -1) {
-            Debug::LogWarning("uniform[%s] not found\n", name);
-        }
-        return loc;
-    }
-
 
     //========== Static Region ==========
 

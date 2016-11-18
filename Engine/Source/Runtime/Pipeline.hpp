@@ -3,7 +3,6 @@
 
 #include "FishEngine.hpp"
 #include "Matrix4x4.hpp"
-#include "GLEnvironment.hpp"
 #include "ShaderVariables_gen.hpp"
 
 namespace FishEngine
@@ -13,30 +12,14 @@ namespace FishEngine
     public:
         Pipeline() = delete;
 
-        static void Init()
-        {
-            glGenBuffers(1, &perDrawUBO);
-            glGenBuffers(1, &perFrameUBO);
-            //glGenBuffers(1, &bonesUBO);
-        }
+        static void Init();
 
-        static void BindPerDrawUniforms()
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, perDrawUBO);
-            //auto size = sizeof(perDrawUniformData);
-            glBufferData(GL_UNIFORM_BUFFER, sizeof(perDrawUniformData), (void*)&perDrawUniformData, GL_DYNAMIC_DRAW);
-            glBindBufferBase(GL_UNIFORM_BUFFER, PerDrawUBOBindingPoint, perDrawUBO);
-            glCheckError();
-        }
+        static void BindCamera(const CameraPtr& camera);
+        static void BindLight(const LightPtr& light);
 
-        static void BindPerFrameUniforms()
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, perFrameUBO);
-            //auto size = sizeof(perFrameUniformData);
-            glBufferData(GL_UNIFORM_BUFFER, sizeof(perFrameUniformData), (void*)&perFrameUniformData, GL_DYNAMIC_DRAW);
-            glBindBufferBase(GL_UNIFORM_BUFFER, PerFrameUBOBindingPoint, perFrameUBO);
-            glCheckError();
-        }
+        static void UpdatePerDrawUniforms(const Matrix4x4& modelMatrix);
+
+        static void UpdatePerFrameUniforms();
         
 //        static void BindBonesUniforms()
 //        {
@@ -47,18 +30,17 @@ namespace FishEngine
 //            glCheckError();
 //        }
 
-        static const GLuint PerDrawUBOBindingPoint = 0;
-        static const GLuint PerFrameUBOBindingPoint = 1;
+        static constexpr unsigned int PerDrawUBOBindingPoint = 0;
+        static constexpr unsigned int PerFrameUBOBindingPoint = 1;
         //static const GLuint BonesUBOBindingPoint = 2;
 
-        static PerDraw perDrawUniformData;
-        static PerFrame perFrameUniformData;
-        //static Bones bonesUniformData;
-
     private:
-        static GLuint perDrawUBO;
-        static GLuint perFrameUBO;
+        static unsigned int s_perDrawUBO;
+        static unsigned int s_perFrameUBO;
         //static GLuint bonesUBO;
+        static PerDraw      s_perDrawUniformData;
+        static PerFrame     s_perFrameUniformData;
+        //static Bones bonesUniformData;
     };
 }
 

@@ -39,3 +39,7 @@ struct PerFrame
  	// Time (t = time since current level load) values from Unity
  	vec4 _Time; // (t/20, t, t*2, t*3)
 };
+
+#undef mat4
+#undef vec3
+#undef vec4

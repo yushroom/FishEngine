@@ -6,7 +6,7 @@
 #ifdef _NORMALMAP
     uniform sampler2D NormalMap;
     const float bumpiness = 0.2;
-#endif
+#endif 
 
 #ifdef _SHADOW
     uniform sampler2D ShadowMap;
@@ -126,7 +126,7 @@ void main()
 #ifdef _SHADOW
     vec4 positionInLightSpace = LightMatrix0 * vec4(vs_out.position, 1);
     float shadowFactor = ShadowCalculation(positionInLightSpace, L, N);
-    color.rgb *= (1.f-shadowFactor);
+    color.rgb *= (1.f-shadowFactor*0.5);
 #endif
     //color.a = 1.0f;
 }

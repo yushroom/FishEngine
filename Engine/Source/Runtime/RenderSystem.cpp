@@ -1,4 +1,5 @@
 #include "RenderSystem.hpp"
+
 #include "Pipeline.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
@@ -6,10 +7,10 @@
 #include "Gizmos.hpp"
 #include "RenderSettings.hpp"
 #include "Camera.hpp"
-#include "Time.hpp"
 #include "Light.hpp"
 #include "Scene.hpp"
 #include "Screen.hpp"
+#include "Graphics.hpp"
 
 namespace FishEngine
 {
@@ -37,15 +38,7 @@ namespace FishEngine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         auto camera = Camera::main();
-        auto proj = camera->projectionMatrix();
-        auto view = camera->worldToCameraMatrix();
-        Pipeline::perFrameUniformData.MATRIX_P = proj;
-        Pipeline::perFrameUniformData.MATRIX_V = view;
-        Pipeline::perFrameUniformData.MATRIX_I_V = view.inverse();
-        Pipeline::perFrameUniformData.MATRIX_VP = proj * view;
-        Pipeline::perFrameUniformData.WorldSpaceCameraPos = Camera::main()->transform()->position();
-        float t = Time::time();
-        Pipeline::perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
+        Pipeline::BindCamera(camera);
 
         Vector4 lightDir(0, 0, 0, 0);
         Matrix4x4 lightVP;
@@ -53,44 +46,17 @@ namespace FishEngine
         if (lights.size() > 0)
         {
             auto& l = lights.front();
-            if (l->transform() != nullptr)
-            {
-                lightDir = Vector4(-l->transform()->forward(), 0);
-                lightVP = l->m_projectMatrixForShadowMap * l->m_viewMatrixForShadowMap;
-            }
-            Pipeline::perFrameUniformData.LightColor0 = l->m_color;
+            Pipeline::BindLight(l);
         }
-        Pipeline::perFrameUniformData.WorldSpaceLightPos0 = lightDir;
-        Pipeline::perFrameUniformData.LightMatrix0 = lightVP;
 
-        Pipeline::BindPerFrameUniforms();
+        Pipeline::UpdatePerFrameUniforms();
 
 
         /************************************************************************/
         /* Skybox                                                               */
         /************************************************************************/
         Matrix4x4 model = Matrix4x4::Scale(100);
-        auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
-        Pipeline::perDrawUniformData.MATRIX_MVP = Pipeline::perFrameUniformData.MATRIX_VP * model;
-        Pipeline::perDrawUniformData.MATRIX_MV = mv;
-        Pipeline::perDrawUniformData.MATRIX_M = model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
-        Pipeline::perDrawUniformData.MATRIX_IT_M = model.transpose().inverse();
-        Pipeline::BindPerDrawUniforms();
-        static auto sphere = Model::builtinMesh(PrimitiveType::Sphere);
-        auto skybox_material = RenderSettings::skybox();
-        auto shader = skybox_material->shader();
-        shader->Use();
-        //glCullFace(GL_BACK);
-        //glDisable(GL_DEPTH_TEST);
-        shader->PreRender();
-        skybox_material->Update();
-        shader->CheckStatus();
-        sphere->Render();
-        shader->PostRender();
-        //glEnable(GL_DEPTH_TEST);
-        //glCullFace(GL_BACK);
-
+        Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
         /************************************************************************/
         /* Shadow                                                               */

@@ -27,7 +27,7 @@ namespace FishEngine
     ComponentPtr
     AddComponentToGameObject(
         const std::string&  componentClassName,
-        GameObjectPtr&        gameObject);
+        GameObjectPtr&      gameObject);
 }
 
 #endif // Component_gen_hpp

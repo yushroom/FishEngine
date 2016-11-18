@@ -74,7 +74,7 @@ namespace FishEngine
 
     void Scene::RenderShadow(LightPtr& light)
     {
-#define DEBUG_SHADOW 0
+#define DEBUG_SHADOW 1
         // get compact light frustum
         auto    camera          = Camera::mainGameCamera();
         //auto    world_to_camera = camera->transform()->worldToLocalMatrix();

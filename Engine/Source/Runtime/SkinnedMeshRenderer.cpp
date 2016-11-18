@@ -68,17 +68,7 @@ namespace FishEngine
     void SkinnedMeshRenderer::Render() const
     {
         auto model = transform()->localToWorldMatrix();
-        auto camera = Camera::main();
-        auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
-
-        //ShaderUniforms uniforms;
-        Pipeline::perDrawUniformData.MATRIX_MVP = Pipeline::perFrameUniformData.MATRIX_P * mv;
-        Pipeline::perDrawUniformData.MATRIX_MV = mv;
-        Pipeline::perDrawUniformData.MATRIX_M = model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
-        Pipeline::perDrawUniformData.MATRIX_IT_M = model.transpose().inverse();
-
-        Pipeline::BindPerDrawUniforms();
+        Pipeline::UpdatePerDrawUniforms(model);
 
         std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
@@ -96,7 +86,8 @@ namespace FishEngine
             UpdateMatrixPalette();
         }
 
-        for (auto& m : m_materials) {
+        for (auto& m : m_materials)
+        {
             auto shader = m->shader();
             assert(shader != nullptr);
             m->EnableKeyword(ShaderKeyword::SkinnedAnimation);
@@ -105,7 +96,7 @@ namespace FishEngine
             if (m_avatar != nullptr)
                 shader->BindMatrixArray("BoneTransformations", m_matrixPalette);
             m->BindTextures(textures);
-            m->Update();
+            m->BindProperties();
             shader->CheckStatus();
             m_sharedMesh->Render();
             shader->PostRender();

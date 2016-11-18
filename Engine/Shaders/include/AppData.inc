@@ -26,14 +26,14 @@ struct AppData
 
 #ifdef USE_DEFAULT_VS
 
-out VS_OUT
-{
-	vec3 position;		// in world space
-	vec3 normal;		// in world space
-    vec3 tangent;
-	vec2 uv;
-	//vec4 positionInLightSpace; // light space
-} vs_out;
+    out VS_OUT
+    {
+    	vec3 position;		// in world space
+    	vec3 normal;		// in world space
+        vec3 tangent;
+    	vec2 uv;
+    	//vec4 positionInLightSpace; // light space
+    } vs_out;
 
     void vs_main(AppData appdata)
     {

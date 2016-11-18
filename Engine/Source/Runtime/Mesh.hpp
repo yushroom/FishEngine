@@ -72,7 +72,7 @@ namespace FishEngine
         Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
         Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
         Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
-        Mesh(const std::string& objModelPath, int vertexUsage);
+        //Mesh(const std::string& objModelPath, int vertexUsage);
 
         Mesh(const Mesh&) = delete;
         void operator=(const Mesh&) = delete;
@@ -81,7 +81,8 @@ namespace FishEngine
 
         ~Mesh();
 
-        void SetVertexUsage(int vertexUsage) {
+        void SetVertexUsage(int vertexUsage)
+        {
             BindBuffer(vertexUsage);
         }
 
@@ -89,7 +90,8 @@ namespace FishEngine
         //void renderPatch(const Shader& shader);
 
         // The bounding volume of the mesh.
-        Bounds bounds() const {
+        Bounds bounds() const
+        {
             return m_bounds;
         }
 

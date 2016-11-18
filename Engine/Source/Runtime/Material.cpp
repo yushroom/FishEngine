@@ -8,7 +8,7 @@
 
 namespace FishEngine
 {
-    std::map<std::string, MaterialPtr> Material::m_builtinMaterial;
+    std::map<std::string, MaterialPtr> Material::s_builtinMaterial;
     MaterialPtr Material::s_defaultMaterial = nullptr;
 
     // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
@@ -46,38 +46,71 @@ namespace FishEngine
     bool FindUniformInShader(std::vector<UniformInfo>& uniforms, const std::string& name)
     {
         constexpr auto type = GLType<T>();
-        for (auto& u : uniforms) {
-            if (u.name == name && u.type == type) {
+        for (auto& u : uniforms)
+        {
+            if (u.name == name && u.type == type)
+            {
                 return true;
             }
         }
         return false;
     }
 
-    void Material::SetShader(ShaderPtr shader)
+    void Material::SetShader(const ShaderPtr& shader)
     {
         m_shader = shader;
-        //for (auto& u : m_shader->uniforms()) {
-        //    if (u.type == GL_FLOAT) {
-        //        m_uniforms.floats[u.name] = 0.5f;
-        //    }
-        //    else if (u.type == GL_FLOAT_VEC3) {
-        //        //m_uniforms.vec3s[u.name] = Vector3(1, 1, 1);
-        //    }
-        //}
+        for (auto& u : m_shader->uniforms())
+        {
+            if (u.type == GL_FLOAT)
+            {
+                m_uniforms.floats[u.name] = 1.0f;
+                m_properties.emplace_back(MaterialProperty{u.name, MaterialPropertyType::Float});
+            }
+            else if (u.type == GL_FLOAT_VEC3)
+            {
+                m_uniforms.vec3s[u.name] = Vector3::one;
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Float3 });
+            }
+            else if (u.type == GL_FLOAT_VEC4)
+            {
+                m_uniforms.vec4s[u.name] = Vector4::one;
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Float4 });
+            }
+            else if (u.type == GL_FLOAT_MAT4)
+            {
+                m_uniforms.mat4s[u.name] = Matrix4x4::identity;
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Mat4 });
+            }
+            else if (u.type == GL_SAMPLER_2D)
+            {
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Texture2D });
+            }
+            else if (u.type == GL_SAMPLER_CUBE)
+            {
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::TextureCube });
+            }
+            else {
+                Debug::LogError("Unknown shader property type");
+            }
+        }
     }
 
-    void Material::DisableKeyword(ShaderKeyword keyword)
+    void Material::DisableKeywords(ShaderKeywords keyword)
     {
-        m_shader->DisableLocalKeyword(keyword);
+        m_shader->DisableLocalKeywords(keyword);
     }
 
-    void Material::EnableKeyword(ShaderKeyword keyword)
+    void Material::EnableKeywords(ShaderKeywords keyword)
     {
-        m_shader->EnableLocalKeyword(keyword);
+        m_shader->EnableLocalKeywords(keyword);
     }
 
-    void Material::Update()
+    bool Material::IsKeywordEnabled(ShaderKeyword keyword)
+    {
+        return m_shader->IsKeywordEnabled(keyword);
+    }
+
+    void Material::BindProperties()
     {
         m_shader->BindUniforms(m_uniforms);
         m_shader->BindTextures(m_textures);
@@ -85,7 +118,8 @@ namespace FishEngine
 
     void Material::SetFloat(const std::string& name, const float value)
     {
-        if (FindUniformInShader<float>(m_shader->m_uniforms, name)) {
+        if (FindUniformInShader<float>(m_shader->m_uniforms, name))
+        {
             m_uniforms.floats[name] = value;
             return;
         }
@@ -95,8 +129,8 @@ namespace FishEngine
 
     void Material::SetVector3(const std::string& name, const Vector3& value)
     {
-        //m_shader->BindUniformVec3(name.c_str(), value);
-        if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name)) {
+        if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name))
+        {
             m_uniforms.vec3s[name] = value;
             return;
         }
@@ -106,7 +140,8 @@ namespace FishEngine
 
     void Material::SetVector4(const std::string& name, const Vector4& value)
     {
-        if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name)) {
+        if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name))
+        {
             m_uniforms.vec4s[name] = value;
             return;
         }
@@ -114,7 +149,7 @@ namespace FishEngine
     }
 
 
-    void Material::SetTexture(const std::string& name, TexturePtr& texture)
+    void Material::SetTexture(const std::string& name, TexturePtr texture)
     {
         for (auto& u : m_shader->m_uniforms)
         {
@@ -124,11 +159,11 @@ namespace FishEngine
                 return;
             }
         }
-        Debug::LogWarning("Uniform %s[sampler2D] not found.", name.c_str());
+        Debug::LogWarning("Uniform %s[texture] not found.", name.c_str());
     }
 
 
-    void Material::setMainTexture(TexturePtr& texture)
+    void Material::setMainTexture(TexturePtr texture)
     {
         SetTexture("_MainTex", texture);
     }
@@ -151,12 +186,11 @@ namespace FishEngine
 
     void Material::BindTextures(const std::map<std::string, TexturePtr>& textures)
     {
-        //m_textures = textures;
-        for (auto& pair : textures) {
+        for (auto& pair : textures)
+        {
             m_textures[pair.first] = pair.second;
         }
     }
-
 
     MaterialPtr Material::defaultMaterial()
     {

@@ -12,7 +12,8 @@
 #include "Pipeline.hpp"
 #include "Camera.hpp"
 #include "Gizmos.hpp"
-#include "Shader.hpp"
+//#include "Shader.hpp"
+#include "Graphics.hpp"
 
 
 namespace FishEngine
@@ -39,17 +40,7 @@ namespace FishEngine
         }
         
         auto model = transform()->localToWorldMatrix();
-        auto camera = Camera::main();
-        auto mv = Pipeline::perFrameUniformData.MATRIX_V * model;
-        
-        //ShaderUniforms uniforms;
-        Pipeline::perDrawUniformData.MATRIX_MVP = Pipeline::perFrameUniformData.MATRIX_P * mv;
-        Pipeline::perDrawUniformData.MATRIX_MV = mv;
-        Pipeline::perDrawUniformData.MATRIX_M = model;
-        Pipeline::perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
-        Pipeline::perDrawUniformData.MATRIX_IT_M = model.transpose().inverse();
-        
-        Pipeline::BindPerDrawUniforms();
+        Pipeline::UpdatePerDrawUniforms(model);
         
         std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
@@ -60,19 +51,23 @@ namespace FishEngine
             }
         }
         
-        std::vector<Matrix4x4> boneTransformation;
         const auto& mesh = meshFilter->mesh();
         
-        for (auto& m : m_materials) {
+        for (auto& m : m_materials)
+        {
+#if 0
             auto shader = m->shader();
             assert(shader != nullptr);
             shader->Use();
             shader->PreRender();
             m->BindTextures(textures);
-            m->Update();
+            m->BindProperties();
             shader->CheckStatus();
             mesh->Render();
             shader->PostRender();
+#else
+            Graphics::DrawMesh(mesh, m);
+#endif
         }
     }
     

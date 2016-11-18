@@ -1,17 +1,39 @@
 #ifndef Material_hpp
 #define Material_hpp
 
+#pragma once
+
 #include "Object.hpp"
 #include "ShaderProperty.hpp"
 
 namespace FishEngine
 {
+    enum class MaterialPropertyType
+    {
+        Float,
+        Float2,
+        Float3,
+        Float4,
+        Mat3,
+        Mat4,
+        Texture2D,
+        Texture3D,
+        TextureCube,
+    };
+
+    struct MaterialProperty
+    {
+        std::string             name;
+        MaterialPropertyType    type;
+    };
+
+
     class Material : public Object
     {
     public:
         Material() = default;
 
-        Material(ShaderPtr shader)
+        Material(const ShaderPtr& shader)
         {
             SetShader(shader);
         }
@@ -25,12 +47,24 @@ namespace FishEngine
         }
 
         // The shader used by the material.
-        void SetShader(ShaderPtr shader);
+        void SetShader(const ShaderPtr& shader);
 
-        void DisableKeyword(ShaderKeyword keyword);
+        void DisableKeyword(ShaderKeyword keyword)
+        {
+            DisableKeywords(static_cast<ShaderKeywords>(keyword));
+        }
+        void EnableKeyword(ShaderKeyword keyword)
+        {
+            EnableKeywords(static_cast<ShaderKeywords>(keyword));
+        }
 
-        void EnableKeyword(ShaderKeyword keyword);
+        void DisableKeywords(ShaderKeywords keyword);
 
+        void EnableKeywords(ShaderKeywords keyword);
+
+        bool IsKeywordEnabled(ShaderKeyword keyword);
+
+        bool HasProperty(const std::string& propertyName);
 
         // Set a named float value.
         void SetFloat(const std::string& name, const float value);
@@ -41,16 +75,17 @@ namespace FishEngine
         void SetVector4(const std::string& name, const Vector4& value);
 
         // Set a named matrix for the shader.
-        void SetMatrix(const std::string& name, const Matrix4x4& value) {
+        void SetMatrix(const std::string& name, const Matrix4x4& value)
+        {
             m_uniforms.mat4s[name] = value;
         }
 
         // Set a named texture
-        void SetTexture(const std::string& name, TexturePtr& texture);
+        void SetTexture(const std::string& name, TexturePtr texture);
 
         // The material's texture.
         // The same as using GetTexture or SetTexture with "_MainTex" name.
-        void setMainTexture(TexturePtr& texture);
+        void setMainTexture(TexturePtr texture);
 
         // The main material's color.
         // The same as using GetColor or SetColor with "_Color" name.
@@ -58,23 +93,16 @@ namespace FishEngine
 
         void BindTextures(const std::map<std::string, TexturePtr>& textures);
 
-        //    auto uniforms() const {
-        //        return m_uniforms;
-        //    }
+        void BindProperties();
 
-        //    ShaderUniforms& uniforms() {
-        //        return m_uniforms;
-        //    }
-
-        void Update();
-
-        //void OnInspectorGUI();
-
-        //========== Static Region ==========
+        /************************************************************************/
+        /* Static Members                                                       */
+        /************************************************************************/
 
         static void Init();
 
-        static MaterialPtr CreateMaterial() {
+        static MaterialPtr CreateMaterial()
+        {
             return std::make_shared<Material>();
         }
 
@@ -84,13 +112,14 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        ShaderPtr m_shader = nullptr;
-        std::map<std::string, TexturePtr> m_textures;
 
-        ShaderUniforms m_uniforms;
+        ShaderPtr                           m_shader = nullptr;
+        std::map<std::string, TexturePtr>   m_textures;
+        ShaderUniforms                      m_uniforms;
+        std::vector<MaterialProperty>       m_properties;
 
-        static std::map<std::string, MaterialPtr> m_builtinMaterial;
-        static MaterialPtr s_defaultMaterial;
+        static std::map<std::string, MaterialPtr>   s_builtinMaterial;
+        static MaterialPtr                          s_defaultMaterial;
     };
 }
 

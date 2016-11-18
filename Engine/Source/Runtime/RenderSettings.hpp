@@ -18,10 +18,7 @@ namespace FishEngine
             return m_skybox;
         }
 
-        static void setSkybox(MaterialPtr& skybox)
-        {
-            m_skybox = skybox;
-        }
+        static void setSkybox(MaterialPtr& skybox);
 
     private:
 

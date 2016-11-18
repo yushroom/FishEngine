@@ -70,7 +70,8 @@ namespace FishEngine
     //    FromObjFile(objModelPath, vertexUsage);
     //}
 
-    Mesh::~Mesh() {
+    Mesh::~Mesh()
+    {
         // Properly de-allocate all resources once they've outlived their purpose
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_positionVBO);
@@ -80,7 +81,8 @@ namespace FishEngine
     }
 
 
-    void Mesh::Render() {
+    void Mesh::Render()
+    {
         glBindVertexArray(m_VAO);
         glDrawElements(GL_TRIANGLES, (GLsizei)m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

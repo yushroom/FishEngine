@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -35,7 +36,9 @@ typedef boost::wave::context<
 std::map<std::string, std::string> pathToShaderString;
 #endif
 
-std::string ReadFile(const std::string& path)
+std::string 
+ReadFile(
+    const std::string& path)
 {
 #ifdef CACHE_INCLUDE_HEADER
     auto it = pathToShaderString.find(path);
@@ -63,7 +66,8 @@ std::string ReadFile(const std::string& path)
 #endif
 }
 
-GLuint CompileShader(
+GLuint
+CompileShader(
     GLenum             shader_type,
     const std::string& shader_str)
 {
@@ -129,15 +133,41 @@ LinkShader(GLuint vs,
 }
 
 
+const char* GLenumToString(GLenum e)
+{
+    switch (e) {
+    case GL_FLOAT:
+        return "GL_FLOAT";
+    case GL_FLOAT_VEC3:
+        return "GL_FLOAT_VEC3";
+    case GL_FLOAT_MAT4:
+        return "GL_FLOAT_MAT4";
+    case GL_SAMPLER_2D:
+        return "GL_SAMPLER_2D";
+    case GL_SAMPLER_3D:
+        return "GL_SAMPLER_3D";
+    case GL_SAMPLER_CUBE:
+        return "GL_SAMPLER_CUBE";
+    default:
+        return "UNKNOWN";
+        break;
+    }
+}
+
+
 namespace FishEngine
 {
+    enum class ShaderFileType
+    {
+        Surface,
+        Combined,
+    };
+
     enum class ShaderType
     {
         VertexShader,
         FragmentShader,
         GeometryShader,
-        SurfaceShader,
-        CombinedShader,
     };
 
     class ShaderImpl
@@ -154,12 +184,11 @@ namespace FishEngine
             }
         }
 
-        void set(std::string shaderText, ShaderType type, std::string filePath = "placeholder.surf")
+        void set(std::string shaderText, ShaderFileType type, std::string filePath = "placeholder.surf")
         {
             m_shaderTextRaw = shaderText + "\n";
             m_filePath = filePath;
-            if (type == ShaderType::SurfaceShader)
-                m_shaderTextRaw = DecorateShaderText(ShaderType::SurfaceShader, m_shaderTextRaw);
+            m_shaderTextRaw = DecorateShaderText(type, m_shaderTextRaw);
         }
 
         GLuint CompileAndLink(ShaderKeywords keywords)
@@ -201,7 +230,6 @@ namespace FishEngine
             return m_shaderTextRaw;
         }
 
-        //std::map<std::string, UniformInfo>  m_uniforms;
         std::map<std::string, std::string>  m_settings;
 
     private:
@@ -243,15 +271,15 @@ namespace FishEngine
                 ctx.add_macro_definition("GEOMETRY_SHADER");
             }
 
-            if (keywords & ShaderKeyword::Shadow)
+            if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::Shadow))
             {
                 ctx.add_macro_definition("_SHADOW");
             }
-            if (keywords & ShaderKeyword::SkinnedAnimation)
+            if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::SkinnedAnimation))
             {
                 ctx.add_macro_definition("_SKINNED");
             }
-            if (keywords & ShaderKeyword::AmbientIBL)
+            if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::AmbientIBL))
             {
                 ctx.add_macro_definition("_AMBIENT_IBL");
             }
@@ -357,13 +385,13 @@ namespace FishEngine
             return parsed_text;
         }
 
-        static std::string DecorateShaderText(ShaderType type, std::string& shaderText)
+        static std::string DecorateShaderText(ShaderFileType type, std::string& shaderText)
         {
             std::string left = "", right = "\n";
 
             switch (type)
             {
-            case FishEngine::ShaderType::SurfaceShader:
+            case FishEngine::ShaderFileType::Surface:
                 left = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n";
                 right = "#endif\n";
                 break;
@@ -382,7 +410,7 @@ namespace FishEngine
             {
                 glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(Pipeline::perDrawUniformData));
+                assert(blockSize == sizeof(Pipeline::s_perDrawUniformData));
             }
 
             blockID = glGetUniformBlockIndex(program, "PerFrame");
@@ -391,7 +419,7 @@ namespace FishEngine
             {
                 glUniformBlockBinding(program, blockID, Pipeline::PerFrameUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(Pipeline::perFrameUniformData));
+                assert(blockSize == sizeof(Pipeline::s_perFrameUniformData));
             }
 
             //    blockID = glGetUniformBlockIndex(m_program, "Bones");
@@ -428,27 +456,6 @@ namespace FishEngine
 } /* FishEngine */
 
 
-const char* GLenumToString(GLenum e)
-{
-    switch (e) {
-    case GL_FLOAT:
-        return "GL_FLOAT";
-    case GL_FLOAT_VEC3:
-        return "GL_FLOAT_VEC3";
-    case GL_FLOAT_MAT4:
-        return "GL_FLOAT_MAT4";
-    case GL_SAMPLER_2D:
-        return "GL_SAMPLER_2D";
-    case GL_SAMPLER_3D:
-        return "GL_SAMPLER_3D";
-    case GL_SAMPLER_CUBE:
-        return "GL_SAMPLER_CUBE";
-    default:
-        return "UNKNOWN";
-        break;
-    }
-}
-
 
 namespace FishEngine {
 
@@ -474,9 +481,9 @@ namespace FishEngine {
         {
             auto ext = getExtensionWithoutDot(path);
             auto shader_text = ReadFile(path);
-            auto t = ext == "surf" ? ShaderType::SurfaceShader : ShaderType::CombinedShader;
+            auto t = ext == "surf" ? ShaderFileType::Surface : ShaderFileType::Combined;
             m_impl->set(shader_text, t, path);
-            m_impl->CompileAndLink(ShaderKeyword::All);
+            m_impl->CompileAndLink(static_cast<ShaderKeywords>(ShaderKeyword::All));
             m_program = m_impl->glslProgram(m_keywords, m_uniforms);
             m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(m_impl->m_settings, "Cull", "Back"));
             m_ZWrite = getValueOrDefault<string, string>(m_impl->m_settings, "ZWrite", "On") == "On";
@@ -662,15 +669,15 @@ namespace FishEngine {
         return nullptr;
     }
 
-    void Shader::EnableLocalKeyword(ShaderKeyword keyword)
+    void Shader::EnableLocalKeywords(ShaderKeywords keyword)
     {
-        m_keywords |= static_cast<ShaderKeywords>(keyword);
+        m_keywords |= keyword;
         m_program = m_impl->glslProgram(m_keywords, m_uniforms);
     }
 
-    void Shader::DisableLocalKeyword(ShaderKeyword keyword)
+    void Shader::DisableLocalKeywords(ShaderKeywords keyword)
     {
-        m_keywords &= ~(static_cast<ShaderKeywords>(keyword));
+        m_keywords &= ~keyword;
         m_program = m_impl->glslProgram(m_keywords, m_uniforms);
     }
 

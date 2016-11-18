@@ -61,6 +61,7 @@ namespace FishEngine
     class Pipeline;
     class Serialization;
     class RenderSystem;
+    class Graphics;
 
     struct Avatar;
     struct Ray;

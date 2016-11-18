@@ -16,14 +16,14 @@
 
 namespace FishEngine
 {
-    std::list<PGameObject>      Scene::m_gameObjects;
-    std::vector<PGameObject>    Scene::m_gameObjectsToBeDestroyed;
-    std::vector<PScript>        Scene::m_scriptsToBeDestroyed;
-    std::vector<PComponent>     Scene::m_componentsToBeDestroyed;
+    std::list<GameObjectPtr>      Scene::m_gameObjects;
+    std::vector<GameObjectPtr>    Scene::m_gameObjectsToBeDestroyed;
+    std::vector<ScriptPtr>        Scene::m_scriptsToBeDestroyed;
+    std::vector<ComponentPtr>     Scene::m_componentsToBeDestroyed;
     Bounds                      Scene::m_bounds;
     SceneOctree                 Scene::m_octree(Bounds(), 16);
 
-    PGameObject Scene::CreateGameObject(const std::string& name)
+    GameObjectPtr Scene::CreateGameObject(const std::string& name)
     {
         auto go = std::make_shared<GameObject>(name);
         go->transform()->m_gameObject = go;
@@ -72,7 +72,7 @@ namespace FishEngine
         //UpdateBounds();
     }
 
-    void Scene::RenderShadow(PLight& light)
+    void Scene::RenderShadow(LightPtr& light)
     {
 #define DEBUG_SHADOW 0
         // get compact light frustum
@@ -162,7 +162,7 @@ namespace FishEngine
         {
             if (!go->activeInHierarchy()) continue;
 
-            PMesh mesh;
+            MeshPtr mesh;
             if (go->GetComponent<MeshRenderer>())
             {
                 auto meshFilter = go->GetComponent<MeshFilter>();
@@ -213,25 +213,25 @@ namespace FishEngine
     }
 
 
-    void Scene::Destroy(PGameObject obj, const float t /*= 0.0f*/)
+    void Scene::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/)
     {
         m_gameObjectsToBeDestroyed.push_back(obj);
     }
 
 
-    void Scene::Destroy(PScript s, const float t /*= 0.0f*/)
+    void Scene::Destroy(ScriptPtr s, const float t /*= 0.0f*/)
     {
         m_scriptsToBeDestroyed.push_back(s);
     }
 
 
-    void Scene::Destroy(PComponent c, const float t /*= 0.0f*/)
+    void Scene::Destroy(ComponentPtr c, const float t /*= 0.0f*/)
     {
         m_componentsToBeDestroyed.push_back(c);
     }
 
 
-    void Scene::DestroyImmediate(PGameObject g)
+    void Scene::DestroyImmediate(GameObjectPtr g)
     {
         auto t = g->transform();
         // remove children
@@ -245,13 +245,13 @@ namespace FishEngine
         m_gameObjects.remove(g);
     }
 
-    void Scene::DestroyImmediate(PComponent c)
+    void Scene::DestroyImmediate(ComponentPtr c)
     {
         c->gameObject()->RemoveComponent(c);
     }
 
 
-    void Scene::DestroyImmediate(PScript s)
+    void Scene::DestroyImmediate(ScriptPtr s)
     {
         s->gameObject()->RemoveScript(s);
     }
@@ -259,11 +259,11 @@ namespace FishEngine
 
     void Scene::Render()
     {
-        std::vector<std::shared_ptr<GameObject>> transparentQueue;
+        std::vector<GameObjectPtr> transparentQueue;
         for (auto& go : Scene::m_gameObjects)
         {
             if (!go->activeInHierarchy()) continue;
-            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
             if (renderer == nullptr)
             {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
@@ -284,7 +284,7 @@ namespace FishEngine
         /************************************************************************/
         for (auto& go : transparentQueue)
         {
-            std::shared_ptr<Renderer> renderer = go->GetComponent<MeshRenderer>();
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
             if (renderer == nullptr)
             {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
@@ -295,7 +295,7 @@ namespace FishEngine
         transparentQueue.clear();
     }
 
-    PGameObject Scene::Find(const std::string& name)
+    GameObjectPtr Scene::Find(const std::string& name)
     {
         for (auto& go : m_gameObjects)
         {
@@ -331,12 +331,12 @@ namespace FishEngine
         }
     }
     
-    PGameObject Scene::IntersectRay(const Ray& ray)
+    GameObjectPtr Scene::IntersectRay(const Ray& ray)
     {
         if (!m_bounds.IntersectRay(ray))
             return nullptr;
         
-        PGameObject selected = nullptr;
+        GameObjectPtr selected = nullptr;
         for (auto& go : m_gameObjects)
         {
             //if (go->transform()->parent() == nullptr)

@@ -28,10 +28,10 @@ using namespace FishEngine;
 namespace FishEditor
 {
 
-    PMaterial sceneGizmoMaterial = nullptr;
-    PMesh cubeMesh = nullptr;
-    PMesh coneMesh = nullptr;
-    std::shared_ptr<SimpleMesh> gridMesh = nullptr;
+    MaterialPtr sceneGizmoMaterial = nullptr;
+    MeshPtr cubeMesh = nullptr;
+    MeshPtr coneMesh = nullptr;
+    SimpleMeshPtr gridMesh = nullptr;
 
     void SceneViewEditor::Init()
     {
@@ -131,7 +131,7 @@ namespace FishEditor
             material->SetVector4("Color", Vector4(0.375f, 0.388f, 0.463f, 1));
 
 
-            std::list<std::shared_ptr<GameObject>> selections;
+            std::list<GameObjectPtr> selections;
             auto go = Selection::selectedGameObjectInHierarchy();
             selections.push_back(go);
             while (!selections.empty())
@@ -148,7 +148,7 @@ namespace FishEditor
                     selections.push_back(c.lock()->gameObject());
                 }
                 auto meshFilter = go->GetComponent<MeshFilter>();
-                PMesh mesh;
+                MeshPtr mesh;
                 if (meshFilter != nullptr)
                 {
                     mesh = meshFilter->mesh();

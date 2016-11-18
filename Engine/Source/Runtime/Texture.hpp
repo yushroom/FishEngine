@@ -47,7 +47,7 @@ namespace FishEngine
 
         //static Texture& GetSimpleTexutreCubeMap();
 
-        static PTexture CreateFromFile(const std::string& path);
+        static TexturePtr CreateFromFile(const std::string& path);
 
         void FromFile(const std::string& path);
 

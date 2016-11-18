@@ -13,12 +13,12 @@ namespace FishEngine
 
         RenderSettings() = delete;
 
-        static PMaterial skybox()
+        static MaterialPtr skybox()
         {
             return m_skybox;
         }
 
-        static void setSkybox(PMaterial& skybox)
+        static void setSkybox(MaterialPtr& skybox)
         {
             m_skybox = skybox;
         }
@@ -26,7 +26,7 @@ namespace FishEngine
     private:
 
         // The global skybox to use.
-        static PMaterial m_skybox;
+        static MaterialPtr m_skybox;
     };
 }
 

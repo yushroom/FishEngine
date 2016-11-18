@@ -149,8 +149,8 @@ namespace FishEngine
         void BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray);
         void BindUniforms(const ShaderUniforms& uniforms);
 
-        void BindTexture(const std::string& name, PTexture& texture);
-        void BindTextures(const std::map<std::string, std::shared_ptr<Texture>>& textures);
+        void BindTexture(const std::string& name, TexturePtr& texture);
+        void BindTextures(const std::map<std::string, TexturePtr>& textures);
 
         void PreRender() const;
         void PostRender() const;

@@ -17,7 +17,7 @@
 
 namespace FishEngine
 {
-    MeshRenderer::MeshRenderer(PMaterial material) : Renderer(material)
+    MeshRenderer::MeshRenderer(MaterialPtr material) : Renderer(material)
     {
         
     }
@@ -51,7 +51,7 @@ namespace FishEngine
         
         Pipeline::BindPerDrawUniforms();
         
-        std::map<std::string, PTexture> textures;
+        std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
         if (lights.size() > 0) {
             auto& l = lights.front();

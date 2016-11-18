@@ -22,7 +22,7 @@ namespace FishEngine
         virtual void Start() override;
         
     protected:
-        PRigidbody m_attachedRigidbody;
+        RigidbodyPtr m_attachedRigidbody;
         Bounds  m_bounds;
         float   m_contactOffset;
         bool    m_enabled;

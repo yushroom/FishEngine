@@ -46,17 +46,17 @@ namespace FishEngine
         }
 
         // Set a named texture
-        void SetTexture(const std::string& name, PTexture& texture);
+        void SetTexture(const std::string& name, TexturePtr& texture);
 
         // The material's texture.
         // The same as using GetTexture or SetTexture with "_MainTex" name.
-        void setMainTexture(PTexture& texture);
+        void setMainTexture(TexturePtr& texture);
 
         // The main material's color.
         // The same as using GetColor or SetColor with "_Color" name.
         void setColor(const Color& color);
 
-        void BindTextures(const std::map<std::string, PTexture>& textures);
+        void BindTextures(const std::map<std::string, TexturePtr>& textures);
 
         //    auto uniforms() const {
         //        return m_uniforms;
@@ -74,23 +74,23 @@ namespace FishEngine
 
         static void Init();
 
-        static PMaterial CreateMaterial() {
+        static MaterialPtr CreateMaterial() {
             return std::make_shared<Material>();
         }
 
-        static PMaterial builtinMaterial(const std::string& name);
+        static MaterialPtr builtinMaterial(const std::string& name);
 
-        static PMaterial defaultMaterial();
+        static MaterialPtr defaultMaterial();
 
     private:
         friend class FishEditor::EditorGUI;
         ShaderPtr m_shader = nullptr;
-        std::map<std::string, PTexture> m_textures;
+        std::map<std::string, TexturePtr> m_textures;
 
         ShaderUniforms m_uniforms;
 
-        static std::map<std::string, PMaterial> m_builtinMaterial;
-        static PMaterial s_defaultMaterial;
+        static std::map<std::string, MaterialPtr> m_builtinMaterial;
+        static MaterialPtr s_defaultMaterial;
     };
 }
 

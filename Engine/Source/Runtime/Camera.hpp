@@ -101,13 +101,13 @@ namespace FishEngine
 
         // TODO
         // The first enabled camera tagged "MainCamera" (Read Only).
-        static PCamera main();
+        static CameraPtr main();
 
-        static PCamera mainGameCamera();
+        static CameraPtr mainGameCamera();
 
         static void OnWindowSizeChanged(const int width, const int height);
 
-        static PCamera
+        static CameraPtr
         Create(
             float       fov,
             float       nearClipPlane,
@@ -144,10 +144,10 @@ namespace FishEngine
         // temp
         // https://docs.unity3d.com/Manual/SceneViewNavigation.html
         mutable Vector3 m_focusPoint{ 0, 0, 0 };
-        void FrameSelected(PGameObject& selected);
+        void FrameSelected(GameObjectPtr& selected);
 
-        static PCamera m_mainCamera;
-        static std::vector<PCamera> m_allCameras;
+        static CameraPtr m_mainCamera;
+        static std::vector<CameraPtr> m_allCameras;
     };
 }
 

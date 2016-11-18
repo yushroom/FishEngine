@@ -22,9 +22,9 @@ void FishEngine::Light::OnDrawGizmosSelected()
     Gizmos::DrawLight(center, dir);
 }
 
-std::list<std::shared_ptr<Light>> FishEngine::Light::m_lights;
+std::list<LightPtr> FishEngine::Light::m_lights;
 
-PLight Light::Create()
+LightPtr Light::Create()
 {
     auto l = std::make_shared<Light>();
     m_lights.push_back(l);

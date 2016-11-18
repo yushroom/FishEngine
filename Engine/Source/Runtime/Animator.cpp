@@ -26,7 +26,7 @@ void Animator::Update() {
     }
 }
 
-void Animator::RecursivelyUpdate(const std::shared_ptr<GameObject>& go)
+void Animator::RecursivelyUpdate(const GameObjectPtr& go)
 {
     auto name = go->name();
     auto t = go->transform();

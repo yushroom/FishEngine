@@ -16,7 +16,7 @@
 namespace FishEngine
 {
     SkinnedMeshRenderer::
-        SkinnedMeshRenderer(PMaterial material)
+        SkinnedMeshRenderer(MaterialPtr material)
         : Renderer(material)
     {
 
@@ -30,7 +30,7 @@ namespace FishEngine
 
 
     void RecursivelyGetTransformation(
-        const PTransform&                   transform,
+        const TransformPtr&                   transform,
         const std::map<std::string, int>&   nameToIndex,
         std::vector<Matrix4x4>&             outMatrixPalette)
     {
@@ -80,7 +80,7 @@ namespace FishEngine
 
         Pipeline::BindPerDrawUniforms();
 
-        std::map<std::string, PTexture> textures;
+        std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
         if (lights.size() > 0) {
             auto& l = lights.front();

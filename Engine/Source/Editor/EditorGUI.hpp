@@ -37,7 +37,7 @@ namespace FishEditor
 
         static void Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat);
 
-        static void SelectMeshDialogBox(std::function<void(std::shared_ptr<FishEngine::Mesh>)> callback);
+        static void SelectMeshDialogBox(std::function<void(FishEngine::MeshPtr)> callback);
 
         static void OnWindowSizeChanged(const int width, const int height);
         
@@ -49,9 +49,9 @@ namespace FishEditor
         friend class FishEditorWindow;
         static int m_idCount;   // temp
 
-        static PSceneViewEditor m_mainSceneViewEditor;
+        static SceneViewEditorPtr m_mainSceneViewEditor;
 
-        static void HierarchyItem(std::shared_ptr<FishEngine::GameObject> gameObject);
+        static void HierarchyItem(FishEngine::GameObjectPtr gameObject);
 
         // https://docs.unity3d.com/Manual/LearningtheInterface.html
         static void DrawInspectorWindow();
@@ -78,10 +78,10 @@ namespace FishEditor
     };
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Component>& component);
+    void EditorGUI::OnInspectorGUI(const FishEngine::ComponentPtr& component);
 
     template<>
-    void EditorGUI::OnInspectorGUI(const std::shared_ptr<FishEngine::Transform>& transform);
+    void EditorGUI::OnInspectorGUI(const FishEngine::TransformPtr& transform);
 }
 
 #endif // EditorGUI_hpp

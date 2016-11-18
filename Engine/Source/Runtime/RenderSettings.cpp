@@ -2,6 +2,6 @@
 
 namespace FishEngine
 {
-    PMaterial RenderSettings::m_skybox;
+    MaterialPtr RenderSettings::m_skybox;
 }
 

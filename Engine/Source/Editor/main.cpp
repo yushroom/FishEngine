@@ -255,7 +255,7 @@ public:
         bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
         
         
-        map<string, PTexture> textures;
+        map<string, TexturePtr> textures;
         //textures["skyTex"] = sky_texture;
         
 //        auto skyboxGO = Scene::CreateGameObject("SkyBox");
@@ -290,7 +290,7 @@ public:
 
         textures["AmbientCubemap"] = sky_texture;
 
-        std::shared_ptr<GameObject> go;
+        GameObjectPtr go;
         
         go = GameObject::CreatePrimitive(PrimitiveType::Plane);
         go->GetComponent<MeshRenderer>()->SetMaterial(stageMaterial);

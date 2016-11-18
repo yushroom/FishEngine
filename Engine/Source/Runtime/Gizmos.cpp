@@ -10,13 +10,13 @@ using namespace FishEngine;
 
 Color       Gizmos::s_color         = Color::green;
 Matrix4x4   Gizmos::s_matrix        = Matrix4x4::identity;
-PSimpleMesh Gizmos::s_circleMesh    = nullptr;
-PSimpleMesh Gizmos::s_boxMesh       = nullptr;
-PSimpleMesh Gizmos::s_light         = nullptr;
+SimpleMeshPtr Gizmos::s_circleMesh    = nullptr;
+SimpleMeshPtr Gizmos::s_boxMesh       = nullptr;
+SimpleMeshPtr Gizmos::s_light         = nullptr;
 
 
-static PTexture cameraGizmoTexture;
-static PTexture lightGizmoTexture;
+static TexturePtr cameraGizmoTexture;
+static TexturePtr lightGizmoTexture;
 
 //std::shared_ptr<SimpleMesh> Gizmos::s_wiredSphereMesh = nullptr;
 
@@ -142,7 +142,7 @@ DrawIcon(
     bool                  allowScaling)
 {
     auto shader = Shader::builtinShader("Alpha-Internal");
-    static PModel quad = Model::builtinModel(PrimitiveType::Quad);
+    static ModelPtr quad = Model::builtinModel(PrimitiveType::Quad);
     shader->Use();
     auto cameraPos = Camera::main()->transform()->position();
     auto view = Camera::main()->worldToCameraMatrix();
@@ -154,7 +154,7 @@ DrawIcon(
     m.SetTRS(center, view.ToRotation().inverse(), Vector3::one*scale);
 
     shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
-    std::map<std::string, PTexture> textures;
+    std::map<std::string, TexturePtr> textures;
     if (name == "Camera")
         textures["_MainTex"] = cameraGizmoTexture;
     else

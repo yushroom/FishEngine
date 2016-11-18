@@ -19,9 +19,9 @@ namespace FishEngine {
         RenderTexture() = default;
         ~RenderTexture();
         
-        static PRenderTexture CreateShadowMap();
+        static RenderTexturePtr CreateShadowMap();
 
-        static PRenderTexture CreateColorMap(const int width, const int height);
+        static RenderTexturePtr CreateColorMap(const int width, const int height);
 
         int width() const
         {

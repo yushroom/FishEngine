@@ -6,8 +6,8 @@
 
 namespace FishEngine
 {
-    PCamera Camera::m_mainCamera = nullptr;
-    std::vector<PCamera> Camera::m_allCameras;
+    CameraPtr Camera::m_mainCamera = nullptr;
+    std::vector<CameraPtr> Camera::m_allCameras;
 
 
     void Camera::OnWindowSizeChanged(const int width, const int height)
@@ -23,7 +23,7 @@ namespace FishEngine
         }
     }
 
-    PCamera Camera::Create(
+    CameraPtr Camera::Create(
         float fov, 
         float nearClipPlane, 
         float farClipPlane, 
@@ -101,7 +101,7 @@ namespace FishEngine
         Gizmos::setMatrix(Matrix4x4::identity);
     }
 
-    PCamera Camera::main()
+    CameraPtr Camera::main()
     {
         if (m_mainCamera == nullptr)
         {
@@ -118,7 +118,7 @@ namespace FishEngine
     }
 
 
-    PCamera Camera::
+    CameraPtr Camera::
     mainGameCamera()
     {
         for (auto& c : m_allCameras)
@@ -133,7 +133,7 @@ namespace FishEngine
 
 
     void Camera::
-    FrameSelected(PGameObject& selected)
+    FrameSelected(GameObjectPtr& selected)
     {
         auto camera = Camera::main()->transform();
         float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);

@@ -40,7 +40,7 @@ namespace FishEngine
         return gameObject()->tag();
     }
 
-    std::shared_ptr<Transform> Component::transform() const
+    TransformPtr Component::transform() const
     {
         if (m_gameObject.expired())
             return nullptr;

@@ -33,7 +33,7 @@ namespace FishEditor
     float FishEditorWindow::m_pixelsPerPoint = 1.0f;
 
     GLFWwindow* FishEditorWindow::m_window = nullptr;
-    std::vector<std::shared_ptr<App>> FishEditorWindow::m_apps;
+    std::vector<AppPtr> FishEditorWindow::m_apps;
     float FishEditorWindow::m_fixedFrameRate = 30;
     bool FishEditorWindow::m_inPlayMode = false;
 

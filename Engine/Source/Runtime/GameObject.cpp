@@ -25,7 +25,7 @@ namespace FishEngine
         m_name = name;
     }
 
-    FishEngine::PGameObject GameObject::CreatePrimitive(PrimitiveType type)
+    FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
     {
         auto go = Model::builtinModel(type)->CreateGameObject();
         if (type == PrimitiveType::Cube)
@@ -37,7 +37,7 @@ namespace FishEngine
         return go;
     }
 
-    PGameObject GameObject::Find(const std::string& name)
+    GameObjectPtr GameObject::Find(const std::string& name)
     {
         return Scene::Find(name);
     }

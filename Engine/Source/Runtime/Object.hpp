@@ -27,17 +27,17 @@ namespace FishEngine
         //virtual std::string ToString() const;
 
         // Removes a gameobject.
-        static void Destroy(PGameObject obj, const float t = 0.0f);
+        static void Destroy(GameObjectPtr obj, const float t = 0.0f);
 
         // Removes a component.
-        static void Destroy(PComponent component, float t = 0.0f);
+        static void Destroy(ComponentPtr component, float t = 0.0f);
 
-        static void Destroy(PScript script, float t = 0.0f);
+        static void Destroy(ScriptPtr script, float t = 0.0f);
 
-        static void DestroyImmediate(PGameObject obj);
+        static void DestroyImmediate(GameObjectPtr obj);
         // Removes a component.
-        static void DestroyImmediate(PComponent component);
-        static void DestroyImmediate(PScript script);
+        static void DestroyImmediate(ComponentPtr component);
+        static void DestroyImmediate(ScriptPtr script);
 
     protected:
         std::string m_name;

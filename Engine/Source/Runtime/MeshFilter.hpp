@@ -12,15 +12,15 @@ namespace FishEngine
 
         MeshFilter() = default;
 
-        MeshFilter(PMesh mesh) : m_mesh(mesh) {
+        MeshFilter(MeshPtr mesh) : m_mesh(mesh) {
 
         }
 
-        PMesh mesh() const {
+        MeshPtr mesh() const {
             return m_mesh;
         }
 
-        void SetMesh(PMesh mesh) {
+        void SetMesh(MeshPtr mesh) {
             m_mesh = mesh;
         }
 
@@ -28,7 +28,7 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        PMesh m_mesh = nullptr;
+        MeshPtr m_mesh = nullptr;
     };
 }
 

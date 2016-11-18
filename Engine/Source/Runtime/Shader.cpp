@@ -594,7 +594,7 @@ namespace FishEngine {
         }
     }
 
-    void Shader::BindTextures(const std::map<std::string, PTexture>& textures)
+    void Shader::BindTextures(const std::map<std::string, TexturePtr>& textures)
     {
         int texture_id = 0;
         for (auto& u : m_uniforms) {

@@ -20,7 +20,7 @@ namespace FishEngine
         virtual void OnDrawGizmosSelected() {}
 
         // The game object this component is attached to. A component is always attached to a game object.
-        PGameObject gameObject() const { return m_gameObject.lock(); }
+        GameObjectPtr gameObject() const { return m_gameObject.lock(); }
 
         // The tag of this game object.
         std::string tag() const;
@@ -29,7 +29,7 @@ namespace FishEngine
         virtual std::string name() const override;
 
         // The Transform attached to this GameObject (null if there is none attached).
-        PTransform transform() const;
+        TransformPtr transform() const;
 
         //virtual void Init() {}
         virtual void Start() {}

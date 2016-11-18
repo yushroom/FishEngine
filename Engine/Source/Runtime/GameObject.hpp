@@ -75,7 +75,7 @@ namespace FishEngine
         }
 
         // The Transform attached to this GameObject.
-        PTransform transform() const
+        TransformPtr transform() const
         {
             return m_transform;
         }
@@ -164,12 +164,12 @@ namespace FishEngine
         }
 
 
-        void RemoveComponent(PComponent component)
+        void RemoveComponent(ComponentPtr component)
         {
             m_components.remove(component);
         }
 
-        void RemoveScript(PScript script)
+        void RemoveScript(ScriptPtr script)
         {
             m_scripts.remove(script);
         }
@@ -184,10 +184,10 @@ namespace FishEngine
         /************************************************************************/
 
         // Creates a game object with a primitive mesh renderer and appropriate collider.
-        static PGameObject CreatePrimitive(PrimitiveType type);
+        static GameObjectPtr CreatePrimitive(PrimitiveType type);
 
         // Finds a game object by name and returns it.
-        static PGameObject Find(const std::string& name);
+        static GameObjectPtr Find(const std::string& name);
 
 
     protected:
@@ -203,14 +203,14 @@ namespace FishEngine
         friend class FishEditor::SceneViewEditor;
         friend class Serialization;
 
-        std::list<PComponent> m_components;
-        std::list<PScript> m_scripts;
+        std::list<ComponentPtr> m_components;
+        std::list<ScriptPtr> m_scripts;
 
         bool m_activeSelf = true;
         int m_layer = 0;
 
         std::string m_tag;
-        PTransform m_transform;
+        TransformPtr m_transform;
 
         //static GameObject m_root;
         //static PGameObject> m_root;

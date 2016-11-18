@@ -12,12 +12,12 @@ namespace FishEngine
     class Skybox : public Behaviour
     {
     public:
-        PMaterial material()
+        MaterialPtr material()
         {
             return m_material;
         }
 
-        void setMaterial(PMaterial material)
+        void setMaterial(MaterialPtr material)
         {
             m_material = material;
         }
@@ -25,7 +25,7 @@ namespace FishEngine
     private:
 
         // The material used by the skybox.
-        PMaterial m_material;
+        MaterialPtr m_material;
     };
 }
 

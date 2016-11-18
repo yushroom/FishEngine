@@ -25,7 +25,7 @@ namespace FishEditor
     public:
         FishEngine::Vector2 m_position;
         FishEngine::Int2 m_size{128, 128};
-        FishEngine::PRenderTexture m_sceneViewRenderTexture;
+        FishEngine::RenderTexturePtr m_sceneViewRenderTexture;
 
         void Init();
 
@@ -35,7 +35,7 @@ namespace FishEditor
 
         void Clean();
 
-        FishEngine::PCamera camera()
+        FishEngine::CameraPtr camera()
         {
             return m_camera;
         }
@@ -55,8 +55,8 @@ namespace FishEditor
     private:
         friend class EditorGUI;
 
-        FishEngine::PCamera m_camera;
-        FishEngine::PGameObject m_cameraGameObject;
+        FishEngine::CameraPtr m_camera;
+        FishEngine::GameObjectPtr m_cameraGameObject;
 
         bool m_isWireFrameMode;
         bool m_useGammaCorrection;
@@ -82,5 +82,5 @@ namespace FishEditor
         void DrawSceneGizmo();
     };
 
-    typedef std::shared_ptr<SceneViewEditor> PSceneViewEditor;
+    typedef std::shared_ptr<SceneViewEditor> SceneViewEditorPtr;
 }

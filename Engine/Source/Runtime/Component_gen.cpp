@@ -12,10 +12,10 @@
 #include "SphereCollider.hpp"
 #include "Rigidbody.hpp"
 
-std::shared_ptr<FishEngine::Component> FishEngine::
+FishEngine::ComponentPtr FishEngine::
 AddComponentToGameObject(
     const std::string&  componentClassName, 
-    PGameObject&        gameObject)
+    GameObjectPtr&        gameObject)
 {
 #define CASE(T) if (componentClassName == #T) { return gameObject->AddComponent<T>(); }
     CASE(Camera)

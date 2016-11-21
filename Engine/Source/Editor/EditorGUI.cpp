@@ -82,7 +82,7 @@ namespace FishEditor
     void EditorGUI::Init()
     {
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../../../assets/";
+        const std::string root_dir = "D:/program/FishEngine/Assets/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
@@ -505,10 +505,6 @@ namespace FishEditor
 
         int local_id = 0;
 
-        //auto headerName = [&local_id](const std::string& className) {
-        //    return camelCaseToReadable(className) + "##header" + boost::lexical_cast<std::string>(local_id++);
-        //};
-
         ComponentPtr componentToBeDestroyed = nullptr;
         for (auto c : selectedGO->m_components)
         {
@@ -748,6 +744,76 @@ namespace FishEditor
             }
             if (ImGui::BeginMenu("Edit"))
             {
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Assets"))
+            {
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("GameObject"))
+            {
+                if (ImGui::MenuItem("Create Empty", "Ctrl+Shift+N"))
+                {
+
+                }
+                if (ImGui::MenuItem("Create Empty Child", "Alt+Shift+N"))
+                {
+
+                }
+
+                if (ImGui::BeginMenu("3D Object"))
+                {
+                    if (ImGui::MenuItem("Cube"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Cube);
+                    }
+                    if (ImGui::MenuItem("Sphere"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Sphere);
+                    }
+                    if (ImGui::MenuItem("Capsule"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Capsule);
+                    }
+                    if (ImGui::MenuItem("Cylinder"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Cylinder);
+                    }
+                    if (ImGui::MenuItem("Plane"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Plane);
+                    }
+                    if (ImGui::MenuItem("Quad"))
+                    {
+                        GameObject::CreatePrimitive(PrimitiveType::Quad);
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("2D Object"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Light"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Audio"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("UI"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::MenuItem("Particle System"))
+                {
+                }
+                if (ImGui::MenuItem("Camera"))
+                {
+                    Camera::Create();
+                }
                 ImGui::EndMenu();
             }
 

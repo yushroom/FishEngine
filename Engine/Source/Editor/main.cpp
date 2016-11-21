@@ -34,7 +34,7 @@ public:
         auto material = Material::defaultMaterial();
         material->SetTexture("RadianceMap", radiance_map);
         material->SetTexture("IrradianceMap", irradiance_map);
-        material->EnableKeyword(ShaderKeyword::AmbientIBL);
+        //material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
@@ -124,7 +124,7 @@ public:
         DefaultScene();
 
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../../../assets/";
+        const std::string root_dir = "D:/program/FishEngine/Assets/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
@@ -450,12 +450,12 @@ public:
         DefaultScene();
 
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../assets/";
+        const std::string root_dir = "D:/program/FishEngine/Assets/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
-        const std::string models_dir = root_dir + "models/";
-        const std::string textures_dir = root_dir + "textures/";
+        const std::string models_dir = root_dir + "Models/";
+        const std::string textures_dir = root_dir + "Textures/";
         
         TextureImporter texture_importer;
         auto checkboard_texture = texture_importer.FromFile(textures_dir + "checkboard.png");
@@ -598,9 +598,9 @@ public:
  
 int main()
 {
-    //FishEditorWindow::AddApp(make_shared<TestPBR>());
+    FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<TestCSM>());
-    FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     //FishEditorWindow::AddApp(make_shared<SimpleTest>());

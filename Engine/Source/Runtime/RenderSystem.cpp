@@ -21,11 +21,8 @@ namespace FishEngine
         Material::Init();
         Model::Init();
         Gizmos::Init();
-        //EditorGUI::Init();
         Scene::Init();
-        //#ifdef GLM_FORCE_LEFT_HANDED
         glFrontFace(GL_CW);
-        //#endif
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);

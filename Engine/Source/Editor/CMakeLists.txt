@@ -1,12 +1,17 @@
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
 
+#set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR}/Binary)
+
 add_executable (FishEditor ${SRCS} ${HEADERS})
 target_compile_options(FishEditor PUBLIC -std=c++14)
 target_link_libraries(FishEditor ${Boost_LIBRARIES})
 
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor imgui)
+target_link_libraries(FishEditor glfw)
+target_link_libraries(FishEditor glew_s)
+target_link_libraries(FishEditor assimp)
 
 if (MSVC)
     target_link_libraries(FishEditor opengl32.lib)
@@ -38,13 +43,7 @@ if (MSVC)
 	endforeach()
 else()
     FILE(GLOB PhysXSDK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/PhysXSDK/Lib/osx64/*.a)
-    #find_package(zlib)
-    #target_link_libraries(FishEditor ${ZLIB_LIBRARIES})
-    #set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 endif()
 
-target_link_libraries(FishEditor glfw)
-target_link_libraries(FishEditor glew_s)
-target_link_libraries(FishEditor assimp)
 # message("PhysXSDK: ${PhysXSDK_LIBRARIES}")
 target_link_libraries(FishEditor ${PhysXSDK_LIBRARIES})

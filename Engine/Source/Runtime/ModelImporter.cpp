@@ -36,7 +36,7 @@ namespace FishEngine {
     void Model::
     Init() {
 #if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "../../../../Assets/models/";
+        const std::string root_dir = "D:/program/FishEngine/Assets/Models/";
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif

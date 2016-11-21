@@ -1,10 +1,5 @@
 #pragma once
 
-//namespace Lumix { namespace FS { class OsFile; } }
-//
-//
-//struct lua_State;
-
 namespace ImGui
 {
 IMGUI_API void ShutdownDock();

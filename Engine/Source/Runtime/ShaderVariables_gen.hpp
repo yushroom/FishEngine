@@ -3,12 +3,12 @@
 #define vec3 FishEngine::Vector3
 #define vec4 FishEngine::Vector4
 
-#define PositionIndex 0
-#define NormalIndex 1
-#define UVIndex 2
-#define TangentIndex 3
-#define BoneIndexIndex 4
-#define BoneWeightIndex 5
+constexpr int PositionIndex = 0;
+constexpr int NormalIndex = 1;
+constexpr int UVIndex = 2;
+constexpr int TangentIndex = 3;
+constexpr int BoneIndexIndex = 4;
+constexpr int BoneWeightIndex = 5;
 
 struct PerDraw
 {

@@ -12,6 +12,7 @@
 #include "Shader.hpp"
 #include "Debug.hpp"
 #include "Common.hpp"
+#include "ShaderVariables_gen.hpp"
 
 using namespace std;
 

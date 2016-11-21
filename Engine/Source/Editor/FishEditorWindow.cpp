@@ -124,7 +124,7 @@ namespace FishEditor
 
         glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
-        std::ifstream fin("./FishEditorLayout.xml");
+        std::ifstream fin("D:/program/FishEngine/Engine/Binary/Debug/FishEditorLayout.xml");
         if (fin.is_open())
             ImGui::LoadDock(fin);
         else

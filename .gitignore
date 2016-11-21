@@ -1,16 +1,14 @@
 # Visual Studio
-/project/vs2015/.vs
-/project/vs2015/*.db
-/project/vs2015/*.opendb
-/project/vs2015/*.user
-/project/vs2015/*.opensdf
-/project/vs2015/*.sdf
-/project/vs2015/*.suo
-/project/vs2015/*.vcxproj.user
-/project/vs2015/*.vspx
-/project/vs2015/Debug/
-/project/vs2015/Release/
-/project/vs2015/*.png
+.vs
+*.db
+*.opendb
+*.user
+*.opensdf
+*.sdf
+*.suo
+*.dll
+
+*.exe
 
 # Xcode
 *.pbxuser
@@ -32,7 +30,11 @@ xcuserdata/
 /Engine/ThirdParty/fbxsdk*
 
 # binary
-/Engine/Binary/
+/Engine/Binary/*/*.lib
+/Engine/Binary/*/*.exp
+/Engine/Binary/*/*.ilk
+/Engine/Binary/*/*.pdb
+/Engine/Binary/*/*.map
 
 # assets
 /assets/models/
@@ -53,10 +55,5 @@ xcuserdata/
 build-*
 CMakeLists.txt.user
 
-
 # vscode
 /.vscode/
-
-imgui.ini
-
-*.dll

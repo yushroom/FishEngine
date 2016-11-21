@@ -4,24 +4,17 @@
 #include <set>
 
 #include "Object.hpp"
-//#include "GLEnvironment.hpp"
 #include "Vector3.hpp"
 #include "Matrix4x4.hpp"
 #include "Common.hpp"
 #include "ShaderProperty.hpp"
 
-#define PositionIndex 0
-#define NormalIndex 1
-#define UVIndex 2
-#define TangentIndex 3
-#define BoneIndexIndex 4
-#define BoneWeightIndex 5
 
 namespace FishEngine
 {
     class ShaderImpl;
 
-    class Shader : public Objcet
+    class Shader : public Object
     {
     public:
         Shader();

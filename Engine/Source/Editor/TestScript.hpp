@@ -324,7 +324,9 @@ SCRIPT_END
 
 void DefaultScene()
 {
-    auto camera = Camera::Create(60.0f, 0.3f, 1000.f);
+    cout << "CWD: " << boost::filesystem::current_path() << endl;
+
+    auto camera = Camera::Create();
     auto camera_go = Scene::CreateGameObject("Main Camera");
     camera_go->AddComponent(camera);
     camera_go->AddComponent<CameraController>();

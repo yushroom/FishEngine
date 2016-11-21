@@ -109,10 +109,10 @@ namespace FishEngine
 
         static CameraPtr
         Create(
-            float       fov,
-            float       nearClipPlane,
-            float       farClipPlane,
-            CameraType  type = CameraType::Game);
+            float       fov             = 60,
+            float       nearClipPlane   = 0.3f,
+            float       farClipPlane    = 1000.0f,
+            CameraType  type            = CameraType::Game);
 
     private:
         friend class RenderSystem;

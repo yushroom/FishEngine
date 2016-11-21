@@ -5,6 +5,7 @@
 #include "Pipeline.hpp"
 #include "Texture.hpp"
 #include "ModelImporter.hpp"
+#include "TextureImporter.hpp"
 
 using namespace FishEngine;
 
@@ -44,8 +45,9 @@ void Gizmos::Init()
     const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
 #endif
     
-    cameraGizmoTexture = Texture::CreateFromFile(root_dir + "textures/Gizmos/camera.png");
-    lightGizmoTexture  = Texture::CreateFromFile(root_dir + "textures/Gizmos/light.png");
+    TextureImporter importer;
+    cameraGizmoTexture = importer.FromFile(root_dir + "textures/Gizmos/camera.png");
+    lightGizmoTexture  = importer.FromFile(root_dir + "textures/Gizmos/light.png");
 
     // circle
     constexpr float radStep = 2.0f * Mathf::PI / circleVertexCount;
@@ -144,7 +146,7 @@ DrawIcon(
     auto shader = Shader::builtinShader("Alpha-Internal");
     static ModelPtr quad = Model::builtinModel(PrimitiveType::Quad);
     shader->Use();
-    auto cameraPos = Camera::main()->transform()->position();
+    //auto cameraPos = Camera::main()->transform()->position();
     auto view = Camera::main()->worldToCameraMatrix();
     auto proj = Camera::main()->projectionMatrix();
     Matrix4x4 m;

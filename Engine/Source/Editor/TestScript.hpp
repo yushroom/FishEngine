@@ -51,6 +51,9 @@ using namespace FishEngine;
 using namespace FishEditor;
 
 #define SCRIPT_BEGIN(T)     \
+class T; \
+CEREAL_REGISTER_TYPE_WITH_NAME(T, #T); \
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Script, T); \
 class T : public Script {   \
     public:                 \
         InjectClassName(T);
@@ -58,10 +61,7 @@ class T : public Script {   \
 #define SCRIPT_END };
     
 
-class ShowFPS : public Script
-{
-public:
-    InjectClassName(ShowFPS);
+SCRIPT_BEGIN(ShowFPS)
 
     int m_fps = 0;
     
@@ -86,13 +86,10 @@ public:
         //    Debug::Log("Mouse Position: %lf, %lf, %lf", mp.x, mp.y, mp.z);
         //}
     }
-};
+SCRIPT_END
 
-class DeactiveSelf : public Script
-{
-public:
-    InjectClassName(DeactiveSelf);
 
+SCRIPT_BEGIN(DeactiveSelf)
     bool m_active = true;
     
     virtual void OnInspectorGUI() override {
@@ -109,17 +106,14 @@ public:
             gameObject()->SetActive(false);
         }
     }
-};
+SCRIPT_END
 
-class VisualizeNormal : public Script
-{
+
+SCRIPT_BEGIN(VisualizeNormal)
 private:
     bool m_added = false;
     MeshRendererPtr m_meshRenderer = nullptr;
     MaterialPtr m_material = nullptr;
-
-public:
-    InjectClassName(VisualizeNormal);
 
     bool m_visualizeNormal = true;
 
@@ -146,13 +140,10 @@ public:
             }
         }
     }
-};
+SCRIPT_END
 
-class TakeScreenShot : public Script
-{
-public:
-    InjectClassName(TakeScreenShot);
-    
+
+SCRIPT_BEGIN(TakeScreenShot)
     virtual void OnInspectorGUI() override {
         if (EditorGUI::Button("Screen shot")) {
             auto tm = time(nullptr);
@@ -161,12 +152,10 @@ public:
             Debug::Log("Screen shot saved to %s", path.c_str());
         }
     }
-};
-            
-class DisplayMatrix : public Script {
-public:
-    InjectClassName(DisplayMatrix);
-    
+SCRIPT_END
+
+
+SCRIPT_BEGIN(DisplayMatrix)
     Matrix4x4 localToWorld;
     Matrix4x4 worldToLocal;
     // Use this for initialization
@@ -180,13 +169,10 @@ public:
         localToWorld = transform()->localToWorldMatrix();
         worldToLocal = transform()->worldToLocalMatrix();
     }
-};
+SCRIPT_END
 
-class EditorRenderSettings : public Script
-{
-public:
-    InjectClassName(EditorRenderSettings);
 
+SCRIPT_BEGIN(EditorRenderSettings)
     bool m_isWireFrameMode = false;
     bool m_useGammaCorrection = true;
     bool m_showShadowMap = false;
@@ -213,12 +199,10 @@ public:
         //    EditorRenderSystem::setHightlightSelections(m_highlightSelections);
         //}
     }
-};
-            
-class Rotator : public Script {
-public:
-    InjectClassName(Rotator);
-    
+SCRIPT_END
+
+
+SCRIPT_BEGIN(Rotator)
     bool rotating = false;
     float step = 1;
     
@@ -230,13 +214,10 @@ public:
     virtual void OnInspectorGUI() override {
         ImGui::Checkbox("Rotating", &rotating);
     }
-};
+SCRIPT_END
             
-            
-class DrawSkeleton : public Script {
-public:
-    InjectClassName(DrawSkeleton);
-    
+
+SCRIPT_BEGIN(DrawSkeleton)
     bool draw = true;
     
     virtual void OnDrawGizmos() override {
@@ -252,13 +233,10 @@ public:
     virtual void OnInspectorGUI() override {
         ImGui::Checkbox("Draw", &draw);
     }
-};
+SCRIPT_END
 
-class TestAABB : public Script
-{
-public:
-    InjectClassName(TestAABB);
 
+SCRIPT_BEGIN(TestAABB)
     Bounds aabb{Vector3(0, 0, 0), Vector3(1, 1, 1)};
     //GameObject::PGameObject target;
 
@@ -285,13 +263,10 @@ public:
             }
         }
     }
-};
+SCRIPT_END
 
-            
-class TestGizmos : public Script
-{
-public:
-    InjectClassName(TestGizmos);
+
+SCRIPT_BEGIN(TestGizmos)
     
     virtual void OnDrawGizmos() override {
         Gizmos::setColor(Color::red);
@@ -306,7 +281,7 @@ public:
         Gizmos::setColor(Color::black);
         Gizmos::DrawWireCapsule(Vector3::zero, 0.5f, 2.f);
     }
-};
+SCRIPT_END
 
 
 SCRIPT_BEGIN(TestExecutionOrder)
@@ -336,7 +311,7 @@ public:
         {
             std::stringstream ss;
             {
-                cereal::XMLOutputArchive oa(ss);
+                cereal::JSONOutputArchive oa(ss);
                 oa << *gameObject();
             }
             auto xml = ss.str();
@@ -344,6 +319,8 @@ public:
         }
     }
 SCRIPT_END
+
+
 
 void DefaultScene()
 {

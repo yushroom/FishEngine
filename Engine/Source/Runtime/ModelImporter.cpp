@@ -156,7 +156,8 @@ namespace FishEngine {
         Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
 
         // Vertex
-        for (unsigned int j = 0; j < assimp_mesh->mNumVertices; ++j) {
+        for (unsigned int j = 0; j < assimp_mesh->mNumVertices; ++j)
+        {
             auto& v = assimp_mesh->mVertices[j];
             float vx = v.x * m_fileScale;
             float vy = v.y * m_fileScale;

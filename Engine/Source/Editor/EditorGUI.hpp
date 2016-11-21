@@ -47,7 +47,7 @@ namespace FishEditor
 
     private:
         friend class FishEditorWindow;
-        static int m_idCount;   // temp
+        //static int m_idCount;   // temp
 
         static SceneViewEditorPtr m_mainSceneViewEditor;
 

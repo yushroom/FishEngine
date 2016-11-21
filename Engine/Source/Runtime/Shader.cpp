@@ -212,7 +212,7 @@ namespace FishEngine
 
         GLuint CompileAndLink(ShaderKeywords keywords)
         {
-            Debug::Log("CompileAndLink %s", m_filePath.c_str());
+            //Debug::Log("CompileAndLink %s", m_filePath.c_str());
             auto vs = Compile(ShaderType::VertexShader, keywords);
             GLuint gs = 0;
             if (getValueOrDefault<string, string>(m_settings, "GeometryShader", "Off") == "On")
@@ -382,7 +382,7 @@ namespace FishEngine
                     {
                         pragma_setting = tok;
                         m_settings[pragma_type] = pragma_setting;
-                        cout << "\tsettings: " << pragma_type << " " << pragma_setting << endl;
+                        //cout << "\tsettings: " << pragma_type << " " << pragma_setting << endl;
                     }
                     next_tok_is_pragma_setting = false;
                 }
@@ -406,7 +406,7 @@ namespace FishEngine
                 }
                 else if (next_tok_is_uniform_var_name)
                 {
-                    cout << tok << endl;
+                    //cout << tok << endl;
                     next_tok_is_uniform_var_name = false;
                 }
 
@@ -646,7 +646,7 @@ namespace FishEngine
                 GLenum type = u.type == GL_SAMPLER_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
                 //BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
                 glActiveTexture(GLenum(GL_TEXTURE0 + texture_id));
-                glBindTexture(type, it->second->GLTexuture());
+                glBindTexture(type, it->second->GetNativeTexturePtr());
                 //GLuint loc = _getUniformLocation(name);
                 glUniform1i(u.location, texture_id);
                 texture_id++;

@@ -38,7 +38,7 @@ namespace FishEngine
     {
         s_perFrameUniformData.LightColor0 = light->m_color;
         s_perFrameUniformData.WorldSpaceLightPos0 = Vector4(-light->transform()->forward(), 0);
-        s_perFrameUniformData.LightMatrix0 = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;;
+        s_perFrameUniformData.LightMatrix0 = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
     }
 
     void Pipeline::UpdatePerDrawUniforms(const Matrix4x4& modelMatrix)

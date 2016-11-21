@@ -1,4 +1,5 @@
 #include "TestScript.hpp"
+#include "TextureImporter.hpp"
 
 using namespace FishEditor;
 using namespace std;
@@ -25,9 +26,10 @@ public:
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-                
-        auto radiance_map = Texture::CreateFromFile(skybox_dir+"BolongaRadiance.dds");
-        auto irradiance_map = Texture::CreateFromFile(skybox_dir+"BolongaIrradiance.dds");
+        
+        TextureImporter importer;
+        auto radiance_map = importer.FromFile(skybox_dir+"BolongaRadiance.dds");
+        auto irradiance_map = importer.FromFile(skybox_dir+"BolongaIrradiance.dds");
         
         auto material = Material::defaultMaterial();
         material->SetTexture("RadianceMap", radiance_map);
@@ -106,7 +108,9 @@ class TestCSM : public App
         auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
         auto terrainGO = model->CreateGameObject();
         auto material = Material::builtinMaterial("Diffuse");
-        auto bakedAO = Texture::CreateFromFile(root_dir + "bakedAO.jpg");
+        
+        TextureImporter texture_importer;
+        auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
         material->setMainTexture(bakedAO);
         terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
@@ -126,7 +130,9 @@ public:
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-        auto checkboardTexture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+        
+        TextureImporter texture_importer;
+        auto checkboardTexture = texture_importer.FromFile(textures_dir + "checkboard.png");
 
         auto checkboardMaterial = Material::builtinMaterial("Diffuse");
         checkboardMaterial->setMainTexture(checkboardTexture);
@@ -205,27 +211,29 @@ public:
         importer2.setFileScale(0.01f);
         //auto jump00Model = importer2.LoadFromFile(chan_roo t_dir + "animations/boblampclean.md5mesh");
         auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_RUN00_F.fbx");
-        auto sky_texture = Texture::CreateFromFile(textures_dir + "StPeters/DiffuseMap.dds");
-        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+        
+        TextureImporter texture_importer;
+        auto sky_texture = texture_importer.FromFile(textures_dir + "StPeters/DiffuseMap.dds");
+        auto checkboard_texture = texture_importer.FromFile(textures_dir + "checkboard.png");
         std::string chan_texture_dir = chan_root_dir + "textures/";
-        auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "body_01.tga");
-        auto skinTexture = Texture::CreateFromFile(chan_texture_dir + "skin_01.tga");
-        auto hairTexture = Texture::CreateFromFile(chan_texture_dir + "hair_01.tga");
-        auto faceTexture = Texture::CreateFromFile(chan_texture_dir + "face_00.tga");
-        auto eyelineTexture = Texture::CreateFromFile(chan_texture_dir + "eyeline_00.tga");
-        auto eyeirisLTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_L_00.tga");
-        auto eyeirisRTexture = Texture::CreateFromFile(chan_texture_dir + "eye_iris_R_00.tga");
-        auto cheekTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+        auto bodyTexture = texture_importer.FromFile(chan_texture_dir + "body_01.tga");
+        auto skinTexture = texture_importer.FromFile(chan_texture_dir + "skin_01.tga");
+        auto hairTexture = texture_importer.FromFile(chan_texture_dir + "hair_01.tga");
+        auto faceTexture = texture_importer.FromFile(chan_texture_dir + "face_00.tga");
+        auto eyelineTexture = texture_importer.FromFile(chan_texture_dir + "eyeline_00.tga");
+        auto eyeirisLTexture = texture_importer.FromFile(chan_texture_dir + "eye_iris_L_00.tga");
+        auto eyeirisRTexture = texture_importer.FromFile(chan_texture_dir + "eye_iris_R_00.tga");
+        auto cheekTexture = texture_importer.FromFile(chan_texture_dir + "cheek_00.tga");
         
         //auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
-        auto rolloffTexture = Texture::CreateFromFile(chan_texture_dir + "FO_CLOTH1.tga");
-        auto rimLightTexture = Texture::CreateFromFile(chan_texture_dir + "FO_RIM1.tga");
-        auto specularTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_SPEC.tga");
-        auto envTexture = Texture::CreateFromFile(chan_texture_dir + "ENV2.tga");
-        auto normalMapTexture = Texture::CreateFromFile(chan_texture_dir + "body_01_NRM.tga");
+        auto rolloffTexture = texture_importer.FromFile(chan_texture_dir + "FO_CLOTH1.tga");
+        auto rimLightTexture = texture_importer.FromFile(chan_texture_dir + "FO_RIM1.tga");
+        auto specularTexture = texture_importer.FromFile(chan_texture_dir + "body_01_SPEC.tga");
+        auto envTexture = texture_importer.FromFile(chan_texture_dir + "ENV2.tga");
+        auto normalMapTexture = texture_importer.FromFile(chan_texture_dir + "body_01_NRM.tga");
         
-        auto stageBaseTexture = Texture::CreateFromFile(chan_texture_dir + "unitychan_tile5.png");
-        auto stageMaskTexture = Texture::CreateFromFile(chan_texture_dir + "AlphaMask.png");
+        auto stageBaseTexture = texture_importer.FromFile(chan_texture_dir + "unitychan_tile5.png");
+        auto stageMaskTexture = texture_importer.FromFile(chan_texture_dir + "AlphaMask.png");
 
 #if 0
         auto alphaMaskShader = make_shared<Shader>();
@@ -448,7 +456,9 @@ public:
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-        auto checkboard_texture = Texture::CreateFromFile(textures_dir + "checkboard.png");
+        
+        TextureImporter texture_importer;
+        auto checkboard_texture = texture_importer.FromFile(textures_dir + "checkboard.png");
         
         auto material = Material::builtinMaterial("Diffuse");
         material->setMainTexture(checkboard_texture);
@@ -550,9 +560,10 @@ public:
 #endif
         const std::string texture_dir = sample_root_dir + "textures/";
 
-        auto texture_bricks2_disp = Texture::CreateFromFile(texture_dir + "bricks2_disp.jpg");
-        auto texture_bricks2_normal = Texture::CreateFromFile(texture_dir + "bricks2_normal.jpg");
-        auto texture_bricks2 = Texture::CreateFromFile(texture_dir + "bricks2.jpg");
+        TextureImporter texture_importer;
+        auto texture_bricks2_disp = texture_importer.FromFile(texture_dir + "bricks2_disp.jpg");
+        auto texture_bricks2_normal = texture_importer.FromFile(texture_dir + "bricks2_normal.jpg");
+        auto texture_bricks2 = texture_importer.FromFile(texture_dir + "bricks2.jpg");
 
         material->SetTexture("diffuseMap", texture_bricks2);
         material->SetTexture("normalMap", texture_bricks2_normal);
@@ -589,10 +600,10 @@ int main()
 {
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<TestCSM>());
-    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     //FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());

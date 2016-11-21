@@ -53,6 +53,7 @@ namespace FishEngine
         static void Serialize(Archive& archive, T& v)
         {
             Debug::LogError("Serialization for %s not implemented", T::StaticClassName().c_str());
+            abort();
         }
         
         template<typename Archive>
@@ -161,14 +162,17 @@ namespace FishEngine
 #undef CEREAL_BASE_CLASS
     };
 
-    //// not work....
-    //// for cereal serialization
-    //template<typename Archive, typename T>
-    //static void serialize(Archive& archive, T& value)
-    //{
-    //    Serialization::Impl<Archive>::Serialize<T>(archive, value);
-    //}
-
+#if 0
+    // not work....
+    // for cereal serialization
+    template<typename Archive, typename T>
+    static void serialize(Archive& archive, T& value)
+    {
+        Serialization::Serialize<Archive>(archive, value);
+    }
+    
+#else
+    
 #define FE_SERIALIZE(T) \
     template<typename Archive> \
     static void serialize(Archive& archive, T& value) \
@@ -189,6 +193,7 @@ namespace FishEngine
     FE_SERIALIZE(Scene);
     
 #undef FE_SERIALIZE
+#endif
 }
 
 #endif //Serialization_hpp

@@ -2,7 +2,9 @@
 #define Shader_hpp
 
 #include <set>
-#include "GLEnvironment.hpp"
+
+#include "Object.hpp"
+//#include "GLEnvironment.hpp"
 #include "Vector3.hpp"
 #include "Matrix4x4.hpp"
 #include "Common.hpp"
@@ -19,7 +21,7 @@ namespace FishEngine
 {
     class ShaderImpl;
 
-    class Shader
+    class Shader : public Objcet
     {
     public:
         Shader();
@@ -106,7 +108,7 @@ namespace FishEngine
         bool FromFile(const std::string& path);
 
         // cache
-        GLuint m_program = 0;
+        unsigned int m_program = 0;
         std::vector<UniformInfo> m_uniforms;
 
         Cullface m_cullface = Cullface::Back;

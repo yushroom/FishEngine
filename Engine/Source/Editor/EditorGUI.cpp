@@ -35,6 +35,7 @@
 #include <Camera.hpp>
 #include <Component_gen.hpp>
 #include <Light.hpp>
+#include <Texture.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -48,8 +49,6 @@ using namespace FishEngine;
 namespace FishEditor
 {
     constexpr float inspector_indent_width              = 4;
-
-    int     EditorGUI::m_idCount                        = 0;
 
     SceneViewEditorPtr EditorGUI::m_mainSceneViewEditor;
 
@@ -333,7 +332,7 @@ namespace FishEditor
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.20f, 0.20f, 0.20f, 1.00f));
         }
 
-        bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)m_idCount, node_flags, "%s", gameObject->name().c_str());
+        bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)hash_value(gameObject->m_uuid), node_flags, "%s", gameObject->name().c_str());
 
         if (ImGui::IsItemClicked())
         {
@@ -369,7 +368,7 @@ namespace FishEditor
                 ImGui::TreePop();
             }
         }
-        m_idCount++;
+        //m_idCount++;
         if (!gameObject->activeSelf())
         {
             ImGui::PopStyleColor();
@@ -381,14 +380,7 @@ namespace FishEditor
         s_isAnyItemClicked = false;
         //auto selectedGO = Selection::activeGameObject();
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        // Hierarchy view
-        //ImGui::BeginDock("Hierarchy");
 
-        //if (s_windowResized)
-        //{
-        //    ImGui::SetNextWindowPos(hierarchyWindowPos);
-        //    ImGui::SetNextWindowSize(hierarchyWindowSize);
-        //}
         //ImGui::Begin("Hierarchy", nullptr, globalWindowFlags);
         ImGui::BeginDock("Hierarchy", nullptr);
         //static ImGuiTextFilter filter;
@@ -410,7 +402,6 @@ namespace FishEditor
             }
         }
 
-        m_idCount = 0;
         ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()); // Increase spacing to differentiate leaves from expanded contents.
         for (auto& go : Scene::m_gameObjects)
         {
@@ -466,32 +457,26 @@ namespace FishEditor
 
     void EditorGUI::DrawInspectorWindow()
     {
-        auto selectedGO = Selection::activeGameObject();
-
-        // Inspector Editor
-        //ImGui::BeginDock("Inspector", nullptr);
-
-        //if (s_windowResized)
-        //{
-        //    ImGui::SetNextWindowPos(inspectorWindowPos);
-        //    ImGui::SetNextWindowSize(inspectorWindowSize);
-        //}
         ImGui::BeginDock("Inspector", nullptr);
         //ImGui::Begin("Inspector", nullptr, globalWindowFlags);
         ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
-        if (selectedGO == nullptr) {
-            ImGui::EndDock(); // Inspector Editor
+        auto selectedGO = Selection::activeGameObject();
+        if (selectedGO == nullptr)
+        {
+            ImGui::EndDock();
             //ImGui::End();
             return;
         }
-        if (ImGui::Checkbox("Lock", &s_locked)) {
+        if (ImGui::Checkbox("Lock", &s_locked))
+        {
             if (!s_locked)
                 Selection::setActiveGameObject(Selection::selectedGameObjectInHierarchy());
         }
         ImGui::PushID("Inspector.selected.active");
         ImGui::Checkbox("", &selectedGO->m_activeSelf);
         ImGui::PopID();
-        char name[128] = { 0 };
+        
+        static char name[128] = { 0 };
         memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
         name[selectedGO->m_name.size()] = 0;
         ImGui::SameLine();
@@ -502,7 +487,6 @@ namespace FishEditor
         ImGui::PopID();
 
         ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.3f);
-        //ImGui::LabelText("", "Tag");
         ImGui::Text("Tag");
         ImGui::SameLine();
         ImGui::LabelText("##Tag", "%s", selectedGO->tag().c_str());
@@ -512,8 +496,8 @@ namespace FishEditor
         ImGui::LabelText("##Layer", "Layer %d", selectedGO->m_layer);
         ImGui::PopItemWidth();
 
-        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen)) {
-            //selectedGO->m_transform->OnInspectorGUI();
+        if (ImGui::CollapsingHeader("Transform##header", ImGuiTreeNodeFlags_DefaultOpen))
+        {
             ImGui::Indent(inspector_indent_width);
             OnInspectorGUI<FishEngine::Transform>(std::static_pointer_cast<FishEngine::Transform>(selectedGO->m_transform));
             ImGui::Unindent(inspector_indent_width);
@@ -649,25 +633,31 @@ namespace FishEditor
         ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.1f, 0));
         
         static int selected = -1;
+        static int selected_item_id = -1;
         if (ImGui::Selectable("Textures", selected==0))
         {
             selected = 0;
+            selected_item_id = -1;
         }
         if (ImGui::Selectable("Materials", selected==1))
         {
             selected = 1;
+            selected_item_id = -1;
         }
         if (ImGui::Selectable("Shaders", selected==2))
         {
             selected = 2;
+            selected_item_id = -1;
         }
         if (ImGui::Selectable("Scripts", selected==3))
         {
             selected = 3;
+            selected_item_id = -1;
         }
         if (ImGui::Selectable("Models", selected==4))
         {
             selected = 4;
+            selected_item_id = -1;
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -689,11 +679,30 @@ namespace FishEditor
 //        ImGui::EndChild();
         
         ImGui::BeginChild("Sub2", ImVec2(0,0), true);
+
+        int item_count = 0;
+        if (selected == 0)
+        {
+            item_count = 0;
+            for (const auto& t : Texture::AllTextures())
+            {
+                if (ImGui::Selectable(t->name().c_str(), selected_item_id == item_count))
+                {
+                    selected_item_id = item_count;
+                }
+                item_count++;
+            }
+        }
         if (selected == 2)
         {
+            item_count = 0;
             for (const auto& m : Shader::allShaders())
             {
-                ImGui::Selectable(m.first.c_str());
+                if (ImGui::Selectable(m.first.c_str(), selected_item_id == item_count))
+                {
+                    selected_item_id = item_count;
+                }
+                item_count++;
             }
         }
         ImGui::EndChild();
@@ -717,7 +726,7 @@ namespace FishEditor
         //EditorInput::CopyToInput();
         m_mainSceneViewEditor->Render();
         auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
-        ImGui::Image((void*)rt->GLTexuture(), size, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((void*)rt->GetNativeTexturePtr(), size, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::EndDock();
     }
 
@@ -1049,7 +1058,7 @@ namespace FishEditor
                 {
                     auto& tex = material->m_textures[u.name];
                     ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
-                    ImGui::Image((void*)tex->GLTexuture(), ImVec2(64, 64));
+                    ImGui::Image((void*)tex->GetNativeTexturePtr(), ImVec2(64, 64));
                     ImGui::SameLine();
                     ImGui::Button("Select");
                 }
@@ -1149,6 +1158,12 @@ namespace FishEditor
         Float("Bias", &light->m_shadowBias);
         Float("Normal Bias", &light->m_shadowNormalBias);
         Float("Shadow Near Plane", &light->m_shadowNearPlane);
+    }
+    
+    template<>
+    void EditorGUI::OnInspectorGUI(const FishEngine::TexturePtr& texture)
+    {
+        ImGui::Image((void *)texture->GetNativeTexturePtr(), ImVec2(128,128));
     }
 
     template<>

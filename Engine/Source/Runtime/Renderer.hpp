@@ -7,7 +7,7 @@
 
 namespace FishEngine
 {
-    class Renderer : public Component
+    class FE_EXPORT Renderer : public Component
     {
     public:
         InjectClassName(Renderer);

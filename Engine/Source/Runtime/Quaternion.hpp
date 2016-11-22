@@ -5,7 +5,7 @@
 
 namespace FishEngine {
 
-class Quaternion
+class FE_EXPORT Quaternion
 {
 public:
 	union {
@@ -64,7 +64,7 @@ public:
     /// @brief Creates a rotation which rotates angle degrees around axis.
     static Quaternion AngleAxis(const float angle, const Vector3& axis);
 
-    void ToAngleAxis(float* angle, Vector3* axis);
+    //void ToAngleAxis(float* angle, Vector3* axis);
 
     static float Dot(const Quaternion& a, const Quaternion& b)
     {
@@ -97,26 +97,26 @@ public:
         return Inverse(*this);
     }
 
-    static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
-    static Quaternion LerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
+    //static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
+    //static Quaternion LerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
 
     static Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t);
     static Quaternion SlerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
 
-    static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards);
+    //static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards);
     
-    void SetLookRotation(const Vector3& view)
-    {
-        Vector3 up = Vector3::up;
-        SetLookRotation(view, up);
-    }
+    //void SetLookRotation(const Vector3& view)
+    //{
+    //    Vector3 up = Vector3::up;
+    //    SetLookRotation(view, up);
+    //}
 
-    void SetLookRotation(const Vector3& view, const Vector3& up)
-    {
-        *this = Quaternion::LookRotation(view, up);
-    }
+    //void SetLookRotation(const Vector3& view, const Vector3& up)
+    //{
+    //    *this = Quaternion::LookRotation(view, up);
+    //}
 
-    static Quaternion LookRotation(const Vector3& forward);
+    //static Quaternion LookRotation(const Vector3& forward);
 
     static Quaternion RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta);
 

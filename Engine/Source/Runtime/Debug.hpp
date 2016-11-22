@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class Debug
+    class FE_EXPORT Debug
     {
     public:
         Debug() = delete;

@@ -24,7 +24,7 @@ namespace FishEngine
         return true;
     }
 
-    ComponentPtr
+    FE_EXPORT ComponentPtr
     AddComponentToGameObject(
         const std::string&  componentClassName,
         GameObjectPtr&      gameObject);

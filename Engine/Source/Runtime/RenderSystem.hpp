@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class RenderSystem
+    class FE_EXPORT RenderSystem
     {
     public:
         RenderSystem() = delete;

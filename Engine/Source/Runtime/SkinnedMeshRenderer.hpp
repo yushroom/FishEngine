@@ -4,9 +4,9 @@
 #include "Renderer.hpp"
 #include "Animator.hpp"
 
-namespace FishEngine {
-    
-    class SkinnedMeshRenderer : public Renderer
+namespace FishEngine
+{
+    class FE_EXPORT SkinnedMeshRenderer : public Renderer
     {
     public:
         InjectClassName(SkinnedMeshRenderer)

@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-    struct Frustum
+    struct FE_EXPORT Frustum
     {
         // center is (0, 0, 0)
         //Vector3 center;

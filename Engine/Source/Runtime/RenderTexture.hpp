@@ -13,7 +13,7 @@ namespace FishEngine {
         Shadowmap,
     };
     
-    class RenderTexture : public Texture
+    class FE_EXPORT RenderTexture : public Texture
     {
     public:
         RenderTexture() = default;

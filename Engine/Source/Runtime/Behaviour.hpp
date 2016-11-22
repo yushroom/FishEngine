@@ -7,7 +7,7 @@
 namespace FishEngine
 {
     // Behaviours are Components that can be enabled or disabled.
-    class Behaviour : public Component
+    class FE_EXPORT Behaviour : public Component
     {
     public:
 

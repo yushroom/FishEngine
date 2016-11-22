@@ -5,14 +5,15 @@
 #include "Component.hpp"
 #include "Vector3.hpp"
 
-namespace physx {
+namespace physx
+{
     class PxShape;
     class PxRigidDynamic;
 }
 
 namespace FishEngine
 {
-    class Rigidbody : public Component
+    class FE_EXPORT Rigidbody : public Component
     {
     public:
         InjectClassName(Rigidbody);

@@ -1,10 +1,60 @@
-#include "TestScript.hpp"
+//#include "TestScript.hpp"
 #include "TextureImporter.hpp"
 
-using namespace FishEditor;
+#include <iostream>
+#include <Camera.hpp>
+#include <Scene.hpp>
+#include <Shader.hpp>
+#include <Material.hpp>
+#include <GameObject.hpp>
+#include <Transform.hpp>
+#include <CameraController.hpp>
+#include <Light.hpp>
+#include <RenderSettings.hpp>
+#include <App.hpp>
+#include <MeshRenderer.hpp>
+
+#include "FishEditorWindow.hpp"
+
 using namespace std;
 using namespace FishEngine;
 using namespace FishEditor;
+
+
+void DefaultScene()
+{
+    cout << "CWD: " << boost::filesystem::current_path() << endl;
+
+    auto camera = Camera::Create();
+    auto camera_go = Scene::CreateGameObject("Main Camera");
+    camera_go->AddComponent(camera);
+    camera_go->AddComponent<CameraController>();
+    camera_go->transform()->setLocalPosition(0, 0, 5);
+    camera_go->transform()->setLocalPosition(0, 1, -10);
+    //camera_go->transform()->LookAt(0, 0, 0);
+    camera_go->setTag("MainCamera");
+    //camera_go->AddComponent<TakeScreenShot>();
+
+    auto light_go = Scene::CreateGameObject("Directional Light");
+    light_go->transform()->setPosition(0, 3, 0);
+    light_go->transform()->setLocalEulerAngles(50, -30, 0);
+    light_go->AddComponent(Light::Create());
+
+
+    //auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+    //skyboxGO->setName("Skybox");
+    //skyboxGO->transform()->setLocalScale(100, 100, 100);
+    auto material = Material::builtinMaterial("SkyboxProcedural");
+    material->SetFloat("_AtmosphereThickness", 1.0);
+    //material->SetFloat("_SunDisk", 2);
+    material->SetFloat("_SunSize", 0.04f);
+    material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+    material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+    material->SetFloat("_Exposure", 1.3f);
+    //skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+    RenderSettings::setSkybox(material);
+}
+
 
 class TestPBR : public App
 {
@@ -34,7 +84,7 @@ public:
         auto material = Material::defaultMaterial();
         material->SetTexture("RadianceMap", radiance_map);
         material->SetTexture("IrradianceMap", irradiance_map);
-        //material->EnableKeyword(ShaderKeyword::AmbientIBL);
+        material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
@@ -93,6 +143,8 @@ public:
 #endif
     }
 };
+
+#if 0
 
 class TestCSM : public App
 {
@@ -595,6 +647,8 @@ public:
         auto modelGO = model->CreateGameObject();
     }
 };
+
+#endif
  
 int main()
 {

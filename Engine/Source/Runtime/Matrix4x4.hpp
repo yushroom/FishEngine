@@ -8,7 +8,7 @@
 namespace FishEngine {
 
 // Matrices are row major.
-class Matrix4x4
+class FE_EXPORT Matrix4x4
 {
 public:
 

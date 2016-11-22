@@ -7,7 +7,7 @@
 namespace FishEngine
 {
 
-class Vector3
+class FE_EXPORT Vector3
 {
 public:
     union

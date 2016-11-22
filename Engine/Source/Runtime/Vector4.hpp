@@ -8,7 +8,7 @@
 namespace FishEngine
 {
 
-class Vector4
+class FE_EXPORT Vector4
 {
 public:
     //const static float kEpsilon = 1e-5f;

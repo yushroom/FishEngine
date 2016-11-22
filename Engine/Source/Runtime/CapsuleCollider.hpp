@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class CapsuleCollider : public Collider
+    class FE_EXPORT CapsuleCollider : public Collider
     {
     public:
         InjectClassName(CapsuleCollider);

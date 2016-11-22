@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class MeshFilter : public Component
+    class FE_EXPORT MeshFilter : public Component
     {
     public:
         InjectClassName(MeshFilter)

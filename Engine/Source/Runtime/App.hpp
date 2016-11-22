@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class App
+    class FE_EXPORT App
     {
     public:
         virtual ~App() = 0;

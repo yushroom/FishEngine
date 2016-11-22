@@ -14,7 +14,7 @@ namespace FishEngine
 {
     class ShaderImpl;
 
-    class Shader : public Object
+    class FE_EXPORT Shader : public Object
     {
     public:
         Shader();

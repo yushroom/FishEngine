@@ -16,7 +16,7 @@ namespace FishEngine
         Preview,
     };
 
-    class Camera : public Behaviour
+    class FE_EXPORT Camera : public Behaviour
     {
     public:
         InjectClassName(Camera)

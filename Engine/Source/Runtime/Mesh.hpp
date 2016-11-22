@@ -65,7 +65,7 @@ namespace FishEngine
         }
     };
 
-    class Mesh : public Object
+    class FE_EXPORT Mesh : public Object
     {
     public:
         Mesh() = default;
@@ -149,7 +149,7 @@ namespace FishEngine
 
 
     // position buffer array
-    class SimpleMesh : public Object
+    class FE_EXPORT SimpleMesh : public Object
     {
     public:
         // 3 components(float) for each vertex

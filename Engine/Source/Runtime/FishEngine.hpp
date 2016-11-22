@@ -2,7 +2,12 @@
 #define FishEngine_h
 
 #if defined(_WIN32) || defined(_WIN64)
-#define FISHENGINE_PLATFORM_WINDOWS 1
+    #define FISHENGINE_PLATFORM_WINDOWS 1
+    #ifdef FishEngine_EXPORTS
+        #define FE_EXPORT __declspec(dllexport)
+    #else
+        #define FE_EXPORT __declspec(dllimport)
+    #endif
 #elif defined(__APPLE__)
 #define FISHENGINE_PLATFORM_APPLE 1
 #else //defined(__linux__)

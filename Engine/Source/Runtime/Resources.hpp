@@ -5,24 +5,24 @@
 
 namespace FishEngine
 {
-class Resources
-{
-public:
-    Resources() = delete;
-
-    //static Object Load(const std::string path);
-
-    static const std::string& shaderRootDirectory()
+    class FE_EXPORT Resources
     {
-        return m_shaderRootDirectory;
-    }
+    public:
+        Resources() = delete;
 
-private:
-    static std::list<std::string> m_rootAssetDirectorys;
+        //static Object Load(const std::string path);
 
-    static std::string m_shaderRootDirectory;
-    static std::string m_textureRootDirectory;
-};
+        static const std::string& shaderRootDirectory()
+        {
+            return m_shaderRootDirectory;
+        }
+
+    private:
+        static std::list<std::string> m_rootAssetDirectorys;
+
+        static std::string m_shaderRootDirectory;
+        static std::string m_textureRootDirectory;
+    };
 }
 
 #endif // Resources_hpp

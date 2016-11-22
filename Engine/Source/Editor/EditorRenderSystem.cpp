@@ -32,8 +32,13 @@ namespace FishEditor
         // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
         glewExperimental = GL_TRUE;
         // Initialize GLEW to setup the OpenGL Function pointers
-        glewInit();
+        auto err = glewInit();
+        if (err != GLEW_OK)
+        {
+            Debug::LogError("%s", glewGetErrorString(err));
+        }
         glCheckError();
+        Debug::Log("GLEW initialized.");
 
         GLFWwindow* window = FishEditorWindow::window();
         // Define the view port dimensions

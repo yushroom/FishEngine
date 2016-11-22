@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class CameraController : public Script
+    class FE_EXPORT CameraController : public Script
     {
     public:
         InjectClassName(CameraController)

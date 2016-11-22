@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-    struct Bounds
+    struct FE_EXPORT Bounds
     {
         Bounds() : m_center(0, 0, 0), m_extents(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity) {}
         

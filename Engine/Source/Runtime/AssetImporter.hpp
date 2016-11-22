@@ -11,7 +11,7 @@ using Path = boost::filesystem::path;
 
 namespace FishEngine
 {
-    class AssetImporter : public Object
+    class FE_EXPORT AssetImporter : public Object
     {
     public:
         AssetImporter() = default;

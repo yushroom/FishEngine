@@ -32,7 +32,7 @@ namespace FishEngine
         Any,        // Any texture type.
     };
 
-    class Texture : public Object
+    class FE_EXPORT Texture : public Object
     {
     public:
         Texture()                       = default;

@@ -6,7 +6,7 @@ namespace FishEngine
 {
     //class RenderBuffer;
 
-    class Graphics
+    class FE_EXPORT Graphics
     {
     public:
         Graphics() = delete;

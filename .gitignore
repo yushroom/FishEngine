@@ -7,6 +7,9 @@
 *.sdf
 *.suo
 *.dll
+*.exp
+*.lib
+*.ilk
 
 *.exe
 
@@ -30,11 +33,11 @@ xcuserdata/
 /Engine/ThirdParty/fbxsdk*
 
 # binary
-/Engine/Binary/*/*.lib
-/Engine/Binary/*/*.exp
-/Engine/Binary/*/*.ilk
-/Engine/Binary/*/*.pdb
-/Engine/Binary/*/*.map
+/Engine/*/*/*.lib
+/Engine/*/*/*.exp
+/Engine/*/*/*.ilk
+/Engine/*/*/*.pdb
+/Engine/*/*/*.map
 
 # assets
 /assets/models/

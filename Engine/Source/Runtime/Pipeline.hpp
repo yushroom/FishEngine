@@ -7,7 +7,7 @@
 
 namespace FishEngine
 {
-    class Pipeline
+    class FE_EXPORT Pipeline
     {
     public:
         Pipeline() = delete;

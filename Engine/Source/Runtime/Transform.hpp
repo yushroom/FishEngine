@@ -15,7 +15,7 @@ namespace FishEngine
         Self
     };
 
-    class Transform : public Component
+    class FE_EXPORT Transform : public Component
     {
     public:
         InjectClassName(Transform);
@@ -246,13 +246,13 @@ namespace FishEngine
         }
 
         // Applies a rotation of eulerAngles.z degrees around the z axis, eulerAngles.x degrees around the x axis, and eulerAngles.y degrees around the y axis (in that order).
-        void Rotate(Vector3 eulerAngles, Space relativeTo = Space::Self);
+        //void Rotate(Vector3 eulerAngles, Space relativeTo = Space::Self);
 
         // Applies a rotation of zAngle degrees around the z axis, xAngle degrees around the x axis, and yAngle degrees around the y axis (in that order)
-        void Rotate(float xAngle, float yAngle, float zAngle, Space relativeTo = Space::Self)
-        {
-            this->Rotate(Vector3(xAngle, yAngle, zAngle), relativeTo);
-        }
+        //void Rotate(float xAngle, float yAngle, float zAngle, Space relativeTo = Space::Self)
+        //{
+        //    this->Rotate(Vector3(xAngle, yAngle, zAngle), relativeTo);
+        //}
 
         // Rotates the transform about axis passing through point in world coordinates by angle degrees.
         void RotateAround(const Vector3& point, const Vector3& axis, float angle);
@@ -268,7 +268,7 @@ namespace FishEngine
         //========== Public Functions ==========//
 
         // Unparents all children.
-        void DetachChildren();
+        //void DetachChildren();
 
         // Finds a child by name and returns it.
         TransformPtr Find(const std::string& name) const;

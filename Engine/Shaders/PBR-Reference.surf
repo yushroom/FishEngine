@@ -55,7 +55,7 @@ float3 DiffuseIBL( uint2 Random, float3 DiffuseColor, float Roughness, float3 N,
         if( NoL > 0 )
         {
             //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = texture(RadianceMap, L).rgb;
+            float3 SampleColor = textureLod(RadianceMap, L, 0).rgb;
 
             float FD90 = ( 0.5 + 2 * VoH * VoH ) * Roughness;
             //float FD90 = 0.5 + 2 * VoH * VoH * Roughness;
@@ -95,7 +95,7 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
         if( NoL > 0 )
         {
             //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = texture(RadianceMap, L).rgb;
+            float3 SampleColor = textureLod(RadianceMap, L, 0).rgb;
 
             float Vis = Vis_SmithJointApprox( Roughness, NoV, NoL );
             float Fc = pow( 1 - VoH, 5 );

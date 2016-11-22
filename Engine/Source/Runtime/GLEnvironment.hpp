@@ -4,9 +4,9 @@
 #include "FishEngine.hpp"
 
 // GLEW
-#ifndef GLEW_STATIC
-#define GLEW_STATIC // passed by command line from cmake
-#endif
+//#ifndef GLEW_STATIC
+//#define GLEW_STATIC // passed by command line from cmake
+//#endif
 #include <GL/glew.h>
 // GLFW
 //#include <glfw/glfw3.h>
@@ -17,6 +17,6 @@
 //#define glCheckError()
 //#endif
 
-void _checkOpenGLError(const char *file, int line);
+FE_EXPORT void _checkOpenGLError(const char *file, int line);
 
 #endif // GLEnvironment_hpp

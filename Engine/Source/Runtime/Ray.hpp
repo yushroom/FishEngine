@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    struct Ray
+    struct FE_EXPORT Ray
     {
         Vector3 origin;
         Vector3 direction;

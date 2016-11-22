@@ -13,7 +13,7 @@ namespace physx {
 
 namespace FishEngine
 {
-    class Collider : public Component
+    class FE_EXPORT Collider : public Component
     {
     public:
         Vector3 ClosestPointOnBounds(const Vector3& position);

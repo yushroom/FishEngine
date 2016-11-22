@@ -14,7 +14,7 @@
 
 namespace FishEngine
 {
-    class PhysicsSystem
+    class FE_EXPORT PhysicsSystem
     {
     public:
         PhysicsSystem() = delete;

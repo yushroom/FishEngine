@@ -29,7 +29,7 @@ namespace FishEngine {
     typedef std::shared_ptr<ModelNode> ModelNodePtr;
     
 
-    class Model : public Object
+    class FE_EXPORT Model : public Object
     {
     public:
         Model() : m_avatar(std::make_shared<Avatar>()) {}

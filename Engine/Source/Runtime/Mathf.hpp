@@ -1,6 +1,7 @@
 #ifndef Mathf_hpp
 #define Mathf_hpp
 
+#include "FishEngine.hpp"
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -9,7 +10,8 @@
 
 namespace FishEngine {
 
-class Mathf {
+class FE_EXPORT Mathf
+{
 
 public:
     Mathf() = delete;

@@ -6,7 +6,7 @@
 namespace FishEngine
 {
     // Base class for everything attached to GameObjects.
-    class Component : public Object
+    class FE_EXPORT Component : public Object
     {
     public:
         virtual std::string ClassName() const = 0;

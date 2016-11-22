@@ -12,7 +12,7 @@ namespace FishEngine
 
 constexpr int MAX_COMMANDS_COUNT = std::numeric_limits<uint8_t>::max();
 
-class CommandManager
+class FE_EXPORT CommandManager
 {
 public:
     CommandManager() = delete;

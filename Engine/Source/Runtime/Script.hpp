@@ -9,7 +9,7 @@ namespace FishEngine
     // Script is the base class every script derives from.
     // http://docs.unity3d.com/ScriptReference/MonoBehaviour.html
     // http://docs.unity3d.com/Manual/ExecutionOrder.html
-    class Script : public Behaviour
+    class FE_EXPORT Script : public Behaviour
     {
     public:
 

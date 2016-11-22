@@ -7,7 +7,7 @@
 
 namespace FishEngine
 {
-    class Time
+    class FE_EXPORT Time
     {
     public:
         Time() = delete;

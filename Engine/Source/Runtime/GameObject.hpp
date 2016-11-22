@@ -25,7 +25,7 @@ namespace FishEngine
 
     // Base class for all entities in Unity scenes.
     // http://docs.unity3d.com/ScriptReference/GameObject.html
-    class GameObject : public Object
+    class FE_EXPORT GameObject : public Object
     {
     public:
         //private:

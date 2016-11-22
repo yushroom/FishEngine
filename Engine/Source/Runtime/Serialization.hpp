@@ -44,7 +44,7 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Script, FishEngine::CameraContr
 
 namespace FishEngine
 {
-    class Serialization
+    class FE_EXPORT Serialization
     {
     public:
         Serialization() = delete;

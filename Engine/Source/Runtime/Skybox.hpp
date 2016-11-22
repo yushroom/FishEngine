@@ -9,7 +9,7 @@ namespace FishEngine
     // A script interface for the skybox component.
     // see: https://docs.unity3d.com/ScriptReference/Skybox.html
     // see: https://docs.unity3d.com/Manual/class-Skybox.html
-    class Skybox : public Behaviour
+    class FE_EXPORT Skybox : public Behaviour
     {
     public:
         MaterialPtr material()

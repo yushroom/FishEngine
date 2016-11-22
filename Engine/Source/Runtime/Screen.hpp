@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-    class Screen
+    class FE_EXPORT Screen
     {
     public:
         Screen() = delete;

@@ -24,7 +24,7 @@ namespace FishEngine
     
     // Texture importer lets you modify Texture2D import settings from editor scripts.
     // Settings of this class match the ones exposed in Texture Import Settings.
-    class TextureImporter : public AssetImporter
+    class FE_EXPORT TextureImporter : public AssetImporter
     {
     public:
         TexturePtr FromFile(const std::string& path);

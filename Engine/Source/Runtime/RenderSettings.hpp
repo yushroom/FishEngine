@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-    class RenderSettings : public Object
+    class FE_EXPORT RenderSettings : public Object
     {
     public:
         //InjectClassName(RenderSettings);

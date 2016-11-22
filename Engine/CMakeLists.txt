@@ -1,14 +1,28 @@
 cmake_minimum_required(VERSION 2.8)
+
 project(FishEngine CXX)
+
 set (FishEngine_VERSION_MAJOR 0)
 set (FishEngine_VERSION_MINOR 1)
 
-set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR}/Binary)
+# Global compile & linker flags
+## Compiler-agnostic settings
+### Target at least C++14
+set(CMAKE_CXX_STANDARD 14)
+
+# Output
+
+#set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_LIST_DIR}/Binary)
+message("HHHHHHHHH" ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 #boost
 set(Boost_USE_STATIC_LIBS       ON) # find static libs
 set(Boost_USE_MULTITHREADED     ON)
-set(Boost_USE_STATIC_RUNTIME    ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.59 REQUIRED
     COMPONENTS
     system
@@ -22,7 +36,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 #message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
 
 include_directories(./Source/Runtime)
-include_directories(./ThirdParty/boost_1_61_0/)
+#include_directories(./ThirdParty/boost_1_61_0/)
 include_directories(./ThirdParty/)
 include_directories(./ThirdParty/PhysXSDK/Include/)
 include_directories(./ThirdParty/glew-2.0.0/include)
@@ -31,10 +45,10 @@ include_directories(./ThirdParty/assimp-3.3.1/include)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+	# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+	# set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
+	# set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
 else()
         #link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
 endif()
@@ -48,6 +62,10 @@ add_subdirectory(./ThirdParty/glfw-3.2.1/)
 
 set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
 add_subdirectory(./ThirdParty/glew-2.0.0/build/cmake)
+#set(GLEW_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glew-2.0.0/lib/Release/Win32/glew32.lib)
+#IF(NOT EXISTS ${GLEW_LIBRARIES})
+#    message(FATAL_ERROR "GLEW lib does not exist: ${GLEW_LIBRARIES}")
+#endif ()
 
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
@@ -95,7 +113,40 @@ set(ASSIMP_BUILD_STL_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TERRAGEN_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_XGL_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 add_subdirectory(./ThirdParty/assimp-3.3.1)
+
+if (MSVC)
+    #target_link_libraries(FishEditor opengl32.lib)
+    # PhysXSDK
+    set(PhysXSDK_ROOT ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/PhysXSDK)
+    set(PhysXSDK_LIBRARIES_DIR ${PhysXSDK_ROOT}/Lib/vc14win64)
+    set(PhysXSDK_LIBRARIES "")
+    foreach(x PhysX3 PhysX3Common PhysX3Cooking)
+        set(lib1 ${PhysXSDK_LIBRARIES_DIR}/${x}DEBUG_x64.lib)
+        set(lib2 ${PhysXSDK_LIBRARIES_DIR}/${x}CHECKED_x64.lib)
+        IF(NOT EXISTS ${lib1})
+            message(FATAL_ERROR "physx root directory does not exist: ${lib1}")
+        endif ()
+        IF(NOT EXISTS ${lib2})
+            message(FATAL_ERROR "physx root directory does not exist: ${lib2}")
+        endif ()
+        list (APPEND PhysXSDK_LIBRARIES debug ${lib1} optimized ${lib2})
+    endforeach()
+    foreach(x PhysX3Extensions PhysX3Vehicle PhysXProfileSDK PhysXVisualDebuggerSDK PxTask)
+        set(lib1 ${PhysXSDK_LIBRARIES_DIR}/${x}DEBUG.lib)
+        set(lib2 ${PhysXSDK_LIBRARIES_DIR}/${x}CHECKED.lib)
+        IF(NOT EXISTS ${lib1})
+            message(FATAL_ERROR "physx root directory does not exist: ${lib1}")
+        endif ()
+        IF(NOT EXISTS ${lib2})
+            message(FATAL_ERROR "physx root directory does not exist: ${lib2}")
+        endif ()
+        list (APPEND PhysXSDK_LIBRARIES debug ${lib1} optimized ${lib2})
+    endforeach()
+else()
+    FILE(GLOB PhysXSDK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/PhysXSDK/Lib/osx64/*.a)
+endif()
 
 add_subdirectory(./Source/Runtime)
 add_subdirectory(./Source/Editor)

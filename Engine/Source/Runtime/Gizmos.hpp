@@ -11,7 +11,7 @@
 namespace FishEngine
 {
     // Gizmos are used to give visual debugging or setup aids in the scene view.
-    class Gizmos
+    class FE_EXPORT Gizmos
     {
     public:
         Gizmos() = delete;

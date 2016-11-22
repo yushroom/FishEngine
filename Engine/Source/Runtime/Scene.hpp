@@ -113,7 +113,7 @@ namespace FishEngine
     typedef Octree<std::weak_ptr<GameObject>> SceneOctree;
     typedef OctNode<std::weak_ptr<GameObject>> SceneOctreeNode;
     
-    class Scene
+    class FE_EXPORT Scene
     {
     public:
 

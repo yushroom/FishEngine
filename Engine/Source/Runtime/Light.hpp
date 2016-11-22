@@ -82,7 +82,7 @@ namespace FishEngine
         abort();
     }
 
-    class Light : public Behaviour
+    class FE_EXPORT Light : public Behaviour
     {
     public:
 

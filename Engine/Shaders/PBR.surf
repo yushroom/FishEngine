@@ -60,6 +60,8 @@ vec4 ps_main(SurfaceData surfaceData)
     outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(i.Roughness), vec3(1), L, V, N, vec2(1));
     float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
 
+    outColor.rgb = vec3(0);
+
 #ifdef _AMBIENT_IBL
     const int numMips   = 6;
     float mip           = numMips - 1 + log2(i.Roughness);
@@ -68,7 +70,7 @@ vec4 ps_main(SurfaceData surfaceData)
     //vec3 radiance       = pow(textureLod(RadianceMap, lookup, mip).rgb, vec3(2.2));
     //vec3 irradiance     = pow(texture(IrradianceMap, N).rgb, vec3(2.2));
     vec3 radiance       = textureLod(RadianceMap, lookup, mip).rgb;
-    vec3 irradiance     = texture(IrradianceMap, N).rgb;
+    vec3 irradiance     = textureLod(IrradianceMap, N, 0).rgb;
 
     vec3 reflectance    = EnvBRDFApprox(SpecularColor, i.Roughness, NoV);
     vec3 diffuse        = DiffuseColor * irradiance;

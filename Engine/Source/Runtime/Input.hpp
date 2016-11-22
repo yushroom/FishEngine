@@ -54,7 +54,8 @@ namespace FishEngine
 
     constexpr int keyCount = 512;
 
-    class Input {
+    class FE_EXPORT Input
+    {
     public:
         Input() = delete;
 

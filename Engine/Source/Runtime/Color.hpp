@@ -7,7 +7,7 @@
 
 namespace FishEngine
 {
-    class Color
+    class FE_EXPORT Color
     {
     public:
         union 

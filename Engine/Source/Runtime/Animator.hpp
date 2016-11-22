@@ -53,7 +53,7 @@ namespace FishEngine {
         std::map<int, std::string> m_indexToBone;
     };
 
-    class Animator : public Component
+    class FE_EXPORT Animator : public Component
     {
     public:
         InjectClassName(Animator);

@@ -13,7 +13,7 @@ namespace FishEngine
 {
     using UUID = boost::uuids::uuid;
     
-    class Object
+    class FE_EXPORT Object
     {
     public:
         Object();

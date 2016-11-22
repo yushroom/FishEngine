@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-    class GameLoop
+    class FE_EXPORT GameLoop
     {
     public:
         GameLoop() = delete;

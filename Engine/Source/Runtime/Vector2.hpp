@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-    class Vector2
+    class FE_EXPORT Vector2
     {
     public:
         union {

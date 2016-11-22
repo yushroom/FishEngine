@@ -28,7 +28,7 @@ namespace FishEngine
     };
 
 
-    class Material : public Object
+    class FE_EXPORT Material : public Object
     {
     public:
         Material() = default;

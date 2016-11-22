@@ -37,11 +37,11 @@ _A common misunderstanding is that some people think immediate mode gui == immed
 
 ImGui allows you create elaborate tools as well as very short-lived ones. On the extreme side of short-liveness: using the Edit&Continue feature of modern compilers you can add a few widgets to tweaks variables while your application is running, and remove the code a minute later! ImGui is not just for tweaking values. You can use it to trace a running algorithm by just emitting text commands. You can use it along with your own reflection data to browse your dataset live. You can use it to expose the internals of a subsystem in your engine, to create a logger, an inspection tool, a profiler, a debugger, etc.  
 
-Demo
-----
+Binaries/Demo
+-------------
 
 You should be able to build the examples from sources (tested on Windows/Mac/Linux). If you don't, let me know! If you want to have a quick look at the features of ImGui, you can download Windows binaries of the demo app here.
-- [imgui-demo-binaries-20160410.zip](http://www.miracleworld.net/imgui/binaries/imgui-demo-binaries-20160410.zip) (Windows binaries, ImGui 1.48+ 2016/04/10, 4 executables, 534 KB)
+- [imgui-demo-binaries-20161113.zip](http://www.miracleworld.net/imgui/binaries/imgui-demo-binaries-20161113.zip) (Windows binaries, ImGui 1.49+ 2016/11/13, 5 executables, 588 KB)
 
 
 Gallery
@@ -103,6 +103,7 @@ The library started its life and is best known as "ImGui" only due to the fact t
 <br><b>How can I have multiple widgets with the same label? Can I have widget without a label? (Yes). A primer on the purpose of labels/IDs.</b>
 <br><b>How can I tell when ImGui wants my mouse/keyboard inputs and when I can pass them to my application?</b>
 <br><b>How can I load a different font than the default?</b>
+<br><b>How can I easily use icons in my application?</b>
 <br><b>How can I load multiple fonts?</b>
 <br><b>How can I display and input non-latin characters such as Chinese, Japanese, Korean, Cyrillic?</b>
 <br><b>How can I use the drawing facilities without an ImGui window? (using ImDrawList API)</b>
@@ -111,7 +112,7 @@ See the FAQ in imgui.cpp for answers.
 
 <b>How do you use ImGui on a platform that may not have a mouse or keyboard?</b>
 
-I recommend using [Synergy](http://synergy-project.org) ([sources](https://github.com/synergy/synergy)). In particular, the _src/micro/uSynergy.c_ file contains a small client that you can use on any platform to connect to your host PC. You can seamlessly use your PC input devices from a video game console or a tablet. ImGui allows to increase the hit box of widgets (via the _TouchPadding_ setting) to accommodate a little for the lack of precision of touch inputs, but it is recommended you use a mouse to allow optimising for screen real-estate.
+I recommend using [Synergy](http://synergy-project.org) ([sources](https://github.com/symless/synergy)). In particular, the _src/micro/uSynergy.c_ file contains a small client that you can use on any platform to connect to your host PC. You can seamlessly use your PC input devices from a video game console or a tablet. ImGui allows to increase the hit box of widgets (via the _TouchPadding_ setting) to accommodate a little for the lack of precision of touch inputs, but it is recommended you use a mouse to allow optimising for screen real-estate.
 
 <b>Can you create elaborate/serious tools with ImGui?</b>
 
@@ -173,12 +174,13 @@ Double-chocolate sponsors:
 - Media Molecule
 - Mobigame
 - Insomniac Games (sponsored the gamepad/keyboard navigation branch)
+- Aras Pranckevičius
 
 Salty caramel supporters:
-- Jetha Chan, Wild Sheep Studio, Pastagames, Mārtiņš Možeiko, Daniel Collin, Stefano Cristiano, Chris Genova, ikrima, Glenn Fiedler, Geoffrey Evans, Dakko Dakko.
+- Jetha Chan, Wild Sheep Studio, Pastagames, Mārtiņš Možeiko, Daniel Collin, Recognition Robotics, Chris Genova, ikrima, Glenn Fiedler, Geoffrey Evans, Dakko Dakko.
 
 Caramel supporters:
-- Michel Courtine, César Leblic, Dale Kim, Alex Evans, Rui Figueira, Paul Patrashcu, Jerome Lanquetot, Ctrl Alt Ninja, Paul Fleming, Neil Henning, Stephan Dilly, Neil Blakey-Milner, Aleksei, NeiloGD, Justin Paver, FiniteSol, Vincent Pancaldi, James Billot, Robin Hübner, furrtek, Eric, Simon Barratt, Game Atelier, Julian Bosch, Simon Lundmark, Vincent Hamm, Farhan Wali, Jeff Roberts, Matt Reyer, Colin Riley, Victor Martins, Josh Simmons, Garrett Hoofman, Sergio Gonzales, Andrew Berridge, Roy Eltham, Game Preservation Society, [Kit framework](http://svkonsult.se/kit), Josh Faust, Martin Donlon.
+- Michel Courtine, César Leblic, Dale Kim, Alex Evans, Rui Figueira, Paul Patrashcu, Jerome Lanquetot, Ctrl Alt Ninja, Paul Fleming, Neil Henning, Stephan Dilly, Neil Blakey-Milner, Aleksei, NeiloGD, Justin Paver, FiniteSol, Vincent Pancaldi, James Billot, Robin Hübner, furrtek, Eric, Simon Barratt, Game Atelier, Julian Bosch, Simon Lundmark, Vincent Hamm, Farhan Wali, Jeff Roberts, Matt Reyer, Colin Riley, Victor Martins, Josh Simmons, Garrett Hoofman, Sergio Gonzales, Andrew Berridge, Roy Eltham, Game Preservation Society, [Kit framework](http://svkonsult.se/kit), Josh Faust, Martin Donlon, Quinton, Felix.
 
 And other supporters; thanks!
 

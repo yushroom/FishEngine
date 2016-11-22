@@ -797,6 +797,7 @@ namespace FishEditor
                 }
                 if (ImGui::BeginMenu("Light"))
                 {
+                    //Light::Create();
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Audio"))

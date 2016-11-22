@@ -124,7 +124,11 @@ namespace FishEditor
 
         glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
+#if FISHENGINE_PLATFORM_APPLE
+        std::ifstream fin("./FishEditorLayout.xml");
+#else
         std::ifstream fin("D:/program/FishEngine/Engine/Binary/Debug/FishEditorLayout.xml");
+#endif
         if (fin.is_open())
             ImGui::LoadDock(fin);
         else

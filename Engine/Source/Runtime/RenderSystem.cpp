@@ -37,9 +37,18 @@ namespace FishEngine
         auto camera = Camera::main();
         Pipeline::BindCamera(camera);
 
+        /************************************************************************/
+        /* Shadow                                                               */
+        /************************************************************************/
+        auto& lights = Light::lights();
+        for (auto& l : lights)
+        {
+            Scene::RenderShadow(l);
+        }
+        
         Vector4 lightDir(0, 0, 0, 0);
         Matrix4x4 lightVP;
-        auto& lights = Light::lights();
+        
         if (lights.size() > 0)
         {
             auto& l = lights.front();
@@ -55,13 +64,7 @@ namespace FishEngine
         Matrix4x4 model = Matrix4x4::Scale(100);
         Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
-        /************************************************************************/
-        /* Shadow                                                               */
-        /************************************************************************/
-        for (auto& l : lights)
-        {
-            Scene::RenderShadow(l);
-        }
+
 
         /************************************************************************/
         /* Scene                                                                */

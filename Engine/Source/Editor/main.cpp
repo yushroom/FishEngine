@@ -1,4 +1,4 @@
-//#include "TestScript.hpp"
+#include "TestScript.hpp"
 #include "TextureImporter.hpp"
 
 #include <iostream>
@@ -13,6 +13,7 @@
 #include <RenderSettings.hpp>
 #include <App.hpp>
 #include <MeshRenderer.hpp>
+#include <ModelImporter.hpp>
 
 #include "FishEditorWindow.hpp"
 
@@ -40,10 +41,6 @@ void DefaultScene()
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
     light_go->AddComponent(Light::Create());
 
-
-    //auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-    //skyboxGO->setName("Skybox");
-    //skyboxGO->transform()->setLocalScale(100, 100, 100);
     auto material = Material::builtinMaterial("SkyboxProcedural");
     material->SetFloat("_AtmosphereThickness", 1.0);
     //material->SetFloat("_SunDisk", 2);
@@ -51,7 +48,6 @@ void DefaultScene()
     material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
     material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
     material->SetFloat("_Exposure", 1.3f);
-    //skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     RenderSettings::setSkybox(material);
 }
 
@@ -144,7 +140,7 @@ public:
     }
 };
 
-#if 0
+#if 1
 
 class TestCSM : public App
 {
@@ -225,7 +221,7 @@ public:
             box->GetComponent<MeshRenderer>()->SetMaterial(checkboardMaterial);
         }
         auto cameraGO = Camera::mainGameCamera()->gameObject();
-        cameraGO->AddComponent<Serialize>();
+        //cameraGO->AddComponent<Serialize>();
     }
 };
 
@@ -652,12 +648,12 @@ public:
  
 int main()
 {
-    FishEditorWindow::AddApp(make_shared<TestPBR>());
+    //FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     //FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());

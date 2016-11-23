@@ -3,15 +3,20 @@
 
 #if defined(_WIN32) || defined(_WIN64)
     #define FISHENGINE_PLATFORM_WINDOWS 1
+#elif defined(__APPLE__)
+    #define FISHENGINE_PLATFORM_APPLE 1
+#else //defined(__linux__)
+    #define FISHENGINE_PLATFORM_LINUX 1
+#endif
+
+#if FISHENGINE_PLATFORM_WINDOWS
     #ifdef FishEngine_EXPORTS
         #define FE_EXPORT __declspec(dllexport)
     #else
         #define FE_EXPORT __declspec(dllimport)
     #endif
-#elif defined(__APPLE__)
-#define FISHENGINE_PLATFORM_APPLE 1
-#else //defined(__linux__)
-#define FISHENGINE_PLATFORM_LINUX 1
+#else
+    #define FE_EXPORT
 #endif
 
 #include <string>

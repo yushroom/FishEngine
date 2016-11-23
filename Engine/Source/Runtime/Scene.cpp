@@ -144,8 +144,8 @@ namespace FishEngine
         
         //glCullFace(GL_FRONT);
         auto shadow_map_material = Material::builtinMaterial("ShadowMap");
-        auto& view = light->m_viewMatrixForShadowMap;
-        auto& proj = light->m_projectMatrixForShadowMap;
+        //auto& view = light->m_viewMatrixForShadowMap;
+        //auto& proj = light->m_projectMatrixForShadowMap;
 
         auto shadowMap = light->m_shadowMap;
         GLint previous_fbo = 0;

@@ -155,8 +155,9 @@ vec4 ps_main(SurfaceData surfaceData)
     float NoL = saturate( dot(N, L) );
     //outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness, Roughness, Roughness), vec3(1), L, V, N, vec2(1));
     uint2 seed = uint2(uint(abs(310103671 * surfaceData.uv.y)), uint(abs(310103671 * surfaceData.uv.x)));
-    outColor.rgb  = SpecularIBL(ScrambleTEA(seed), SpecularColor, Roughness, N, V);
-    outColor.rgb += DiffuseIBL(ScrambleTEA(seed), DiffuseColor, Roughness, N, V);
+    seed = ScrambleTEA(seed);
+    outColor.rgb  = SpecularIBL(seed, SpecularColor, Roughness, N, V);
+    outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
     outColor.a = 1;
     return outColor;
 }

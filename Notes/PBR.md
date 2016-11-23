@@ -274,6 +274,8 @@ http://www.luluathena.com/?p=1781
 
 https://zhuanlan.zhihu.com/p/21376124
 
+https://placeholderart.wordpress.com/2015/07/28/implementation-notes-runtime-environment-map-filtering-for-image-based-lighting/
+
 
 
 历年SIGGRAPH PBR讲座

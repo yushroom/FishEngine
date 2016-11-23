@@ -74,7 +74,7 @@ float4 lerp(float4 a, float4 b, float w)
 
 
 // http://http.developer.nvidia.com/Cg/saturate.html
-#define saturate(x) clamp(x, 0.0, 1.0)
+#define saturate(x) clamp((x), 0.0, 1.0)
 
 //http://http.developer.nvidia.com/Cg/frac.html
 #define frac(x) fract(x)

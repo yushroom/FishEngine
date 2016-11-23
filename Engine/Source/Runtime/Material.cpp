@@ -59,6 +59,11 @@ namespace FishEngine
     void Material::SetShader(const ShaderPtr& shader)
     {
         m_shader = shader;
+        m_uniforms.floats.clear();
+        m_uniforms.vec3s.clear();
+        m_uniforms.vec4s.clear();
+        m_uniforms.mat4s.clear();
+        m_properties.clear();
         for (auto& u : m_shader->uniforms())
         {
             if (u.type == GL_FLOAT)
@@ -102,7 +107,13 @@ namespace FishEngine
 
     void Material::EnableKeywords(ShaderKeywords keyword)
     {
-        m_shader->EnableLocalKeywords(keyword);
+        auto i = m_shader->m_keywords & keyword;
+        if (i == 0)
+        {
+            Debug::LogWarning("EnableKeywords");
+            m_shader->EnableLocalKeywords(keyword);
+            SetShader(m_shader);
+        }
     }
 
     bool Material::IsKeywordEnabled(ShaderKeyword keyword)
@@ -201,7 +212,7 @@ namespace FishEngine
     void Material::Init()
     {
         s_defaultMaterial = CreateMaterial();
-        s_defaultMaterial->name() = "DefaultMaterial";
+        s_defaultMaterial->setName("DefaultMaterial");
         s_defaultMaterial->SetShader(Shader::builtinShader("PBR"));
         s_defaultMaterial->SetFloat("Metallic", 0);
         s_defaultMaterial->SetFloat("Roughness", 0.5f);

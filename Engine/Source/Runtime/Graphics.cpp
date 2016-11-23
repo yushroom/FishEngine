@@ -10,7 +10,6 @@ namespace FishEngine
     void Graphics::DrawMesh(const MeshPtr& mesh, const Matrix4x4& matrix, const MaterialPtr& material)
     {
         Pipeline::UpdatePerDrawUniforms(matrix);
-
         DrawMesh(mesh, material);
     }
 

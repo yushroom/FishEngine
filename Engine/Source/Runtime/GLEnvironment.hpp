@@ -4,9 +4,9 @@
 #include "FishEngine.hpp"
 
 // GLEW
-//#ifndef GLEW_STATIC
-//#define GLEW_STATIC // passed by command line from cmake
-//#endif
+#if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
+#define GLEW_STATIC
+#endif
 #include <GL/glew.h>
 // GLFW
 //#include <glfw/glfw3.h>

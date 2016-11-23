@@ -43,11 +43,8 @@ namespace FishEngine
         auto& lights = Light::lights();
         for (auto& l : lights)
         {
-            Scene::RenderShadow(l);
+            Scene::RenderShadow(l); // note: RenderShadow will change viewport
         }
-        
-        Vector4 lightDir(0, 0, 0, 0);
-        Matrix4x4 lightVP;
         
         if (lights.size() > 0)
         {
@@ -57,6 +54,10 @@ namespace FishEngine
 
         Pipeline::UpdatePerFrameUniforms();
 
+        auto v = Camera::main()->viewport();
+        const int w = Screen::width();
+        const int h = Screen::height();
+        glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
 
         /************************************************************************/
         /* Skybox                                                               */
@@ -65,14 +66,9 @@ namespace FishEngine
         Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
 
-
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
-        auto v = Camera::main()->viewport();
-        const int w = Screen::width();
-        const int h = Screen::height();
-        glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
         Scene::Render();
 
         //if (m_isWireFrameMode)

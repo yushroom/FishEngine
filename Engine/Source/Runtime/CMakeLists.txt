@@ -1,10 +1,3 @@
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
-add_library (FishEngine SHARED ${SRCS} ${HEADERS})
-
-target_link_libraries(FishEngine ${PhysXSDK_LIBRARIES})
-target_link_libraries(FishEngine ${Boost_LIBRARIES})
-target_link_libraries(FishEngine glfw)
-target_link_libraries(FishEngine glew)
-#target_link_libraries(FishEngine ${GLEW_LIBRARIES})
-target_link_libraries(FishEngine assimp)
+add_library (FishEngine STATIC ${SRCS} ${HEADERS})

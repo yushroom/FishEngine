@@ -9,7 +9,7 @@
     #define FISHENGINE_PLATFORM_LINUX 1
 #endif
 
-#if FISHENGINE_PLATFORM_WINDOWS
+#if defined(FishEngine_SHARED_LIB) && FISHENGINE_PLATFORM_WINDOWS
     #ifdef FishEngine_EXPORTS
         #define FE_EXPORT __declspec(dllexport)
     #else

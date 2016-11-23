@@ -77,11 +77,22 @@ namespace FishEngine
         {
             m_wrapMode = wrapMode;
         }
+
+        TextureDimension dimension() const
+        {
+            return m_dimension;
+        }
+
+        void setDimension(TextureDimension dimension)
+        {
+            m_dimension = dimension;
+        }
         
         static const std::vector<TexturePtr>& AllTextures()
         {
             return m_textures;
         }
+
 
     protected:
         

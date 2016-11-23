@@ -1,3 +1,8 @@
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
 add_executable (ShaderCompiler ${SRCS})
 target_link_libraries(ShaderCompiler FishEngine)
+target_link_libraries(ShaderCompiler glfw)
+target_link_libraries(ShaderCompiler glew_s)
+target_link_libraries(ShaderCompiler assimp)
+target_link_libraries(ShaderCompiler ${PhysXSDK_LIBRARIES})
+target_link_libraries(ShaderCompiler ${Boost_LIBRARIES})

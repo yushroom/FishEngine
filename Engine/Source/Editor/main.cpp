@@ -1,4 +1,4 @@
-#include "TestScript.hpp"
+//#include "TestScript.hpp"
 #include "TextureImporter.hpp"
 
 #include <iostream>
@@ -72,18 +72,27 @@ public:
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
-        
+
         TextureImporter importer;
         auto radiance_map = importer.FromFile(skybox_dir+"BolongaRadiance.dds");
         auto irradiance_map = importer.FromFile(skybox_dir+"BolongaIrradiance.dds");
         
+        auto pisa_hdr = importer.FromFile(textures_dir + "pisa.hdr");
+
         auto material = Material::defaultMaterial();
-        material->SetTexture("RadianceMap", radiance_map);
-        material->SetTexture("IrradianceMap", irradiance_map);
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
+        material->SetTexture("AmbientCubemap", radiance_map);
+        //material->SetTexture("IrradianceMap", irradiance_map);
         
+#if 1
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
+#else
+        auto skybox_panorama = Shader::CreateFromFile(root_dir + "../Engine/Shaders/SkyBox-Panorama.shader");
+        material = Material::CreateMaterial();
+        material->SetShader(skybox_panorama);
+        material->SetTexture("_Tex", pisa_hdr);
+#endif
         material->SetVector4("_Tint", Vector4::one);
         material->SetFloat("_Exposure", 1);
         material->SetFloat("_Rotation", 0);
@@ -104,12 +113,13 @@ public:
                 auto material = (x%2 == 0) ?
                     Material::builtinMaterial("PBR") :
                     Material::builtinMaterial("PBR-Reference");
+                material->EnableKeyword(ShaderKeyword::AmbientIBL);
                 material->SetFloat("Metallic", x >= 2 ? 1.0f : 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-                material->SetTexture("RadianceMap", radiance_map);
-                material->SetTexture("IrradianceMap", irradiance_map);
+                material->SetTexture("AmbientCubemap", radiance_map);
+                //material->SetTexture("IrradianceMap", irradiance_map);
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
@@ -140,7 +150,7 @@ public:
     }
 };
 
-#if 1
+#if 0
 
 class TestCSM : public App
 {
@@ -648,12 +658,12 @@ public:
  
 int main()
 {
-    //FishEditorWindow::AddApp(make_shared<TestPBR>());
+    FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
-    FishEditorWindow::AddApp(make_shared<SimpleTest>());
+    //FishEditorWindow::AddApp(make_shared<SimpleTest>());
     //FishEditorWindow::AddApp(make_shared<TestSerialization>());
     //FishEditorWindow::AddApp(make_shared<TestParallaxMap>());
     //FishEditorWindow::AddApp(make_shared<CharacterThirdPerson>());

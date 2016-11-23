@@ -9,8 +9,9 @@
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 
-// GLEW/GLFW
-//#define GLEW_STATIC
+#if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
+#define GLEW_STATIC
+#endif
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
@@ -79,7 +80,7 @@ void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
         { 0.0f,                  2.0f/-io.DisplaySize.y, 0.0f, 0.0f },
         { 0.0f,                  0.0f,                  -1.0f, 0.0f },
         {-1.0f,                  1.0f,                   0.0f, 1.0f },
-    };
+    }; 
     glUseProgram(g_ShaderHandle);
     glUniform1i(g_AttribLocationTex, 0);
     glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);

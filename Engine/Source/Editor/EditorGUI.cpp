@@ -682,10 +682,14 @@ namespace FishEditor
             item_count = 0;
             for (const auto& t : Texture::AllTextures())
             {
-                if (ImGui::Selectable(t->name().c_str(), selected_item_id == item_count))
-                {
-                    selected_item_id = item_count;
-                }
+                //constexpr ImVec2 size(128, 128);
+                ImGui::SameLine();
+                if (t->dimension() == TextureDimension::Tex2D)
+                    ImGui::Image((void*)t->GetNativeTexturePtr(), ImVec2(64, 64));
+                //if (ImGui::Selectable(t->name().c_str(), selected_item_id == item_count))
+                //{
+                //    selected_item_id = item_count;
+                //}
                 item_count++;
             }
         }

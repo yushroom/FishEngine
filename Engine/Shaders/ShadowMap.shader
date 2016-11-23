@@ -1,13 +1,13 @@
-#include <ShaderVariables.inc>
+//#include <ShaderVariables.inc>
 
 #ifdef VERTEX_SHADER
-	#include "AppData.inc"
+	layout (location = 0) 	in vec3 InputPositon;
 
 	uniform mat4 MATRIX_LIGHT_MVP;
 
-	void vs_main(AppData appdata)
+	void main()
 	{
-	    gl_Position = MATRIX_LIGHT_MVP * appdata.position;
+	    gl_Position = MATRIX_LIGHT_MVP * vec4(InputPositon, 1);
 	}
 #endif
 

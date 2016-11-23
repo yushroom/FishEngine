@@ -12,7 +12,7 @@ namespace FishEngine
 {
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed
-    GLuint CreateTextureFromDDS(char const* Filename)
+    GLuint CreateTextureFromDDS(char const* Filename, FishEngine::TextureDimension* out_textureFormat)
     {
         glCheckError();
         
@@ -45,6 +45,14 @@ namespace FishEngine
         glm::tvec3<GLsizei> const Extent(Texture.extent());
         //GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
         
+        auto t = Texture.target();
+        if (t == gli::TARGET_2D)
+            *out_textureFormat = TextureDimension::Tex2D;
+        else if (t == gli::TARGET_3D)
+            *out_textureFormat = TextureDimension::Tex3D;
+        else if (t == gli::TARGET_CUBE)
+            *out_textureFormat = TextureDimension::Cube;
+
         switch (Texture.target())
         {
             case gli::TARGET_1D:
@@ -163,8 +171,8 @@ namespace FishEngine
         glGenerateMipmap(GL_TEXTURE_2D);
         
         // Parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -175,22 +183,27 @@ namespace FishEngine
     
     TexturePtr TextureImporter::FromFile(const std::string& path)
     {
+        auto t = std::make_shared<Texture>();
         GLuint texture;
         auto ext = getExtensionWithoutDot(path);
         if (ext == "dds")
         {
-            texture = CreateTextureFromDDS(path.c_str());
+            TextureDimension format;
+            texture = CreateTextureFromDDS(path.c_str(), &format);
+            t->m_dimension = format;
+ 
         }
-        else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga")
+        else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga" || ext == "hdr")
         {
             texture = CreateTexture(path);
+            t->m_dimension = TextureDimension::Tex2D;
         }
         else
         {
             Debug::LogError("texture type[%s] not supported\n", ext.c_str());
             abort();
         }
-        auto t = std::make_shared<Texture>();
+
         t->m_texture = texture;
         auto name = getFileNameWithoutExtension(path);
         t->setName(name);

@@ -159,6 +159,8 @@ const char* GLenumToString(GLenum e)
         return "GL_FLOAT";
     case GL_FLOAT_VEC3:
         return "GL_FLOAT_VEC3";
+    case GL_FLOAT_VEC4:
+        return "GL_FLOAT_VEC4";
     case GL_FLOAT_MAT4:
         return "GL_FLOAT_MAT4";
     case GL_SAMPLER_2D:
@@ -212,7 +214,7 @@ namespace FishEngine
 
         GLuint CompileAndLink(ShaderKeywords keywords)
         {
-            //Debug::Log("CompileAndLink %s", m_filePath.c_str());
+            Debug::LogWarning("CompileAndLink %s", m_filePath.c_str());
             auto vs = Compile(ShaderType::VertexShader, keywords);
             GLuint gs = 0;
             if (getValueOrDefault<string, string>(m_settings, "GeometryShader", "Off") == "On")
@@ -475,11 +477,12 @@ namespace FishEngine
             for (int i = 0; i < count; i++)
             {
                 glGetActiveUniform(program, (GLuint)i, bufSize, &length, &size, &type, name);
-                //GLint location = glGetUniformLocation(m_program, name);
                 GLint loc = glGetUniformLocation(program, name);
-                //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type).c_str(), name, loc);
                 if (loc != GL_INVALID_INDEX)
+                {
+                    Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type), name, loc);
                     uniforms.push_back(UniformInfo{ type, string(name), (GLuint)loc, false });
+                }
             }
             m_GLProgramToUniforms[program] = uniforms;
         }
@@ -540,6 +543,9 @@ namespace FishEngine
             printf("VERTEX\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_vertexShaderText).c_str());
             printf("Geometry\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_geometryShaderText).c_str());
             printf("FRAGMENT\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_fragmentShaderText).c_str());
+            //printf("VERTEX\n==========\n%s\n==========\n", (m_impl->m_vertexShaderText).c_str());
+            //printf("Geometry\n==========\n%s\n==========\n", (m_impl->m_geometryShaderText).c_str());
+            //printf("FRAGMENT\n==========\n%s\n==========\n", (m_impl->m_fragmentShaderText).c_str());
             printf("%s", e.what());
             return false;
         }
@@ -598,10 +604,13 @@ namespace FishEngine
 
     void Shader::BindUniforms(const ShaderUniforms& uniforms)
     {
-        for (auto& u : m_uniforms) {
-            if (u.type == GL_FLOAT_MAT4) {
+        for (auto& u : m_uniforms)
+        {
+            if (u.type == GL_FLOAT_MAT4)
+            {
                 auto it = uniforms.mat4s.find(u.name);
-                if (it != uniforms.mat4s.end()) {
+                if (it != uniforms.mat4s.end())
+                {
                     glUniformMatrix4fv(u.location, 1, GL_TRUE, it->second.data());
                     u.binded = true;
                 }
@@ -609,9 +618,11 @@ namespace FishEngine
                 //                Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
                 //            }
             }
-            else if (u.type == GL_FLOAT_VEC3) {
+            else if (u.type == GL_FLOAT_VEC3)
+            {
                 auto it = uniforms.vec3s.find(u.name);
-                if (it != uniforms.vec3s.end()) {
+                if (it != uniforms.vec3s.end())
+                {
                     glUniform3fv(u.location, 1, it->second.data());
                     u.binded = true;
                 }
@@ -619,16 +630,20 @@ namespace FishEngine
                 //                Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
                 //            }
             }
-            else if (u.type == GL_FLOAT) {
+            else if (u.type == GL_FLOAT)
+            {
                 auto it = uniforms.floats.find(u.name);
-                if (it != uniforms.floats.end()) {
+                if (it != uniforms.floats.end())
+                {
                     glUniform1f(u.location, it->second);
                     u.binded = true;
                 }
             }
-            else if (u.type == GL_FLOAT_VEC4) {
+            else if (u.type == GL_FLOAT_VEC4)
+            {
                 auto it = uniforms.vec4s.find(u.name);
-                if (it != uniforms.vec4s.end()) {
+                if (it != uniforms.vec4s.end())
+                {
                     glUniform4fv(u.location, 1, it->second.data());
                     u.binded = true;
                 }
@@ -639,10 +654,12 @@ namespace FishEngine
     void Shader::BindTextures(const std::map<std::string, TexturePtr>& textures)
     {
         int texture_id = 0;
-        for (auto& u : m_uniforms) {
+        for (auto& u : m_uniforms)
+        {
             if (u.type != GL_SAMPLER_2D && u.type != GL_SAMPLER_CUBE) continue;
             auto it = textures.find(u.name);
-            if (it != textures.end()) {
+            if (it != textures.end())
+            {
                 GLenum type = u.type == GL_SAMPLER_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
                 //BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
                 glActiveTexture(GLenum(GL_TEXTURE0 + texture_id));
@@ -652,7 +669,8 @@ namespace FishEngine
                 texture_id++;
                 u.binded = true;
             }
-            else {
+            else
+            {
                 Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
             }
         }
@@ -660,14 +678,17 @@ namespace FishEngine
 
     void Shader::PreRender() const
     {
-        if (m_cullface == Cullface::Off) {
+        if (m_cullface == Cullface::Off)
+        {
             glDisable(GL_CULL_FACE);
         }
-        else {
+        else
+        {
             glCullFace((GLenum)m_cullface);
         }
         glDepthMask(m_ZWrite);
-        if (m_blend) {
+        if (m_blend)
+        {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -685,8 +706,10 @@ namespace FishEngine
 
     void Shader::CheckStatus() const
     {
-        for (auto& u : m_uniforms) {
-            if (!u.binded) {
+        for (auto& u : m_uniforms)
+        {
+            if (!u.binded)
+            {
                 Debug::LogWarning("Uniform %s[%s] not binded!", u.name.c_str(), GLenumToString(u.type));
             }
         }

@@ -8,29 +8,8 @@ uniform float Metallic;
 uniform float Roughness;
 uniform float Specular;
 
-uniform samplerCube RadianceMap;
+uniform samplerCube AmbientCubemap;
 uniform samplerCube IrradianceMap;
-
-float4 ImportanceSampleGGX( float2 E, float Roughness )
-{
-    float m = Roughness * Roughness;
-    float m2 = m * m;
-
-    float Phi = 2 * PI * E.x;
-    float CosTheta = sqrt( (1 - E.y) / ( 1 + (m2 - 1) * E.y ) );
-    float SinTheta = sqrt( 1 - CosTheta * CosTheta );
-
-    float3 H;
-    H.x = SinTheta * cos( Phi );
-    H.y = SinTheta * sin( Phi );
-    H.z = CosTheta;
-    
-    float d = ( CosTheta * m2 - CosTheta ) * CosTheta + 1;
-    float D = m2 / ( PI*d*d );
-    float PDF = D * CosTheta;
-
-    return float4( H, PDF );
-}
 
 float3 DiffuseIBL( uint2 Random, float3 DiffuseColor, float Roughness, float3 N, float3 V )
 {
@@ -55,7 +34,7 @@ float3 DiffuseIBL( uint2 Random, float3 DiffuseColor, float Roughness, float3 N,
         if( NoL > 0 )
         {
             //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = textureLod(RadianceMap, L, 0).rgb;
+            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
 
             float FD90 = ( 0.5 + 2 * VoH * VoH ) * Roughness;
             //float FD90 = 0.5 + 2 * VoH * VoH * Roughness;
@@ -80,7 +59,7 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
 {
     float3 SpecularLighting = vec3(0);
 
-    const uint NumSamples = 256;
+    const uint NumSamples = 1024;
     for( uint i = 0; i < NumSamples; i++ )
     {
         float2 E = Hammersley( i, NumSamples, Random );
@@ -95,7 +74,7 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
         if( NoL > 0 )
         {
             //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = textureLod(RadianceMap, L, 0).rgb;
+            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
 
             float Vis = Vis_SmithJointApprox( Roughness, NoV, NoL );
             float Fc = pow( 1 - VoH, 5 );
@@ -111,39 +90,6 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
     return SpecularLighting / NumSamples;
 }
 
-/*
- * Pseudo random number generator, based on "TEA, a tiny Encrytion Algorithm"
- * http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf
- * http://www.umbc.edu/~olano/papers/index.html#GPUTEA
- * @param v - old seed (full 32bit range)
- * @param IterationCount - >=1, bigger numbers cost more performance but improve quality
- * @return new seed
- */
-uint2 ScrambleTEA(uint2 v, uint IterationCount)
-{
-    // Start with some random data (numbers can be arbitrary but those have been used by others and seem to work well)
-    uint k[4] = uint[4]( 0xA341316Cu , 0xC8013EA4u , 0xAD90777Du , 0x7E95761Eu );
-    
-    uint y = v[0];
-    uint z = v[1];
-    uint sum = 0;
-    
-    for(uint i = 0; i < IterationCount; ++i)
-    {
-        sum += 0x9e3779b9;
-        y += ((z << 4u) + k[0]) ^ (z + sum) ^ ((z >> 5u) + k[1]);
-        z += ((y << 4u) + k[2]) ^ (y + sum) ^ ((y >> 5u) + k[3]);
-    }
-
-    return uint2(y, z);
-}
-
-uint2 ScrambleTEA(uint2 v)
-{
-    return ScrambleTEA(v, 3);
-}
-
-
 vec4 ps_main(SurfaceData surfaceData)
 {
     vec4 outColor;
@@ -157,7 +103,7 @@ vec4 ps_main(SurfaceData surfaceData)
     uint2 seed = uint2(uint(abs(310103671 * surfaceData.uv.y)), uint(abs(310103671 * surfaceData.uv.x)));
     seed = ScrambleTEA(seed);
     outColor.rgb  = SpecularIBL(seed, SpecularColor, Roughness, N, V);
-    outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
+    //outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
     outColor.a = 1;
     return outColor;
 }

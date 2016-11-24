@@ -4,15 +4,10 @@
 #include <BRDF.inc>
 #include <Ambient.inc>
 
-
 uniform vec3  BaseColor;
 uniform float Metallic;
 uniform float Roughness;
 uniform float Specular;
-
-//#define _AMBIENT_IBL 1
-//uniform samplerCube AmbientCubemap;
-//uniform samplerCube IrradianceMap;
 
 struct PixelMaterialInputs
 {
@@ -37,51 +32,8 @@ struct PixelMaterialInputs
     }
 #endif
 
+
 #if 0
-
-vec4 ps_main(SurfaceData surfaceData)
-{
-    //PixelMaterialInputs i = CalcPixelMaterialInputs(surfaceData);
-    vec4 outColor;
-    vec3 L = surfaceData.L;
-    vec3 V = surfaceData.V;
-    vec3 N = surfaceData.N;
-    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
-    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
-#if 0
-    float NoL = saturate( dot(N, L) );
-    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness), vec3(1), L, V, N, vec2(1));
-#endif
-
-#ifdef _AMBIENT_IBL
-#if 0
-    float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
-    const int numMips   = 6;
-    float mip           = numMips - 1 + log2(Roughness);
-    vec3 lookup         = -reflect(V, N);
-    //lookup              = fix_cube_lookup(lookup, 512, mip);
-    //vec3 radiance       = pow(textureLod(RadianceMap, lookup, mip).rgb, vec3(2.2));
-    //vec3 irradiance     = pow(texture(IrradianceMap, N).rgb, vec3(2.2));
-    vec3 radiance       = textureLod(AmbientCubemap, lookup, mip).rgb;
-    vec3 irradiance     = textureLod(IrradianceMap, N, 0).rgb;
-
-    vec3 reflectance    = EnvBRDFApprox(SpecularColor, Roughness, NoV);
-    vec3 diffuse        = DiffuseColor * irradiance;
-    vec3 specular       = radiance * reflectance;
-    //outColor.rgb       += pow(diffuse + specular, vec3(1.0/2.2));
-    outColor.rgb        += diffuse + specular;
-#else
-    uint2 seed = uint2(uint(abs(310103671 * surfaceData.uv.y)), uint(abs(310103671 * surfaceData.uv.x)));
-    seed = ScrambleTEA(seed);
-    outColor.rgb  = ApproximateSpecularIBL(seed, SpecularColor, Roughness, N, V);
-#endif
-#endif
-    //outColor.rgb = vec3(0.5f);
-    outColor.a = 1.0f;
-    return outColor;
-}
-
-#elif 0
 
 vec4 ps_main(SurfaceData surfaceData)
 {
@@ -123,11 +75,20 @@ vec4 ps_main(SurfaceData surfaceData)
     float a = Square( Roughness );
     float3 R = lerp( N, R0, (1 - a) * ( sqrt(1 - a) + a ) );
     
+    float3 NonSpecularContribution = vec3(0);
+    float3 SpecularContribution = vec3(0);
+
+    float AbsoluteDiffuseMip = AmbientCubemapMipAdjust.z;
+    //float3 DiffuseLookup =  TextureCubeSampleLevel(AmbientCubemap, AmbientCubemapSampler, N, AbsoluteDiffuseMip).rgb;
+    float3 DiffuseLookup =  textureLod(AmbientCubemap, N, AbsoluteDiffuseMip).rgb;
+    NonSpecularContribution += DiffuseColor * DiffuseLookup;
+
+
     float Mip = ComputeCubemapMipFromRoughness(Roughness, AmbientCubemapMipAdjust.w);
     float3 SampleColor = textureLod(AmbientCubemap, R, Mip).rgb;
-    float3 SpecularContribution = SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
+    SpecularContribution += SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
 
-    outColor.rgb = SpecularContribution;
+    outColor.rgb = SpecularContribution + NonSpecularContribution;
     // //outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness, Roughness, Roughness), vec3(1), L, V, N, vec2(1));
     // uint2 seed = uint2(uint(abs(31010367 * surfaceData.uv.y)), uint(abs(10103671 * surfaceData.uv.x)));
     // seed = ScrambleTEA(seed);

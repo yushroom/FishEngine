@@ -79,14 +79,16 @@ public:
     // ushort FloatToHalf(float val);
     // float HalfToFloat(ushort val);
 
-    static float Clamp(float value, float min_value, float max_value) {
-        
+    template<typename T>
+    static T Clamp(T value, T min_value, T max_value)
+    {
         if (value < min_value) value = min_value;
         else if (value > max_value) value = max_value;
         return value;
     }
 
-    static float Clamp01(float value) {
+    static float Clamp01(float value)
+    {
         if (value < 0.f) {
             return 0.f;
         }
@@ -320,7 +322,11 @@ public:
     /********** misc **********/
     static float PerlinNoise(float x, float y);
 
-}; // namespace Mathf
+}; // class Mathf
+
+
+template float Mathf::Clamp<float>(float value, float min_value, float max_value);
+template uint32_t Mathf::Clamp<uint32_t>(uint32_t value, uint32_t min_value, uint32_t max_value);
 
 }
 

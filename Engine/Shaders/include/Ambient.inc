@@ -1,56 +1,164 @@
 #pragma once
 
 #include <BRDF.inc>
+#include <ShadingModels.inc>
+#include <DeferredShadingCommon.inc>
+#include <MonteCarlo.inc>
+#include <CubemapCommon.inc>
+#include <Random.inc>
 
-uniform samplerCube AmbientCubemap;
-
-const uint GDiffuseConvolveMipLevel = 4;
-
-// MipCount = FMath::Log2(CubemapWidth) + 1.0f;
-const uint MipCount = 9;
-// in PostProcessAmbient.cpp
-// AmbientCubemapMipAdjustValue.X =  1.0f - GDiffuseConvolveMipLevel / MipCount;
-// AmbientCubemapMipAdjustValue.Y = (MipCount - 1.0f) * AmbientCubemapMipAdjustValue.X;
-// AmbientCubemapMipAdjustValue.Z = MipCount - GDiffuseConvolveMipLevel;
-// AmbientCubemapMipAdjustValue.W = MipCount;
-const half4 AmbientCubemapMipAdjust = half4(0.5555555555555556, 4.444444444444445, 5.0, 9.0);
-
-// @param MipCount e.g. 10 for x 512x512
-half ComputeCubemapMipFromRoughness( half Roughness, half MipCount )
+float3 DiffuseIBL( uint2 Random, float3 DiffuseColor, float Roughness, float3 N, float3 V )
 {
-    // Level starting from 1x1 mip
-    half Level = 3 - 1.15 * log2( Roughness );
-    return MipCount - 1 - Level;
-}
+    N = normalize( N );
+    V = normalize( V );
 
-
-float4 ImportanceSampleGGX( float2 E, float Roughness )
-{
-    float m = Roughness * Roughness;
-    float m2 = m * m;
-
-    float Phi = 2 * PI * E.x;
-    float CosTheta = sqrt( (1 - E.y) / ( 1 + (m2 - 1) * E.y ) );
-    float SinTheta = sqrt( 1 - CosTheta * CosTheta );
-
-    float3 H;
-    H.x = SinTheta * cos( Phi );
-    H.y = SinTheta * sin( Phi );
-    H.z = CosTheta;
+    float3 DiffuseLighting = float3(0);
     
-    float d = ( CosTheta * m2 - CosTheta ) * CosTheta + 1;
-    float D = m2 / ( PI*d*d );
-    float PDF = D * CosTheta;
+    float NoV = saturate( dot( N, V ) );
 
-    return float4( H, PDF );
+    const uint NumSamples = 512;
+    for( uint i = 0; i < NumSamples; i++ )
+    {
+        float2 E = Hammersley( i, NumSamples, Random );
+        float3 L = TangentToWorld( CosineSampleHemisphere( E ).xyz, N );
+        float3 H = normalize(V + L);
+
+        float NoL = saturate( dot( N, L ) );
+        float NoH = saturate( dot( N, H ) );
+        float VoH = saturate( dot( V, H ) );
+
+        if( NoL > 0 )
+        {
+            //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
+            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
+
+            float FD90 = ( 0.5 + 2 * VoH * VoH ) * Roughness;
+            //float FD90 = 0.5 + 2 * VoH * VoH * Roughness;
+            float FdV = 1 + (FD90 - 1) * pow( 1 - NoV, 5 );
+            float FdL = 1 + (FD90 - 1) * pow( 1 - NoL, 5 );
+
+#if 0
+            // lambert = DiffuseColor * NoL / PI
+            // pdf = NoL / PI
+            DiffuseLighting += SampleColor * DiffuseColor * FdV * FdL * ( 1 - 0.3333 * Roughness );
+#else
+            DiffuseLighting += SampleColor * DiffuseColor;
+#endif
+        }
+    }
+
+    return DiffuseLighting / NumSamples;
 }
+
+
+float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 N, float3 V )
+{
+    float3 SpecularLighting = vec3(0);
+
+    const uint NumSamples = 512;
+    for( uint i = 0; i < NumSamples; i++ )
+    {
+        float2 E = Hammersley( i, NumSamples, Random );
+        float3 H = TangentToWorld( ImportanceSampleGGX( E, Roughness ).xyz, N );
+        float3 L = 2 * dot( V, H ) * H - V;
+
+        float NoV = saturate( dot( N, V ) );
+        float NoL = saturate( dot( N, L ) );
+        float NoH = saturate( dot( N, H ) );
+        float VoH = saturate( dot( V, H ) );
+        
+        if( NoL > 0 )
+        {
+            //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
+            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
+
+            float Vis = Vis_SmithJointApprox( Roughness, NoV, NoL );
+            float Fc = pow( 1 - VoH, 5 );
+            float3 F = (1 - Fc) * SpecularColor + Fc;
+
+            // Incident light = SampleColor * NoL
+            // Microfacet specular = D*G*F / (4*NoL*NoV) = D*Vis*F
+            // pdf = D * NoH / (4 * VoH)
+            SpecularLighting += SampleColor * F * ( NoL * Vis * (4 * VoH / NoH) );
+        }
+    }
+
+    return SpecularLighting / NumSamples;
+}
+
+
+float3 ImageBasedLightingMIS(FGBufferData GBuffer, float3 V, float3 N, uint2 Random)
+{
+    float3 Lighting = float3(0);
+
+    float Roughness1 = GBuffer.Roughness;
+    float Roughness2 = 0.1;
+
+    uint NumSamples[] = uint[](16, 16, 0);
+
+    for (uint Set = 0; Set < 3; Set++)
+    {
+        for (uint i = 0; i < NumSamples[ Set ]; i++)
+        {
+            float2 E = Hammersley( i, NumSamples[ Set ], Random );
+
+            float3 L, H;
+            if ( Set == 0 )
+            {
+                L = TangentToWorld( CosineSampleHemisphere( E ).xyz, N );
+                H = normalize(V + L);
+            }
+            else if ( Set == 1)
+            {
+                H = TangentToWorld( ImportanceSampleGGX( E, Roughness1 ).xyz, N );
+                L = 2 * dot( V, H ) * H - V;
+            }
+            else
+            {
+                H = TangentToWorld( ImportanceSampleGGX( E, Roughness2 ).xyz, N );
+                L = 2 * dot( V, H ) * H - V;
+            }
+
+            float NoL = saturate( dot(N, L) );
+            float NoH = saturate( dot(N, H) );
+            float VoH = saturate( dot(V, H) );
+
+            if (NoL > 0 && VoH > 0)
+            {
+                float3 SampleColor = textureLod( AmbientCubemap, L, 0 ).rgb;
+
+                float PDF[] = float[]
+                (
+                    NoL / PI, 
+                    D_GGX( Roughness1, NoH ) * NoH / (4 * VoH),
+                    D_GGX( Roughness2, NoH ) * NoH / (4 * VoH)
+                );
+
+                // MIS balance heuristic
+                float InvWeight = 0;
+                for (uint j = 0; j < 3; ++j)
+                {
+                    InvWeight += PDF[j] * NumSamples[j];
+                }
+                float Weight = rcp( InvWeight );
+
+                float3 Shading = StandardShading( GBuffer.DiffuseColor, GBuffer.SpecularColor, float3(GBuffer.Roughness), float3(1), L, V, N );
+
+                Lighting += SampleColor * Shading * ( NoL * Weight );
+            }
+        }
+    }
+
+    return Lighting;
+}
+
 
 float3 PrefilterEnvMap( uint2 Random, float Roughness, float3 R )
 {
     float3 FilteredColor = float3(0);
     float Weight = 0;
         
-    const uint NumSamples = 64;
+    const uint NumSamples = 128;
     for( uint i = 0; i < NumSamples; i++ )
     {
         float2 E = Hammersley( i, NumSamples, Random );
@@ -68,7 +176,7 @@ float3 PrefilterEnvMap( uint2 Random, float Roughness, float3 R )
 
     return FilteredColor / max( Weight, 0.001 );
 }
-//#endif
+
 
 float3 IntegrateBRDF( uint2 Random, float Roughness, float NoV )
 {
@@ -146,83 +254,4 @@ float3 ApproximateSpecularIBL( uint2 Random, float3 SpecularColor, float Roughne
     float2 AB = IntegrateBRDF( Random, Roughness, NoV ).xy;
 
     return PrefilteredColor * ( SpecularColor * AB.x + AB.y );
-}
-
-float3 DiffuseIBL( uint2 Random, float3 DiffuseColor, float Roughness, float3 N, float3 V )
-{
-    N = normalize( N );
-    V = normalize( V );
-
-    float3 DiffuseLighting = float3(0);
-    
-    float NoV = saturate( dot( N, V ) );
-
-    const uint NumSamples = 32;
-    for( uint i = 0; i < NumSamples; i++ )
-    {
-        float2 E = Hammersley( i, NumSamples, Random );
-        float3 L = TangentToWorld( CosineSampleHemisphere( E ).xyz, N );
-        float3 H = normalize(V + L);
-
-        float NoL = saturate( dot( N, L ) );
-        float NoH = saturate( dot( N, H ) );
-        float VoH = saturate( dot( V, H ) );
-
-        if( NoL > 0 )
-        {
-            //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
-
-            float FD90 = ( 0.5 + 2 * VoH * VoH ) * Roughness;
-            //float FD90 = 0.5 + 2 * VoH * VoH * Roughness;
-            float FdV = 1 + (FD90 - 1) * pow( 1 - NoV, 5 );
-            float FdL = 1 + (FD90 - 1) * pow( 1 - NoL, 5 );
-
-#if 1
-            // lambert = DiffuseColor * NoL / PI
-            // pdf = NoL / PI
-            DiffuseLighting += SampleColor * DiffuseColor * FdV * FdL * ( 1 - 0.3333 * Roughness );
-#else
-            DiffuseLighting += SampleColor * DiffuseColor;
-#endif
-        }
-    }
-
-    return DiffuseLighting / NumSamples;
-}
-
-
-float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 N, float3 V )
-{
-    float3 SpecularLighting = vec3(0);
-
-    const uint NumSamples = 1024;
-    for( uint i = 0; i < NumSamples; i++ )
-    {
-        float2 E = Hammersley( i, NumSamples, Random );
-        float3 H = TangentToWorld( ImportanceSampleGGX( E, Roughness ).xyz, N );
-        float3 L = 2 * dot( V, H ) * H - V;
-
-        float NoV = saturate( dot( N, V ) );
-        float NoL = saturate( dot( N, L ) );
-        float NoH = saturate( dot( N, H ) );
-        float VoH = saturate( dot( V, H ) );
-        
-        if( NoL > 0 )
-        {
-            //float3 SampleColor = AmbientCubemap.SampleLevel( AmbientCubemapSampler, L, 0 ).rgb;
-            float3 SampleColor = textureLod(AmbientCubemap, L, 0).rgb;
-
-            float Vis = Vis_SmithJointApprox( Roughness, NoV, NoL );
-            float Fc = pow( 1 - VoH, 5 );
-            float3 F = (1 - Fc) * SpecularColor + Fc;
-
-            // Incident light = SampleColor * NoL
-            // Microfacet specular = D*G*F / (4*NoL*NoV) = D*Vis*F
-            // pdf = D * NoH / (4 * VoH)
-            SpecularLighting += SampleColor * F * ( NoL * Vis * (4 * VoH / NoH) );
-        }
-    }
-
-    return SpecularLighting / NumSamples;
 }

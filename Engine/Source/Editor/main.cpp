@@ -63,7 +63,7 @@ public:
         const std::string root_dir = "D:/program/FishEngine/Assets/";
         const std::string skybox_dir = R"(D:\program\github\Cinder-Experiments\common\textures\)";
         const std::string concrete_texture_dir = R"(D:\program\FishEngine\Example\PBR\concrete_rebarconcrete_pbr\TGA\concrete_rebarconcrete_1k_TGA\)";
-        auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
+        //auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
 #else
         auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
         const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
@@ -74,9 +74,8 @@ public:
         const std::string textures_dir = root_dir + "textures/";
 
         TextureImporter importer;
-        auto radiance_map = importer.FromFile(skybox_dir+"BolongaRadiance.dds");
+        auto radiance_map = importer.FromFile(skybox_dir + "uffizi_cross_128_filtered.dds");
         auto irradiance_map = importer.FromFile(skybox_dir+"BolongaIrradiance.dds");
-        
 
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
@@ -101,7 +100,7 @@ public:
 #if 1
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = 2; x <= 3; ++x)
+        for (int x = 0; x <= 3; ++x)
         {
             for (int y = -5; y <= 5; y++)
             {

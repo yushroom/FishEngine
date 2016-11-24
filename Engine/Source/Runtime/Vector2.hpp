@@ -19,6 +19,11 @@ namespace FishEngine
         {
         }
 
+        Vector2(const float val)
+            : x(val), y(val)
+        {
+        }
+
         Vector2(const float x, const float y)
             : x(x), y(y)
         {

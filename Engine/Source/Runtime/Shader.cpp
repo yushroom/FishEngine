@@ -529,24 +529,20 @@ namespace FishEngine
         }
         catch (const boost::wave::preprocess_exception& e)
         {
-            printf("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
-            //printf(m_impl->m_shaderTextRaw);
+            Debug::LogError("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const boost::wave::cpplexer::lexing_exception& e)
         {
-            printf("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
+            Debug::LogError("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
             return false;
         }
         catch (const std::exception& e)
         {
-            printf("VERTEX\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_vertexShaderText).c_str());
-            printf("Geometry\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_geometryShaderText).c_str());
-            printf("FRAGMENT\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_fragmentShaderText).c_str());
-            //printf("VERTEX\n==========\n%s\n==========\n", (m_impl->m_vertexShaderText).c_str());
-            //printf("Geometry\n==========\n%s\n==========\n", (m_impl->m_geometryShaderText).c_str());
-            //printf("FRAGMENT\n==========\n%s\n==========\n", (m_impl->m_fragmentShaderText).c_str());
-            printf("%s", e.what());
+            //printf("VERTEX\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_vertexShaderText).c_str());
+            //printf("Geometry\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_geometryShaderText).c_str());
+            //printf("FRAGMENT\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_fragmentShaderText).c_str());
+            Debug::LogError("%s", e.what());
             return false;
         }
         return true;

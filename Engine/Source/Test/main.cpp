@@ -1,293 +1,186 @@
-#include <iostream>
-#include <set>
-#include <cassert>
-#include <map>
-#include <memory>
-
+#include <Texture.hpp>
+#include <Mathf.hpp>
+#include <Vector2.hpp>
+#include <Vector3.hpp>
+#include <Vector4.hpp>
+#include <Color.hpp>
 #include <Debug.hpp>
-#include <Shader.hpp>
 
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/wave.hpp>
-#include <boost/wave/cpplexer/cpp_lex_token.hpp>
-#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
-#include <boost/wave/preprocessing_hooks.hpp>
-#include <boost/wave/grammars/cpp_grammar.hpp>
-#include <boost/wave/grammars/cpp_defined_grammar.hpp>
+#include <gli/gli.hpp>
 
-using namespace std;
 using namespace FishEngine;
+using namespace std;
 
+typedef FishEngine::Vector2 float2;
+typedef FishEngine::Vector3 float3;
+typedef FishEngine::Vector4 float4;
 
-enum class FishShaderType
+void ToAddress(CubemapFace& face, uint32_t& x, uint32_t& y, float3 const & dir, uint32_t size)
 {
-    SurfaceShader,
-    VSFSShader,
-};
+    float3 n_dir = dir.normalized();
+    float3 abs_dir;
+    for (int i = 0; i < 3; ++i)
+        abs_dir[i] = Mathf::Abs(n_dir[i]);
 
-enum class ShaderType
-{
-    VertexShader,
-    FragmentShader,
-    GeometryShader,
-};
-
-
-std::string ReadFile(const std::string& path)
-{
-    std::ifstream fin(path);
-    if (!fin.is_open()) {
-        FishEngine::Debug::LogError("Can not open shader header file: %s", path.c_str());
-        throw exception();
+    if (abs_dir.x > abs_dir.y)
+    {
+        if (abs_dir.x > abs_dir.z)
+        {
+            face = n_dir.x > 0 ? CubemapFace::PositiveX : CubemapFace::NegativeX;
+        }
+        else
+        {
+            face = n_dir.z > 0 ? CubemapFace::PositiveZ : CubemapFace::NegativeZ;
+        }
     }
-    return std::string(
-        std::istreambuf_iterator<char>(fin.rdbuf()),
-        std::istreambuf_iterator<char>());
+    else
+    {
+        if (abs_dir.y > abs_dir.z)
+        {
+            face = n_dir.y > 0 ? CubemapFace::PositiveY : CubemapFace::NegativeY;
+        }
+        else
+        {
+            face = n_dir.z > 0 ? CubemapFace::PositiveZ : CubemapFace::NegativeZ;
+        }
+    }
+
+    switch (face)
+    {
+    case CubemapFace::PositiveX:
+        n_dir /= abs_dir.x;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+
+    case CubemapFace::NegativeX:
+        n_dir /= abs_dir.x;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+
+    case CubemapFace::PositiveY:
+        n_dir /= abs_dir.y;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+
+    case CubemapFace::NegativeY:
+        n_dir /= abs_dir.y;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+
+    case CubemapFace::PositiveZ:
+        n_dir /= abs_dir.z;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+
+    case CubemapFace::NegativeZ:
+    default:
+        n_dir /= abs_dir.z;
+        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
+        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
+        break;
+    }
+
 }
 
-class ShaderCompiler;
-
-typedef std::shared_ptr<ShaderCompiler> ShaderCompilerPtr;
-
-class ShaderCompiler
+uint32_t ReverseBits(uint32_t bits)
 {
-public:
+    bits = (bits << 16) | (bits >> 16);
+    bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
+    bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCC) >> 2);
+    bits = ((bits & 0x0F0F0F0F) << 4) | ((bits & 0xF0F0F0F0) >> 4);
+    bits = ((bits & 0x00FF00FF) << 8) | ((bits & 0xFF00FF00) >> 8);
+    return bits;
+}
 
-    static ShaderCompilerPtr FromFile(const std::string& path)
-    {
-        auto compiler = std::make_shared<ShaderCompiler>();
-        compiler->m_rawText = ReadFile(path);
-    }
-
-    void Preprocess()
-    {
-
-    }
-
-    //void DecorateShaderText()
-    //{
-    //    shader_text = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n#line 1\n" + shader_text + "#endif\n";
-    //}
-
-private:
-    FishShaderType m_type;
-    std::string m_filePath;
-    std::string m_rawText;
-    std::string m_preprocessedText;
-};
-
-
-set<string> uniform_types = {
-    "float", "vec2", "vec3", "vec4",
-    "mat2", "mat3", "mat4",
-    "int", "ivec2", "ivec3", "ivec4",
-    "bool", "bvec2", "bvec3", "bvec4",
-    "samplerCube", "sampler2D",
-};
-
-set<string> pragmas = {
-    "Normalmap", "Shadow", "AmbientIBL",
-};
-
-struct custom_directives_hooks : public boost::wave::context_policies::default_preprocessing_hooks
+float RadicalInverseVdC(uint32_t bits)
 {
-    // new signature
-    template <typename ContextT, typename TokenT, typename ContainerT>
-    bool
-        expanding_object_like_macro(ContextT const& ctx, TokenT const& macro,
-            ContainerT const& definition, TokenT const& macrocall)
+    return ReverseBits(bits) * 2.3283064365386963e-10f; // / 0x100000000
+}
+
+float2 Hammersley2D(uint32_t i, uint32_t N)
+{
+    return float2(static_cast<float>(i) / N, RadicalInverseVdC(i));
+}
+
+float4 ImportanceSampleGGX(float2 E, float Roughness)
+{
+    float m = Roughness * Roughness;
+    float m2 = m * m;
+
+    float Phi = 2 * Mathf::PI * E.x;
+    float CosTheta = sqrt((1 - E.y) / (1 + (m2 - 1) * E.y));
+    float SinTheta = sqrt(1 - CosTheta * CosTheta);
+
+    float3 H;
+    H.x = SinTheta * cos(Phi);
+    H.y = SinTheta * sin(Phi);
+    H.z = CosTheta;
+
+    float d = (CosTheta * m2 - CosTheta) * CosTheta + 1;
+    float D = m2 / (Mathf::PI*d*d);
+    float PDF = D * CosTheta;
+
+    return float4(H, PDF);
+}
+
+// adapted from shader code in UE4
+// also see PrefilterCube.cpp in KlayGE
+// float3 PrefilterEnvMap( uint2 Random, float Roughness, float3 R )
+float3 PrefilterEnvMapSpecular(float roughness, const float3& R, float3* env_map[6], uint32_t size)
+{
+    auto& N = R;  // normal
+    auto& V = R;  // view
+
+    float3 FilteredColor = float3(0);
+    float Weight = 0;
+
+    constexpr uint32_t NumSamples = 128;
+    for (uint32_t i = 0; i < NumSamples; i++)
     {
-        auto d = macro.get_value().c_str();
-        return false;
-    }   // default is to normally expand the macro
+        float2 E = Hammersley2D(i, NumSamples);
+        float3 H = ImportanceSampleGGX(E, roughness);
+        float3 L = 2 * float3::Dot(R, H) * H - R;
 
-    // new signature
-    template <typename ContextT, typename ContainerT>
-    void expanded_macro(ContextT const& ctx, ContainerT const& result)
-    {}
+        float NoL = Mathf::Clamp01(float3::Dot(R, L));
+        if (NoL > 0)
+        {
+            CubemapFace face;
+            uint32_t x, y;
+            ToAddress(face, x, y, L, size);
+            FilteredColor += env_map[static_cast<uint32_t>(face)][y * size + x] * NoL;
+            Weight += NoL;
+        }
+    }
+    return FilteredColor / Mathf::Max(Weight, 0.001);
+}
 
-    //template <typename ContextT, typename TokenT, typename ContainerT>
-    //bool evaluated_conditional_expression(ContextT const& ctx,
-    //        TokenT const& directive, ContainerT const& expression,
-    //        bool expression_value)
-    //{
-    //    auto d = directive.get_value().c_str();
-    //    std::string e = expression.front().get_value().c_str();
-    //    if (e == "SKINNED")
-    //        return true;
-    //    return false;
-    //}
-
-    //template <typename ContextT, typename TokenT>
-    //void skipped_token(ContextT const& ctx, TokenT const& token)
-    //{
-    //    auto d = token.get_value().c_str();
-    //    Debug::Log(d);
-    //}
-};
-
-typedef boost::wave::cpplexer::lex_iterator<
-    boost::wave::cpplexer::lex_token<> >
-    lex_iterator_type;
-typedef boost::wave::context<
-    std::string::iterator,
-    lex_iterator_type
-    //,boost::wave::iteration_context_policies::load_file_to_string
-    //,custom_directives_hooks
->
-context_type;
-
+void PrefilterCube(const std::string & in_file, const std::string & out_file)
+{
+    gli::texture Texture = gli::load(in_file);
+    if (Texture.empty())
+    {
+        Debug::LogError("Texture %s not found", in_file.c_str());
+        abort();
+    }
+    gli::gl GL(gli::gl::PROFILE_GL33);
+    gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+    auto Target = GL.translate(Texture.target());
+}
 
 int main()
 {
-    Debug::Init();
-    const char* shader_path = R"(D:\program\FishEngine\Engine\Shaders\PBR.surf)";
-    auto path = boost::filesystem::path(shader_path);
-    auto shader_dir = path.parent_path();
-
-    cout << shader_dir << endl;
-
-    auto shader_include_dir = R"(D:\program\FishEngine\Engine\Shaders\include)";
-
-    auto shader_text = ReadFile(shader_path);
-    if (path.extension() == ".surf")
-    {
-        shader_text = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n#line 1\n" + shader_text + "#endif\n";
-    }
-    cout << shader_text << endl;
-
-    map<string, string> settings;
-
-    context_type ctx(shader_text.begin(), shader_text.end(), shader_path);
-
-    ctx.add_sysinclude_path(shader_include_dir);
-    ctx.add_macro_definition("VERTEX_SHADER");
-    //ctx.add_macro_definition("FRAGMENT_SHADER");
-
-    if (ctx.is_defined_macro(string("FRAGMENT_SHADER")))
-    {
-        Debug::Log("defined");
-    }
-
-    auto first = ctx.begin();
-    auto last = ctx.end();
-
-    Debug::LogWarning("==================================================");
-
-#if 0
-    std::string parsed_shader_text = R"(#version 410 core
-#extension GL_GOOGLE_cpp_style_line_directive : require
-)";
-#else
-    std::string parsed_shader_text;
-#endif
-    parsed_shader_text.reserve(shader_text.size());
+    const char* input = R"(D:\program\github\Cinder-Experiments\common\textures\BolongaRadiance2.dds)";
     
-    int intent_level = 0;
-    string last_tok = "";
-    bool next_tok_is_uniform_var_type = false;
-    bool next_tok_is_uniform_var_name = false;
+    boost::filesystem::path output_path(input);
+    std::string output = output_path.stem().string() + "_filtered.dds";
 
-    bool next_tok_is_pragma_type = false;
-    bool next_tok_is_pragma_setting = false;
-    string pragma_type = "";
-    string pragma_setting = "";
+    PrefilterCube(input, output);
 
-    try
-    {
-        while (first != last) {
-            //std::cout << first->get_value();
-            string tok = first->get_value().c_str();
-
-            auto id = boost::wave::token_id(*first);
-            if (id == boost::wave::T_SPACE)
-            {
-                goto SKIP;
-            }
-
-            if (tok == "}")
-            {
-                intent_level--;
-            }
-            if (last_tok == "\n" && tok != "#line")
-            {
-                assert(intent_level >= 0);
-                for (int i = 0; i < intent_level; ++i)
-                {
-                    parsed_shader_text += "\t";
-                }
-            }
-            if (tok == "{")
-            {
-                intent_level++;
-            }
-
-            if (tok == "#pragma")
-            {
-                cout << tok << endl;
-                next_tok_is_pragma_type = true;
-            }
-            else if (next_tok_is_pragma_type) {
-                if (id == boost::wave::T_IDENTIFIER)
-                {
-                    pragma_type = tok;
-                    next_tok_is_pragma_setting = true;
-                }
-                next_tok_is_pragma_type = false;
-            }
-            else if (next_tok_is_pragma_setting) {
-                if (id == boost::wave::T_IDENTIFIER)
-                {
-                    pragma_setting = tok;
-                    settings[pragma_type] = pragma_setting;
-                }
-                next_tok_is_pragma_setting = false;
-            }
-
-            if (tok == "InternalUniform")
-            {
-                tok = "uniform";
-            }
-            else if (tok == "uniform")
-            {
-                next_tok_is_uniform_var_type = true;
-            }
-            else if (next_tok_is_uniform_var_type) {
-                if (uniform_types.find(tok) != uniform_types.end())
-                {
-                    cout << tok << " ";
-                    next_tok_is_uniform_var_name = true;
-                }
-                next_tok_is_uniform_var_type = false;
-            }
-            else if (next_tok_is_uniform_var_name) {
-                cout << tok << endl;
-                next_tok_is_uniform_var_name = false;
-            }
-
-SKIP:
-            parsed_shader_text += tok;
-            last_tok = tok;
-            ++first;
-        }
-    }
-    catch (const boost::wave::preprocess_exception& e)
-    {
-        //cout.flush();
-        Debug::LogError("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
-        return 1;
-    }
-    catch (const boost::wave::cpplexer::lexing_exception& e)
-    {
-        //cout.flush();
-        Debug::LogError("%s(%d) : %s\n", e.file_name(), e.line_no(), e.description());
-        return 1;
-    }
-
-    //std::cout << parsed_shader_text << endl;
-    auto out_file = shader_dir.append("parsed.vert");
-    ofstream fout(out_file.string());
-    fout << parsed_shader_text << endl;
     return 0;
-}
+} 

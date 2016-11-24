@@ -77,7 +77,6 @@ public:
         auto radiance_map = importer.FromFile(skybox_dir+"BolongaRadiance.dds");
         auto irradiance_map = importer.FromFile(skybox_dir+"BolongaIrradiance.dds");
         
-        auto pisa_hdr = importer.FromFile(textures_dir + "pisa.hdr");
 
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
@@ -88,6 +87,7 @@ public:
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", radiance_map);
 #else
+        auto pisa_hdr = importer.FromFile(textures_dir + "pisa.hdr");
         auto skybox_panorama = Shader::CreateFromFile(root_dir + "../Engine/Shaders/SkyBox-Panorama.shader");
         material = Material::CreateMaterial();
         material->SetShader(skybox_panorama);
@@ -101,7 +101,7 @@ public:
 #if 1
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = 0; x <= 3; ++x)
+        for (int x = 2; x <= 3; ++x)
         {
             for (int y = -5; y <= 5; y++)
             {

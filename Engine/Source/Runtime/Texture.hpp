@@ -133,6 +133,45 @@ namespace FishEngine
     class Texture2D : public Texture
     {
     public:
+        TextureFormat format() const
+        {
+            return m_format;
+        }
+        
+        void setFormat(TextureFormat format)
+        {
+            m_format = format;
+        }
+
+    private:
+        TextureFormat m_format;
+        uint32_t m_mipmapCount;
+    };
+    
+    class Cubemap : public Texture
+    {
+    public:
+        TextureFormat format() const
+        {
+            return m_format;
+        }
+        
+//        void setFormat(TextureFormat format)
+//        {
+//            m_format = format;
+//        }
+        
+        uint32_t mipmapCount() const
+        {
+            return m_mipmapCount;
+        }
+        
+        
+        void setMipmapCount(uint32_t mipmapCount)
+        {
+            m_mipmapCount = mipmapCount;
+        }
+        
     private:
         TextureFormat m_format;
         uint32_t m_mipmapCount;

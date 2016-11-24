@@ -18,7 +18,6 @@
 *.xcuserstate
 project.xcworkspace/
 xcuserdata/
-/project/xcode/build/
 
 *.DS_Store
 
@@ -38,6 +37,10 @@ xcuserdata/
 /Engine/*/*/*.ilk
 /Engine/*/*/*.pdb
 /Engine/*/*/*.map
+
+/Engine/Binary/lib/*/*.lib
+/Engine/Binary/lib/*/*.a
+/Engine/Binary/lib/*/*.dylib
 
 # assets
 /assets/models/

@@ -48,6 +48,9 @@ namespace FishEngine
     class SimpleMesh;
     class Shader;
     class Texture;
+    class Texture2D;
+    class Texture3D;
+    class Cubemap;
     class Time;
     class App;
     class Mathf;

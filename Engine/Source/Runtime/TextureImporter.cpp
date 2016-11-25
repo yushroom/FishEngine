@@ -210,4 +210,47 @@ namespace FishEngine
         Texture::m_textures.push_back(t);
         return t;
     }
+    
+    TexturePtr TextureImporter::FromRawData(const uint8_t* data, int width, int height, TextureFormat format)
+    {
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG16, width, height);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GL_RG, GL_UNSIGNED_SHORT, data);
+        
+        GLenum wrap_mode = (m_wrapMode == TextureWrapMode::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        
+        GLenum min_filter_mode;
+        GLenum mag_filter_mode = GL_LINEAR;
+        if (m_filterMode == FilterMode::Point)
+        {
+            mag_filter_mode = min_filter_mode = GL_NEAREST;
+        }
+        else if (m_filterMode == FilterMode::Bilinear)
+        {
+            min_filter_mode = GL_LINEAR;
+        }
+        else    // Trilinear
+        {
+            min_filter_mode = GL_LINEAR_MIPMAP_LINEAR;
+        }
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter_mode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter_mode);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glCheckError();
+        
+        auto t = std::make_shared<Texture>();
+        t->m_texture = texture;
+        t->m_width = width;
+        t->m_height = height;
+        t->m_dimension = TextureDimension::Tex2D;
+        
+        Texture::m_textures.push_back(t);
+        return t;
+    }
 }

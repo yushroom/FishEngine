@@ -117,8 +117,13 @@ public:
         v |= v >> 16;
         return v+1;
     }
+    
+    inline static float Square(float f)
+    {
+        return f*f;
+    }
 
-    static float Sqrt(float f)
+    inline static float Sqrt(float f)
     {
         return ::std::sqrtf(f);
     }

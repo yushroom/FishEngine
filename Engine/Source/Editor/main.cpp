@@ -52,6 +52,116 @@ void DefaultScene()
 }
 
 
+uint32_t ReverseBits( uint32_t Bits )
+{
+    Bits = ( Bits << 16) | ( Bits >> 16);
+    Bits = ( (Bits & 0x00ff00ff) << 8 ) | ( (Bits & 0xff00ff00) >> 8 );
+    Bits = ( (Bits & 0x0f0f0f0f) << 4 ) | ( (Bits & 0xf0f0f0f0) >> 4 );
+    Bits = ( (Bits & 0x33333333) << 2 ) | ( (Bits & 0xcccccccc) >> 2 );
+    Bits = ( (Bits & 0x55555555) << 1 ) | ( (Bits & 0xaaaaaaaa) >> 1 );
+    return Bits;
+}
+
+TexturePtr MakePreintegratedGF()
+{
+    constexpr uint32_t size = 256;
+    // RG16
+    uint16_t DestBuffer[size * size * 2];
+    constexpr uint16_t DestStride = size * 2;
+    
+    // x is NoV, y is roughness
+    for (uint32_t y = 0; y < size; y++)
+    {
+        float Roughness = (float)(y + 0.5f) / size;
+        float m = Roughness * Roughness;
+        float m2 = m*m;
+        
+        for (uint32_t x = 0; x < size; x++)
+        {
+            float NoV = (float)(x + 0.5f) / size;
+            
+            Vector3 V;
+            V.x = Mathf::Sqrt(1.0f - NoV * NoV);	// sin
+            V.y = 0.0f;
+            V.z = NoV;								// cos
+            
+            float A = 0.0f;
+            float B = 0.0f;
+            float C = 0.0f;
+            
+            constexpr uint32_t NumSamples = 128;
+            for (uint32_t i = 0; i < NumSamples; i++)
+            {
+                float E1 = (float)i / NumSamples;
+                float E2 = (double)ReverseBits(i) / (double)0x100000000LL;
+                
+                {
+                    float Phi = 2.0f * Mathf::PI * E1;
+                    float CosPhi = Mathf::Cos(Phi);
+                    float SinPhi = Mathf::Sin(Phi);
+                    float CosTheta = Mathf::Sqrt((1.0f - E2) / (1.0f + (m2 - 1.0f) * E2));
+                    float SinTheta = Mathf::Sqrt(1.0f - CosTheta * CosTheta);
+                    
+                    Vector3 H(SinTheta * CosPhi, SinTheta * SinPhi, CosTheta);
+                    float VoH = Vector3::Dot(V, H);
+                    Vector3 L = 2.0f * VoH * H - V;
+                    
+                    float NoL = Mathf::Max(L.z, 0.0f);
+                    float NoH = Mathf::Max(H.z, 0.0f);
+                    VoH = Mathf::Max(VoH, 0.0f);
+                    
+                    if (NoL > 0.0f)
+                    {
+                        float Vis_SmithV = NoL * ( NoV * ( 1 - m ) + m );
+                        float Vis_SmithL = NoV * ( NoL * ( 1 - m ) + m );
+                        float Vis = 0.5f / ( Vis_SmithV + Vis_SmithL );
+                        
+                        float NoL_Vis_PDF = NoL * Vis * (4.0f * VoH / NoH);
+                        float Fc = 1.0f - VoH;
+                        Fc *= Mathf::Square(Fc*Fc);
+                        A += NoL_Vis_PDF * (1.0f - Fc);
+                        B += NoL_Vis_PDF * Fc;
+                    }
+                }
+                
+//                {
+//                    float Phi = 2.0f * Mathf::PI * E1;
+//                    float CosPhi = Mathf::Cos(Phi);
+//                    float SinPhi = Mathf::Sin(Phi);
+//                    float CosTheta = Mathf::Sqrt(E2);
+//                    float SinTheta = Mathf::Sqrt(1.0f - CosTheta * CosTheta);
+//                    
+//                    Vector3 L(SinTheta * CosPhi, SinTheta * SinPhi, CosTheta);
+//                    Vector3 H = (V + L).normalized();
+//                    
+//                    float NoL = Mathf::Max(L.z, 0.0f);
+//                    float NoH = Mathf::Max(H.z, 0.0f);
+//                    float VoH = Mathf::Max(Vector3::Dot(V, H), 0.0f);
+//                    
+//                    float FD90 = 0.5f + 2.0f * VoH * VoH * Roughness;
+//                    float FdV = 1.0f + (FD90 - 1.0f) * pow( 1.0f - NoV, 5 );
+//                    float FdL = 1.0f + (FD90 - 1.0f) * pow( 1.0f - NoL, 5 );
+//                    C += FdV * FdL;// * ( 1.0f - 0.3333f * Roughness );
+//                }
+            }
+            A /= NumSamples;
+            B /= NumSamples;
+            //C /= NumSamples;
+            
+            uint16_t* Dest = (uint16_t*)(DestBuffer + x * 2 + (size - y - 1) * DestStride);
+            //uint16_t* Dest = (uint16_t*)(DestBuffer + x * 2 + (size - y - 1) * DestStride);
+            Dest[0] = (uint32_t)(Mathf::Clamp01(A) * 65535.0f + 0.5f);
+            Dest[1] = (uint32_t)(Mathf::Clamp01(B) * 65535.0f + 0.5f);
+        }
+    }
+    
+    TextureImporter importer;
+    importer.setWrapMode(TextureWrapMode::Clamp);
+    importer.setFilterMode(FilterMode::Bilinear);
+    return importer.FromRawData((uint8_t*)DestBuffer, size, size, TextureFormat::RG16);
+}
+
+
 class TestPBR : public App
 {
 public:
@@ -65,26 +175,29 @@ public:
         const std::string concrete_texture_dir = R"(D:\program\FishEngine\Example\PBR\concrete_rebarconcrete_pbr\TGA\concrete_rebarconcrete_1k_TGA\)";
         //auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
 #else
-        auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
-        const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
+        //auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
+        //const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
-        const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
+        //const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
 
         TextureImporter importer;
-        auto radiance_map = importer.FromFile(skybox_dir + "uffizi_cross_128_filtered.dds");
-        auto irradiance_map = importer.FromFile(skybox_dir+"BolongaIrradiance.dds");
+        auto envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross.dds");
+        auto filtered_envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross_128_filtered.dds");
+        //auto irradiance_map = importer.FromFile(textures_dir + "envmap/BolongaIrradiance.dds");
 
+        auto PreintegratedGF = MakePreintegratedGF();
+        
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
-        material->SetTexture("AmbientCubemap", radiance_map);
+        material->SetTexture("AmbientCubemap", filtered_envmap);
         //material->SetTexture("IrradianceMap", irradiance_map);
         
 #if 1
         material = Material::builtinMaterial("SkyboxCubed");
-        material->SetTexture("_Tex", radiance_map);
+        material->SetTexture("_Tex", envmap);
 #else
         auto pisa_hdr = importer.FromFile(textures_dir + "pisa.hdr");
         auto skybox_panorama = Shader::CreateFromFile(root_dir + "../Engine/Shaders/SkyBox-Panorama.shader");
@@ -102,6 +215,10 @@ public:
 
         for (int x = 0; x <= 3; ++x)
         {
+#if FISHENGINE_PLATFORM_APPLE
+            if (x % 2 != 0)
+                continue;
+#endif
             for (int y = -5; y <= 5; y++)
             {
                 auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
@@ -117,7 +234,8 @@ public:
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-                material->SetTexture("AmbientCubemap", radiance_map);
+                material->SetTexture("AmbientCubemap", filtered_envmap);
+                material->SetTexture("PreIntegratedGF", PreintegratedGF);
                 //material->SetTexture("IrradianceMap", irradiance_map);
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }

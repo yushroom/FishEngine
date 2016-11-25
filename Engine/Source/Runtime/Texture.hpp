@@ -123,29 +123,43 @@ namespace FishEngine
     enum class TextureFormat
     {
         RGB32,
-        RGBA32,
-        ARGB32,
-        R16,
-        DXT1,
-        DXT5,
+        RGBA32, // Color with alpha texture format, 8-bits per channel.
+        ARGB32, // Color with an alpha channel texture format.
+        R16,    // A 16 bit color texture format that only has a red channel.
+        DXT1,   // Compressed color texture format.
+        DXT5,   // Compressed color with alpha channel texture format.
+        RG8,    // **New**, uint8_t * 2
+        RG16,   // **New**, uint16_t * 2
+        RGHalf,	// Two color (RG) texture format, 16 bit floating point per channel.
+        RGFloat	// Two color (RG) texture format, 32 bit floating point per channel.
     };
     
     class Texture2D : public Texture
     {
     public:
+        
+        // The format of the pixel data in the texture (Read Only).
         TextureFormat format() const
         {
             return m_format;
         }
         
-        void setFormat(TextureFormat format)
+        // How many mipmap levels are in this texture (Read Only).
+        uint32_t mipmapCount() const
         {
-            m_format = format;
+            return m_mipmapCount;
         }
 
     private:
+        
+        // The format of the pixel data in the texture (Read Only).
         TextureFormat m_format;
+        
+        // How many mipmap levels are in this texture (Read Only).
         uint32_t m_mipmapCount;
+        
+        static Texture2DPtr m_blackTexture;
+        static Texture2DPtr m_whiteTexture;
     };
     
     enum class CubemapFace
@@ -162,28 +176,23 @@ namespace FishEngine
     class Cubemap : public Texture
     {
     public:
+        
+        // The format of the pixel data in the texture (Read Only).
         TextureFormat format() const
         {
             return m_format;
         }
         
-//        void setFormat(TextureFormat format)
-//        {
-//            m_format = format;
-//        }
         
+        // How many mipmap levels are in this texture (Read Only).
         uint32_t mipmapCount() const
         {
             return m_mipmapCount;
         }
         
-        
-        void setMipmapCount(uint32_t mipmapCount)
-        {
-            m_mipmapCount = mipmapCount;
-        }
-        
     private:
+        
+        // The format of the pixel data in the texture (Read Only).
         TextureFormat m_format;
         uint32_t m_mipmapCount;
     };

@@ -97,6 +97,9 @@ namespace FishEngine
     typedef std::shared_ptr<SimpleMesh> SimpleMeshPtr;
     typedef std::shared_ptr<Shader> ShaderPtr;
     typedef std::shared_ptr<Texture> TexturePtr;
+    typedef std::shared_ptr<Texture2D> Texture2DPtr;
+    typedef std::shared_ptr<Texture3D> Texture3DPtr;
+    typedef std::shared_ptr<Cubemap> CubemapPtr;
     typedef std::shared_ptr<App> AppPtr;
     typedef std::shared_ptr<Light> LightPtr;
     typedef std::shared_ptr<RenderTexture> RenderTexturePtr;

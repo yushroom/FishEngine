@@ -178,18 +178,21 @@ float3 F_Fresnel( float3 SpecularColor, float VoH )
 // EnvBRDF
 //---------------
 
-// Texture2D       PreIntegratedGF;
-// SamplerState    PreIntegratedGFSampler;
+//Texture2D       PreIntegratedGF;
+//SamplerState    PreIntegratedGFSampler;
 
-// half3 EnvBRDF( half3 SpecularColor, half Roughness, half NoV )
-// {
-//     // Importance sampled preintegrated G * F
-//     float2 AB = Texture2DSampleLevel( PreIntegratedGF, PreIntegratedGFSampler, float2( NoV, Roughness ), 0 ).rg;
+uniform sampler2D   PreIntegratedGF;
 
-//     // Anything less than 2% is physically impossible and is instead considered to be shadowing 
-//     float3 GF = SpecularColor * AB.x + saturate( 50.0 * SpecularColor.g ) * AB.y;
-//     return GF;
-// }
+half3 EnvBRDF( half3 SpecularColor, half Roughness, half NoV )
+{
+    // Importance sampled preintegrated G * F
+    //float2 AB = Texture2DSampleLevel( PreIntegratedGF, PreIntegratedGFSampler, float2( NoV, Roughness ), 0 ).rg;
+    float2 AB = textureLod( PreIntegratedGF, float2( NoV, Roughness ), 0 ).rg;
+
+    // Anything less than 2% is physically impossible and is instead considered to be shadowing 
+    float3 GF = SpecularColor * AB.x + saturate( 50.0 * SpecularColor.g ) * AB.y;
+    return GF;
+}
 
 half3 EnvBRDFApprox( half3 SpecularColor, half Roughness, half NoV )
 {

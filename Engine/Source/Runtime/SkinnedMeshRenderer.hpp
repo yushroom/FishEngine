@@ -20,11 +20,13 @@ namespace FishEngine
         //protected:
         virtual void Render() const override;
 
-        void setAvatar(AvatarPtr avatar) {
+        void setAvatar(AvatarPtr avatar)
+        {
             m_avatar = avatar;
         }
 
-        void setRootBone(std::weak_ptr<Transform> rootBone) {
+        void setRootBone(std::weak_ptr<Transform> rootBone)
+        {
             m_rootBone = rootBone;
         }
         

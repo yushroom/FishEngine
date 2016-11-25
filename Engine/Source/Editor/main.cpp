@@ -1,4 +1,4 @@
-//#include "TestScript.hpp"
+#include "TestScript.hpp"
 #include "TextureImporter.hpp"
 
 #include <iostream>
@@ -64,10 +64,12 @@ uint32_t ReverseBits( uint32_t Bits )
 
 TexturePtr MakePreintegratedGF()
 {
-    constexpr uint32_t size = 256;
-    // RG16
-    uint16_t DestBuffer[size * size * 2];
-    constexpr uint16_t DestStride = size * 2;
+    auto texture_format = TextureFormat::RG16;
+    constexpr uint32_t bytes_per_pixel = 4;    // 2 * 2 for RG16, and 4*2 for RGFloat
+    constexpr uint32_t size = 128;
+
+    uint8_t DestBuffer[size * size * bytes_per_pixel];
+    constexpr uint16_t DestStride = size * bytes_per_pixel;
     
     // x is NoV, y is roughness
     for (uint32_t y = 0; y < size; y++)
@@ -87,9 +89,8 @@ TexturePtr MakePreintegratedGF()
             
             float A = 0.0f;
             float B = 0.0f;
-            float C = 0.0f;
             
-            constexpr uint32_t NumSamples = 128;
+            constexpr uint32_t NumSamples = 512;
             for (uint32_t i = 0; i < NumSamples; i++)
             {
                 float E1 = (float)i / NumSamples;
@@ -97,8 +98,8 @@ TexturePtr MakePreintegratedGF()
                 
                 {
                     float Phi = 2.0f * Mathf::PI * E1;
-                    float CosPhi = Mathf::Cos(Phi);
-                    float SinPhi = Mathf::Sin(Phi);
+                    float CosPhi = std::cosf(Phi);
+                    float SinPhi = std::sinf(Phi);
                     float CosTheta = Mathf::Sqrt((1.0f - E2) / (1.0f + (m2 - 1.0f) * E2));
                     float SinTheta = Mathf::Sqrt(1.0f - CosTheta * CosTheta);
                     
@@ -123,42 +124,29 @@ TexturePtr MakePreintegratedGF()
                         B += NoL_Vis_PDF * Fc;
                     }
                 }
-                
-//                {
-//                    float Phi = 2.0f * Mathf::PI * E1;
-//                    float CosPhi = Mathf::Cos(Phi);
-//                    float SinPhi = Mathf::Sin(Phi);
-//                    float CosTheta = Mathf::Sqrt(E2);
-//                    float SinTheta = Mathf::Sqrt(1.0f - CosTheta * CosTheta);
-//                    
-//                    Vector3 L(SinTheta * CosPhi, SinTheta * SinPhi, CosTheta);
-//                    Vector3 H = (V + L).normalized();
-//                    
-//                    float NoL = Mathf::Max(L.z, 0.0f);
-//                    float NoH = Mathf::Max(H.z, 0.0f);
-//                    float VoH = Mathf::Max(Vector3::Dot(V, H), 0.0f);
-//                    
-//                    float FD90 = 0.5f + 2.0f * VoH * VoH * Roughness;
-//                    float FdV = 1.0f + (FD90 - 1.0f) * pow( 1.0f - NoV, 5 );
-//                    float FdL = 1.0f + (FD90 - 1.0f) * pow( 1.0f - NoL, 5 );
-//                    C += FdV * FdL;// * ( 1.0f - 0.3333f * Roughness );
-//                }
             }
             A /= NumSamples;
             B /= NumSamples;
-            //C /= NumSamples;
             
-            uint16_t* Dest = (uint16_t*)(DestBuffer + x * 2 + (size - y - 1) * DestStride);
-            //uint16_t* Dest = (uint16_t*)(DestBuffer + x * 2 + (size - y - 1) * DestStride);
-            Dest[0] = (uint32_t)(Mathf::Clamp01(A) * 65535.0f + 0.5f);
-            Dest[1] = (uint32_t)(Mathf::Clamp01(B) * 65535.0f + 0.5f);
+            if (texture_format == TextureFormat::RG16)
+            {
+                uint16_t* Dest = (uint16_t*)(DestBuffer + x * bytes_per_pixel + y * DestStride);
+                Dest[0] = (uint32_t)(Mathf::Clamp01(A) * 65535.0f + 0.5f);
+                Dest[1] = (uint32_t)(Mathf::Clamp01(B) * 65535.0f + 0.5f);
+            }
+            else if (texture_format == TextureFormat::RGFloat)
+            {
+                float* Dest = (float*)(DestBuffer + x * bytes_per_pixel + y * DestStride);
+                Dest[0] = A;
+                Dest[1] = B;
+            }
         }
     }
     
     TextureImporter importer;
     importer.setWrapMode(TextureWrapMode::Clamp);
     importer.setFilterMode(FilterMode::Bilinear);
-    return importer.FromRawData((uint8_t*)DestBuffer, size, size, TextureFormat::RG16);
+    return importer.FromRawData((uint8_t*)DestBuffer, size, size, texture_format);
 }
 
 
@@ -186,14 +174,12 @@ public:
         TextureImporter importer;
         auto envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross.dds");
         auto filtered_envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross_128_filtered.dds");
-        //auto irradiance_map = importer.FromFile(textures_dir + "envmap/BolongaIrradiance.dds");
+        RenderSettings::setAmbientCubemap(filtered_envmap);
 
         auto PreintegratedGF = MakePreintegratedGF();
         
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
-        material->SetTexture("AmbientCubemap", filtered_envmap);
-        //material->SetTexture("IrradianceMap", irradiance_map);
         
 #if 1
         material = Material::builtinMaterial("SkyboxCubed");
@@ -211,9 +197,12 @@ public:
         RenderSettings::setSkybox(material);
 
 #if 1
+
+        auto pbr2 = Shader::CreateFromFile(R"(D:\program\FishEngine\Engine\Shaders\PBR2.surf)");
+
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = 0; x <= 3; ++x)
+        for (int x = 0; x < 3; ++x)
         {
 #if FISHENGINE_PLATFORM_APPLE
             if (x % 2 != 0)
@@ -223,20 +212,29 @@ public:
             {
                 auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
                 go->transform()->SetParent(group->transform());
-                go->transform()->setLocalPosition(y*1.2f, x*1.2f, 0);
+                go->transform()->setLocalPosition(y*1.2f, (x-1)*1.2f, 0);
                 go->transform()->setLocalEulerAngles(0, 30, 0);
                 go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-                auto material = (x%2 == 0) ?
-                    Material::builtinMaterial("PBR") :
-                    Material::builtinMaterial("PBR-Reference");
+                MaterialPtr material;
+                if (x == 0)
+                {
+                    material = Material::builtinMaterial("PBR");
+                }
+                else if (x == 1)
+                {
+                    material = Material::CreateMaterial();
+                    material->SetShader(pbr2);
+                }
+                else
+                {
+                    material = Material::builtinMaterial("PBR-Reference");
+                }
                 material->EnableKeyword(ShaderKeyword::AmbientIBL);
-                material->SetFloat("Metallic", x >= 2 ? 1.0f : 0.0f);
+                material->SetFloat("Metallic", 1.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-                material->SetTexture("AmbientCubemap", filtered_envmap);
                 material->SetTexture("PreIntegratedGF", PreintegratedGF);
-                //material->SetTexture("IrradianceMap", irradiance_map);
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
@@ -267,7 +265,7 @@ public:
     }
 };
 
-#if 0
+#if 1
 
 class TestCSM : public App
 {

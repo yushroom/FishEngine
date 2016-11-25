@@ -4,6 +4,7 @@
 namespace FishEngine
 {
     MaterialPtr RenderSettings::m_skybox;
+    TexturePtr RenderSettings::m_ambientCubemap;
 
     void RenderSettings::setSkybox(MaterialPtr& skybox)
     {

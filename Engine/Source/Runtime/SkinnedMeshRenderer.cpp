@@ -12,6 +12,7 @@
 #include "Camera.hpp"
 #include "Gizmos.hpp"
 #include "Shader.hpp"
+#include "Graphics.hpp"
 
 namespace FishEngine
 {
@@ -72,9 +73,11 @@ namespace FishEngine
 
         std::map<std::string, TexturePtr> textures;
         auto& lights = Light::lights();
-        if (lights.size() > 0) {
+        if (lights.size() > 0)
+        {
             auto& l = lights.front();
-            if (l->transform() != nullptr) {
+            if (l->transform() != nullptr)
+            {
                 textures["ShadowMap"] = l->m_shadowMap;
             }
         }
@@ -82,24 +85,29 @@ namespace FishEngine
         // hack
         // TODO: remove this block
         bool skinned = m_avatar != nullptr;
-        if (skinned && m_matrixPalette.size() == 0) {
+        if (skinned && m_matrixPalette.size() == 0)
+        {
             UpdateMatrixPalette();
         }
+        
+        Pipeline::UpdateBonesUniforms(m_matrixPalette);
 
         for (auto& m : m_materials)
         {
+            m->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+#if 0
             auto shader = m->shader();
             assert(shader != nullptr);
-            m->EnableKeyword(ShaderKeyword::SkinnedAnimation);
             shader->Use();
             shader->PreRender();
-            if (m_avatar != nullptr)
-                shader->BindMatrixArray("BoneTransformations", m_matrixPalette);
             m->BindTextures(textures);
             m->BindProperties();
             shader->CheckStatus();
             m_sharedMesh->Render();
             shader->PostRender();
+#else
+            Graphics::DrawMesh(m_sharedMesh, m);
+#endif
             m->DisableKeyword(ShaderKeyword::SkinnedAnimation);
         }
     }

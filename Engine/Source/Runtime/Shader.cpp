@@ -456,14 +456,14 @@ namespace FishEngine
                 assert(blockSize == sizeof(PerFrame));
             }
 
-            //    blockID = glGetUniformBlockIndex(m_program, "Bones");
-            //    //assert(blockID != GL_INVALID_INDEX);
-            //    if (blockID != GL_INVALID_INDEX)
-            //    {
-            //        glUniformBlockBinding(m_program, blockID, Pipeline::BonesUBOBindingPoint);
-            //        glGetActiveUniformBlockiv(m_program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-            //        assert(blockSize == sizeof(Pipeline::bonesUniformData));
-            //    }
+            blockID = glGetUniformBlockIndex(program, "Bones");
+            //assert(blockID != GL_INVALID_INDEX);
+            if (blockID != GL_INVALID_INDEX)
+            {
+                glUniformBlockBinding(program, blockID, Pipeline::BonesUBOBindingPoint);
+                glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+                assert(blockSize == sizeof(Bones));
+            }
 
             GLint count;
             GLint size; // size of the variable

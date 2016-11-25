@@ -135,6 +135,8 @@ namespace FishEngine
     void Camera::
     FrameSelected(GameObjectPtr& selected)
     {
+        if (selected == nullptr)
+            return;
         auto camera = Camera::main()->transform();
         float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);
         m_focusPoint = selected->transform()->position();

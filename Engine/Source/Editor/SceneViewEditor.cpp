@@ -18,6 +18,7 @@
 #include <ModelImporter.hpp>
 #include <Gizmos.hpp>
 #include <CameraController.hpp>
+#include <Graphics.hpp>
 
 #include "Selection.hpp"
 #include "FishEditorWindow.hpp"
@@ -119,6 +120,7 @@ namespace FishEditor
         /* Selection                                                            */
         /************************************************************************/
         if (m_highlightSelections)
+        //if (true)
         {
             auto camera = Camera::main();
             auto view = camera->worldToCameraMatrix();
@@ -128,6 +130,7 @@ namespace FishEditor
             glPolygonOffset(-1.0, -1.0f);
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             auto material = Material::builtinMaterial("SolidColor");
+            material->DisableKeyword(ShaderKeyword::All);
             material->SetVector4("Color", Vector4(0.375f, 0.388f, 0.463f, 1));
 
 
@@ -147,12 +150,11 @@ namespace FishEditor
                 {
                     selections.push_back(c.lock()->gameObject());
                 }
-                auto meshFilter = go->GetComponent<MeshFilter>();
                 MeshPtr mesh;
+                auto meshFilter = go->GetComponent<MeshFilter>();
                 if (meshFilter != nullptr)
                 {
                     mesh = meshFilter->mesh();
-                    material->shader()->Use();
                 }
                 else
                 {
@@ -164,20 +166,15 @@ namespace FishEditor
                         if (useSkinnedVersion)
                         {
                             material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-                            material->shader()->Use();
-                            material->shader()->BindMatrixArray("BoneTransformations", skinnedMeshRenderer->m_matrixPalette);
+                            Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->m_matrixPalette);
                         }
                     }
-                    else    // no MeshFilter and SkinnedMeshRenderer
-                    {
-                        continue;
-                    }
                 }
-                auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-                Pipeline::UpdatePerDrawUniforms(model);
-                material->BindProperties();
-                material->shader()->CheckStatus();
-                mesh->Render();
+                if (mesh != nullptr)
+                {
+                    auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+                    Graphics::DrawMesh(mesh, model, material);
+                }
             }
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glDisable(GL_POLYGON_OFFSET_LINE);

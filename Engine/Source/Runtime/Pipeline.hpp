@@ -21,26 +21,19 @@ namespace FishEngine
 
         static void UpdatePerFrameUniforms();
         
-//        static void BindBonesUniforms()
-//        {
-//            glBindBuffer(GL_UNIFORM_BUFFER, bonesUBO);
-//            //auto size = sizeof(perFrameUniformData);
-//            glBufferData(GL_UNIFORM_BUFFER, sizeof(bonesUniformData), (void*)&bonesUniformData, GL_DYNAMIC_DRAW);
-//            glBindBufferBase(GL_UNIFORM_BUFFER, BonesUBOBindingPoint, bonesUBO);
-//            glCheckError();
-//        }
+        static void UpdateBonesUniforms(const std::vector<Matrix4x4>& bones);
 
         static constexpr unsigned int PerDrawUBOBindingPoint = 0;
         static constexpr unsigned int PerFrameUBOBindingPoint = 1;
-        //static const GLuint BonesUBOBindingPoint = 2;
+        static constexpr unsigned int BonesUBOBindingPoint = 2;
 
     private:
         static unsigned int s_perDrawUBO;
         static unsigned int s_perFrameUBO;
-        //static GLuint bonesUBO;
+        static unsigned int s_bonesUBO;
         static PerDraw      s_perDrawUniformData;
         static PerFrame     s_perFrameUniformData;
-        //static Bones bonesUniformData;
+        //static Bones        s_bonesUniformData;
     };
 }
 

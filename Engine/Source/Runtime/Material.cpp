@@ -110,9 +110,9 @@ namespace FishEngine
         auto i = m_shader->m_keywords & keyword;
         if (i == 0)
         {
-            Debug::LogWarning("EnableKeywords");
+            //Debug::LogWarning("EnableKeywords");
             m_shader->EnableLocalKeywords(keyword);
-            SetShader(m_shader);
+            //SetShader(m_shader);
         }
     }
 

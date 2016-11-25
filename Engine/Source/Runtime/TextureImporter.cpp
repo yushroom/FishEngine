@@ -10,6 +10,35 @@
 
 namespace FishEngine
 {
+    void TextureFormat2GLFormat(
+        TextureFormat format, 
+        GLenum& out_internalFormat, 
+        GLenum& out_externalFormat,
+        GLenum& out_pixelType)
+    {
+        switch (format)
+        {
+        case TextureFormat::RG16:
+            out_internalFormat = GL_RG16;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_UNSIGNED_SHORT;
+            break;
+        case TextureFormat::RG8:
+            out_internalFormat = GL_RG8;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_UNSIGNED_BYTE;
+            break;
+        case TextureFormat::RGFloat:
+            out_internalFormat = GL_RG32F;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_FLOAT;
+            break;
+        default:
+            Debug::LogError("Unknown texture format");
+            abort();
+        }
+    }
+
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed
     GLuint CreateTextureFromDDS(char const* Filename, FishEngine::TextureDimension* out_textureFormat)
@@ -180,7 +209,6 @@ namespace FishEngine
         return t;
     }
 
-    
     TexturePtr TextureImporter::FromFile(const std::string& path)
     {
         auto t = std::make_shared<Texture>();
@@ -213,13 +241,20 @@ namespace FishEngine
     
     TexturePtr TextureImporter::FromRawData(const uint8_t* data, int width, int height, TextureFormat format)
     {
+        GLenum internal_format, external_format, pixel_type;
+
+        TextureFormat2GLFormat(format, internal_format, external_format, pixel_type);
+
         GLuint texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG16, width, height);
+        glCheckError();
+        glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
+        glCheckError();
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RG, GL_UNSIGNED_SHORT, data);
-        
+            external_format, pixel_type, data);
+        glCheckError();
+
         GLenum wrap_mode = (m_wrapMode == TextureWrapMode::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
         
         GLenum min_filter_mode;
@@ -236,6 +271,7 @@ namespace FishEngine
         {
             min_filter_mode = GL_LINEAR_MIPMAP_LINEAR;
         }
+        glCheckError();
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode);

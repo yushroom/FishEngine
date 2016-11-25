@@ -1,6 +1,6 @@
 #pragma Normalmap Off
 #pragma Shadow Off
-
+#pragma AmbientIBL On
 #include <Ambient.inc>
 
 uniform vec3 BaseColor;
@@ -18,8 +18,8 @@ vec4 ps_main(SurfaceData surfaceData)
     vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
     uint2 seed = uint2(uint(abs(31010367 * surfaceData.uv.y)), uint(abs(10103671 * surfaceData.uv.x)));
     seed = ScrambleTEA(seed);
-    outColor.rgb  = SpecularIBL(seed, SpecularColor, Roughness, N, V);
-    outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
+    outColor.rgb = SpecularIBL(seed, SpecularColor, Roughness, N, V);
+    //outColor.rgb = DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
     outColor.a = 1;
     return outColor;
 }

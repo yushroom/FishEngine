@@ -40,6 +40,12 @@ struct PerFrame
  	vec4 _Time; // (t/20, t, t*2, t*3)
 };
 
+#define MAX_BONE_SIZE 128
+struct Bones
+{
+    mat4 BoneTransformations[MAX_BONE_SIZE];
+};
+
 #undef mat4
 #undef vec3
 #undef vec4

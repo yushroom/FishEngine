@@ -76,12 +76,11 @@ layout(std140, row_major) InternalUniform PerFrame
 };
 
 
-// #define MAX_BONE_SIZE 100
-// //uniform mat4 BoneTransformations[MAX_BONE_SIZE];
-// layout(std140, row_major) uniform Bones
-// {
-//     mat4 BoneTransformations2[MAX_BONE_SIZE];
-// };
+#define MAX_BONE_SIZE 128
+layout(std140, row_major) InternalUniform Bones
+{
+    mat4 BoneTransformations[MAX_BONE_SIZE];
+};
 
 #define PI 3.141592653589793f
 #define INV_PI 0.3183098861837907f

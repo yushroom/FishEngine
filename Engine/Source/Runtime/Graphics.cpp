@@ -4,6 +4,7 @@
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "Light.hpp"
+#include "RenderSettings.hpp"
 
 namespace FishEngine
 {
@@ -26,6 +27,10 @@ namespace FishEngine
                     material->SetTexture("ShadowMap", l->m_shadowMap);
                 }
             }
+        }
+        if (material->IsKeywordEnabled(ShaderKeyword::AmbientIBL))
+        {
+            material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
         }
 
         auto shader = material->shader();

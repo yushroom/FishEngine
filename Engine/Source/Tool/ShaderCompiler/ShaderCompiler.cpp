@@ -33,6 +33,12 @@ int main(int argc, char* argv[])
     std::string path = R"(D:\program\FishEngine\Engine\Shaders\SkinnedPass.surf)";
     if (argc == 2)
         path = argv[1];
+    else
+    {
+        Debug::LogError("invalid command");
+        return 1;
+    }
+        
 
     auto shader = Shader::CreateFromFile(path);
     if (shader == nullptr)

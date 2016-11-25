@@ -63,8 +63,8 @@ vec4 ps_main(SurfaceData surfaceData)
 
     float Mip = ComputeCubemapMipFromRoughness(Roughness, AmbientCubemapMipAdjust.w);
     float3 SampleColor = textureLod(AmbientCubemap, R, Mip).rgb;
-    SpecularContribution += SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
-    //SpecularContribution += SampleColor * EnvBRDF(SpecularColor, Roughness, NoV);
+    //SpecularContribution += SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
+    SpecularContribution += SampleColor * EnvBRDF(SpecularColor, Roughness, NoV);
 
     //outColor.rgb += SpecularContribution + NonSpecularContribution;
     outColor.rgb += SpecularContribution;

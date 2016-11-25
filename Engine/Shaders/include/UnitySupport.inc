@@ -8,17 +8,6 @@
 // http://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 #define glstate_matrix_mvp MATRIX_MVP
 
-// uniform mat4 UNITY_MATRIX_MVP;  // Current model * view * projection matrix.
-// uniform mat4 UNITY_MATRIX_MV;   // Current model * view matrix.
-// uniform mat4 UNITY_MATRIX_V;    // Current view matrix.
-// uniform mat4 UNITY_MATRIX_P;    // Current projection matrix.
-// uniform mat4 UNITY_MATRIX_VP;   // Current view * projection matrix.
-// uniform mat4 UNITY_MATRIX_T_MV; // Transpose of model * view matrix.
-// uniform mat4 UNITY_MATRIX_IT_MV;// Inverse transpose of model * view matrix.
-// uniform mat4 _Object2World;     // Current model matrix.
-// uniform mat4 _World2Object;     // Inverse of current world matrix.
-
-
 // #define UNITY_MATRIX_P glstate_matrix_projection
 // #define UNITY_MATRIX_V unity_MatrixV
 // #define UNITY_MATRIX_I_V unity_MatrixInvV

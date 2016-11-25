@@ -1,13 +1,29 @@
-//#include <ShaderVariables.inc>
-
 #ifdef VERTEX_SHADER
-	layout (location = 0) 	in vec3 InputPositon;
+	#include <ShaderVariables.inc>
+	layout (location = PositionIndex) 	in vec3 InputPositon;
+	layout (location = NormalIndex) 	in vec3 InputNormal;
+	layout (location = TangentIndex)    in vec3 InputTangent;
+	layout (location = UVIndex) 		in vec2 InputUV;
+	#ifdef _SKINNED
+		layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
+		layout (location = BoneWeightIndex) in vec4 boneWeight;
+	#endif
 
 	uniform mat4 MATRIX_LIGHT_MVP;
 
 	void main()
 	{
-	    gl_Position = MATRIX_LIGHT_MVP * vec4(InputPositon, 1);
+	#ifdef _SKINNED
+		mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
+		boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
+		boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
+		boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
+		vec4 position = boneTransformation * vec4(InputPositon, 1);
+	#else // !_SKINNED
+		vec4 position = vec4(InputPositon, 1);
+	#endif // _SKINNED
+
+		gl_Position = MATRIX_LIGHT_MVP * position;
 	}
 #endif
 

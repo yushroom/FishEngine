@@ -10,9 +10,6 @@ layout (location = UVIndex) 		in vec2 InputUV;
 #ifdef _SKINNED
 	layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
 	layout (location = BoneWeightIndex) in vec4 boneWeight;
-	
-	#define MAX_BONE_SIZE 100
-	InternalUniform mat4 BoneTransformations[MAX_BONE_SIZE];
 #endif
 
 struct AppData
@@ -64,10 +61,6 @@ void main()
     appdata.tangent     = InputTangent;
 #endif // _SKINNED
     appdata.uv			= InputUV;
-
-    //vec4 posW			= MATRIX_M * appdata.position;
-    //vs_out.position     = posW.xyz;
-    //vs_out.positionInLightSpace = LightMatrix0 * posW;
 
     vs_main(appdata);
 }

@@ -4,7 +4,7 @@
 	CubemapCommon.usf: Cubemap shared functions and structures.
 =============================================================================*/
 
-uniform samplerCube AmbientCubemap;
+InternalUniform samplerCube AmbientCubemap;
 
 const uint GDiffuseConvolveMipLevel = 4;
 

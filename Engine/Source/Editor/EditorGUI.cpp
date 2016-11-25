@@ -185,7 +185,8 @@ namespace FishEditor
     {
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
 
-        if (EditorInput::GetKeyDown(KeyCode::F)) {
+        if (EditorInput::GetKeyDown(KeyCode::F))
+        {
             Camera::main()->FrameSelected(selectedGO);
         }
         
@@ -628,7 +629,7 @@ namespace FishEditor
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
         ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.1f, 0));
         
-        static int selected = -1;
+        static int selected = 0;
         static int selected_item_id = -1;
         if (ImGui::Selectable("Textures", selected==0))
         {

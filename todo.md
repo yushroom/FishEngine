@@ -126,7 +126,7 @@
 
 ## 渲染
 
-- [ ] PBR
+- [x] PBR
 - [ ] Shadow: standard shadow map with PSF => CSM/VSM
 - [x] expose更多的shader uniform给Editor
 - [ ] 渲染优化：渲染前按父子关系将transform更新完，渲染时按批次重组draw call batching
@@ -139,6 +139,9 @@
 - [x] skinned mesh运动时的线框显示问题（以后考虑用transform feedback加速动画）
 - [ ] Directional Light 抖动的问题
 - [ ] Terrain/height map
+- [ ] builtinMaterial每次都会make_shaderd新的
+- [ ] InternalUniform和普通的uniform区分开来，固定某些texture的binding point
+- [ ] ​
 
 
 
@@ -151,7 +154,7 @@
 
 ## Asset
 
-- [ ] Texture里面加入sampler2D/samplerCube之类的类型标识
+- [x] Texture里面加入sampler2D/samplerCube之类的类型标识
 
 
 

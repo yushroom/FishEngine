@@ -9,16 +9,16 @@ namespace FishEngine
 {
     PerDraw Pipeline::s_perDrawUniformData;
     PerFrame Pipeline::s_perFrameUniformData;
-    //Bones Pipeline::bonesUniformData;
+    //Bones Pipeline::s_bonesUniformData;
     GLuint Pipeline::s_perDrawUBO = 0;
     GLuint Pipeline::s_perFrameUBO = 0;
-    //GLuint Pipeline::bonesUBO = 0;
+    GLuint Pipeline::s_bonesUBO = 0;
 
     void Pipeline::Init()
     {
         glGenBuffers(1, &s_perDrawUBO);
         glGenBuffers(1, &s_perFrameUBO);
-        //glGenBuffers(1, &bonesUBO);
+        glGenBuffers(1, &s_bonesUBO);
     }
 
     void Pipeline::BindCamera(const CameraPtr& camera)
@@ -65,4 +65,14 @@ namespace FishEngine
         glBindBufferBase(GL_UNIFORM_BUFFER, PerFrameUBOBindingPoint, s_perFrameUBO);
         glCheckError();
     }
+
+    void Pipeline::UpdateBonesUniforms(const std::vector<Matrix4x4>& bones)
+    {
+        glBindBuffer(GL_UNIFORM_BUFFER, s_bonesUBO);
+        //auto size = sizeof(perFrameUniformData);
+        glBufferData(GL_UNIFORM_BUFFER, bones.size() * sizeof(Matrix4x4), (void*)bones.data(), GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, BonesUBOBindingPoint, s_bonesUBO);
+        glCheckError();
+    }
+
 }

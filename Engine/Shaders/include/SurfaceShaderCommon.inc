@@ -7,7 +7,6 @@
 
 #ifdef FRAGMENT_SHADER
 	#include <FragmentShaderShadow.inc>
-	//uniform sampler2D _MainTex;
 	#define SURFACE_SHADER
 #endif
 

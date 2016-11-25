@@ -31,11 +31,13 @@ namespace FishEngine
         return go;
     }
 
-    void Scene::Init() {
+    void Scene::Init()
+    {
 
     }
 
-    void Scene::Start() {
+    void Scene::Start()
+    {
         for (auto& go : m_gameObjects) {
             if (go->activeInHierarchy())
                 go->Start();
@@ -43,7 +45,8 @@ namespace FishEngine
         UpdateBounds();
     }
 
-    void Scene::Update() {
+    void Scene::Update()
+    {
         // Destroy components
         for (auto & c : m_componentsToBeDestroyed) {
             c->gameObject()->RemoveComponent(c);
@@ -144,6 +147,7 @@ namespace FishEngine
         
         //glCullFace(GL_FRONT);
         auto shadow_map_material = Material::builtinMaterial("ShadowMap");
+        shadow_map_material->DisableKeyword(ShaderKeyword::Shadow);
         //auto& view = light->m_viewMatrixForShadowMap;
         //auto& proj = light->m_projectMatrixForShadowMap;
 
@@ -160,7 +164,8 @@ namespace FishEngine
         
         for (auto& go : m_gameObjects)
         {
-            if (!go->activeInHierarchy()) continue;
+            if (!go->activeInHierarchy())
+                continue;
 
             MeshPtr mesh;
             if (go->GetComponent<MeshRenderer>())
@@ -169,29 +174,24 @@ namespace FishEngine
                 if (meshFilter != nullptr)
                 {
                     mesh = meshFilter->mesh();
-                    auto shader = shadow_map_material->shader();
-                    shader->Use();
-                    auto mvp = light_vp * go->transform()->localToWorldMatrix();
-                    shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
-                    shader->CheckStatus();
-                    mesh->Render();
-                    continue;
+                }
+            }
+            else
+            {
+                auto renderer = go->GetComponent<SkinnedMeshRenderer>();
+                if (renderer != nullptr)
+                {
+                    mesh = renderer->sharedMesh();
+                    if (renderer->m_avatar != nullptr)
+                    {
+                        shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+                        Pipeline::UpdateBonesUniforms(renderer->m_matrixPalette);
+                    }
                 }
             }
 
-            auto renderer = go->GetComponent<SkinnedMeshRenderer>();
-            if (renderer != nullptr)
+            if (mesh != nullptr)
             {
-                mesh = renderer->sharedMesh();
-                if (renderer->m_avatar != nullptr)
-                {
-                    shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-                    shadow_map_material->shader()->Use();
-                    shadow_map_material->shader()->BindMatrixArray("BoneTransformations", renderer->m_matrixPalette);
-                }
-                else {
-                    shadow_map_material->shader()->Use();
-                }
                 auto shader = shadow_map_material->shader();
                 shader->Use();
                 auto mvp = light_vp * go->transform()->localToWorldMatrix();

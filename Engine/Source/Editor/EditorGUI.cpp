@@ -570,7 +570,7 @@ namespace FishEditor
 
             static const char* names[] = {
                 "Camera", "Animator", "MeshFilter", "MeshRenderer", "Rigidbody", "SkinnedMeshRenderer",
-                "BoxCollider", "CapsuleCollider", "SphereCollider", "SphereCollider",
+                "BoxCollider", "CapsuleCollider", "SphereCollider",
             };
 
             bool addComponentFailed = false;
@@ -718,13 +718,41 @@ namespace FishEditor
         ImGui::BeginDock("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse);
         m_mainSceneViewEditor->m_focused = ImGui::IsWindowFocused();
         m_mainSceneViewEditor->m_isMouseHovered = ImGui::IsWindowHovered();
+
+        //constexpr int menubar_height = 40;
+        auto frame_padding = ImGui::GetStyle().FramePadding;
+        float padding = frame_padding.y * 2;
+        float height = 24 + padding;
+        ImVec2 toolbar_size(ImGui::GetIO().DisplaySize.x, height);
+        if (ImGui::BeginToolbar("SceneViewToolBar", ImVec2(0, g_editorGUISettings.mainMenubarHeight), toolbar_size))
+        {
+            if (ImGui::Button("Light on"))
+            {
+                
+            }
+            
+            ImGui::SameLine();
+            if (ImGui::Button("Gizmos on"))
+            {
+                
+            }
+            
+            ImGui::SameLine();
+            bool highlight = m_mainSceneViewEditor->highlightSelections();
+            if (ImGui::Checkbox("Highlight", &highlight))
+            {
+                m_mainSceneViewEditor->setHighlightSelections(highlight);
+            }
+            
+        }
+        ImGui::EndToolbar();
+        
         auto position = ImGui::GetCurrentWindow()->DC.CursorPos;
         m_mainSceneViewEditor->m_position.x = position.x;
         m_mainSceneViewEditor->m_position.y = position.y;
         auto size = ImGui::GetContentRegionAvail();
         m_sceneViewSize.x = static_cast<int>(size.x);
         m_sceneViewSize.y = static_cast<int>(size.y);
-        //EditorInput::CopyToInput();
         m_mainSceneViewEditor->Render();
         auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
         ImGui::Image((void*)rt->GetNativeTexturePtr(), size, ImVec2(0, 1), ImVec2(1, 0));
@@ -761,7 +789,7 @@ namespace FishEditor
             {
                 if (ImGui::MenuItem("Create Empty", "Ctrl+Shift+N"))
                 {
-
+                    Scene::CreateGameObject("GameObject");
                 }
                 if (ImGui::MenuItem("Create Empty Child", "Alt+Shift+N"))
                 {
@@ -1095,13 +1123,17 @@ namespace FishEditor
             meshFilter->SetMesh(mesh);
         });
         //ImGui::SameLine();
-        ImGui::LabelText("Mesh", "%s", meshFilter->m_mesh->name().c_str());
-
-        //bool skinned = meshFilter->m_mesh->m_skinned;
-        //ImGui::Checkbox("Skinned", &skinned);
-        if (meshFilter->m_mesh->m_skinned) {
-            int boneCount = (int)meshFilter->m_mesh->m_boneNameToIndex.size();
-            Int("Bone Count", boneCount);
+        if (meshFilter->m_mesh == nullptr)
+        {
+            ImGui::LabelText("Mesh", "None");
+        }
+        else
+        {
+            if (meshFilter->m_mesh->m_skinned) {
+                int boneCount = (int)meshFilter->m_mesh->m_boneNameToIndex.size();
+                Int("Bone Count", boneCount);
+            }
+            ImGui::LabelText("Mesh", "%s", meshFilter->m_mesh->name().c_str());
         }
     }
 

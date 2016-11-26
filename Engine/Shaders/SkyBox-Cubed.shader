@@ -1,15 +1,15 @@
-#include <UnitySupport.inc>
+@Cull Front
+@ZWrite Off
 
-#pragma Cull Front
-#pragma ZWrite Off
+#include <UnitySupport.inc>
 
 uniform samplerCube _Tex;
 uniform vec4        _Tint;
 uniform float       _Exposure;
 uniform float       _Rotation;
 
-#ifdef VERTEX_SHADER
-
+@vertex
+{
     layout(location = PositionIndex) in vec3 InputPositon;
 
     out vec3 uv;
@@ -29,10 +29,10 @@ uniform float       _Rotation;
         gl_Position = UnityObjectToClipPos(rotated);
         uv = InputPositon.xyz;
     }
+}
 
-#endif
-
-#ifdef FRAGMENT_SHADER
+@fragment
+{
     in vec3 uv;
 
     out vec4 color;
@@ -47,4 +47,4 @@ uniform float       _Rotation;
         //c *= _Exposure;
         color = half4(c, 1);
     }
-#endif
+}

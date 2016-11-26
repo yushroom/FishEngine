@@ -34,38 +34,35 @@ typedef boost::wave::context<
         lex_iterator_type>
     context_type;
 
-#ifdef CACHE_INCLUDE_HEADER
-std::map<std::string, std::string> pathToShaderString;
-#endif
 
 std::string 
 ReadFile(
     const std::string& path)
 {
-#ifdef CACHE_INCLUDE_HEADER
-    auto it = pathToShaderString.find(path);
-    if (it != pathToShaderString.end())
-    {
-        return it->second;
-    }
-#endif
     std::ifstream fin(path);
     if (!fin.is_open()) {
         FishEngine::Debug::LogError("Can not open shader file: %s", path.c_str());
         throw exception();
     }
-
-#ifdef CACHE_INCLUDE_HEADER
-    const auto& str = std::string(
-        std::istreambuf_iterator<char>(fin.rdbuf()),
-        std::istreambuf_iterator<char>());
-    pathToShaderString[path] = str;
-    return str;
-#else 
     return std::string(
         std::istreambuf_iterator<char>(fin.rdbuf()),
         std::istreambuf_iterator<char>());
-#endif
+}
+
+std::map<std::string, std::string> pathToShaderString;
+
+std::string GetHeader(const std::string& filename)
+{
+    static const auto& include_dir = Resources::shaderRootDirectory() + "include/";
+    auto path = include_dir + filename;
+    auto it = pathToShaderString.find(path);
+    if (it != pathToShaderString.end())
+    {
+        return it->second;
+    }
+    auto str = ReadFile(path);
+    pathToShaderString[path] = str;
+    return str;
 }
 
 GLuint
@@ -190,6 +187,191 @@ namespace FishEngine
         FragmentShader,
         GeometryShader,
     };
+    
+    enum class ShaderCompilerError
+    {
+        EarlyEOF,
+        Grammar,
+    };
+    
+    class ShaderCompiler
+    {
+    public:
+        ShaderCompiler() = delete;
+        
+        static void Preprocess(const std::string& shaderText,
+                               std::string& out_parsedShaderText,
+                               std::map<std::string, std::string>& out_settings,
+                               bool& out_hasGeometryShader)
+        {
+            out_hasGeometryShader = false;
+            std::string parsed;
+            parsed.reserve(shaderText.size());
+            
+            size_t begin = 0;
+            size_t end = shaderText.size();
+            
+            while (begin < end)
+            {
+                size_t begin_of_this_tok = begin;
+                string tok = nextTok(shaderText, begin);
+                if (tok.size() >= 2 && tok[0] == '\\' && tok[1] == '\\')
+                {
+                    readToNewline(shaderText, begin);
+                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                }
+                else if (tok == "#include")
+                {
+                    ignoreSpace(shaderText, begin);
+                    auto tok = nextTok(shaderText, begin);
+                    bool is_system_include = tok[0] == '<';
+                    auto header = tok.substr(1, tok.size()-2);
+                    //cout << "include " << header << " " << is_system_include << endl;
+                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                }
+                else if (tok == "uniform")
+                {
+                    ignoreSpace(shaderText, begin);
+                    auto type = nextTok(shaderText, begin);
+                    ignoreSpace(shaderText, begin);
+                    auto name = nextTok(shaderText, begin);
+                    //cout << "uniform " << type << " " << name << endl;
+                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                }
+                else if (tok.size() > 0 && tok[0] == '@')
+                {
+                    if (tok == "@vertex")
+                    {
+                        ignoreSpace(shaderText, begin);
+                        expect(shaderText, begin, "{");
+                        //cout << "vertex begin"  << endl;
+                        out_parsedShaderText += "#ifdef VERTEX_SHADER";
+                        size_t right = findPair(shaderText, begin);
+                        out_parsedShaderText += shaderText.substr(begin, right-begin);
+                        out_parsedShaderText += "#endif /* VERTEX_SHADER*/";
+                        begin = right+1;
+                    }
+                    else if (tok == "@geometry")
+                    {
+                        out_hasGeometryShader = true;
+                        ignoreSpace(shaderText, begin);
+                        expect(shaderText, begin, "{");
+                        //cout << "geometry begin"  << endl;
+                        out_parsedShaderText += "#ifdef GEOMETRY_SHADER";
+                        size_t right = findPair(shaderText, begin);
+                        out_parsedShaderText += shaderText.substr(begin, right-begin);
+                        out_parsedShaderText += "#endif /* GEOMETRY_SHADER*/";
+                        begin = right+1;
+                    }
+                    else if (tok == "@fragment")
+                    {
+                        ignoreSpace(shaderText, begin);
+                        expect(shaderText, begin, "{");
+                        //cout << "fragment begin"  << endl;
+                        out_parsedShaderText += "#ifdef FRAGMENT_SHADER";
+                        size_t right = findPair(shaderText, begin);
+                        out_parsedShaderText += shaderText.substr(begin, right-begin);
+                        out_parsedShaderText += "#endif /* FRAGMENT_SHADER*/";
+                        begin = right+1;
+                    }
+                    else    // keyword
+                    {
+                        auto name = tok.substr(1);
+                        ignoreSpace(shaderText, begin);
+                        auto setting = nextTok(shaderText, begin);
+                        readToNewline(shaderText, begin);
+                        //cout << "Keyword " << name << " " << setting << endl;
+                        out_settings[name] = setting;
+                    }
+                }
+                else
+                {
+                    out_parsedShaderText += tok;
+                }
+            }
+            //cout << out_parsedShaderText << endl;
+        }
+        
+    private:
+        
+        static std::string nextTok(const std::string &shaderText, size_t& pos)
+        {
+            size_t start = pos;
+            size_t end = shaderText.size();
+            
+            bool first_is_space = std::isspace(shaderText[start]);
+            while (pos < end)
+            {
+                char c = shaderText[pos];
+                bool is_space = std::isspace(c);
+                if ((first_is_space && !is_space) ||
+                    (!first_is_space && is_space))
+                    break;
+                pos++;
+            }
+            if (start == pos)
+                pos ++;
+            return shaderText.substr(start, pos-start);
+        };
+        
+        static void readToNewline(const std::string& shaderText, size_t& pos)
+        {
+            for (; pos < shaderText.size(); pos++)
+            {
+                if (shaderText[pos] == '\n')
+                    return;
+            }
+        }
+        
+//        static void readUntil(const std::string& shaderText, size_t& pos, const string& target)
+//        {
+//            size_t end = shaderText.size();
+//            while (pos < end)
+//            {
+//                if (nextTok(shaderText, pos) == target)
+//                    break;
+//            }
+//        };
+        
+        static void ignoreSpace(const std::string& text, size_t& pos)
+        {
+            if (std::isspace(text[pos]))
+                nextTok(text, pos);
+        }
+        
+        static bool expect(const std::string& text, size_t& pos, const std::string& target)
+        {
+            for (int i = 0; i < target.size(); ++i)
+            {
+                if (text[pos+i] != target[i])
+                    return false;
+            }
+            pos += target.size();
+            return true;
+        }
+        
+        static size_t findPair(const std::string& text, const size_t pos)
+        {
+            int left_count = 1;
+            int i = pos;
+            for (i = pos; i < text.size(); ++i)
+            {
+                if (text[i] == '{')
+                {
+                    left_count++;
+                }
+                else if (text[i] == '}')
+                {
+                    left_count--;
+                    if (left_count == 0)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return i;
+        }
+    };
 
     class ShaderImpl
     {
@@ -205,7 +387,7 @@ namespace FishEngine
             }
         }
 
-        void set(std::string shaderText, ShaderFileType type, std::string filePath = "placeholder.surf")
+        void set(const std::string& shaderText, ShaderFileType type, const std::string& filePath = "placeholder.surf")
         {
             m_shaderTextRaw = shaderText + "\n";
             m_filePath = filePath;
@@ -217,7 +399,7 @@ namespace FishEngine
             Debug::LogWarning("CompileAndLink %s", m_filePath.c_str());
             auto vs = Compile(ShaderType::VertexShader, keywords);
             GLuint gs = 0;
-            if (getValueOrDefault<string, string>(m_settings, "GeometryShader", "Off") == "On")
+            if (m_hasGeometryShader)
                 gs = Compile(ShaderType::GeometryShader, keywords);
             auto fs = Compile(ShaderType::FragmentShader, keywords);
             auto glsl_program = LinkShader(vs, 0, 0, gs, fs);
@@ -251,10 +433,11 @@ namespace FishEngine
             return m_shaderTextRaw;
         }
 
+        bool m_hasGeometryShader = false;
         std::string m_vertexShaderText;
         std::string m_fragmentShaderText;
         std::string m_geometryShaderText;
-        std::map<std::string, std::string>  m_settings;
+        //std::map<std::string, std::string>  m_settings;
 
     private:
         std::string                         m_filePath;
@@ -331,10 +514,10 @@ namespace FishEngine
             bool next_tok_is_uniform_var_type = false;
             bool next_tok_is_uniform_var_name = false;
 
-            bool next_tok_is_pragma_type = false;
-            bool next_tok_is_pragma_setting = false;
-            string pragma_type = "";
-            string pragma_setting = "";
+//            bool next_tok_is_pragma_type = false;
+//            bool next_tok_is_pragma_setting = false;
+//            string pragma_type = "";
+//            string pragma_setting = "";
 
             while (first != last)
             {
@@ -363,31 +546,31 @@ namespace FishEngine
                 {
                     intent_level++;
                 }
-
-                if (tok == "#pragma")
-                {
-                    //cout << tok << endl;
-                    next_tok_is_pragma_type = true;
-                }
-                else if (next_tok_is_pragma_type)
-                {
-                    if (id == boost::wave::T_IDENTIFIER)
-                    {
-                        pragma_type = tok;
-                        next_tok_is_pragma_setting = true;
-                    }
-                    next_tok_is_pragma_type = false;
-                }
-                else if (next_tok_is_pragma_setting)
-                {
-                    if (id == boost::wave::T_IDENTIFIER)
-                    {
-                        pragma_setting = tok;
-                        m_settings[pragma_type] = pragma_setting;
-                        //cout << "\tsettings: " << pragma_type << " " << pragma_setting << endl;
-                    }
-                    next_tok_is_pragma_setting = false;
-                }
+//
+//                if (tok == "#pragma")
+//                {
+//                    //cout << tok << endl;
+//                    next_tok_is_pragma_type = true;
+//                }
+//                else if (next_tok_is_pragma_type)
+//                {
+//                    if (id == boost::wave::T_IDENTIFIER)
+//                    {
+//                        pragma_type = tok;
+//                        next_tok_is_pragma_setting = true;
+//                    }
+//                    next_tok_is_pragma_type = false;
+//                }
+//                else if (next_tok_is_pragma_setting)
+//                {
+//                    if (id == boost::wave::T_IDENTIFIER)
+//                    {
+//                        pragma_setting = tok;
+//                        m_settings[pragma_type] = pragma_setting;
+//                        //cout << "\tsettings: " << pragma_type << " " << pragma_setting << endl;
+//                    }
+//                    next_tok_is_pragma_setting = false;
+//                }
 
                 if (tok == "InternalUniform")
                 {
@@ -399,11 +582,8 @@ namespace FishEngine
                 }
                 else if (next_tok_is_uniform_var_type)
                 {
-                    //if (uniform_types.find(tok) != uniform_types.end())
-                    //{
                     //cout << tok << " ";
                     next_tok_is_uniform_var_name = true;
-                    //}
                     next_tok_is_uniform_var_type = false;
                 }
                 else if (next_tok_is_uniform_var_name)
@@ -517,15 +697,31 @@ namespace FishEngine
         {
             auto ext = getExtensionWithoutDot(path);
             auto shader_text = ReadFile(path);
+            std::string parsed_shader_text;
+            std::map<std::string, std::string> settings;
+            ShaderCompiler::Preprocess(shader_text, parsed_shader_text, settings, m_impl->m_hasGeometryShader);
+            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "Cull", "Back"));
+            m_ZWrite = getValueOrDefault<string, string>(settings, "ZWrite", "On") == "On";
+            m_blend = getValueOrDefault<string, string>(settings, "Blend", "Off") == "On";
+            m_applyNormalMap = getValueOrDefault<string, string>(settings, "Normalmap", "Off") == "On";
+            m_receiveShadow = getValueOrDefault<string, string>(settings, "Shadow", "On") == "On";
+            
+            //SetLocalKeywords(ShaderKeyword::Shadow, m_receiveShadow);
+            auto k = static_cast<ShaderKeywords>(ShaderKeyword::Shadow);
+            if (m_receiveShadow)
+            {
+                m_keywords |= k;
+            }
+            else
+            {
+                m_keywords &= ~k;;
+            }
+            
             auto t = ext == "surf" ? ShaderFileType::Surface : ShaderFileType::Combined;
-            m_impl->set(shader_text, t, path);
+            m_impl->set(parsed_shader_text, t, path);
             m_impl->CompileAndLink(m_keywords);
             m_program = m_impl->glslProgram(m_keywords, m_uniforms);
-            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(m_impl->m_settings, "Cull", "Back"));
-            m_ZWrite = getValueOrDefault<string, string>(m_impl->m_settings, "ZWrite", "On") == "On";
-            m_blend = getValueOrDefault<string, string>(m_impl->m_settings, "Blend", "Off") == "On";
-            m_applyNormalMap = getValueOrDefault<string, string>(m_impl->m_settings, "Normalmap", "Off") == "On";
-            m_receiveShadow = getValueOrDefault<string, string>(m_impl->m_settings, "Shadow", "On") == "On";
+
         }
         catch (const boost::wave::preprocess_exception& e)
         {
@@ -722,7 +918,20 @@ namespace FishEngine
         abort();
         return nullptr;
     }
-
+    
+    void Shader::SetLocalKeywords(ShaderKeyword keyword, bool value)
+    {
+        auto k = static_cast<ShaderKeywords>(keyword);
+        if (value)
+        {
+            EnableLocalKeywords(k);
+        }
+        else
+        {
+            DisableLocalKeywords(k);
+        }
+    }
+    
     void Shader::EnableLocalKeywords(ShaderKeywords keyword)
     {
         m_keywords |= keyword;

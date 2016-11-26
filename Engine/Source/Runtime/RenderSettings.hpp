@@ -29,6 +29,8 @@ namespace FishEngine
         {
             m_ambientCubemap = ambientCubemap;
         }
+        
+        static TexturePtr preintegratedGF();
 
     private:
 

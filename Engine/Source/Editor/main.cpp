@@ -52,104 +52,6 @@ void DefaultScene()
 }
 
 
-uint32_t ReverseBits( uint32_t Bits )
-{
-    Bits = ( Bits << 16) | ( Bits >> 16);
-    Bits = ( (Bits & 0x00ff00ff) << 8 ) | ( (Bits & 0xff00ff00) >> 8 );
-    Bits = ( (Bits & 0x0f0f0f0f) << 4 ) | ( (Bits & 0xf0f0f0f0) >> 4 );
-    Bits = ( (Bits & 0x33333333) << 2 ) | ( (Bits & 0xcccccccc) >> 2 );
-    Bits = ( (Bits & 0x55555555) << 1 ) | ( (Bits & 0xaaaaaaaa) >> 1 );
-    return Bits;
-}
-
-TexturePtr MakePreintegratedGF()
-{
-    auto texture_format = TextureFormat::RG16;
-    constexpr uint32_t bytes_per_pixel = 4;    // 2 * 2 for RG16, and 4*2 for RGFloat
-    constexpr uint32_t size = 128;
-
-    uint8_t DestBuffer[size * size * bytes_per_pixel];
-    constexpr uint16_t DestStride = size * bytes_per_pixel;
-    
-    // x is NoV, y is roughness
-    for (uint32_t y = 0; y < size; y++)
-    {
-        float Roughness = (float)(y + 0.5f) / size;
-        float m = Roughness * Roughness;
-        float m2 = m*m;
-        
-        for (uint32_t x = 0; x < size; x++)
-        {
-            float NoV = (float)(x + 0.5f) / size;
-            
-            Vector3 V;
-            V.x = Mathf::Sqrt(1.0f - NoV * NoV);	// sin
-            V.y = 0.0f;
-            V.z = NoV;								// cos
-            
-            float A = 0.0f;
-            float B = 0.0f;
-            
-            constexpr uint32_t NumSamples = 512;
-            for (uint32_t i = 0; i < NumSamples; i++)
-            {
-                float E1 = (float)i / NumSamples;
-                float E2 = (double)ReverseBits(i) / (double)0x100000000LL;
-                
-                {
-                    float Phi = 2.0f * Mathf::PI * E1;
-                    float CosPhi = std::cosf(Phi);
-                    float SinPhi = std::sinf(Phi);
-                    float CosTheta = Mathf::Sqrt((1.0f - E2) / (1.0f + (m2 - 1.0f) * E2));
-                    float SinTheta = Mathf::Sqrt(1.0f - CosTheta * CosTheta);
-                    
-                    Vector3 H(SinTheta * CosPhi, SinTheta * SinPhi, CosTheta);
-                    float VoH = Vector3::Dot(V, H);
-                    Vector3 L = 2.0f * VoH * H - V;
-                    
-                    float NoL = Mathf::Max(L.z, 0.0f);
-                    float NoH = Mathf::Max(H.z, 0.0f);
-                    VoH = Mathf::Max(VoH, 0.0f);
-                    
-                    if (NoL > 0.0f)
-                    {
-                        float Vis_SmithV = NoL * ( NoV * ( 1 - m ) + m );
-                        float Vis_SmithL = NoV * ( NoL * ( 1 - m ) + m );
-                        float Vis = 0.5f / ( Vis_SmithV + Vis_SmithL );
-                        
-                        float NoL_Vis_PDF = NoL * Vis * (4.0f * VoH / NoH);
-                        float Fc = 1.0f - VoH;
-                        Fc *= Mathf::Square(Fc*Fc);
-                        A += NoL_Vis_PDF * (1.0f - Fc);
-                        B += NoL_Vis_PDF * Fc;
-                    }
-                }
-            }
-            A /= NumSamples;
-            B /= NumSamples;
-            
-            if (texture_format == TextureFormat::RG16)
-            {
-                uint16_t* Dest = (uint16_t*)(DestBuffer + x * bytes_per_pixel + y * DestStride);
-                Dest[0] = (uint32_t)(Mathf::Clamp01(A) * 65535.0f + 0.5f);
-                Dest[1] = (uint32_t)(Mathf::Clamp01(B) * 65535.0f + 0.5f);
-            }
-            else if (texture_format == TextureFormat::RGFloat)
-            {
-                float* Dest = (float*)(DestBuffer + x * bytes_per_pixel + y * DestStride);
-                Dest[0] = A;
-                Dest[1] = B;
-            }
-        }
-    }
-    
-    TextureImporter importer;
-    importer.setWrapMode(TextureWrapMode::Clamp);
-    importer.setFilterMode(FilterMode::Bilinear);
-    return importer.FromRawData((uint8_t*)DestBuffer, size, size, texture_format);
-}
-
-
 class TestPBR : public App
 {
 public:
@@ -162,11 +64,13 @@ public:
         const std::string skybox_dir = R"(D:\program\github\Cinder-Experiments\common\textures\)";
         const std::string concrete_texture_dir = R"(D:\program\FishEngine\Example\PBR\concrete_rebarconcrete_pbr\TGA\concrete_rebarconcrete_1k_TGA\)";
         //auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
+        auto pbr2 = Shader::CreateFromFile(R"(D:\program\FishEngine\Engine\Shaders\PBR2.surf)");
 #else
         //auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
         //const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
         //const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
+        auto pbr2 = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/PBR2.surf");
 #endif
         const std::string models_dir = root_dir + "models/";
         const std::string textures_dir = root_dir + "textures/";
@@ -175,9 +79,7 @@ public:
         auto envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross.dds");
         auto filtered_envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross_128_filtered.dds");
         RenderSettings::setAmbientCubemap(filtered_envmap);
-
-        auto PreintegratedGF = MakePreintegratedGF();
-        
+    
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
@@ -198,16 +100,10 @@ public:
 
 #if 1
 
-        auto pbr2 = Shader::CreateFromFile(R"(D:\program\FishEngine\Engine\Shaders\PBR2.surf)");
-
         auto group = Scene::CreateGameObject("Group");
 
-        for (int x = 0; x < 3; ++x)
+        for (int x = 0; x < 2; ++x)
         {
-#if FISHENGINE_PLATFORM_APPLE
-            if (x % 2 != 0)
-                continue;
-#endif
             for (int y = -5; y <= 5; y++)
             {
                 auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
@@ -230,11 +126,10 @@ public:
                     material = Material::builtinMaterial("PBR-Reference");
                 }
                 material->EnableKeyword(ShaderKeyword::AmbientIBL);
-                material->SetFloat("Metallic", 1.0f);
+                material->SetFloat("Metallic", 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-                material->SetTexture("PreIntegratedGF", PreintegratedGF);
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
@@ -275,7 +170,7 @@ class TestCSM : public App
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = R"(D:\program\FishEngine\Example\CascadedShadowMapping\)";
 #else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
+        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/Example/CascadedShadowMapping/";
 #endif
         ModelImporter importer;
         auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
@@ -773,8 +668,8 @@ public:
  
 int main()
 {
-    FishEditorWindow::AddApp(make_shared<TestPBR>());
-    //FishEditorWindow::AddApp(make_shared<TestCSM>());
+    //FishEditorWindow::AddApp(make_shared<TestPBR>());
+    FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

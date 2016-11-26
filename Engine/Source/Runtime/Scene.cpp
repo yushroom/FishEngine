@@ -270,8 +270,8 @@ namespace FishEngine
                 if (renderer == nullptr)
                     continue;
             }
-            bool isTransparent = renderer->material()->shader()->IsTransparent();
-            if (isTransparent)
+            if (renderer->material() != nullptr
+                && renderer->material()->shader()->IsTransparent())
             {
                 transparentQueue.push_back(go);
                 continue;
@@ -312,7 +312,7 @@ namespace FishEngine
         m_bounds = Bounds();
         for (auto& go : m_gameObjects)
         {
-            if (go->transform()->parent() == nullptr)
+            //if (go->transform()->parent() == nullptr)
             {
                 Bounds bound;
                 auto rend = go->GetComponent<MeshRenderer>();

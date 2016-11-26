@@ -86,7 +86,9 @@ namespace FishEngine
         {
             return (m_keywords & static_cast<ShaderKeywords>(keyword)) != 0;
         }
-
+        
+        void SetLocalKeywords(ShaderKeyword keyword, bool value);
+        
         void EnableLocalKeywords(ShaderKeywords keyword);
 
         void DisableLocalKeywords(ShaderKeywords keyword);

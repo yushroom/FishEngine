@@ -3,7 +3,8 @@ struct VS_OUT
 	vec2 uv;
 };
 
-#ifdef VERTEX_SHADER
+@vertex
+{
 	#include <CG.inc>
 
 	layout (location = PositionIndex) in vec3 position;
@@ -16,9 +17,10 @@ struct VS_OUT
 	    gl_Position = vec4(position.x, position.y, 0.f, 1.f);
 	    vs_out.uv = uv;
 	}
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	in VS_OUT vs_out;
 
 	out vec4 color;
@@ -29,4 +31,4 @@ struct VS_OUT
 	{
 	    color = texture(screenTexture, vs_out.uv);
 	}
-#endif
+}

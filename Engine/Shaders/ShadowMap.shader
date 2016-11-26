@@ -1,9 +1,8 @@
-#ifdef VERTEX_SHADER
+@vertex
+{
 	#include <ShaderVariables.inc>
 	layout (location = PositionIndex) 	in vec3 InputPositon;
-	layout (location = NormalIndex) 	in vec3 InputNormal;
-	layout (location = TangentIndex)    in vec3 InputTangent;
-	layout (location = UVIndex) 		in vec2 InputUV;
+
 	#ifdef _SKINNED
 		layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
 		layout (location = BoneWeightIndex) in vec4 boneWeight;
@@ -25,11 +24,12 @@
 
 		gl_Position = MATRIX_LIGHT_MVP * position;
 	}
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	void main()
 	{
 	    
 	}
-#endif
+}

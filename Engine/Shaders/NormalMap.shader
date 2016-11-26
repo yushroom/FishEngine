@@ -5,7 +5,8 @@ struct VS_OUT
     vec2 uv;
 };
 
-#ifdef VERTEX_SHADER
+@vertex
+{
 	#include "AppData.inc"
 	out VS_OUT vs_out;
 
@@ -16,10 +17,10 @@ struct VS_OUT
 	    vs_out.uv = appdata.uv;
 	    gl_Position = MATRIX_MVP * appdata.position;
 	}
+}
 
-#endif // VERTEX_SHADER
-
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	const vec3 lightDir = normalize(vec3(1, 1, 1));
 	const float bumpiness = 0.2;
 	uniform sampler2D diffuseMap;
@@ -44,4 +45,4 @@ struct VS_OUT
 	    //color.rgb = vec3(c,c,c);
 	    color.a = 1.0f;
 	}
-#endif // FRAGMENT_SHADER
+}

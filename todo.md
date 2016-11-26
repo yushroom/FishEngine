@@ -127,7 +127,7 @@
 ## 渲染
 
 - [x] PBR
-- [ ] Shadow: standard shadow map with PSF => CSM/VSM
+- [ ] Shadow: standard shadow map with PSF => CSM/VSM, Screen space shadow map
 - [x] expose更多的shader uniform给Editor
 - [ ] 渲染优化：渲染前按父子关系将transform更新完，渲染时按批次重组draw call batching
 - [x] uniform buffer
@@ -141,7 +141,7 @@
 - [ ] Terrain/height map
 - [ ] builtinMaterial每次都会make_shaderd新的
 - [ ] InternalUniform和普通的uniform区分开来，固定某些texture的binding point
-- [ ] ​
+- [ ] ​shader compiler中去掉boost::wave，依赖太多了，boost::thread,boost::system,boost::spirit...
 
 
 

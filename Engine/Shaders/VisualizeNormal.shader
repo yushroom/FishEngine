@@ -1,11 +1,6 @@
-#pragma GeometryShader On
-
-// struct VS_OUT {
-//     vec3 normal;
-// };
-
-#ifdef VERTEX_SHADER
-	#include "AppData.inc"
+@vertex
+{
+	#include <AppData.inc>
 
 	out VS_OUT {
 		vec3 normal;
@@ -17,9 +12,10 @@
 	    mat3 normalMatrix = mat3(MATRIX_IT_M);
 	    vs_out.normal = normalize(vec3(MATRIX_VP * vec4(normalMatrix*appdata.normal, 0.0)));
 	}
-#endif /* VERTEX_SHADER */
+}
 
-#ifdef GEOMETRY_SHADER
+@geometry
+{
 	layout (triangles) in;
 	layout (line_strip, max_vertices = 6) out;
 
@@ -43,12 +39,13 @@
 	    GenerateLine(1);
 	    GenerateLine(2);
 	}
-#endif /* GEOMETRY_SHADER */
+}
 
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	out vec4 color;
 	void main()
 	{
 	    color = vec4(1.0, 0.5, 1.0, 1.0);
 	}
-#endif
+}

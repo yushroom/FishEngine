@@ -1,10 +1,10 @@
+@Cull Off
+@ZWrite Off
+
 #include <UnitySupport.inc>
 
 #define _SUNDISK_HIGH_QUALITY
 #define UNITY_COLORSPACE_GAMMA
-
-#pragma Cull Off
-#pragma ZWrite Off
 
 //uniform int     _SunDisk                = 2;
 uniform float   _SunSize                = 0.04;

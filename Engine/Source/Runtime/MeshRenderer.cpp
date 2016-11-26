@@ -26,7 +26,7 @@ namespace FishEngine
     Bounds MeshRenderer::localBounds() const
     {
         auto mf = gameObject()->GetComponent<MeshFilter>();
-        if (mf == nullptr)
+        if (mf == nullptr || mf->mesh() == nullptr)
             return Bounds();
         return mf->mesh()->bounds();
     }

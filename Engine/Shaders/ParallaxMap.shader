@@ -13,8 +13,8 @@ struct VS_OUT
     vec2 uv;
 };
 
-#ifdef VERTEX_SHADER
-
+@vertex
+{
     #include "AppData.inc"
     #include "CG.inc"
 
@@ -35,10 +35,10 @@ struct VS_OUT
         vs_out.viewDirInTangent  = normalize(TBN * WorldSpaceViewDir(vs_out.positionInWorld)); 
         gl_Position = MATRIX_MVP * appdata.position;
     }
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
-
+@fragment
+{
     in  VS_OUT vs_out;
     out vec4 fragColor;
 
@@ -109,5 +109,4 @@ struct VS_OUT
         NDotL = clamp(NDotL, 0.0, 1.0);
         fragColor = vec4( diffuse * NDotL, 1.0);
     }
-
-#endif
+}

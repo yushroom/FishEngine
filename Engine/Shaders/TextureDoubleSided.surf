@@ -1,4 +1,4 @@
-#pragma Cull Off
+@Cull Off
 uniform sampler2D _MainTex;
 
 vec4 ps_main(SurfaceData surfaceData)

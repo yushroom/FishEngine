@@ -1,11 +1,12 @@
-#pragma Cull Front
+@Cull Front
 
 struct VS_OUT
 {
 	vec2 uv;
 };
 
-#ifdef VERTEX_SHADER
+@vertex
+{
 	#include "AppData.inc"
 
 	uniform float _EdgeThickness = 0.5;
@@ -24,10 +25,10 @@ struct VS_OUT
 		gl_Position = projSpacePos + scaledNormal;
 	    vs_out.uv = appdata.uv;
 	}
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
-
+@fragment
+{
 	#include "CGSupport.inc"
 
 	in VS_OUT vs_out;
@@ -53,4 +54,4 @@ struct VS_OUT
 		
 		color = float4( BRIGHTNESS_FACTOR * newMapColor.rgb * diffuseMapColor.rgb, diffuseMapColor.a ) * _Color * LightColor0; 
 	}
-#endif
+}

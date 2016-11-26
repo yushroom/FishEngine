@@ -9,7 +9,8 @@ struct V2F
 	vec3 color;
 };
 
-#ifdef VERTEX_SHADER
+@vertex
+{
 	layout(location = 0)	in vec3 InputPositon;
 	layout(location = 1)	in vec3 InputNormal;
 
@@ -22,9 +23,10 @@ struct V2F
 	    float NoL = clamp(-N_view.z, 0, 1);
 	    v2f.color = _Color * NoL;
 	}
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	in V2F v2f;
 	out vec4 fragColor;
 
@@ -32,4 +34,4 @@ struct V2F
 	{
 		fragColor = vec4(v2f.color, 1);
 	}
-#endif
+}

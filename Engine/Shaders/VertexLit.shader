@@ -3,7 +3,8 @@ struct VS_OUT
 	vec3 color;
 };
 
-#ifdef VERTEX_SHADER
+@vertex
+{
 	#include "AppData.inc"
 
 	uniform vec3 _Color = vec3(1, 1, 1);
@@ -19,9 +20,10 @@ struct VS_OUT
 	    c = clamp(c, 0, 1);
 	    vs_out.color = _Color * c;
 	}
-#endif
+}
 
-#ifdef FRAGMENT_SHADER
+@fragment
+{
 	in VS_OUT vs_out;
 
 	out vec4 color;
@@ -30,4 +32,4 @@ struct VS_OUT
 	{
 	    color = vec4(vs_out.color, 1);
 	}
-#endif
+}

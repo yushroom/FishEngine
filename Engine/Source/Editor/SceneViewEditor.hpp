@@ -19,13 +19,20 @@ namespace FishEditor
         Global,
         Local,
     };
+    
+    enum class ShadingMode
+    {
+        Shaded,
+        Wireframe,
+        ShadedWireframe,
+    };
 
     class SceneViewEditor
     {
     public:
-        FishEngine::Vector2 m_position;
-        FishEngine::Int2 m_size{128, 128};
-        FishEngine::RenderTexturePtr m_sceneViewRenderTexture;
+        FishEngine::Vector2             m_position;
+        FishEngine::Int2                m_size{128, 128};
+        FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
 
         void Init();
 
@@ -51,6 +58,16 @@ namespace FishEditor
         {
             return m_isMouseHovered;
         }
+        
+        bool highlightSelections() const
+        {
+            return m_highlightSelections;
+        }
+        
+        void setHighlightSelections(bool value)
+        {
+            m_highlightSelections = value;
+        }
 
     private:
         friend class EditorGUI;
@@ -58,23 +75,27 @@ namespace FishEditor
         FishEngine::CameraPtr m_camera;
         FishEngine::GameObjectPtr m_cameraGameObject;
 
-        bool m_isWireFrameMode;
-        bool m_useGammaCorrection;
-        bool m_showShadowMap;
-        bool m_highlightSelections;
+        bool        m_isWireFrameMode;
+        bool        m_useGammaCorrection;
+        bool        m_showShadowMap;
+        bool        m_highlightSelections   = false;
 
-        bool m_mouseEventHandled;
+        bool        m_mouseEventHandled;
+        
+        ShadingMode m_shadingMode           = ShadingMode::Shaded;
+        bool        m_showGizmos            = true;
+        
 
         // this scene view is focused, so it may receive keyboard event.
-        bool m_focused  = false;
+        bool        m_focused               = false;
 
         // mouse position is inside of this scene view, so it may receive mouse event.
-        bool m_isMouseHovered = false;
+        bool        m_isMouseHovered        = false;
 
         TransformToolType m_transformToolType = TransformToolType::Translate;
-        TransformSpace m_transformSpace = TransformSpace::Global;
+        TransformSpace m_transformSpace     = TransformSpace::Global;
 
-        int m_selectedAxis = -1; // temp
+        int         m_selectedAxis          = -1; // temp
         std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
         void DrawTranslateGizmo();
         void DrawRotateGizmo();

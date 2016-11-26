@@ -31,6 +31,7 @@ namespace FishEngine
         if (material->IsKeywordEnabled(ShaderKeyword::AmbientIBL))
         {
             material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
+            material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
         }
 
         auto shader = material->shader();

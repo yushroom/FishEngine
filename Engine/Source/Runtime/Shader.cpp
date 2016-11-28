@@ -10,57 +10,15 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/wave.hpp>
-#include <boost/wave/cpplexer/cpp_lex_token.hpp>
-#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
-#include <boost/wave/preprocessing_hooks.hpp>
-#include <boost/wave/grammars/cpp_grammar.hpp>
-#include <boost/wave/grammars/cpp_defined_grammar.hpp>
 
 #include "Texture.hpp"
 #include "Common.hpp"
 #include "Debug.hpp"
 #include "Pipeline.hpp"
-#include "Resources.hpp"
+#include "ShaderCompiler.hpp"
 
 using namespace std;
 using namespace FishEngine;
-
-typedef boost::wave::cpplexer::lex_iterator<
-        boost::wave::cpplexer::lex_token<> >
-    lex_iterator_type;
-typedef boost::wave::context<
-        std::string::iterator,
-        lex_iterator_type>
-    context_type;
-
-
-std::string ReadFile(const Path& path)
-{
-    std::ifstream fin(path.string());
-    if (!fin.is_open()) {
-        FishEngine::Debug::LogError("Can not open shader file: %s", path.string().c_str());
-        throw exception();
-    }
-    return std::string(
-        std::istreambuf_iterator<char>(fin.rdbuf()),
-        std::istreambuf_iterator<char>());
-}
-
-std::map<std::string, std::string> pathToShaderString;
-
-std::string GetHeader(const Path& path)
-{
-    auto path_str = path.string();
-    auto it = pathToShaderString.find(path_str);
-    if (it != pathToShaderString.end())
-    {
-        return it->second;
-    }
-    auto str = ReadFile(path_str);
-    pathToShaderString[path_str] = str;
-    return str;
-}
 
 GLuint
 CompileShader(
@@ -172,263 +130,6 @@ const char* GLenumToString(GLenum e)
 
 namespace FishEngine
 {
-    //enum class ShaderFileType
-    //{
-    //    Surface,
-    //    Combined,
-    //};
-
-    enum class ShaderType
-    {
-        VertexShader,
-        FragmentShader,
-        GeometryShader,
-    };
-    
-    enum class ShaderCompilerError
-    {
-        EarlyEOF,
-        Grammar,
-    };
-    
-    class ShaderCompiler
-    {
-    public:
-        ShaderCompiler() = delete;
-        
-        static void Preprocess(const Path& path,
-                               std::string& out_parsedShaderText,
-                               std::map<std::string, std::string>& out_settings,
-                               bool& out_hasGeometryShader)
-        {
-            std::string& shaderText = ReadFile(path);
-            if (path.extension() == ".surf")
-            {
-                shaderText = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n" +
-                    shaderText + "\n#endif\n";
-            }
-
-            PreprocessImpl(shaderText,
-                out_parsedShaderText,
-                out_settings,
-                out_hasGeometryShader,
-                path.parent_path());
-            //cout << out_parsedShaderText << endl;
-        }
-
-    private:
-
-        static void PreprocessImpl(
-            const std::string& shaderText,
-            std::string& out_parsedShaderText,
-            std::map<std::string, std::string>& out_settings,
-            bool& out_hasGeometryShader,
-            const Path& localDir)
-        {
-            std::string parsed;
-            parsed.reserve(shaderText.size());
-
-            size_t begin = 0;
-            size_t end = shaderText.size();
-
-            while (begin < end)
-            {
-                size_t begin_of_this_tok = begin;
-                string tok = nextTok(shaderText, begin);
-                if (tok == "//")
-                {
-                    readToNewline(shaderText, begin);
-                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin - begin_of_this_tok);
-                }
-                else if (tok == "/*")
-                {
-                    bool found_end_of_comment = false;
-                    size_t i = begin;
-                    for (; i < shaderText.size() - 1; ++i)
-                    {
-                        if (shaderText[i] == '*' && shaderText[i + 1] == '/')
-                        {
-                            found_end_of_comment = true;
-                            break;
-                        }
-                    }
-                    assert(found_end_of_comment);
-                    begin = i + 2;
-                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin - begin_of_this_tok);
-                }
-                else if (tok == "#include")
-                {
-                    ignoreSpace(shaderText, begin);
-                    auto tok = nextTok(shaderText, begin);
-                    bool is_system_include = tok[0] == '<';
-                    auto header = tok.substr(1, tok.size() - 2);
-                    cout << "include " << header << " " << is_system_include << endl;
-                    Path header_path = is_system_include ? 
-                        (Resources::shaderHeaderDirectory() / header) : (localDir / header);
-                    //string header_text = GetHeader(header_path);
-                    string parsed_header_text;
-                    ShaderCompiler::Preprocess(header_path, parsed_header_text, out_settings, out_hasGeometryShader);
-                    //out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
-                    out_parsedShaderText += parsed_header_text + "\n";
-                }
-                else if (tok == "uniform")
-                {
-                    ignoreSpace(shaderText, begin);
-                    auto type = nextTok(shaderText, begin);
-                    ignoreSpace(shaderText, begin);
-                    auto name = nextTok(shaderText, begin);
-                    //cout << "uniform " << type << " " << name << endl;
-                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin - begin_of_this_tok);
-                }
-                else if (tok.size() > 0 && tok[0] == '@')
-                {
-                    if (tok == "@vertex")
-                    {
-                        out_parsedShaderText += parseSubShader(shaderText, begin, "VERTEX_SHADER", out_settings, localDir);
-                    }
-                    else if (tok == "@geometry")
-                    {
-                        out_parsedShaderText += parseSubShader(shaderText, begin, "GEOMETRY_SHADER", out_settings, localDir);
-                    }
-                    else if (tok == "@fragment")
-                    {
-                        out_parsedShaderText += parseSubShader(shaderText, begin, "FRAGMENT_SHADER", out_settings, localDir);
-                    }
-                    else    // keyword
-                    {
-                        auto name = tok.substr(1);
-                        ignoreSpace(shaderText, begin);
-                        auto setting = nextTok(shaderText, begin);
-                        readToNewline(shaderText, begin);
-                        cout << "Keyword " << name << " " << setting << endl;
-                        // do NOT override settings;
-                        auto it = out_settings.find(name);
-                        if (it == out_settings.end())
-                            out_settings[name] = setting;
-                    }
-                }
-                else
-                {
-                    out_parsedShaderText += tok;
-                }
-            }
-        }
-
-        static std::string parseSubShader(
-            const std::string& shaderText,
-            size_t& begin,
-            const std::string& str,
-            std::map<std::string,
-            std::string>& out_settings,
-            const Path& localDir)
-        {
-            std::string out_parsedShaderText;
-            ignoreSpace(shaderText, begin);
-            expect(shaderText, begin, "{");
-            //cout << "vertex begin"  << endl;
-            out_parsedShaderText += "#ifdef " + str;
-            size_t right = findPair(shaderText, begin);
-            string parsed_vertex;
-            bool ignore;
-            //std::cout << shaderText.substr(begin, right - begin) << std::endl;
-            ShaderCompiler::PreprocessImpl(shaderText.substr(begin, right - begin), parsed_vertex, out_settings, ignore, localDir);
-            out_parsedShaderText += parsed_vertex;
-            out_parsedShaderText += "#endif /*" + str + "*/\n";
-            begin = right + 1;
-            return out_parsedShaderText;
-        }
-
-        static std::string nextTok(const std::string &shaderText, size_t& pos)
-        {
-            size_t start = pos;
-            size_t end = shaderText.size();
-            
-            string test = shaderText.substr(start, 2);
-            if (test == "//" || test == "/*" || test == "*/")
-            {
-                return test;
-            }
-
-            test = shaderText.substr(start, 8);
-            if (test == "#include")
-            {
-                pos += 8;
-                return test;
-            }
-            bool first_is_space = std::isspace(shaderText[start]);
-            while (pos < end)
-            {
-                char c = shaderText[pos];
-                bool is_space = std::isspace(c);
-                if ((first_is_space && !is_space) ||
-                    (!first_is_space && is_space))
-                    break;
-                pos++;
-            }
-            if (start == pos)
-                pos ++;
-            return shaderText.substr(start, pos-start);
-        };
-        
-        static void readToNewline(const std::string& shaderText, size_t& pos)
-        {
-            for (; pos < shaderText.size(); pos++)
-            {
-                if (shaderText[pos] == '\n')
-                    return;
-            }
-        }
-        
-//        static void readUntil(const std::string& shaderText, size_t& pos, const string& target)
-//        {
-//            size_t end = shaderText.size();
-//            while (pos < end)
-//            {
-//                if (nextTok(shaderText, pos) == target)
-//                    break;
-//            }
-//        };
-        
-        static void ignoreSpace(const std::string& text, size_t& pos)
-        {
-            if (std::isspace(text[pos]))
-                nextTok(text, pos);
-        }
-        
-        static bool expect(const std::string& text, size_t& pos, const std::string& target)
-        {
-            for (int i = 0; i < target.size(); ++i)
-            {
-                if (text[pos+i] != target[i])
-                    return false;
-            }
-            pos += target.size();
-            return true;
-        }
-        
-        static size_t findPair(const std::string& text, const size_t pos)
-        {
-            int left_count = 1;
-            int i = pos;
-            for (i = pos; i < text.size(); ++i)
-            {
-                if (text[i] == '{')
-                {
-                    left_count++;
-                }
-                else if (text[i] == '}')
-                {
-                    left_count--;
-                    if (left_count == 0)
-                    {
-                        return i;
-                    }
-                }
-            }
-            return i;
-        }
-    };
-
     class ShaderImpl
     {
     public:
@@ -488,10 +189,6 @@ namespace FishEngine
         }
 
         bool m_hasGeometryShader = false;
-        std::string m_vertexShaderText;
-        std::string m_fragmentShaderText;
-        std::string m_geometryShaderText;
-        //std::map<std::string, std::string>  m_settings;
 
     private:
         //std::string                         m_filePath;
@@ -502,126 +199,46 @@ namespace FishEngine
 
         GLuint Compile(ShaderType type, ShaderKeywords keywords)
         {
-            std::string text = Preprocess(type, keywords);
-            GLenum t = GL_VERTEX_SHADER;
-            if (type == ShaderType::FragmentShader)
+            std::string text = "#version 410 core\n";
+
+            auto add_macro_definition = [&text](const string& d)
             {
+                text += "#define " + d + "\n";
+            };
+
+            GLenum t = GL_VERTEX_SHADER;
+
+            if (type == ShaderType::VertexShader)
+            {
+                add_macro_definition("VERTEX_SHADER");
+            }
+            else if (type == ShaderType::FragmentShader)
+            {
+                add_macro_definition("FRAGMENT_SHADER");
                 t = GL_FRAGMENT_SHADER;
-                m_fragmentShaderText = text;
             }
             else if (type == ShaderType::GeometryShader)
             {
                 t = GL_GEOMETRY_SHADER;
-                m_geometryShaderText = text;
-            }
-            else {
-                m_vertexShaderText = text;
-            }
-            return CompileShader(t, "#version 410 core\n" + text);
-        }
-
-        std::string Preprocess(ShaderType type, ShaderKeywords keywords)
-        {
-            const auto& include_dir = Resources::shaderHeaderDirectory();
-            //auto text = DecorateShaderText(type, m_shaderTextRaw);
-            auto& text = m_shaderTextRaw;
-            context_type ctx(text.begin(), text.end());
-#if FISHENGINE_PLATFORM_APPLE
-            ctx.set_language(boost::wave::language_support::support_option_emit_pragma_directives);
-#endif
-            //ctx.add_sysinclude_path(include_dir.string().c_str());
-
-            if (type == ShaderType::VertexShader)
-            {
-                ctx.add_macro_definition("VERTEX_SHADER");
-            }
-            else if (type == ShaderType::FragmentShader)
-            {
-                ctx.add_macro_definition("FRAGMENT_SHADER");
-            }
-            else if (type == ShaderType::GeometryShader)
-            {
-                ctx.add_macro_definition("GEOMETRY_SHADER");
+                add_macro_definition("GEOMETRY_SHADER");
             }
 
             if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::Shadow))
             {
-                ctx.add_macro_definition("_SHADOW");
+                add_macro_definition("_SHADOW");
             }
             if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::SkinnedAnimation))
             {
-                ctx.add_macro_definition("_SKINNED");
+                add_macro_definition("_SKINNED");
             }
             if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::AmbientIBL))
             {
-                ctx.add_macro_definition("_AMBIENT_IBL");
+                add_macro_definition("_AMBIENT_IBL");
             }
 
-            auto first = ctx.begin();
-            auto last = ctx.end();
-            std::string parsed_text;
+            text += m_shaderTextRaw;
 
-            parsed_text.reserve(text.size());
-
-            int intent_level = 0;
-            string last_tok = "";
-            bool next_tok_is_uniform_var_type = false;
-            bool next_tok_is_uniform_var_name = false;
-
-            while (first != last)
-            {
-                //std::cout << first->get_value();
-                string tok = first->get_value().c_str();
-
-                auto id = boost::wave::token_id(*first);
-                if (id == boost::wave::T_SPACE)
-                {
-                    goto SKIP;
-                }
-
-                if (tok == "}")
-                {
-                    intent_level--;
-                }
-                if (last_tok == "\n" && tok != "#line")
-                {
-                    assert(intent_level >= 0);
-                    for (int i = 0; i < intent_level; ++i)
-                    {
-                        parsed_text += "\t";
-                    }
-                }
-                if (tok == "{")
-                {
-                    intent_level++;
-                }
-                if (tok == "InternalUniform")
-                {
-                    tok = "uniform";
-                }
-                else if (tok == "uniform")
-                {
-                    next_tok_is_uniform_var_type = true;
-                }
-                else if (next_tok_is_uniform_var_type)
-                {
-                    //cout << tok << " ";
-                    next_tok_is_uniform_var_name = true;
-                    next_tok_is_uniform_var_type = false;
-                }
-                else if (next_tok_is_uniform_var_name)
-                {
-                    //cout << tok << endl;
-                    next_tok_is_uniform_var_name = false;
-                }
-
-            SKIP:
-                parsed_text += tok;
-                last_tok = tok;
-                ++first;
-            }
-
-            return parsed_text;
+            return CompileShader(t, text);
         }
 
         void GetAllUniforms(GLuint program) noexcept
@@ -705,9 +322,10 @@ namespace FishEngine
     {
         try
         {
-            std::string parsed_shader_text;
-            std::map<std::string, std::string> settings;
-            ShaderCompiler::Preprocess(path, parsed_shader_text, settings, m_impl->m_hasGeometryShader);
+            ShaderCompiler compiler(path);
+            std::string parsed_shader_text = compiler.Preprocess();
+            std::map<std::string, std::string> settings = compiler.m_settings;
+            m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
             m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "Cull", "Back"));
             m_ZWrite = getValueOrDefault<string, string>(settings, "ZWrite", "On") == "On";
             m_blend = getValueOrDefault<string, string>(settings, "Blend", "Off") == "On";
@@ -728,17 +346,6 @@ namespace FishEngine
             m_impl->set(parsed_shader_text);
             m_impl->CompileAndLink(m_keywords);
             m_program = m_impl->glslProgram(m_keywords, m_uniforms);
-
-        }
-        catch (const boost::wave::preprocess_exception& e)
-        {
-            Debug::LogError("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
-            return false;
-        }
-        catch (const boost::wave::cpplexer::lexing_exception& e)
-        {
-            Debug::LogError("%s(%lu) : %s\n", e.file_name(), e.line_no(), e.description());
-            return false;
         }
         catch (const std::exception& e)
         {

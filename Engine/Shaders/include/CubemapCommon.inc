@@ -1,7 +1,7 @@
 #ifndef CubemapCommon_inc
 #define CubemapCommon_inc
 
-InternalUniform samplerCube AmbientCubemap;
+uniform samplerCube AmbientCubemap;
 
 const uint GDiffuseConvolveMipLevel = 4;
 

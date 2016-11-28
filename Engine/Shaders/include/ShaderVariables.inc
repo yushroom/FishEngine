@@ -45,7 +45,7 @@
 // };
 
 
-layout(std140, row_major) InternalUniform PerDraw
+layout(std140, row_major) uniform PerDraw
 {
 	mat4 MATRIX_MVP;
 	mat4 MATRIX_MV;
@@ -54,7 +54,7 @@ layout(std140, row_major) InternalUniform PerDraw
 	mat4 MATRIX_IT_M;   // new
 };
 
-layout(std140, row_major) InternalUniform PerFrame
+layout(std140, row_major) uniform PerFrame
 {
 	mat4 MATRIX_P;
 	mat4 MATRIX_V;
@@ -77,7 +77,7 @@ layout(std140, row_major) InternalUniform PerFrame
 
 
 #define MAX_BONE_SIZE 128
-layout(std140, row_major) InternalUniform Bones
+layout(std140, row_major) uniform Bones
 {
     mat4 BoneTransformations[MAX_BONE_SIZE];
 };
@@ -92,10 +92,10 @@ layout(std140, row_major) InternalUniform Bones
 //uniform vec4 WorldSpaceLightPos0;	//Directional lights: (world space direction, 0). Other lights: (world space position, 1).
 
 //	 Deffered shading/lighting
-InternalUniform vec4 LightColor;
+uniform vec4 LightColor;
 //uniform mat4 LightMatrix0; // World-to-light matrix. Used to sample cookie & attenuation textures.
 
 //	 Vertex-lit rendering
-InternalUniform vec3 unity_LightPosition; // view space light position
+uniform vec3 unity_LightPosition; // view space light position
 
 #endif // ShaderVariables_inc

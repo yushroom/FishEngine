@@ -1,8 +1,8 @@
 import os
 import sys
 
-#compiler = r'..\Binary\RelWithDebInfo\ShaderCompiler'
-compiler = r'../Binary/Debug/ShaderCompiler'
+compiler = r'..\Binary\RelWithDebInfo\ShaderCompiler'
+#compiler = r'../Binary/Debug/ShaderCompiler'
 shader_dirs = ['.', './Editor']
 count = 0;
 

@@ -26,11 +26,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.59 REQUIRED
     COMPONENTS
     system
-    filesystem
-    wave
-    thread
-    date_time
-    chrono)
+    filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 
 #message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})

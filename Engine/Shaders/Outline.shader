@@ -7,7 +7,7 @@ struct VS_OUT
 
 @vertex
 {
-	#include "AppData.inc"
+	#include <AppData.inc>
 
 	uniform float _EdgeThickness = 0.5;
 	// Outline thickness multiplier
@@ -29,7 +29,7 @@ struct VS_OUT
 
 @fragment
 {
-	#include "CGSupport.inc"
+	#include <CGSupport.inc>
 
 	in VS_OUT vs_out;
 

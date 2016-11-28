@@ -1,4 +1,4 @@
-#include "TestScript.hpp"
+//#include "TestScript.hpp"
 #include "TextureImporter.hpp"
 
 #include <iostream>
@@ -175,7 +175,11 @@ public:
     virtual void Init() override
     {
         DefaultScene();
+#if FISHENGINE_PLATFORM_WINDOWS
+        string sponza_root = R"(D:\program\FishEngine\Example\Sponza\crytek-sponza\)";
+#else
         string sponza_root = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza/crytek-sponza/";
+#endif
         ModelImporter importer;
         importer.setFileScale(0.01f);
         auto sponza_model = importer.LoadFromFile(sponza_root + "sponza.obj");
@@ -187,7 +191,7 @@ public:
     }
 };
 
-#if 1
+#if 0
 
 class TestCSM : public App
 {
@@ -643,7 +647,7 @@ public:
         auto quadGO = GameObject::CreatePrimitive(PrimitiveType::Quad);
         quadGO->transform()->setLocalScale(4);
         quadGO->transform()->setLocalPosition(0, 1, 0);
-        auto shader = Shader::CreateFromFile(Resources::shaderRootDirectory() + "ParallaxMap.vsfs");
+        auto shader = Shader::CreateFromFile(Resources::shaderRootDirectory() / "ParallaxMap.vsfs");
         auto material = Material::CreateMaterial();
         material->SetShader(shader);
         auto current_path = boost::filesystem::current_path();

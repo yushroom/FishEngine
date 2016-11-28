@@ -5,7 +5,7 @@ struct VS_OUT
 
 @vertex
 {
-	#include "AppData.inc"
+	#include <AppData.inc>
 
 	uniform vec3 _Color = vec3(1, 1, 1);
 

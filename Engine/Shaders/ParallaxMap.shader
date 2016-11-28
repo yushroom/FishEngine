@@ -15,8 +15,8 @@ struct VS_OUT
 
 @vertex
 {
-    #include "AppData.inc"
-    #include "CG.inc"
+    #include <AppData.inc>
+    #include <CG.inc>
 
     out VS_OUT vs_out;
 

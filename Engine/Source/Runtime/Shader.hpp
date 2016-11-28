@@ -8,7 +8,7 @@
 #include "Matrix4x4.hpp"
 #include "Common.hpp"
 #include "ShaderProperty.hpp"
-
+#include "Resources.hpp"
 
 namespace FishEngine
 {
@@ -26,7 +26,7 @@ namespace FishEngine
 
         static void Init();
         
-        static ShaderPtr CreateFromFile(const std::string& path);
+        static ShaderPtr CreateFromFile(const Path& path);
 
 
         void Use() const;
@@ -100,7 +100,7 @@ namespace FishEngine
         std::unique_ptr<ShaderImpl> m_impl;
 
         //void GetAllUniforms();
-        bool FromFile(const std::string& path);
+        bool FromFile(const Path& path);
 
         // cache
         unsigned int m_program = 0;

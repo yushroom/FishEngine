@@ -4,6 +4,7 @@
 #include "FishEngine.hpp"
 #include "AssetImporter.hpp"
 #include "Texture.hpp"
+#include "Resources.hpp"
 
 namespace FishEngine
 {
@@ -27,7 +28,7 @@ namespace FishEngine
     class FE_EXPORT TextureImporter : public AssetImporter
     {
     public:
-        TexturePtr FromFile(const std::string& path);
+        TexturePtr FromFile(const Path& path);
 
         TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);
         

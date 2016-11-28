@@ -9,6 +9,7 @@ int main(int argc, char* argv[])
 {
     //Debug::Init();
     Debug::setColorMode(false);
+    Resources::Init();
     Debug::Log("Compiling...");
     glfwInit();
     // Set all the required options for GLFW
@@ -30,15 +31,18 @@ int main(int argc, char* argv[])
     // Initialize GLEW to setup the OpenGL Function pointers
     glewInit();
 
-    std::string path = R"(D:\program\FishEngine\Engine\Shaders\SkinnedPass.surf)";
+    std::string path = R"(D:\program\FishEngine\Engine\Shaders\SkyBox-Cubed.shader)";
     if (argc == 2)
+    {
         path = argv[1];
+    }
     else
     {
-        Debug::LogError("invalid command");
+        Debug::LogError("invalid command.");
+#ifndef _DEBUG
         return 1;
+#endif
     }
-        
 
     auto shader = Shader::CreateFromFile(path);
     if (shader == nullptr)

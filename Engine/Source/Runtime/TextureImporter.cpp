@@ -183,10 +183,10 @@ namespace FishEngine
         return TextureName;
     }
     
-    GLuint CreateTexture(const std::string& path)
+    GLuint CreateTexture(const Path& path)
     {
         int width, height, n;
-        unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 4);
+        unsigned char *data = stbi_load(path.string().c_str(), &width, &height, &n, 4);
         if (data == nullptr)
         {
             Debug::LogError("Texture not found, path: %s", path.c_str());
@@ -209,31 +209,31 @@ namespace FishEngine
         return t;
     }
 
-    TexturePtr TextureImporter::FromFile(const std::string& path)
+    TexturePtr TextureImporter::FromFile(const Path& path)
     {
         auto t = std::make_shared<Texture>();
         GLuint texture;
-        auto ext = getExtensionWithoutDot(path);
+        auto ext = path.extension();
         if (ext == "dds")
         {
             TextureDimension format;
-            texture = CreateTextureFromDDS(path.c_str(), &format);
+            texture = CreateTextureFromDDS(path.string().c_str(), &format);
             t->m_dimension = format;
  
         }
-        else if (ext == "bmp" || ext == "png" || ext == "jpg" || ext == "tga" || ext == "hdr")
+        else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
         {
             texture = CreateTexture(path);
             t->m_dimension = TextureDimension::Tex2D;
         }
         else
         {
-            Debug::LogError("texture type[%s] not supported\n", ext.c_str());
+            Debug::LogError("texture type[%s] not supported\n", ext.string().c_str());
             abort();
         }
 
         t->m_texture = texture;
-        auto name = getFileNameWithoutExtension(path);
+        auto name = path.stem().string();
         t->setName(name);
         Texture::m_textures.push_back(t);
         return t;

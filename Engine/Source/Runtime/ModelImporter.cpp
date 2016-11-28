@@ -318,9 +318,9 @@ namespace FishEngine {
 
     ModelPtr ModelImporter::
     LoadFromFile(
-        const std::string&  path)
+        const Path&  path)
     {
-        auto fileExtention = getExtensionWithoutDot(path);
+        auto fileExtention = path.extension();
         Assimp::Importer importer;
         unsigned int load_option = aiProcess_Triangulate;
         load_option |= aiProcess_LimitBoneWeights;
@@ -343,7 +343,7 @@ namespace FishEngine {
         //load_option |= aiProcess_OptimizeGraph;
         //load_option |= aiProcess_FlipUVs;
         
-        if (fileExtention == "obj")
+        if (fileExtention == ".obj")
         {
             load_option |= aiProcess_OptimizeGraph;
         }
@@ -368,7 +368,7 @@ namespace FishEngine {
             load_option |= aiProcess_CalcTangentSpace;
         }
         
-        const aiScene* scene = importer.ReadFile(path.c_str(), load_option);
+        const aiScene* scene = importer.ReadFile(path.string().c_str(), load_option);
         if (!scene)
         {
             Debug::LogError(importer.GetErrorString());
@@ -379,8 +379,8 @@ namespace FishEngine {
         bool load_uv = (m_vertexUsages & (int)VertexUsage::UV) != 0;
         
         m_model = std::make_shared<Model>();
-        m_model->m_name = split(path, "/").back();
-        bool isFBX = fileExtention == "fbx";
+        m_model->m_name = path.stem().string();
+        bool isFBX = fileExtention == ".fbx";
         
         bool loadAnimation = scene->HasAnimations();
         if (loadAnimation)
@@ -426,7 +426,6 @@ namespace FishEngine {
             m_model->m_materials.push_back(material);
         }
         
-        m_model->setName(getFileNameWithoutExtension(path));
         return m_model;
     }
 

@@ -1,7 +1,7 @@
 @vertex
 {
 	#define USE_DEFAULT_VS
-	#include "AppData.inc"
+	#include <AppData.inc>
 }
 
 @fragment

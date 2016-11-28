@@ -4,20 +4,20 @@
 
 namespace FishEngine
 {
-    std::vector<std::string> split(const std::string& str, const std::string& separator) {
-        auto l = separator.length();
-        auto pos = str.find_first_of(separator);
-        decltype(pos) last_pos = 0;
-        std::vector<std::string> ret;
-        while (pos != std::string::npos) {
-            ret.push_back(str.substr(last_pos, pos - last_pos));
-            pos += l;
-            last_pos = pos;
-            pos = str.find_first_of(separator, pos);
-        }
-        ret.push_back(str.substr(last_pos, pos));
-        return ret;
-    }
+    //std::vector<std::string> split(const std::string& str, const std::string& separator) {
+    //    auto l = separator.length();
+    //    auto pos = str.find_first_of(separator);
+    //    decltype(pos) last_pos = 0;
+    //    std::vector<std::string> ret;
+    //    while (pos != std::string::npos) {
+    //        ret.push_back(str.substr(last_pos, pos - last_pos));
+    //        pos += l;
+    //        last_pos = pos;
+    //        pos = str.find_first_of(separator, pos);
+    //    }
+    //    ret.push_back(str.substr(last_pos, pos));
+    //    return ret;
+    //}
 
     std::string camelCaseToReadable(const std::string& str)
     {
@@ -46,16 +46,16 @@ namespace FishEngine
     //    return str.substr(0, str2.size()) == str2;
     //}
 
-    std::string getFileNameWithoutExtension(const std::string& path)
-    {
-        boost::filesystem::path p(path);
-        return p.stem().string();
-    }
+    //std::string getFileNameWithoutExtension(const std::string& path)
+    //{
+    //    boost::filesystem::path p(path);
+    //    return p.stem().string();
+    //}
 
-    std::string getExtensionWithoutDot(const std::string& path)
-    {
-        boost::filesystem::path p(path);
-        return boost::to_lower_copy(p.extension().string().substr(1));
-    }
+    //std::string getExtensionWithoutDot(const std::string& path)
+    //{
+    //    boost::filesystem::path p(path);
+    //    return boost::to_lower_copy(p.extension().string().substr(1));
+    //}
 
 }

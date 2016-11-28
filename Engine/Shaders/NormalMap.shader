@@ -7,7 +7,7 @@ struct VS_OUT
 
 @vertex
 {
-	#include "AppData.inc"
+	#include <AppData.inc>
 	out VS_OUT vs_out;
 
 	void vs_main(AppData appdata)

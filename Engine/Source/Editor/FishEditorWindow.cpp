@@ -21,6 +21,7 @@
 #include "EditorTime.hpp"
 #include "Selection.hpp"
 #include "EditorInput.hpp"
+#include "Resources.hpp"
 
 const uint32_t WIDTH = 1280, HEIGHT = 960;
 
@@ -91,8 +92,9 @@ namespace FishEditor
     {
         Debug::Init();
  #if FISHENGINE_PLATFORM_APPLE
-         Debug::setColorMode(false);
+        Debug::setColorMode(false);
  #endif
+        Resources::Init();
         EditorInput::Init();
 
         Debug::Log("Starting GLFW context, OpenGL 4.1");

@@ -116,7 +116,7 @@ namespace FishEngine {
         
         ModelPtr
         LoadFromFile(
-            const std::string& path);
+            const Path& path);
 
         void
         setImportNormals(

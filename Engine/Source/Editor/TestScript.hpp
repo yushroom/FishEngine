@@ -311,7 +311,7 @@ public:
         {
             std::stringstream ss;
             {
-                cereal::JSONOutputArchive oa(ss);
+                cereal::XMLOutputArchive oa(ss);
                 oa << *gameObject();
             }
             auto xml = ss.str();
@@ -407,7 +407,7 @@ void test()
         std::stringstream ss;
         Vector3 v(1, 2, 3);
         {
-            cereal::JSONOutputArchive json_out(ss);
+            cereal::XMLOutputArchive json_out(ss);
             json_out << cereal::make_nvp("v", v);
         }
         cout << ss.str();
@@ -420,13 +420,13 @@ void test()
         t.setLocalScale(1.1f, 2.2f, 3.3f);
         t.setName("test transform");
         {
-            cereal::JSONOutputArchive json_out(ss);
+            cereal::XMLOutputArchive json_out(ss);
             json_out << cereal::make_nvp("t", t);
         }
         cout << ss.str();
         {
             Transform t2;
-            cereal::JSONInputArchive json_in(ss);
+            cereal::XMLInputArchive json_in(ss);
             json_in >> t2;
             Debug::LogWarning("%s", t2.name().c_str());
         }

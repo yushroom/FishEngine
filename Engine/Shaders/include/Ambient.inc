@@ -1,8 +1,9 @@
-#pragma once
+#ifndef Ambient_inc
+#define Ambient_inc
 
 #include <BRDF.inc>
 #include <ShadingModels.inc>
-#include <DeferredShadingCommon.inc>
+//#include <DeferredShadingCommon.inc>
 #include <MonteCarlo.inc>
 #include <CubemapCommon.inc>
 #include <Random.inc>
@@ -85,3 +86,5 @@ float3 SpecularIBL( uint2 Random, float3 SpecularColor, float Roughness, float3 
 
     return SpecularLighting / NumSamples;
 }
+
+#endif

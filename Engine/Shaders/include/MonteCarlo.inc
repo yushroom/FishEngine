@@ -1,9 +1,5 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
-#pragma once
-
-/*=============================================================================
-	MonteCarlo.usf: Monte Carlo integration of distributions
-=============================================================================*/
+#ifndef MonteCarlo_inc
+#define MonteCarlo_inc
 
 float3 TangentToWorld( float3 Vec, float3 TangentZ )
 {
@@ -56,3 +52,5 @@ float4 ImportanceSampleGGX( float2 E, float Roughness )
 
 	return float4( H, PDF );
 }
+
+#endif

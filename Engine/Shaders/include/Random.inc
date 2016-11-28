@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Random_inc
+#define Random_inc
 
 /*
  * Pseudo random number generator, based on "TEA, a tiny Encrytion Algorithm"
@@ -32,3 +33,4 @@ uint2 ScrambleTEA(uint2 v)
     return ScrambleTEA(v, 3);
 }
 
+#endif

@@ -1,7 +1,7 @@
 #ifndef FragmentShaderShadow_inc
 #define FragmentShaderShadow_inc
 
-#include "CG.inc"
+#include <CG.inc>
 
 #ifdef _NORMALMAP
     uniform sampler2D NormalMap;

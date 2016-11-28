@@ -1,8 +1,5 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
-
-/*=============================================================================
-	CubemapCommon.usf: Cubemap shared functions and structures.
-=============================================================================*/
+#ifndef CubemapCommon_inc
+#define CubemapCommon_inc
 
 InternalUniform samplerCube AmbientCubemap;
 
@@ -24,3 +21,6 @@ half ComputeCubemapMipFromRoughness( half Roughness, half MipCount )
     half Level = 3 - 1.15 * log2( Roughness );
     return MipCount - 1 - Level;
 }
+
+#endif
+

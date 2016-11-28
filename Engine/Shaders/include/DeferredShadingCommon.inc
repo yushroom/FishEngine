@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DeferredShadingCommon_inc
+#define DeferredShadingCommon_inc
 
 float3 EncodeNormal( float3 N )
 {
@@ -14,7 +15,24 @@ float3 DecodeNormal( float3 N )
 
 struct FGBufferData
 {
-    float3 DiffuseColor;
-    float Roughness;
-    float3 SpecularColor;
+    float3  DiffuseColor;
+    float3  WorldNormal;
+    float   Metallic;
+    float   Roughness;
+    float   Specular;
+    //float   AO;
+    uint    MaterialID;
 };
+
+void EncodeGBuffer(
+    FGBufferData GBuffer,
+    out float4 RT0,
+    out float4 RT1,
+    out float4 RT2)
+{
+    RT0 = float4(GBuffer.DiffuseColor, GBuffer.MaterialID);
+    RT1 = float4(GBuffer.WorldNormal, 1);
+    RT2 = float4(GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1);
+}
+
+#endif

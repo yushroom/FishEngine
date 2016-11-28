@@ -7,6 +7,7 @@
 
 namespace FishEngine
 {
+#if 0
     inline Bounds OctreeChildBound(int child, const Bounds& nodeBound, const Vector3 &pMid)
     {
         Vector3 pMin, pMax;
@@ -112,6 +113,8 @@ namespace FishEngine
     
     typedef Octree<std::weak_ptr<GameObject>> SceneOctree;
     typedef OctNode<std::weak_ptr<GameObject>> SceneOctreeNode;
+
+#endif
     
     class FE_EXPORT Scene
     {
@@ -152,7 +155,7 @@ namespace FishEngine
         static std::vector<ScriptPtr>     m_scriptsToBeDestroyed;
         
         static Bounds                   m_bounds;
-        static SceneOctree              m_octree;
+        //static SceneOctree              m_octree;
         
         static void UpdateBounds();
 

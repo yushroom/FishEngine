@@ -1,6 +1,7 @@
-#pragma once
+#ifndef ShadingModels_inc
+#define ShadingModels_inc
 
-#include "BRDF.inc"
+#include <BRDF.inc>
 
 float3 StandardShading( float3 DiffuseColor, float3 SpecularColor, float3 LobeRoughness, float3 LobeEnergy, float3 L, float3 V, half3 N )
 {
@@ -21,3 +22,5 @@ float3 StandardShading( float3 DiffuseColor, float3 SpecularColor, float3 LobeRo
 
 	return Diffuse * LobeEnergy[2] + (D * Vis) * F;
 }
+
+#endif

@@ -37,6 +37,9 @@
 #include <Light.hpp>
 #include <Texture.hpp>
 
+#include <Serialization.hpp>
+#include <cereal/archives/json.hpp>
+
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
 #include "EditorRenderSystem.hpp"
@@ -742,6 +745,17 @@ namespace FishEditor
             if (ImGui::Checkbox("Highlight", &highlight))
             {
                 m_mainSceneViewEditor->setHighlightSelections(highlight);
+            }
+            
+            ImGui::SameLine();
+            if (ImGui::Button("Serialize"))
+            {
+                std::ofstream fout("Scene.json");
+                {
+                    cereal::JSONOutputArchive oa(fout);
+                    oa << Scene::m_gameObjects;
+                }
+                //std::cout << ss.str() << std::endl;
             }
             
         }

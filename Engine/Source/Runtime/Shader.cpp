@@ -51,10 +51,10 @@ ReadFile(
 
 std::map<std::string, std::string> pathToShaderString;
 
-std::string GetHeader(const std::string& filename)
+std::string GetHeader(const std::string& path)
 {
-    static const auto& include_dir = Resources::shaderRootDirectory() + "include/";
-    auto path = include_dir + filename;
+    //static const auto& include_dir = Resources::shaderRootDirectory() + "include/";
+    //auto path = include_dir + filename;
     auto it = pathToShaderString.find(path);
     if (it != pathToShaderString.end())
     {
@@ -199,12 +199,15 @@ namespace FishEngine
     public:
         ShaderCompiler() = delete;
         
-        static void Preprocess(const std::string& shaderText,
+        static void Preprocess(const std::string& path,
                                std::string& out_parsedShaderText,
                                std::map<std::string, std::string>& out_settings,
                                bool& out_hasGeometryShader)
         {
-            out_hasGeometryShader = false;
+            static const auto& include_dir = Resources::shaderRootDirectory() + "include/";
+            const std::string& shaderText = ReadFile(path);
+            boost::filesystem::path bpath(path);
+            //out_hasGeometryShader = false;
             std::string parsed;
             parsed.reserve(shaderText.size());
             
@@ -215,9 +218,25 @@ namespace FishEngine
             {
                 size_t begin_of_this_tok = begin;
                 string tok = nextTok(shaderText, begin);
-                if (tok.size() >= 2 && tok[0] == '\\' && tok[1] == '\\')
+                if (tok == "//")
                 {
                     readToNewline(shaderText, begin);
+                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                }
+                else if (tok == "/*")
+                {
+                    bool found_end_of_comment = false;
+                    size_t i = begin;
+                    for (; i < shaderText.size()-1; ++i)
+                    {
+                        if (shaderText[i] == '*' && shaderText[i+1] == '/')
+                        {
+                            found_end_of_comment = true;
+                            break;
+                        }
+                    }
+                    assert(found_end_of_comment);
+                    begin = i+2;
                     out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
                 }
                 else if (tok == "#include")
@@ -226,8 +245,13 @@ namespace FishEngine
                     auto tok = nextTok(shaderText, begin);
                     bool is_system_include = tok[0] == '<';
                     auto header = tok.substr(1, tok.size()-2);
-                    //cout << "include " << header << " " << is_system_include << endl;
-                    out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                    cout << "include " << header << " " << is_system_include << endl;
+                    string header_path = is_system_include ? include_dir + header : bpath.parent_path().append(header).c_str();
+                    //string header_text = GetHeader(header_path);
+                    string parsed_header_text;
+                    ShaderCompiler::Preprocess(header_path, parsed_header_text, out_settings, out_hasGeometryShader);
+                    //out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);
+                    out_parsedShaderText += parsed_header_text + "\n";
                 }
                 else if (tok == "uniform")
                 {
@@ -255,7 +279,8 @@ namespace FishEngine
                     {
                         out_hasGeometryShader = true;
                         ignoreSpace(shaderText, begin);
-                        expect(shaderText, begin, "{");
+                        bool found = expect(shaderText, begin, "{");
+                        assert(found);
                         //cout << "geometry begin"  << endl;
                         out_parsedShaderText += "#ifdef GEOMETRY_SHADER";
                         size_t right = findPair(shaderText, begin);
@@ -280,8 +305,11 @@ namespace FishEngine
                         ignoreSpace(shaderText, begin);
                         auto setting = nextTok(shaderText, begin);
                         readToNewline(shaderText, begin);
-                        //cout << "Keyword " << name << " " << setting << endl;
-                        out_settings[name] = setting;
+                        cout << "Keyword " << name << " " << setting << endl;
+                        // do NOT override settings;
+                        auto it = out_settings.find(name);
+                        if (it == out_settings.end())
+                            out_settings[name] = setting;
                     }
                 }
                 else
@@ -298,6 +326,12 @@ namespace FishEngine
         {
             size_t start = pos;
             size_t end = shaderText.size();
+            
+            string test = shaderText.substr(start, 2);
+            if (test == "//" || test == "/*" || test == "*/")
+            {
+                return test;
+            }
             
             bool first_is_space = std::isspace(shaderText[start]);
             while (pos < end)
@@ -696,10 +730,10 @@ namespace FishEngine
         try
         {
             auto ext = getExtensionWithoutDot(path);
-            auto shader_text = ReadFile(path);
+            //auto shader_text = ReadFile(path);
             std::string parsed_shader_text;
             std::map<std::string, std::string> settings;
-            ShaderCompiler::Preprocess(shader_text, parsed_shader_text, settings, m_impl->m_hasGeometryShader);
+            ShaderCompiler::Preprocess(path, parsed_shader_text, settings, m_impl->m_hasGeometryShader);
             m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "Cull", "Back"));
             m_ZWrite = getValueOrDefault<string, string>(settings, "ZWrite", "On") == "On";
             m_blend = getValueOrDefault<string, string>(settings, "Blend", "Off") == "On";

@@ -21,7 +21,7 @@ namespace FishEngine
     std::vector<ScriptPtr>        Scene::m_scriptsToBeDestroyed;
     std::vector<ComponentPtr>     Scene::m_componentsToBeDestroyed;
     Bounds                      Scene::m_bounds;
-    SceneOctree                 Scene::m_octree(Bounds(), 16);
+    //SceneOctree                 Scene::m_octree(Bounds(), 16);
 
     GameObjectPtr Scene::CreateGameObject(const std::string& name)
     {

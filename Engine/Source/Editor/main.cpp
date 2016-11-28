@@ -52,6 +52,15 @@ void DefaultScene()
 }
 
 
+class Empty : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+    }
+};
+
 class TestPBR : public App
 {
 public:
@@ -157,6 +166,24 @@ public:
         //auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
         //mitsuba->CreateGameObject()->GetComponent<MeshRenderer>()->SetMaterial(material);
 #endif
+    }
+};
+
+class Sponza : public App
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+        string sponza_root = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza/crytek-sponza/";
+        ModelImporter importer;
+        importer.setFileScale(0.01f);
+        auto sponza_model = importer.LoadFromFile(sponza_root + "sponza.obj");
+        auto sponza_go = sponza_model->CreateGameObject();
+        
+        auto transform = Camera::main()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
     }
 };
 
@@ -592,14 +619,14 @@ public:
         //cameraGO->AddComponent<Serialize>();
         std::stringstream ss;
         {
-            cereal::JSONOutputArchive oa(ss);
+            cereal::XMLOutputArchive oa(ss);
             oa << *cameraGO;
         }
         {
-            cereal::JSONInputArchive ia(ss);
+            cereal::XMLInputArchive ia(ss);
             GameObject go("lll");
             ia >> go;
-            cereal::JSONOutputArchive oa(ss);
+            cereal::XMLOutputArchive oa(ss);
             oa << *cameraGO;
         }
         auto xml = ss.str();
@@ -668,8 +695,10 @@ public:
  
 int main()
 {
+    //FishEditorWindow::AddApp(make_shared<Empty>());
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    FishEditorWindow::AddApp(make_shared<TestCSM>());
+    FishEditorWindow::AddApp(make_shared<Sponza>());
+    //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

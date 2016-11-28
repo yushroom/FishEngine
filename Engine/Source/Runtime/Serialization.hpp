@@ -4,7 +4,7 @@
 #include "FishEngine.hpp"
 
 #include <cereal/cereal.hpp>
-#include <cereal/archives/json.hpp>
+//#include <cereal/archives/json.hpp>
 #include <cereal/archives/xml.hpp>
 //#include <cereal/archives/binary.hpp>
 //#include <cereal/archives/portable_binary.hpp>
@@ -25,22 +25,41 @@
 #include "Camera.hpp"
 #include "CameraController.hpp"
 #include "Scene.hpp"
+#include "Light.hpp"
+#include "MeshRenderer.hpp"
+#include "MeshFilter.hpp"
+#include "SphereCollider.hpp"
 
-//CEREAL_REGISTER_POLYMORPHIC_RELATION(BaseClass, DerivedClassOne);
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Object, "Object");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Component, "Component");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Behaviour, "Behaviour");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Camera, "Camera");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Script, "Script");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::CameraController, "CameraController");
-//CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Scene, "Scene");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Light, "Light");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Renderer, "Renderer");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::MeshRenderer, "MeshRenderer");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::MeshFilter, "MeshFilter");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Collider, "Collider");
+CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::SphereCollider, "SphereCollider");
 
+//CEREAL_REGISTER_POLYMORPHIC_RELATION(BaseClass, DerivedClassOne);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Object, FishEngine::Component);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Component, FishEngine::Behaviour);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Behaviour, FishEngine::Camera);
 
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Component, FishEngine::Behaviour);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Component, FishEngine::Renderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Component, FishEngine::MeshFilter);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Component, FishEngine::Collider);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Behaviour, FishEngine::Camera);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Behaviour, FishEngine::Script);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Behaviour, FishEngine::Light);
+
 CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Script, FishEngine::CameraController);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Renderer, FishEngine::MeshRenderer);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Collider, FishEngine::SphereCollider);
 
 namespace FishEngine
 {
@@ -152,12 +171,61 @@ namespace FishEngine
             );
         }
 
+//        template<typename Archive>
+//        static void Serialize(Archive& archive, Scene& value)
+//        {
+//            archive(
+//                value.m_gameObjects
+//            );
+//        }
+        
         template<typename Archive>
-        static void Serialize(Archive& archive, Scene& value)
+        static void Serialize(Archive& archive, Light& value)
         {
             archive(
-                value.m_gameObjects
-            );
+                    CEREAL_BASE_CLASS(Behaviour),
+                    cereal::make_nvp("type", value.m_type)
+                    );
+        }
+        
+        template<typename Archive>
+        static void Serialize(Archive& archive, Renderer& value)
+        {
+            archive(
+                    CEREAL_BASE_CLASS(Component)
+                    );
+        }
+        
+        template<typename Archive>
+        static void Serialize(Archive& archive, MeshRenderer& value)
+        {
+            archive(
+                    CEREAL_BASE_CLASS(Renderer)
+                    );
+        }
+        
+        template<typename Archive>
+        static void Serialize(Archive& archive, MeshFilter& value)
+        {
+            archive(
+                    CEREAL_BASE_CLASS(Component)
+                    );
+        }
+        
+        template<typename Archive>
+        static void Serialize(Archive& archive, Collider& value)
+        {
+            archive(
+                    CEREAL_BASE_CLASS(Component)
+                    );
+        }
+        
+        template<typename Archive>
+        static void Serialize(Archive& archive, SphereCollider& value)
+        {
+            archive(
+                    CEREAL_BASE_CLASS(Collider)
+                    );
         }
 #undef CEREAL_BASE_CLASS
     };
@@ -190,8 +258,13 @@ namespace FishEngine
     FE_SERIALIZE(Camera);
     FE_SERIALIZE(Script);
     FE_SERIALIZE(CameraController);
-    FE_SERIALIZE(Scene);
-    
+    //FE_SERIALIZE(Scene);
+    FE_SERIALIZE(Light);
+    FE_SERIALIZE(Renderer);
+    FE_SERIALIZE(MeshRenderer);
+    FE_SERIALIZE(MeshFilter);
+    FE_SERIALIZE(Collider);
+    FE_SERIALIZE(SphereCollider);
 #undef FE_SERIALIZE
 #endif
 }

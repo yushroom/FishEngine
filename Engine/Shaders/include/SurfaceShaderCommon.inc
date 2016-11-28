@@ -2,7 +2,7 @@
 
 #ifdef VERTEX_SHADER
 	#define USE_DEFAULT_VS
-	#include "AppData.inc"
+	#include <AppData.inc>
 #endif
 
 #ifdef FRAGMENT_SHADER

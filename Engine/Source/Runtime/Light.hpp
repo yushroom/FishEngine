@@ -113,6 +113,7 @@ namespace FishEngine
         friend class SkinnedMeshRenderer;
         friend class Graphics;
         friend class Pipeline;
+        friend class Serialization;
 
         // The current type of light. Possible values are Directional, Point, Spot and Area
         LightType m_type = LightType::Directional;

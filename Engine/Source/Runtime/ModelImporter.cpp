@@ -120,11 +120,13 @@ namespace FishEngine {
         m_model->m_avatar->m_indexToBone[index] = node->name;
         node->index = index;
         
-        for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i) {
+        for (uint32_t i = 0; i < assimp_node->mNumMeshes; ++i)
+        {
             node->meshesIndices.push_back(assimp_node->mMeshes[i]);
         }
 
-        for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i) {
+        for (uint32_t i = 0; i < assimp_node->mNumChildren; ++i)
+        {
             auto child = buildModelTree(assimp_node->mChildren[i]);
             node->children.push_back(child);
             child->parent = node.get();
@@ -177,13 +179,15 @@ namespace FishEngine {
             mesh->m_normalBuffer.push_back(n.y);
             mesh->m_normalBuffer.push_back(n.z);
 
-            if (has_uv) {
+            if (has_uv)
+            {
                 auto& uv = assimp_mesh->mTextureCoords[0][j];
                 mesh->m_uvBuffer.push_back(uv.x);
                 mesh->m_uvBuffer.push_back(uv.y);
             }
 
-            if (load_tangent) {
+            if (load_tangent)
+            {
                 auto& t = assimp_mesh->mTangents[j];
                 mesh->m_tangentBuffer.push_back(t.x);
                 mesh->m_tangentBuffer.push_back(t.y);
@@ -250,16 +254,14 @@ namespace FishEngine {
     }
 
 
-    Vector3
-    ConvertVector3(
-        const aiVector3D& avec3) {
+    Vector3 ConvertVector3(const aiVector3D& avec3)
+    {
         return Vector3(avec3.x, avec3.y, avec3.z);
     };
 
 
-    Quaternion
-    ConvertQuaternion(
-        const aiQuaternion& aquat) {
+    Quaternion ConvertQuaternion(const aiQuaternion& aquat)
+    {
         return Quaternion(aquat.x, aquat.y, aquat.z, aquat.w);
     };
 
@@ -347,21 +349,28 @@ namespace FishEngine {
         }
 
         //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
+        //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_LIGHTS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_CAMERAS, false);
-        if (m_importNormals == ModelImporterNormals::Calculate) {
+        if (m_importNormals == ModelImporterNormals::Calculate)
+        {
             importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS);
             load_option |= aiProcess_GenSmoothNormals |aiProcess_RemoveComponent;
-        } else {
+        }
+        else
+        {
             load_option |= aiProcess_GenNormals;
         }
         bool load_tangent = (m_importTangents != ModelImporterTangents::None);
         if (load_tangent)
+        {
             load_option |= aiProcess_CalcTangentSpace;
+        }
+        
         const aiScene* scene = importer.ReadFile(path.c_str(), load_option);
-        if (!scene) {
+        if (!scene)
+        {
             Debug::LogError(importer.GetErrorString());
             Debug::LogError("Can not open file %s", path.c_str());
             abort();
@@ -375,27 +384,46 @@ namespace FishEngine {
         
         bool loadAnimation = scene->HasAnimations();
         if (loadAnimation)
+        {
             Debug::Log("%s has animation", path.c_str());
+        }
 
         m_model->m_rootNode = buildModelTree(scene->mRootNode);
         
-        for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+        for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
         {
             auto mesh = ParseMesh(scene->mMeshes[meshIndex], load_uv, load_tangent);
-            if (mesh->m_name.empty()) {
+            if (mesh->m_name.empty())
+            {
                 mesh->m_name = "mesh" + boost::lexical_cast<std::string>(m_model->m_meshes.size());
             }
-
+            m_model->m_meterailIndexForEachMesh.push_back(scene->mMeshes[meshIndex]->mMaterialIndex);
             m_model->AddMesh(mesh);
         }
 
-        for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
+        for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex)
+        {
             auto animation = ParseAnimation(scene->mAnimations[animIndex], m_fileScale);
 #ifdef REMOVE_FBX_PIVOT
             if (isFBX)
                 RemoveDummyNodeFBX(animation);
 #endif
             m_model->m_animations.push_back(animation);
+        }
+        
+        for (uint32_t material_idx = 0; material_idx < scene->mNumMaterials; ++material_idx)
+        {
+            aiMaterial* mtl = scene->mMaterials[material_idx];
+            aiString name;
+            mtl->Get(AI_MATKEY_NAME, name);
+            //Debug::Log("%s", name.C_Str());
+            MaterialPtr material = Material::builtinMaterial("PBR");
+            material->SetFloat("Metallic", 0);
+            material->SetFloat("Roughness", 0.5f);
+            material->SetFloat("Specular", 0.5f);
+            material->SetVector3("BaseColor", Vector3(1, 1, 1));
+            material->setName(std::string(name.C_Str()));
+            m_model->m_materials.push_back(material);
         }
         
         m_model->setName(getFileNameWithoutExtension(path));
@@ -407,7 +435,8 @@ namespace FishEngine {
     RemoveDummyNodeFBX(
         AnimationPtr animation)
     {
-        for (auto& it : m_nodeTransformations) {
+        for (auto& it : m_nodeTransformations)
+        {
             auto& name = it.first;
             AnimationNode resultNode;
             resultNode.name = name;
@@ -415,18 +444,22 @@ namespace FishEngine {
             // position
             {
                 auto it2 = it.second.find("Translation");
-                if (it2 == it.second.end()) {   // No translation subnode;
+                if (it2 == it.second.end())
+                {   // No translation subnode;
                     resultNode.positionKeys.emplace_back(Vector3Key{ 0.f, Vector3::zero });
                 }
-                else {
+                else
+                {
                     Matrix4x4 positionMat = it2->second;
                     Vector3 initPosition(positionMat.m[0][3], positionMat.m[1][3], positionMat.m[2][3]);
                     auto fullName = name + "_$AssimpFbx$_Translation";
                     auto it3 = animation->channels.find(fullName);
-                    if (it3 == animation->channels.end()) { // no animation on Translation
+                    if (it3 == animation->channels.end())
+                    { // no animation on Translation
                         resultNode.positionKeys.emplace_back(Vector3Key{ 0.f, initPosition });
                     }
-                    else {
+                    else
+                    {
 #ifdef DEBUG_ANIMATION
                         assert(it3->second.rotationKeys.size() == 1);
                         assert(it3->second.rotationKeys[0].value == Quaternion::identity);
@@ -444,17 +477,20 @@ namespace FishEngine {
                 Matrix4x4 preRotation, postRotation;
                 {
                     auto it2 = it.second.find("PreRotation");
-                    if (it2 != it.second.end()) {
+                    if (it2 != it.second.end())
+                    {
                         preRotation = it2->second;
                     }
                     auto it3 = it.second.find("PostRotation");
-                    if (it3 != it.second.end()) {
+                    if (it3 != it.second.end())
+                    {
                         postRotation = it3->second;
                     }
                 }
 
                 auto it2 = it.second.find("Rotation");
-                if (it2 == it.second.end()) {   // No rotation subnode;
+                if (it2 == it.second.end())
+                {   // No rotation subnode;
                     auto rotMat = preRotation * postRotation;
 #ifdef DEBUG_ANIMATION
                     Vector3 pos;
@@ -469,10 +505,12 @@ namespace FishEngine {
 #endif
                     resultNode.rotationKeys.emplace_back(QuaternionKey{ 0.f, rot });
                 }
-                else {
+                else
+                {
                     auto fullName = name + "_$AssimpFbx$_Rotation";
                     auto it3 = animation->channels.find(fullName);
-                    if (it3 == animation->channels.end()) { // no animation on rotation
+                    if (it3 == animation->channels.end())
+                    { // no animation on rotation
                         Matrix4x4 rotMat = preRotation * it2->second * postRotation;
 #ifdef DEBUG_ANIMATION
                         Vector3 pos;
@@ -487,7 +525,8 @@ namespace FishEngine {
 #endif
                         resultNode.rotationKeys.emplace_back(QuaternionKey{ 0.f, initRotation });
                     }
-                    else {
+                    else
+                    {
 #ifdef DEBUG_ANIMATION
                         assert(it3->second.positionKeys.size() == 1);
                         assert(it3->second.positionKeys[0].value == Vector3::zero);
@@ -511,13 +550,16 @@ namespace FishEngine {
             // scale
             {
                 auto it2 = it.second.find("Scaling");
-                if (it2 == it.second.end()) {   // No scaling subnode;
+                if (it2 == it.second.end())
+                {   // No scaling subnode;
                     resultNode.scalingKeys.emplace_back(Vector3Key{ 0.f, Vector3::one });
                 }
-                else {
+                else
+                {
                     auto fullName = name + "_$AssimpFbx$_Scaling";
                     auto it3 = animation->channels.find(fullName);
-                    if (it3 == animation->channels.end()) { // no animation on Scaling
+                    if (it3 == animation->channels.end())
+                    { // no animation on Scaling
                         Matrix4x4 scaleMat = it2->second;
                         Vector3 pos;
                         Quaternion rot;
@@ -527,7 +569,8 @@ namespace FishEngine {
                         assert(rot == Quaternion::identity);
                         resultNode.scalingKeys.emplace_back(Vector3Key{ 0.f, initScale });
                     }
-                    else {
+                    else
+                    {
 #ifdef DEBUG_ANIMATION
                         assert(it3->second.positionKeys.size() == 1);
                         assert(it3->second.positionKeys[0].value == Vector3::zero);
@@ -576,9 +619,10 @@ namespace FishEngine {
 
         if (node->meshesIndices.size() == 1)
         {
-            const auto& mesh = m_meshes[node->meshesIndices.front()];
+            uint32_t idx = node->meshesIndices.front();
+            const auto& mesh = m_meshes[idx];
             mesh->setName(node->name);
-            auto material = Material::defaultMaterial();
+            auto material = m_materials[m_meterailIndexForEachMesh[idx]];
             if (mesh->m_skinned)
             {
                 auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
@@ -605,7 +649,7 @@ namespace FishEngine {
                 child->transform()->SetParent(go->transform());
                 nameToGameObject[m->name()] = child;
                 const auto& mesh = m_meshes[idx];
-                auto material = Material::defaultMaterial();
+                auto material = m_materials[m_meterailIndexForEachMesh[idx]];
                 if (mesh->m_skinned)
                 {
                     auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);

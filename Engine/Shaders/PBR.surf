@@ -1,5 +1,5 @@
 @Normalmap Off
-@Shadow Off
+// @Shadow Off
 
 #include <UnrealSupport.inc>
 #include <BRDF.inc>
@@ -35,20 +35,21 @@ struct PixelMaterialInputs
 
 vec4 ps_main(SurfaceData surfaceData)
 {
+    PixelMaterialInputs s = CalcPixelMaterialInputs(surfaceData);
     vec4 outColor = vec4(0, 0, 0, 1);
     vec3 L = surfaceData.L;
     vec3 V = surfaceData.V;
     vec3 N = surfaceData.N;
     float3 R0 = 2 * dot( V, N ) * N - V;
 
-    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
-    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
+    vec3 DiffuseColor = s.BaseColor - s.BaseColor * s.Metallic;
+    vec3 SpecularColor = mix( vec3(0.08 * s.Specular), s.BaseColor, s.Metallic);
     float NoL = saturate( dot(N, L) );
     //float NoV = max( dot(N, V), 1e-5 );
     float NoV = saturate( dot(N, V) );
     // Point lobe in off-specular peak direction
 
-    //outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness), vec3(1), L, V, N);
+    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(s.Roughness), vec3(1), L, V, N);
     
 #ifdef _AMBIENT_IBL
     float a = Square( Roughness );

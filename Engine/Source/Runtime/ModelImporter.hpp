@@ -22,6 +22,7 @@ namespace FishEngine {
         ModelNode*              parent;
         std::vector<std::shared_ptr<ModelNode>> children;
         std::vector<uint32_t>   meshesIndices;
+        //uint32_t                materialIndices;
         Matrix4x4               transform;
         bool                    isBone;
     };
@@ -36,17 +37,20 @@ namespace FishEngine {
         
         GameObjectPtr CreateGameObject() const;
         
-        MeshPtr mainMesh() const {
+        MeshPtr mainMesh() const
+        {
             return m_meshes[0];
         }
         
-        AnimationPtr mainAnimation() const {
+        AnimationPtr mainAnimation() const
+        {
             if (m_animations.empty())
                 return nullptr;
             return m_animations.front();
         }
 
-        AvatarPtr avatar() const {
+        AvatarPtr avatar() const
+        {
             return m_avatar;
         }
         
@@ -64,6 +68,8 @@ namespace FishEngine {
         ResursivelyCreateGameObject(const ModelNodePtr& node,
                                     std::map<std::string, std::weak_ptr<GameObject>>& nameToGameObject) const;
         
+        std::vector<MaterialPtr> m_materials;
+        std::vector<uint32_t> m_meterailIndexForEachMesh; // same size as m_meshes;
         std::vector<MeshPtr> m_meshes;
         std::vector<AnimationPtr> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;

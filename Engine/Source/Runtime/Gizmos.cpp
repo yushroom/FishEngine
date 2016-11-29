@@ -222,7 +222,7 @@ DrawHalfWireSphere(
         m.SetTRS(center, Quaternion::Euler(Vector3(e)), Vector3::one * radius);
         shader->BindUniformMat4("MATRIX_MVP", p * v * m * modelMatrix);
         glBindVertexArray(s_circleMesh->m_VAO);
-        int count = s_circleMesh->m_positionBuffer.size()/3;
+        GLsizei count = static_cast<GLsizei>(s_circleMesh->m_positionBuffer.size()/3);
         if (i == 1) {
             glDrawArrays(GL_LINE_LOOP, 0, count);
         } else {
@@ -305,7 +305,7 @@ DrawHalfCircle(
     shader->BindUniformMat4("MATRIX_MVP", p * v * m);
     shader->BindUniformVec4("_Color", s_color);
     glBindVertexArray(s_circleMesh->m_VAO);
-    int count = s_circleMesh->m_positionBuffer.size() / 3;
+    GLsizei count = static_cast<GLsizei>(s_circleMesh->m_positionBuffer.size() / 3);
     count = count / 2 + 1;
     glDrawArrays(GL_LINE_STRIP, 0, count);
     glBindVertexArray(0);

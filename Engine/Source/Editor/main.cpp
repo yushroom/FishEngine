@@ -1,6 +1,4 @@
 //#include "TestScript.hpp"
-#include "TextureImporter.hpp"
-
 #include <iostream>
 #include <Camera.hpp>
 #include <Scene.hpp>
@@ -14,6 +12,7 @@
 #include <App.hpp>
 #include <MeshRenderer.hpp>
 #include <ModelImporter.hpp>
+#include <TextureImporter.hpp>
 
 #include "FishEditorWindow.hpp"
 
@@ -51,6 +50,22 @@ void DefaultScene()
     RenderSettings::setSkybox(material);
 }
 
+GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
+{
+    auto& children = root->transform()->children();
+    for (auto& c : children) {
+        const auto& g = c.lock();
+        //Debug::Log("Name: %s", g->name().c_str());
+        if (g->name() == name) {
+            return g->gameObject();
+        }
+        auto r = FindNamedChild(g->gameObject(), name);
+        if (r != nullptr) {
+            return r;
+        }
+    }
+    return nullptr;
+}
 
 class Empty : public App
 {
@@ -68,46 +83,24 @@ public:
     virtual void Init() override
     {
         DefaultScene();
-#if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = "D:/program/FishEngine/Assets/";
-        const std::string skybox_dir = R"(D:\program\github\Cinder-Experiments\common\textures\)";
-        const std::string concrete_texture_dir = R"(D:\program\FishEngine\Example\PBR\concrete_rebarconcrete_pbr\TGA\concrete_rebarconcrete_1k_TGA\)";
-        //auto shader = Shader::CreateFromFile(R"(D:\program\FishEngine\Example\PBR\PBR.surf)");
-        auto pbr2 = Shader::CreateFromFile(R"(D:\program\FishEngine\Engine\Shaders\PBR2.surf)");
-#else
-        //auto shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Example/PBR/PBR.surf");
-        //const std::string concrete_texture_dir = "/Users/yushroom/program/graphics/FishEngine/Example/PBR/concrete_rebarconcrete_pbr/TGA/concrete_rebarconcrete_1k_TGA/";
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
-        //const std::string skybox_dir = "/Users/yushroom/program/github/Cinder-Experiments/common/textures/";
-        auto pbr2 = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/PBR2.surf");
-#endif
-        const std::string models_dir = root_dir + "models/";
-        const std::string textures_dir = root_dir + "textures/";
+
+        auto pbr2 = Shader::CreateFromFile(Resources::shaderRootDirectory() / "PBR2.surf");
 
         TextureImporter importer;
-        auto envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross.dds");
-        auto filtered_envmap = importer.FromFile(textures_dir + "envmap/uffizi_cross_128_filtered.dds");
+        auto textures_dir = Resources::textureRootDirectory();
+        auto envmap = importer.FromFile(textures_dir / "envmap" / "uffizi_cross.dds");
+        auto filtered_envmap = importer.FromFile(textures_dir / "envmap" / "uffizi_cross_128_filtered.dds");
         RenderSettings::setAmbientCubemap(filtered_envmap);
     
         auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
-#if 1
         material = Material::builtinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", envmap);
-#else
-        auto pisa_hdr = importer.FromFile(textures_dir + "pisa.hdr");
-        auto skybox_panorama = Shader::CreateFromFile(root_dir + "../Engine/Shaders/SkyBox-Panorama.shader");
-        material = Material::CreateMaterial();
-        material->SetShader(skybox_panorama);
-        material->SetTexture("_Tex", pisa_hdr);
-#endif
         material->SetVector4("_Tint", Vector4::one);
         material->SetFloat("_Exposure", 1);
         material->SetFloat("_Rotation", 0);
         RenderSettings::setSkybox(material);
-
-#if 1
 
         auto group = Scene::CreateGameObject("Group");
 
@@ -135,6 +128,7 @@ public:
                     material = Material::builtinMaterial("PBR-Reference");
                 }
                 material->EnableKeyword(ShaderKeyword::AmbientIBL);
+                material->DisableKeyword(ShaderKeyword::Shadow);
                 material->SetFloat("Metallic", 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
@@ -142,30 +136,6 @@ public:
                 go->GetComponent<MeshRenderer>()->SetMaterial(material);
             }
         }
-#else
-        auto albedo_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_alb.tga");
-        auto mask_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_mask.tga");
-        auto gloss_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_g.tga");
-        auto normal_map = Texture::CreateFromFile(concrete_texture_dir + "concrete_rebarconcrete_1k_n.tga");
-
-        
-        material = Material::CreateMaterial();
-        material->SetShader(shader);
-        material->SetFloat("Specular", 0.5f);
-        material->SetTexture("AlbedoMap", albedo_map);
-        material->SetTexture("GlossMap", gloss_map);
-        material->SetTexture("MaskMap", mask_map);
-        material->SetTexture("NormalMap", normal_map);
-        material->SetTexture("RadianceMap", radiance_map);
-        material->SetTexture("IrradianceMap", irradiance_map);
-        auto go = GameObject::CreatePrimitive(PrimitiveType::Plane);
-        go->GetComponent<MeshRenderer>()->SetMaterial(material);
-
-        //ModelImporter importer;
-        //importer.setImportNormals(ModelImporterNormals::Calculate);
-        //auto mitsuba = importer.LoadFromFile(models_dir + "mitsuba-sphere.obj");
-        //mitsuba->CreateGameObject()->GetComponent<MeshRenderer>()->SetMaterial(material);
-#endif
     }
 };
 
@@ -175,16 +145,70 @@ public:
     virtual void Init() override
     {
         DefaultScene();
-#if FISHENGINE_PLATFORM_WINDOWS
-        string sponza_root = R"(D:\program\FishEngine\Example\Sponza\crytek-sponza\)";
-#else
-        string sponza_root = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza/crytek-sponza/";
-#endif
+        Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
+        Path sponza_assets_root = sponza_root / "crytek-sponza";
+        Resources::SetAssetsDirectory(sponza_root);
         ModelImporter importer;
         importer.setFileScale(0.01f);
-        auto sponza_model = importer.LoadFromFile(sponza_root + "sponza.obj");
+        auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
         auto sponza_go = sponza_model->CreateGameObject();
-        
+
+        TextureImporter tex_importer;
+
+        Path textures_root = sponza_assets_root / "textures";
+
+        auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.surf");
+        auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
+        (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
+        {
+            auto mesh0 = FindNamedChild(sponza_go, go_name);
+            auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+            mtl->SetShader(shader1);
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+            auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+            mtl->SetTexture("DiffuseTex", diffuse);
+            mtl->SetTexture("MaskTex", mask);
+        };
+
+        ApplyMateril1("mesh0", "sponza_thorn_diff", "sponza_thorn_mask");
+        ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
+        ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
+
+        auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.surf");
+        auto ApplyMateril2 = [&sponza_go, &tex_importer, &shader2, &textures_root]
+        (const char* go_name, const std::string& diffuse_tex)
+        {
+            auto mesh0 = FindNamedChild(sponza_go, go_name);
+            auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+            mtl->SetShader(shader2);
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+            //auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+            mtl->SetTexture("DiffuseTex", diffuse);
+            //mtl->SetTexture("MaskTex", mask);
+        };
+
+        ApplyMateril2("mesh2", "vase_round");
+        ApplyMateril2("mesh3", "background");
+        ApplyMateril2("mesh4", "spnza_bricks_a_diff");
+        ApplyMateril2("mesh5", "sponza_arch_diff");
+        ApplyMateril2("mesh6", "sponza_ceiling_a_diff");
+        ApplyMateril2("mesh7", "sponza_column_a_diff");
+        ApplyMateril2("mesh8", "sponza_floor_a_diff");
+        ApplyMateril2("mesh9", "sponza_column_c_diff");
+        ApplyMateril2("mesh10", "sponza_details_diff");
+        ApplyMateril2("mesh11", "sponza_column_b_diff");
+        ApplyMateril2("mesh13", "sponza_flagpole_diff");
+        ApplyMateril2("mesh14", "sponza_fabric_green_diff");
+        ApplyMateril2("mesh15", "sponza_fabric_blue_diff");
+        ApplyMateril2("mesh16", "sponza_fabric_diff");
+        ApplyMateril2("mesh17", "sponza_curtain_blue_diff");
+        ApplyMateril2("mesh18", "sponza_curtain_diff");
+        ApplyMateril2("mesh19", "sponza_curtain_green_diff");
+        ApplyMateril2("mesh21", "vase_hanging");
+        ApplyMateril2("mesh22", "vase_dif");
+        ApplyMateril2("mesh23", "lion");
+        ApplyMateril2("mesh24", "sponza_roof_diff");
+
         auto transform = Camera::main()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);

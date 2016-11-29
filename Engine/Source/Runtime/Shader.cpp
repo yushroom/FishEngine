@@ -326,11 +326,11 @@ namespace FishEngine
             std::string parsed_shader_text = compiler.Preprocess();
             std::map<std::string, std::string> settings = compiler.m_settings;
             m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
-            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "Cull", "Back"));
-            m_ZWrite = getValueOrDefault<string, string>(settings, "ZWrite", "On") == "On";
-            m_blend = getValueOrDefault<string, string>(settings, "Blend", "Off") == "On";
-            m_applyNormalMap = getValueOrDefault<string, string>(settings, "Normalmap", "Off") == "On";
-            m_receiveShadow = getValueOrDefault<string, string>(settings, "Shadow", "On") == "On";
+            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "cull", "back"));
+            m_ZWrite = getValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
+            m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
+            m_applyNormalMap = getValueOrDefault<string, string>(settings, "normalmap", "off") == "on";
+            m_receiveShadow = getValueOrDefault<string, string>(settings, "shadow", "on") == "on";
             
             //SetLocalKeywords(ShaderKeyword::Shadow, m_receiveShadow);
             auto k = static_cast<ShaderKeywords>(ShaderKeyword::Shadow);
@@ -402,7 +402,7 @@ namespace FishEngine
         {
             if (boost::starts_with(u.name, name))
             {
-                glUniformMatrix4fv(u.location, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
+                glUniformMatrix4fv(u.location, static_cast<GLsizei>(matrixArray.size()), GL_TRUE, matrixArray.data()->data());
                 u.binded = true;
                 return;
             }

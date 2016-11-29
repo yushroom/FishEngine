@@ -3,11 +3,7 @@
 
 #include "FishEngine.hpp"
 #include "Object.hpp"
-
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-#include <boost/filesystem.hpp>
-
-using Path = boost::filesystem::path;
+#include "Resources.hpp"
 
 namespace FishEngine
 {

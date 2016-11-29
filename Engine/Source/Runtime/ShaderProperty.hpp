@@ -58,9 +58,9 @@ namespace FishEngine
     template<>
     inline Cullface ToEnum<Cullface>(const std::string& s)
     {
-        if (s == "Back") return Cullface::Back;
-        if (s == "Front") return Cullface::Front;
-        if (s == "Off") return Cullface::Off;
+        if (s == "back" || s == "Back") return Cullface::Back;
+        if (s == "front" || s == "Front") return Cullface::Front;
+        if (s == "off" || s == "Off") return Cullface::Off;
         abort();
     }
 

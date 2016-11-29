@@ -46,6 +46,7 @@
 #include "EditorInput.hpp"
 #include "MaterialEditor.hpp"
 #include "Shader.hpp"
+#include "Resources.hpp"
 
 using namespace FishEngine;
 
@@ -621,16 +622,10 @@ namespace FishEditor
 
     void EditorGUI::DrawProjectWindow()
     {
-        //if (s_windowResized)
-        //{
-        //    ImGui::SetNextWindowPos(projectWindowPos);
-        //    ImGui::SetNextWindowSize(projectWindowSize);
-        //}
-        //ImGui::Begin("Project", nullptr, globalWindowFlags);
         ImGui::BeginDock("Project", nullptr);
         
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-        ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.1f, 0));
+        ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.15f, 0));
         
         static int selected = 0;
         static int selected_item_id = -1;
@@ -659,45 +654,93 @@ namespace FishEditor
             selected = 4;
             selected_item_id = -1;
         }
+
+        ImGui::Separator();
+
+        if (ImGui::Selectable("Assets", selected == 5))
+        {
+            selected = 5;
+            selected_item_id = -1;
+        }
+
         ImGui::EndChild();
         ImGui::PopStyleVar();
         
-        ImGui::SameLine();
+        ImGui::SameLine();  // Sub1 and Sub2
         
-        
-//        ImGui::BeginChild("Sub2", ImVec2(0,0), true);
-//        //ImGui::Text("With border");
-//        ImGui::Columns(2);
-//        for (int i = 0; i < 100; i++)
-//        {
-//            if (i == 50)
-//                ImGui::NextColumn();
-//            char buf[32];
-//            sprintf(buf, "%08x", i*5731);
-//            ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
-//        }
-//        ImGui::EndChild();
-        
-        ImGui::BeginChild("Sub2", ImVec2(0,0), true);
+        static FileNode* current_dir = nullptr;
+        if (current_dir == nullptr)
+            current_dir = &Resources::s_assetsDirectoryRootNode;
+        ImGui::BeginChild("Sub2", ImVec2(0,0));
 
+        ImGui::BeginChild("Sub2Top", ImVec2(0, 20));
+        if (ImGui::Button("Assets"))
+        {
+            current_dir = &Resources::s_assetsDirectoryRootNode;
+        }
+        auto relative_path = boost::filesystem::relative(current_dir->path, Resources::s_assetsDirectory);
+        Path rp(relative_path);
+        int depth = 0;
+        while (rp.has_parent_path())
+        {
+            depth++;
+            rp = rp.parent_path();
+        }
+        for (auto& p : relative_path)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button(p.string().c_str()))
+            {
+                for (int i = 0; i < depth; ++i)
+                {
+                    current_dir = current_dir->parent;
+                }
+                break;
+            }
+            depth--;
+        }
+        ImGui::EndChild();
+
+        ImGui::BeginChild("Sub2Bottom", ImVec2(0, 0));
+
+        float image_size = 92;
         int item_count = 0;
-        if (selected == 0)
+        if (selected == 0) // textures
         {
             item_count = 0;
+            static int item_selected = -1;
             for (const auto& t : Texture::AllTextures())
             {
                 //constexpr ImVec2 size(128, 128);
-                ImGui::SameLine();
                 if (t->dimension() == TextureDimension::Tex2D)
-                    ImGui::Image((void*)t->GetNativeTexturePtr(), ImVec2(64, 64));
-                //if (ImGui::Selectable(t->name().c_str(), selected_item_id == item_count))
-                //{
-                //    selected_item_id = item_count;
-                //}
+                {
+                    ImGui::SameLine();
+                    if (ImGui::GetContentRegionAvailWidth() < image_size)
+                    {
+                        ImGui::NewLine();
+                    }
+                    //ImGui::Image((void*)t->GetNativeTexturePtr(), ImVec2(64, 64));
+                    if (item_selected == item_count)
+                        ImGui::ImageWithLabel(
+                            t->name().c_str(),
+                            (void*)t->GetNativeTexturePtr(),
+                            ImVec2(image_size, image_size),
+                            { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 1, 0, 0, 1 });
+                    else
+                        ImGui::ImageWithLabel(
+                            t->name().c_str(),
+                            (void*)t->GetNativeTexturePtr(),
+                            ImVec2(image_size, image_size));
+                    if (ImGui::IsItemClicked(0))
+                    {
+                        std::cout << t->name() << " clicked" << std::endl;
+                        item_selected = item_count;
+                    }
+                }
                 item_count++;
             }
         }
-        if (selected == 2)
+        else if (selected == 2) // shaders
         {
             item_count = 0;
             for (const auto& m : Shader::allShaders())
@@ -709,7 +752,31 @@ namespace FishEditor
                 item_count++;
             }
         }
-        ImGui::EndChild();
+        else if (selected == 5) // Assets
+        {
+            item_count = 0;
+            
+            for (auto& node : current_dir->children)
+            {
+                ImGuiSelectableFlags flags = 0;
+                if (node.IsDirectory())
+                    flags |= ImGuiSelectableFlags_AllowDoubleClick;
+                if (ImGui::Selectable(node.path.filename().string().c_str(),
+                    selected_item_id == item_count, flags))
+                {
+                    selected_item_id = item_count;
+                    if (ImGui::IsMouseDoubleClicked(0))
+                    {
+                        current_dir = &node;
+                        break;
+                    }
+                }
+                item_count++;
+            }
+        }
+
+        ImGui::EndChild(); // Sub2Bottom
+        ImGui::EndChild(); // Sub2
 
         
         //ImGui::End();

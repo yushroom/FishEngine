@@ -333,22 +333,6 @@ void RecursivelyAddScript(const FishEngine::TransformPtr& t)
 }
 
 
-GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
-{
-    auto& children = root->transform()->children();
-    for (auto& c : children) {
-        const auto& g = c.lock();
-        //Debug::Log("Name: %s", g->name().c_str());
-        if (g->name() == name) {
-            return g->gameObject();
-        }
-        auto r = FindNamedChild(g->gameObject(), name);
-        if (r != nullptr) {
-            return r;
-        }
-    }
-    return nullptr;
-}
 
 
 GameObjectPtr CreateCube()

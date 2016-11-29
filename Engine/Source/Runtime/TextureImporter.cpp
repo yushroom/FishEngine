@@ -214,7 +214,7 @@ namespace FishEngine
         auto t = std::make_shared<Texture>();
         GLuint texture;
         auto ext = path.extension();
-        if (ext == "dds")
+        if (ext == ".dds")
         {
             TextureDimension format;
             texture = CreateTextureFromDDS(path.string().c_str(), &format);

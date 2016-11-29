@@ -236,7 +236,7 @@ namespace FishEngine
     void SimpleMesh::Render() const
     {
         glBindVertexArray(m_VAO);
-        glDrawArrays(m_drawMode, 0, m_positionBuffer.size() / 3);
+        glDrawArrays(m_drawMode, 0, static_cast<GLsizei>(m_positionBuffer.size() / 3));
         glBindVertexArray(0);
     }
 

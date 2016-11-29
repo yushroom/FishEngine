@@ -115,7 +115,7 @@ namespace FishEngine {
         //Debug::LogWarning("Node: %s", node->name.c_str());
         node->transform = transform;
         node->isBone = false;
-        int index = m_model->m_avatar->m_boneToIndex.size();
+        uint32_t index = m_model->m_avatar->m_boneToIndex.size();
         m_model->m_avatar->m_boneToIndex[node->name] = index;
         m_model->m_avatar->m_indexToBone[index] = node->name;
         node->index = index;

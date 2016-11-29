@@ -4,12 +4,28 @@
 
 namespace FishEngine
 {
-    //Path::Path(std::string path)
-    //    : m_pathStr(path)
-    //{
+    FishEngine::FileNode Resources::s_assetsDirectoryRootNode;
 
-    //}
+    void FileNode::BuildNodeTree(const Path path)
+    {
+        this->path = path;
+        if (boost::filesystem::is_directory(path))
+        {
+            for (auto& it : boost::filesystem::directory_iterator(path))
+            {
+                //std::cout << "\t" << it.path() << '\n';
+                children.emplace_back();
+                children.back().parent = this;
+                children.back().BuildNodeTree(it.path());
+            }
+        }
+    }
 
+    void Resources::SetAssetsDirectory(const Path& path)
+    {
+        s_assetsDirectory = path;
+        s_assetsDirectoryRootNode.BuildNodeTree(path);
+    }
 
     void Resources::Init()
     {
@@ -44,4 +60,5 @@ namespace FishEngine
 
     Path Resources::s_assetsDirectory;
     Path Resources::s_rootSystemDirectory;
+
 }

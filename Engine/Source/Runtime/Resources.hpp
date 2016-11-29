@@ -2,35 +2,27 @@
 #define Resources_hpp
 
 #include "FishEngine.hpp"
+
+#define BOOST_FILESYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
 
 namespace FishEngine
 {
     typedef boost::filesystem::path Path;
-    //// simple implmentation, remove it after c++17
-    //class FE_EXPORT Path
-    //{
-    //public:
-    //    Path(std::string path);
 
-    //    Path parent_path() const
-    //    {
-    //        return boost::filesystem::path(m_pathStr).parent_path().string();
-    //    }
+    struct FileNode
+    {
+        Path path;
+        FileNode* parent;
+        std::list<FileNode> children;
 
-    //    Path stem() const
-    //    {
-    //        return boost::filesystem::path(m_pathStr).stem().string();
-    //    }
+        void BuildNodeTree(const Path path);
 
-    //    Path extension() const
-    //    {
-    //        return boost::filesystem::path(m_pathStr).extension().string();
-    //    }
-
-    //private:
-    //    std::string m_pathStr;
-    //};
+        bool IsDirectory() const
+        {
+            return children.size() > 0;
+        }
+    };
 
     enum class SystemDirectoryType
     {
@@ -59,7 +51,7 @@ namespace FishEngine
 
         static Path textureRootDirectory()
         {
-            return s_rootSystemDirectory / "Assets/Texture";
+            return s_rootSystemDirectory / "Assets/Textures";
         }
 
         static Path modelRootDirectory()
@@ -67,31 +59,32 @@ namespace FishEngine
             return s_rootSystemDirectory / "Assets/Models";
         }
 
-        static const Path& fontRootDirectory()
+        static Path fontRootDirectory()
         {
             return s_rootSystemDirectory / "Assets/Fonts";
         }
 
-        static void SetAssetsDirectory(const Path& path)
+        static Path exampleRootDirectory()
         {
-            s_assetsDirectory = path;
+            return s_rootSystemDirectory / "Example";
         }
 
-        static bool FindAssetFile(const std::string& filename, Path& out_path)
-        {
-        }
+        static void SetAssetsDirectory(const Path& path);
 
-        static bool FindSystemFile(const std::string& filename, Path& out_path)
-        {
+        static bool FindAssetFile(const std::string& filename, Path& out_path);
 
-        }
+        static bool FindSystemFile(const std::string& filename, Path& out_path);
 
         static void Init();
 
     private:
+        friend FishEditor::EditorGUI;
+
         static Path s_assetsDirectory;
         static Path s_rootSystemDirectory;
         const static Path s_textureRootDirectory;
+
+        static FileNode s_assetsDirectoryRootNode;
     };
 }
 

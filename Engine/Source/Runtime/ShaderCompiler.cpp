@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cctype>
+#include <boost/algorithm/string.hpp>
 
 #include "Debug.hpp"
 
@@ -125,8 +126,10 @@ namespace FishEngine
                 else    // keyword
                 {
                     auto name = tok.substr(1);
+                    boost::to_lower(name);
                     ignoreSpace(shaderText, cursor);
                     auto setting = nextTok(shaderText, cursor);
+                    boost::to_lower(setting);
                     readToNewline(shaderText, cursor);
                     cout << "Keyword " << name << " " << setting << endl;
 
@@ -178,11 +181,11 @@ namespace FishEngine
             cursor += 8;
             return test;
         }
-        bool first_is_space = std::isspace(shaderText[start]);
+        bool first_is_space = (std::isspace(shaderText[start]) != 0);
         while (cursor < end)
         {
             char c = shaderText[cursor];
-            bool is_space = std::isspace(c);
+            bool is_space = (std::isspace(c) != 0);
             if ((first_is_space && !is_space) ||
                 (!first_is_space && is_space))
                 break;
@@ -222,8 +225,8 @@ namespace FishEngine
     size_t ShaderCompiler::findPair(const std::string& text, const size_t cursor)
     {
         int left_count = 1;
-        int i = cursor;
-        for (i = cursor; i < text.size(); ++i)
+        size_t i = cursor;
+        for ( ; i < text.size(); ++i)
         {
             if (text[i] == '{')
             {

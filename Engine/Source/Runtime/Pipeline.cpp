@@ -7,17 +7,20 @@
 
 namespace FishEngine
 {
-    PerDraw Pipeline::s_perDrawUniformData;
-    PerFrame Pipeline::s_perFrameUniformData;
-    //Bones Pipeline::s_bonesUniformData;
-    GLuint Pipeline::s_perDrawUBO = 0;
-    GLuint Pipeline::s_perFrameUBO = 0;
-    GLuint Pipeline::s_bonesUBO = 0;
+    PerDrawUniforms     Pipeline::s_perDrawUniforms;
+    LightingUniforms    Pipeline::s_lightingUniforms;
+    PerCameraUniforms   Pipeline::s_perCameraUniforms;
+
+    unsigned int        Pipeline::s_perCameraUBO = 0;
+    unsigned int        Pipeline::s_perDrawUBO = 0;
+    unsigned int        Pipeline::s_lightingUBO = 0;
+    unsigned int        Pipeline::s_bonesUBO = 0;
 
     void Pipeline::Init()
     {
+        glGenBuffers(1, &s_perCameraUBO);
         glGenBuffers(1, &s_perDrawUBO);
-        glGenBuffers(1, &s_perFrameUBO);
+        glGenBuffers(1, &s_lightingUBO);
         glGenBuffers(1, &s_bonesUBO);
     }
 
@@ -25,44 +28,47 @@ namespace FishEngine
     {
         auto proj = camera->projectionMatrix();
         auto view = camera->worldToCameraMatrix();
-        s_perFrameUniformData.MATRIX_P = proj;
-        s_perFrameUniformData.MATRIX_V = view;
-        s_perFrameUniformData.MATRIX_I_V = view.inverse();
-        s_perFrameUniformData.MATRIX_VP = proj * view;
-        s_perFrameUniformData.WorldSpaceCameraPos = camera->transform()->position();
+        s_perCameraUniforms.MATRIX_P = proj;
+        s_perCameraUniforms.MATRIX_V = view;
+        s_perCameraUniforms.MATRIX_I_V = view.inverse();
+        s_perCameraUniforms.MATRIX_VP = proj * view;
+        s_perCameraUniforms.WorldSpaceCameraPos = Vector4(camera->transform()->position(), 1);
         float t = Time::time();
-        s_perFrameUniformData._Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
+        s_perCameraUniforms.Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, s_perCameraUBO);
+        //auto size = sizeof(perFrameUniformData);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(s_perCameraUniforms), (void*)&s_perCameraUniforms, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, PerCameraUBOBindingPoint, s_perCameraUBO);
+        glCheckError();
     }
 
     void Pipeline::BindLight(const LightPtr& light)
     {
-        s_perFrameUniformData.LightColor0 = light->m_color;
-        s_perFrameUniformData.WorldSpaceLightPos0 = Vector4(-light->transform()->forward(), 0);
-        s_perFrameUniformData.LightMatrix0 = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
+        s_lightingUniforms.LightColor = light->m_color;
+        s_lightingUniforms.WorldSpaceLightPos = Vector4(-light->transform()->forward(), 0);
+        s_lightingUniforms.LightMatrix = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
+        
+        glBindBuffer(GL_UNIFORM_BUFFER, s_lightingUBO);
+        //auto size = sizeof(perFrameUniformData);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(s_lightingUniforms), (void*)&s_lightingUniforms, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, LightingUBOBindingPoint, s_lightingUBO);
+        glCheckError();
     }
 
     void Pipeline::UpdatePerDrawUniforms(const Matrix4x4& modelMatrix)
     {
-        auto mv = Pipeline::s_perFrameUniformData.MATRIX_V * modelMatrix;
-        s_perDrawUniformData.MATRIX_MVP = Pipeline::s_perFrameUniformData.MATRIX_VP * modelMatrix;
-        s_perDrawUniformData.MATRIX_MV = mv;
-        s_perDrawUniformData.MATRIX_M = modelMatrix;
-        s_perDrawUniformData.MATRIX_IT_MV = mv.transpose().inverse();
-        s_perDrawUniformData.MATRIX_IT_M = modelMatrix.transpose().inverse();
+        auto mv = Pipeline::s_perCameraUniforms.MATRIX_V * modelMatrix;
+        s_perDrawUniforms.MATRIX_MVP = Pipeline::s_perCameraUniforms.MATRIX_VP * modelMatrix;
+        s_perDrawUniforms.MATRIX_MV = mv;
+        s_perDrawUniforms.MATRIX_M = modelMatrix;
+        s_perDrawUniforms.MATRIX_IT_MV = mv.transpose().inverse();
+        s_perDrawUniforms.MATRIX_IT_M = modelMatrix.transpose().inverse();
 
         glBindBuffer(GL_UNIFORM_BUFFER, s_perDrawUBO);
         //auto size = sizeof(perDrawUniformData);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(s_perDrawUniformData), (void*)&s_perDrawUniformData, GL_DYNAMIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(s_perDrawUniforms), (void*)&s_perDrawUniforms, GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, PerDrawUBOBindingPoint, s_perDrawUBO);
-        glCheckError();
-    }
-
-    void Pipeline::UpdatePerFrameUniforms()
-    {
-        glBindBuffer(GL_UNIFORM_BUFFER, s_perFrameUBO);
-        //auto size = sizeof(perFrameUniformData);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(s_perFrameUniformData), (void*)&s_perFrameUniformData, GL_DYNAMIC_DRAW);
-        glBindBufferBase(GL_UNIFORM_BUFFER, PerFrameUBOBindingPoint, s_perFrameUBO);
         glCheckError();
     }
 

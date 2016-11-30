@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     // Initialize GLEW to setup the OpenGL Function pointers
     glewInit();
 
-    std::string path = R"(D:\program\FishEngine\Engine\Shaders\SkyBox-Cubed.shader)";
+    std::string path = R"(D:\program\FishEngine\Engine\Shaders\Deferred.shader)";
     if (argc == 2)
     {
         path = argv[1];

@@ -1,6 +1,8 @@
 #ifndef DeferredShadingCommon_inc
 #define DeferredShadingCommon_inc
 
+#include <UnrealSupport.inc>
+
 float3 EncodeNormal( float3 N )
 {
 	return N * 0.5 + 0.5;
@@ -21,7 +23,9 @@ struct FGBufferData
     float   Roughness;
     float   Specular;
     //float   AO;
-    uint    MaterialID;
+    //uint    MaterialID;
+
+    float   Depth;
 };
 
 void EncodeGBuffer(
@@ -30,9 +34,23 @@ void EncodeGBuffer(
     out float4 RT1,
     out float4 RT2)
 {
-    RT0 = float4(GBuffer.DiffuseColor, GBuffer.MaterialID);
-    RT1 = float4(GBuffer.WorldNormal, 1);
-    RT2 = float4(GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1);
+    RT0 = float4( GBuffer.DiffuseColor, 1 );
+    RT1 = float4( EncodeNormal( GBuffer.WorldNormal ), 1 );
+    RT2 = float4( GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1 );
+}
+
+FGBufferData DecodeGBuffer(
+    float4 DBufferA,
+    float4 DBufferB,
+    float4 DBufferC)
+{
+    FGBufferData ret;
+    ret.DiffuseColor    = DBufferA.rgb;
+    ret.WorldNormal     = DecodeNormal( DBufferB.xyz );
+    ret.Metallic        = DBufferC.x;
+    ret.Roughness       = DBufferC.y;
+    ret.Specular        = DBufferC.z;
+    return ret;
 }
 
 #endif

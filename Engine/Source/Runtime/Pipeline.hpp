@@ -19,20 +19,21 @@ namespace FishEngine
 
         static void UpdatePerDrawUniforms(const Matrix4x4& modelMatrix);
 
-        static void UpdatePerFrameUniforms();
-        
         static void UpdateBonesUniforms(const std::vector<Matrix4x4>& bones);
 
-        static constexpr unsigned int PerDrawUBOBindingPoint = 0;
-        static constexpr unsigned int PerFrameUBOBindingPoint = 1;
-        static constexpr unsigned int BonesUBOBindingPoint = 2;
+        static constexpr unsigned int PerCameraUBOBindingPoint  = 0;
+        static constexpr unsigned int PerDrawUBOBindingPoint    = 1;
+        static constexpr unsigned int LightingUBOBindingPoint   = 2;
+        static constexpr unsigned int BonesUBOBindingPoint      = 3;
 
     private:
-        static unsigned int s_perDrawUBO;
-        static unsigned int s_perFrameUBO;
-        static unsigned int s_bonesUBO;
-        static PerDraw      s_perDrawUniformData;
-        static PerFrame     s_perFrameUniformData;
+        static unsigned int         s_perCameraUBO;
+        static unsigned int         s_perDrawUBO;
+        static unsigned int         s_lightingUBO;
+        static unsigned int         s_bonesUBO;
+        static PerCameraUniforms    s_perCameraUniforms;
+        static PerDrawUniforms      s_perDrawUniforms;
+        static LightingUniforms     s_lightingUniforms;
         //static Bones        s_bonesUniformData;
     };
 }

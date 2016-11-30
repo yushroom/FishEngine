@@ -711,15 +711,15 @@ namespace FishEditor
             static int item_selected = -1;
             for (const auto& t : Texture::AllTextures())
             {
-                //constexpr ImVec2 size(128, 128);
                 if (t->dimension() == TextureDimension::Tex2D)
                 {
-                    ImGui::SameLine();
+                    ImGui::SameLine(0, 0);
                     if (ImGui::GetContentRegionAvailWidth() < image_size)
                     {
                         ImGui::NewLine();
                     }
-                    //ImGui::Image((void*)t->GetNativeTexturePtr(), ImVec2(64, 64));
+                    //std::cout << ImGui::GetCursorPosX() << std::endl;
+                    //std::cout << ImGui::GetCurrentWindow()->DC.CursorPos.x << std::endl;
                     if (item_selected == item_count)
                         ImGui::ImageWithLabel(
                             t->name().c_str(),

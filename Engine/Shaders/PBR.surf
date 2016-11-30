@@ -49,7 +49,7 @@ vec4 ps_main(SurfaceData surfaceData)
     float NoV = saturate( dot(N, V) );
     // Point lobe in off-specular peak direction
 
-    outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(s.Roughness), vec3(1), L, V, N);
+    outColor.rgb = PI * LightColor.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(s.Roughness), vec3(1), L, V, N);
     
 #ifdef _AMBIENT_IBL
     float a = Square( Roughness );

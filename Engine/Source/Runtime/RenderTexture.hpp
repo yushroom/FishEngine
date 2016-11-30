@@ -21,7 +21,7 @@ namespace FishEngine {
         
         static RenderTexturePtr CreateShadowMap();
 
-        static RenderTexturePtr CreateColorMap(const int width, const int height);
+        static RenderTexturePtr CreateColorMap(const int width, const int height);\
 
         int width() const
         {
@@ -55,6 +55,17 @@ namespace FishEngine {
         int m_width;
         int m_height;
         GLuint m_FBO = 0;
+        GLuint m_depthBuffer = 0;
+    };
+
+    class FE_EXPORT GBuffer
+    {
+    public:
+
+        static std::shared_ptr<GBuffer> Create(const int width, const int height);
+
+        GLuint m_FBO = 0;
+        GLuint m_rt[3] = { 0, 0, 0 };
         GLuint m_depthBuffer = 0;
     };
 }

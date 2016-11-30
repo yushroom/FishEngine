@@ -85,4 +85,39 @@ namespace FishEngine
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_width, m_height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
     }
 
+    std::shared_ptr<GBuffer> GBuffer::Create(const int width, const int height)
+    {
+        auto gbuffer = std::make_shared<GBuffer>();
+        glGenFramebuffers(1, &gbuffer->m_FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer->m_FBO);
+
+        for (int i = 0; i < 3; ++i)
+        {
+            auto& rt = gbuffer->m_rt[i];
+            glGenTextures(1, &rt);
+            glBindTexture(GL_TEXTURE_2D, rt);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, rt, 0);
+        }
+
+        GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+        glDrawBuffers(3, attachments);
+
+        glGenTextures(1, &gbuffer->m_depthBuffer);
+        glBindTexture(GL_TEXTURE_2D, gbuffer->m_depthBuffer);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, rt->m_width, rt->m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, gbuffer->m_depthBuffer, 0);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        return gbuffer;
+    }
+
 } // namespace FishEngine

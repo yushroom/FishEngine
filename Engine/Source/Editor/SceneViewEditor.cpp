@@ -120,7 +120,6 @@ namespace FishEditor
         /* Selection                                                            */
         /************************************************************************/
         if (m_highlightSelections)
-        //if (true)
         {
             auto camera = Camera::main();
             auto view = camera->worldToCameraMatrix();

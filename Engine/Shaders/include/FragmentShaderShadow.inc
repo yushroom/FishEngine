@@ -113,7 +113,7 @@ void main()
 {
     SurfaceData surfaceData;
     vec3 L = normalize(WorldSpaceLightDir(vs_out.position));
-    vec3 V = normalize(WorldSpaceCameraPos - vs_out.position);
+    vec3 V = normalize(WorldSpaceCameraPos.xyz - vs_out.position);
     //vec3 N = normalize(vs_out.normal);
     vec3 N = GetNormal();
     surfaceData.L = L;
@@ -124,7 +124,7 @@ void main()
     color = ps_main(surfaceData);
 
 #ifdef _SHADOW
-    vec4 positionInLightSpace = LightMatrix0 * vec4(vs_out.position, 1);
+    vec4 positionInLightSpace = LightMatrix * vec4(vs_out.position, 1);
     float shadowFactor = ShadowCalculation(positionInLightSpace, L, N);
     color.rgb *= (1.f-shadowFactor*0.5);
 #endif

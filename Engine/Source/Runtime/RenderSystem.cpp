@@ -52,8 +52,6 @@ namespace FishEngine
             Pipeline::BindLight(l);
         }
 
-        Pipeline::UpdatePerFrameUniforms();
-
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
         const int h = Screen::height();

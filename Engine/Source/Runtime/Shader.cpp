@@ -10,6 +10,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "Texture.hpp"
 #include "Common.hpp"
@@ -189,6 +190,7 @@ namespace FishEngine
         }
 
         bool m_hasGeometryShader = false;
+        uint32_t m_lineCount;   // for error message
 
     private:
         //std::string                         m_filePath;
@@ -200,10 +202,12 @@ namespace FishEngine
         GLuint Compile(ShaderType type, ShaderKeywords keywords)
         {
             std::string text = "#version 410 core\n";
+            m_lineCount = 1;
 
-            auto add_macro_definition = [&text](const string& d)
+            auto add_macro_definition = [&text, this](const string& d)
             {
                 text += "#define " + d + "\n";
+                this->m_lineCount++;
             };
 
             GLenum t = GL_VERTEX_SHADER;
@@ -244,23 +248,33 @@ namespace FishEngine
         void GetAllUniforms(GLuint program) noexcept
         {
             std::vector<UniformInfo> uniforms;
-            GLuint blockID = glGetUniformBlockIndex(program, "PerDraw");
+            GLuint blockID = glGetUniformBlockIndex(program, "PerCameraUniforms");
             GLint blockSize = 0;
+            //assert(blockID != GL_INVALID_INDEX);
+            if (blockID != GL_INVALID_INDEX)
+            {
+                glUniformBlockBinding(program, blockID, Pipeline::PerCameraUBOBindingPoint);
+                glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+                assert(blockSize == sizeof(PerCameraUniforms));
+            }
+
+            blockID = glGetUniformBlockIndex(program, "PerDrawUniforms");
+            blockSize = 0;
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
                 glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(PerDraw));
+                assert(blockSize == sizeof(PerDrawUniforms));
             }
 
-            blockID = glGetUniformBlockIndex(program, "PerFrame");
+            blockID = glGetUniformBlockIndex(program, "LightingUniforms");
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
-                glUniformBlockBinding(program, blockID, Pipeline::PerFrameUBOBindingPoint);
+                glUniformBlockBinding(program, blockID, Pipeline::LightingUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-                assert(blockSize == sizeof(PerFrame));
+                assert(blockSize == sizeof(LightingUniforms));
             }
 
             blockID = glGetUniformBlockIndex(program, "Bones");
@@ -349,9 +363,39 @@ namespace FishEngine
         }
         catch (const std::exception& e)
         {
-            //printf("VERTEX\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_vertexShaderText).c_str());
-            //printf("Geometry\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_geometryShaderText).c_str());
-            //printf("FRAGMENT\n==========\n%s\n==========\n", AddLineNumber(m_impl->m_fragmentShaderText).c_str());
+            //std::cout << AddLineNumber(m_impl->shaderTextRaw()) 
+            //    << std::endl << m_impl->m_lineCount << std::endl;
+            std::string str = string(e.what());
+            auto begin = str.find_first_of('(');
+            auto end = str.find_first_of(')');
+            uint32_t line_number = boost::lexical_cast<uint32_t>(str.substr(begin + 1, end - begin - 1));
+            //cout << line_number << endl;
+            uint32_t start_line = m_impl->m_lineCount;
+            auto& text = m_impl->shaderTextRaw();
+
+            string::size_type cursor = 0;
+
+            int first = line_number - start_line - 5;
+            if (first < 0)
+                first = 0;
+
+            for (int i = 0; i < first-1; ++i)
+            {
+                cursor = text.find_first_of('\n', cursor) + 1;
+            }
+
+            auto total = std::count(text.begin(), text.end(), '\n') + 1;
+            int last = line_number - start_line + 5;
+            if (last >= total)
+                last = total - 1;
+
+            for (int i = first; i < last; ++i)
+            {
+                auto new_cursor = text.find_first_of('\n', cursor);
+                cout << '#' << i+ start_line << '\t' << text.substr(cursor, new_cursor-cursor) << '\n';
+                cursor = new_cursor+1;
+            }
+
             Debug::LogError("%s", e.what());
             return false;
         }

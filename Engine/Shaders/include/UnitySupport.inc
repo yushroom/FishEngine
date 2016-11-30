@@ -28,8 +28,8 @@
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
 
-#define _WorldSpaceLightPos0 WorldSpaceLightPos0
-#define _LightColor0 LightColor0
+#define _WorldSpaceLightPos0 WorldSpaceLightPos
+#define _LightColor0 LightColor
 
 
 // Tranforms position from object to homogenous space

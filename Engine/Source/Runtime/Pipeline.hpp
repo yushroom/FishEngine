@@ -4,9 +4,30 @@
 #include "FishEngine.hpp"
 #include "Matrix4x4.hpp"
 #include "ShaderVariables_gen.hpp"
+#include <stack>
 
 namespace FishEngine
 {
+    class FE_EXPORT RenderTarget
+    {
+    public:
+        RenderTarget() = default;
+
+        void Set(ColorBufferPtr colorBuffer, DepthBufferPtr depthBuffer);
+        void Set(ColorBufferPtr colorBuffer1, ColorBufferPtr colorBuffer2, ColorBufferPtr colorBuffer3, DepthBufferPtr depthBuffer);
+
+        void Attach();
+        void Detach();
+
+    private:
+        uint32_t  m_activeColorBufferCount = 1;
+        ColorBufferPtr m_colorBuffers[3];
+        DepthBufferPtr m_depthBuffer;
+        unsigned int m_fbo = 0;
+
+        void Init();
+    };
+
     class FE_EXPORT Pipeline
     {
     public:
@@ -20,6 +41,15 @@ namespace FishEngine
         static void UpdatePerDrawUniforms(const Matrix4x4& modelMatrix);
 
         static void UpdateBonesUniforms(const std::vector<Matrix4x4>& bones);
+
+        static RenderTargetPtr CurrentRenderTarget()
+        {
+            s_renderTargetStack.top();
+        }
+
+        static void PushRenderTarget(const RenderTargetPtr& renderTarget);
+
+        static void PopRenderTarget();
 
         static constexpr unsigned int PerCameraUBOBindingPoint  = 0;
         static constexpr unsigned int PerDrawUBOBindingPoint    = 1;
@@ -35,6 +65,10 @@ namespace FishEngine
         static PerDrawUniforms      s_perDrawUniforms;
         static LightingUniforms     s_lightingUniforms;
         //static Bones        s_bonesUniformData;
+
+        static RenderTargetPtr      s_currentRenderTarget;
+
+        static std::stack<RenderTargetPtr> s_renderTargetStack;
     };
 }
 

@@ -76,6 +76,10 @@ namespace FishEngine
     class RenderSystem;
     class Graphics;
 
+    class RenderTarget;
+    class ColorBuffer;
+    class DepthBuffer;
+
     struct Avatar;
     struct Ray;
     struct Bounds;
@@ -111,6 +115,10 @@ namespace FishEngine
     typedef std::shared_ptr<SphereCollider> SphereColliderPtr;
     typedef std::shared_ptr<MeshCollider> MeshColliderPtr;
     typedef std::shared_ptr<Avatar> AvatarPtr;
+
+    typedef std::shared_ptr<RenderTarget> RenderTargetPtr;
+    typedef std::shared_ptr<ColorBuffer> ColorBufferPtr;
+    typedef std::shared_ptr<DepthBuffer> DepthBufferPtr;
 }
 
 // hack: inject FishEditor namespace

@@ -95,6 +95,10 @@ namespace FishEngine
             return m_textures;
         }
 
+        virtual void Resize(const int newWidth, const int newHeight)
+        {
+            abort();
+        }
 
     protected:
         
@@ -105,7 +109,7 @@ namespace FishEngine
         int m_anisoLevel;
         
         // Dimensionality (type) of the texture (Read Only).
-        TextureDimension m_dimension;
+        TextureDimension m_dimension = TextureDimension::Unknown;
         
         // Filtering mode of the texture.
         FilterMode m_filterMode = FilterMode::Trilinear;
@@ -116,11 +120,10 @@ namespace FishEngine
         //OpenGL
         unsigned int m_texture = 0;
 
+        static std::vector<TexturePtr> m_textures;
+
     private:
         friend class TextureImporter;
-        friend class GBuffer;
-        
-        static std::vector<TexturePtr> m_textures;
     };
     
     enum class TextureFormat
@@ -135,6 +138,20 @@ namespace FishEngine
         RG16,   // **New**, uint16_t * 2
         RGHalf,	// Two color (RG) texture format, 16 bit floating point per channel.
         RGFloat	// Two color (RG) texture format, 32 bit floating point per channel.
+    };
+
+    class ColorBuffer : public Texture
+    {
+    public:
+        static std::shared_ptr<ColorBuffer> Create(const int width, const int height);
+        virtual void Resize(const int newWidth, const int newHeight) override;
+    };
+
+    class DepthBuffer : public Texture
+    {
+    public:
+        static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
+        virtual void Resize(const int newWidth, const int newHeight) override;
     };
     
     class Texture2D : public Texture

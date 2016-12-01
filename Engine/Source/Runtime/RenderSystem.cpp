@@ -1,5 +1,7 @@
 #include "RenderSystem.hpp"
 
+#include <boost/lexical_cast.hpp>
+
 #include "Pipeline.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
@@ -11,10 +13,16 @@
 #include "Scene.hpp"
 #include "Screen.hpp"
 #include "Graphics.hpp"
+#include "GameObject.hpp"
+#include "MeshRenderer.hpp"
+#include "SkinnedMeshRenderer.hpp"
 
 namespace FishEngine
 {
-    FishEngine::GBuffer RenderSystem::m_GBuffer;
+    //FishEngine::GBuffer RenderSystem::m_GBuffer;
+    FishEngine::ColorBufferPtr      RenderSystem::m_GBuffer[3];
+    FishEngine::DepthBufferPtr      RenderSystem::m_depthBuffer;
+    FishEngine::RenderTargetPtr     RenderSystem::m_deferredRenderTarget;
 
     void RenderSystem::Init()
     {
@@ -33,7 +41,16 @@ namespace FishEngine
 
         const int w = Screen::width();
         const int h = Screen::height();
-        m_GBuffer.Init(w, h);
+
+        m_depthBuffer = DepthBuffer::Create(w, h);
+        m_depthBuffer->setName("DepthBuffer");
+        for (int i = 0; i < 3; ++i)
+        {
+            m_GBuffer[i] = ColorBuffer::Create(w, h);
+            m_GBuffer[i]->setName("GBuffer-RT" + boost::lexical_cast<std::string>(i));
+        }
+        m_deferredRenderTarget = std::make_shared<RenderTarget>();
+        m_deferredRenderTarget->Set(m_GBuffer[0], m_GBuffer[1], m_GBuffer[2], m_depthBuffer);
     }
 
     void RenderSystem::Render()
@@ -63,32 +80,106 @@ namespace FishEngine
         const int h = Screen::height();
         glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
 
+
+#if 0
         /************************************************************************/
         /* Skybox                                                               */
         /************************************************************************/
         Matrix4x4 model = Matrix4x4::Scale(100);
         Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
-        GLint previous_fbo = 0;
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_GBuffer.m_FBO);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
         Scene::Render();
+#else
+        /************************************************************************/
+        /* Scene                                                                */
+        /************************************************************************/
+        Pipeline::PushRenderTarget(m_deferredRenderTarget);
+        glClear(GL_COLOR_BUFFER_BIT);
+        std::vector<GameObjectPtr> transparentQueue;
+        std::vector<GameObjectPtr> forwardQueue;
 
-        glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+        for (auto& go : Scene::m_gameObjects)
+        {
+            if (!go->activeInHierarchy()) continue;
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
 
+            if (renderer == nullptr)
+            {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+                if (renderer == nullptr)
+                    continue;
+            }
+
+            if (renderer->material() != nullptr)
+            {
+                if (renderer->material()->shader()->IsTransparent())
+                {
+                    transparentQueue.push_back(go);
+                    continue;
+                }
+                else if (!renderer->material()->shader()->IsDeferred())
+                {
+                    forwardQueue.push_back(go);
+                    continue;
+                }
+            }
+            // Deferred
+            renderer->Render();
+        }
+
+        Pipeline::PopRenderTarget();
+
+        glDepthFunc(GL_ALWAYS);
+        glDepthMask(GL_FALSE);
         auto quad = Model::builtinMesh(PrimitiveType::Quad);
         auto mtl = Material::builtinMaterial("Deferred");
-        mtl->SetTexture("DBufferATexture", m_GBuffer.m_colorBuffers[0]);
-        mtl->SetTexture("DBufferBTexture", m_GBuffer.m_colorBuffers[1]);
-        mtl->SetTexture("DBufferCTexture", m_GBuffer.m_colorBuffers[2]);
-        mtl->SetTexture("SceneDepthTexture", m_GBuffer.m_depthBuffer);
-
+        mtl->SetTexture("DBufferATexture", m_GBuffer[0]);
+        mtl->SetTexture("DBufferBTexture", m_GBuffer[1]);
+        mtl->SetTexture("DBufferCTexture", m_GBuffer[2]);
+        mtl->SetTexture("SceneDepthTexture", m_depthBuffer);
         Graphics::DrawMesh(quad, mtl);
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LESS);
+
+        /************************************************************************/
+        /* Forward                                                              */
+        /************************************************************************/
+        for (auto& go : forwardQueue)
+        {
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
+            if (renderer == nullptr)
+            {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+            }
+            renderer->Render();
+        }
+        forwardQueue.clear();
+
+
+        /************************************************************************/
+        /* Skybox                                                               */
+        /************************************************************************/
+        Matrix4x4 model = Matrix4x4::Scale(100);
+        Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
+
+
+        /************************************************************************/
+        /* Transparent                                                          */
+        /************************************************************************/
+        for (auto& go : transparentQueue)
+        {
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
+            if (renderer == nullptr)
+            {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+            }
+            renderer->Render();
+        }
+        transparentQueue.clear();
+#endif
 
         //if (m_isWireFrameMode)
         //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -111,7 +202,6 @@ namespace FishEngine
         Gizmos::setColor(Color::red);
         auto& b = Scene::m_bounds;
         Gizmos::DrawWireCube(b.center(), b.size());
-
     }
 
     void RenderSystem::Clean()
@@ -119,6 +209,12 @@ namespace FishEngine
 
     }
 
+    void RenderSystem::ResizeBufferSize(const int width, const int height)
+    {
+        m_depthBuffer->Resize(width, height);
+        for (auto& gb : m_GBuffer)
+            gb->Resize(width, height);
+    }
 
 } // namespace FishEngine
 

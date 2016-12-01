@@ -80,6 +80,11 @@ namespace FishEngine
             return m_blend;
         }
 
+        bool IsDeferred() const
+        {
+            return m_deferred;
+        }
+
         //std::shared_ptr<Shader> m_skinnedShader = nullptr;
 
         bool IsKeywordEnabled(ShaderKeyword keyword)
@@ -111,6 +116,8 @@ namespace FishEngine
         bool m_blend = false;
         bool m_applyNormalMap = false;
         bool m_receiveShadow = true;
+
+        bool m_deferred = false;
 
         friend class RenderSystem;
 

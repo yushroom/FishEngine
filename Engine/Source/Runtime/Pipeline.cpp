@@ -5,11 +5,17 @@
 #include "Time.hpp"
 #include "Light.hpp"
 #include "Screen.hpp"
+#include "RenderTexture.hpp"
 
 namespace FishEngine
 {
     PerDrawUniforms     Pipeline::s_perDrawUniforms;
     LightingUniforms    Pipeline::s_lightingUniforms;
+
+    FishEngine::RenderTargetPtr Pipeline::s_currentRenderTarget;
+
+    std::stack<RenderTargetPtr> Pipeline::s_renderTargetStack;
+
     PerCameraUniforms   Pipeline::s_perCameraUniforms;
 
     unsigned int        Pipeline::s_perCameraUBO = 0;
@@ -100,6 +106,77 @@ namespace FishEngine
         //auto size = sizeof(perFrameUniformData);
         glBufferData(GL_UNIFORM_BUFFER, bones.size() * sizeof(Matrix4x4), (void*)bones.data(), GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, BonesUBOBindingPoint, s_bonesUBO);
+        glCheckError();
+    }
+
+    void Pipeline::PushRenderTarget(const RenderTargetPtr& renderTarget)
+    {
+        s_renderTargetStack.push(renderTarget);
+        renderTarget->Attach();
+    }
+
+    void Pipeline::PopRenderTarget()
+    {
+        if (!s_renderTargetStack.empty())
+        {
+            s_renderTargetStack.top()->Detach();
+            s_renderTargetStack.pop();
+            glCheckError();
+        }
+        if (!s_renderTargetStack.empty())
+        {
+            s_renderTargetStack.top()->Attach();
+            glCheckError();
+        }
+    }
+
+    void RenderTarget::Set(ColorBufferPtr colorBuffer, DepthBufferPtr depthBuffer)
+    {
+        m_activeColorBufferCount = 1;
+        m_colorBuffers[0] = colorBuffer;
+        m_depthBuffer = depthBuffer;
+
+        Init();
+    }
+
+    void RenderTarget::Set(ColorBufferPtr colorBuffer1, ColorBufferPtr colorBuffer2, ColorBufferPtr colorBuffer3, DepthBufferPtr depthBuffer)
+    {
+        m_activeColorBufferCount = 3;
+        m_colorBuffers[0] = colorBuffer1;
+        m_colorBuffers[1] = colorBuffer2;
+        m_colorBuffers[2] = colorBuffer3;
+        m_depthBuffer = depthBuffer;
+
+        Init();
+    }
+
+    void RenderTarget::Attach()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    }
+
+    void RenderTarget::Detach()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void RenderTarget::Init()
+    {
+        glGenFramebuffers(1, &m_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+        for (int i = 0; i < m_activeColorBufferCount; ++i)
+        {
+            auto rt = m_colorBuffers[i]->GetNativeTexturePtr();
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, rt, 0);
+        }
+        GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        glDrawBuffers(m_activeColorBufferCount, attachments);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->GetNativeTexturePtr(), 0);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         glCheckError();
     }
 

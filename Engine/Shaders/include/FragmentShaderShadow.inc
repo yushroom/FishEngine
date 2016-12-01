@@ -17,14 +17,14 @@
 // uniform samplerCube RadianceMap;
 // uniform samplerCube IrradianceMap;
 
-in VS_OUT
+struct VS_OUT
 {
     vec3 position;      // in world space
     vec3 normal;        // in world space
     vec3 tangent;
     vec2 uv;
-    //vec4 positionInLightSpace; // light space
-} vs_out;
+};
+in VS_OUT vs_out;
 
 out vec4 color;
 

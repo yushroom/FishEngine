@@ -259,26 +259,52 @@ namespace FishEngine
 
     void Scene::Render()
     {
+#if 1
         std::vector<GameObjectPtr> transparentQueue;
+        std::vector<GameObjectPtr> forwardQueue;
+
         for (auto& go : Scene::m_gameObjects)
         {
             if (!go->activeInHierarchy()) continue;
             RendererPtr renderer = go->GetComponent<MeshRenderer>();
+
             if (renderer == nullptr)
             {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
                 if (renderer == nullptr)
                     continue;
             }
-            if (renderer->material() != nullptr
-                && renderer->material()->shader()->IsTransparent())
+
+            if (renderer->material() != nullptr)
             {
-                transparentQueue.push_back(go);
-                continue;
+                if (renderer->material()->shader()->IsTransparent())
+                {
+                    transparentQueue.push_back(go);
+                    continue;
+                }
+                else if (!renderer->material()->shader()->IsDeferred())
+                {
+                    forwardQueue.push_back(go);
+                    continue;
+                }
             }
+            // Deferred
             renderer->Render();
         }
         
+        /************************************************************************/
+        /* Forward                                                              */
+        /************************************************************************/
+        for (auto& go : forwardQueue)
+        {
+            RendererPtr renderer = go->GetComponent<MeshRenderer>();
+            if (renderer == nullptr)
+            {
+                renderer = go->GetComponent<SkinnedMeshRenderer>();
+            }
+            renderer->Render();
+        }
+
         /************************************************************************/
         /* Transparent                                                          */
         /************************************************************************/
@@ -293,6 +319,7 @@ namespace FishEngine
         }
         
         transparentQueue.clear();
+#endif
     }
 
     GameObjectPtr Scene::Find(const std::string& name)

@@ -12,7 +12,6 @@
 		FGBufferData GBuffer;
 		GBuffer.WorldNormal = v2f.normal;
 
-		GBuffer.Depth		= distance(v2f.position, WorldSpaceCameraPos.xyz) / ProjectionParams.z;
 		GBuffer.BaseColor	= texture(DiffuseTex, v2f.uv).rgb;
 		GBuffer.Metallic 	= 0;
 		GBuffer.Roughness 	= Roughness;

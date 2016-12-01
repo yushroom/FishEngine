@@ -345,7 +345,8 @@ namespace FishEngine
             m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
             m_applyNormalMap = getValueOrDefault<string, string>(settings, "normalmap", "off") == "on";
             m_receiveShadow = getValueOrDefault<string, string>(settings, "shadow", "on") == "on";
-            
+            m_deferred = getValueOrDefault<string, string>(settings, "deferred", "off") == "on";
+
             //SetLocalKeywords(ShaderKeyword::Shadow, m_receiveShadow);
             auto k = static_cast<ShaderKeywords>(ShaderKeyword::Shadow);
             if (m_receiveShadow)

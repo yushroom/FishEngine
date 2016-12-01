@@ -127,17 +127,25 @@ namespace FishEngine
                 {
                     auto name = tok.substr(1);
                     boost::to_lower(name);
-                    ignoreSpace(shaderText, cursor);
-                    auto setting = nextTok(shaderText, cursor);
-                    boost::to_lower(setting);
+                    if (name == "deferred")
+                    {
+                        cout << "Keyword " << name << endl;
+                        m_settings[name] = "on";
+                    }
+                    else
+                    {
+                        ignoreSpace(shaderText, cursor);
+                        auto setting = nextTok(shaderText, cursor);
+                        boost::to_lower(setting);
+                        cout << "Keyword " << name << " " << setting << endl;
+                        // TODO: override if smaller depth
+                        // do NOT override settings;
+                        auto it = m_settings.find(name);
+                        if (it == m_settings.end())
+                            m_settings[name] = setting;
+                    }
+                    
                     readToNewline(shaderText, cursor);
-                    cout << "Keyword " << name << " " << setting << endl;
-
-                    // TODO: override if smaller depth
-                    // do NOT override settings;
-                    auto it = m_settings.find(name);
-                    if (it == m_settings.end())
-                        m_settings[name] = setting;
                 }
             }
             else

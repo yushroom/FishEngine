@@ -835,8 +835,7 @@ namespace FishEditor
         m_sceneViewSize.x = static_cast<int>(size.x);
         m_sceneViewSize.y = static_cast<int>(size.y);
         m_mainSceneViewEditor->Render();
-        auto& rt = m_mainSceneViewEditor->m_sceneViewRenderTexture;
-        ImGui::Image((void*)rt->GetNativeTexturePtr(), size, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((void*)m_mainSceneViewEditor->m_colorBuffer->GetNativeTexturePtr(), size, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::EndDock();
     }
 

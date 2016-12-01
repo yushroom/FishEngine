@@ -1,4 +1,4 @@
-//#include "TestScript.hpp"
+#include "TestScript.hpp"
 #include <iostream>
 #include <Camera.hpp>
 #include <Scene.hpp>
@@ -219,7 +219,7 @@ public:
     }
 };
 
-#if 0
+#if 1
 
 class TestCSM : public App
 {

@@ -51,7 +51,11 @@ namespace FishEditor
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
         m_size = EditorGUI::sceneViewSize();
-        m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
+        //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
+        m_colorBuffer = ColorBuffer::Create(m_size.x, m_size.y);
+        m_colorBuffer->setName("SceneView");
+        m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
+        m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_depthBuffer);
 
         constexpr int rows = 10;
         constexpr int vertex_count = (rows * 2 + 1) * 2 * 2;
@@ -91,13 +95,14 @@ namespace FishEditor
             m_size = tsize;
             const int ix = static_cast<int>(m_size.x * Screen::pixelsPerPoint());
             const int iy = static_cast<int>(m_size.y * Screen::pixelsPerPoint());
-            m_sceneViewRenderTexture->Resize(ix, iy);
-            RenderSystem::m_GBuffer.Resize(ix, iy);
+            m_colorBuffer->Resize(ix, iy);
+            RenderSystem::ResizeBufferSize(ix, iy);
             Camera::OnWindowSizeChanged(ix, iy);
             Screen::m_width = ix;
             Screen::m_height = iy;
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, m_sceneViewRenderTexture->FBO());
+        Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
+        //glBindFramebuffer(GL_FRAMEBUFFER, m_sceneViewRenderTexture->FBO());
         glViewport(0, 0, Screen::m_width, Screen::m_height);
 
         RenderSystem::Render();
@@ -251,8 +256,8 @@ namespace FishEditor
             Selection::setActiveGameObject(go);
         }
         
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        Pipeline::PopRenderTarget();
     }
 
     void SceneViewEditor::DrawTranslateGizmo()

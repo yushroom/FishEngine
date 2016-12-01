@@ -16,8 +16,11 @@ namespace FishEngine
         
         static void Clean();
 
-    //private:
-        static GBuffer m_GBuffer;
+        static void ResizeBufferSize(const int width, const int height);
+
+        static ColorBufferPtr   m_GBuffer[3];
+        static DepthBufferPtr   m_depthBuffer;
+        static RenderTargetPtr  m_deferredRenderTarget;
     };
 }
 

@@ -1,3 +1,5 @@
+@deferred
+
 @vertex
 {
 	#define USE_DEFAULT_VS
@@ -35,7 +37,6 @@
 		FGBufferData GBuffer;
 		GBuffer.WorldNormal = v2f.normal;
 
-		GBuffer.Depth		= distance(v2f.position, WorldSpaceCameraPos.xyz) / ProjectionParams.z;
 		GBuffer.BaseColor	= BaseColor;
 		GBuffer.Metallic 	= Metallic;
 		GBuffer.Roughness 	= Roughness;

@@ -35,7 +35,7 @@ void EncodeGBuffer(
 {
     RT0 = float4( GBuffer.BaseColor, 1 );
     RT1 = float4( EncodeNormal( GBuffer.WorldNormal ), 1 );
-    RT2 = float4( GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, GBuffer.Depth );
+    RT2 = float4( GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1 );
 }
 
 FGBufferData DecodeGBuffer(
@@ -49,7 +49,7 @@ FGBufferData DecodeGBuffer(
     ret.Metallic        = DBufferC.x;
     ret.Roughness       = DBufferC.y;
     ret.Specular        = DBufferC.z;
-    ret.Depth           = DBufferC.w;
+    //ret.Depth           = DBufferC.w;
     return ret;
 }
 

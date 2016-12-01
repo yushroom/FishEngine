@@ -32,7 +32,10 @@ namespace FishEditor
     public:
         FishEngine::Vector2             m_position;
         FishEngine::Int2                m_size{128, 128};
-        FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
+
+        FishEngine::RenderTargetPtr     m_sceneViewRenderTarget;
+        FishEngine::ColorBufferPtr      m_colorBuffer;
+        //FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
 
         void Init();
 

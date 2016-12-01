@@ -61,12 +61,19 @@ namespace FishEngine {
     class FE_EXPORT GBuffer
     {
     public:
+        GBuffer();
+        ~GBuffer();
 
-        static std::shared_ptr<GBuffer> Create(const int width, const int height);
+        void Init(const int width, const int height);
+        void Resize(const int newWidth, const int newHeight);
 
+        int m_width;
+        int m_height;
         GLuint m_FBO = 0;
-        GLuint m_rt[3] = { 0, 0, 0 };
-        GLuint m_depthBuffer = 0;
+        //GLuint m_rt[3] = { 0, 0, 0 };
+        TexturePtr m_colorBuffers[3];
+        TexturePtr m_depthBuffer;
+        //GLuint m_depthBuffer = 0;
     };
 }
 

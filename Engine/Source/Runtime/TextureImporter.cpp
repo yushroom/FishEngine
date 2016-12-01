@@ -186,12 +186,14 @@ namespace FishEngine
     GLuint CreateTexture(const Path& path)
     {
         int width, height, n;
-        unsigned char *data = stbi_load(path.string().c_str(), &width, &height, &n, 4);
+        uint8_t *data = stbi_load(path.string().c_str(), &width, &height, &n, 4);
         if (data == nullptr)
         {
             Debug::LogError("Texture not found, path: %s", path.c_str());
             abort();
         }
+        //TextureImporter::FromRawData(data, width, height, TextureFormat::RGBA32);
+
         //assert(data!=nullptr);
         GLuint t;
         glGenTextures(1, &t);

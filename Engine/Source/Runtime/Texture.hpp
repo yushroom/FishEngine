@@ -41,6 +41,8 @@ namespace FishEngine
         
         virtual ~Texture();
         
+        static TexturePtr Create();
+
         uint32_t width() const
         {
             return m_width;
@@ -116,6 +118,7 @@ namespace FishEngine
 
     private:
         friend class TextureImporter;
+        friend class GBuffer;
         
         static std::vector<TexturePtr> m_textures;
     };

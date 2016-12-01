@@ -4,6 +4,7 @@
 #include "Transform.hpp"
 #include "Time.hpp"
 #include "Light.hpp"
+#include "Screen.hpp"
 
 namespace FishEngine
 {
@@ -32,9 +33,30 @@ namespace FishEngine
         s_perCameraUniforms.MATRIX_V = view;
         s_perCameraUniforms.MATRIX_I_V = view.inverse();
         s_perCameraUniforms.MATRIX_VP = proj * view;
+        
         s_perCameraUniforms.WorldSpaceCameraPos = Vector4(camera->transform()->position(), 1);
+        s_perCameraUniforms.WorldSpaceCameraDir = Vector4(camera->transform()->forward(), 0);
+
         float t = Time::time();
         s_perCameraUniforms.Time = Vector4(t / 20.f, t, t*2.f, t*3.f);
+        
+        float far = camera->farClipPlane();
+        float near = camera->nearClipPlane();
+
+        s_perCameraUniforms.ProjectionParams.x = 1.0f;
+        s_perCameraUniforms.ProjectionParams.y = camera->nearClipPlane();
+        s_perCameraUniforms.ProjectionParams.z = camera->farClipPlane();
+        s_perCameraUniforms.ProjectionParams.w = 1.0f / camera->farClipPlane();
+
+        s_perCameraUniforms.ScreenParams.x = Screen::width();
+        s_perCameraUniforms.ScreenParams.y = Screen::height();
+        s_perCameraUniforms.ScreenParams.z = 1.0f + 1.0f / Screen::width();
+        s_perCameraUniforms.ScreenParams.w = 1.0f + 1.0f / Screen::height();
+
+        s_perCameraUniforms.ZBufferParams.x = 1.0f - far / near;
+        s_perCameraUniforms.ZBufferParams.y = far / near;
+        s_perCameraUniforms.ZBufferParams.z = s_perCameraUniforms.ZBufferParams.x / far;
+        s_perCameraUniforms.ZBufferParams.w = s_perCameraUniforms.ZBufferParams.y / far;
 
         glBindBuffer(GL_UNIFORM_BUFFER, s_perCameraUBO);
         //auto size = sizeof(perFrameUniformData);

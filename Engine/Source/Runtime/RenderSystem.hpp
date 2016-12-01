@@ -1,7 +1,7 @@
 #ifndef RenderSystem_hpp
 #define RenderSystem_hpp
 
-#include "GLEnvironment.hpp"
+#include "RenderTexture.hpp"
 
 namespace FishEngine
 {
@@ -15,8 +15,10 @@ namespace FishEngine
         static void Render();
         
         static void Clean();
-    };
 
+    //private:
+        static GBuffer m_GBuffer;
+    };
 }
 
 #endif // RenderSystem_hpp

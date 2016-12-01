@@ -23,15 +23,25 @@ struct AppData
 
 #ifdef USE_DEFAULT_VS
 
+#if 0
     out VS_OUT
     {
     	vec3 position;		// in world space
     	vec3 normal;		// in world space
         vec3 tangent;
     	vec2 uv;
-    	//vec4 positionInLightSpace; // light space
     } vs_out;
 
+#else
+    struct VS_OUT
+    {
+        vec3 position;      // in world space
+        vec3 normal;        // in world space
+        vec3 tangent;
+        vec2 uv;
+    };
+    out VS_OUT vs_out;
+#endif
     void vs_main(AppData appdata)
     {
         gl_Position     = MATRIX_MVP * appdata.position;

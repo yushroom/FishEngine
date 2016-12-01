@@ -14,6 +14,8 @@
 
 namespace FishEngine
 {
+    FishEngine::GBuffer RenderSystem::m_GBuffer;
+
     void RenderSystem::Init()
     {
         Pipeline::Init();
@@ -28,6 +30,10 @@ namespace FishEngine
         glEnable(GL_CULL_FACE);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         //glEnable(GL_LINE_SMOOTH);
+
+        const int w = Screen::width();
+        const int h = Screen::height();
+        m_GBuffer.Init(w, h);
     }
 
     void RenderSystem::Render()
@@ -63,11 +69,26 @@ namespace FishEngine
         Matrix4x4 model = Matrix4x4::Scale(100);
         Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
+        GLint previous_fbo = 0;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_GBuffer.m_FBO);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
         Scene::Render();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+
+        auto quad = Model::builtinMesh(PrimitiveType::Quad);
+        auto mtl = Material::builtinMaterial("Deferred");
+        mtl->SetTexture("DBufferATexture", m_GBuffer.m_colorBuffers[0]);
+        mtl->SetTexture("DBufferBTexture", m_GBuffer.m_colorBuffers[1]);
+        mtl->SetTexture("DBufferCTexture", m_GBuffer.m_colorBuffers[2]);
+        mtl->SetTexture("SceneDepthTexture", m_GBuffer.m_depthBuffer);
+
+        Graphics::DrawMesh(quad, mtl);
 
         //if (m_isWireFrameMode)
         //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -90,12 +111,14 @@ namespace FishEngine
         Gizmos::setColor(Color::red);
         auto& b = Scene::m_bounds;
         Gizmos::DrawWireCube(b.center(), b.size());
+
     }
 
     void RenderSystem::Clean()
     {
 
     }
+
 
 } // namespace FishEngine
 

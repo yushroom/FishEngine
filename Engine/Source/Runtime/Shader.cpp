@@ -614,7 +614,7 @@ namespace FishEngine
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
         }
 
-        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap", "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap"})
+        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap", "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap", "Deferred"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
         }

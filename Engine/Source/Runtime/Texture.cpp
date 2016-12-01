@@ -9,4 +9,11 @@ namespace FishEngine
     {
         glDeleteTextures(1, &m_texture);
     }
+
+    FishEngine::TexturePtr Texture::Create()
+    {
+        auto t = std::make_shared<Texture>();
+        m_textures.push_back(t);
+        return t;
+    }
 }

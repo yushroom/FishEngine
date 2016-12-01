@@ -157,7 +157,7 @@ public:
 
         Path textures_root = sponza_assets_root / "textures";
 
-        auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.surf");
+        auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
         auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
         (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
         {
@@ -174,7 +174,7 @@ public:
         ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
         ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
 
-        auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.surf");
+        auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.shader");
         auto ApplyMateril2 = [&sponza_go, &tex_importer, &shader2, &textures_root]
         (const char* go_name, const std::string& diffuse_tex)
         {
@@ -210,6 +210,10 @@ public:
         ApplyMateril2("mesh24", "sponza_roof_diff");
 
         auto transform = Camera::main()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
+
+        transform = Camera::mainGameCamera()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
     }

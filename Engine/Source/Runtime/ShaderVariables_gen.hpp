@@ -49,6 +49,7 @@ struct PerCameraUniforms
     //vec4 unity_OrthoParams;
 
     vec4 WorldSpaceCameraPos;		// .w is not used
+    vec4 WorldSpaceCameraDir;		// forward direction of the camera in world space
 };
 
 

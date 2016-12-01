@@ -40,7 +40,6 @@ vec4 ps_main(SurfaceData surfaceData)
     vec3 L = surfaceData.L;
     vec3 V = surfaceData.V;
     vec3 N = surfaceData.N;
-    float3 R0 = 2 * dot( V, N ) * N - V;
 
     vec3 DiffuseColor = s.BaseColor - s.BaseColor * s.Metallic;
     vec3 SpecularColor = mix( vec3(0.08 * s.Specular), s.BaseColor, s.Metallic);
@@ -52,6 +51,7 @@ vec4 ps_main(SurfaceData surfaceData)
     outColor.rgb = PI * LightColor.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(s.Roughness), vec3(1), L, V, N);
     
 #ifdef _AMBIENT_IBL
+    float3 R0 = 2 * dot( V, N ) * N - V;
     float a = Square( Roughness );
     float3 R = lerp( N, R0, (1 - a) * ( sqrt(1 - a) + a ) );
 

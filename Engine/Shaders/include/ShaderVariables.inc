@@ -46,7 +46,8 @@ layout(std140, row_major) uniform PerCameraUniforms
 	// w = 1.0 if camera is ortho, 0.0 if perspective
 	//vec4 unity_OrthoParams;
 	
-	vec4 WorldSpaceCameraPos;		// .w is not used
+	vec4 WorldSpaceCameraPos;		// .w = 1, not used
+	vec4 WorldSpaceCameraDir;		// .w = 0, not used, forward direction of the camera in world space
 };
 
 

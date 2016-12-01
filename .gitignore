@@ -35,7 +35,7 @@ xcuserdata/
 /Engine/*/*/*.lib
 /Engine/*/*/*.exp
 /Engine/*/*/*.ilk
-/Engine/*/*/*.pdb
+*.pdb
 /Engine/*/*/*.map
 
 /Engine/Binary/lib/*/*.lib
@@ -46,7 +46,7 @@ xcuserdata/
 /assets/models/
 /assets/textures/
 /example/Content
-/Example/Sponza/
+/Example/Sponza/crytek-sponza/
 *.png
 *.tga
 *.jpg

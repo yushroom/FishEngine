@@ -92,6 +92,7 @@ namespace FishEditor
             const int ix = static_cast<int>(m_size.x * Screen::pixelsPerPoint());
             const int iy = static_cast<int>(m_size.y * Screen::pixelsPerPoint());
             m_sceneViewRenderTexture->Resize(ix, iy);
+            RenderSystem::m_GBuffer.Resize(ix, iy);
             Camera::OnWindowSizeChanged(ix, iy);
             Screen::m_width = ix;
             Screen::m_height = iy;

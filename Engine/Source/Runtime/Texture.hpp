@@ -2,7 +2,7 @@
 #define Texture_hpp
 
 #include "Object.hpp"
-//#include "GLEnvironment.hpp"
+#include "GLEnvironment.hpp"
 
 namespace FishEngine
 {
@@ -134,17 +134,68 @@ namespace FishEngine
         R16,    // A 16 bit color texture format that only has a red channel.
         DXT1,   // Compressed color texture format.
         DXT5,   // Compressed color with alpha channel texture format.
+        R32,    // **New**, float * 1
         RG8,    // **New**, uint8_t * 2
         RG16,   // **New**, uint16_t * 2
         RGHalf,	// Two color (RG) texture format, 16 bit floating point per channel.
         RGFloat	// Two color (RG) texture format, 32 bit floating point per channel.
     };
 
+    static void TextureFormat2GLFormat(
+        TextureFormat format,
+        GLenum& out_internalFormat,
+        GLenum& out_externalFormat,
+        GLenum& out_pixelType)
+    {
+        switch (format)
+        {
+        case TextureFormat::RGBA32:
+            out_internalFormat = GL_RGBA8;
+            out_externalFormat = GL_RGBA;
+            out_pixelType = GL_UNSIGNED_BYTE;
+            break;
+        case TextureFormat::RG16:
+            out_internalFormat = GL_RG16;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_UNSIGNED_SHORT;
+            break;
+        case TextureFormat::RG8:
+            out_internalFormat = GL_RG8;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_UNSIGNED_BYTE;
+            break;
+        case TextureFormat::RGFloat:
+            out_internalFormat = GL_RG32F;
+            out_externalFormat = GL_RG;
+            out_pixelType = GL_FLOAT;
+            break;
+        case TextureFormat::R32:
+            out_internalFormat = GL_R32F;
+            out_externalFormat = GL_RED;
+            out_pixelType = GL_FLOAT;
+            break;
+        default:
+            //Debug::LogError("Unknown texture format");
+            abort();
+        }
+    }
+
     class ColorBuffer : public Texture
     {
     public:
-        static std::shared_ptr<ColorBuffer> Create(const int width, const int height);
+        static std::shared_ptr<ColorBuffer> Create(const int width, const int height, TextureFormat format = TextureFormat::RGBA32);
         virtual void Resize(const int newWidth, const int newHeight) override;
+    protected:
+        TextureFormat m_format;
+    };
+
+    class LayeredColorBuffer : public ColorBuffer
+    {
+    public:
+        static std::shared_ptr<LayeredColorBuffer> Create(const int width, const int height, const int layers, TextureFormat format = TextureFormat::RGBA32);
+        //virtual void Resize(const int newWidth, const int newHeight) override;
+    protected:
+        int m_layers;
     };
 
     class DepthBuffer : public Texture
@@ -152,6 +203,15 @@ namespace FishEngine
     public:
         static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
         virtual void Resize(const int newWidth, const int newHeight) override;
+    };
+
+    class LayeredDepthBuffer : public DepthBuffer
+    {
+    public:
+        static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int layers);
+        //virtual void Resize(const int newWidth, const int newHeight) override;
+    protected:
+        int m_layers;
     };
     
     class Texture2D : public Texture

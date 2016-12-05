@@ -90,6 +90,10 @@ namespace FishEngine
             {
                 m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Texture2D });
             }
+            else if (u.type == GL_SAMPLER_2D_ARRAY)
+            {
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Texture2DArray });
+            }
             else if (u.type == GL_SAMPLER_CUBE)
             {
                 m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::TextureCube });
@@ -164,7 +168,7 @@ namespace FishEngine
     {
         for (auto& u : m_shader->m_uniforms)
         {
-            if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE))
+            if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY))
             {
                 m_textures[name] = texture;
                 return;

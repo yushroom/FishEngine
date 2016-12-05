@@ -49,7 +49,7 @@ namespace FishEngine
                 for (uint32_t i = 0; i < NumSamples; i++)
                 {
                     float E1 = (float)i / NumSamples;
-                    float E2 = (double)ReverseBits(i) / (double)0x100000000LL;
+                    float E2 = static_cast<float>((double)ReverseBits(i) / (double)0x100000000LL);
                     
                     {
                         float Phi = 2.0f * Mathf::PI * E1;

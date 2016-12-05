@@ -5,29 +5,37 @@
 
 #include "Gizmos.hpp"
 #include "Transform.hpp"
+#include "RenderTarget.hpp"
 
-using namespace FishEngine;
-
-
-void FishEngine::Light::OnDrawGizmos()
+namespace FishEngine
 {
-    Gizmos::DrawIcon(transform()->position(), "Light");
+    std::list<LightPtr> Light::m_lights;
+
+    void Light::OnDrawGizmos()
+    {
+        Gizmos::DrawIcon(transform()->position(), "Light");
+    }
+
+    void Light::OnDrawGizmosSelected()
+    {
+        Gizmos::setColor(Color::yellow);
+        Vector3 center = transform()->position();
+        Vector3 dir = transform()->forward();
+        Gizmos::DrawLight(center, dir);
+    }
+
+    Light::Light()
+    {
+        m_shadowMap = LayeredColorBuffer::Create(1024, 1024, 4, TextureFormat::R32);
+        m_depthBuffer = LayeredDepthBuffer::Create(1024, 1024, 4);
+        m_renderTarget = std::make_shared<RenderTarget>();
+        m_renderTarget->Set(m_shadowMap, m_depthBuffer);
+    }
+
+    LightPtr Light::Create()
+    {
+        auto l = std::make_shared<Light>();
+        m_lights.push_back(l);
+        return l;
+    }
 }
-
-void FishEngine::Light::OnDrawGizmosSelected()
-{
-    Gizmos::setColor(Color::yellow);
-    Vector3 center = transform()->position();
-    Vector3 dir = transform()->forward();
-    Gizmos::DrawLight(center, dir);
-}
-
-std::list<LightPtr> FishEngine::Light::m_lights;
-
-LightPtr Light::Create()
-{
-    auto l = std::make_shared<Light>();
-    m_lights.push_back(l);
-    return l;
-}
-

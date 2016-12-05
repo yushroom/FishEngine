@@ -87,17 +87,18 @@ namespace FishEngine
     public:
 
         InjectClassName(Light);
-        Light() {
-            m_shadowMap = RenderTexture::CreateShadowMap();
-        }
+
+        Light();
 
         static LightPtr Create();
 
-        static std::list<LightPtr>& lights() {
+        static std::list<LightPtr>& lights()
+        {
             return m_lights;
         }
 
-        float shadowNearPlane() const {
+        float shadowNearPlane() const
+        {
             return m_shadowNearPlane;
         }
 
@@ -107,7 +108,7 @@ namespace FishEngine
     private:
         friend class Scene;
         //friend class FishEditor::EditorRenderSystem;
-        //friend class RenderSystem;
+        friend class RenderSystem;
         friend class FishEditor::EditorGUI;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
@@ -134,9 +135,17 @@ namespace FishEngine
         float m_shadowNormalBias    = 0.4f;
         float m_shadowNearPlane     = 0.2f;
 
-        RenderTexturePtr m_shadowMap;
-        Matrix4x4 m_viewMatrixForShadowMap;
-        Matrix4x4 m_projectMatrixForShadowMap;
+        //RenderTexturePtr m_shadowMap;
+        LayeredColorBufferPtr m_shadowMap;
+        LayeredDepthBufferPtr m_depthBuffer;
+        RenderTargetPtr m_renderTarget;
+        Matrix4x4 m_viewMatrixForShadowMap[4];
+        Matrix4x4 m_projectMatrixForShadowMap[4];
+
+        Vector4 m_cascadesNear;
+        Vector4 m_cascadesFar;
+        Vector4 m_cascadesSplitPlaneNear;
+        Vector4 m_cascadesSplitPlaneFar;
 
         static std::list<LightPtr> m_lights;
     };

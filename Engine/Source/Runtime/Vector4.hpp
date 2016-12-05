@@ -29,6 +29,14 @@ public:
         return Vector3(x, y, z);
     }
 
+    void set(float x, float y, float z, float w)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->w = w;
+    }
+
     const float* data() const {
         return m;
     }

@@ -17,6 +17,7 @@ namespace FishEngine
         Mat3,
         Mat4,
         Texture2D,
+        Texture2DArray,
         Texture3D,
         TextureCube,
     };

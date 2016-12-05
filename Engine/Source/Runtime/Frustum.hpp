@@ -24,14 +24,14 @@ namespace FishEngine
             float w2 = h2 * aspect;
             
             //Vector3 v[8];
-            v[0].Set(-w1, h1, minRange);
-            v[1].Set(w1, h1, minRange);
-            v[2].Set(w1, -h1, minRange);
-            v[3].Set(-w1, -h1, minRange);
-            v[4].Set(-w2, h2, maxRange);
-            v[5].Set(w2, h2, maxRange);
-            v[6].Set(w2, -h2, maxRange);
-            v[7].Set(-w2, -h2, maxRange);
+            v[0].Set(-w1, h1, minRange);    // near top left
+            v[1].Set(w1, h1, minRange);     // near top right
+            v[2].Set(w1, -h1, minRange);    // near bottom right
+            v[3].Set(-w1, -h1, minRange);   // near bottom left
+            v[4].Set(-w2, h2, maxRange);    // far top left
+            v[5].Set(w2, h2, maxRange);     // far top right
+            v[6].Set(w2, -h2, maxRange);    // far bottom right
+            v[7].Set(-w2, -h2, maxRange);   // far bottom left
         }
     };
 }

@@ -16,6 +16,7 @@
 #include "GameObject.hpp"
 #include "MeshRenderer.hpp"
 #include "SkinnedMeshRenderer.hpp"
+#include "RenderTarget.hpp"
 
 namespace FishEngine
 {
@@ -69,17 +70,16 @@ namespace FishEngine
             Scene::RenderShadow(l); // note: RenderShadow will change viewport
         }
         
-        if (lights.size() > 0)
-        {
-            auto& l = lights.front();
-            Pipeline::BindLight(l);
-        }
+        //if (lights.size() > 0)
+        //{
+        //    auto& l = lights.front();
+        //    Pipeline::BindLight(l);
+        //}
 
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
         const int h = Screen::height();
         glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
-
 
 #if 0
         /************************************************************************/
@@ -98,6 +98,7 @@ namespace FishEngine
         /************************************************************************/
         Pipeline::PushRenderTarget(m_deferredRenderTarget);
         glClear(GL_COLOR_BUFFER_BIT);
+        
         std::vector<GameObjectPtr> transparentQueue;
         std::vector<GameObjectPtr> forwardQueue;
 
@@ -179,6 +180,23 @@ namespace FishEngine
             renderer->Render();
         }
         transparentQueue.clear();
+
+#if 0
+        glDepthFunc(GL_ALWAYS);
+        auto display_csm_mtl = Material::builtinMaterial("DisplayCSM");
+        constexpr float size = 0.25f;
+        for (int i = 0; i < 4; ++i)
+        {
+            display_csm_mtl->SetFloat("Section", float(i));
+            Vector4 v(i*size*2-1, -1, size, size);
+            display_csm_mtl->SetVector4("DrawRectParameters", v);
+            //Debug::Log("%d", lights.front()->m_depthBuffer->GetNativeTexturePtr());
+            display_csm_mtl->setMainTexture(lights.front()->m_depthBuffer);
+            Graphics::DrawMesh(quad, display_csm_mtl);
+        }
+        glDepthFunc(GL_LESS);
+#endif
+
 #endif
 
         //if (m_isWireFrameMode)

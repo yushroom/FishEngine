@@ -10,34 +10,6 @@
 
 namespace FishEngine
 {
-    void TextureFormat2GLFormat(
-        TextureFormat format, 
-        GLenum& out_internalFormat, 
-        GLenum& out_externalFormat,
-        GLenum& out_pixelType)
-    {
-        switch (format)
-        {
-        case TextureFormat::RG16:
-            out_internalFormat = GL_RG16;
-            out_externalFormat = GL_RG;
-            out_pixelType = GL_UNSIGNED_SHORT;
-            break;
-        case TextureFormat::RG8:
-            out_internalFormat = GL_RG8;
-            out_externalFormat = GL_RG;
-            out_pixelType = GL_UNSIGNED_BYTE;
-            break;
-        case TextureFormat::RGFloat:
-            out_internalFormat = GL_RG32F;
-            out_externalFormat = GL_RG;
-            out_pixelType = GL_FLOAT;
-            break;
-        default:
-            Debug::LogError("Unknown texture format");
-            abort();
-        }
-    }
 
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed

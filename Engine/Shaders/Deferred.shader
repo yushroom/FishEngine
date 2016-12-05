@@ -25,15 +25,10 @@ struct V2F
 	    //gl_Position = ObjectToClipPos(InputPosition);
 	    // Screen to world
 	    v2f.UV = InputUV * vec2(1, -1);	// OpenGL
-	#if 1
+	    
 		vec4 WorldPosition = inverse(MATRIX_VP) * vec4(InputPosition.x, InputPosition.y, 1.0f, 1.0f);
 		// in world space
-		v2f.ScreenVector = normalize(WorldPosition.xyz / WorldPosition.w - WorldSpaceCameraPos.xyz);	// in view space
-	#else
-		vec4 ViewSpacePosition = inverse(MATRIX_P) * vec4(InputPosition.x, InputPosition.y, 1.0f, 1.0f);
-		// in view space
-		v2f.ScreenVector = normalize(ViewSpacePosition.xyz / ViewSpacePosition.w);
-	#endif
+		v2f.ScreenVector = normalize(WorldPosition.xyz / WorldPosition.w - WorldSpaceCameraPos.xyz);
 	}
 }
 
@@ -80,7 +75,7 @@ struct V2F
 	}
 
 
-	vec4 GetDynamicLighting(vec3 WorldPosition, vec3 CameraVector, FGBufferData GBuffer)
+	vec4 GetDynamicLighting(vec3 WorldPosition, vec3 CameraVector, float SceneDepth, FGBufferData GBuffer)
 	{
 		vec4 Color = vec4(0, 0, 0, 1);
 		vec3 L = normalize(WorldSpaceLightDir(WorldPosition));
@@ -97,9 +92,8 @@ struct V2F
 	    Color.rgb = PI * LightColor.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(GBuffer.Roughness), vec3(1), L, V, N);
 
 	#ifdef _SHADOW
-	    vec4 positionInLightSpace = LightMatrix * vec4(WorldPosition, 1);
-	    float ShadowFactor = ShadowCalculation(positionInLightSpace, L, N);
-	    Color.rgb *= (1.f - ShadowFactor*0.5);
+		float ShadowFactor = CalcShadowTerm(vec4(WorldPosition, 1), SceneDepth);
+	    Color.rgb *= ShadowFactor;
 	#endif
 	    return Color;
 	}
@@ -119,17 +113,11 @@ struct V2F
 		FGBufferData GBuffer = DecodeGBuffer(DBufferA, DBufferB, DBufferC);
 		float SceneDepth = CalcSceneDepth(v2f.UV);
 
-	#if 1
 		//vec4 WorldSpaceCameraDir = MATRIX_I_V * vec4(0, 0, 1, 0);
 		float z = dot(CameraVector, WorldSpaceCameraDir.xyz);
 		vec3 WorldPosition = CameraVector * (SceneDepth / z) + WorldSpaceCameraPos.xyz;
-	#else
-		vec3 ViewSpacePosition = CameraVector * (SceneDepth / CameraVector.z);
-		vec3 WorldPosition = (MATRIX_I_V * vec4(ViewSpacePosition, 1)).xyz;
-		CameraVector = (MATRIX_I_V * vec4(CameraVector, 0)).xyz;	// view -> world
-	#endif
 
-		FragColor = GetDynamicLighting(WorldPosition, CameraVector, GBuffer);
+		FragColor = GetDynamicLighting(WorldPosition, CameraVector, SceneDepth, GBuffer);
 		//FragColor = vec4(1, 1, 0, 1);
 	}
 }

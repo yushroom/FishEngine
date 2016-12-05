@@ -19,6 +19,7 @@
 #include <Gizmos.hpp>
 #include <CameraController.hpp>
 #include <Graphics.hpp>
+#include <RenderTarget.hpp>
 
 #include "Selection.hpp"
 #include "FishEditorWindow.hpp"
@@ -208,7 +209,7 @@ namespace FishEditor
         /************************************************************************/
         /* Camera Preview                                                       */
         /************************************************************************/
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
         auto camera_preview = selectedGO == nullptr ? nullptr : selectedGO->GetComponent<Camera>();
         if (camera_preview != nullptr)
@@ -236,7 +237,7 @@ namespace FishEditor
             Screen::m_height = h;
         }
 
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
 
         if (selectedGO != nullptr)

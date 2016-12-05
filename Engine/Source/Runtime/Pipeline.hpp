@@ -8,26 +8,6 @@
 
 namespace FishEngine
 {
-    class FE_EXPORT RenderTarget
-    {
-    public:
-        RenderTarget() = default;
-
-        void Set(ColorBufferPtr colorBuffer, DepthBufferPtr depthBuffer);
-        void Set(ColorBufferPtr colorBuffer1, ColorBufferPtr colorBuffer2, ColorBufferPtr colorBuffer3, DepthBufferPtr depthBuffer);
-
-        void Attach();
-        void Detach();
-
-    private:
-        uint32_t  m_activeColorBufferCount = 1;
-        ColorBufferPtr m_colorBuffers[3];
-        DepthBufferPtr m_depthBuffer;
-        unsigned int m_fbo = 0;
-
-        void Init();
-    };
-
     class FE_EXPORT Pipeline
     {
     public:
@@ -50,6 +30,25 @@ namespace FishEngine
         static void PushRenderTarget(const RenderTargetPtr& renderTarget);
 
         static void PopRenderTarget();
+
+        // screen coord:
+        // (0, 1)    (1, 1)
+        //    -----------
+        //    |         |
+        //    |         |
+        //    |         |
+        //    -----------
+        // (0, 0)     (0, 1)
+        // 
+        // OpenGL Clip
+        // (-1, 1)    (1, 1)
+        //    -----------
+        //    |         |
+        //    |         |
+        //    |         |
+        //    -----------
+        // (-1, -1)    (1, -1)
+        static void DrawRect();
 
         static constexpr unsigned int PerCameraUBOBindingPoint  = 0;
         static constexpr unsigned int PerDrawUBOBindingPoint    = 1;

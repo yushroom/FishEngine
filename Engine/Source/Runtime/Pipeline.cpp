@@ -6,6 +6,7 @@
 #include "Light.hpp"
 #include "Screen.hpp"
 #include "RenderTexture.hpp"
+#include "RenderTarget.hpp"
 
 namespace FishEngine
 {
@@ -54,8 +55,8 @@ namespace FishEngine
         s_perCameraUniforms.ProjectionParams.z = camera->farClipPlane();
         s_perCameraUniforms.ProjectionParams.w = 1.0f / camera->farClipPlane();
 
-        s_perCameraUniforms.ScreenParams.x = Screen::width();
-        s_perCameraUniforms.ScreenParams.y = Screen::height();
+        s_perCameraUniforms.ScreenParams.x = static_cast<float>(Screen::width());
+        s_perCameraUniforms.ScreenParams.y = static_cast<float>(Screen::height());
         s_perCameraUniforms.ScreenParams.z = 1.0f + 1.0f / Screen::width();
         s_perCameraUniforms.ScreenParams.w = 1.0f + 1.0f / Screen::height();
 
@@ -73,9 +74,14 @@ namespace FishEngine
 
     void Pipeline::BindLight(const LightPtr& light)
     {
-        s_lightingUniforms.LightColor = light->m_color;
-        s_lightingUniforms.WorldSpaceLightPos = Vector4(-light->transform()->forward(), 0);
-        s_lightingUniforms.LightMatrix = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
+        s_lightingUniforms.LightColor               = light->m_color;
+        s_lightingUniforms.WorldSpaceLightPos       = Vector4(-light->transform()->forward(), 0);
+        s_lightingUniforms.CascadesNear             = light->m_cascadesNear;
+        s_lightingUniforms.CascadesFar              = light->m_cascadesFar;
+        s_lightingUniforms.CascadesSplitPlaneNear   = light->m_cascadesSplitPlaneNear;
+        s_lightingUniforms.CascadesSplitPlaneFar    = light->m_cascadesSplitPlaneFar;
+        for (int i = 0; i < 4; ++i)
+            s_lightingUniforms.LightMatrix[i] = light->m_projectMatrixForShadowMap[i] * light->m_viewMatrixForShadowMap[i];
         
         glBindBuffer(GL_UNIFORM_BUFFER, s_lightingUBO);
         //auto size = sizeof(perFrameUniformData);
@@ -128,56 +134,6 @@ namespace FishEngine
             s_renderTargetStack.top()->Attach();
             glCheckError();
         }
-    }
-
-    void RenderTarget::Set(ColorBufferPtr colorBuffer, DepthBufferPtr depthBuffer)
-    {
-        m_activeColorBufferCount = 1;
-        m_colorBuffers[0] = colorBuffer;
-        m_depthBuffer = depthBuffer;
-
-        Init();
-    }
-
-    void RenderTarget::Set(ColorBufferPtr colorBuffer1, ColorBufferPtr colorBuffer2, ColorBufferPtr colorBuffer3, DepthBufferPtr depthBuffer)
-    {
-        m_activeColorBufferCount = 3;
-        m_colorBuffers[0] = colorBuffer1;
-        m_colorBuffers[1] = colorBuffer2;
-        m_colorBuffers[2] = colorBuffer3;
-        m_depthBuffer = depthBuffer;
-
-        Init();
-    }
-
-    void RenderTarget::Attach()
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    }
-
-    void RenderTarget::Detach()
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    void RenderTarget::Init()
-    {
-        glGenFramebuffers(1, &m_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-        for (int i = 0; i < m_activeColorBufferCount; ++i)
-        {
-            auto rt = m_colorBuffers[i]->GetNativeTexturePtr();
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, rt, 0);
-        }
-        GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-        glDrawBuffers(m_activeColorBufferCount, attachments);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->GetNativeTexturePtr(), 0);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glCheckError();
     }
 
 }

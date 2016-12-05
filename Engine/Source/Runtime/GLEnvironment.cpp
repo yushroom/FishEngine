@@ -19,7 +19,7 @@ void _checkOpenGLError(const char *file, int line)
             default:                        error = "UNKNOWN_ERROR";
         }
         
-        FishEngine::Debug::LogWarning("GL_%s - %s:%d", error.c_str(), file, line);
+        FishEngine::Debug::LogError("GL_%s - %s:%d", error.c_str(), file, line);
         err = glGetError();
     }
 }

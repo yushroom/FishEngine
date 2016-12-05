@@ -213,9 +213,12 @@ public:
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
 
+        
         transform = Camera::mainGameCamera()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
+
+        //Camera::mainGameCamera()->setFarClipPlane(100.f);
     }
 };
 
@@ -235,6 +238,8 @@ class TestCSM : public App
         auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
         auto terrainGO = model->CreateGameObject();
         auto material = Material::builtinMaterial("Diffuse");
+        //auto material = Material::defaultMaterial();
+        material->EnableKeyword(ShaderKeyword::Shadow);
         
         TextureImporter texture_importer;
         auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
@@ -729,8 +734,8 @@ int main()
 {
     //FishEditorWindow::AddApp(make_shared<Empty>());
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    FishEditorWindow::AddApp(make_shared<Sponza>());
-    //FishEditorWindow::AddApp(make_shared<TestCSM>());
+    //FishEditorWindow::AddApp(make_shared<Sponza>());
+    FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

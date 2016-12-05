@@ -118,6 +118,8 @@ const char* GLenumToString(GLenum e)
         return "GL_FLOAT_MAT4";
     case GL_SAMPLER_2D:
         return "GL_SAMPLER_2D";
+    case GL_SAMPLER_2D_ARRAY:
+        return "GL_SAMPLER_2D_ARRAY";
     case GL_SAMPLER_3D:
         return "GL_SAMPLER_3D";
     case GL_SAMPLER_CUBE:
@@ -386,7 +388,7 @@ namespace FishEngine
             }
 
             auto total = std::count(text.begin(), text.end(), '\n') + 1;
-            int last = line_number - start_line + 5;
+            size_t last = line_number - start_line + 5;
             if (last >= total)
                 last = total - 1;
 
@@ -467,9 +469,9 @@ namespace FishEngine
                     glUniformMatrix4fv(u.location, 1, GL_TRUE, it->second.data());
                     u.binded = true;
                 }
-                //            else {
-                //                Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
-                //            }
+                else {
+                    Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+                }
             }
             else if (u.type == GL_FLOAT_VEC3)
             {
@@ -479,9 +481,9 @@ namespace FishEngine
                     glUniform3fv(u.location, 1, it->second.data());
                     u.binded = true;
                 }
-                //            else {
-                //                Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
-                //            }
+                else {
+                    Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+                }
             }
             else if (u.type == GL_FLOAT)
             {
@@ -502,6 +504,7 @@ namespace FishEngine
                 }
             }
         }
+        glCheckError();
     }
 
     void Shader::BindTextures(const std::map<std::string, TexturePtr>& textures)
@@ -509,18 +512,27 @@ namespace FishEngine
         int texture_id = 0;
         for (auto& u : m_uniforms)
         {
-            if (u.type != GL_SAMPLER_2D && u.type != GL_SAMPLER_CUBE) continue;
+            if ( !(u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY) )
+                continue;
             auto it = textures.find(u.name);
             if (it != textures.end())
             {
-                GLenum type = u.type == GL_SAMPLER_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+                glCheckError();
+                GLenum type = GL_TEXTURE_2D;
+                if (u.type == GL_SAMPLER_CUBE)
+                    type = GL_TEXTURE_CUBE_MAP;
+                else if (u.type == GL_SAMPLER_2D_ARRAY)
+                    type = GL_TEXTURE_2D_ARRAY;
                 //BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
                 glActiveTexture(GLenum(GL_TEXTURE0 + texture_id));
+                glCheckError(); 
                 glBindTexture(type, it->second->GetNativeTexturePtr());
                 //GLuint loc = _getUniformLocation(name);
+                glCheckError();
                 glUniform1i(u.location, texture_id);
                 texture_id++;
                 u.binded = true;
+                glCheckError();
             }
             else
             {
@@ -615,7 +627,9 @@ namespace FishEngine
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
         }
 
-        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap", "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap", "Deferred"})
+        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap",
+            "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap",
+            "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
         }

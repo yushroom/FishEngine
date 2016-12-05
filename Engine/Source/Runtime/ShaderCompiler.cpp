@@ -117,6 +117,8 @@ namespace FishEngine
                 }
                 else if (tok == "@geometry")
                 {
+                    Debug::Log("Geometry shader enabled");
+                    m_hasGeometryShader = true;
                     parsed += parseSubShader(shaderText, cursor, "GEOMETRY_SHADER", localDir);
                 }
                 else if (tok == "@fragment")

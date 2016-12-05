@@ -12,6 +12,7 @@
 #include "Frustum.hpp"
 #include "Gizmos.hpp"
 #include "Shader.hpp"
+#include "QualitySettings.hpp"
 
 
 namespace FishEngine
@@ -78,6 +79,108 @@ namespace FishEngine
     void Scene::RenderShadow(LightPtr& light)
     {
 #define DEBUG_SHADOW 1
+#if 1
+        const float split_lambda = 0.5f;
+        auto    camera = Camera::mainGameCamera();
+        auto    camera_to_world = camera->transform()->localToWorldMatrix();
+        float   near = camera->nearClipPlane();
+        //float   far = camera->farClipPlane();
+        float far = QualitySettings::shadowDistance();
+        Vector3 light_dir = light->transform()->forward();
+
+        Frustum total_frustum = camera->frustum();
+
+        constexpr float splits[] = { 0, 1.0f / 15.0f, 3.0f / 15.0f, 7.0f / 15.0f, 1 };
+
+        for (int i = 0; i < 4; ++i)
+        {
+#if 0
+            // From GPU Gem 3. Chap 10 "Practical Split Scheme".
+            float split_near = near;
+            if (i > 0)
+                split_near = Mathf::Lerp(near + i / 4.0f * (far - near), near * Mathf::Pow(far / near, i / 4.0f), split_lambda);
+            float split_far = far;
+            if (i < 4 - 1)
+                split_far = Mathf::Lerp(near + (i + 1) / 4.0f * (far - near), near*Mathf::Pow(far / near, (i + 1) / 4.0f), split_lambda);
+#else
+            // From Unity
+            // 0:    0 ~ 1/15,  1/15
+            // 1: 1/15 ~ 3/15,  2/15
+            // 2: 3/15 ~ 7/15,  4/15
+            // 3: 7/15 ~ 1,     8/15
+            float split_near = Mathf::Lerp(near, far, splits[i]);
+            float split_far = Mathf::Lerp(near, far, splits[i+1]);
+#endif
+
+            Frustum frustum = total_frustum;
+            frustum.minRange = split_near;
+            frustum.maxRange = split_far;
+
+            Gizmos::setMatrix(camera_to_world);
+            Gizmos::setColor(Color::cyan * i / 3);
+            Gizmos::DrawFrustum(frustum);
+            Gizmos::setMatrix(Matrix4x4::identity);
+
+            Vector3 view_corners[8];
+            frustum.getLocalCorners(view_corners);
+            Vector3 world_corners[8];
+            for (int i = 0; i < 8; ++i)
+            {
+                world_corners[i] = camera_to_world.MultiplyPoint(view_corners[i]);
+            }
+
+            Vector3 split_centroid(0, 0, 0);
+            for (auto& c : world_corners)
+            {
+                split_centroid += c;
+            }
+            split_centroid /= 8.0f;
+
+            float dist = Mathf::Max(split_far - split_near, Vector3::Distance(world_corners[4], world_corners[5]));
+            auto eye_pos = split_centroid - light_dir * dist;
+            Gizmos::DrawWireSphere(eye_pos, 0.5f);
+            Matrix4x4 world_to_light = Matrix4x4::LookAt(eye_pos, split_centroid, Vector3::up);
+
+            Bounds aabb;    // the bounding box of view frustum in light's local space
+            for (int i = 0; i < 8; ++i)
+            {
+                view_corners[i] = world_to_light.MultiplyPoint(world_corners[i]);
+                aabb.Encapsulate(view_corners[i]);
+            }
+
+            constexpr float near_offset = 10.0f;
+            constexpr float far_offset = 20.0f;
+            auto min_p = aabb.min();
+            auto max_p = aabb.max();
+
+            Gizmos::setColor(Color::red * i / 3);
+            Gizmos::setMatrix(world_to_light.inverse());
+            Gizmos::DrawWireCube(aabb.center(), aabb.size());
+            Gizmos::setMatrix(Matrix4x4::identity);
+
+            float z_near = min_p.z;
+            float z_far = max_p.z;
+            light->m_cascadesNear[i] = z_near;
+            light->m_cascadesFar[i] = z_far;
+            light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, z_near, z_far);
+            //light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, light->shadowNearPlane(), light->shadowNearPlane());
+            //static const Matrix4x4 offset_mat = 
+            //    Matrix4x4(0.5f, 0.0f, 0.0f, 0.5f,
+            //    0.0f, 0.5f, 0.5f, 0.5f,
+            //    0.0f, 0.0f, 0.5f, 0.5f,
+            //    0.0f, 0.0f, 0.0f, 1.0f);
+            light->m_viewMatrixForShadowMap[i] = world_to_light;
+
+
+            light->m_cascadesSplitPlaneNear[i] = split_near;
+            light->m_cascadesSplitPlaneFar[i] = split_far;
+        }
+
+        auto shadow_map_material = Material::builtinMaterial("CascadedShadowMap");
+
+        Pipeline::BindLight(light);
+#else
+
         // get compact light frustum
         auto    camera          = Camera::mainGameCamera();
         //auto    world_to_camera = camera->transform()->worldToLocalMatrix();
@@ -140,28 +243,29 @@ namespace FishEngine
         Gizmos::DrawWireSphere(new_light_position, 0.5f);
 #endif
 
-        light->m_viewMatrixForShadowMap = Matrix4x4::LookAt(new_light_position, new_light_position+light_dir, camera->transform()->up());
+        light->m_viewMatrixForShadowMap[0] = Matrix4x4::LookAt(new_light_position, new_light_position+light_dir, camera->transform()->up());
         //auto dir = light->m_viewMatrixForShadowMap.MultiplyVector(0, 0, 1);
         const auto& ext = aabb.extents();
-        light->m_projectMatrixForShadowMap = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
+        light->m_projectMatrixForShadowMap[0] = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
         
         //glCullFace(GL_FRONT);
         auto shadow_map_material = Material::builtinMaterial("ShadowMap");
         shadow_map_material->DisableKeyword(ShaderKeyword::Shadow);
         //auto& view = light->m_viewMatrixForShadowMap;
         //auto& proj = light->m_projectMatrixForShadowMap;
+#endif
 
         auto shadowMap = light->m_shadowMap;
-        GLint previous_fbo = 0;
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
-        //Debug::LogWarning("%d", previous_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->FBO());
-        glViewport(0, 0, shadowMap->width(), shadowMap->height());
-        glClear(GL_DEPTH_BUFFER_BIT);
+        Pipeline::PushRenderTarget(light->m_renderTarget);
 
-        //shader->Use();
-        auto light_vp = light->m_projectMatrixForShadowMap * light->m_viewMatrixForShadowMap;
-        
+        glViewport(0, 0, shadowMap->width(), shadowMap->height());
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_CLAMP);
+
+        auto shader = shadow_map_material->shader();
+        shader->Use();
+
         for (auto& go : m_gameObjects)
         {
             if (!go->activeInHierarchy())
@@ -192,16 +296,15 @@ namespace FishEngine
 
             if (mesh != nullptr)
             {
-                auto shader = shadow_map_material->shader();
-                shader->Use();
-                auto mvp = light_vp * go->transform()->localToWorldMatrix();
-                shader->BindUniformMat4("MATRIX_LIGHT_MVP", mvp);
+                shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
                 shader->CheckStatus();
                 mesh->Render();
                 shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
             }
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+        glDisable(GL_DEPTH_CLAMP);
+        //glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+        Pipeline::PopRenderTarget();
 #undef DEBUG_SHADOW
     }
 

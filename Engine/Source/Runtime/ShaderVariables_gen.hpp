@@ -70,7 +70,13 @@ struct LightingUniforms
 {
     vec4 LightColor;
     vec4 WorldSpaceLightPos;
-    mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
+
+    vec4 CascadesNear;
+    vec4 CascadesFar;
+    vec4 CascadesSplitPlaneNear;
+    vec4 CascadesSplitPlaneFar;
+    //mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
+    mat4 LightMatrix[4];
 };
 
 

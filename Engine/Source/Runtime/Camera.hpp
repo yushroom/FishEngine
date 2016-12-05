@@ -70,9 +70,21 @@ namespace FishEngine
             return m_nearClipPlane;
         }
 
+        void setNearClipPlane(const float nearClipPlane)
+        {
+            m_nearClipPlane = nearClipPlane;
+            m_isDirty = true;
+        }
+
         float farClipPlane() const
         {
             return m_farClipPlane;
+        }
+
+        void setFarClipPlane(const float farClipPlane)
+        {
+            m_farClipPlane = farClipPlane;
+            m_isDirty = true;
         }
         
         Frustum frustum() const

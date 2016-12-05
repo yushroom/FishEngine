@@ -24,7 +24,7 @@ namespace FishEngine
                 auto& l = lights.front();
                 if (l->transform() != nullptr)
                 {
-                    material->SetTexture("ShadowMap", l->m_shadowMap);
+                    material->SetTexture("ShadowMap", l->m_depthBuffer);
                 }
             }
         }

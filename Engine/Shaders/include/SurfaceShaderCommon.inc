@@ -9,5 +9,3 @@
 	#include <FragmentShaderShadow.inc>
 	#define SURFACE_SHADER
 #endif
-
-

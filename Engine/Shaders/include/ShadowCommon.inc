@@ -3,8 +3,18 @@
 
 #include <ShaderVariables.inc>
 
+uniform sampler2D ScreenShadowMap;
+
+float GetScreenShadow(vec2 UV)
+{
+    return texture(ScreenShadowMap, UV).r;
+}
+
+#if 0
+
 uniform sampler2DArray ShadowMap;
 const float bias = 0.002f;
+const float ExpC = 300.0;
 
 vec4 GetCascadeWeights( float Depth )
 {
@@ -23,12 +33,25 @@ float CalcShadowTerm(vec4 WorldPosition, float Depth)
     
     vec4 ProjCoords = LightMatrix[Section] * WorldPosition;
     ProjCoords.xyz = ProjCoords.xyz * (0.5 / ProjCoords.w) + 0.5;
-    float closestDepth = texture( ShadowMap, vec3(ProjCoords.xy, fSection) ).r;
-    float currentDepth = ProjCoords.z;
+
+    float Z = ProjCoords.z;
+    float Occluder = texture( ShadowMap, vec3(ProjCoords.xy, fSection) ).r;
+
+#if 1
+    // ESM
+    //return clamp( Occluder * exp( -ExpC*Z ), 0.2, 1.0 );
+    return clamp( exp( ExpC*(Occluder - Z) ), 0.2, 1.0 );
+#elif 0
+    // a modified version of ESM
+    // http://www.klayge.org/2013/10/07/%E5%88%87%E6%8D%A2%E5%88%B0esm/
+    float C = ExpC / (ProjectionParams.z - ProjectionParams.y); //  ExpC / (far - near)
+    return clamp( exp( C * (Z - Occluder) ), 0.0, 1.0 );
+#else
     float Shadow = 1.0;
-    if (currentDepth - bias > closestDepth)
+    if (Z - bias > Occluder)
         Shadow = 0.2f;
     return Shadow;
+#endif
 }
 
 float CalcShadowTerm(vec4 WorldPosition)
@@ -36,6 +59,8 @@ float CalcShadowTerm(vec4 WorldPosition)
     float Depth = distance(WorldPosition.xyz, WorldSpaceCameraPos.xyz);
     return CalcShadowTerm(WorldPosition, Depth);
 }
+
+#endif
 
 #if 0
 

@@ -2,17 +2,13 @@
 #define FragmentShaderShadow_inc
 
 #include <CG.inc>
-#include <ShadowCommon.inc>
+//#include <ShadowCommon.inc>
+//#include <CascadedShadowMapCommon.inc>
 
 #ifdef _NORMALMAP
     uniform sampler2D NormalMap;
     const float bumpiness = 0.2;
 #endif 
-
-
-// ambient: IBL lighting
-// uniform samplerCube RadianceMap;
-// uniform samplerCube IrradianceMap;
 
 struct VS_OUT
 {
@@ -37,7 +33,6 @@ vec3 UnpackNormalMap(vec4 TextureSample)
 #endif
 }
 
-//#define _NORMALMAP
 
 vec3 GetNormal()
 {
@@ -54,34 +49,41 @@ vec3 GetNormal()
 #endif
 }
 
+
 struct SurfaceData
 {
     vec3 L;
     vec3 V;
     vec3 N;
     vec2 uv;
+    float Depth;    // depth to camera
 };
 
+
 vec4 ps_main(SurfaceData surfaceData);
+
 
 void main()
 {
     SurfaceData surfaceData;
     vec3 L = normalize(WorldSpaceLightDir(vs_out.position));
-    vec3 V = normalize(WorldSpaceCameraPos.xyz - vs_out.position);
+    vec3 V = WorldSpaceCameraPos.xyz - vs_out.position;
+    float Depth = length(V);
+    V /= Depth;
     //vec3 N = normalize(vs_out.normal);
     vec3 N = GetNormal();
     surfaceData.L = L;
     surfaceData.V = V;
     surfaceData.N = N;
     surfaceData.uv = vs_out.uv;
+    surfaceData.Depth = Depth;
 
     color = ps_main(surfaceData);
 
-#ifdef _SHADOW
-    vec4 WorldPosition = vec4(vs_out.position, 1);
-    color.rgb *= CalcShadowTerm(WorldPosition);
-#endif
+// #ifdef _SHADOW
+//     vec4 WorldPosition = vec4(vs_out.position, 1.0);
+//     color.rgb *= CalcShadowTerm(WorldPosition);
+// #endif
     //color.a = 1.0f;
 }
 

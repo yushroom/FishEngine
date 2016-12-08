@@ -71,8 +71,6 @@ float4 lerp(float4 a, float4 b, float w)
 	return a + w*(b-a);
 }
 
-
-
 // http://http.developer.nvidia.com/Cg/saturate.html
 #define saturate(x) clamp((x), 0.0, 1.0)
 

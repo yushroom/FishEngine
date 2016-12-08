@@ -1,13 +1,5 @@
 @shadow off
-@cull off
 @zwrite off
-
-#include <Common.inc>
-
-struct V2F
-{
-	vec2 UV;
-};
 
 @vertex
 {
@@ -16,12 +8,11 @@ struct V2F
 	layout (location = PositionIndex) 	in vec3 InputPosition;
 	layout (location = UVIndex) 		in vec2 InputUV;
 
-	//out V2F v2f;
 	out vec2 UV;
 
 	void main()
 	{
-	    gl_Position = DrawRect(InputPosition.xy);
+	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
 	    UV = InputUV * vec2(1, -1);
 	}
 }
@@ -32,12 +23,14 @@ struct V2F
 
 	out vec4 FragColor;
 
-	uniform float Section;
-	uniform sampler2DArray _MainTex;
+	uniform sampler2D _MainTex;
+	uniform sampler2D ScreenShadow;
 
 	void main()
 	{
-	    vec3 d = texture(_MainTex, vec3(UV, Section)).rgb;
-		FragColor = vec4(d, 1);
+		float Shadow = texture(ScreenShadow, UV).r;
+	    FragColor = texture(_MainTex, UV);
+	    FragColor.rgb *= Shadow;
+	    FragColor.a = 1.0;
 	}
 }

@@ -49,7 +49,6 @@ FGBufferData DecodeGBuffer(
     ret.Metallic        = DBufferC.x;
     ret.Roughness       = DBufferC.y;
     ret.Specular        = DBufferC.z;
-    //ret.Depth           = DBufferC.w;
     return ret;
 }
 

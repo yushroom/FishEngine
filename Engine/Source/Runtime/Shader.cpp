@@ -628,16 +628,19 @@ namespace FishEngine
     void Shader::Init()
     {
         const auto& root_dir = Resources::shaderRootDirectory();
-        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse"})
+        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
+            m_builtinShaders[n]->setName(n);
         }
 
         for (auto& n : { "Outline", "ScreenTexture", "ShadowMap",
-            "SolidColor", "VertexLit", "VisualizeNormal", "NormalMap",
-            "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad"})
+            "SolidColor", "VisualizeNormal", "NormalMap",
+            "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad",
+            "GatherScreenSpaceShadow", "PostProcessShadow"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
+            m_builtinShaders[n]->setName(n);
         }
 
         m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir / "Skybox-Cubed.shader");
@@ -645,5 +648,9 @@ namespace FishEngine
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir / "Editor/SolidColor.shader");
         m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir / "Editor/Alpha.shader");
         m_builtinShaders["VertexLit-Internal"]  = Shader::CreateFromFile(root_dir / "Editor/VertexLit.shader");
+        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
+        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
+        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
+        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
     }
 }

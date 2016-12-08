@@ -1,4 +1,4 @@
-#include "TestScript.hpp"
+//#include "TestScript.hpp"
 #include <iostream>
 #include <Camera.hpp>
 #include <Scene.hpp>
@@ -13,6 +13,7 @@
 #include <MeshRenderer.hpp>
 #include <ModelImporter.hpp>
 #include <TextureImporter.hpp>
+#include <QualitySettings.hpp>
 
 #include "FishEditorWindow.hpp"
 
@@ -145,6 +146,7 @@ public:
     virtual void Init() override
     {
         DefaultScene();
+        QualitySettings::setShadowDistance(30);
         Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
         Path sponza_assets_root = sponza_root / "crytek-sponza";
         Resources::SetAssetsDirectory(sponza_root);
@@ -217,18 +219,17 @@ public:
         transform = Camera::mainGameCamera()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
-
-        //Camera::mainGameCamera()->setFarClipPlane(100.f);
     }
 };
 
-#if 1
 
 class TestCSM : public App
 {
     virtual void Init() override
     {
         DefaultScene();
+        QualitySettings::setShadowDistance(20);
+
 #if FISHENGINE_PLATFORM_WINDOWS
         const std::string root_dir = R"(D:\program\FishEngine\Example\CascadedShadowMapping\)";
 #else
@@ -237,16 +238,18 @@ class TestCSM : public App
         ModelImporter importer;
         auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
         auto terrainGO = model->CreateGameObject();
-        auto material = Material::builtinMaterial("Diffuse");
+        auto material = Material::builtinMaterial("DebugCSM");
         //auto material = Material::defaultMaterial();
         material->EnableKeyword(ShaderKeyword::Shadow);
         
-        TextureImporter texture_importer;
-        auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
-        material->setMainTexture(bakedAO);
+        //TextureImporter texture_importer;
+        //auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
+        //material->setMainTexture(bakedAO);
         terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 };
+
+#if 0
 
 class SimpleTest : public App
 {
@@ -734,8 +737,8 @@ int main()
 {
     //FishEditorWindow::AddApp(make_shared<Empty>());
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    //FishEditorWindow::AddApp(make_shared<Sponza>());
-    FishEditorWindow::AddApp(make_shared<TestCSM>());
+    FishEditorWindow::AddApp(make_shared<Sponza>());
+    //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

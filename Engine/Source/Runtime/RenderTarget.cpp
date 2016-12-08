@@ -5,6 +5,22 @@
 
 namespace FishEngine
 {
+
+    void RenderTarget::SetColorBufferOnly(ColorBufferPtr colorBuffer)
+    {
+        m_activeColorBufferCount = 1;
+        m_colorBuffers[0] = colorBuffer;
+        m_useDepthBuffer = false;
+        Init();
+    }
+
+    void RenderTarget::SetDepthBufferOnly(DepthBufferPtr depthBuffer)
+    {
+        m_activeColorBufferCount = 0;
+        m_depthBuffer = depthBuffer;
+        Init();
+    }
+
     void RenderTarget::Set(ColorBufferPtr colorBuffer, DepthBufferPtr depthBuffer)
     {
         m_activeColorBufferCount = 1;
@@ -48,7 +64,13 @@ namespace FishEngine
         GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
         glDrawBuffers(m_activeColorBufferCount, attachments);
 
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_depthBuffer->GetNativeTexturePtr(), 0);
+        if (m_useDepthBuffer)
+        {
+            if (m_depthBuffer->m_useStencil)
+                glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_depthBuffer->GetNativeTexturePtr(), 0);
+            else
+                glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthBuffer->GetNativeTexturePtr(), 0);
+        }
 
         auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if ( result != GL_FRAMEBUFFER_COMPLETE )
@@ -65,6 +87,7 @@ namespace FishEngine
                 TEMP_CASE(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
                 TEMP_CASE(GL_FRAMEBUFFER_UNSUPPORTED)
                 TEMP_CASE(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
+                TEMP_CASE(GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS)
             default:
                 str = "UNKNOWN";
                 break;

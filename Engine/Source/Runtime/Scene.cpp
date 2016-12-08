@@ -160,17 +160,11 @@ namespace FishEngine
 
             float z_near = min_p.z;
             float z_far = max_p.z;
-            light->m_cascadesNear[i] = z_near;
-            light->m_cascadesFar[i] = z_far;
+            light->m_cascadesNear[i] = z_near - near_offset;
+            light->m_cascadesFar[i] = z_far + far_offset;
             light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, z_near, z_far);
             //light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, light->shadowNearPlane(), light->shadowNearPlane());
-            //static const Matrix4x4 offset_mat = 
-            //    Matrix4x4(0.5f, 0.0f, 0.0f, 0.5f,
-            //    0.0f, 0.5f, 0.5f, 0.5f,
-            //    0.0f, 0.0f, 0.5f, 0.5f,
-            //    0.0f, 0.0f, 0.0f, 1.0f);
             light->m_viewMatrixForShadowMap[i] = world_to_light;
-
 
             light->m_cascadesSplitPlaneNear[i] = split_near;
             light->m_cascadesSplitPlaneFar[i] = split_far;
@@ -259,6 +253,7 @@ namespace FishEngine
         Pipeline::PushRenderTarget(light->m_renderTarget);
 
         glViewport(0, 0, shadowMap->width(), shadowMap->height());
+        glClearColor(1, 0, 0, 1);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         glEnable(GL_DEPTH_CLAMP);

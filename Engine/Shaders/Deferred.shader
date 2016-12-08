@@ -1,8 +1,9 @@
 @zwrite off
+@deferred on
 
 #include <DeferredShadingCommon.inc>
 #include <ShadingModels.inc>
-#include <ShadowCommon.inc>
+//#include <ShadowCommon.inc>
 
 struct V2F
 {
@@ -34,48 +35,13 @@ struct V2F
 
 @fragment
 {
+	#include <Common.inc>
+
 	uniform sampler2D DBufferATexture;
 	uniform sampler2D DBufferBTexture;
 	uniform sampler2D DBufferCTexture;
-	uniform sampler2D SceneDepthTexture;
 
-	// also see ConvertToDeviceZ()
-	// @param DeviceZ value that is stored in the depth buffer (Z/W)
-	// @return SceneDepth (linear in world units, W)
-	// float ConvertFromDeviceZ(float DeviceZ)
-	// {
-	// 	// Supports ortho and perspective, see CreateInvDeviceZToWorldZTransform()
-	// 	return DeviceZ * View.InvDeviceZToWorldZTransform[0] + View.InvDeviceZToWorldZTransform[1] + 1.0f / (DeviceZ * View.InvDeviceZToWorldZTransform[2] - View.InvDeviceZToWorldZTransform[3]);
-	// }
-
-
-	// Z buffer to linear 0..1 depth (0 at eye, 1 at far plane)
-	float Linear01Depth( float z )
-	{
-		return 1.0 / (ZBufferParams.x * z + ZBufferParams.y);
-	}
-	// Z buffer to linear depth
-	float LinearEyeDepth( float z )
-	{
-		//(n * f) / (f - z * (f - n))
-		return 1.0 / (ZBufferParams.z * z + ZBufferParams.w);
-	}
-
-	// Returns clip space W, which is world space distance along the View Z axis.
-	float CalcSceneDepth(float2 ScreenUV)
-	{
-		// (2 * n * f) / (f + n - z * (f - n))
-		//return LinearEyeDepth( textureLod( SceneDepthTexture, ScreenUV, 0 ).r );
-		float DeviceZ = textureLod( SceneDepthTexture, ScreenUV, 0 ).r;
-		return LinearEyeDepth(DeviceZ);
-		// float ClipSpaceZ = DeviceZ * 2 - 1;
-		// float near = ProjectionParams.y;
-		// float far = ProjectionParams.z;
-		// return 2*near*far / (far+near - (far-near)*ClipSpaceZ);
-	}
-
-
-	vec4 GetDynamicLighting(vec3 WorldPosition, vec3 CameraVector, float SceneDepth, FGBufferData GBuffer)
+	vec4 GetDynamicLighting(vec3 WorldPosition, vec3 CameraVector, FGBufferData GBuffer)
 	{
 		vec4 Color = vec4(0, 0, 0, 1);
 		vec3 L = normalize(WorldSpaceLightDir(WorldPosition));
@@ -91,10 +57,6 @@ struct V2F
 
 	    Color.rgb = PI * LightColor.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(GBuffer.Roughness), vec3(1), L, V, N);
 
-	#ifdef _SHADOW
-		float ShadowFactor = CalcShadowTerm(vec4(WorldPosition, 1), SceneDepth);
-	    Color.rgb *= ShadowFactor;
-	#endif
 	    return Color;
 	}
 
@@ -112,12 +74,15 @@ struct V2F
 
 		FGBufferData GBuffer = DecodeGBuffer(DBufferA, DBufferB, DBufferC);
 		float SceneDepth = CalcSceneDepth(v2f.UV);
-
-		//vec4 WorldSpaceCameraDir = MATRIX_I_V * vec4(0, 0, 1, 0);
 		float z = dot(CameraVector, WorldSpaceCameraDir.xyz);
 		vec3 WorldPosition = CameraVector * (SceneDepth / z) + WorldSpaceCameraPos.xyz;
 
-		FragColor = GetDynamicLighting(WorldPosition, CameraVector, SceneDepth, GBuffer);
+		FragColor = GetDynamicLighting(WorldPosition, CameraVector, GBuffer);
+		// #ifdef _SHADOW
+		// 	//float ShadowFactor = CalcShadowTerm(vec4(WorldPosition, 1), SceneDepth);
+		// 	float ShadowFactor = GetScreenShadow(v2f.UV);
+		//     FragColor.rgb *= ShadowFactor;
+		// #endif
 		//FragColor = vec4(1, 1, 0, 1);
 	}
 }

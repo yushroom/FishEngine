@@ -3,7 +3,6 @@
 
 #include <BRDF.inc>
 #include <ShadingModels.inc>
-//#include <DeferredShadingCommon.inc>
 #include <MonteCarlo.inc>
 #include <CubemapCommon.inc>
 #include <Random.inc>

@@ -71,16 +71,16 @@ namespace FishEngine
         auto model = transform()->localToWorldMatrix();
         Pipeline::UpdatePerDrawUniforms(model);
 
-        std::map<std::string, TexturePtr> textures;
-        auto& lights = Light::lights();
-        if (lights.size() > 0)
-        {
-            auto& l = lights.front();
-            if (l->transform() != nullptr)
-            {
-                textures["ShadowMap"] = l->m_shadowMap;
-            }
-        }
+        //std::map<std::string, TexturePtr> textures;
+        //auto& lights = Light::lights();
+        //if (lights.size() > 0)
+        //{
+        //    auto& l = lights.front();
+        //    if (l->transform() != nullptr)
+        //    {
+        //        textures["ShadowMap"] = l->m_shadowMap;
+        //    }
+        //}
 
         // hack
         // TODO: remove this block

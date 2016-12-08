@@ -41,14 +41,11 @@ namespace FishEditor
         Debug::Log("GLEW initialized.");
 
         GLFWwindow* window = FishEditorWindow::window();
-        // Define the view port dimensions
 
         ImGui_ImplGlfwGL3_Init(window, false);
 
         RenderSystem::Init();
         EditorGUI::Init();
-        //auto scene_view_pos_size = EditorGUI::sceneViewPositionAndSize();
-        //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(scene_view_pos_size.z, scene_view_pos_size.w);
     }
 
     void EditorRenderSystem::Render()

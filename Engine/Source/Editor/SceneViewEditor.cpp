@@ -56,7 +56,7 @@ namespace FishEditor
         m_colorBuffer = ColorBuffer::Create(m_size.x, m_size.y);
         m_colorBuffer->setName("SceneView");
         m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
-        m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_depthBuffer);
+        m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_mainDepthBuffer);
 
         constexpr int rows = 10;
         constexpr int vertex_count = (rows * 2 + 1) * 2 * 2;

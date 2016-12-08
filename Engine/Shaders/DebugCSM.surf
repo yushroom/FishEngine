@@ -1,0 +1,18 @@
+vec3 DebugColor[4] = vec3[4](
+	vec3(0.396, 0.396, 0.475),
+	vec3(0.396, 0.475, 0.396),
+	vec3(0.475, 0.475, 0.396),
+	vec3(0.475, 0.396, 0.396));
+
+#include <CascadedShadowMapCommon.inc>
+
+vec4 ps_main(SurfaceData surfaceData)
+{
+    float nDotL = dot(surfaceData.N, surfaceData.L);
+    nDotL = clamp(nDotL, 0.0f, 1.0f);
+    vec4 Weights = GetCascadeWeights(surfaceData.Depth);
+    float fSection = dot(Weights, vec4(0, 1, 2, 3));
+    int iSection = int(fSection);
+    vec3 diffuse = nDotL * DebugColor[iSection];
+    return vec4(diffuse, 1);
+}

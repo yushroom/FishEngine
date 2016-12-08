@@ -19,8 +19,18 @@ namespace FishEngine
         static void ResizeBufferSize(const int width, const int height);
 
         static ColorBufferPtr   m_GBuffer[3];
-        static DepthBufferPtr   m_depthBuffer;
+        static DepthBufferPtr   m_mainDepthBuffer;
         static RenderTargetPtr  m_deferredRenderTarget;
+
+        static ColorBufferPtr   m_screenShadowMap;
+        static RenderTargetPtr  m_screenShadowMapRenderTarget;
+
+        static ColorBufferPtr   m_mainColorBuffer;
+        static RenderTargetPtr  m_mainRenderTarget;
+
+
+        //static LayeredColorBufferPtr    m_blurredShadowMap;
+        //static RenderTargetPtr          m_blurShadowMapRenderTarget;
     };
 }
 

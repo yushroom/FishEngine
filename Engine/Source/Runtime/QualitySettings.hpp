@@ -17,10 +17,17 @@ namespace FishEngine
     public:
         QualitySettings() = delete;
 
+        static void setShadowDistance(float shadowDistance)
+        {
+            m_shadowDistance = shadowDistance;
+        }
+
         static float shadowDistance()
         {
             return m_shadowDistance;
         }
+
+        static uint32_t CalculateShadowMapSize();
 
     private:
         // Shadows	This determines which type of shadows should be used.The available options are Hard and Soft Shadows, Hard Shadows Only and Disable Shadows.

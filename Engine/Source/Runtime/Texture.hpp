@@ -9,16 +9,16 @@ namespace FishEngine
     // Filtering mode for textures.
     enum class FilterMode
     {
-        Point,      // Point filtering - texture pixels become blocky up close.
-        Bilinear,   // Bilinear filtering - texture samples are averaged.
-        Trilinear,  // Trilinear filtering - texture samples are averaged and also blended between mipmap levels.
+        Point       = 0,    // Point filtering - texture pixels become blocky up close.
+        Bilinear    = 1,    // Bilinear filtering - texture samples are averaged.
+        Trilinear   = 2,    // Trilinear filtering - texture samples are averaged and also blended between mipmap levels.
     };
 
     // Wrap mode for textures.
     enum class TextureWrapMode
     {
-        Repeat,     // Tiles the texture, creating a repeating pattern.
-        Clamp,      // Clamps the texture to the last pixel at the border.
+        Repeat      = 0,    // Tiles the texture, creating a repeating pattern.
+        Clamp       = 1,    // Clamps the texture to the last pixel at the border.
     };
     
     enum class TextureDimension
@@ -31,6 +31,27 @@ namespace FishEngine
         Tex2DArray, // 2D array texture (Texture2DArray).
         Any,        // Any texture type.
     };
+
+
+    class TextureSampler
+    {
+    public:
+        TextureSampler() = default;
+        TextureSampler(const TextureSampler&) = delete;
+        TextureSampler& operator=(const TextureSampler&) = delete;
+        ~TextureSampler();
+
+        static void Init();
+
+        static const TextureSampler& GetSampler(FilterMode filterMode, TextureWrapMode wrapMode);
+
+    private:
+        friend class Texture;
+        unsigned int m_nativeGLSampler = 0;
+
+        static TextureSampler s_samplers[6];
+    };
+
 
     class FE_EXPORT Texture : public Object
     {
@@ -67,6 +88,7 @@ namespace FishEngine
         void setFilterMode(const FilterMode filterMode)
         {
             m_filterMode = filterMode;
+            BindSampler();
         }
 
         // Wrap mode (Repeat or Clamp) of the texture.
@@ -78,6 +100,7 @@ namespace FishEngine
         void setWrapMode(const TextureWrapMode wrapMode)
         {
             m_wrapMode = wrapMode;
+            BindSampler();
         }
 
         TextureDimension dimension() const
@@ -89,7 +112,7 @@ namespace FishEngine
         {
             m_dimension = dimension;
         }
-        
+
         static const std::vector<TexturePtr>& AllTextures()
         {
             return m_textures;
@@ -120,6 +143,8 @@ namespace FishEngine
         //OpenGL
         unsigned int m_texture = 0;
 
+        void BindSampler();
+
         static std::vector<TexturePtr> m_textures;
 
     private:
@@ -134,6 +159,7 @@ namespace FishEngine
         R16,    // A 16 bit color texture format that only has a red channel.
         DXT1,   // Compressed color texture format.
         DXT5,   // Compressed color with alpha channel texture format.
+        R8,
         R32,    // **New**, float * 1
         RG8,    // **New**, uint8_t * 2
         RG16,   // **New**, uint16_t * 2
@@ -174,6 +200,11 @@ namespace FishEngine
             out_externalFormat = GL_RED;
             out_pixelType = GL_FLOAT;
             break;
+        case TextureFormat::R8:
+            out_internalFormat = GL_R8;
+            out_externalFormat = GL_RED;
+            out_pixelType = GL_UNSIGNED_BYTE;
+            break;
         default:
             //Debug::LogError("Unknown texture format");
             abort();
@@ -203,12 +234,13 @@ namespace FishEngine
     public:
         static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
         virtual void Resize(const int newWidth, const int newHeight) override;
+        bool m_useStencil = true;
     };
 
     class LayeredDepthBuffer : public DepthBuffer
     {
     public:
-        static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int layers);
+        static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int layers, bool useStencil = true);
         //virtual void Resize(const int newWidth, const int newHeight) override;
     protected:
         int m_layers;

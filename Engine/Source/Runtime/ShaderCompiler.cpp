@@ -37,13 +37,13 @@ namespace FishEngine
                 return it->second;
             }
             //Debug::LogWarning("Open header %s", path.string().c_str());
-            std::string& shaderText = ReadFile(path);
+            const std::string& shaderText = ReadFile(path);
             auto parsed = PreprocessImpl(shaderText, m_path.parent_path());
             s_cachedHeaders[full_path] = parsed;
             return parsed;
         }
 
-        std::string& shaderText = ReadFile(path);
+        auto shaderText = ReadFile(path);
         if (path.extension() == ".surf")
         {
             shaderText = "#include <SurfaceShaderCommon.inc>\n#ifdef SURFACE_SHADER\n" +

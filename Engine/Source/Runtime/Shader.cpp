@@ -371,8 +371,14 @@ namespace FishEngine
             //std::cout << AddLineNumber(m_impl->shaderTextRaw()) 
             //    << std::endl << m_impl->m_lineCount << std::endl;
             std::string str = string(e.what());
+#if FISHENGINE_PLATFORM_WINDOWS
             auto begin = str.find_first_of('(');
             auto end = str.find_first_of(')');
+#else
+            auto begin = str.find_first_of(':');
+            begin = str.find_first_of(':', begin+1);
+            auto end = str.find_first_of(':', begin+1);
+#endif
             uint32_t line_number = boost::lexical_cast<uint32_t>(str.substr(begin + 1, end - begin - 1));
             //cout << line_number << endl;
             uint32_t start_line = m_impl->m_lineCount;

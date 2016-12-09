@@ -31,8 +31,10 @@ namespace FishEngine
     FishEngine::ColorBufferPtr      RenderSystem::m_mainColorBuffer;
     FishEngine::RenderTargetPtr     RenderSystem::m_mainRenderTarget;
 
-    //FishEngine::LayeredColorBufferPtr   RenderSystem::m_blurredShadowMap;
-    //FishEngine::RenderTargetPtr         RenderSystem::m_blurShadowMapRenderTarget;
+    FishEngine::ColorBufferPtr      RenderSystem::m_blurredScreenShadowMap;
+    FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget1;
+    FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget2;
+
 
     void RenderSystem::Init()
     {
@@ -63,9 +65,6 @@ namespace FishEngine
         m_deferredRenderTarget = std::make_shared<RenderTarget>();
         m_deferredRenderTarget->Set(m_GBuffer[0], m_GBuffer[1], m_GBuffer[2], m_mainDepthBuffer);
 
-        //m_blurredShadowMap = LayeredColorBuffer::Create(2048, 2048, 4, TextureFormat::R32);
-        //m_blurShadowMapRenderTarget = std::make_shared<RenderTarget>();
-        //m_blurShadowMapRenderTarget->SetColorBufferOnly(m_blurredShadowMap);
         m_screenShadowMap = ColorBuffer::Create(w, h, TextureFormat::R8);
         m_screenShadowMap->setName("ScreenShadowMap");
         m_screenShadowMapRenderTarget = std::make_shared<RenderTarget>();
@@ -75,7 +74,13 @@ namespace FishEngine
         m_mainColorBuffer->setName("MainColorBuffer");
         m_mainRenderTarget = std::make_shared<RenderTarget>();
         m_mainRenderTarget->Set(m_mainColorBuffer, m_mainDepthBuffer);
-        //m_mainRenderTarget->SetDepthBufferOnly(m_depthBuffer);
+
+        m_blurredScreenShadowMap = ColorBuffer::Create(w, h, TextureFormat::R8);
+        m_blurredScreenShadowMap->setFilterMode(FilterMode::Bilinear);
+        m_blurScreenShadowMapRenderTarget1 = std::make_shared<RenderTarget>();
+        m_blurScreenShadowMapRenderTarget2 = std::make_shared<RenderTarget>();
+        m_blurScreenShadowMapRenderTarget1->SetColorBufferOnly(m_blurredScreenShadowMap);
+        m_blurScreenShadowMapRenderTarget2->SetColorBufferOnly(m_screenShadowMap);
     }
 
     void RenderSystem::Render()
@@ -183,7 +188,10 @@ namespace FishEngine
         Pipeline::PopRenderTarget(); // m_mainRenderTarget
 
 
-        // Screen Space Shadow
+        /************************************************************************/
+        /* Screen Space Shadow                                                  */
+        /************************************************************************/
+
         // 1 color buffer
         // no depth buffer
         Pipeline::PushRenderTarget(m_screenShadowMapRenderTarget);
@@ -202,6 +210,43 @@ namespace FishEngine
         }
         Pipeline::PopRenderTarget();
 
+#if 1
+        // blur shadow map, pass 1
+        m_screenShadowMap->setFilterMode(FilterMode::Bilinear);
+        Pipeline::PushRenderTarget(m_blurScreenShadowMapRenderTarget1);
+        {
+            glDepthFunc(GL_ALWAYS);
+            glDepthMask(GL_FALSE);
+            glClearBufferfv(GL_COLOR, 0, black);
+            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
+            Vector2 direction(1.0f / static_cast<float>(m_screenShadowMap->width()), 0);
+            mtl->SetVector2("Direction", direction);
+            mtl->setMainTexture(m_screenShadowMap);
+            Graphics::DrawMesh(quad, mtl);
+            glDepthMask(GL_TRUE);
+            glDepthFunc(GL_LESS);
+        }
+        Pipeline::PopRenderTarget();
+        m_screenShadowMap->setFilterMode(FilterMode::Point);
+
+        // blur shadow map, pass 2
+        Pipeline::PushRenderTarget(m_blurScreenShadowMapRenderTarget2);
+        {
+            glDepthFunc(GL_ALWAYS);
+            glDepthMask(GL_FALSE);
+            glClearBufferfv(GL_COLOR, 0, black);
+            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
+            Vector2 direction(0, 1.0f / static_cast<float>(m_screenShadowMap->height()));
+            mtl->SetVector2("Direction", direction);
+            mtl->setMainTexture(m_blurredScreenShadowMap);
+            Graphics::DrawMesh(quad, mtl);
+            glDepthMask(GL_TRUE);
+            glDepthFunc(GL_LESS);
+        }
+        Pipeline::PopRenderTarget();
+#endif
 
         // add shadow
         {
@@ -292,6 +337,7 @@ namespace FishEngine
         for (auto& gb : m_GBuffer)
             gb->Resize(width, height);
         m_screenShadowMap->Resize(width, height);
+        m_blurredScreenShadowMap->Resize(width, height);
     }
 
 } // namespace FishEngine

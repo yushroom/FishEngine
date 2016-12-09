@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Matrix4x4.hpp"
+#include "Vector2.hpp"
 #include "Vector3.hpp"
 #include "Vector4.hpp"
 #include "GLEnvironment.hpp"
@@ -11,6 +12,7 @@ namespace FishEngine
     struct ShaderUniforms
     {
         std::map<std::string, Matrix4x4> mat4s;
+        std::map<std::string, Vector2> vec2s;
         std::map<std::string, Vector3> vec3s;
         std::map<std::string, Vector4> vec4s;
         std::map<std::string, float> floats;

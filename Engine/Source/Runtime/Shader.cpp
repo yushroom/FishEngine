@@ -110,6 +110,8 @@ const char* GLenumToString(GLenum e)
     switch (e) {
     case GL_FLOAT:
         return "GL_FLOAT";
+    case GL_FLOAT_VEC2:
+        return "GL_FLOAT_VEC2";
     case GL_FLOAT_VEC3:
         return "GL_FLOAT_VEC3";
     case GL_FLOAT_VEC4:
@@ -473,6 +475,18 @@ namespace FishEngine
                     Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
                 }
             }
+            else if (u.type == GL_FLOAT_VEC2)
+            {
+                auto it = uniforms.vec2s.find(u.name);
+                if (it != uniforms.vec2s.end())
+                {
+                    glUniform2fv(u.location, 1, it->second.data());
+                    u.binded = true;
+                }
+                else {
+                    Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+                }
+            }
             else if (u.type == GL_FLOAT_VEC3)
             {
                 auto it = uniforms.vec3s.find(u.name);
@@ -622,7 +636,8 @@ namespace FishEngine
     void Shader::Init()
     {
         const auto& root_dir = Resources::shaderRootDirectory();
-        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent", "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
+        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent",
+            "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
             m_builtinShaders[n]->setName(n);
@@ -631,7 +646,7 @@ namespace FishEngine
         for (auto& n : { "Outline", "ScreenTexture", "ShadowMap",
             "SolidColor", "VisualizeNormal", "NormalMap",
             "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad",
-            "GatherScreenSpaceShadow", "PostProcessShadow"})
+            "GatherScreenSpaceShadow", "PostProcessShadow", "PostProcessGaussianBlur" })
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
             m_builtinShaders[n]->setName(n);

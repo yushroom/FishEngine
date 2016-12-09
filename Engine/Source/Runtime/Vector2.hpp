@@ -35,6 +35,11 @@ namespace FishEngine
             return m[index];
         }
 
+        const float* data() const
+        {
+            return m;
+        }
+
         void Set(const float newX, const float newY)
         {
             x = newX;

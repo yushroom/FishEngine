@@ -70,6 +70,8 @@ namespace FishEngine
         // Set a named float value.
         void SetFloat(const std::string& name, const float value);
 
+        void SetVector2(const std::string& name, const Vector2& value);
+
         // Set a named Vector3 value.
         void SetVector3(const std::string& name, const Vector3& value);
 

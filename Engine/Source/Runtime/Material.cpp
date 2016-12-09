@@ -5,6 +5,7 @@
 #include "Debug.hpp"
 #include "Color.hpp"
 #include "Shader.hpp"
+#include "Vector2.hpp"
 
 namespace FishEngine
 {
@@ -22,6 +23,12 @@ namespace FishEngine
     constexpr GLenum GLType<float>()
     {
         return GL_FLOAT;
+    }
+
+    template<>
+    constexpr GLenum GLType<Vector2>()
+    {
+        return GL_FLOAT_VEC2;
     }
 
     template<>
@@ -60,6 +67,7 @@ namespace FishEngine
     {
         m_shader = shader;
         m_uniforms.floats.clear();
+        m_uniforms.vec2s.clear();
         m_uniforms.vec3s.clear();
         m_uniforms.vec4s.clear();
         m_uniforms.mat4s.clear();
@@ -70,6 +78,11 @@ namespace FishEngine
             {
                 m_uniforms.floats[u.name] = 1.0f;
                 m_properties.emplace_back(MaterialProperty{u.name, MaterialPropertyType::Float});
+            }
+            else if (u.type == GL_FLOAT_VEC2)
+            {
+                m_uniforms.vec2s[u.name] = Vector2::one;
+                m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Float2 });
             }
             else if (u.type == GL_FLOAT_VEC3)
             {
@@ -141,6 +154,16 @@ namespace FishEngine
         Debug::LogWarning("Uniform %s[float] not found.", name.c_str());
     }
 
+
+    void Material::SetVector2(const std::string& name, const Vector2& value)
+    {
+        if (FindUniformInShader<Vector2>(m_shader->m_uniforms, name))
+        {
+            m_uniforms.vec2s[name] = value;
+            return;
+        }
+        Debug::LogWarning("Uniform %s[vec2] not found.", name.c_str());
+    }
 
     void Material::SetVector3(const std::string& name, const Vector3& value)
     {

@@ -46,19 +46,19 @@
 {
 	in vec2 UV;
 
-	out float FragColor;
+	out vec4 FragColor;
 	
 	uniform sampler2D _MainTex;
 	uniform vec2 Direction;	// (1, 0) * InvWindowSize or (0, 1) * InvWindowSize;
 
 	void main()
 	{
-		FragColor = 0;
+		FragColor = vec4(0, 0, 0, 1);
 		for (int i = 0; i < KERNEL; ++i)
 		{
 			vec2 Offset = offsets[i] * Direction;
-			float Color = texture( _MainTex, UV + Offset ).r + texture( _MainTex, UV - Offset ).r;
-			FragColor += Color * weights[i];
+			vec4 Color = texture( _MainTex, UV + Offset ) + texture( _MainTex, UV - Offset );
+			FragColor.rgb += Color.rgb * weights[i];
 		}
 	}
 }

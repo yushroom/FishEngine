@@ -231,10 +231,6 @@ namespace FishEngine
                 add_macro_definition("GEOMETRY_SHADER");
             }
 
-            if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::Shadow))
-            {
-                add_macro_definition("_SHADOW");
-            }
             if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::SkinnedAnimation))
             {
                 add_macro_definition("_SKINNED");
@@ -348,19 +344,19 @@ namespace FishEngine
             m_ZWrite = getValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
             m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
             m_applyNormalMap = getValueOrDefault<string, string>(settings, "normalmap", "off") == "on";
-            m_receiveShadow = getValueOrDefault<string, string>(settings, "shadow", "on") == "on";
+            //m_receiveShadow = getValueOrDefault<string, string>(settings, "shadow", "on") == "on";
             m_deferred = getValueOrDefault<string, string>(settings, "deferred", "off") == "on";
 
             //SetLocalKeywords(ShaderKeyword::Shadow, m_receiveShadow);
-            auto k = static_cast<ShaderKeywords>(ShaderKeyword::Shadow);
-            if (m_receiveShadow)
-            {
-                m_keywords |= k;
-            }
-            else
-            {
-                m_keywords &= ~k;;
-            }
+            //auto k = static_cast<ShaderKeywords>(ShaderKeyword::None);
+            //if (m_receiveShadow)
+            //{
+            //    m_keywords |= k;
+            //}
+            //else
+            //{
+            //    m_keywords &= ~k;;
+            //}
 
             m_impl->set(parsed_shader_text);
             m_impl->CompileAndLink(m_keywords);

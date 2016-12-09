@@ -1,9 +1,67 @@
-cpp_enum_code = '''
-enum class ShadingMode {
-    Shaded,
-    Wireframe,
-    ShadedWireframe,
+from mako.template import Template
+t_str = '''
+// enum count
+template<>
+constexpr int EnumCount<${T}>() { return ${length}; }
+
+// string array
+static const char* ${T}Strings[] =
+{
+    ${CStrings}
 };
+
+// cstring array
+template<>
+inline constexpr const char** EnumToCStringArray<${T}>()
+{
+    return ${T}Strings;
+}
+
+// index to enum
+template<>
+inline ${T} ToEnum<${T}>(const int index)
+{
+    switch (index) {
+    ${IndexToEnumCases}
+    default: abort(); break;
+    }
+}
+
+// enum to index
+template<>
+inline int EnumToIndex<${T}>(${T} e)
+{
+    switch (e) {
+    ${EnumToIndexCases}
+    default: abort(); break;
+    }
+}
+
+// enum to string
+// TODO
+inline const char* ToString(${T} e)
+{
+	return ${T}Strings[EnumToIndex<T>()];
+}
+
+// string to enum
+template<>
+inline ${T} ToEnum<${T}>(const std::string& s)
+{
+    ${StringToEnumCases}
+    abort();
+}
+'''
+t = Template(t_str)
+
+
+cpp_enum_code = '''
+    enum class ShadowCastingMode {
+        Off,
+        On,
+        TwoSided,
+        ShdowsOnly,
+    };
 '''
 
 lines = cpp_enum_code.strip().split('\n');
@@ -26,59 +84,23 @@ for line in lines[1:-1]:
 print(enum_elements)
 print('')
 
-# count
-template = "template<>\nconstexpr int EnumCount<{0}>() {{ return {1}; }}".format(enum_name, len(enum_elements))
-print("// enum count")
-print(template)
-print('')
+enum_name = "ShadowCastingMode"
+enum_elements = ['Off', 'On', 'TwoSided', 'ShdowsOnly']
 
-# String array
-template = "constexpr const char* {}Strings[] = {{\n".format(enum_name)
-for e in enum_elements:
-	template += '    "{}", \n'.format(e)
-template += '};'
-print("// string array")
-print(template)
-print('')
+index_to_enum_case  = "case {0}: return {1}::{2}; break;"
+enum_to_index_case  = "case {1}::{2}: return {0}; break;"
+string_to_enum_case = 'if (s == "{0}") return {1}::Off;'
 
+index_to_enum_cases = ''
+enum_to_index_cases = ''
+string_to_enum_cases = ''
 
-# index to enum
-template = 'template<>\n'.format(enum_name)
-template += 'inline {0} ToEnum<{0}>(const int index)\n{{\n    switch (index) {{ \n'.format(enum_name)
-for idx, e in enumerate(enum_elements):
-	template += '        case {2}: return {0}::{1}; break; \n'.format(enum_name, e, idx)
+for i in range(len(enum_elements)):
+	index_to_enum_cases  += index_to_enum_case.format(i, enum_name, enum_elements[i]) + '\n\t'
+	enum_to_index_cases  += enum_to_index_case.format(i, enum_name, enum_elements[i]) + '\n\t'
+	string_to_enum_cases += string_to_enum_case.format(enum_name, enum_elements[i]) + '\n\t'
 
-print("// index to enum")
-template += '        default: abort(); break;\n    }\n}'
-print(template)
-print('')
-
-
-# enum to index
-template = 'inline int ToIndex({} e)\n{{\n    switch (e) {{ \n'.format(enum_name)
-for idx, e in enumerate(enum_elements):
-	template += '        case {0}::{1}: return {2}; break; \n'.format(enum_name, e, idx)
-template += '        default: abort(); break;\n    }\n}'
-print("// enum to index")
-print(template)
-print('')
-
-
-# enum to string
-template = 'inline const char* ToString({} e)\n{{\n    switch (e) {{ \n'.format(enum_name)
-for e in enum_elements:
-	template += '        case {0}::{1}: return "{1}"; break; \n'.format(enum_name, e)
-template += '        default: abort(); break;\n    }\n}'
-print("// enum to string");
-print(template)
-print('')
-
-
-# string to enum
-template = 'template<>\n'.format(enum_name)
-template += 'inline {0} ToEnum<{0}>(const std::string& s)\n{{\n'.format(enum_name)
-for e in enum_elements:
-	template += '    if (s == "{0}") return {1}::{0};\n'.format(e, enum_name)
-print("// string to enum")
-template += '    abort();\n}'
-print(template)
+CStrings = ',\n\t'.join(['"{}"'.format(e) for e in enum_elements])
+print t.render(T = enum_name, length = 4, CStrings= CStrings, \
+	IndexToEnumCases = index_to_enum_cases, EnumToIndexCases = enum_to_index_cases, \
+	StringToEnumCases = string_to_enum_cases)

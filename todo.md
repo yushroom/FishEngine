@@ -76,6 +76,8 @@
 
       mf->setMesh(...)
 
+- [ ] selection 换成像Unreal和Unity 5.5中一样的outline
+
 ## Editor
 
 - [x] GameObject inactive时在Hierarchy中颜色变灰色​
@@ -127,21 +129,38 @@
 ## 渲染
 
 - [x] PBR
-- [ ] Shadow: standard shadow map with PSF => CSM/VSM, Screen space shadow map
+
+- [x] Shadow: standard shadow map with PCF => CSM/~~VSM~~, Screen space shadow map
+
+      CSM+ (blurred) Screen space shadow map
+
 - [x] expose更多的shader uniform给Editor
+
 - [ ] 渲染优化：渲染前按父子关系将transform更新完，渲染时按批次重组draw call batching
+
 - [x] uniform buffer
-- [ ] Gbuffer结构和deferred shading
+
+- [x] Gbuffer结构和deferred rendering
+
 - [ ] tone mapping
-- [ ] 复杂场景的渲染，如sponza
+
+- [x] 复杂场景的渲染，如sponza
+
 - [x] 更完善的shader include，现在是单纯的查找替换，没有语义，会把注释里面的替换掉，甚至中间不能加空格。区分<>和""，系统目录和当前目录。(boost::wave)
+
 - [ ] 考虑用bison做shader代码生成
+
 - [x] skinned mesh运动时的线框显示问题（以后考虑用transform feedback加速动画）
-- [ ] Directional Light 抖动的问题
+
+- [x] Directional Light 抖动的问题
+
 - [ ] Terrain/height map
+
 - [ ] builtinMaterial每次都会make_shaderd新的
+
 - [ ] InternalUniform和普通的uniform区分开来，固定某些texture的binding point
-- [ ] ​shader compiler中去掉boost::wave，依赖太多了，boost::thread,boost::system,boost::spirit...
+
+- [x] shader compiler中去掉boost::wave，依赖太多了，boost::thread,boost::system,boost::spirit...
 
 
 

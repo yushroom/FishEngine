@@ -129,7 +129,7 @@ public:
                     material = Material::builtinMaterial("PBR-Reference");
                 }
                 material->EnableKeyword(ShaderKeyword::AmbientIBL);
-                material->DisableKeyword(ShaderKeyword::Shadow);
+                //material->DisableKeyword(ShaderKeyword::Shadow);
                 material->SetFloat("Metallic", 0.0f);
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
@@ -240,7 +240,7 @@ class TestCSM : public App
         auto terrainGO = model->CreateGameObject();
         auto material = Material::builtinMaterial("DebugCSM");
         //auto material = Material::defaultMaterial();
-        material->EnableKeyword(ShaderKeyword::Shadow);
+        //material->EnableKeyword(ShaderKeyword::Shadow);
         
         //TextureImporter texture_importer;
         //auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");

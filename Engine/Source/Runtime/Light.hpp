@@ -34,6 +34,12 @@ namespace FishEngine
         "Area",
     };
 
+    template<>
+    inline constexpr const char** EnumToCStringArray<LightType>()
+    {
+        return LightTypeStrings;
+    }
+
     // index to enum
     template<>
     inline LightType ToEnum<LightType>(const int index)
@@ -48,7 +54,8 @@ namespace FishEngine
     }
 
     // enum to index
-    inline int ToIndex(LightType e)
+    template<>
+    inline int EnumToIndex<LightType>(LightType e)
     {
         switch (e) {
         case LightType::Directional: return 0; break;

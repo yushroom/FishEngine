@@ -24,6 +24,12 @@ namespace FishEngine
     inline T ToEnum(const int index);
 
     template<typename T>
+    inline int EnumToIndex(T e);
+
+    template<typename T>
+    inline constexpr const char** EnumToCStringArray();
+
+    template<typename T>
     constexpr int EnumCount();
 
     //template<typename T>

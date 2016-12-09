@@ -115,7 +115,7 @@ namespace FishEngine
         bool m_ZWrite = true;
         bool m_blend = false;
         bool m_applyNormalMap = false;
-        bool m_receiveShadow = true;
+        //bool m_receiveShadow = true;
 
         bool m_deferred = false;
 
@@ -123,7 +123,7 @@ namespace FishEngine
 
         static std::map<std::string, ShaderPtr> m_builtinShaders;
 
-        ShaderKeywords m_keywords = static_cast<ShaderKeywords>(ShaderKeyword::Shadow);
+        ShaderKeywords m_keywords = static_cast<ShaderKeywords>(ShaderKeyword::None);
     };
 }
 

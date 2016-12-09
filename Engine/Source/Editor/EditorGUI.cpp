@@ -1102,15 +1102,15 @@ namespace FishEditor
     template<typename T>
     void Enum(const char* label, const T& e)
     {
-        int index = ToIndex(e);
-        ImGui::Combo(label, &index, LightTypeStrings, EnumCount<T>());
+        int index = EnumToIndex<T>(e);
+        ImGui::Combo(label, &index, EnumToCStringArray<T>(), EnumCount<T>());
     }
     
     template<typename T>
     void Enum(const char* label, T* e)
     {
-        int index = ToIndex(*e);
-        if (ImGui::Combo(label, &index, LightTypeStrings, EnumCount<T>()))
+        int index = EnumToIndex<T>(*e);
+        if (ImGui::Combo(label, &index, EnumToCStringArray<T>(), EnumCount<T>()))
         {
             *e = ToEnum<T>(index);
         }
@@ -1254,6 +1254,7 @@ namespace FishEditor
     template<>
     void EditorGUI::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
     {
+        Enum<ShadowCastingMode>("Cast Shadows", &renderer->m_shadowCastingMode);
         if (ImGui::CollapsingHeader("Materials", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(inspector_indent_width);

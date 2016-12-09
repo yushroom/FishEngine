@@ -81,7 +81,7 @@ namespace FishEngine
 #define DEBUG_SHADOW 1
 #if 1
         const float split_lambda = 0.5f;
-        auto    camera = Camera::mainGameCamera();
+        auto    camera = Camera::main();
         auto    camera_to_world = camera->transform()->localToWorldMatrix();
         float   near = camera->nearClipPlane();
         //float   far = camera->farClipPlane();

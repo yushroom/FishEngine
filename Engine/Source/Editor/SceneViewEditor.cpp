@@ -47,7 +47,7 @@ namespace FishEditor
         m_cameraGameObject->transform()->LookAt(0, 0, 0);
         //m_cameraGameObject->SetTag("MainCamera");
 
-        sceneGizmoMaterial = Material::builtinMaterial("VertexLit-Internal");
+        sceneGizmoMaterial = Material::InstantiateBuiltinMaterial("VertexLit-Internal");
         cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);

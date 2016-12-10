@@ -28,13 +28,9 @@ namespace FishEngine
         
         static ShaderPtr CreateFromFile(const Path& path);
 
-
         void Use() const;
 
-        //GLuint program() const
-        //{
-        //    return m_program;
-        //}
+        bool HasUniform(const std::string& name);
 
         //GLuint getAttribLocation(const char* name) const;
 
@@ -85,8 +81,6 @@ namespace FishEngine
             return m_deferred;
         }
 
-        //std::shared_ptr<Shader> m_skinnedShader = nullptr;
-
         bool IsKeywordEnabled(ShaderKeyword keyword)
         {
             return (m_keywords & static_cast<ShaderKeywords>(keyword)) != 0;
@@ -100,30 +94,25 @@ namespace FishEngine
 
     private:
         friend class Material;
+        friend class RenderSystem;
 
-        //GLuint m_program = 0;
         std::unique_ptr<ShaderImpl> m_impl;
 
         //void GetAllUniforms();
         bool FromFile(const Path& path);
 
         // cache
-        unsigned int m_program = 0;
+        unsigned int m_GLNativeProgram = 0;
         std::vector<UniformInfo> m_uniforms;
 
-        Cullface m_cullface = Cullface::Back;
-        bool m_ZWrite = true;
-        bool m_blend = false;
-        bool m_applyNormalMap = false;
-        //bool m_receiveShadow = true;
-
-        bool m_deferred = false;
-
-        friend class RenderSystem;
-
-        static std::map<std::string, ShaderPtr> m_builtinShaders;
+        Cullface    m_cullface  = Cullface::Back;
+        bool        m_ZWrite    = true;
+        bool        m_blend     = false;
+        bool        m_deferred  = false;
 
         ShaderKeywords m_keywords = static_cast<ShaderKeywords>(ShaderKeyword::None);
+
+        static std::map<std::string, ShaderPtr> m_builtinShaders;
     };
 }
 

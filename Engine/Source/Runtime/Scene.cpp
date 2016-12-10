@@ -243,7 +243,7 @@ namespace FishEngine
         light->m_projectMatrixForShadowMap[0] = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
         
         //glCullFace(GL_FRONT);
-        auto shadow_map_material = Material::builtinMaterial("ShadowMap");
+        auto shadow_map_material = Material::InstantiateBuiltinMaterial("ShadowMap");
         shadow_map_material->DisableKeyword(ShaderKeyword::Shadow);
         //auto& view = light->m_viewMatrixForShadowMap;
         //auto& proj = light->m_projectMatrixForShadowMap;
@@ -260,19 +260,26 @@ namespace FishEngine
 
         auto shader = shadow_map_material->shader();
         shader->Use();
+        
 
         for (auto& go : m_gameObjects)
         {
+            bool is_skinned = false;
+
             if (!go->activeInHierarchy())
                 continue;
 
             MeshPtr mesh;
-            if (go->GetComponent<MeshRenderer>())
+            auto mesh_renderer = go->GetComponent<MeshRenderer>();
+            if (mesh_renderer != nullptr)
             {
-                auto meshFilter = go->GetComponent<MeshFilter>();
-                if (meshFilter != nullptr)
+                if (mesh_renderer->shadowCastingMode() != ShadowCastingMode::Off)
                 {
-                    mesh = meshFilter->mesh();
+                    auto meshFilter = go->GetComponent<MeshFilter>();
+                    if (meshFilter != nullptr)
+                    {
+                        mesh = meshFilter->mesh();
+                    }
                 }
             }
             else
@@ -284,6 +291,7 @@ namespace FishEngine
                     if (renderer->m_avatar != nullptr)
                     {
                         shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+                        is_skinned = true;
                         Pipeline::UpdateBonesUniforms(renderer->m_matrixPalette);
                     }
                 }
@@ -294,7 +302,10 @@ namespace FishEngine
                 shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
                 shader->CheckStatus();
                 mesh->Render();
-                shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+                if (!is_skinned)
+                {
+                    shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+                }
             }
         }
         glDisable(GL_DEPTH_CLAMP);

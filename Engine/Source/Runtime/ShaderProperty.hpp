@@ -18,14 +18,23 @@ namespace FishEngine
         std::map<std::string, float> floats;
     };
 
-    struct UniformInfo {
-        //GLint size; // size of the variable
-        GLenum type; // type of the variable (float, vec3 or mat4, etc)
-        //GLchar name[32];
+    struct UniformInfo
+    {
+        GLenum      type; // type of the variable (float, vec3 or mat4, etc)
         std::string name;  // variable name in GLSL
-        GLuint location;
-        bool binded;
+        GLuint      location;
+        int         textureBindPoint;
+        bool        binded;
     };
+
+    //struct UniformTextureInfo
+    //{
+    //    GLenum type;
+    //    string name;
+    //    GLuint location;
+    //    
+    //    bool binded;
+    //};
 
     enum class ShaderKeyword
     {

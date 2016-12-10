@@ -119,6 +119,8 @@ namespace FishEngine
         std::vector<GameObjectPtr> transparentQueue;
         std::vector<GameObjectPtr> forwardQueue;
 
+        bool deferred_enabled = false;
+
         for (auto& go : Scene::m_gameObjects)
         {
             if (!go->activeInHierarchy()) continue;
@@ -145,6 +147,7 @@ namespace FishEngine
                 }
             }
             // Deferred
+            deferred_enabled = true;
             renderer->Render();
         }
 
@@ -159,17 +162,20 @@ namespace FishEngine
         /************************************************************************/
         /* Deferred Rendering                                                   */
         /************************************************************************/
-        glDepthFunc(GL_ALWAYS);
-        glDepthMask(GL_FALSE);
-        auto quad = Model::builtinMesh(PrimitiveType::Quad);
-        auto mtl = Material::builtinMaterial("Deferred");
-        mtl->SetTexture("DBufferATexture", m_GBuffer[0]);
-        mtl->SetTexture("DBufferBTexture", m_GBuffer[1]);
-        mtl->SetTexture("DBufferCTexture", m_GBuffer[2]);
-        mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
-        Graphics::DrawMesh(quad, mtl);
-        glDepthMask(GL_TRUE);
-        glDepthFunc(GL_LESS);
+        if (deferred_enabled)
+        {
+            glDepthFunc(GL_ALWAYS);
+            glDepthMask(GL_FALSE);
+            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto mtl = Material::builtinMaterial("Deferred");
+            mtl->SetTexture("DBufferATexture", m_GBuffer[0]);
+            mtl->SetTexture("DBufferBTexture", m_GBuffer[1]);
+            mtl->SetTexture("DBufferCTexture", m_GBuffer[2]);
+            mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
+            Graphics::DrawMesh(quad, mtl);
+            glDepthMask(GL_TRUE);
+            glDepthFunc(GL_LESS);
+        }
 
         /************************************************************************/
         /* Forward                                                              */

@@ -1,4 +1,4 @@
-cpp_code = r'''TextureWrapMode m_wrapMode = TextureWrapMode::Repeat;'''
+cpp_code = r'''ShadowCastingMode m_shadowCastingMode = ShadowCastingMode::On;'''
 
 toks = cpp_code.strip().split()
 print(toks)

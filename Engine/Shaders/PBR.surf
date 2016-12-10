@@ -1,6 +1,3 @@
-@Normalmap Off
-// @Shadow Off
-
 #include <UnrealSupport.inc>
 #include <BRDF.inc>
 #include <Ambient.inc>

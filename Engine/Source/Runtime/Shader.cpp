@@ -132,6 +132,11 @@ const char* GLenumToString(GLenum e)
     }
 }
 
+bool UniformIsTexture(GLenum type)
+{
+    return (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_ARRAY || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE);
+}
+
 
 namespace FishEngine
 {
@@ -295,6 +300,7 @@ namespace FishEngine
 
             glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
 
+            int texture_count = 0;
             for (int i = 0; i < count; i++)
             {
                 glGetActiveUniform(program, (GLuint)i, bufSize, &length, &size, &type, name);
@@ -302,7 +308,20 @@ namespace FishEngine
                 if (loc != GL_INVALID_INDEX)
                 {
                     Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type), name, loc);
-                    uniforms.push_back(UniformInfo{ type, string(name), (GLuint)loc, false });
+                    UniformInfo u;
+                    u.type = type;
+                    u.name = name;
+                    u.location = loc;
+                    if (UniformIsTexture(type))
+                    {
+                        u.textureBindPoint = texture_count;
+                        texture_count++;
+                    }
+                    else {
+                        u.textureBindPoint = -1;
+                    }
+                    u.binded = false;
+                    uniforms.emplace_back(u);
                 }
             }
             m_GLProgramToUniforms[program] = uniforms;
@@ -343,24 +362,11 @@ namespace FishEngine
             m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "cull", "back"));
             m_ZWrite = getValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
             m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
-            m_applyNormalMap = getValueOrDefault<string, string>(settings, "normalmap", "off") == "on";
-            //m_receiveShadow = getValueOrDefault<string, string>(settings, "shadow", "on") == "on";
             m_deferred = getValueOrDefault<string, string>(settings, "deferred", "off") == "on";
-
-            //SetLocalKeywords(ShaderKeyword::Shadow, m_receiveShadow);
-            //auto k = static_cast<ShaderKeywords>(ShaderKeyword::None);
-            //if (m_receiveShadow)
-            //{
-            //    m_keywords |= k;
-            //}
-            //else
-            //{
-            //    m_keywords &= ~k;;
-            //}
 
             m_impl->set(parsed_shader_text);
             m_impl->CompileAndLink(m_keywords);
-            m_program = m_impl->glslProgram(m_keywords, m_uniforms);
+            m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
         }
         catch (const std::exception& e)
         {
@@ -415,14 +421,30 @@ namespace FishEngine
 
     void Shader::Use() const
     {
-        glUseProgram(m_program);
+        glUseProgram(m_GLNativeProgram);
+        for (auto& u : m_uniforms)
+        {
+            if (u.textureBindPoint >= 0)
+            {
+                glUniform1i(u.location, u.textureBindPoint);
+            }
+        }
+    }
+
+    bool Shader::HasUniform(const std::string& name)
+    {
+        for (auto& u : m_uniforms)
+        {
+            if (u.name == name)
+                return true;
+        }
+        return false;
     }
 
     void Shader::BindUniformVec4(const char* name, const Vector4& value)
     {
         for (auto& u : m_uniforms)
         {
-            //if (boost::starts_with(u.name, name))
             if (u.name == name)
             {
                 glUniform4fv(u.location, 1, value.data());
@@ -435,8 +457,10 @@ namespace FishEngine
 
     void Shader::BindUniformMat4(const char* name, const Matrix4x4& value)
     {
-        for (auto& u : m_uniforms) {
-            if (boost::starts_with(u.name, name)) {
+        for (auto& u : m_uniforms)
+        {
+            if (boost::starts_with(u.name, name))
+            {
                 glUniformMatrix4fv(u.location, 1, GL_TRUE, value.data());
                 u.binded = true;
                 return;
@@ -447,8 +471,6 @@ namespace FishEngine
 
     void Shader::BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray)
     {
-        //auto loc = GetUniformLocation(name.c_str());
-        //glUniformMatrix4fv(loc, matrixArray.size(), GL_TRUE, matrixArray.data()->data());
         for (auto& u : m_uniforms)
         {
             if (boost::starts_with(u.name, name))
@@ -485,7 +507,8 @@ namespace FishEngine
                     glUniform2fv(u.location, 1, it->second.data());
                     u.binded = true;
                 }
-                else {
+                else
+                {
                     Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
                 }
             }
@@ -497,7 +520,8 @@ namespace FishEngine
                     glUniform3fv(u.location, 1, it->second.data());
                     u.binded = true;
                 }
-                else {
+                else
+                {
                     Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
                 }
             }
@@ -523,9 +547,13 @@ namespace FishEngine
         glCheckError();
     }
 
+    void Shader::BindTexture(const std::string& name, TexturePtr& texture)
+    {
+        abort();
+    }
+
     void Shader::BindTextures(const std::map<std::string, TexturePtr>& textures)
     {
-        int texture_id = 0;
         for (auto& u : m_uniforms)
         {
             if ( !(u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY) )
@@ -533,20 +561,14 @@ namespace FishEngine
             auto it = textures.find(u.name);
             if (it != textures.end())
             {
-                glCheckError();
                 GLenum type = GL_TEXTURE_2D;
                 if (u.type == GL_SAMPLER_CUBE)
                     type = GL_TEXTURE_CUBE_MAP;
                 else if (u.type == GL_SAMPLER_2D_ARRAY)
                     type = GL_TEXTURE_2D_ARRAY;
                 //BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
-                glActiveTexture(GLenum(GL_TEXTURE0 + texture_id));
-                glCheckError(); 
+                glActiveTexture(GLenum(GL_TEXTURE0 + u.textureBindPoint));
                 glBindTexture(type, it->second->GetNativeTexturePtr());
-                //GLuint loc = _getUniformLocation(name);
-                glCheckError();
-                glUniform1i(u.location, texture_id);
-                texture_id++;
                 u.binded = true;
                 glCheckError();
             }
@@ -624,13 +646,13 @@ namespace FishEngine
     void Shader::EnableLocalKeywords(ShaderKeywords keyword)
     {
         m_keywords |= keyword;
-        m_program = m_impl->glslProgram(m_keywords, m_uniforms);
+        m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
     }
 
     void Shader::DisableLocalKeywords(ShaderKeywords keyword)
     {
         m_keywords &= ~keyword;
-        m_program = m_impl->glslProgram(m_keywords, m_uniforms);
+        m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
     }
 
     //========== Static Region ==========
@@ -646,7 +668,7 @@ namespace FishEngine
         }
 
         for (auto& n : { "Outline", "ScreenTexture", "ShadowMap",
-            "SolidColor", "VisualizeNormal", "NormalMap",
+            "SolidColor", "VisualizeNormal", "NormalMap", "Standard",
             "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad",
             "GatherScreenSpaceShadow", "PostProcessShadow", "PostProcessGaussianBlur" })
         {
@@ -659,9 +681,11 @@ namespace FishEngine
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir / "Editor/SolidColor.shader");
         m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir / "Editor/Alpha.shader");
         m_builtinShaders["VertexLit-Internal"]  = Shader::CreateFromFile(root_dir / "Editor/VertexLit.shader");
+        m_builtinShaders["SkyboxProcedural"]->setName("SkyboxProcedural");
         m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
-        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
-        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
-        m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
+        m_builtinShaders["SolidColor-Internal"]->setName("SolidColor-Internal");
+        m_builtinShaders["Alpha-Internal"]->setName("Alpha-Internal");
+        m_builtinShaders["VertexLit-Internal"]->setName("VertexLit-Internal");
     }
+
 }

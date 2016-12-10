@@ -119,7 +119,7 @@ private:
 
     virtual void Start() override {
         m_meshRenderer = gameObject()->GetComponent<MeshRenderer>();
-        m_material = Material::builtinMaterial("VisualizeNormal");
+        m_material = Material::InstantiateBuiltinMaterial("VisualizeNormal");
     }
     
     virtual void OnInspectorGUI() override {

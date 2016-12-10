@@ -15,6 +15,8 @@
 #include <TextureImporter.hpp>
 #include <QualitySettings.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 #include "FishEditorWindow.hpp"
 
 using namespace std;
@@ -41,7 +43,7 @@ void DefaultScene()
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
     light_go->AddComponent(Light::Create());
 
-    auto material = Material::builtinMaterial("SkyboxProcedural");
+    auto material = Material::InstantiateBuiltinMaterial("SkyboxProcedural");
     material->SetFloat("_AtmosphereThickness", 1.0);
     //material->SetFloat("_SunDisk", 2);
     material->SetFloat("_SunSize", 0.04f);
@@ -85,7 +87,7 @@ public:
     {
         DefaultScene();
 
-        auto pbr2 = Shader::CreateFromFile(Resources::shaderRootDirectory() / "PBR2.surf");
+        //auto pbr2 = Shader::CreateFromFile(Resources::shaderRootDirectory() / "PBR2.surf");
 
         TextureImporter importer;
         auto textures_dir = Resources::textureRootDirectory();
@@ -93,10 +95,10 @@ public:
         auto filtered_envmap = importer.FromFile(textures_dir / "envmap" / "uffizi_cross_128_filtered.dds");
         RenderSettings::setAmbientCubemap(filtered_envmap);
     
-        auto material = Material::defaultMaterial();
-        material->EnableKeyword(ShaderKeyword::AmbientIBL);
+        //auto material = Material::defaultMaterial();
+        //material->EnableKeyword(ShaderKeyword::AmbientIBL);
         
-        material = Material::builtinMaterial("SkyboxCubed");
+        auto material = Material::InstantiateBuiltinMaterial("SkyboxCubed");
         material->SetTexture("_Tex", envmap);
         material->SetVector4("_Tint", Vector4::one);
         material->SetFloat("_Exposure", 1);
@@ -117,16 +119,18 @@ public:
                 MaterialPtr material;
                 if (x == 0)
                 {
-                    material = Material::builtinMaterial("PBR");
+                    material = Material::InstantiateBuiltinMaterial("PBR");
+                    material->setName("PBR" + boost::lexical_cast<string>(y+5));
                 }
-                else if (x == 1)
-                {
-                    material = Material::CreateMaterial();
-                    material->SetShader(pbr2);
-                }
+                //else if (x == 1)
+                //{
+                //    material = Material::CreateMaterial();
+                //    material->SetShader(pbr2);
+                //}
                 else
                 {
-                    material = Material::builtinMaterial("PBR-Reference");
+                    material = Material::InstantiateBuiltinMaterial("PBR-Reference");
+                    material->setName("PBR-Reference" + boost::lexical_cast<string>(y + 5));
                 }
                 material->EnableKeyword(ShaderKeyword::AmbientIBL);
                 //material->DisableKeyword(ShaderKeyword::Shadow);
@@ -134,7 +138,9 @@ public:
                 material->SetFloat("Roughness", 0.1f*(y+5));
                 material->SetFloat("Specular", 0.5);
                 material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-                go->GetComponent<MeshRenderer>()->SetMaterial(material);
+                auto renderer = go->GetComponent<MeshRenderer>();
+                renderer->SetMaterial(material);
+                renderer->setShadowCastingMode(ShadowCastingMode::Off);
             }
         }
     }
@@ -238,7 +244,7 @@ class TestCSM : public App
         ModelImporter importer;
         auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
         auto terrainGO = model->CreateGameObject();
-        auto material = Material::builtinMaterial("DebugCSM");
+        auto material = Material::InstantiateBuiltinMaterial("DebugCSM");
         //auto material = Material::defaultMaterial();
         //material->EnableKeyword(ShaderKeyword::Shadow);
         
@@ -269,7 +275,7 @@ public:
         TextureImporter texture_importer;
         auto checkboardTexture = texture_importer.FromFile(textures_dir + "checkboard.png");
 
-        auto checkboardMaterial = Material::builtinMaterial("Diffuse");
+        auto checkboardMaterial = Material::InstantiateBuiltinMaterial("Diffuse");
         checkboardMaterial->setMainTexture(checkboardTexture);
 
         auto ground = GameObject::CreatePrimitive(PrimitiveType::Cube);
@@ -378,7 +384,7 @@ public:
         stageMaterial->SetTexture("_MainTex", stageBaseTexture);
         stageMaterial->SetTexture("_AlphaMask", stageMaskTexture);
 #else
-        auto stageMaterial = Material::builtinMaterial("Diffuse");
+        auto stageMaterial = Material::InstantiateBuiltinMaterial("Diffuse");
         stageMaterial->setMainTexture(stageBaseTexture);
 #endif
 
@@ -595,7 +601,7 @@ public:
         TextureImporter texture_importer;
         auto checkboard_texture = texture_importer.FromFile(textures_dir + "checkboard.png");
         
-        auto material = Material::builtinMaterial("Diffuse");
+        auto material = Material::InstantiateBuiltinMaterial("Diffuse");
         material->setMainTexture(checkboard_texture);
 
         auto go = GameObject::CreatePrimitive(PrimitiveType::Cube);
@@ -736,9 +742,9 @@ public:
 int main()
 {
     //FishEditorWindow::AddApp(make_shared<Empty>());
-    //FishEditorWindow::AddApp(make_shared<TestPBR>());
+    FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<Sponza>());
-    FishEditorWindow::AddApp(make_shared<TestCSM>());
+    //FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

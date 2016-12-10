@@ -9,7 +9,7 @@
 
 namespace FishEngine
 {
-    std::map<std::string, MaterialPtr> Material::s_builtinMaterial;
+    std::map<std::string, MaterialPtr> Material::s_builtinMaterialInstance;
     MaterialPtr Material::s_defaultMaterial = nullptr;
 
     // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
@@ -211,8 +211,21 @@ namespace FishEngine
         SetVector4("_Color", Vector4(color.r, color.g, color.b, color.a));
     }
 
-    MaterialPtr Material::builtinMaterial(const std::string& name)
+    FishEngine::MaterialPtr Material::builtinMaterial(const std::string& name)
     {
+        auto it = s_builtinMaterialInstance.find(name);
+        if (it != s_builtinMaterialInstance.end())
+        {
+            return it->second;
+        }
+        auto mtl = InstantiateBuiltinMaterial(name);
+        s_builtinMaterialInstance[name] = mtl;
+        return mtl;
+    }
+
+    MaterialPtr Material::InstantiateBuiltinMaterial(const std::string& name)
+    {
+        Debug::Log("Material::InstantiateBuiltinMaterial, %s", name.c_str());
         auto shader = Shader::builtinShader(name);
         assert(shader != nullptr);
         auto material = CreateMaterial();

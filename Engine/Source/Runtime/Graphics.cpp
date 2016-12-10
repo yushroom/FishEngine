@@ -17,33 +17,22 @@ namespace FishEngine
 
     void Graphics::DrawMesh(const MeshPtr& mesh, const MaterialPtr& material)
     {
-        //if (material->IsKeywordEnabled(ShaderKeyword::Shadow))
+        //if (material->IsKeywordEnabled(ShaderKeyword::AmbientIBL))
         //{
-        //    if (material->shader()->IsDeferred())
-        //    {
-        //        material->SetTexture("ScreenShadowMap", RenderSystem::m_screenShadowMap);
-        //    }
-        //    else
-        //    {
-        //        auto& lights = Light::lights();
-        //        if (lights.size() > 0)
-        //        {
-        //            auto& l = lights.front();
-        //            if (l->transform() != nullptr)
-        //            {
-        //                material->SetTexture("CascadedShadowMap", l->m_shadowMap);
-        //            }
-        //        }
-        //    }
+        //    material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
+        //    material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
         //}
-        if (material->IsKeywordEnabled(ShaderKeyword::AmbientIBL))
-        {
-            material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
-            material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
-        }
 
         auto shader = material->shader();
         shader->Use();
+        if (shader->HasUniform("AmbientCubemap"))
+        {
+            shader->BindTexture("AmbientCubemap", RenderSettings::ambientCubemap());
+        }
+        if (shader->HasUniform("PreIntegratedGF"))
+        {
+            shader->BindTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
+        }
         shader->PreRender();
         material->BindProperties();
         shader->CheckStatus();

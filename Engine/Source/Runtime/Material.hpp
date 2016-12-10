@@ -111,6 +111,8 @@ namespace FishEngine
 
         static MaterialPtr builtinMaterial(const std::string& name);
 
+        static MaterialPtr InstantiateBuiltinMaterial(const std::string& name);
+
         static MaterialPtr defaultMaterial();
 
     private:
@@ -121,7 +123,7 @@ namespace FishEngine
         ShaderUniforms                      m_uniforms;
         std::vector<MaterialProperty>       m_properties;
 
-        static std::map<std::string, MaterialPtr>   s_builtinMaterial;
+        static std::map<std::string, MaterialPtr>   s_builtinMaterialInstance;
         static MaterialPtr                          s_defaultMaterial;
     };
 }

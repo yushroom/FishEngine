@@ -31,6 +31,8 @@
 #define _WorldSpaceLightPos0 WorldSpaceLightPos
 #define _LightColor0 LightColor
 
+#define WorldSpaceLightPos0 WorldSpaceLightPos
+#define LightColor0 LightColor
 
 // Tranforms position from object to homogenous space
 float4 UnityObjectToClipPos( in float3 pos )

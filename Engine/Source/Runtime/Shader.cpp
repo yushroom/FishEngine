@@ -253,11 +253,12 @@ namespace FishEngine
         void GetAllUniforms(GLuint program) noexcept
         {
             std::vector<UniformInfo> uniforms;
-            GLuint blockID = glGetUniformBlockIndex(program, "PerCameraUniforms");
+            GLuint blockID = glGetUniformBlockIndex(program, "PerCameraUniforms"); 
             GLint blockSize = 0;
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
+                Debug::Log("%s", "use PerCameraUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::PerCameraUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(PerCameraUniforms));
@@ -268,6 +269,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
+                Debug::Log("%s", "use PerDrawUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(PerDrawUniforms));
@@ -277,6 +279,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
+                Debug::Log("%s", "use LightingUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::LightingUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(LightingUniforms));
@@ -286,6 +289,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
+                Debug::Log("%s", "use Bones");
                 glUniformBlockBinding(program, blockID, Pipeline::BonesUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(Bones));
@@ -547,7 +551,7 @@ namespace FishEngine
         glCheckError();
     }
 
-    void Shader::BindTexture(const std::string& name, TexturePtr& texture)
+    void Shader::BindTexture(const std::string& name, TexturePtr texture)
     {
         abort();
     }
@@ -572,10 +576,10 @@ namespace FishEngine
                 u.binded = true;
                 glCheckError();
             }
-            else
-            {
-                Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
-            }
+//            else
+//            {
+//                Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
+//            }
         }
     }
 
@@ -660,17 +664,15 @@ namespace FishEngine
     void Shader::Init()
     {
         const auto& root_dir = Resources::shaderRootDirectory();
-        for (auto& n : { "Texture", "TextureDoubleSided", "Transparent",
-            "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
+        for (auto& n : { "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
             m_builtinShaders[n]->setName(n);
         }
 
-        for (auto& n : { "Outline", "ScreenTexture", "ShadowMap",
-            "SolidColor", "VisualizeNormal", "NormalMap", "Standard",
-            "Deferred", "CascadedShadowMap", "DisplayCSM", "DrawQuad",
-            "GatherScreenSpaceShadow", "PostProcessShadow", "PostProcessGaussianBlur" })
+        for (auto& n : { "ScreenTexture", "Deferred", "CascadedShadowMap",
+            "DisplayCSM", "DrawQuad", "GatherScreenSpaceShadow",
+            "PostProcessShadow", "PostProcessGaussianBlur" })
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
             m_builtinShaders[n]->setName(n);

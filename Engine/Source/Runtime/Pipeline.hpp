@@ -24,7 +24,7 @@ namespace FishEngine
 
         static RenderTargetPtr CurrentRenderTarget()
         {
-            s_renderTargetStack.top();
+            return s_renderTargetStack.top();
         }
 
         static void PushRenderTarget(const RenderTargetPtr& renderTarget);

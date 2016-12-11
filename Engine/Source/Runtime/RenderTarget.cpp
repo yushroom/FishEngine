@@ -56,14 +56,6 @@ namespace FishEngine
         glGenFramebuffers(1, &m_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-        for (uint32_t i = 0; i < m_activeColorBufferCount; ++i)
-        {
-            auto rt = m_colorBuffers[i]->GetNativeTexturePtr();
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, rt, 0);
-        }
-        GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-        glDrawBuffers(m_activeColorBufferCount, attachments);
-
         if (m_useDepthBuffer)
         {
             if (m_depthBuffer->m_useStencil)
@@ -71,6 +63,18 @@ namespace FishEngine
             else
                 glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthBuffer->GetNativeTexturePtr(), 0);
         }
+        
+        if (m_activeColorBufferCount > 0)
+        {
+            for (uint32_t i = 0; i < m_activeColorBufferCount; ++i)
+            {
+                auto rt = m_colorBuffers[i]->GetNativeTexturePtr();
+                glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, rt, 0);
+            }
+            GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+            glDrawBuffers(m_activeColorBufferCount, attachments);
+        }
+
 
         auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if ( result != GL_FRAMEBUFFER_COMPLETE )

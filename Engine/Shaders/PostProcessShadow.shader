@@ -1,4 +1,3 @@
-@shadow off
 @zwrite off
 
 @vertex

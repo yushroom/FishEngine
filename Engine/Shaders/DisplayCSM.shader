@@ -1,4 +1,3 @@
-@shadow off
 @cull off
 @zwrite off
 

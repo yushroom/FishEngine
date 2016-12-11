@@ -81,7 +81,12 @@ namespace FishEngine
         s_lightingUniforms.CascadesSplitPlaneNear   = light->m_cascadesSplitPlaneNear;
         s_lightingUniforms.CascadesSplitPlaneFar    = light->m_cascadesSplitPlaneFar;
         for (int i = 0; i < 4; ++i)
+        {
             s_lightingUniforms.LightMatrix[i] = light->m_projectMatrixForShadowMap[i] * light->m_viewMatrixForShadowMap[i];
+            // macOS bug
+            s_lightingUniforms.LightMatrix[i] = s_lightingUniforms.LightMatrix[i].transpose();
+            //s_lightingUniforms.LightMatrix[i] = Matrix4x4::identity;
+        }
         
         glBindBuffer(GL_UNIFORM_BUFFER, s_lightingUBO);
         //auto size = sizeof(perFrameUniformData);

@@ -57,6 +57,10 @@ namespace FishEngine
         {
             auto& m = m_matrixPalette[i];
             m = invGlobalTransform * m * bindposes[i];
+            // macOS bug
+            m = m.transpose();
+#if FISHENGINE_PLATFORM_APPLE
+#endif
         }
     }
     

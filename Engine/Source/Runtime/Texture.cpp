@@ -103,6 +103,8 @@ namespace FishEngine
         auto t = std::make_shared<LayeredColorBuffer>();
         Texture::m_textures.push_back(t);
         t->m_dimension = TextureDimension::Tex2DArray;
+        t->m_filterMode = FilterMode::Point;
+        t->m_wrapMode = TextureWrapMode::Clamp;
         t->m_width = width;
         t->m_height = height;
         t->m_format = format;
@@ -135,15 +137,19 @@ namespace FishEngine
 
         glGenTextures(1, &t->m_texture);
         glBindTexture(GL_TEXTURE_2D_ARRAY, t->m_texture);
+//        if (useStencil)
+//            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH24_STENCIL8, t->m_width, t->m_height, layers, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+//        else
+//            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, t->m_width, t->m_height, layers, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
         if (useStencil)
-            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH24_STENCIL8, t->m_width, t->m_height, layers, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+            glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH24_STENCIL8, width, height, layers);
         else
-            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, t->m_width, t->m_height, layers, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+            glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32, width, height, layers);
         glCheckError();
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
         glCheckError();
         return t;
@@ -151,7 +157,8 @@ namespace FishEngine
 
     TextureSampler::~TextureSampler()
     {
-        glDeleteSamplers(1, &m_nativeGLSampler);
+        if (m_nativeGLSampler != 0)
+            glDeleteSamplers(1, &m_nativeGLSampler);
     }
 
 

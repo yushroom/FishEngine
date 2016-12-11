@@ -80,7 +80,7 @@ namespace FishEngine
     {
 #define DEBUG_SHADOW 1
 #if 1
-        const float split_lambda = 0.5f;
+        
         auto    camera = Camera::main();
         auto    camera_to_world = camera->transform()->localToWorldMatrix();
         float   near = camera->nearClipPlane();
@@ -96,6 +96,7 @@ namespace FishEngine
         {
 #if 0
             // From GPU Gem 3. Chap 10 "Practical Split Scheme".
+            const float split_lambda = 0.5f;
             float split_near = near;
             if (i > 0)
                 split_near = Mathf::Lerp(near + i / 4.0f * (far - near), near * Mathf::Pow(far / near, i / 4.0f), split_lambda);
@@ -253,15 +254,15 @@ namespace FishEngine
         Pipeline::PushRenderTarget(light->m_renderTarget);
 
         glViewport(0, 0, shadowMap->width(), shadowMap->height());
-        glClearColor(1, 0, 0, 1);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         glEnable(GL_DEPTH_CLAMP);
 
+#if 1
         auto shader = shadow_map_material->shader();
         shader->Use();
+        //shader->BindUniformMat4("TestMat", Matrix4x4::identity);
         
-
         for (auto& go : m_gameObjects)
         {
             bool is_skinned = false;
@@ -309,7 +310,7 @@ namespace FishEngine
             }
         }
         glDisable(GL_DEPTH_CLAMP);
-        //glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+#endif
         Pipeline::PopRenderTarget();
 #undef DEBUG_SHADOW
     }

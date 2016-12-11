@@ -1,6 +1,7 @@
-#ifdef VERTEX_SHADER
-    #include "UnitySupport.inc"
-    #include "AppData.inc"
+#include <UnitySupport.inc>
+@vertex
+{
+    #include <AppData.inc>
 
     // Transforms 2D UV by scale/bias property
     #define TRANSFORM_TEX(tex,name) (tex.xy * name##_ST.xy + name##_ST.zw)
@@ -57,11 +58,10 @@
 
         vs_out.lightDir = WorldSpaceLightDir(appdata.position);
     }
+}
 
-#endif
-
-#ifdef FRAGMENT_SHADER
-
+@fragment
+{
     #include <CGSupport.inc>
     // Material parameters
     uniform float4 _Color;
@@ -171,4 +171,4 @@
 
         color = float4( combinedColor, opacity );
     }
-#endif
+}

@@ -725,12 +725,12 @@ namespace FishEditor
                             t->name().c_str(),
                             (void*)t->GetNativeTexturePtr(),
                             ImVec2(image_size, image_size),
-                            { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 1, 0, 0, 1 });
+                            { 0, 1 }, { 1, 0 }, { 1, 1, 1, 1 }, { 1, 0, 0, 1 });
                     else
                         ImGui::ImageWithLabel(
                             t->name().c_str(),
                             (void*)t->GetNativeTexturePtr(),
-                            ImVec2(image_size, image_size));
+                            ImVec2(image_size, image_size), {0, 1}, {1, 0});
                     if (ImGui::IsItemClicked(0))
                     {
                         std::cout << t->name() << " clicked" << std::endl;

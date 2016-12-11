@@ -12,7 +12,12 @@
 #if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
 #define GLEW_STATIC
 #endif
+#if 0
 #include <GL/glew.h>
+#else
+#include <OpenGL/gl3.h>
+#include <OpenGL/gl3ext.h>
+#endif
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY

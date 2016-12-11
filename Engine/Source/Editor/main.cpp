@@ -742,9 +742,9 @@ public:
 int main()
 {
     //FishEditorWindow::AddApp(make_shared<Empty>());
-    FishEditorWindow::AddApp(make_shared<TestPBR>());
+    //FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<Sponza>());
-    //FishEditorWindow::AddApp(make_shared<TestCSM>());
+    FishEditorWindow::AddApp(make_shared<TestCSM>());
     //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());

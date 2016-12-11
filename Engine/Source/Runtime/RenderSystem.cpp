@@ -296,12 +296,12 @@ namespace FishEngine
         glDepthFunc(GL_ALWAYS);
         auto display_csm_mtl = Material::builtinMaterial("DisplayCSM");
         constexpr float size = 0.25f;
+        auto quad = Model::builtinMesh(PrimitiveType::Quad);
         for (int i = 0; i < 4; ++i)
         {
             display_csm_mtl->SetFloat("Section", float(i));
             Vector4 v(i*size*2-1, -1, size, size);
             display_csm_mtl->SetVector4("DrawRectParameters", v);
-            //Debug::Log("%d", lights.front()->m_depthBuffer->GetNativeTexturePtr());
             display_csm_mtl->setMainTexture(lights.front()->m_shadowMap);
             Graphics::DrawMesh(quad, display_csm_mtl);
         }

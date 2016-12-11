@@ -74,12 +74,14 @@ layout(std140, row_major) uniform LightingUniforms
 	vec4 CascadesSplitPlaneNear;
 	vec4 CascadesSplitPlaneFar;
 	//mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
-	mat4 LightMatrix[4]; // world -> clip (VP)
+	// macOS bug
+	layout(column_major) mat4 LightMatrix[4]; // world -> clip (VP)
 };
 
 
 #define MAX_BONE_SIZE 128
-layout(std140, row_major) uniform Bones
+// column_major: macOS bug
+layout(std140, column_major) uniform Bones
 {
     mat4 BoneTransformations[MAX_BONE_SIZE];
 };

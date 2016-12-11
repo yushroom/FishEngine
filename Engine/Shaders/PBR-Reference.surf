@@ -1,5 +1,3 @@
-@Normalmap Off
-@Shadow Off
 @AmbientIBL On
 
 #include <Ambient.inc>

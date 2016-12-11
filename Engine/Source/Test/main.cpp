@@ -1,186 +1,124 @@
-#include <Texture.hpp>
-#include <Mathf.hpp>
-#include <Vector2.hpp>
-#include <Vector3.hpp>
-#include <Vector4.hpp>
-#include <Color.hpp>
+#include <GLEnvironment.hpp>
+#include <glfw/glfw3.h>
 #include <Debug.hpp>
-
-#include <boost/filesystem.hpp>
-#include <gli/gli.hpp>
+#include <Resources.hpp>
+#include <Shader.hpp>
+#include <ModelImporter.hpp>
+#include <Graphics.hpp>
 
 using namespace FishEngine;
-using namespace std;
 
-typedef FishEngine::Vector2 float2;
-typedef FishEngine::Vector3 float3;
-typedef FishEngine::Vector4 float4;
+constexpr int WIDTH = 640;
+constexpr int HEIGHT = 480;
 
-void ToAddress(CubemapFace& face, uint32_t& x, uint32_t& y, float3 const & dir, uint32_t size)
+GLuint tex = 0;
+GLuint fbo = 0;
+MeshPtr quad = nullptr;
+ShaderPtr shader = nullptr;
+
+void Init()
 {
-    float3 n_dir = dir.normalized();
-    float3 abs_dir;
-    for (int i = 0; i < 3; ++i)
-        abs_dir[i] = Mathf::Abs(n_dir[i]);
-
-    if (abs_dir.x > abs_dir.y)
-    {
-        if (abs_dir.x > abs_dir.z)
-        {
-            face = n_dir.x > 0 ? CubemapFace::PositiveX : CubemapFace::NegativeX;
-        }
-        else
-        {
-            face = n_dir.z > 0 ? CubemapFace::PositiveZ : CubemapFace::NegativeZ;
-        }
-    }
-    else
-    {
-        if (abs_dir.y > abs_dir.z)
-        {
-            face = n_dir.y > 0 ? CubemapFace::PositiveY : CubemapFace::NegativeY;
-        }
-        else
-        {
-            face = n_dir.z > 0 ? CubemapFace::PositiveZ : CubemapFace::NegativeZ;
-        }
-    }
-
-    switch (face)
-    {
-    case CubemapFace::PositiveX:
-        n_dir /= abs_dir.x;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-
-    case CubemapFace::NegativeX:
-        n_dir /= abs_dir.x;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-
-    case CubemapFace::PositiveY:
-        n_dir /= abs_dir.y;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-
-    case CubemapFace::NegativeY:
-        n_dir /= abs_dir.y;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.z * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-
-    case CubemapFace::PositiveZ:
-        n_dir /= abs_dir.z;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((+n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-
-    case CubemapFace::NegativeZ:
-    default:
-        n_dir /= abs_dir.z;
-        x = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.x * 0.5f + 0.5f) * size), 0U, size - 1);
-        y = Mathf::Clamp<uint32_t>(static_cast<uint32_t>((-n_dir.y * 0.5f + 0.5f) * size), 0U, size - 1);
-        break;
-    }
-
-}
-
-uint32_t ReverseBits(uint32_t bits)
-{
-    bits = (bits << 16) | (bits >> 16);
-    bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
-    bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCC) >> 2);
-    bits = ((bits & 0x0F0F0F0F) << 4) | ((bits & 0xF0F0F0F0) >> 4);
-    bits = ((bits & 0x00FF00FF) << 8) | ((bits & 0xFF00FF00) >> 8);
-    return bits;
-}
-
-float RadicalInverseVdC(uint32_t bits)
-{
-    return ReverseBits(bits) * 2.3283064365386963e-10f; // / 0x100000000
-}
-
-float2 Hammersley2D(uint32_t i, uint32_t N)
-{
-    return float2(static_cast<float>(i) / N, RadicalInverseVdC(i));
-}
-
-float4 ImportanceSampleGGX(float2 E, float Roughness)
-{
-    float m = Roughness * Roughness;
-    float m2 = m * m;
-
-    float Phi = 2 * Mathf::PI * E.x;
-    float CosTheta = sqrt((1 - E.y) / (1 + (m2 - 1) * E.y));
-    float SinTheta = sqrt(1 - CosTheta * CosTheta);
-
-    float3 H;
-    H.x = SinTheta * cos(Phi);
-    H.y = SinTheta * sin(Phi);
-    H.z = CosTheta;
-
-    float d = (CosTheta * m2 - CosTheta) * CosTheta + 1;
-    float D = m2 / (Mathf::PI*d*d);
-    float PDF = D * CosTheta;
-
-    return float4(H, PDF);
-}
-
-// adapted from shader code in UE4
-// also see PrefilterCube.cpp in KlayGE
-// float3 PrefilterEnvMap( uint2 Random, float Roughness, float3 R )
-float3 PrefilterEnvMapSpecular(float roughness, const float3& R, float3* env_map[6], uint32_t size)
-{
-    auto& N = R;  // normal
-    auto& V = R;  // view
-
-    float3 FilteredColor = float3(0);
-    float Weight = 0;
-
-    constexpr uint32_t NumSamples = 128;
-    for (uint32_t i = 0; i < NumSamples; i++)
-    {
-        float2 E = Hammersley2D(i, NumSamples);
-        float3 H = ImportanceSampleGGX(E, roughness);
-        float3 L = 2 * float3::Dot(R, H) * H - R;
-
-        float NoL = Mathf::Clamp01(float3::Dot(R, L));
-        if (NoL > 0)
-        {
-            CubemapFace face;
-            uint32_t x, y;
-            ToAddress(face, x, y, L, size);
-            FilteredColor += env_map[static_cast<uint32_t>(face)][y * size + x] * NoL;
-            Weight += NoL;
-        }
-    }
-    return FilteredColor / Mathf::Max(Weight, 0.001);
-}
-
-void PrefilterCube(const std::string & in_file, const std::string & out_file)
-{
-    gli::texture Texture = gli::load(in_file);
-    if (Texture.empty())
-    {
-        Debug::LogError("Texture %s not found", in_file.c_str());
-        abort();
-    }
-    gli::gl GL(gli::gl::PROFILE_GL33);
-    gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
-    auto Target = GL.translate(Texture.target());
+    glCheckError();
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+    //glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, WIDTH, HEIGHT, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, WIDTH, HEIGHT, 4);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex, 0);
+    glCheckError();
+    static const GLenum draw_buffers[] = {
+        GL_COLOR_ATTACHMENT0
+    };
+    glDrawBuffers(1, draw_buffers);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
+    quad = Model::builtinMesh(PrimitiveType::Quad);
+    
+    glCheckError();
+    shader = Shader::CreateFromFile("/Users/yushroom/program/graphics/FishEngine/Engine/Source/Test/TestLayerRendering.shader");
+    
+    glCheckError();
 }
 
 int main()
 {
-    const char* input = R"(D:\program\github\Cinder-Experiments\common\textures\BolongaRadiance2.dds)";
+    glfwInit();
+    // Set all the required options for GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+    // Create a GLFWwindow object that we can use for GLFW's functions
+    auto window = glfwCreateWindow(WIDTH, HEIGHT, "FishEngine", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
+    glCheckError();
     
-    boost::filesystem::path output_path(input);
-    std::string output = output_path.stem().string() + "_filtered.dds";
-
-    PrefilterCube(input, output);
-
+    Debug::setColorMode(false);
+    Resources::Init();
+    Shader::Init();
+    Material::Init();
+    Model::Init();
+    Init();
+    
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        glClearColor(0.1, 0.2, 0.3, 1);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glDepthFunc(GL_ALWAYS);
+        shader->Use();
+        quad->Render();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        glCheckError();
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        glDepthFunc(GL_ALWAYS);
+        auto display_csm_mtl = Material::builtinMaterial("DisplayCSM");
+        auto s = display_csm_mtl->shader();
+        s->Use();
+        ShaderUniforms uniforms;
+        constexpr float size = 0.25f;
+        auto quad = Model::builtinMesh(PrimitiveType::Quad);
+        for (int i = 0; i < 4; ++i)
+        {
+//            display_csm_mtl->SetFloat("Section", float(i));
+//            Vector4 v(i*size*2-1, -1, size, size);
+//            display_csm_mtl->SetVector4("DrawRectParameters", v);
+//            display_csm_mtl->setMainTexture();
+//            Graphics::DrawMesh(quad, display_csm_mtl);
+            uniforms.floats["Section"] = float(i);
+            Vector4 v(i*size*2-1, -1, size, size);
+            uniforms.vec4s["DrawRectParameters"] = v;
+            glCheckError();
+            s->BindUniforms(uniforms);
+            glCheckError();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+            glCheckError();
+            
+            quad->Render();
+        }
+        glDepthFunc(GL_LESS);
+        
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+        
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+    
+    glfwTerminate();
     return 0;
-} 
+}

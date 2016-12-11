@@ -3,13 +3,16 @@
 
 #include "FishEngine.hpp"
 
-// GLEW
-#if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
-#define GLEW_STATIC
+#if FISHENGINE_PLATFORM_WINDOWS
+    // GLEW
+    #if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
+        #define GLEW_STATIC
+    #endif
+    #include <GL/glew.h>
+#else
+    #include <OpenGL/gl3.h>
+    #include <OpenGL/gl3ext.h>
 #endif
-#include <GL/glew.h>
-// GLFW
-//#include <glfw/glfw3.h>
 
 //#ifdef _DEBUG
 #define glCheckError() _checkOpenGLError(__FILE__,__LINE__)

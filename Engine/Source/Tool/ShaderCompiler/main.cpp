@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     Debug::setColorMode(false);
     Resources::Init();
     Debug::Log("Compiling...");
+    
     glfwInit();
     // Set all the required options for GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -25,25 +26,27 @@ int main(int argc, char* argv[])
     auto window = glfwCreateWindow(WIDTH, HEIGHT, "FishEngine", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glCheckError();
-
+    
+#if FISHENGINE_PLATFORM_WINDOWS
     // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
     glewExperimental = GL_TRUE;
     // Initialize GLEW to setup the OpenGL Function pointers
     glewInit();
+#endif
 
-    std::string path = R"(D:\program\FishEngine\Engine\Shaders\Deferred.shader)";
+    std::string path = R"(/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/Deferred.shader)";
     if (argc == 2)
     {
         path = argv[1];
     }
+#ifdef _DEBUG
     else
     {
         Debug::LogError("invalid command.");
-#ifndef _DEBUG
         return 1;
-#endif
     }
-
+#endif
+    
     auto shader = Shader::CreateFromFile(path);
     if (shader == nullptr)
         return 1;

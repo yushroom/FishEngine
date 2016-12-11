@@ -34,14 +34,10 @@ namespace FishEngine
         //m_renderTarget->Set(m_shadowMap, m_depthBuffer);
 
         m_shadowMap = LayeredDepthBuffer::Create(shadow_map_size, shadow_map_size, 4, false);
-        //m_shadowMap = LayeredColorBuffer::Create(shadow_map_size, shadow_map_size, 4, TextureFormat::R32);
+        //m_tempColorBuffer = LayeredColorBuffer::Create(shadow_map_size, shadow_map_size, 4, TextureFormat::R32);
         m_shadowMap->setFilterMode(FilterMode::Bilinear);
         m_shadowMap->setWrapMode(TextureWrapMode::Clamp);
         m_renderTarget->SetDepthBufferOnly(m_shadowMap);
-
-        //m_depthBuffer = LayeredDepthBuffer::Create(shadow_map_size, shadow_map_size, 4);
-        //m_shadowMap = LayeredColorBuffer::Create(shadow_map_size, shadow_map_size, 4, TextureFormat::R32);
-        //m_renderTarget->Set(m_shadowMap, m_depthBuffer);
     }
 
     LightPtr Light::Create()

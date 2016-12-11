@@ -1,4 +1,3 @@
-@shadow off
 #include <ShaderVariables.inc>
 #include <ShadowCommon.inc>
 

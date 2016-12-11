@@ -129,9 +129,9 @@ namespace FishEditor
         if (m_highlightSelections)
         {
             auto camera = Camera::main();
-            auto view = camera->worldToCameraMatrix();
-            auto proj = camera->projectionMatrix();
-            auto vp = proj * view;
+            //auto view = camera->worldToCameraMatrix();
+            //auto proj = camera->projectionMatrix();
+            //auto vp = proj * view;
             glEnable(GL_POLYGON_OFFSET_LINE);
             glPolygonOffset(-1.0, -1.0f);
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -351,7 +351,7 @@ namespace FishEditor
         ShaderUniforms uniforms;
 
 
-        Color colors[3] = { Color::red, Color::green, Color::blue };
+        //Color colors[3] = { Color::red, Color::green, Color::blue };
 
         float f[] = {
             1,  0,  0,   0, 0, -90,    // red axis, +x

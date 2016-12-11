@@ -143,7 +143,6 @@ namespace FishEngine
         float m_shadowNearPlane     = 0.2f;
 
         //LayeredColorBufferPtr m_shadowMap;
-        //LayeredColorBufferPtr m_shadowMap;
         LayeredDepthBufferPtr m_shadowMap;
         RenderTargetPtr m_renderTarget;
         Matrix4x4 m_viewMatrixForShadowMap[4];

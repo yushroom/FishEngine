@@ -1,5 +1,3 @@
-@shadow off
-
 struct V2F
 {
 	vec2 UV;

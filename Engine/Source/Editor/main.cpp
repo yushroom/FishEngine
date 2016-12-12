@@ -16,6 +16,7 @@
 #include <QualitySettings.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <Timer.hpp>
 
 #include "FishEditorWindow.hpp"
 

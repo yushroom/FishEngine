@@ -17,6 +17,7 @@
 #include "MeshRenderer.hpp"
 #include "SkinnedMeshRenderer.hpp"
 #include "RenderTarget.hpp"
+#include "Timer.hpp"
 
 namespace FishEngine
 {
@@ -94,14 +95,17 @@ namespace FishEngine
         auto camera = Camera::main();
         Pipeline::BindCamera(camera);
 
+
         /************************************************************************/
         /* Shadow                                                               */
         /************************************************************************/
+        Timer t("Shadow");
         auto& lights = Light::lights();
         for (auto& l : lights)
         {
             Scene::RenderShadow(l); // note: RenderShadow will change viewport
         }
+        t.StopAndPrint();
 
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
@@ -111,6 +115,8 @@ namespace FishEngine
         /************************************************************************/
         /* Scene                                                                */
         /************************************************************************/
+        t.SetLabel("Deferred Queue");
+        t.Start();
         Pipeline::PushRenderTarget(m_deferredRenderTarget);
         glClearBufferfv(GL_COLOR, 0, black);
         glClearBufferfv(GL_COLOR, 1, error_color);
@@ -177,6 +183,11 @@ namespace FishEngine
             glDepthFunc(GL_LESS);
         }
 
+        t.StopAndPrint();
+
+        t.SetLabel("Forward");
+        t.Start();
+
         /************************************************************************/
         /* Forward                                                              */
         /************************************************************************/
@@ -193,11 +204,13 @@ namespace FishEngine
 
         Pipeline::PopRenderTarget(); // m_mainRenderTarget
 
+        t.StopAndPrint();
 
         /************************************************************************/
         /* Screen Space Shadow                                                  */
         /************************************************************************/
-
+        t.SetLabel("ScreenSpaceShadow");
+        t.Start();
         // 1 color buffer
         // no depth buffer
         Pipeline::PushRenderTarget(m_screenShadowMapRenderTarget);
@@ -270,6 +283,10 @@ namespace FishEngine
             glDepthFunc(GL_LESS);
         }
 
+        t.StopAndPrint();
+
+        t.SetLabel("Skybox and transparent");
+        t.Start();
 
         /************************************************************************/
         /* Skybox                                                               */
@@ -291,6 +308,8 @@ namespace FishEngine
             renderer->Render();
         }
         transparentQueue.clear();
+
+        t.StopAndPrint();
 
 #if 0
         glDepthFunc(GL_ALWAYS);

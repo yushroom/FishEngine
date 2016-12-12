@@ -672,7 +672,7 @@ namespace FishEngine
 
         for (auto& n : { "ScreenTexture", "Deferred", "CascadedShadowMap",
             "DisplayCSM", "DrawQuad", "GatherScreenSpaceShadow",
-            "PostProcessShadow", "PostProcessGaussianBlur" })
+            "PostProcessShadow", "PostProcessGaussianBlur", "SolidColor" })
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
             m_builtinShaders[n]->setName(n);

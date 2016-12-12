@@ -4,12 +4,24 @@
 @vertex
 {
 	layout (location = PositionIndex) 	in vec3 InputPositon;
+	#ifdef _SKINNED
+		layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
+		layout (location = BoneWeightIndex) in vec4 boneWeight;
+	#endif
 
 	uniform mat4 ObjectToWorld;
 
 	void main()
 	{
-		gl_Position = ObjectToWorld * vec4(InputPositon, 1);
+		vec4 ObjectPosition = vec4(InputPositon, 1);
+		#ifdef _SKINNED
+			mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
+			boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
+			boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
+			boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
+		    ObjectPosition	= boneTransformation * ObjectPosition;
+		#endif // _SKINNED
+		gl_Position = ObjectToWorld * ObjectPosition;
 	}
 }
 

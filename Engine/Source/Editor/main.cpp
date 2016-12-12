@@ -1,4 +1,4 @@
-//#include "TestScript.hpp"
+#include "TestScript.hpp"
 #include <iostream>
 #include <Camera.hpp>
 #include <Scene.hpp>
@@ -255,7 +255,7 @@ class TestCSM : public App
     }
 };
 
-#if 0
+#if 1
 
 class SimpleTest : public App
 {
@@ -405,38 +405,6 @@ public:
         
         
         map<string, TexturePtr> textures;
-        //textures["skyTex"] = sky_texture;
-        
-//        auto skyboxGO = Scene::CreateGameObject("SkyBox");
-//        skyboxGO->transform()->setLocalScale(100, 100, 100);
-//        auto meshFilter = make_shared<MeshFilter>(sphere);
-//        auto material = Material::builtinMaterial("SkyboxProcedural");
-//        material->SetFloat("_AtmosphereThickness", 1.0);
-//        material->SetFloat("_SunDisk", 2);
-//        material->SetFloat("_SunSize", 0.04f);
-//        material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
-//        material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
-//        material->SetFloat("_Exposure", 1.3f);
-//        //material->SetTexture("_Tex", sky_texture);
-//        //material->SetFloat("_Exposure", 1.3);
-//        //material->SetFloat("_Rotation", 0);
-//        //material->SetVector4("_Tint", Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-//        auto meshRenderer = make_shared<MeshRenderer>(material);
-//        skyboxGO->AddComponent(meshFilter);
-//        skyboxGO->AddComponent(meshRenderer);
-        //auto skyboxGO = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-        //skyboxGO->setName("Skybox");
-        //skyboxGO->transform()->setLocalScale(100, 100, 100);
-        //auto material = Material::builtinMaterial("SkyboxProcedural");
-        //material->SetFloat("_AtmosphereThickness", 1.0);
-        //material->SetFloat("_SunDisk", 2);
-        //material->SetFloat("_SunSize", 0.04f);
-        //material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
-        //material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
-        //material->SetFloat("_Exposure", 1.3f);
-        //skyboxGO->GetComponent<MeshRenderer>()->SetMaterial(material);
-
-
         textures["AmbientCubemap"] = sky_texture;
 
         GameObjectPtr go;
@@ -744,8 +712,8 @@ int main()
     //FishEditorWindow::AddApp(make_shared<Empty>());
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
     //FishEditorWindow::AddApp(make_shared<Sponza>());
-    FishEditorWindow::AddApp(make_shared<TestCSM>());
-    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<TestCSM>());
+    FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     //FishEditorWindow::AddApp(make_shared<SimpleTest>());

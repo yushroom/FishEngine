@@ -369,7 +369,7 @@ namespace FishEngine
 
     void Scene::Render()
     {
-#if 1
+#if 0
         std::vector<GameObjectPtr> transparentQueue;
         std::vector<GameObjectPtr> forwardQueue;
 

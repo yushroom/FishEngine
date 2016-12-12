@@ -16,7 +16,13 @@ namespace FishEngine
         void Set(ColorBufferPtr colorBuffer1, ColorBufferPtr colorBuffer2, ColorBufferPtr colorBuffer3, DepthBufferPtr depthBuffer);
 
         void Attach();
+        void AttachForRead();
         void Detach();
+
+        //unsigned int GetGLNativeFBO() const
+        //{
+        //    return m_fbo;
+        //}
 
     private:
         bool            m_useDepthBuffer = true;

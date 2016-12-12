@@ -19,7 +19,7 @@ namespace FishEngine {
         RenderTexture() = default;
         ~RenderTexture();
         
-        static RenderTexturePtr CreateShadowMap();
+        //static RenderTexturePtr CreateShadowMap();
 
         static RenderTexturePtr CreateColorMap(const int width, const int height);
 
@@ -45,7 +45,7 @@ namespace FishEngine {
 
         GLuint colorBuffer() const
         {
-            return m_texture;
+            return m_GLNativeTexture;
         }
         
         void Resize(const int newWidth, const int newHeight);

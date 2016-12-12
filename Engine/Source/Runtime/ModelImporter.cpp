@@ -417,7 +417,7 @@ namespace FishEngine {
             aiString name;
             mtl->Get(AI_MATKEY_NAME, name);
             //Debug::Log("%s", name.C_Str());
-            MaterialPtr material = Material::builtinMaterial("PBR");
+            MaterialPtr material = Material::InstantiateBuiltinMaterial("PBR");
             material->SetFloat("Metallic", 0);
             material->SetFloat("Roughness", 0.5f);
             material->SetFloat("Specular", 0.5f);

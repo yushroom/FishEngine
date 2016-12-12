@@ -1,4 +1,4 @@
-#include "TestScript.hpp"
+//#include "TestScript.hpp"
 #include <iostream>
 #include <Camera.hpp>
 #include <Scene.hpp>
@@ -160,11 +160,9 @@ public:
         importer.setFileScale(0.01f);
         auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
         auto sponza_go = sponza_model->CreateGameObject();
-
+     
         TextureImporter tex_importer;
-
         Path textures_root = sponza_assets_root / "textures";
-
         auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
         auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
         (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
@@ -190,9 +188,7 @@ public:
             auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
             mtl->SetShader(shader2);
             auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
-            //auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
             mtl->SetTexture("DiffuseTex", diffuse);
-            //mtl->SetTexture("MaskTex", mask);
         };
 
         ApplyMateril2("mesh2", "vase_round");
@@ -221,7 +217,6 @@ public:
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
 
-        
         transform = Camera::mainGameCamera()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
@@ -255,7 +250,7 @@ class TestCSM : public App
     }
 };
 
-#if 1
+#if 0
 
 class SimpleTest : public App
 {
@@ -325,56 +320,47 @@ public:
     virtual void Init() override {
         
         DefaultScene();
+        QualitySettings::setShadowDistance(20);
         
         glCheckError();
-#if FISHENGINE_PLATFORM_WINDOWS
-        const std::string root_dir = R"(D:\program\FishEngine\assets\)";
-#else
-        const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/Assets/";
-#endif
-        const std::string models_dir = root_dir + "models/";
-        const std::string textures_dir = root_dir + "textures/";
-        //const std::string chan_dir = models_dir + "UnityChan/";
-        const std::string chan_root_dir = root_dir + "../Example/UnityChan/assets/";
-        
-        auto sphere = Model::builtinModel(PrimitiveType::Sphere)->mainMesh();
+        const Path example_root = Resources::exampleRootDirectory() / "UnityChan" / "assets";
+        Resources::SetAssetsDirectory(example_root);
+
+        //auto sphere = Model::builtinModel(PrimitiveType::Sphere)->mainMesh();
         
         ModelImporter importer;
         importer.setFileScale(0.01f);
         //importer.setImportNormals(ModelImporterNormals::Calculate);
-        //auto model = importer.LoadFBX(chan_root_dir + "models/unitychan.fbx");
-        auto model = importer.LoadFromFile(chan_root_dir + "models/unitychan.fbx");
-        //auto model = importer.LoadFromFile(chan_root_dir + "animations/boblampclean.md5mesh");
-        
+        auto model = importer.LoadFromFile(example_root / "models" / "unitychan.fbx");
         
         ModelImporter importer2;
         //importer2.setImportNormals(ModelImporterNormals::Calculate);
         importer2.setFileScale(0.01f);
-        //auto jump00Model = importer2.LoadFromFile(chan_roo t_dir + "animations/boblampclean.md5mesh");
-        auto jump00Model = importer2.LoadFromFile(chan_root_dir + "animations/unitychan_RUN00_F.fbx");
+        auto jump00Model = importer2.LoadFromFile(example_root / "animations" / "unitychan_RUN00_F.fbx");
         
         TextureImporter texture_importer;
-        auto sky_texture = texture_importer.FromFile(textures_dir + "StPeters/DiffuseMap.dds");
-        auto checkboard_texture = texture_importer.FromFile(textures_dir + "checkboard.png");
-        std::string chan_texture_dir = chan_root_dir + "textures/";
-        auto bodyTexture = texture_importer.FromFile(chan_texture_dir + "body_01.tga");
-        auto skinTexture = texture_importer.FromFile(chan_texture_dir + "skin_01.tga");
-        auto hairTexture = texture_importer.FromFile(chan_texture_dir + "hair_01.tga");
-        auto faceTexture = texture_importer.FromFile(chan_texture_dir + "face_00.tga");
-        auto eyelineTexture = texture_importer.FromFile(chan_texture_dir + "eyeline_00.tga");
-        auto eyeirisLTexture = texture_importer.FromFile(chan_texture_dir + "eye_iris_L_00.tga");
-        auto eyeirisRTexture = texture_importer.FromFile(chan_texture_dir + "eye_iris_R_00.tga");
-        auto cheekTexture = texture_importer.FromFile(chan_texture_dir + "cheek_00.tga");
+        auto textures_root = Resources::textureRootDirectory();
+        auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
+        auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
+        auto chan_texture_dir = example_root / "textures";
+        auto bodyTexture = texture_importer.FromFile(chan_texture_dir / "body_01.tga");
+        auto skinTexture = texture_importer.FromFile(chan_texture_dir / "skin_01.tga");
+        auto hairTexture = texture_importer.FromFile(chan_texture_dir / "hair_01.tga");
+        auto faceTexture = texture_importer.FromFile(chan_texture_dir / "face_00.tga");
+        auto eyelineTexture = texture_importer.FromFile(chan_texture_dir / "eyeline_00.tga");
+        auto eyeirisLTexture = texture_importer.FromFile(chan_texture_dir / "eye_iris_L_00.tga");
+        auto eyeirisRTexture = texture_importer.FromFile(chan_texture_dir / "eye_iris_R_00.tga");
+        auto cheekTexture = texture_importer.FromFile(chan_texture_dir / "cheek_00.tga");
         
         //auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
-        auto rolloffTexture = texture_importer.FromFile(chan_texture_dir + "FO_CLOTH1.tga");
-        auto rimLightTexture = texture_importer.FromFile(chan_texture_dir + "FO_RIM1.tga");
-        auto specularTexture = texture_importer.FromFile(chan_texture_dir + "body_01_SPEC.tga");
-        auto envTexture = texture_importer.FromFile(chan_texture_dir + "ENV2.tga");
-        auto normalMapTexture = texture_importer.FromFile(chan_texture_dir + "body_01_NRM.tga");
+        auto rolloffTexture = texture_importer.FromFile(chan_texture_dir / "FO_CLOTH1.tga");
+        auto rimLightTexture = texture_importer.FromFile(chan_texture_dir / "FO_RIM1.tga");
+        auto specularTexture = texture_importer.FromFile(chan_texture_dir / "body_01_SPEC.tga");
+        auto envTexture = texture_importer.FromFile(chan_texture_dir / "ENV2.tga");
+        auto normalMapTexture = texture_importer.FromFile(chan_texture_dir / "body_01_NRM.tga");
         
-        auto stageBaseTexture = texture_importer.FromFile(chan_texture_dir + "unitychan_tile5.png");
-        auto stageMaskTexture = texture_importer.FromFile(chan_texture_dir + "AlphaMask.png");
+        auto stageBaseTexture = texture_importer.FromFile(chan_texture_dir / "unitychan_tile5.png");
+        auto stageMaskTexture = texture_importer.FromFile(chan_texture_dir / "AlphaMask.png");
 
 #if 0
         auto alphaMaskShader = make_shared<Shader>();
@@ -390,7 +376,7 @@ public:
 
         //GameObject::CreatePrimitive(BuiltinModelType::Cube)->CreateGameObject();
         
-        auto chanMainShader = Shader::CreateFromFile(chan_root_dir+"shaders/CharaMain.shader");
+        auto chanMainShader = Shader::CreateFromFile(example_root / "shaders" / "CharaMain.shader");
         auto bodyMaterial = Material::CreateMaterial();
         bodyMaterial->setName("body");
         bodyMaterial->SetShader(chanMainShader);
@@ -711,9 +697,9 @@ int main()
 {
     //FishEditorWindow::AddApp(make_shared<Empty>());
     //FishEditorWindow::AddApp(make_shared<TestPBR>());
-    //FishEditorWindow::AddApp(make_shared<Sponza>());
+    FishEditorWindow::AddApp(make_shared<Sponza>());
     //FishEditorWindow::AddApp(make_shared<TestCSM>());
-    FishEditorWindow::AddApp(make_shared<TestAnimation>());
+    //FishEditorWindow::AddApp(make_shared<TestAnimation>());
     //FishEditorWindow::AddApp(make_shared<Shadertoy>());
     //FishEditorWindow::AddApp(make_shared<TestPhysics>());
     //FishEditorWindow::AddApp(make_shared<SimpleTest>());

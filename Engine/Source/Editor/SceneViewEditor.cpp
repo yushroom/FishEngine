@@ -54,9 +54,26 @@ namespace FishEditor
         m_size = EditorGUI::sceneViewSize();
         //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
         m_colorBuffer = ColorBuffer::Create(m_size.x, m_size.y);
-        m_colorBuffer->setName("SceneView");
+        m_colorBuffer->setName("SceneViewColor");
+        //m_depthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
+        //m_depthBuffer->setName("SceneViewDepth");
         m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
+        // TODO
         m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_mainDepthBuffer);
+
+        m_selectionOutlineRT = std::make_shared<RenderTarget>();
+        m_selectionOutlineDepthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
+        m_selectionOutlineDepthBuffer->setName("SelectionOutlineDepth");
+        m_selectionOutlineDepthBuffer->setFilterMode(FilterMode::Point);
+        m_selectionOutlineDepthBuffer->setWrapMode(TextureWrapMode::Repeat);
+        m_selectionOutlineRT->SetDepthBufferOnly(m_selectionOutlineDepthBuffer);
+
+        m_selectionOutlineRT2 = std::make_shared<RenderTarget>();
+        m_selectionOutlineColorBuffer2 = ColorBuffer::Create(m_size.x, m_size.y);
+        m_selectionOutlineColorBuffer2->setName("SelectionOutlineColor");
+        m_selectionOutlineColorBuffer2->setFilterMode(FilterMode::Point);
+        m_selectionOutlineColorBuffer2->setWrapMode(TextureWrapMode::Clamp);
+        m_selectionOutlineRT2->SetColorBufferOnly(m_selectionOutlineColorBuffer2);
 
         constexpr int rows = 10;
         constexpr int vertex_count = (rows * 2 + 1) * 2 * 2;
@@ -97,13 +114,14 @@ namespace FishEditor
             const int ix = static_cast<int>(m_size.x * Screen::pixelsPerPoint());
             const int iy = static_cast<int>(m_size.y * Screen::pixelsPerPoint());
             m_colorBuffer->Resize(ix, iy);
+            m_selectionOutlineDepthBuffer->Resize(ix, iy);
+            m_selectionOutlineColorBuffer2->Resize(ix, iy);
             RenderSystem::ResizeBufferSize(ix, iy);
             Camera::OnWindowSizeChanged(ix, iy);
             Screen::m_width = ix;
             Screen::m_height = iy;
         }
         Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
-        //glBindFramebuffer(GL_FRAMEBUFFER, m_sceneViewRenderTexture->FBO());
         glViewport(0, 0, Screen::m_width, Screen::m_height);
 
         RenderSystem::Render();
@@ -126,6 +144,7 @@ namespace FishEditor
         /************************************************************************/
         /* Selection                                                            */
         /************************************************************************/
+#if 0
         if (m_highlightSelections)
         {
             auto camera = Camera::main();
@@ -185,6 +204,72 @@ namespace FishEditor
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glDisable(GL_POLYGON_OFFSET_LINE);
         }
+#endif
+        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        if (selectedGO != nullptr)
+        {
+            Pipeline::PushRenderTarget(m_selectionOutlineRT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            auto material = Material::builtinMaterial("SolidColor");
+            material->SetVector4("Color", Vector4(1, 0, 1, 1));
+            std::list<GameObjectPtr> selections;
+            selections.push_back(selectedGO);
+            while (!selections.empty())
+            {
+                auto go = selections.front();
+                selections.pop_front();
+                if (go == nullptr)
+                {
+                    continue;
+                }
+                auto& children = go->transform()->children();
+                for (auto& c : children)
+                {
+                    selections.push_back(c.lock()->gameObject());
+                }
+                MeshPtr mesh;
+                auto meshFilter = go->GetComponent<MeshFilter>();
+                if (meshFilter != nullptr)
+                {
+                    mesh = meshFilter->mesh();
+                }
+                else
+                {
+                    auto skinnedMeshRenderer = go->GetComponent<SkinnedMeshRenderer>();
+                    if (skinnedMeshRenderer != nullptr)
+                    {
+                        mesh = skinnedMeshRenderer->sharedMesh();
+                        bool useSkinnedVersion = FishEditorWindow::InPlayMode();
+                        if (useSkinnedVersion)
+                        {
+                            material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+                            Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->m_matrixPalette);
+                        }
+                    }
+                }
+                if (mesh != nullptr)
+                {
+                    auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+                    Graphics::DrawMesh(mesh, model, material);
+                }
+            }
+            Pipeline::PopRenderTarget();
+
+            Pipeline::PushRenderTarget(m_selectionOutlineRT2);
+            glClear(GL_COLOR_BUFFER_BIT);
+            auto selection_outline_mtl = Material::builtinMaterial("PostProcessSelectionOutline");
+            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            selection_outline_mtl->SetTexture("StencilTexture", m_selectionOutlineDepthBuffer);
+            selection_outline_mtl->SetTexture("ColorTexture", m_colorBuffer);
+            selection_outline_mtl->SetTexture("DepthTexture", RenderSystem::m_mainDepthBuffer);
+            Graphics::DrawMesh(quad, selection_outline_mtl);
+            Pipeline::PopRenderTarget();
+
+            m_selectionOutlineRT2->AttachForRead();
+            auto w = m_colorBuffer->width();
+            auto h = m_colorBuffer->height();
+            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
 
         if (m_isWireFrameMode)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -210,7 +295,7 @@ namespace FishEditor
         /* Camera Preview                                                       */
         /************************************************************************/
         //glClear(GL_DEPTH_BUFFER_BIT);
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        //auto selectedGO = Selection::selectedGameObjectInHierarchy();
         auto camera_preview = selectedGO == nullptr ? nullptr : selectedGO->GetComponent<Camera>();
         if (camera_preview != nullptr)
         {
@@ -256,8 +341,7 @@ namespace FishEditor
             auto go = Scene::IntersectRay(ray);
             Selection::setActiveGameObject(go);
         }
-        
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         Pipeline::PopRenderTarget();
     }
 

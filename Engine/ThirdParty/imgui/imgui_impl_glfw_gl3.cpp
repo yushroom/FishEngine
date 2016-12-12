@@ -12,7 +12,7 @@
 #if !defined(GLEW_STATIC) && !defined(FishEngine_SHARED_LIB)
 #define GLEW_STATIC
 #endif
-#if 0
+#if defined(_WIN32) || defined(_WIN64)
 #include <GL/glew.h>
 #else
 #include <OpenGL/gl3.h>

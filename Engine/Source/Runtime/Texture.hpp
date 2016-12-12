@@ -76,7 +76,7 @@ namespace FishEngine
         
         unsigned int GetNativeTexturePtr() const
         {
-            return m_texture;
+            return m_GLNativeTexture;
         }
 
         // Filtering mode of the texture.
@@ -141,7 +141,7 @@ namespace FishEngine
         TextureWrapMode m_wrapMode = TextureWrapMode::Repeat;
         
         //OpenGL
-        unsigned int m_texture = 0;
+        unsigned int m_GLNativeTexture = 0;
 
         void BindSampler();
 
@@ -220,14 +220,14 @@ namespace FishEngine
         TextureFormat m_format;
     };
 
-    class LayeredColorBuffer : public ColorBuffer
-    {
-    public:
-        static std::shared_ptr<LayeredColorBuffer> Create(const int width, const int height, const int layers, TextureFormat format = TextureFormat::RGBA32);
-        //virtual void Resize(const int newWidth, const int newHeight) override;
-    protected:
-        int m_layers;
-    };
+    //class LayeredColorBuffer : public ColorBuffer
+    //{
+    //public:
+    //    static std::shared_ptr<LayeredColorBuffer> Create(const int width, const int height, const int layers, TextureFormat format = TextureFormat::RGBA32);
+    //    //virtual void Resize(const int newWidth, const int newHeight) override;
+    //protected:
+    //    int m_layers;
+    //};
 
     class DepthBuffer : public Texture
     {
@@ -240,10 +240,10 @@ namespace FishEngine
     class LayeredDepthBuffer : public DepthBuffer
     {
     public:
-        static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int layers, bool useStencil = true);
+        static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int depth, bool useStencil = true);
         //virtual void Resize(const int newWidth, const int newHeight) override;
     protected:
-        int m_layers;
+        int m_depth;
     };
     
     class Texture2D : public Texture

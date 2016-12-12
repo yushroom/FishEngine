@@ -46,6 +46,11 @@ namespace FishEngine
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     }
 
+    void RenderTarget::AttachForRead()
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+    }
+
     void RenderTarget::Detach()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

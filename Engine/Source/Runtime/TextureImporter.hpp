@@ -76,6 +76,9 @@ namespace FishEngine
         
         // Wrap mode (Repeat or Clamp) of the texture.
         TextureWrapMode m_wrapMode = TextureWrapMode::Repeat;
+
+        bool mipmapEnabled = true;
+
     };
 }
 

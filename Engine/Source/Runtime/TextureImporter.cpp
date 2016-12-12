@@ -206,7 +206,7 @@ namespace FishEngine
             abort();
         }
 
-        t->m_texture = texture;
+        t->m_GLNativeTexture = texture;
         auto name = path.stem().string();
         t->setName(name);
         Texture::m_textures.push_back(t);
@@ -255,7 +255,7 @@ namespace FishEngine
         glCheckError();
         
         auto t = std::make_shared<Texture>();
-        t->m_texture = texture;
+        t->m_GLNativeTexture = texture;
         t->m_width = width;
         t->m_height = height;
         t->m_dimension = TextureDimension::Tex2D;

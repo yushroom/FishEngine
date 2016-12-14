@@ -109,7 +109,7 @@ namespace FishEngine
         static void UpdateMouseButtonState(int button, MouseButtonState state);
 
     private:
-        friend class GameLoop;
+        friend class GameApp;
         friend class FishEditor::FishEditorWindow;
         friend class FishEditor::EditorInput;
 

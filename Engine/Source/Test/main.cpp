@@ -1,60 +1,39 @@
-#include <GLEnvironment.hpp>
-#include <glfw/glfw3.h>
-#include <Debug.hpp>
-#include <Resources.hpp>
-#include <Shader.hpp>
-#include <ModelImporter.hpp>
-#include <Graphics.hpp>
-#include <Camera.hpp>
-#include <CameraController.hpp>
-#include <Pipeline.hpp>
-#include <RenderSystem.hpp>
-#include <Light.hpp>
-#include <RenderTarget.hpp>
-//#include <Input.hpp>
+#include <iostream>
+
+#include "FishEngine.hpp"
+#include "GameApp.hpp"
+#include "GameObject.hpp"
+#include "RenderSystem.hpp"
+#include "RenderSettings.hpp"
+#include "Scene.hpp"
+#include "Shader.hpp"
+#include "Material.hpp"
+#include "Camera.hpp"
+#include "Resources.hpp"
+#include "QualitySettings.hpp"
+#include "Light.hpp"
+#include "CameraController.hpp"
+#include "ModelImporter.hpp"
+#include "TextureImporter.hpp"
+#include "MeshRenderer.hpp"
 
 using namespace FishEngine;
 using namespace std;
 
-constexpr int WIDTH = 640;
-constexpr int HEIGHT = 480;
+constexpr int WIDTH = 1280;
+constexpr int HEIGHT = 960;
 
-//class GameApp
-//{
-//public:
-//    virtual void Init() = 0;
-//    virtual void Update() = 0;
-//    virtual void Render() = 0;
-//};
-
-
-ColorBufferPtr color_buffer;
-DepthBufferPtr depth_buffer;
-RenderTargetPtr render_target;
-RenderTargetPtr render_target2;
-RenderTargetPtr render_target3;
-MaterialPtr selection_outline;
-MeshPtr cone = nullptr;
-ShaderPtr shader = nullptr;
-
-void Init()
+void DefaultScene()
 {
-    depth_buffer = DepthBuffer::Create(WIDTH, HEIGHT);
-    color_buffer = ColorBuffer::Create(WIDTH, HEIGHT);
-    render_target = make_shared<RenderTarget>();
-    render_target->SetDepthBufferOnly(depth_buffer);
+    cout << "CWD: " << boost::filesystem::current_path() << endl;
 
-    render_target2 = make_shared<RenderTarget>();
-    render_target2->SetColorBufferOnly(color_buffer);
-
-    cone = Model::builtinMesh(PrimitiveType::Cone);
     auto camera = Camera::Create();
     auto camera_go = Scene::CreateGameObject("Main Camera");
     camera_go->AddComponent(camera);
     camera_go->AddComponent<CameraController>();
     camera_go->transform()->setLocalPosition(0, 0, 5);
     camera_go->transform()->setLocalPosition(0, 1, -10);
-    camera_go->transform()->LookAt(0, 0, 0);
+    //camera_go->transform()->LookAt(0, 0, 0);
     camera_go->setTag("MainCamera");
     //camera_go->AddComponent<TakeScreenShot>();
 
@@ -63,108 +42,123 @@ void Init()
     light_go->transform()->setLocalEulerAngles(50, -30, 0);
     light_go->AddComponent(Light::Create());
 
-    auto shader = Shader::CreateFromFile(Resources::shaderRootDirectory() / "SelectionOutline.shader");
-    selection_outline = Material::CreateMaterial();
-    selection_outline->SetShader(shader);
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-
-    //GLint range[2];
-    //glGetIntegerv(GL_LINE_WIDTH_RANGE, range);
-    //Debug::LogError("%d %d", range[0], range[1]);
+    auto material = Material::InstantiateBuiltinMaterial("SkyboxProcedural");
+    material->SetFloat("_AtmosphereThickness", 1.0);
+    //material->SetFloat("_SunDisk", 2);
+    material->SetFloat("_SunSize", 0.04f);
+    material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+    material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+    material->SetFloat("_Exposure", 1.3f);
+    RenderSettings::setSkybox(material);
 }
 
-void Render()
+GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 {
-    Pipeline::BindCamera(Camera::main());
-    Pipeline::BindLight(Light::lights().front());
-    glClearColor(0.1, 0.2, 0.3, 1);
-    glClearStencil(0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    auto mtl = Material::defaultMaterial();
-    Graphics::DrawMesh(cone, Matrix4x4::identity, mtl);
-
-    Pipeline::PushRenderTarget(render_target);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //glStencilFunc(GL_ALWAYS, 1, -1);
-    //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    Graphics::DrawMesh(cone, Matrix4x4::identity, mtl);
-    glCheckError();
-    Pipeline::PopRenderTarget();
-
-#if 0
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, render_target->GetGLNativeFBO());
-    glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-
-    //glClear(GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    auto mtl2 = Material::builtinMaterial("SolidColor");
-    mtl2->SetVector4("Color", Vector4(1, 0, 1, 1));
-    glStencilFunc(GL_NOTEQUAL, 1, -1);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    Graphics::DrawMesh(cone, Matrix4x4::Scale(1.2f), mtl2);
-#endif
-
-    //Pipeline::PushRenderTarget(render_target2);
-    //glClear(GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    auto quad = Model::builtinMesh(PrimitiveType::Quad);
-    //auto mtl2 = Material::builtinMaterial("ScreenTexture");
-    selection_outline->setMainTexture(depth_buffer);
-    Graphics::DrawMesh(quad, selection_outline);
-    //Pipeline::PopRenderTarget();
+    auto& children = root->transform()->children();
+    for (auto& c : children) {
+        const auto& g = c.lock();
+        //Debug::Log("Name: %s", g->name().c_str());
+        if (g->name() == name) {
+            return g->gameObject();
+        }
+        auto r = FindNamedChild(g->gameObject(), name);
+        if (r != nullptr) {
+            return r;
+        }
+    }
+    return nullptr;
 }
+
+
+
+class TestDeferredRenderingApp : public GameApp
+{
+public:
+    virtual void Init() override
+    {
+        DefaultScene();
+        GameObject::CreatePrimitive(PrimitiveType::Cube);
+#if 0
+        QualitySettings::setShadowDistance(30);
+        Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
+        Path sponza_assets_root = sponza_root / "crytek-sponza";
+        Resources::SetAssetsDirectory(sponza_root);
+        ModelImporter importer;
+        importer.setFileScale(0.01f);
+        auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+        auto sponza_go = sponza_model->CreateGameObject();
+
+        TextureImporter tex_importer;
+        Path textures_root = sponza_assets_root / "textures";
+        auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
+        auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
+        (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
+        {
+            auto mesh0 = FindNamedChild(sponza_go, go_name);
+            auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+            mtl->SetShader(shader1);
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+            auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+            mtl->SetTexture("DiffuseTex", diffuse);
+            mtl->SetTexture("MaskTex", mask);
+        };
+
+        ApplyMateril1("mesh0", "sponza_thorn_diff", "sponza_thorn_mask");
+        ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
+        ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
+
+        auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.shader");
+        auto ApplyMateril2 = [&sponza_go, &tex_importer, &shader2, &textures_root]
+        (const char* go_name, const std::string& diffuse_tex)
+        {
+            auto mesh0 = FindNamedChild(sponza_go, go_name);
+            auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+            mtl->SetShader(shader2);
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+            mtl->SetTexture("DiffuseTex", diffuse);
+        };
+
+        ApplyMateril2("mesh2", "vase_round");
+        ApplyMateril2("mesh3", "background");
+        ApplyMateril2("mesh4", "spnza_bricks_a_diff");
+        ApplyMateril2("mesh5", "sponza_arch_diff");
+        ApplyMateril2("mesh6", "sponza_ceiling_a_diff");
+        ApplyMateril2("mesh7", "sponza_column_a_diff");
+        ApplyMateril2("mesh8", "sponza_floor_a_diff");
+        ApplyMateril2("mesh9", "sponza_column_c_diff");
+        ApplyMateril2("mesh10", "sponza_details_diff");
+        ApplyMateril2("mesh11", "sponza_column_b_diff");
+        ApplyMateril2("mesh13", "sponza_flagpole_diff");
+        ApplyMateril2("mesh14", "sponza_fabric_green_diff");
+        ApplyMateril2("mesh15", "sponza_fabric_blue_diff");
+        ApplyMateril2("mesh16", "sponza_fabric_diff");
+        ApplyMateril2("mesh17", "sponza_curtain_blue_diff");
+        ApplyMateril2("mesh18", "sponza_curtain_diff");
+        ApplyMateril2("mesh19", "sponza_curtain_green_diff");
+        ApplyMateril2("mesh21", "vase_hanging");
+        ApplyMateril2("mesh22", "vase_dif");
+        ApplyMateril2("mesh23", "lion");
+        ApplyMateril2("mesh24", "sponza_roof_diff");
+
+        auto transform = Camera::main()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
+
+        transform = Camera::mainGameCamera()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
+#endif
+    }
+
+    virtual void Update() override
+    {
+
+    }
+};
+
 
 int main()
 {
-    glfwInit();
-    // Set all the required options for GLFW
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-    // Create a GLFWwindow object that we can use for GLFW's functions
-    auto window = glfwCreateWindow(WIDTH, HEIGHT, "FishEngine", nullptr, nullptr);
-    glfwMakeContextCurrent(window);
-    glCheckError();
-    
-#if FISHENGINE_PLATFORM_WINDOWS
-    glewExperimental = GL_TRUE;
-    // Initialize GLEW to setup the OpenGL Function pointers
-    auto err = glewInit();
-    if (err != GLEW_OK)
-    {
-        Debug::LogError("%s", glewGetErrorString(err));
-    }
-#endif
-
-    Debug::Init();
-    Debug::setColorMode(true);
-    Resources::Init();
-    //Input::Init();
-    RenderSystem::Init();
-    //Shader::Init();
-    //Material::Init();
-    //Model::Init();
-    Init();
-    
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        /* Render here */
-        Render();
-        
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-        
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-    
-    glfwTerminate();
-    return 0;
+    TestDeferredRenderingApp app;
+    return app.Run();
 }

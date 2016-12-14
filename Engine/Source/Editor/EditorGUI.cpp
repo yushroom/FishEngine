@@ -841,8 +841,6 @@ namespace FishEditor
 
     void EditorGUI::DrawMainMenu()
     {
-        static float time_stamp = 0;
-
         // Main menu bar
         if (ImGui::BeginMainMenuBar())
         {
@@ -931,9 +929,17 @@ namespace FishEditor
                 ImGui::EndMenu();
             }
 
+            static float time_stamp = (float)glfwGetTime();
+            static int count = 0;
+            static int fps = 30;
+            count++;
             float new_time = (float)glfwGetTime();
-            int fps = (int)roundf(1.f / float(new_time - time_stamp));
-            time_stamp = new_time;
+            if (count >= 30)
+            {
+                fps = (int)roundf(30.f / float(new_time - time_stamp));
+                count = 0;
+                time_stamp = new_time;
+            }
             std::string fps_str = "FPS: " + std::to_string(fps);
             auto fps_stats_size = ImGui::CalcTextSize(fps_str.c_str());
             ImGui::SameLine(ImGui::GetContentRegionMax().x - fps_stats_size.x);

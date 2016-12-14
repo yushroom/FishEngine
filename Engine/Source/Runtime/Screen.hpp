@@ -28,6 +28,7 @@ namespace FishEngine
         friend class FishEditor::FishEditorWindow;
         friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
+        friend class GameApp;
         static int m_width;
         static int m_height;
         static float m_dpi;

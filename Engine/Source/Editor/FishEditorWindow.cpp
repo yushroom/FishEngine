@@ -113,6 +113,9 @@ namespace FishEditor
         //WindowManager::NewWindow("Another window", WIDTH/2, HEIGHT/2);
         //m_window = WindowManager::firstWindow();
         glfwMakeContextCurrent(m_window);
+#if FISHENGINE_PLATFORM_WINDOWS
+        glfwSwapInterval(0);
+#endif
 
         //WindowManager::NewWindow("Material Editor", 1024, 768);
 
@@ -194,12 +197,12 @@ namespace FishEditor
 
             EditorRenderSystem::Render();
 
-            float new_t = (float)glfwGetTime();
-            float interval = new_t - EditorTime::m_time;
-            if (interval < fixed_delta_time) {
-                std::chrono::milliseconds sleep_time((long long)((fixed_delta_time - interval) * 1000));
-                std::this_thread::sleep_for(sleep_time);
-            }
+            //float new_t = (float)glfwGetTime();
+            //float interval = new_t - EditorTime::m_time;
+            //if (interval < fixed_delta_time) {
+            //    std::chrono::milliseconds sleep_time((long long)((fixed_delta_time - interval) * 1000));
+            //    std::this_thread::sleep_for(sleep_time);
+            //}
 
             const float old_time = (float)glfwGetTime();
             EditorTime::m_deltaTime = old_time - EditorTime::m_time;

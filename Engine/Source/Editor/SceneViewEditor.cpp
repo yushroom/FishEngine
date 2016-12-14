@@ -206,7 +206,7 @@ namespace FishEditor
         }
 #endif
         auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        if (selectedGO != nullptr)
+        if (m_highlightSelections && selectedGO != nullptr)
         {
             Pipeline::PushRenderTarget(m_selectionOutlineRT);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

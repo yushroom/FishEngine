@@ -10,12 +10,17 @@
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "PhysicsSystem.hpp"
+#include "RenderTarget.hpp"
+#include "Pipeline.hpp"
+#include "Material.hpp"
+#include "ModelImporter.hpp"
+#include "Graphics.hpp"
 
 namespace FishEngine
 {
 
-int GameApp::m_windowWidth = 1280;
-int GameApp::m_windowHeight = 960;
+int GameApp::m_windowWidth = 640;
+int GameApp::m_windowHeight = 480;
 
 int GameApp::Run()
 {
@@ -61,13 +66,20 @@ int GameApp::Run()
     glFrontFace(GL_CW);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    
+    int w, h;
+    glfwGetFramebufferSize(m_window, &w, &h);
+    Screen::m_width = w;
+    Screen::m_height = h;
+    Screen::m_pixelsPerPoint = static_cast<float>(w) / m_windowWidth;
 
     Resources::Init();
     Input::Init();
     RenderSystem::Init();
-    WindowSizeCallback(m_window, m_windowWidth, m_windowHeight);
+    //WindowSizeCallback(m_window, m_windowWidth, m_windowHeight);
 
     Init();
     Scene::Init();
@@ -75,7 +87,16 @@ int GameApp::Run()
 
     Scene::Start();
     //PhysicsSystem::Start();
-
+    
+    
+    auto m_colorBuffer = ColorBuffer::Create(Screen::width(), Screen::height());
+    m_colorBuffer->setName("SceneViewColor");
+    //m_depthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
+    //m_depthBuffer->setName("SceneViewDepth");
+    auto m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
+    // TODO
+    m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_mainDepthBuffer);
+    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(m_window))
     {
@@ -91,8 +112,22 @@ int GameApp::Run()
         Scene::Update();
         PhysicsSystem::FixedUpdate();
 
-        glViewport(0, 0, m_windowWidth, m_windowHeight);
+//        Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
+        glViewport(0, 0, Screen::width(), Screen::height());
         RenderSystem::Render();
+//        Pipeline::PopRenderTarget();
+//        
+//        auto mtl = Material::builtinMaterial("ScreenTexture");
+//        auto quad = Model::builtinMesh(PrimitiveType::Quad);
+//        mtl->setMainTexture(m_colorBuffer);
+//        Graphics::DrawMesh(quad, mtl);
+        
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        
+//        auto mtl = Material::defaultMaterial();
+//        auto sphere = Model::builtinMesh(PrimitiveType::Sphere);
+//        Graphics::DrawMesh(sphere, mtl);
+//        
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
     }

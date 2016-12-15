@@ -56,12 +56,15 @@ namespace FishEngine
     void ColorBuffer::Resize(const int newWidth, const int newHeight)
     {
         Debug::Log("ColorBuffer::Resize");
+        if (newWidth == m_width && newHeight == m_height)
+            return;
         m_width = newWidth;
         m_height = newHeight;
         GLenum internal_format, external_format, pixel_type;
         TextureFormat2GLFormat(m_format, internal_format, external_format, pixel_type);
         glBindTexture(GL_TEXTURE_2D, m_GLNativeTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0, external_format, pixel_type, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
         glCheckError();
     }
 
@@ -90,6 +93,8 @@ namespace FishEngine
     void DepthBuffer::Resize(const int newWidth, const int newHeight)
     {
         Debug::Log("DepthBuffer::Resize");
+        if (newWidth == m_width && newHeight == m_height)
+            return;
         m_width = newWidth;
         m_height = newHeight;
         glBindTexture(GL_TEXTURE_2D, m_GLNativeTexture);
@@ -97,6 +102,7 @@ namespace FishEngine
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_width, m_height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
         glCheckError();
     }
 

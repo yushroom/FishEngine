@@ -78,11 +78,14 @@ namespace FishEngine
     void RenderTexture::Resize(const int newWidth, const int newHeight)
     {
         Debug::Log("RenderTexture::Resize");
+        if (newWidth == m_width && newHeight == m_height)
+            return;
         m_width = newWidth;
         m_height = newHeight;
         glBindTexture(GL_TEXTURE_2D, m_GLNativeTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_width, m_height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 } // namespace FishEngine

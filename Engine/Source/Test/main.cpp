@@ -20,9 +20,6 @@
 using namespace FishEngine;
 using namespace std;
 
-constexpr int WIDTH = 1280;
-constexpr int HEIGHT = 960;
-
 void DefaultScene()
 {
     cout << "CWD: " << boost::filesystem::current_path() << endl;
@@ -55,14 +52,17 @@ void DefaultScene()
 GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 {
     auto& children = root->transform()->children();
-    for (auto& c : children) {
+    for (auto& c : children)
+    {
         const auto& g = c.lock();
         //Debug::Log("Name: %s", g->name().c_str());
-        if (g->name() == name) {
+        if (g->name() == name)
+        {
             return g->gameObject();
         }
         auto r = FindNamedChild(g->gameObject(), name);
-        if (r != nullptr) {
+        if (r != nullptr)
+        {
             return r;
         }
     }
@@ -78,7 +78,7 @@ public:
     {
         DefaultScene();
         GameObject::CreatePrimitive(PrimitiveType::Cube);
-#if 0
+#if 1
         QualitySettings::setShadowDistance(30);
         Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
         Path sponza_assets_root = sponza_root / "crytek-sponza";

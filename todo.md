@@ -66,6 +66,10 @@
 
 - [ ] class Graphics
 
+- [ ] class CommandBuffer
+
+- [ ] class in
+
 - [ ] 我需要一个动态的反射操作
 
       1: "MeshFilter" ==> make_shared<MeshFilter>() 而且要运行期动态生成或者变成dll动态加载
@@ -76,7 +80,7 @@
 
       mf->setMesh(...)
 
-- [ ] selection 换成像Unreal和Unity 5.5中一样的outline
+- [x] selection 换成像Unreal和Unity 5.5中一样的outline
 
 ## Editor
 
@@ -179,3 +183,11 @@
 
 
 ## Audio
+
+- [ ] 基本的声音
+- [ ] 3D音效
+
+
+## 性能
+
+Editor在macOS上已经有点慢了

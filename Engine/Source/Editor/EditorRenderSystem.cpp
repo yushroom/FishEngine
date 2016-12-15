@@ -18,6 +18,7 @@
 #include <Color.hpp>
 #include <RenderTexture.hpp>
 #include <Screen.hpp>
+#include <Timer.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "EditorGUI.hpp"
@@ -52,12 +53,13 @@ namespace FishEditor
 
     void EditorRenderSystem::Render()
     {
+        
         ImGui_ImplGlfwGL3_NewFrame();
-
+        Timer timer("EditorRenderSystem::Render");
         EditorGUI::Update();
-
         // Swap the screen buffers
         glfwSwapBuffers(FishEditorWindow::window());
+        timer.StopAndPrint();
     }
 
     void EditorRenderSystem::Clean()

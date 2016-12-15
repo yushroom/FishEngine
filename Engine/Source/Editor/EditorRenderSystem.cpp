@@ -53,13 +53,12 @@ namespace FishEditor
 
     void EditorRenderSystem::Render()
     {
-        
         ImGui_ImplGlfwGL3_NewFrame();
-        Timer timer("EditorRenderSystem::Render");
+        //Timer timer("EditorRenderSystem::Render");
         EditorGUI::Update();
         // Swap the screen buffers
         glfwSwapBuffers(FishEditorWindow::window());
-        timer.StopAndPrint();
+        //timer.StopAndPrint();
     }
 
     void EditorRenderSystem::Clean()

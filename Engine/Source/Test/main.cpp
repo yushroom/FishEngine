@@ -77,8 +77,7 @@ public:
     virtual void Init() override
     {
         DefaultScene();
-        GameObject::CreatePrimitive(PrimitiveType::Cube);
-#if 1
+
         QualitySettings::setShadowDistance(30);
         Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
         Path sponza_assets_root = sponza_root / "crytek-sponza";
@@ -147,7 +146,6 @@ public:
         transform = Camera::mainGameCamera()->gameObject()->transform();
         transform->setPosition(5, 8, 0);
         transform->setLocalEulerAngles(30, -90, 0);
-#endif
     }
 
     virtual void Update() override

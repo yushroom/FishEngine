@@ -35,6 +35,7 @@ namespace FishEditor
 
         FishEngine::RenderTargetPtr     m_sceneViewRenderTarget;
         FishEngine::ColorBufferPtr      m_colorBuffer;
+        FishEngine::DepthBufferPtr      m_depthBuffer;
         //FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
 
         FishEngine::RenderTargetPtr     m_selectionOutlineRT;

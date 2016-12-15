@@ -1,3 +1,5 @@
+#include <string>
+
 #include "GameApp.hpp"
 #include "GLEnvironment.hpp"
 #include <glfw/glfw3.h>
@@ -16,11 +18,13 @@
 #include "ModelImporter.hpp"
 #include "Graphics.hpp"
 
+using namespace std;
+
 namespace FishEngine
 {
 
-int GameApp::m_windowWidth = 640;
-int GameApp::m_windowHeight = 480;
+int GameApp::m_windowWidth = 1280;
+int GameApp::m_windowHeight = 960;
 
 int GameApp::Run()
 {
@@ -49,6 +53,8 @@ int GameApp::Run()
 
     glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
+    glfwSwapInterval(0);
+
 #if FISHENGINE_PLATFORM_WINDOWS
     glewExperimental = GL_TRUE;
     // Initialize GLEW to setup the OpenGL Function pointers
@@ -66,8 +72,7 @@ int GameApp::Run()
     glFrontFace(GL_CW);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     
     int w, h;
@@ -87,15 +92,11 @@ int GameApp::Run()
 
     Scene::Start();
     //PhysicsSystem::Start();
-    
-    
-    auto m_colorBuffer = ColorBuffer::Create(Screen::width(), Screen::height());
-    m_colorBuffer->setName("SceneViewColor");
-    //m_depthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
-    //m_depthBuffer->setName("SceneViewDepth");
-    auto m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
-    // TODO
-    m_sceneViewRenderTarget->Set(m_colorBuffer, RenderSystem::m_mainDepthBuffer);
+
+    constexpr int report_frames = 100;
+    int frames = 0;
+    int fps = 30;
+    float time_stamp = static_cast<float>(glfwGetTime());
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(m_window))
@@ -112,22 +113,20 @@ int GameApp::Run()
         Scene::Update();
         PhysicsSystem::FixedUpdate();
 
-//        Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
         glViewport(0, 0, Screen::width(), Screen::height());
         RenderSystem::Render();
-//        Pipeline::PopRenderTarget();
-//        
-//        auto mtl = Material::builtinMaterial("ScreenTexture");
-//        auto quad = Model::builtinMesh(PrimitiveType::Quad);
-//        mtl->setMainTexture(m_colorBuffer);
-//        Graphics::DrawMesh(quad, mtl);
-        
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        
-//        auto mtl = Material::defaultMaterial();
-//        auto sphere = Model::builtinMesh(PrimitiveType::Sphere);
-//        Graphics::DrawMesh(sphere, mtl);
-//        
+
+        frames++;
+        if (frames >= report_frames)
+        {
+            float new_time_stamp = static_cast<float>(glfwGetTime());
+            fps = static_cast<int>(report_frames / (new_time_stamp - time_stamp));
+            string title = "FishEngine FPS: " + to_string(fps);
+            glfwSetWindowTitle(m_window, title.c_str());
+            time_stamp = new_time_stamp;
+            frames = 0;
+        }
+
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
     }

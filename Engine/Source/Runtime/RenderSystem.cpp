@@ -114,11 +114,12 @@ namespace FishEngine
         /* Scene                                                                */
         /************************************************************************/
         // 3 color buffer: G-BUffer
-        // depth buufer
+        // depth buffer
         Pipeline::PushRenderTarget(m_deferredRenderTarget);
         glClearBufferfv(GL_COLOR, 0, black);
         glClearBufferfv(GL_COLOR, 1, error_color);
         glClearBufferfv(GL_COLOR, 2, error_color);
+        glClearBufferfv(GL_DEPTH, 0, white);
         
         std::vector<GameObjectPtr> transparentQueue;
         std::vector<GameObjectPtr> forwardQueue;
@@ -161,7 +162,7 @@ namespace FishEngine
         // depth buffer
         Pipeline::PushRenderTarget(m_mainRenderTarget);
         glClearBufferfv(GL_COLOR, 0, error_color);
-        glClearBufferfv(GL_DEPTH, 0, white);
+        //glClearBufferfv(GL_DEPTH, 0, white);
 
         /************************************************************************/
         /* Deferred Rendering                                                   */
@@ -196,14 +197,7 @@ namespace FishEngine
         forwardQueue.clear();
 
         Pipeline::PopRenderTarget(); // m_mainRenderTarget
-        
-        
-//        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-//        m_mainRenderTarget->Attach();
-//        //auto w = m_mainDepthBuffer->width();
-//        //auto h = m_mainDepthBuffer->height();
-//        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-//        m_mainRenderTarget->Detach();
+
 #if 1
         /************************************************************************/
         /* Screen Space Shadow                                                  */
@@ -278,7 +272,15 @@ namespace FishEngine
             glDepthFunc(GL_LESS);
         }
 #endif
-        
+
+        //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        //m_mainRenderTarget->Attach();
+        //auto w = m_mainDepthBuffer->width();
+        //auto h = m_mainDepthBuffer->height();
+        m_mainRenderTarget->AttachForRead();
+        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        //m_mainRenderTarget->Detach();
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         
         /************************************************************************/
         /* Skybox                                                               */
@@ -301,7 +303,7 @@ namespace FishEngine
         }
         transparentQueue.clear();
 
-#if 1
+#if 0
         glDepthFunc(GL_ALWAYS);
         auto display_csm_mtl = Material::builtinMaterial("DisplayCSM");
         constexpr float size = 0.25f;

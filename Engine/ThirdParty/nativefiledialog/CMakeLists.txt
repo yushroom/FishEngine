@@ -1,0 +1,6 @@
+# aux_source_directory(. SRCS)
+# FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.h)
+SET(SRCS src/nfd_win.cpp src/nfd_common.c)
+SET(HEADERS src/common.h src/nfd_common.h src/include/nfd.h)
+include_directories(./src/include)
+add_library (nativefiledialog STATIC ${SRCS} ${HEADERS})

@@ -2,7 +2,7 @@
 #define Camera_hpp
 
 #include "Script.hpp"
-#include "GLEnvironment.hpp"
+//#include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
 #include "Ray.hpp"
 #include "Frustum.hpp"

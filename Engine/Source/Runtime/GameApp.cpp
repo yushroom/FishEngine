@@ -68,12 +68,6 @@ int GameApp::Run()
         Debug::Log("GlEW initialized");
     }
 #endif
-
-    glFrontFace(GL_CW);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     
     int w, h;
     glfwGetFramebufferSize(m_window, &w, &h);

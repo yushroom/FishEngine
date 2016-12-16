@@ -25,6 +25,11 @@ namespace FishEngine
             return Vector4(r, g, b, a);
         }
 
+        const float* data() const
+        {
+            return m;
+        }
+
         float operator[](int index) const
         {
             return m[index];

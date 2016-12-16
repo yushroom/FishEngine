@@ -1,19 +1,23 @@
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.6)
 
-project(FishEngine CXX)
+PROJECT(FishEngine CXX)
 
-set (FishEngine_VERSION_MAJOR 0)
-set (FishEngine_VERSION_MINOR 1)
+SET(FISHENGINE_VERSION_MAJOR 0)
+SET(FISHENGINE_VERSION_MINOR 1)
+SET(FISHENGINE_VERSION_PATCH 0)
+SET(FISHENGINE_VERSION ${FISHENGINE_VERSION_MAJOR}.${FISHENGINE_VERSION_MINOR}.${FISHENGINE_VERSION_PATCH})
 
 # Global compile & linker flags
 ## Compiler-agnostic settings
 ### Target at least C++14
 set(CMAKE_CXX_STANDARD 14)
 
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # Output
 
 set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_LIST_DIR}/Binary)
-message("HHHHHHHHH" ${CMAKE_BINARY_DIR})
+# message("HHHHHHHHH" ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -46,23 +50,28 @@ if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
     include_directories(./ThirdParty/glew-2.0.0/include)
     set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
-    add_subdirectory(./ThirdParty/glew-2.0.0/build/cmake)
-    add_subdirectory(./ThirdParty/glfw-3.2.1/)
+    ADD_SUBDIRECTORY(./ThirdParty/glew-2.0.0/build/cmake)
+    ADD_SUBDIRECTORY(./ThirdParty/glfw-3.2.1/)
     include_directories(./ThirdParty/glfw-3.2.1/include)
 	# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 	# set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 	# set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+    SET_TARGET_PROPERTIES(glew PROPERTIES FOLDER "ThirdParty")
+    SET_TARGET_PROPERTIES(glew_s PROPERTIES FOLDER "ThirdParty")
 else()
-    add_subdirectory(./ThirdParty/glfw/)
+    ADD_SUBDIRECTORY(./ThirdParty/glfw/)
+    # SET_TARGET_PROPERTIES(glfw PROPERTIES FOLDER "ThirdParty")
     include_directories(./ThirdParty/glfw/include)
-        #link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
+    # link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
 endif()
 
-add_subdirectory(./ThirdParty/imgui)
+ADD_SUBDIRECTORY(./ThirdParty/imgui)
+SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "ThirdParty")
 
-
-
+include_directories(./ThirdParty/nativefiledialog/src/include)
+ADD_SUBDIRECTORY(./ThirdParty/nativefiledialog)
+SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "ThirdParty")
 
 #set(GLEW_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glew-2.0.0/lib/Release/Win32/glew32.lib)
 #IF(NOT EXISTS ${GLEW_LIBRARIES})
@@ -116,7 +125,10 @@ set(ASSIMP_BUILD_TERRAGEN_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_XGL_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
-add_subdirectory(./ThirdParty/assimp-3.3.1)
+ADD_SUBDIRECTORY(./ThirdParty/assimp-3.3.1)
+SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "ThirdParty")
+SET_TARGET_PROPERTIES(zlibstatic PROPERTIES FOLDER "ThirdParty")
+SET_TARGET_PROPERTIES(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ThirdParty")
 
 if (MSVC)
     #target_link_libraries(FishEditor opengl32.lib)
@@ -150,8 +162,7 @@ else()
     FILE(GLOB PhysXSDK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/PhysXSDK/Lib/osx64/*.a)
 endif()
 
-add_subdirectory(./Source/Runtime)
-add_subdirectory(./Source/Editor)
-add_subdirectory(./Source/Tool/ShaderCompiler)
-add_subdirectory(./Source/Tool/ModelConverter)
-add_subdirectory(./Source/Test)
+ADD_SUBDIRECTORY(./Source/Runtime)
+ADD_SUBDIRECTORY(./Source/Editor)
+ADD_SUBDIRECTORY(./Source/Tool)
+ADD_SUBDIRECTORY(./Source/Test)

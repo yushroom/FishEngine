@@ -58,7 +58,6 @@ namespace FishEditor
         m_depthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
         m_depthBuffer->setName("SceneViewDepth");
         m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
-        // TODO
         m_sceneViewRenderTarget->Set(m_colorBuffer, m_depthBuffer);
 
         m_selectionOutlineRT = std::make_shared<RenderTarget>();

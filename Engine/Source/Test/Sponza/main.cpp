@@ -70,7 +70,6 @@ GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name
 }
 
 
-
 class TestDeferredRenderingApp : public GameApp
 {
 public:

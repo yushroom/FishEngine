@@ -47,6 +47,7 @@
 #include "MaterialEditor.hpp"
 #include "Shader.hpp"
 #include "Resources.hpp"
+#include "EditorUnility.hpp"
 
 using namespace FishEngine;
 
@@ -850,6 +851,18 @@ namespace FishEditor
                 {
                     //Debug::LogWarning("New");
                     //std::files
+                }
+                if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+                {
+                    EditorUtility::OpenFilePanel("Open Scene", "", "scene");
+                }
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+                {
+                    Debug::LogWarning("Save Scene: Not Implemented");
+                }
+                if (ImGui::MenuItem("Save Scene as...", "Shift+Ctrl+S"))
+                {
+                    EditorUtility::SaveFilePanel("Save Scene", "", "Scene.scene", "scene");
                 }
                 ImGui::EndMenu();
             }

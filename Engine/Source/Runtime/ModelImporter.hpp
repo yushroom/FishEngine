@@ -102,6 +102,45 @@ namespace FishEngine {
         None,           // Do not import vertex tangents.
     };
     
+    // Material naming options for ModelImporter.
+    enum class ModelImporterMaterialName
+    {
+        BasedOnTextureName,                 // Use material names in the form <textureName>.mat.
+        BasedOnMaterialName,                // Use a material name of the form <materialName>.mat.
+        BasedOnModelNameAndMaterialName,    // Use material names in the form <modelFileName>-<materialName>.mat.
+    };
+    
+    enum class ModelImporterAnimationType
+    {
+        None,       // Generate no animation data.
+        //Legacy,     // Generate a legacy animation type.
+        Generic,    // Generate a generic animator.
+        Human,      // Generate a human animator.
+    };
+    
+    enum class ModelImporterMaterialSearch
+    {
+        Local,          // Search in local Materials folder.
+        RecursiveUp,    // Recursive-up search in Materials folders.
+        Everywhere,     // Search in all project.
+    };
+    
+    enum class ModelImporterMeshCompression
+    {
+        Off,        // No mesh compression (default).
+        Low,        // Low amount of mesh compression.
+        Medium,     // Medium amount of mesh compression.
+        High,       // High amount of mesh compression.
+    };
+    
+    enum class ModelImporterAnimationCompression
+    {
+        Off,                                // No animation compression.
+        KeyframeReduction,                  // Perform keyframe reduction.
+        KeyframeReductionAndCompression,    // Perform keyframe reduction and compression.
+        Optimal,                            //Perform keyframe reduction and choose the best animation curve representation at runtime to reduce memory footprint (default).
+    };
+    
     class ModelImporter : public AssetImporter
     {
     public:
@@ -159,6 +198,9 @@ namespace FishEngine {
 
         // Vertex tangent import options.
         ModelImporterTangents m_importTangents  = ModelImporterTangents::Calculate;
+        
+        // Existing material search setting.
+        ModelImporterMaterialSearch materialSearch;
 
 
         // remove dummy nodes

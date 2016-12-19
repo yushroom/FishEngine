@@ -127,10 +127,10 @@ set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(./ThirdParty/assimp-3.3.1)
 SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "ThirdParty")
-SET_TARGET_PROPERTIES(zlibstatic PROPERTIES FOLDER "ThirdParty")
-SET_TARGET_PROPERTIES(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ThirdParty")
 
 if (MSVC)
+    SET_TARGET_PROPERTIES(zlibstatic PROPERTIES FOLDER "ThirdParty")
+    SET_TARGET_PROPERTIES(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ThirdParty")
     #target_link_libraries(FishEditor opengl32.lib)
     # PhysXSDK
     set(PhysXSDK_ROOT ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/PhysXSDK)

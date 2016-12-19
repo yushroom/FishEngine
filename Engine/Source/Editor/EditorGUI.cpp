@@ -814,18 +814,6 @@ namespace FishEditor
             {
                 m_mainSceneViewEditor->setHighlightSelections(highlight);
             }
-            
-            ImGui::SameLine();
-            if (ImGui::Button("Serialize"))
-            {
-                std::ofstream fout("Scene.json");
-                {
-                    cereal::JSONOutputArchive oa(fout);
-                    oa << Scene::m_gameObjects;
-                }
-                //std::cout << ss.str() << std::endl;
-            }
-            
         }
         ImGui::EndToolbar();
         
@@ -862,7 +850,13 @@ namespace FishEditor
                 }
                 if (ImGui::MenuItem("Save Scene as...", "Shift+Ctrl+S"))
                 {
-                    EditorUtility::SaveFilePanel("Save Scene", "", "Scene.scene", "scene");
+                    auto path = EditorUtility::SaveFilePanel("Save Scene", "", "Scene.scene", "scene");
+                    if (path.size() > 0)
+                    {
+                        std::ofstream fout(path);
+                        cereal::JSONOutputArchive oa(fout);
+                        oa << Scene::m_gameObjects;
+                    }
                 }
                 ImGui::EndMenu();
             }

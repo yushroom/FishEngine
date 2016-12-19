@@ -8,18 +8,6 @@
 
 namespace FishEngine
 {
-    enum class VertexUsage {
-        Position = 1 << 0,
-        Normal = 1 << 1,
-        UV = 1 << 2,
-        Tangent = 1 << 3,
-        PN = Position | Normal,
-        PNU = PN | UV,
-        PNUT = PNU | Tangent
-    };
-
-    typedef int VertexUsages;
-
     static constexpr int MaxBoneForEachVertex = 4;
 
     struct BoneWeight
@@ -46,33 +34,18 @@ namespace FishEngine
         int boneIndex[MaxBoneForEachVertex];
         float weight[MaxBoneForEachVertex];
 
-        BoneWeight() {
-            for (int i = 0; i < MaxBoneForEachVertex; ++i) {
-                boneIndex[i] = 0;
-                weight[i] = 0.f;
-            }
-        }
+        BoneWeight();
 
-        void AddBoneData(uint32_t boneIndex, float weight) {
-            for (int i = 0; i < MaxBoneForEachVertex; ++i) {
-                if (this->weight[i] == 0.0f) {
-                    this->boneIndex[i] = boneIndex;
-                    this->weight[i] = weight;
-                    return;
-                }
-            }
-            abort();
-        }
+        void AddBoneData(uint32_t boneIndex, float weight);
     };
 
     class FE_EXPORT Mesh : public Object
     {
     public:
         Mesh() = default;
-        Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
-        Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
-        Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
-        //Mesh(const std::string& objModelPath, int vertexUsage);
+        //Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
+        //Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
+        //Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
 
         Mesh(const Mesh&) = delete;
         void operator=(const Mesh&) = delete;
@@ -80,11 +53,27 @@ namespace FishEngine
         Mesh(Mesh&& m);
 
         ~Mesh();
-
-        void SetVertexUsage(int vertexUsage)
+        
+        // Returns state of the Read / Write Enabled checkbox when model was imported.
+        bool isReadable() const
         {
-            BindBuffer(vertexUsage);
+            return m_isReadable;
         }
+
+        uint32_t vertexCount()
+        {
+            if (m_vertexCount == 0)
+            {
+                m_vertexCount = static_cast<uint32_t>(m_indexBuffer.size() / 3);
+            }
+            return m_vertexCount;
+        }
+
+        // Upload previously done Mesh modifications to the graphics API.
+        // <param name="markNoLongerReadable">Frees up system memory copy of mesh data when set to true.</param>
+        void UploadMeshData(bool markNoLogerReadable = true);
+
+        void Clear();
 
         void Render();
         //void renderPatch(const Shader& shader);
@@ -112,6 +101,23 @@ namespace FishEngine
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
 
+        enum class InternalShaderChannel
+        {
+            Vertex,
+            Normal,
+            //Color,
+            TexCoord0,
+            //TexCoord1,
+            //TexCoord2,
+            //TexCoord3,
+            Tangent
+        };
+
+        bool m_isReadable = false;
+        bool m_uploaded = false;
+        uint32_t m_vertexCount = 0;
+        uint32_t m_triangleCount = 0;
+
         Bounds m_bounds;
 
         std::vector<float>      m_positionBuffer;
@@ -126,7 +132,6 @@ namespace FishEngine
 
         std::vector<Matrix4x4>  m_bindposes;
         std::vector<BoneWeight> m_boneWeights;
-        //std::vector<BoneWeight> m_boneWeights;
 
         GLuint m_VAO;
         GLuint m_indexVBO;
@@ -137,14 +142,14 @@ namespace FishEngine
         GLuint m_boneIndexVBO;
         GLuint m_boneWeightVBO;
 
-        GLuint m_TFBO;              // transform feedback buffer object, for Animation
-        GLuint m_animationOutputVAO;
-        GLuint m_animationOutputVBO; // animation output buffer object
+        //GLuint m_TFBO;              // transform feedback buffer object, for Animation
+        //GLuint m_animationOutputVAO;
+        //GLuint m_animationOutputVBO; // animation output buffer object
 
         //static std::map<std::string, PMesh> m_meshes;
 
-        void GenerateBuffer(int vertexUsage);
-        void BindBuffer(int vertexUsage);
+        void GenerateBuffer();
+        void BindBuffer();
     };
 
 

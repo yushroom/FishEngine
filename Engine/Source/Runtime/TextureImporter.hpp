@@ -22,6 +22,19 @@ namespace FishEngine
         Advance,    // Select this when you want to have specific parameters on your texture and you want to have total control over your texture.
     };
 
+    enum class TextureImporterShape
+    {
+        Texture2D,
+        TextureCube,
+    };
+
+    enum class TextureImporterCompression
+    {
+        Uncompressed,
+        Compressed,
+        CompressedHQ,
+        CompressedLQ,
+    };
     
     // Texture importer lets you modify Texture2D import settings from editor scripts.
     // Settings of this class match the ones exposed in Texture Import Settings.
@@ -69,16 +82,18 @@ namespace FishEngine
     private:
         
         // Which type of texture are we dealing with here.
-        TextureImporterType m_textureType = TextureImporterType::Image;
+        TextureImporterType     m_textureType   = TextureImporterType::Image;
 
         // Filtering mode of the texture.
-        FilterMode m_filterMode = FilterMode::Trilinear;
-        
+        FilterMode              m_filterMode    = FilterMode::Trilinear;
+
         // Wrap mode (Repeat or Clamp) of the texture.
-        TextureWrapMode m_wrapMode = TextureWrapMode::Repeat;
+        TextureWrapMode         m_wrapMode      = TextureWrapMode::Repeat;
+
+        bool                    m_isReadable    = false;
+        bool                    m_mipmapEnabled = false;
 
         bool mipmapEnabled = true;
-
     };
 }
 

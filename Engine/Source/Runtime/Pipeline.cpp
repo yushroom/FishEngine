@@ -97,6 +97,7 @@ namespace FishEngine
 
     void Pipeline::UpdatePerDrawUniforms(const Matrix4x4& modelMatrix)
     {
+        glCheckError();
         auto mv = Pipeline::s_perCameraUniforms.MATRIX_V * modelMatrix;
         s_perDrawUniforms.MATRIX_MVP = Pipeline::s_perCameraUniforms.MATRIX_VP * modelMatrix;
         s_perDrawUniforms.MATRIX_MV = mv;

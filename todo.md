@@ -18,7 +18,7 @@
 
 - [x] 改成左手系之后cubemap反了
 
-- [ ] GLSL中TBN，cross的问题
+- [ ] GLSL中TBN，cross的问题（cross是手系问题的）
 
 - [x] 如何减少transform::update的调用次数？简单使用脏属性来标记是不正确的，因为不知道父节点上的信息是不是更新了（那么父节点变化时通知所有子节点？或者脏属性像GameObject::active一样拿（这样也有个问题，就是父节点可能变脏了，但是在子节点check脏属性之前父节点update了）？）。
 
@@ -54,21 +54,11 @@
 
 - [ ] 用bsp或八叉树之类的结构来组织场景，相交测试，鼠标选取物体等等
 
-- [ ] check Matrix->Quaternion的代码，RTR3 p76, DX11 24.3.3
-
-- [ ] quaternion*vector3
-
-- [ ] angleAxis
-
-- [ ] Transform::rotate
-
 - [ ] const的位置
 
 - [ ] class Graphics
 
 - [ ] class CommandBuffer
-
-- [ ] class in
 
 - [ ] 我需要一个动态的反射操作
 
@@ -160,9 +150,9 @@
 
 - [ ] Terrain/height map
 
-- [ ] builtinMaterial每次都会make_shaderd新的
+- [x] builtinMaterial每次都会make_shaderd新的
 
-- [ ] InternalUniform和普通的uniform区分开来，固定某些texture的binding point
+- [ ] InternalUniform和普通的uniform区分开来，固定某些texture的binding point(GL4.1没有这个特性)
 
 - [x] shader compiler中去掉boost::wave，依赖太多了，boost::thread,boost::system,boost::spirit...
 

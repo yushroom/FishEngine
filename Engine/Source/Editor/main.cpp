@@ -17,6 +17,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <Timer.hpp>
+#include <future>
 
 #include "FishEditorWindow.hpp"
 
@@ -159,12 +160,23 @@ public:
         Resources::SetAssetsDirectory(sponza_root);
         ModelImporter importer;
         importer.setFileScale(0.01f);
-        auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
-        auto sponza_go = sponza_model->CreateGameObject();
+        //auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+        //auto sponza_go = sponza_model->CreateGameObject();
+
+        auto handle = std::async(std::launch::async,
+            [&importer, &sponza_assets_root]() {
+                return importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+            }
+        );
      
         TextureImporter tex_importer;
         Path textures_root = sponza_assets_root / "textures";
         auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
+
+        //auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+        auto sponza_model = handle.get();
+        auto sponza_go = sponza_model->CreateGameObject();
+
         auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
         (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
         {

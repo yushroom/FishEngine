@@ -49,12 +49,20 @@ namespace FishEngine {
         s_builtinModels[PrimitiveType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
         s_builtinModels[PrimitiveType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
         s_builtinModels[PrimitiveType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
+        for (auto& p : s_builtinModels)
+        {
+            for (auto& mesh : p.second->m_meshes)
+            {
+                mesh->UploadMeshData();
+            }
+        }
     }
     
 
     ModelPtr Model::
     builtinModel(
-        const PrimitiveType type) {
+        const PrimitiveType type)
+    {
         return s_builtinModels[type];
     }
 
@@ -68,7 +76,8 @@ namespace FishEngine {
 
     Matrix4x4
     ConvertMatrix(
-        const aiMatrix4x4& m) {
+        const aiMatrix4x4& m)
+    {
         Matrix4x4 result;
         memcpy(result.m, &m.a1, 16*sizeof(float));
         //result *= Matrix4x4(1, 0, 0, 0,   0, 1, 0, 0,   0, 0, -1, 0,   0, 0, 0, 1);
@@ -115,7 +124,7 @@ namespace FishEngine {
         //Debug::LogWarning("Node: %s", node->name.c_str());
         node->transform = transform;
         node->isBone = false;
-        uint32_t index = m_model->m_avatar->m_boneToIndex.size();
+        uint32_t index = static_cast<uint32_t>(m_model->m_avatar->m_boneToIndex.size());
         m_model->m_avatar->m_boneToIndex[node->name] = index;
         m_model->m_avatar->m_indexToBone[index] = node->name;
         node->index = index;
@@ -146,8 +155,10 @@ namespace FishEngine {
         bool has_uv = assimp_mesh->HasTextureCoords(0);
 
         auto n_vertices = assimp_mesh->mNumVertices;
-        auto n_triangles = assimp_mesh->mNumVertices;
+        auto n_triangles = assimp_mesh->mNumFaces;
         auto n_bones = assimp_mesh->mNumBones;
+        mesh->m_vertexCount = n_vertices;
+        mesh->m_triangleCount = n_triangles;
         mesh->m_positionBuffer.reserve(n_vertices * 3);
         mesh->m_normalBuffer.reserve(n_vertices * 3);
         mesh->m_uvBuffer.reserve(n_vertices * 2);
@@ -248,8 +259,6 @@ namespace FishEngine {
             }
         }
 
-        mesh->GenerateBuffer(m_vertexUsages);
-        mesh->BindBuffer(m_vertexUsages);
         return mesh;
     }
 
@@ -334,7 +343,7 @@ namespace FishEngine {
         load_option |= aiProcess_FindInstances;
         load_option |= aiProcess_OptimizeMeshes;
         load_option |= aiProcess_ConvertToLeftHanded;
-        //load_option |= aiProcess_GenUVCoords;
+        load_option |= aiProcess_GenUVCoords;
         //load_option |= aiProcess_TransformUVCoords;
         //load_option |= aiProcess_SplitByBoneCount;
         //load_option |= aiProcess_SortByPType;
@@ -376,7 +385,8 @@ namespace FishEngine {
             abort();
         }
 
-        bool load_uv = (m_vertexUsages & (int)VertexUsage::UV) != 0;
+        //bool load_uv = (m_vertexUsages & (int)VertexUsage::UV) != 0;
+        bool load_uv = true;
         
         m_model = std::make_shared<Model>();
         m_model->m_name = path.stem().string();
@@ -589,6 +599,11 @@ namespace FishEngine {
     GameObjectPtr Model::
     CreateGameObject() const
     {
+        for (auto& mesh : m_meshes)
+        {
+            mesh->UploadMeshData();
+        }
+
         std::map<std::string, std::weak_ptr<GameObject>> nameToGameObject;
         auto root = ResursivelyCreateGameObject(m_rootNode, nameToGameObject);
         if (m_animations.size() > 0)

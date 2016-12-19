@@ -18,31 +18,56 @@ using namespace std;
 
 namespace FishEngine
 {
+
+    BoneWeight::BoneWeight()
+    {
+        for (int i = 0; i < MaxBoneForEachVertex; ++i)
+        {
+            boneIndex[i] = 0;
+            weight[i] = 0.f;
+        }
+    }
+
+    void BoneWeight::AddBoneData(uint32_t boneIndex, float weight)
+    {
+        for (int i = 0; i < MaxBoneForEachVertex; ++i)
+        {
+            if (this->weight[i] == 0.0f)
+            {
+                this->boneIndex[i] = boneIndex;
+                this->weight[i] = weight;
+                return;
+            }
+        }
+        Debug::LogError("BoneWeight::AddBoneData");
+    }
+
+
     //std::map<std::string, Mesh::PMesh> Mesh::m_meshes;
 
-    Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices)
-        : m_positionBuffer(positions, positions + n_vertex * 3),
-        m_indexBuffer(indices, indices + n_face * 3)
-    {
-        GenerateBuffer((int)VertexUsage::Position);
-        BindBuffer((int)VertexUsage::Position);
-    }
+    //Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices)
+    //    : m_positionBuffer(positions, positions + n_vertex * 3),
+    //    m_indexBuffer(indices, indices + n_face * 3)
+    //{
+    //    GenerateBuffer((int)VertexUsage::Position);
+    //    BindBuffer((int)VertexUsage::Position);
+    //}
 
-    Mesh::Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer)
-        : m_positionBuffer(position_buffer), m_indexBuffer(index_buffer)
-    {
-        GenerateBuffer((int)VertexUsage::Position);
-        BindBuffer((int)VertexUsage::Position);
-    }
+    //Mesh::Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer)
+    //    : m_positionBuffer(position_buffer), m_indexBuffer(index_buffer)
+    //{
+    //    GenerateBuffer((int)VertexUsage::Position);
+    //    BindBuffer((int)VertexUsage::Position);
+    //}
 
-    Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices)
-        : m_positionBuffer(positions, positions + n_vertex * 3),
-        m_normalBuffer(normals, normals + n_vertex * 3),
-        m_indexBuffer(indices, indices + n_face * 3)
-    {
-        GenerateBuffer((int)VertexUsage::PN);
-        BindBuffer((int)VertexUsage::PN);
-    }
+    //Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices)
+    //    : m_positionBuffer(positions, positions + n_vertex * 3),
+    //    m_normalBuffer(normals, normals + n_vertex * 3),
+    //    m_indexBuffer(indices, indices + n_face * 3)
+    //{
+    //    GenerateBuffer((int)VertexUsage::PN);
+    //    BindBuffer((int)VertexUsage::PN);
+    //}
 
     Mesh::Mesh(Mesh&& m)
     {
@@ -82,10 +107,42 @@ namespace FishEngine
     }
 
 
+    void Mesh::UploadMeshData(bool markNoLogerReadable /*= true*/)
+    {
+        GenerateBuffer();
+        BindBuffer();
+        glCheckError();
+
+        m_vertexCount = static_cast<uint32_t>(m_positionBuffer.size() / 3);
+        m_triangleCount = static_cast<uint32_t>(m_indexBuffer.size() / 3);
+        m_isReadable = !markNoLogerReadable;
+        if (markNoLogerReadable)
+        {
+            Clear();
+        }
+        m_uploaded = true;
+    }
+
+    void Mesh::Clear()
+    {
+        m_positionBuffer.clear();
+        m_normalBuffer.clear();
+        m_uvBuffer.clear();
+        m_tangentBuffer.clear();
+        m_indexBuffer.clear();
+        //m_boneIndexBuffer.clear();
+        //m_boneWeightBuffer.clear();
+    }
+
     void Mesh::Render()
     {
+        //if (!m_uploaded)
+        //{
+        //    UploadMeshData();
+        //}
+        assert(m_uploaded);
         glBindVertexArray(m_VAO);
-        glDrawElements(GL_TRIANGLES, (GLsizei)m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, m_triangleCount*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
@@ -95,7 +152,7 @@ namespace FishEngine
     //    glBindVertexArray(0);
     //}
 
-    void Mesh::GenerateBuffer(int vertexUsage)
+    void Mesh::GenerateBuffer()
     {
         // VAO
         glGenVertexArrays(1, &m_VAO);
@@ -109,23 +166,23 @@ namespace FishEngine
         glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
         glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size() * 4, m_positionBuffer.data(), GL_STATIC_DRAW);
 
-        if (vertexUsage & (int)VertexUsage::Normal) {
+        //if (vertexUsage & (int)VertexUsage::Normal) {
             glGenBuffers(1, &m_normalVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
             glBufferData(GL_ARRAY_BUFFER, m_normalBuffer.size() * 4, m_normalBuffer.data(), GL_STATIC_DRAW);
-        }
+        //}
 
-        if (vertexUsage & (int)VertexUsage::UV) {
+        //if (vertexUsage & (int)VertexUsage::UV) {
             glGenBuffers(1, &m_uvVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
             glBufferData(GL_ARRAY_BUFFER, m_uvBuffer.size() * 4, m_uvBuffer.data(), GL_STATIC_DRAW);
-        }
+        //}
 
-        if (vertexUsage & (int)VertexUsage::Tangent) {
+        //if (vertexUsage & (int)VertexUsage::Tangent) {
             glGenBuffers(1, &m_tangentVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
             glBufferData(GL_ARRAY_BUFFER, m_tangentBuffer.size() * 4, m_tangentBuffer.data(), GL_STATIC_DRAW);
-        }
+        //}
 
         if (m_skinned) {
             //glGenTransformFeedbacks(1, &m_TFBO);
@@ -147,7 +204,7 @@ namespace FishEngine
         }
     }
 
-    void Mesh::BindBuffer(int vertexUsage/* = VertexUsagePN*/) {
+    void Mesh::BindBuffer() {
         glBindVertexArray(m_VAO);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
@@ -156,23 +213,23 @@ namespace FishEngine
         glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(PositionIndex);
 
-        if (vertexUsage & (int)VertexUsage::Normal) {
+        //if (vertexUsage & (int)VertexUsage::Normal) {
             glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
             glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
             glEnableVertexAttribArray(NormalIndex);
-        }
+        //}
 
-        if (vertexUsage & (int)VertexUsage::UV) {
+        //if (vertexUsage & (int)VertexUsage::UV) {
             glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
             glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
             glEnableVertexAttribArray(UVIndex);
-        }
+        //}
 
-        if (vertexUsage & (int)VertexUsage::Tangent) {
+        //if (vertexUsage & (int)VertexUsage::Tangent) {
             glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
             glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
             glEnableVertexAttribArray(TangentIndex);
-        }
+        //}
 
         if (m_skinned) {
             glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
@@ -254,5 +311,4 @@ namespace FishEngine
         glDrawArrays(m_drawMode, 0, vertexCount);
         glBindVertexArray(0);
     }
-
 }

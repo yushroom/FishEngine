@@ -125,6 +125,17 @@ namespace FishEditor
         glViewport(0, 0, Screen::m_width, Screen::m_height);
 
         RenderSystem::Render();
+
+        /************************************************************************/
+        /* Gizmos                                                               */
+        /************************************************************************/
+        glDepthFunc(GL_LEQUAL);
+        Scene::OnDrawGizmos();
+        glDepthFunc(GL_LESS);
+
+        Gizmos::setColor(Color::red);
+        Bounds b = Scene::bounds();
+        Gizmos::DrawWireCube(b.center(), b.size());
          
         /************************************************************************/
         /* Grid                                                                 */

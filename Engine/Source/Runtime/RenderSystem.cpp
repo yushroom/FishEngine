@@ -86,6 +86,7 @@ namespace FishEngine
 
     void RenderSystem::Render()
     {
+        glCheckError();
         float white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         float black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
         float error_color[] = { 1.0f, 0.0f, 1.0f, 1.0f };
@@ -322,16 +323,16 @@ namespace FishEngine
         //if (m_isWireFrameMode)
         //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        /************************************************************************/
-        /* Gizmos                                                               */
-        /************************************************************************/
-        glDepthFunc(GL_LEQUAL);
-        Scene::OnDrawGizmos();
-        glDepthFunc(GL_LESS);
+        ///************************************************************************/
+        ///* Gizmos                                                               */
+        ///************************************************************************/
+        //glDepthFunc(GL_LEQUAL);
+        //Scene::OnDrawGizmos();
+        //glDepthFunc(GL_LESS);
 
-        Gizmos::setColor(Color::red);
-        auto& b = Scene::m_bounds;
-        Gizmos::DrawWireCube(b.center(), b.size());
+        //Gizmos::setColor(Color::red);
+        //auto& b = Scene::m_bounds;
+        //Gizmos::DrawWireCube(b.center(), b.size());
     }
 
     void RenderSystem::Clean()

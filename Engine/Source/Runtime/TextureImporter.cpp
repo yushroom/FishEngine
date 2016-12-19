@@ -222,9 +222,7 @@ namespace FishEngine
         GLuint texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glCheckError();
         glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
-        glCheckError();
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
             external_format, pixel_type, data);
         glCheckError();

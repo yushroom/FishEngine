@@ -1,4 +1,5 @@
 #include <iostream>
+#include <future>
 
 #include "FishEngine.hpp"
 #include "GameApp.hpp"
@@ -16,6 +17,7 @@
 #include "ModelImporter.hpp"
 #include "TextureImporter.hpp"
 #include "MeshRenderer.hpp"
+#include "Timer.hpp"
 
 using namespace FishEngine;
 using namespace std;
@@ -75,20 +77,38 @@ class TestDeferredRenderingApp : public GameApp
 public:
     virtual void Init() override
     {
-        DefaultScene();
-
+        Timer timer("load");
         QualitySettings::setShadowDistance(30);
         Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
         Path sponza_assets_root = sponza_root / "crytek-sponza";
         Resources::SetAssetsDirectory(sponza_root);
         ModelImporter importer;
         importer.setFileScale(0.01f);
-        auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
-        auto sponza_go = sponza_model->CreateGameObject();
+
+        auto handle = std::async(std::launch::async, 
+            [&importer, &sponza_assets_root]() { return importer.LoadFromFile(sponza_assets_root / "sponza.obj"); }
+        );
 
         TextureImporter tex_importer;
         Path textures_root = sponza_assets_root / "textures";
         auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
+
+        DefaultScene();
+
+        auto transform = Camera::main()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
+
+        transform = Camera::mainGameCamera()->gameObject()->transform();
+        transform->setPosition(5, 8, 0);
+        transform->setLocalEulerAngles(30, -90, 0);
+
+        //auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+        auto sponza_model = handle.get();
+        auto sponza_go = sponza_model->CreateGameObject();
+
+        timer.StopAndPrint();
+
         auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
         (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
         {
@@ -137,14 +157,6 @@ public:
         ApplyMateril2("mesh22", "vase_dif");
         ApplyMateril2("mesh23", "lion");
         ApplyMateril2("mesh24", "sponza_roof_diff");
-
-        auto transform = Camera::main()->gameObject()->transform();
-        transform->setPosition(5, 8, 0);
-        transform->setLocalEulerAngles(30, -90, 0);
-
-        transform = Camera::mainGameCamera()->gameObject()->transform();
-        transform->setPosition(5, 8, 0);
-        transform->setLocalEulerAngles(30, -90, 0);
     }
 
     virtual void Update() override

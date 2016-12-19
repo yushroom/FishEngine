@@ -191,7 +191,7 @@ namespace FishEngine {
 
         ModelPtr      m_model;
 
-        VertexUsages m_vertexUsages = (int)VertexUsage::PNUT;
+        //VertexUsages m_vertexUsages = (int)VertexUsage::PNUT;
 
         // Vertex normal import options.
         ModelImporterNormals m_importNormals    = ModelImporterNormals::Import;

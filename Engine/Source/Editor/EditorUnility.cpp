@@ -17,7 +17,7 @@ namespace FishEditor
             dir = directory.c_str();
         }
         nfdchar_t *out_path = nullptr;
-        nfdresult_t result = NFD_OpenDialog(nullptr, dir, &out_path);
+        nfdresult_t result = NFD_OpenDialog(extension.c_str(), dir, &out_path);
 
         if (result == NFD_OKAY)
         {

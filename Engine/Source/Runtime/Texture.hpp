@@ -125,23 +125,23 @@ namespace FishEngine
 
     protected:
         
-        uint32_t m_height;
-        uint32_t m_width;
+        uint32_t            m_height;
+        uint32_t            m_width;
         
         // Anisotropic filtering level of the texture.
-        int m_anisoLevel;
+        int                 m_anisoLevel;
         
         // Dimensionality (type) of the texture (Read Only).
-        TextureDimension m_dimension = TextureDimension::Unknown;
+        TextureDimension    m_dimension     = TextureDimension::Unknown;
         
         // Filtering mode of the texture.
-        FilterMode m_filterMode = FilterMode::Trilinear;
+        FilterMode          m_filterMode    = FilterMode::Trilinear;
         
         // Wrap mode (Repeat or Clamp) of the texture.
-        TextureWrapMode m_wrapMode = TextureWrapMode::Repeat;
+        TextureWrapMode     m_wrapMode      = TextureWrapMode::Repeat;
         
         //OpenGL
-        unsigned int m_GLNativeTexture = 0;
+        unsigned int        m_GLNativeTexture = 0;
 
         void BindSampler();
 

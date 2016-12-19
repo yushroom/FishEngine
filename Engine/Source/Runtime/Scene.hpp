@@ -143,6 +143,11 @@ namespace FishEngine
         
         static GameObjectPtr IntersectRay(const Ray& ray);
 
+        static Bounds bounds()
+        {
+            return m_bounds;
+        }
+
     private:
         friend class RenderSystem;
         friend class FishEditor::EditorGUI;

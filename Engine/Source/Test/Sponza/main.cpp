@@ -109,13 +109,19 @@ public:
 
         timer.StopAndPrint();
 
+#define LOAD_COMPRESSED_DIFFUSE_MAP 1
+
         auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
         (const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
         {
             auto mesh0 = FindNamedChild(sponza_go, go_name);
             auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
             mtl->SetShader(shader1);
+#if LOAD_COMPRESSED_DIFFUSE_MAP
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + "_bc1.dds"));
+#else
             auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+#endif
             auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
             mtl->SetTexture("DiffuseTex", diffuse);
             mtl->SetTexture("MaskTex", mask);
@@ -132,7 +138,11 @@ public:
             auto mesh0 = FindNamedChild(sponza_go, go_name);
             auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
             mtl->SetShader(shader2);
+#if LOAD_COMPRESSED_DIFFUSE_MAP
+            auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + "_bc1.dds"));
+#else
             auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+#endif
             mtl->SetTexture("DiffuseTex", diffuse);
         };
 

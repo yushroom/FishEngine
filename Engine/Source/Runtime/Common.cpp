@@ -1,4 +1,6 @@
 #include "Common.hpp"
+
+#include <cctype>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 

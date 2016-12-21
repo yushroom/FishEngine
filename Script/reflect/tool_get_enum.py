@@ -2,8 +2,14 @@ from __future__ import print_function
 import os
 import clang.cindex
 import json
+import sys
 
-libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
+debug = False
+
+if sys.platform == 'darwin':
+    libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
+else:
+    libclang_path = R'D:\Program Files (x86)\LLVM\3.8.0\bin\libclang.dll'
 src_dirs = ['../Engine/Source/Runtime']
 
 clang.cindex.Config.set_library_file(libclang_path)
@@ -13,11 +19,30 @@ namespaces = ('FishEngine', 'FishEditor')
 
 enum_types = {}
 
+count = {}
+
+skip_cursor_types = (clang.cindex.CursorKind.CLASS_DECL, \
+    clang.cindex.CursorKind.STRUCT_DECL, \
+    clang.cindex.CursorKind.FUNCTION_TEMPLATE, \
+    clang.cindex.CursorKind.UNEXPOSED_DECL,\
+    clang.cindex.CursorKind.TEMPLATE_REF
+    )
+
 def find_typerefs(node):
     global enum_types
     """ Find all references to the type named 'typename'
     """
-    #print(node.spelling, node.kind, node.access_specifier, node.location, node.mangled_name)
+    if (node.location.file is not None) and ('FishEngine' not in node.location.file.name):
+        return
+    if node.kind in skip_cursor_types:
+        return
+    if debug:
+        if node.kind not in count:
+            count[node.kind] = 1
+        else:
+            count[node.kind] += 1
+        print(node.kind, node.spelling, node.location.file)
+
     #print node.spelling, str(node.kind)[str(node.kind).index('.')+1:], node.access_specifier
     short_kind = str(node.kind)[str(node.kind).index('.')+1:]
     #short_kind = str(node.kind).split('.')
@@ -39,8 +64,7 @@ def find_typerefs(node):
                 enum_member_list.append(c.spelling)
         enum_types[node.spelling] = { 'data' : enum_member_list, 'header_file' : header_file, 'scope_prefix' : scope_prefix}
         return
-    elif node.kind == clang.cindex.CursorKind.CLASS_DECL:
-        return
+
     for c in node.get_children():
         find_typerefs(c)
 
@@ -54,3 +78,6 @@ def ExtractEnums(path):
 
 if __name__ == "__main__":
     print(ExtractEnums("temp/AllHeaders.hpp"))
+    if debug:
+        for key in count:
+            print(key, count[key])

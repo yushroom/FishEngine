@@ -10,6 +10,8 @@ namespace FishEngine
     class FE_EXPORT AssetImporter : public Object
     {
     public:
+        InjectClassName(AssetImporter)
+
         AssetImporter() = default;
         virtual ~AssetImporter() {};
         

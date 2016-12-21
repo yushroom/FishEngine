@@ -23,7 +23,7 @@ namespace FishEngine
         //static void CharacterCallback(GLFWwindow* window, unsigned int codepoint);
 
     private:
-        GLFWwindow*     m_window = nullptr;
+        static GLFWwindow*     m_window;
         static int      m_windowWidth;
         static int      m_windowHeight;
     };

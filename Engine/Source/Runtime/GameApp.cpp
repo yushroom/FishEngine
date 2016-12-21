@@ -23,7 +23,9 @@ using namespace std;
 namespace FishEngine
 {
 
-int GameApp::m_windowWidth = 1280;
+    GLFWwindow* GameApp::m_window = nullptr;
+
+    int GameApp::m_windowWidth = 1280;
 int GameApp::m_windowHeight = 960;
 
 int GameApp::Run()
@@ -40,7 +42,7 @@ int GameApp::Run()
     //glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     // Create a GLFWwindow object that we can use for GLFW's functions
-    auto m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "FishEngine", nullptr, nullptr);
+    m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "FishEngine", nullptr, nullptr);
     glfwMakeContextCurrent(m_window);
     glCheckError();
 

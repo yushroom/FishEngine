@@ -32,6 +32,8 @@ namespace FishEngine
     class FE_EXPORT Material : public Object
     {
     public:
+        InjectClassName(Material)
+
         Material() = default;
 
         Material(const ShaderPtr& shader)

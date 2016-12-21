@@ -28,6 +28,8 @@ namespace FishEngine
     class FE_EXPORT GameObject : public Object
     {
     public:
+        InjectClassName(GameObject)
+
         //private:
         GameObject(const std::string& name);
         GameObject(const GameObject&) = delete;

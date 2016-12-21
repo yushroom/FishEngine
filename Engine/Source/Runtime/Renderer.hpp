@@ -60,18 +60,6 @@ namespace FishEngine
         }
     }
 
-    // enum to string
-    inline const char* ToString(ShadowCastingMode e)
-    {
-        switch (e) {
-        case ShadowCastingMode::Off: return "Off"; break;
-        case ShadowCastingMode::On: return "On"; break;
-        case ShadowCastingMode::TwoSided: return "TwoSided"; break;
-        case ShadowCastingMode::ShdowsOnly: return "ShdowsOnly"; break;
-        default: abort(); break;
-        }
-    }
-
     // string to enum
     template<>
     inline ShadowCastingMode ToEnum<ShadowCastingMode>(const std::string& s)

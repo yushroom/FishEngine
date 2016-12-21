@@ -17,6 +17,8 @@ namespace FishEngine
     class FE_EXPORT Shader : public Object
     {
     public:
+        InjectClassName(Shader)
+
         Shader();
         Shader(const Shader&) = delete;
         Shader& operator=(const Shader&) = delete;

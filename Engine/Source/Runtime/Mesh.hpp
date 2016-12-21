@@ -42,6 +42,8 @@ namespace FishEngine
     class FE_EXPORT Mesh : public Object
     {
     public:
+        InjectClassName(Mesh)
+
         Mesh() = default;
         //Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
         //Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
@@ -157,6 +159,8 @@ namespace FishEngine
     class FE_EXPORT SimpleMesh : public Object
     {
     public:
+        InjectClassName(SimpleMesh)
+
         // 3 components(float) for each vertex
         SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
         //SimpleMesh(std::vector<float> positionBuffer);
@@ -177,6 +181,8 @@ namespace FishEngine
     class DynamicMesh : public Object
     {
     public:
+        InjectClassName(DynamicMesh)
+
         DynamicMesh() = default;
 
         void Render(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);

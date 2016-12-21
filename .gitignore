@@ -30,6 +30,7 @@ xcuserdata/
 /Engine/ThirdParty/glfw-3.2.1*
 /Engine/ThirdParty/clang*
 /Engine/ThirdParty/fbxsdk*
+/Engine/ThirdParty/nativefiledialog/
 
 # binary
 /Engine/*/*/*.lib

@@ -48,6 +48,7 @@
 #include "Shader.hpp"
 #include "Resources.hpp"
 #include "EditorUnility.hpp"
+#include "TextureImporter.hpp"
 
 using namespace FishEngine;
 
@@ -466,13 +467,24 @@ namespace FishEditor
         ImGui::BeginDock("Inspector", nullptr);
         //ImGui::Begin("Inspector", nullptr, globalWindowFlags);
         ImGui::PushItemWidth(ImGui::GetWindowWidth()*0.55f);
+
         auto selectedGO = Selection::activeGameObject();
-        if (selectedGO == nullptr)
+        if (selectedGO != nullptr)
+            DrawInspectorWindow(selectedGO);
+        else
         {
-            ImGui::EndDock();
-            //ImGui::End();
-            return;
+            auto asset = Selection::activeAsset();
+            //if (asset != nullptr && asset->ClassName() == "Texture")
+            //    DrawInspectorWindow(std::dynamic_pointer_cast<Texture>(asset));
         }
+
+        ImGui::EndDock(); // Inspector Editor
+        //ImGui::End();
+    }
+
+
+    void EditorGUI::DrawInspectorWindow(FishEngine::GameObjectPtr selectedGO)
+    {
         if (ImGui::Checkbox("Lock", &s_locked))
         {
             if (!s_locked)
@@ -481,7 +493,7 @@ namespace FishEditor
         ImGui::PushID("Inspector.selected.active");
         ImGui::Checkbox("", &selectedGO->m_activeSelf);
         ImGui::PopID();
-        
+
         static char name[128] = { 0 };
         memcpy(name, selectedGO->name().c_str(), selectedGO->name().size());
         name[selectedGO->m_name.size()] = 0;
@@ -615,9 +627,6 @@ namespace FishEditor
                 ImGui::EndPopup();
             }
         }
-
-        ImGui::EndDock(); // Inspector Editor
-        //ImGui::End();
     }
 
 
@@ -734,8 +743,9 @@ namespace FishEditor
                             ImVec2(image_size, image_size), {0, 1}, {1, 0});
                     if (ImGui::IsItemClicked(0))
                     {
-                        std::cout << t->name() << " clicked" << std::endl;
+                        //std::cout << t->name() << " clicked" << std::endl;
                         item_selected = item_count;
+                        Selection::setActiveAsset(t);
                     }
                 }
                 item_count++;

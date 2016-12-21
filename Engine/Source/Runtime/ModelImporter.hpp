@@ -33,6 +33,8 @@ namespace FishEngine {
     class FE_EXPORT Model : public Object
     {
     public:
+        InjectClassName(Model)
+
         Model() : m_avatar(std::make_shared<Avatar>()) {}
         
         GameObjectPtr CreateGameObject() const;

@@ -66,18 +66,6 @@ namespace FishEngine
         }
     }
 
-    // enum to string
-    inline const char* ToString(LightType e)
-    {
-        switch (e) {
-        case LightType::Directional: return "Directional"; break;
-        case LightType::Point: return "Point"; break;
-        case LightType::Spot: return "Spot"; break;
-        case LightType::Area: return "Area"; break;
-        default: abort(); break;
-        }
-    }
-
     // string to enum
     template<>
     inline LightType ToEnum<LightType>(const std::string& s)

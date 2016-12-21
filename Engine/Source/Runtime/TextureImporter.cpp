@@ -11,7 +11,7 @@
 
 namespace FishEngine
 {
-
+    // https://github.com/g-truc/gli/blob/master/manual.md
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed
     GLuint CreateTextureFromDDS(char const* path, FishEngine::TextureDimension* out_textureFormat)

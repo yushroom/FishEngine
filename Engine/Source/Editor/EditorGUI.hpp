@@ -61,6 +61,9 @@ namespace FishEditor
         static void DrawMainToolbar();
         static void DrawMainMenu();
 
+        static void DrawInspectorWindow(FishEngine::GameObjectPtr gameObject);
+        //static void DrawInspectorWindow(FishEngine::TextureImporter& textureImporter);
+
         static void GUIStyleTweakWindow();
 
         static bool s_locked;       // temp

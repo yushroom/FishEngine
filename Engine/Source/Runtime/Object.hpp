@@ -18,6 +18,8 @@ namespace FishEngine
     public:
         Object();
         virtual ~Object() = 0;
+
+        virtual std::string ClassName() const = 0;
         
         // The name of the object.
         virtual std::string name() const { return m_name; }
@@ -55,5 +57,13 @@ namespace FishEngine
     //    }
     };
 }
+
+#define InjectClassName(name) \
+    static std::string StaticClassName() { \
+        return #name; \
+    } \
+    virtual std::string ClassName() const override { \
+        return StaticClassName(); \
+    }
 
 #endif // Object_hpp

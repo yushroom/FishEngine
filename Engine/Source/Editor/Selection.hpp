@@ -37,6 +37,12 @@ namespace FishEditor
             if (!m_isActiveGameObjectLocked)
                 m_activeGameObject = gameObject;
         }
+
+        static FishEngine::ObjectPtr
+        activeAsset()
+        {
+            return m_activeAsset.lock();
+        }
         
         static void
         setActiveAsset(FishEngine::ObjectPtr assetObject)
@@ -47,13 +53,15 @@ namespace FishEditor
         }
 
     private:
+        static std::weak_ptr<FishEngine::Object>        m_objectInInspector;
+
         //friend class EditorGUI;
         static bool m_isActiveGameObjectLocked;
-        static std::weak_ptr<FishEngine::Object>        m_objectInInspector;
-        
         static std::weak_ptr<FishEngine::GameObject>    m_activeGameObject;
-        static std::weak_ptr<FishEngine::GameObject> m_selectedGameObjectInHierarchy;
-        
+        //static std::weak_ptr<FishEngine::Object>        m_activeObject;
+        static std::weak_ptr<FishEngine::Transform>     m_activeTransform;
+
+        static std::weak_ptr<FishEngine::GameObject>    m_selectedGameObjectInHierarchy;
         static std::weak_ptr<FishEngine::Object>        m_activeAsset;
     };
 }

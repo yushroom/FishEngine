@@ -9,9 +9,9 @@ namespace FishEngine
     class FE_EXPORT Component : public Object
     {
     public:
-        virtual std::string ClassName() const = 0;
-
         virtual ~Component() = default;
+
+        InjectClassName(Component)
 
         // TODO: remove this
         virtual void OnInspectorGUI() {}
@@ -57,12 +57,5 @@ namespace FishEngine
     };
 }
 
-#define InjectClassName(name) \
-    static std::string StaticClassName() { \
-        return #name; \
-    } \
-    virtual std::string ClassName() const override { \
-        return StaticClassName(); \
-    }
 
 #endif // Component_hpp

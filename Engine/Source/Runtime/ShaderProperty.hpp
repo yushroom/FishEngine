@@ -54,16 +54,6 @@ namespace FishEngine
         Off = GL_NONE,
     };
 
-    inline const char* ToString(Cullface e)
-    {
-        switch (e) {
-        case Cullface::Back: return "Back"; break;
-        case Cullface::Front: return "Front"; break;
-        case Cullface::Off: return "Off"; break;
-        default: abort(); break;
-        }
-    }
-
 
     template<>
     inline Cullface ToEnum<Cullface>(const std::string& s)
@@ -78,15 +68,6 @@ namespace FishEngine
         On,
         Off,
     };
-
-    inline const char* ToString(ZWrite e)
-    {
-        switch (e) {
-        case ZWrite::On: return "On"; break;
-        case ZWrite::Off: return "Off"; break;
-        default: abort(); break;
-        }
-    }
 
     template<>
     inline ZWrite ToEnum<ZWrite>(const std::string& s)

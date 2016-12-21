@@ -96,7 +96,7 @@ namespace FishEngine
 
     enum class CubemapFace
     {
-        Unknown,
+        Unknown = 6,
         PositiveX = 0,
         NegativeX = 1,
         PositiveY = 2,

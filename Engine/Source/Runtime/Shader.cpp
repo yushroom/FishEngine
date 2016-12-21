@@ -18,6 +18,9 @@
 #include "Pipeline.hpp"
 #include "ShaderCompiler.hpp"
 
+//#include EnumHeader(CullFace)
+#include "generate/Enum_Cullface.hpp"
+
 using namespace std;
 using namespace FishEngine;
 
@@ -363,7 +366,7 @@ namespace FishEngine
             std::string parsed_shader_text = compiler.Preprocess();
             std::map<std::string, std::string> settings = compiler.m_settings;
             m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
-            m_cullface = ToEnum<Cullface>(getValueOrDefault<string, string>(settings, "cull", "back"));
+            m_cullface = ToEnum<Cullface>(Capitalize(getValueOrDefault<string, string>(settings, "cull", "back")));
             m_ZWrite = getValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
             m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
             m_deferred = getValueOrDefault<string, string>(settings, "deferred", "off") == "on";

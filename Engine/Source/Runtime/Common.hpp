@@ -2,6 +2,13 @@
 #define Common_hpp
 
 #include "FishEngine.hpp"
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/stringize.hpp>
+
+//#define QUOTEM(M) #M
+
+//#define EnumHeader(M) BOOST_PP_STRINGIZE(BOOST_PP_CAT(generate/Enum_, M))) ## ".hpp"
+//#define EnumHeader(T) QUOTEM(generate/##Enum_##T##.hpp)
 
 namespace FishEngine
 {
@@ -11,6 +18,7 @@ namespace FishEngine
     //FE_EXPORT std::vector<std::string>  split(const std::string& str, const std::string& separator);
 
     FE_EXPORT std::string camelCaseToReadable(const std::string& str);
+    std::string Capitalize(const std::string& str);
 
     //void trim(std::string& str);
     //std::string trim(const std::string& str);

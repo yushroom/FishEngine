@@ -23,60 +23,6 @@ namespace FishEngine
         Area,
     };
 
-    template<>
-    constexpr int EnumCount<LightType>() { return 4; }
-
-    // string array
-    static const char* LightTypeStrings[] = {
-        "Directional",
-        "Point",
-        "Spot",
-        "Area",
-    };
-
-    template<>
-    inline constexpr const char** EnumToCStringArray<LightType>()
-    {
-        return LightTypeStrings;
-    }
-
-    // index to enum
-    template<>
-    inline LightType ToEnum<LightType>(const int index)
-    {
-        switch (index) {
-        case 0: return LightType::Directional; break;
-        case 1: return LightType::Point; break;
-        case 2: return LightType::Spot; break;
-        case 3: return LightType::Area; break;
-        default: abort(); break;
-        }
-    }
-
-    // enum to index
-    template<>
-    inline int EnumToIndex<LightType>(LightType e)
-    {
-        switch (e) {
-        case LightType::Directional: return 0; break;
-        case LightType::Point: return 1; break;
-        case LightType::Spot: return 2; break;
-        case LightType::Area: return 3; break;
-        default: abort(); break;
-        }
-    }
-
-    // string to enum
-    template<>
-    inline LightType ToEnum<LightType>(const std::string& s)
-    {
-        if (s == "Directional") return LightType::Directional;
-        if (s == "Point") return LightType::Point;
-        if (s == "Spot") return LightType::Spot;
-        if (s == "Area") return LightType::Area;
-        abort();
-    }
-
     class FE_EXPORT Light : public Behaviour
     {
     public:

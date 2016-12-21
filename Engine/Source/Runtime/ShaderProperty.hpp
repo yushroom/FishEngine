@@ -54,28 +54,10 @@ namespace FishEngine
         Off = GL_NONE,
     };
 
-
-    template<>
-    inline Cullface ToEnum<Cullface>(const std::string& s)
-    {
-        if (s == "back" || s == "Back") return Cullface::Back;
-        if (s == "front" || s == "Front") return Cullface::Front;
-        if (s == "off" || s == "Off") return Cullface::Off;
-        abort();
-    }
-
     enum class ZWrite {
         On,
         Off,
     };
-
-    template<>
-    inline ZWrite ToEnum<ZWrite>(const std::string& s)
-    {
-        if (s == "On") return ZWrite::On;
-        if (s == "Off") return ZWrite::Off;
-        abort();
-    }
 
     enum class ZTest {
         Less = GL_LESS,
@@ -86,31 +68,4 @@ namespace FishEngine
         NotEqual = GL_NOTEQUAL,
         Always = GL_ALWAYS,
     };
-
-    inline const char* ToString(ZTest e)
-    {
-        switch (e) {
-        case ZTest::Less: return "Less"; break;
-        case ZTest::Greater: return "Greater"; break;
-        case ZTest::LEqual: return "LEqual"; break;
-        case ZTest::GEqual: return "GEqual"; break;
-        case ZTest::Equal: return "Equal"; break;
-        case ZTest::NotEqual: return "NotEqual"; break;
-        case ZTest::Always: return "Always"; break;
-        default: abort(); break;
-        }
-    }
-
-    template<>
-    inline ZTest ToEnum<ZTest>(const std::string& s)
-    {
-        if (s == "Less") return ZTest::Less;
-        if (s == "Greater") return ZTest::Greater;
-        if (s == "LEqual") return ZTest::LEqual;
-        if (s == "GEqual") return ZTest::GEqual;
-        if (s == "Equal") return ZTest::Equal;
-        if (s == "NotEqual") return ZTest::NotEqual;
-        if (s == "Always") return ZTest::Always;
-        abort();
-    }
 }

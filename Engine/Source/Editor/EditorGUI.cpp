@@ -50,6 +50,9 @@
 #include "EditorUnility.hpp"
 #include "TextureImporter.hpp"
 
+#include "../Runtime/generate/Enum_ShadowCastingMode.hpp"
+#include "../Runtime/generate/Enum_LightType.hpp"
+
 using namespace FishEngine;
 
 namespace FishEditor

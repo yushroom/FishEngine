@@ -33,6 +33,16 @@ namespace FishEngine
         //ret.push_back(0);
         return ret;
     }
+    
+    std::string Capitalize(const std::string& str)
+    {
+        std::string ret = str;
+        if (std::islower(ret[0]))
+        {
+            ret[0] = std::toupper(ret[0]);
+        }
+        return ret;
+    }
 
     //std::string trim(const std::string& str) {
     //    //str.erase(0, str.find_first_not_of(' '));

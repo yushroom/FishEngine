@@ -15,62 +15,6 @@ namespace FishEngine
         ShdowsOnly,
     };
 
-    // enum count
-    template<>
-    constexpr int EnumCount<ShadowCastingMode>() { return 4; }
-
-    // string array
-    static const char* ShadowCastingModeStrings[] = {
-        "Off",
-        "On",
-        "TwoSided",
-        "ShdowsOnly",
-    };
-
-    // cstring array
-    template<>
-    inline constexpr const char** EnumToCStringArray<ShadowCastingMode>()
-    {
-        return ShadowCastingModeStrings;
-    }
-
-    // index to enum
-    template<>
-    inline ShadowCastingMode ToEnum<ShadowCastingMode>(const int index)
-    {
-        switch (index) {
-        case 0: return ShadowCastingMode::Off; break;
-        case 1: return ShadowCastingMode::On; break;
-        case 2: return ShadowCastingMode::TwoSided; break;
-        case 3: return ShadowCastingMode::ShdowsOnly; break;
-        default: abort(); break;
-        }
-    }
-
-    // enum to index
-    template<>
-    inline int EnumToIndex<ShadowCastingMode>(ShadowCastingMode e)
-    {
-        switch (e) {
-        case ShadowCastingMode::Off: return 0; break;
-        case ShadowCastingMode::On: return 1; break;
-        case ShadowCastingMode::TwoSided: return 2; break;
-        case ShadowCastingMode::ShdowsOnly: return 3; break;
-        default: abort(); break;
-        }
-    }
-
-    // string to enum
-    template<>
-    inline ShadowCastingMode ToEnum<ShadowCastingMode>(const std::string& s)
-    {
-        if (s == "Off") return ShadowCastingMode::Off;
-        if (s == "On") return ShadowCastingMode::On;
-        if (s == "TwoSided") return ShadowCastingMode::TwoSided;
-        if (s == "ShdowsOnly") return ShadowCastingMode::ShdowsOnly;
-        abort();
-    }
-
     class FE_EXPORT Renderer : public Component
     {
     public:

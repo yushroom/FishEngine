@@ -49,6 +49,8 @@ def find_typerefs(node):
     #print 'short kind', short_kind
 
     if node.kind == clang.cindex.CursorKind.ENUM_DECL:
+        if not node.is_definition():
+            return
         scope_prefix = '::'.join( node.type.spelling.split('::')[:-1])
         if scope_prefix not in namespaces:
             return

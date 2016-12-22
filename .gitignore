@@ -32,22 +32,22 @@ xcuserdata/
 /Engine/ThirdParty/fbxsdk*
 /Engine/ThirdParty/nativefiledialog/
 
-# binary
-/Engine/*/*/*.lib
-/Engine/*/*/*.exp
-/Engine/*/*/*.ilk
-*.pdb
-/Engine/*/*/*.map
+# generated
+/Engine/Source/Runtime/generate/
 
-/Engine/Binary/lib/*/*.lib
-/Engine/Binary/lib/*/*.a
-/Engine/Binary/lib/*/*.dylib
+# binary
+/Engine/Binary
+
+# temp
+*.pyc
+/Script/reflect/temp/
 
 # assets
 /assets/models/
 /assets/textures/
 /example/Content
 /Example/Sponza/crytek-sponza/
+*.dds
 *.png
 *.tga
 *.jpg

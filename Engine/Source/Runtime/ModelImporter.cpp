@@ -608,9 +608,8 @@ namespace FishEngine {
         auto root = ResursivelyCreateGameObject(m_rootNode, nameToGameObject);
         if (m_animations.size() > 0)
         {
-            auto animator = std::make_shared<Animator>();
+            auto animator = root->AddComponent<Animator>();
             animator->m_animation = m_animations.front();
-            root->AddComponent(animator);
         }
         root->setName(m_name);
         return root;
@@ -639,19 +638,18 @@ namespace FishEngine {
             auto material = m_materials[m_meterailIndexForEachMesh[idx]];
             if (mesh->m_skinned)
             {
-                auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
+                auto meshRenderer = go->AddComponent<SkinnedMeshRenderer>();
+                meshRenderer->SetMaterial(material);
                 meshRenderer->setSharedMesh(mesh);
                 meshRenderer->setAvatar(m_avatar);
                 meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
-                go->AddComponent(meshRenderer);
-                //m_skinnedMeshRenderersToFindLCA.push_back(meshRenderer);
             }
             else
             {
-                auto meshRenderer = std::make_shared<MeshRenderer>(material);
-                go->AddComponent(meshRenderer);
-                auto meshFilter = std::make_shared<MeshFilter>(mesh);
-                go->AddComponent(meshFilter);
+                auto meshRenderer = go->AddComponent<MeshRenderer>();
+                meshRenderer->SetMaterial(material);
+                auto meshFilter = go->AddComponent<MeshFilter>();
+                meshFilter->SetMesh(mesh);
             }
         }
         else if (node->meshesIndices.size() > 1)
@@ -666,19 +664,18 @@ namespace FishEngine {
                 auto material = m_materials[m_meterailIndexForEachMesh[idx]];
                 if (mesh->m_skinned)
                 {
-                    auto meshRenderer = std::make_shared<SkinnedMeshRenderer>(material);
+                    auto meshRenderer = child->AddComponent<SkinnedMeshRenderer>();
+                    meshRenderer->SetMaterial(material);
                     meshRenderer->setSharedMesh(mesh);
                     meshRenderer->setAvatar(m_avatar);
                     meshRenderer->setRootBone(m_rootGameObject.lock()->transform());
-                    child->AddComponent(meshRenderer);
-                    //m_skinnedMeshRenderersToFindLCA.push_back(meshRenderer);
                 }
                 else
                 {
-                    auto meshRenderer = std::make_shared<MeshRenderer>(material);
-                    child->AddComponent(meshRenderer);
-                    auto meshFilter = std::make_shared<MeshFilter>(mesh);
-                    child->AddComponent(meshFilter);
+                    auto meshRenderer = child->AddComponent<MeshRenderer>();
+                    meshRenderer->SetMaterial(material);
+                    auto meshFilter = child->AddComponent<MeshFilter>();
+                    meshFilter->SetMesh(mesh);
                 }
             }
         }

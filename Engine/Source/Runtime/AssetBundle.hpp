@@ -8,6 +8,8 @@ namespace FishEngine
     {
     public:
 
+        InjectClassName(AssetBundle)
+
         // Check if an AssetBundle contains a specific object.
         // Returns true if an object referred to by name is contained in the AssetBundle, false otherwise.
         bool Contains(const std::string& name);

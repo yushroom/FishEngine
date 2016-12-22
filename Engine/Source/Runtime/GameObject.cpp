@@ -12,7 +12,8 @@ namespace FishEngine
 
     bool GameObject::activeInHierarchy() const
     {
-        if (m_activeSelf && m_transform->parent() != nullptr) {
+        if (m_activeSelf && m_transform->parent() != nullptr)
+        {
             return m_transform->parent()->gameObject()->activeInHierarchy();
         }
         return m_activeSelf;
@@ -45,23 +46,18 @@ namespace FishEngine
     void GameObject::Update()
     {
         m_transform->Update();
-        for (auto& s : m_scripts)
-        {
-            if (!s->m_isStartFunctionCalled)
-            {
-                // TODO
-                s->Awake();
-                s->OnEnable();
-                s->Start();
-                s->m_isStartFunctionCalled = true;
-            }
-            s->Update();
-        }
 
         for (auto& c : m_components)
         {
             if (!c->m_isStartFunctionCalled)
             {
+                if (IsScript(c->ClassName()))
+                {
+                    auto s = std::static_pointer_cast<Script>(c);
+                    // TODO
+                    s->Awake();
+                    s->OnEnable();
+                }
                 c->Start();
                 c->m_isStartFunctionCalled = true;
             }
@@ -71,14 +67,9 @@ namespace FishEngine
 
     void GameObject::OnDrawGizmos()
     {
-        for (auto& c : m_components) {
+        for (auto& c : m_components)
+        {
             c->OnDrawGizmos();
-            Gizmos::setColor(Color::green);
-            Gizmos::setMatrix(Matrix4x4::identity);
-        }
-
-        for (auto& s : m_scripts) {
-            s->OnDrawGizmos();
             Gizmos::setColor(Color::green);
             Gizmos::setMatrix(Matrix4x4::identity);
         }
@@ -86,14 +77,9 @@ namespace FishEngine
 
     void GameObject::OnDrawGizmosSelected()
     {
-        for (auto& c : m_components) {
+        for (auto& c : m_components)
+        {
             c->OnDrawGizmosSelected();
-            Gizmos::setColor(Color::green);
-            Gizmos::setMatrix(Matrix4x4::identity);
-        }
-
-        for (auto& s : m_scripts) {
-            s->OnDrawGizmosSelected();
             Gizmos::setColor(Color::green);
             Gizmos::setMatrix(Matrix4x4::identity);
         }
@@ -101,17 +87,17 @@ namespace FishEngine
 
     void GameObject::Start()
     {
-        for (auto& c : m_components) {
+        for (auto& c : m_components)
+        {
+            if (IsScript(c->ClassName()))
+            {
+                // // TODO:
+                auto s = std::static_pointer_cast<Script>(c);
+                s->Awake();
+                s->OnEnable();
+            }
             c->Start();
             c->m_isStartFunctionCalled = true;
-        }
-
-        // TODO:
-        for (auto& s : m_scripts) {
-            s->Awake();
-            s->OnEnable();
-            s->Start();
-            s->m_isStartFunctionCalled = true;
         }
     }
 }

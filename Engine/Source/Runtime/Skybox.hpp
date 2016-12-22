@@ -12,6 +12,9 @@ namespace FishEngine
     class FE_EXPORT Skybox : public Behaviour
     {
     public:
+
+        InjectClassName(Skybox)
+
         MaterialPtr material()
         {
             return m_material;

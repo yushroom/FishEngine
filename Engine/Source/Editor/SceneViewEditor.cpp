@@ -325,15 +325,13 @@ namespace FishEditor
             Camera::m_mainCamera = camera_preview;
 
             Pipeline::BindCamera(camera_preview);
-            //Pipeline::BindPerFrameUniforms();
-            Scene::Render();
-            //RenderSystem::Render();
+            RenderSystem::Render();
             Camera::m_mainCamera = main_camera;
             Screen::m_width = w;
             Screen::m_height = h;
         }
 
-        //glClear(GL_DEPTH_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
 
         if (selectedGO != nullptr)

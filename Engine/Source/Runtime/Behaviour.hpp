@@ -11,6 +11,8 @@ namespace FishEngine
     {
     public:
 
+        InjectClassName(Behaviour)
+
         virtual ~Behaviour() = default;
 
         // Enabled Behaviours are Updated, disabled Behaviours are not.

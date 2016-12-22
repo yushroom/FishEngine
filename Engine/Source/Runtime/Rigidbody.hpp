@@ -4,6 +4,7 @@
 #include "FishEngine.hpp"
 #include "Component.hpp"
 #include "Vector3.hpp"
+#include "ReflectClass.hpp"
 
 namespace physx
 {
@@ -13,7 +14,7 @@ namespace physx
 
 namespace FishEngine
 {
-    class FE_EXPORT Rigidbody : public Component
+    class FE_EXPORT Meta(DisallowMultipleComponent) Rigidbody : public Component
     {
     public:
         InjectClassName(Rigidbody);

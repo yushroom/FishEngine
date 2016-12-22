@@ -19,7 +19,6 @@ namespace FishEngine
 {
     std::list<GameObjectPtr>      Scene::m_gameObjects;
     std::vector<GameObjectPtr>    Scene::m_gameObjectsToBeDestroyed;
-    std::vector<ScriptPtr>        Scene::m_scriptsToBeDestroyed;
     std::vector<ComponentPtr>     Scene::m_componentsToBeDestroyed;
     Bounds                      Scene::m_bounds;
     //SceneOctree                 Scene::m_octree(Bounds(), 16);
@@ -54,12 +53,6 @@ namespace FishEngine
         }
         m_componentsToBeDestroyed.clear();
 
-        // Destroy scripts
-        for (auto & s : m_scriptsToBeDestroyed) {
-            s->gameObject()->RemoveScript(s);
-        }
-        m_scriptsToBeDestroyed.clear();
-
         // Destroy game objects
         for (auto& g : m_gameObjectsToBeDestroyed) {
             DestroyImmediate(g);
@@ -79,8 +72,6 @@ namespace FishEngine
     void Scene::RenderShadow(LightPtr& light)
     {
 #define DEBUG_SHADOW 1
-#if 1
-        
         auto    camera = Camera::main();
         auto    camera_to_world = camera->transform()->localToWorldMatrix();
         float   near = camera->nearClipPlane();
@@ -174,81 +165,6 @@ namespace FishEngine
         auto shadow_map_material = Material::builtinMaterial("CascadedShadowMap");
 
         Pipeline::BindLight(light);
-#else
-
-        // get compact light frustum
-        auto    camera          = Camera::mainGameCamera();
-        //auto    world_to_camera = camera->transform()->worldToLocalMatrix();
-        auto    camera_to_world = camera->transform()->localToWorldMatrix();
-        Vector3 camera_pos      = camera->transform()->position();
-        Vector3 light_dir       = light->transform()->forward();
-        
-        Frustum view_frustum = camera->frustum();
-        
-        UpdateBounds(); // get bounding box of the whole scene
-        Bounds bound_in_camera_space = camera->transform()->InverseTransformBounds(m_bounds);
-        if (!bound_in_camera_space.IsEmpty())   // TODO: hack for empty scene
-        {
-            auto pmin = bound_in_camera_space.min();
-            auto pmax = bound_in_camera_space.max();
-            if (view_frustum.minRange < pmin.z)
-            {
-                view_frustum.minRange = pmin.z;
-            }
-            if (view_frustum.maxRange > pmax.z)
-            {
-                view_frustum.maxRange = pmax.z;
-            }
-        }
-        
-#if DEBUG_SHADOW
-        Gizmos::setMatrix(camera_to_world);
-        Gizmos::setColor(Color::cyan);
-        Gizmos::DrawFrustum(view_frustum);
-        Gizmos::setMatrix(Matrix4x4::identity);
-#endif
-
-        Matrix4x4 light_view_matrix = Matrix4x4::LookAt(camera_pos, camera_pos+light_dir, camera->transform()->up());
-        Vector3 local_corners_of_view_frustum[8];
-        view_frustum.getLocalCorners(local_corners_of_view_frustum);
-        auto& world_to_light = light_view_matrix;
-        auto light_to_world = light_view_matrix.inverse();
-        Bounds aabb;    // the bounding box of view frustum in light's local space
-        for (auto corner : local_corners_of_view_frustum)
-        {
-            corner = camera_to_world.MultiplyPoint(corner); // -> world space
-            corner = world_to_light.MultiplyPoint(corner);  // -> light's local space
-            aabb.Encapsulate(corner);
-        }
-        
-#if DEBUG_SHADOW
-        // light frustum
-        Gizmos::setMatrix(light_to_world);
-        Gizmos::setColor(Color::magenta);
-        Gizmos::DrawWireCube(aabb.center(), aabb.size());
-        Gizmos::DrawLine(aabb.center(), aabb.center()+Vector3(0, 0, 1)*aabb.extents());
-        Gizmos::setMatrix(Matrix4x4::identity);
-#endif
-        
-        Vector3 new_light_position = aabb.center();
-        new_light_position.z -= aabb.extents().z + light->shadowNearPlane();
-        new_light_position = light_to_world.MultiplyPoint(new_light_position);
-        
-#if DEBUG_SHADOW
-        Gizmos::DrawWireSphere(new_light_position, 0.5f);
-#endif
-
-        light->m_viewMatrixForShadowMap[0] = Matrix4x4::LookAt(new_light_position, new_light_position+light_dir, camera->transform()->up());
-        //auto dir = light->m_viewMatrixForShadowMap.MultiplyVector(0, 0, 1);
-        const auto& ext = aabb.extents();
-        light->m_projectMatrixForShadowMap[0] = Matrix4x4::Ortho(-ext.x, ext.x, -ext.y, ext.y, light->shadowNearPlane(), ext.z*2+light->shadowNearPlane());
-        
-        //glCullFace(GL_FRONT);
-        auto shadow_map_material = Material::InstantiateBuiltinMaterial("ShadowMap");
-        shadow_map_material->DisableKeyword(ShaderKeyword::Shadow);
-        //auto& view = light->m_viewMatrixForShadowMap;
-        //auto& proj = light->m_projectMatrixForShadowMap;
-#endif
 
         auto shadowMap = light->m_shadowMap;
         Pipeline::PushRenderTarget(light->m_renderTarget);
@@ -322,24 +238,15 @@ namespace FishEngine
         }
     }
 
-
     void Scene::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/)
     {
         m_gameObjectsToBeDestroyed.push_back(obj);
     }
 
-
-    void Scene::Destroy(ScriptPtr s, const float t /*= 0.0f*/)
-    {
-        m_scriptsToBeDestroyed.push_back(s);
-    }
-
-
     void Scene::Destroy(ComponentPtr c, const float t /*= 0.0f*/)
     {
         m_componentsToBeDestroyed.push_back(c);
     }
-
 
     void Scene::DestroyImmediate(GameObjectPtr g)
     {
@@ -358,78 +265,6 @@ namespace FishEngine
     void Scene::DestroyImmediate(ComponentPtr c)
     {
         c->gameObject()->RemoveComponent(c);
-    }
-
-
-    void Scene::DestroyImmediate(ScriptPtr s)
-    {
-        s->gameObject()->RemoveScript(s);
-    }
-
-
-    void Scene::Render()
-    {
-#if 0
-        std::vector<GameObjectPtr> transparentQueue;
-        std::vector<GameObjectPtr> forwardQueue;
-
-        for (auto& go : Scene::m_gameObjects)
-        {
-            if (!go->activeInHierarchy()) continue;
-            RendererPtr renderer = go->GetComponent<MeshRenderer>();
-
-            if (renderer == nullptr)
-            {
-                renderer = go->GetComponent<SkinnedMeshRenderer>();
-                if (renderer == nullptr)
-                    continue;
-            }
-
-            if (renderer->material() != nullptr)
-            {
-                if (renderer->material()->shader()->IsTransparent())
-                {
-                    transparentQueue.push_back(go);
-                    continue;
-                }
-                else if (!renderer->material()->shader()->IsDeferred())
-                {
-                    forwardQueue.push_back(go);
-                    continue;
-                }
-            }
-            // Deferred
-            renderer->Render();
-        }
-        
-        /************************************************************************/
-        /* Forward                                                              */
-        /************************************************************************/
-        for (auto& go : forwardQueue)
-        {
-            RendererPtr renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr)
-            {
-                renderer = go->GetComponent<SkinnedMeshRenderer>();
-            }
-            renderer->Render();
-        }
-
-        /************************************************************************/
-        /* Transparent                                                          */
-        /************************************************************************/
-        for (auto& go : transparentQueue)
-        {
-            RendererPtr renderer = go->GetComponent<MeshRenderer>();
-            if (renderer == nullptr)
-            {
-                renderer = go->GetComponent<SkinnedMeshRenderer>();
-            }
-            renderer->Render();
-        }
-        
-        transparentQueue.clear();
-#endif
     }
 
     GameObjectPtr Scene::Find(const std::string& name)

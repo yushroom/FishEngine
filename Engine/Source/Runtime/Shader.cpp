@@ -366,10 +366,10 @@ namespace FishEngine
             std::string parsed_shader_text = compiler.Preprocess();
             std::map<std::string, std::string> settings = compiler.m_settings;
             m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
-            m_cullface = ToEnum<Cullface>(Capitalize(getValueOrDefault<string, string>(settings, "cull", "back")));
-            m_ZWrite = getValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
-            m_blend = getValueOrDefault<string, string>(settings, "blend", "off") == "on";
-            m_deferred = getValueOrDefault<string, string>(settings, "deferred", "off") == "on";
+            m_cullface = ToEnum<Cullface>(Capitalize(GetValueOrDefault<string, string>(settings, "cull", "back")));
+            m_ZWrite = GetValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
+            m_blend = GetValueOrDefault<string, string>(settings, "blend", "off") == "on";
+            m_deferred = GetValueOrDefault<string, string>(settings, "deferred", "off") == "on";
 
             m_impl->set(parsed_shader_text);
             m_impl->CompileAndLink(m_keywords);

@@ -1,4 +1,6 @@
 from mako.template import Template
+import json
+
 t_str = '''
 /**************************************************
 * Reflection for ${T}
@@ -18,29 +20,37 @@ namespace ${Namespace}
 '''
 t = Template(t_str)
 
-register_teamplate = 
+#register_teamplate
+componentInheritance_template_str = '''
+static std::map<std::string, std::string> s_componentInheritance = {
+    ${pairs}
+};
+'''
 
-def GenEnumFunctions(enum_name, enum_elements):
-    #print(enum_name, enum_elements)
-    index_to_enum_case  = "case {0}: return {1}::{2}; break;"
-    enum_to_index_case  = "case {1}::{2}: return {0}; break;"
-    string_to_enum_case = 'if (s == "{1}") return {0}::{1};'
+classname_template_str = '''
 
-    index_to_enum_cases = ''
-    enum_to_index_cases = ''
-    string_to_enum_cases = ''
+'''
 
-    for i in range(len(enum_elements)):
-        index_to_enum_cases  += index_to_enum_case.format(i, enum_name, enum_elements[i]) + '\n\t'
-        enum_to_index_cases  += enum_to_index_case.format(i, enum_name, enum_elements[i]) + '\n\t'
-        string_to_enum_cases += string_to_enum_case.format(enum_name, enum_elements[i]) + '\n\t'
+def GenClassFunctions(class_info):
+    def IsComponent(name):
+        #print(name)
+        if name == "Component":
+            return True
+        if 'parent' not in class_info[name]:
+            return False
+        return IsComponent(class_info[name]['parent'])
 
-    CStrings = ',\n\t'.join(['"{}"'.format(e) for e in enum_elements])
-    return t.render(T = enum_name, length = len(enum_elements), CStrings= CStrings, \
-        IndexToEnumCases = index_to_enum_cases, EnumToIndexCases = enum_to_index_cases, \
-        StringToEnumCases = string_to_enum_cases)
+    pairs = []
+    for key in class_info.keys():
+        if "Component" == key:
+             pairs.append((key, ''))
+        elif IsComponent(key):
+            pairs.append((key, class_info[key]['parent']))
+    pairs = ['{{"{0}", "{1}"}},'.format(x, y) for (x, y) in pairs]
+    #print(pairs)
+    print(Template(componentInheritance_template_str).render(pairs='\n\t'.join(pairs)))
 
 if __name__ == "__main__":
-    enum_name = "ShadowCastingMode"
-    enum_elements = ['Off', 'On', 'TwoSided', 'ShdowsOnly']
-    print(GenEnumFunctions(enum_name, enum_elements))
+    with open('temp/class.json') as f:
+        class_info = json.loads(f.read())
+    GenClassFunctions(class_info)

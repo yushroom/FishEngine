@@ -3,10 +3,11 @@
 
 #include "Object.hpp"
 #include "RenderSystem.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT RenderSettings : public Object
+    class FE_EXPORT Meta(NonSerializable) RenderSettings : public Object
     {
     public:
         //InjectClassName(RenderSettings);

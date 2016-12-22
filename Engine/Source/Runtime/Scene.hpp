@@ -129,17 +129,14 @@ namespace FishEngine
         static void Update();
         static void RenderShadow(LightPtr& light);
         static void OnDrawGizmos();
-        static void Render();
 
         static GameObjectPtr Find(const std::string& name);
 
         static void DestroyImmediate(GameObjectPtr g);
         static void DestroyImmediate(ComponentPtr c);
-        static void DestroyImmediate(ScriptPtr s);
 
         static void Destroy(GameObjectPtr obj,    const float t = 0.0f);
         static void Destroy(ComponentPtr c,       const float t = 0.0f);
-        static void Destroy(ScriptPtr s,          const float t = 0.0f);
         
         static GameObjectPtr IntersectRay(const Ray& ray);
 
@@ -157,19 +154,11 @@ namespace FishEngine
         static std::list<GameObjectPtr>   m_gameObjects;
         static std::vector<GameObjectPtr> m_gameObjectsToBeDestroyed;
         static std::vector<ComponentPtr>  m_componentsToBeDestroyed;
-        static std::vector<ScriptPtr>     m_scriptsToBeDestroyed;
         
         static Bounds                   m_bounds;
         //static SceneOctree              m_octree;
         
         static void UpdateBounds();
-
-        //friend class boost::serialization::access;
-        //template<class Archive>
-        //inline void serialize(Archive& ar, const unsigned int version)
-        //{
-        //    //ar & 
-        //}
     };
 }
 

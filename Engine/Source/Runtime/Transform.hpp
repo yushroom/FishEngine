@@ -6,6 +6,7 @@
 #include "Quaternion.hpp"
 #include "Matrix4x4.hpp"
 #include "Bounds.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -293,22 +294,25 @@ namespace FishEngine
 
     private:
         friend class FishEditor::EditorGUI;
-        //friend class FishEditor::SceneViewEditor;
         friend class Scene;
         friend class Serialization;
 
-        Vector3         m_localPosition;
-        Vector3         m_localScale;
-        Quaternion      m_localRotation;
-        //mutable Quaternion  m_rotation; // cache, do not use its value directly, use rotation() instead.
-        //mutable Vector3     m_localEulerAngles;
-        mutable bool        m_isDirty;
+        Vector3                             m_localPosition;
+        Vector3                             m_localScale;
+        Quaternion                          m_localRotation;
+
 
         std::weak_ptr<Transform>            m_parent;
         std::list<std::weak_ptr<Transform>> m_children;
 
-        mutable Matrix4x4 m_localToWorldMatrix; // localToWorld
-        mutable Matrix4x4 m_worldToLocalMatrix; // worldToLocal
+        Meta(NonSerializable)
+        mutable bool                        m_isDirty;
+
+        Meta(NonSerializable)
+        mutable Matrix4x4                   m_localToWorldMatrix; // localToWorld
+
+        Meta(NonSerializable)
+        mutable Matrix4x4                   m_worldToLocalMatrix; // worldToLocal
 
         //bool dirtyInHierarchy() const;
         void MakeDirty() const;

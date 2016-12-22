@@ -150,8 +150,7 @@ namespace FishEngine
                 cereal::make_nvp("activeSelf", value.m_activeSelf),
                 cereal::make_nvp("layer", value.m_layer),
                 cereal::make_nvp("transform", value.m_transform),
-                cereal::make_nvp("components", value.m_components),
-                cereal::make_nvp("Scripts", value.m_scripts)
+                cereal::make_nvp("components", value.m_components)
             );
         }
 

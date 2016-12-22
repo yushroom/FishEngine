@@ -4,10 +4,6 @@
 #include "FishEngine.hpp"
 #include <string>
 #include <boost/uuid/uuid.hpp>
-//#include <boost/uuid/uuid_io.hpp>
-//#include <boost/uuid/uuid_serialize.hpp>
-//#include <boost/serialization/nvp.hpp>
-//#include <boost/serialization/base_object.hpp>
 
 namespace FishEngine
 {
@@ -19,12 +15,19 @@ namespace FishEngine
         Object();
         virtual ~Object() = 0;
 
-        virtual std::string ClassName() const = 0;
+        static std::string StaticClassName()
+        {
+            return "Object";
+        }
+
+        virtual std::string ClassName() const
+        {
+            return "Object";
+        }
         
         // The name of the object.
         virtual std::string name() const { return m_name; }
         void setName(const std::string& name) { m_name = name; }
-
 
         //virtual std::string ToString() const;
 
@@ -46,15 +49,6 @@ namespace FishEngine
         UUID        m_uuid;
 
         friend class Serialization;
-
-    //private:
-    //    friend class boost::serialization::access;
-    //    template<class Archive>
-    //    inline void serialize(Archive& ar, const unsigned int version)
-    //    {
-    //        ar & BOOST_SERIALIZATION_NVP(m_name);
-    //        ar & BOOST_SERIALIZATION_NVP(m_uuid);
-    //    }
     };
 }
 

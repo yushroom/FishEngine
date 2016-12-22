@@ -4,13 +4,13 @@
 #include "FishEngine.hpp"
 #include "Object.hpp"
 #include "Resources.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT AssetImporter : public Object
+    class FE_EXPORT Meta(NonSerializable) AssetImporter : public Object
     {
     public:
-        InjectClassName(AssetImporter)
 
         AssetImporter() = default;
         virtual ~AssetImporter() {};

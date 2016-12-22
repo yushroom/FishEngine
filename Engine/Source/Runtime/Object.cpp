@@ -19,22 +19,9 @@ namespace FishEngine
         Scene::Destroy(obj, t);
     }
 
-
     void Object::Destroy(ComponentPtr component, float t /*= 0.0f*/)
     {
         Scene::Destroy(component, t);
-    }
-
-
-    void Object::Destroy(ScriptPtr script, float t /*= 0.0f*/)
-    {
-        Scene::Destroy(script, t);
-    }
-
-
-    void Object::DestroyImmediate(ScriptPtr script)
-    {
-        Scene::DestroyImmediate(script);
     }
 
     void Object::DestroyImmediate(ComponentPtr component)

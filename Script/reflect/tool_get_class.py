@@ -3,6 +3,7 @@ import os
 import clang.cindex
 import json
 import sys
+from tool_helper import CamelCaseToReadable
 
 debug = False
 
@@ -21,24 +22,24 @@ classes = {}
 
 count = {}
 
-skip_cursor_types = (clang.cindex.CursorKind.ENUM_DECL,
-    clang.cindex.CursorKind.STRUCT_DECL,
-    clang.cindex.CursorKind.FUNCTION_TEMPLATE,
-    clang.cindex.CursorKind.UNEXPOSED_DECL,
-    clang.cindex.CursorKind.TEMPLATE_REF
-    )
+# skip_cursor_types = (clang.cindex.CursorKind.ENUM_DECL,
+#     clang.cindex.CursorKind.STRUCT_DECL,
+#     clang.cindex.CursorKind.FUNCTION_TEMPLATE,
+#     clang.cindex.CursorKind.UNEXPOSED_DECL,
+#     clang.cindex.CursorKind.TEMPLATE_REF
+#     )
 
-skip_class_internal_type = (clang.cindex.CursorKind.UNEXPOSED_DECL,
-    clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL,
-    clang.cindex.CursorKind.TYPEDEF_DECL,
-    clang.cindex.CursorKind.FUNCTION_TEMPLATE,
-    clang.cindex.CursorKind.CONSTRUCTOR,
-    clang.cindex.CursorKind.DESTRUCTOR,
-    clang.cindex.CursorKind.ENUM_DECL,
-    #clang.cindex.CursorKind.UNION_DECL, # TODO
-    clang.cindex.CursorKind.VAR_DECL, # TODO, static var
-    clang.cindex.CursorKind.CONVERSION_FUNCTION
-    )
+# skip_class_internal_type = (clang.cindex.CursorKind.UNEXPOSED_DECL,
+#     clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL,
+#     clang.cindex.CursorKind.TYPEDEF_DECL,
+#     clang.cindex.CursorKind.FUNCTION_TEMPLATE,
+#     clang.cindex.CursorKind.CONSTRUCTOR,
+#     clang.cindex.CursorKind.DESTRUCTOR,
+#     clang.cindex.CursorKind.ENUM_DECL,
+#     #clang.cindex.CursorKind.UNION_DECL, # TODO
+#     clang.cindex.CursorKind.VAR_DECL, # TODO, static var
+#     clang.cindex.CursorKind.CONVERSION_FUNCTION
+#     )
 
 Serialization_type = (
     'float',
@@ -49,6 +50,22 @@ Serialization_type = (
     'std::string',
     )
 
+all_attributes = (
+    'DisallowMultipleComponent',
+    'HideInInspector',
+    'Serializable',
+    'NonSerializable',
+    'ExecuteInEditMode',
+    'AddComponentMenu',
+    'RequireComponent',
+    )
+
+class UnknownAttributeError(ValueError):
+    pass
+
+class ClassNameNotInjected(ValueError):
+    pass
+
 def internal_append_to_list_of_a_map(map, key, item):
     if key not in map:
         map[key] = [item]
@@ -58,8 +75,27 @@ def internal_append_to_list_of_a_map(map, key, item):
 def internal_get_annotation(node):
     for child in node.get_children():
         if child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+            if child.spelling not in all_attributes:
+                raise UnknownAttributeError()
             return child
     return None
+
+def internal_is_derived_from_Component(classname):
+    #print(classname)
+    if classname == "Component":
+        return True
+    if 'parent' not in classes[classname]:
+        return False
+    return internal_is_derived_from_Component(classes[classname]['parent'])
+
+def internal_is_derived_from_Object(classname):
+    #print(classname)
+    if classname == "Object":
+        return True
+    if 'parent' not in classes[classname]:
+        return False
+    return internal_is_derived_from_Object(classes[classname]['parent'])
+
 
 def internal_parse_class(node):
     if not node.is_definition():
@@ -69,19 +105,37 @@ def internal_parse_class(node):
         return
     print('class:', node.type.spelling)
     header_file = os.path.basename( node.location.file.name )
-    if node.spelling not in classes:
-        classes[node.spelling] = {}
-    classes[node.spelling]['scope_prefix'] = scope_prefix
-    classes[node.spelling]['header_file'] = header_file
+
+    if node.type.spelling in classes:
+        ''' duplicate class?
+        '''
+        raise ValueError
+
+    members = []
+    # nonserializable = False
+    classes[node.type.spelling] = {'scope_prefix': scope_prefix, 'header_file': header_file, 'is_unique': False, 'pretty_name': CamelCaseToReadable(node.spelling)}
+    classname_injected = False
+    static_classname_injected = False
+
     for child in node.get_children():
         if child.kind == clang.cindex.CursorKind.CXX_BASE_SPECIFIER:
             base_class = next(child.get_children()).spelling
             base_class = base_class.split(' ')[-1].split('::')[-1]
-            classes[node.spelling]['parent'] = base_class
+            if base_class not in classes:
+                ''' parent is NonSerializable
+                '''
+                classes.pop(node.type.spelling)
+                return
+            classes[node.type.spelling]['parent'] = base_class
 
         elif child.kind == clang.cindex.CursorKind.CXX_METHOD:
             #print('\t', 'method', child.spelling)
+            if child.spelling == "ClassName":
+                classname_injected = True
+            elif child.spelling == "StaticClassName":
+                static_classname_injected = True
             pass
+
         # elif child.kind == clang.cindex.CursorKind.UNION_DECL:
         #     ''' eg. Vector4, Color...
         #     '''
@@ -96,35 +150,69 @@ def internal_parse_class(node):
         #                     #if (annotation is not None) and (annotation.spelling == 'Serialize'):
         #                     #    internal_append_to_list_of_a_map(classes[node.spelling], 'member', {'name': cc.spelling, 'type': cc.type.spelling})
         #                     internal_append_to_list_of_a_map(classes[node.spelling], 'member', {'name': cc.spelling, 'type': cc.type.spelling})
-                
+
+        elif child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+            #print('\t', child.type.spelling, child.spelling)
+            if child.spelling not in all_attributes:
+                raise UnknownAttributeError()
+            if child.spelling == 'DisallowMultipleComponent':
+                classes[node.type.spelling]['is_unique'] = True
+            elif child.spelling == 'NonSerializable':
+                classes.pop(node.type.spelling)
+                return
+
         elif child.kind == clang.cindex.CursorKind.FIELD_DECL:
-            print('\tFIELD_DECL', child.spelling, child.type.spelling)
-            # for c in child.get_children():
-            #     print('\t\t', c.spelling, c.kind)
-            annotation = internal_get_annotation(child)
-            #if child.type.spelling in Serialization_type:
+            maybe_error_type = (child.type.spelling == 'int')
+            #maybe_error_type = True
+            if (maybe_error_type):
+                print('\tFIELD_DECL', child.spelling, child.type.spelling)
             hidden = False
-            if (annotation is not None) and (annotation.spelling == 'HideInInspector'):
-                hidden = True
+            for c in child.get_children():
+                if (maybe_error_type):
+                    print('\t\t', c.spelling, c.kind)
+                if c.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+                    #print('\t', child.type.spelling, child.spelling)
+                    if c.spelling not in all_attributes:
+                        raise UnknownAttributeError()
+                    elif c.spelling == 'NonSerializable':
+                        hidden = True
             if not hidden:
-                internal_append_to_list_of_a_map(classes[node.spelling], 'member', {'name': child.spelling, 'type': child.type.spelling})
+                CamelCaseToReadable
+                member = {'name': child.spelling, 'pretty_name': CamelCaseToReadable(child.spelling), 'type': child.type.spelling}
+                #internal_append_to_list_of_a_map(classes[node.spelling], 'member', member)
+                members.append(member)
             # else:
             #     print("Unkown type,", child.type.spelling)
 
-        elif child.kind in skip_class_internal_type:
-            pass
+        # elif child.kind in skip_class_internal_type:
+        #     pass
 
         else:
-            print('\t\t', child.kind, child.spelling)
+            # print('\t', child.kind, child.spelling)
+            pass
+
+    if internal_is_derived_from_Object(node.type.spelling):
+        if not (static_classname_injected and classname_injected):
+            ''' Did you forget to add InjectClassName to class defination?
+                eg.
+                class CameraController : public Script
+                {
+                public:
+                    InjectClassName(CameraController)
+                    ...
+                }
+            '''
+            raise ClassNameNotInjected()
+    classes[node.type.spelling]['members'] = members
 
 def internal_find_typerefs(node):
     global classes
     """ Find all references to the type named 'typename'
     """
-    if (node.location.file is not None) and ('FishEngine' not in node.location.file.name):
-        return
-    if node.kind in skip_cursor_types:
-        return
+    # if (node.location.file is not None) and ('FishEngine' not in node.location.file.name):
+    #     return
+    # if node.kind in skip_cursor_types:
+    #     return
     if debug:
         if node.kind not in count:
             count[node.kind] = 1
@@ -147,7 +235,8 @@ def ExtractClasses(path):
     global classes
     classes = {}
     print(path)
-    tu = index.parse(path, ['-x', 'c++', '-std=c++14', '-fsyntax-only', '-D__REFLECTION_PARSER__'])
+    #tu = index.parse(path, ['-x', 'c++', '-std=c++14', '-fsyntax-only', '-D__REFLECTION_PARSER__'])
+    tu = index.parse(path, ['-x', 'c++', '-std=c++14', '-fsyntax-only', '-ast-dump', '-D__REFLECTION_PARSER__'])
     internal_find_typerefs(tu.cursor)
     return classes
 
@@ -160,6 +249,8 @@ if __name__ == "__main__":
     #print(json.dumps(classes['Animator'], indent=4))
     #if debug:
     print('dump classes')
+    #print(json.dumps(classes['Animator'], indent = 4))
+    #print(json.dumps(classes['Rigidbody'], indent = 4))
     with open('temp/class.json', 'w') as f:
         f.write(json.dumps(classes, indent = 4))
     if debug:

@@ -21,7 +21,7 @@ namespace FishEngine
     //    return ret;
     //}
 
-    std::string camelCaseToReadable(const std::string& str)
+    std::string CamelCaseToReadable(const std::string& str)
     {
         std::string ret;
         ret.reserve(str.size() * 2); // at most: ceil(str.size()/2)*3

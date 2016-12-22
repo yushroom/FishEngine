@@ -16,6 +16,8 @@ namespace FishEngine
     class FE_EXPORT Collider : public Component
     {
     public:
+        InjectClassName(Collider)
+
         Vector3 ClosestPointOnBounds(const Vector3& position);
         //bool Raycast(const Ray& ray, RaycastHit* out_hitInfo, const float maxDistance);
 

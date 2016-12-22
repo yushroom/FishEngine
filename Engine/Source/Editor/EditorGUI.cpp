@@ -550,32 +550,6 @@ namespace FishEditor
             Object::DestroyImmediate(componentToBeDestroyed);
         }
 
-
-        ScriptPtr scriptToBeDestroyed = nullptr;
-        for (auto s : selectedGO->m_scripts)
-        {
-            ImGui::PushID(local_id++);
-            bool is_open = true;
-            if (ImGui::CollapsingHeader(s->ClassName().c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                //OnInspectorGUI(s);
-                ImGui::Indent(inspector_indent_width);
-                s->OnInspectorGUI();
-                ImGui::Unindent(inspector_indent_width);
-            }
-            if (!is_open)
-            {
-                //Object::DestroyImmediate(s);
-                scriptToBeDestroyed = s;
-            }
-            ImGui::PopID();
-        }
-
-        if (scriptToBeDestroyed != nullptr)
-        {
-            Object::DestroyImmediate(scriptToBeDestroyed);
-        }
-
         /************************************************************************/
         /*                          Add Component                               */
         /************************************************************************/

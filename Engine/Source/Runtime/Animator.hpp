@@ -6,10 +6,10 @@
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
 #include "Matrix4x4.hpp"
+#include "ReflectClass.hpp"
 
-namespace FishEngine {
-    
-    
+namespace FishEngine
+{
     struct Vector3Key
     {
         float time;
@@ -53,7 +53,7 @@ namespace FishEngine {
         std::map<int, std::string> m_indexToBone;
     };
 
-    class FE_EXPORT Animator : public Component
+    class FE_EXPORT Meta(DisallowMultipleComponent) Animator : public Component
     {
     public:
         InjectClassName(Animator);

@@ -2,8 +2,8 @@
 #define Texture_hpp
 
 #include "Object.hpp"
-//#include "GLEnvironment.hpp"
 #include "TextureProperty.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -127,7 +127,7 @@ namespace FishEngine
         friend class TextureImporter;
     };
 
-    class ColorBuffer : public Texture
+    class Meta(NonSerializable) ColorBuffer : public Texture
     {
     public:
         static std::shared_ptr<ColorBuffer> Create(const int width, const int height, TextureFormat format = TextureFormat::RGBA32);
@@ -145,7 +145,7 @@ namespace FishEngine
     //    int m_layers;
     //};
 
-    class DepthBuffer : public Texture
+    class Meta(NonSerializable) DepthBuffer : public Texture
     {
     public:
         static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
@@ -166,6 +166,8 @@ namespace FishEngine
     {
     public:
         
+        InjectClassName(Texture2D)
+
         // The format of the pixel data in the texture (Read Only).
         TextureFormat format() const
         {
@@ -194,6 +196,8 @@ namespace FishEngine
     {
     public:
         
+        InjectClassName(Cubemap)
+
         // The format of the pixel data in the texture (Read Only).
         TextureFormat format() const
         {

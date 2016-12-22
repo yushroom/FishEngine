@@ -4,11 +4,9 @@
 #include "Transform.hpp"
 #include "Script.hpp"
 #include "Object.hpp"
-#include "Component_gen.hpp"
-//#include <boost/serialization/nvp.hpp>
-//#include <boost/serialization/base_object.hpp>
-//#include <boost/serialization/nvp.hpp>
-//#include <boost/serialization/base_object.hpp>
+#include "ReflectClass.hpp"
+#include "generate/Class_ConponentInfo.hpp"
+#include <memory>
 
 namespace FishEngine
 {
@@ -87,9 +85,10 @@ namespace FishEngine
         /************************************************************************/
 
         // Returns the component of Type type if the game object has one attached, null if it doesn't.
-        template<typename T, std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
+        template<typename T>
         std::shared_ptr<T> GetComponent() const
         {
+            static_assert(std::is_base_of<Component, T>::value, "Component only");
             for (auto& comp : m_components)
             {
                 if (comp->ClassName() == T::StaticClassName())
@@ -100,47 +99,27 @@ namespace FishEngine
             return nullptr;
         }
 
-        template<typename T, std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
-        std::shared_ptr<T> GetComponent() const
-        {
-            for (auto& s : m_scripts)
-            {
-                if (s->ClassName() == T::StaticClassName())
-                {
-                    return std::static_pointer_cast<T>(s);
-                }
-            }
-            return nullptr;
-        }
-
-
+#if 1
         // Adds a component class named className to the game object.
-        template<class T, std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
-        bool AddComponent(std::shared_ptr<T> component)
+        bool AddComponent(ComponentPtr component)
         {
-            static_assert(std::is_base_of<Component, T>::value, "Component only");
-            if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
-            {
-                return false;
-            }
+            //if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
+            //{
+            //    return false;
+            //}
             component->m_gameObject = m_transform->gameObject();
             m_components.push_back(component);
+            if (IsScript(component->ClassName()))
+            {
+                auto script = std::static_pointer_cast<Script>(component);
+                script->Reset();
+            }
             return true;
         }
+#endif
 
-        template<class T, std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
-        bool AddComponent(std::shared_ptr<T> script)
-        {
-            static_assert(std::is_base_of<Script, T>::value, "Script only");
-            script->m_gameObject = m_transform->gameObject();
-            m_scripts.push_back(script);
-            script->Reset();
-            return true;
-        }
-
-        template<class T, std::enable_if_t<!std::is_base_of<Script, T>::value, int> = 42>
-        std::shared_ptr<T>
-        AddComponent()
+        template<class T>
+        std::shared_ptr<T> AddComponent()
         {
             static_assert(std::is_base_of<Component, T>::value, "Component only");
             if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
@@ -153,27 +132,9 @@ namespace FishEngine
             return component;
         }
 
-        template<class T, std::enable_if_t<std::is_base_of<Script, T>::value, int> = 42>
-        std::shared_ptr<T>
-        AddComponent()
-        {
-            static_assert(std::is_base_of<Script, T>::value, "Script only");
-            auto script = std::make_shared<T>();
-            script->m_gameObject = m_transform->gameObject();
-            m_scripts.push_back(script);
-            script->Reset();
-            return script;
-        }
-
-
         void RemoveComponent(ComponentPtr component)
         {
             m_components.remove(component);
-        }
-
-        void RemoveScript(ScriptPtr script)
-        {
-            m_scripts.remove(script);
         }
 
         // Activates/Deactivates the GameObject (activeSelf).
@@ -206,39 +167,12 @@ namespace FishEngine
         friend class Serialization;
 
         std::list<ComponentPtr> m_components;
-        std::list<ScriptPtr> m_scripts;
 
         bool m_activeSelf = true;
         int m_layer = 0;
 
         std::string m_tag;
         TransformPtr m_transform;
-
-        //static GameObject m_root;
-        //static PGameObject> m_root;
-
-        //friend class boost::serialization::access;
-
-        //template<class Archive>
-        //inline void save(Archive& ar, const unsigned int version) const
-        //{
-        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-        //    ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
-        //    ar & BOOST_SERIALIZATION_NVP(m_layer);
-        //    ar & BOOST_SERIALIZATION_NVP(m_tag);
-        //    //for (auto& m_components : )
-        //}
-
-        //template<class Archive>
-        //inline void load(Archive& ar, const unsigned int version)
-        //{
-        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-        //    ar & BOOST_SERIALIZATION_NVP(m_activeSelf);
-        //    ar & BOOST_SERIALIZATION_NVP(m_layer);
-        //    ar & BOOST_SERIALIZATION_NVP(m_tag);
-        //}
-
-        //BOOST_SERIALIZATION_SPLIT_MEMBER();
     };
 }
 

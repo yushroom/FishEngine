@@ -2,6 +2,7 @@
 #define CameraController_hpp
 
 #include "Input.hpp"
+#include "Transform.hpp"
 
 namespace FishEngine
 {

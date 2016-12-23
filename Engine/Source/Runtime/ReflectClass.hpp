@@ -16,7 +16,7 @@ namespace FishEngine
     template<typename BaseClass>
     bool IsSubClassOf(const std::string& className)
     {
-        return IsDerivedFrom(className, T::StaticClassName());
+        return IsDerivedFrom(className, BaseClass::StaticClassName());
     }
 
     static bool IsScript(const std::string& className)

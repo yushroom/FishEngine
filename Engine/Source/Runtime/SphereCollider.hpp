@@ -16,6 +16,7 @@ namespace FishEngine
         virtual void OnDrawGizmosSelected() override;
 
     private:
+        friend class Serialization;
         friend class FishEditor::EditorGUI;
         Vector3 m_center{0, 0, 0};
         float m_radius = 1;

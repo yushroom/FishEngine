@@ -5,6 +5,7 @@
 #include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
 #include "Bounds.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -98,6 +99,7 @@ namespace FishEngine
         }
 
     private:
+        friend class Serialization;
         friend class FishEditor::EditorGUI;
         friend class ModelImporter;
         friend class MeshRenderer;
@@ -156,7 +158,7 @@ namespace FishEngine
 
 
     // position buffer array
-    class FE_EXPORT SimpleMesh : public Object
+    class FE_EXPORT Meta(NonSerializable) SimpleMesh : public Object
     {
     public:
         InjectClassName(SimpleMesh)
@@ -178,7 +180,7 @@ namespace FishEngine
         GLuint m_VBO = 0;
     };
 
-    class DynamicMesh : public Object
+    class Meta(NonSerializable) DynamicMesh : public Object
     {
     public:
         InjectClassName(DynamicMesh)

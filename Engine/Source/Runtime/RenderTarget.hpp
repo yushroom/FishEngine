@@ -1,11 +1,12 @@
 #pragma once
 
 #include "FishEngine.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
 
-    class FE_EXPORT RenderTarget
+    class FE_EXPORT Meta(NonSerializable) RenderTarget
     {
     public:
         RenderTarget() = default;

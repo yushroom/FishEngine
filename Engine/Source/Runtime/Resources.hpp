@@ -6,6 +6,8 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
 
+#include "ReflectClass.hpp"
+
 namespace FishEngine
 {
     typedef boost::filesystem::path Path;
@@ -32,7 +34,7 @@ namespace FishEngine
         FontDir,
     };
 
-    class FE_EXPORT Resources
+    class FE_EXPORT Meta(NonSerializable) Resources
     {
     public:
         Resources() = delete;

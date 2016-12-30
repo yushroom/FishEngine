@@ -2,10 +2,11 @@
 
 #include <chrono>
 #include "Debug.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class Timer
+    class Meta(NonSerializable) Timer
     {
     public:
         Timer(std::string label);

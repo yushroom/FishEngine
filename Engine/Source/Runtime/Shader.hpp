@@ -95,6 +95,7 @@ namespace FishEngine
         void DisableLocalKeywords(ShaderKeywords keyword);
 
     private:
+        friend class Serialization;
         friend class Material;
         friend class RenderSystem;
 

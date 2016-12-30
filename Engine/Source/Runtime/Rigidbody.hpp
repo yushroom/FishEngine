@@ -35,6 +35,7 @@ namespace FishEngine
         }
         
     private:
+        friend class Serialization;
         friend class FishEditor::EditorGUI;
         float m_mass = 2;
         float m_drag = 0;

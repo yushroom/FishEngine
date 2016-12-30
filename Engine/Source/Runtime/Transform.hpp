@@ -301,8 +301,10 @@ namespace FishEngine
         Vector3                             m_localScale;
         Quaternion                          m_localRotation;
 
-
+        Meta(HideInInspector)
         std::weak_ptr<Transform>            m_parent;
+        
+        Meta(HideInInspector)
         std::list<std::weak_ptr<Transform>> m_children;
 
         Meta(NonSerializable)

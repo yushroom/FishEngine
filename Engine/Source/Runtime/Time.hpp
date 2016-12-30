@@ -4,10 +4,11 @@
 #include "FishEngine.hpp"
 #include <time.h>
 #include <chrono>
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT Time
+    class FE_EXPORT Meta(NonSerializable) Time
     {
     public:
         Time() = delete;

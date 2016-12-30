@@ -4,11 +4,12 @@
 #include "FishEngine.hpp"
 #include "Matrix4x4.hpp"
 #include "ShaderVariables_gen.hpp"
+#include "ReflectClass.hpp"
 #include <stack>
 
 namespace FishEngine
 {
-    class FE_EXPORT Pipeline
+    class FE_EXPORT Meta(NonSerializable) Pipeline
     {
     public:
         Pipeline() = delete;

@@ -24,6 +24,7 @@ namespace FishEngine
         virtual void Start() override;
         
     protected:
+        friend class Serialization;
         RigidbodyPtr m_attachedRigidbody;
         Bounds  m_bounds;
         float   m_contactOffset;

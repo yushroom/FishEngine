@@ -27,6 +27,7 @@ namespace FishEngine
         //virtual void OnInspectorGUI() override;
 
     private:
+        friend class Serialization;
         friend class FishEditor::EditorGUI;
         MeshPtr m_mesh = nullptr;
     };

@@ -1,9 +1,10 @@
 #include "Color.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
     // Low-level graphics library.
-    class GL
+    class Meta(NonSerializable) GL
     {
     public:
         GL() = delete;

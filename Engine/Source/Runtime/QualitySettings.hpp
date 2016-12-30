@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FishEngine.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -12,7 +13,7 @@ namespace FishEngine
         VeryHigh,   // Very high shadow map resolution.
     };
 
-    class QualitySettings
+    class Meta(NonSerializable) QualitySettings
     {
     public:
         QualitySettings() = delete;

@@ -7,10 +7,11 @@
 #include <cstdlib>
 #include <limits>
 #include <algorithm>
+#include "ReflectClass.hpp"
 
 namespace FishEngine {
 
-class FE_EXPORT Mathf
+class FE_EXPORT Meta(NonSerializable) Mathf
 {
 
 public:

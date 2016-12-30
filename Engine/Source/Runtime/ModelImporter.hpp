@@ -62,6 +62,7 @@ namespace FishEngine {
         static MeshPtr builtinMesh(const PrimitiveType type);
         
     private:
+        friend class Serialization;
         friend class ModelImporter;
 
         void AddMesh(MeshPtr& mesh);

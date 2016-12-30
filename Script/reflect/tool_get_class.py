@@ -8,8 +8,8 @@ from tool_helper import CamelCaseToReadable
 debug = False
 
 if sys.platform == 'darwin':
-    #libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
-    libclang_path = R'/Users/yushroom/Downloads/llvm-3.9.1.src/build/lib/libclang.dylib'
+    libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
+    #libclang_path = R'/Users/yushroom/Downloads/llvm-3.9.1.src/build/lib/libclang.dylib'
 else:
     libclang_path = R'D:\Program Files (x86)\LLVM\3.8.0\bin\libclang.dll'
 src_dirs = ['../Engine/Source/Runtime']
@@ -21,7 +21,6 @@ namespaces = ('FishEngine', 'FishEditor')
 
 classes = {}
 
-count = {}
 
 skip_cursor_types = (clang.cindex.CursorKind.ENUM_DECL,
     clang.cindex.CursorKind.STRUCT_DECL,
@@ -171,12 +170,10 @@ def internal_parse_class(node):
             # hack
             # libclang(python binding) not recognize stl class(std::list, std::vector, std::map...)(or forward declared type) and treats it as 'int'
             # when this happens, get actual type from raw tokens
-            if child.type.spelling.startswith('std::'):
-                print(child.type.spelling, child.spelling)
             member_type = child.type.spelling
             maybe_error_type = (child.type.spelling == 'int')
             #maybe_error_type = True
-            if (maybe_error_type):
+            if maybe_error_type:
                 #print('\tFIELD_DECL', child.spelling, child.type.spelling)
                 toks = []
                 end = False
@@ -187,7 +184,7 @@ def internal_parse_class(node):
                     if tok not in ('mutable', 'volatile'):
                         toks.append(tok.spelling)
                 if not end:
-                    raise ValueError
+                    raise ValueError(toks)
                 member_type = ''.join(toks)
                 print('\tFIELD_DECL', child.spelling, child.type.spelling, member_type)
             NonSerializable = False
@@ -218,7 +215,7 @@ def internal_parse_class(node):
 
     if internal_is_derived_from_Object(class_name):
         if not (static_classname_injected and classname_injected):
-            ''' Did you forget to add InjectClassName to class defination?
+            msg = r''' Did you forget to add InjectClassName to class defination?
                 eg.
                 class CameraController : public Script
                 {
@@ -227,8 +224,7 @@ def internal_parse_class(node):
                     ...
                 }
             '''
-            #raise ClassNameNotInjected()
-            pass
+            raise ClassNameNotInjected(msg)
     classes[class_name]['members'] = members
 
 def internal_find_typerefs(node):
@@ -244,12 +240,6 @@ def internal_find_typerefs(node):
         return
     if node.kind in skip_cursor_types:
         return
-    if debug:
-        if node.kind not in count:
-            count[node.kind] = 1
-        else:
-            count[node.kind] += 1
-        print(node.kind, node.spelling, node.location.file)
 
     #print node.spelling, str(node.kind)[str(node.kind).index('.')+1:], node.access_specifier
     #short_kind = str(node.kind)[str(node.kind).index('.')+1:]
@@ -264,25 +254,8 @@ def internal_find_typerefs(node):
 
 def ExtractClasses(path):
     global classes
-    std_includes = (
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1', 
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include',
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
-        '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include',
-        '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks',
-        '/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0',
-        '/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include',
-        '/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/',
-        '/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include',
-        )
-    options = ['-x', 'c++', '-std=c++14', '-fsyntax-only', '-ast-dump', '-D__REFLECTION_PARSER__']
-    #options = ['-x', 'c++', '-std=c++14', '-E', '-D__REFLECTION_PARSER__']
-    options += ['-I'+x for x in std_includes]
-    classes = {}
-    print(path)
-    tu = index.parse(path, options)
-    #tu = index.read("temp/dump.txt")
-    #tu = index.parse(path, ['-x', 'c++', '-std=c++14', '-fsyntax-only', '-ast-dump', '-D__REFLECTION_PARSER__'])
+    #os.system(R'clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
+    tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
     return classes
 
@@ -292,13 +265,11 @@ if __name__ == "__main__":
     #print(classes['Object'])
     #print(classes['Color'])
     #print(json.dumps(classes, indent=4))
-    print(json.dumps(classes['Transform'], indent=4))
+    print('Transform.m_children: ', [x for x in classes['Transform']['members'] if x['name'] == 'm_children'][0]['type'])
+    #print(json.dumps(classes['Transform'], indent=4))
     #if debug:
     print('dump classes')
     #print(json.dumps(classes['Animator'], indent = 4))
     #print(json.dumps(classes['Rigidbody'], indent = 4))
-    with open('temp/class.json', 'w') as f:
+    with open('/class.json', 'w') as f:
         f.write(json.dumps(classes, indent = 4))
-    if debug:
-        for key in count:
-            print(key, count[key])

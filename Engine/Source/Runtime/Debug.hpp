@@ -2,10 +2,11 @@
 #define Debug_hpp
 
 #include "FishEngine.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT Debug
+    class FE_EXPORT Meta(NonSerializable) Debug
     {
     public:
         Debug() = delete;

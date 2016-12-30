@@ -7,11 +7,12 @@
 #include "Matrix4x4.hpp"
 #include "Frustum.hpp"
 //#include "GLEnvironment.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
     // Gizmos are used to give visual debugging or setup aids in the scene view.
-    class FE_EXPORT Gizmos
+    class FE_EXPORT Meta(NonSerializable) Gizmos
     {
     public:
         Gizmos() = delete;

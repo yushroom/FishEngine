@@ -46,14 +46,6 @@ namespace FishEngine
 
         std::weak_ptr<GameObject> m_gameObject;
         bool m_isStartFunctionCalled = false;
-
-        //friend class boost::serialization::access;
-        //template<class Archive>
-        //inline void serialize(Archive& ar, const unsigned int version)
-        //{
-        //    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Object);
-        //    //ar & BOOST_SERIALIZATION_NVP(m_gameObject);
-        //}
     };
 }
 

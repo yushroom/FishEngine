@@ -12,9 +12,11 @@
 #endif
 #include <PhysXSDK/Include/PxPhysicsAPI.h>
 
+#include "ReflectClass.hpp"
+
 namespace FishEngine
 {
-    class FE_EXPORT PhysicsSystem
+    class FE_EXPORT Meta(NonSerializable) PhysicsSystem
     {
     public:
         PhysicsSystem() = delete;

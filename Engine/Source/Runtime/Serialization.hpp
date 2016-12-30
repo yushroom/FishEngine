@@ -3,16 +3,6 @@
 
 #include "FishEngine.hpp"
 
-#include <cereal/cereal.hpp>
-//#include <cereal/archives/json.hpp>
-#include <cereal/archives/xml.hpp>
-//#include <cereal/archives/binary.hpp>
-//#include <cereal/archives/portable_binary.hpp>
-#include <cereal/types/base_class.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/list.hpp>
-
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
 #include "Matrix4x4.hpp"
@@ -29,6 +19,65 @@
 #include "MeshRenderer.hpp"
 #include "MeshFilter.hpp"
 #include "SphereCollider.hpp"
+
+#include "ReflectClass.hpp"
+
+#if 0
+
+#ifndef __REFLECTION_PARSER__
+#include "generate/Class_Serialization.hpp"
+#endif
+
+#elif 0
+
+#include "Archive.hpp"
+
+namespace FishEngine
+{
+    class FE_EXPORT Meta(NonSerializable) Serialization
+    {
+    public:
+        Serialization() = delete;
+        
+        template<typename T>
+        static void Serialize(Archive& archive, const std::string& name, T& v)
+//        {
+//            Debug::LogError("Serialization for %s not implemented", typeid(T).name());
+//            abort();
+//        }
+    };
+    
+    template<>
+    void Serialization::Serialize(Archive& archive, const std::string& name,  const Vector3& v)
+    {
+        Serialize(archive, "x", v.x);
+        Serialize(archive, "y", v.y);
+        Serialize(archive, "z", v.z);
+    }
+    
+    template<>
+    void Serialization::Serialize(Archive& archive, const std::string& name,  const Quaternion& v)
+    {
+        Serialize(archive, "x", v.x);
+        Serialize(archive, "y", v.y);
+        Serialize(archive, "z", v.z);
+        Serialize(archive, "w", v.w);
+    }
+}
+
+#include "generate/Class_Serialization.hpp"
+
+#else
+
+#include <cereal/cereal.hpp>
+//#include <cereal/archives/json.hpp>
+#include <cereal/archives/xml.hpp>
+//#include <cereal/archives/binary.hpp>
+//#include <cereal/archives/portable_binary.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/list.hpp>
 
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Object, "Object");
 CEREAL_REGISTER_TYPE_WITH_NAME(FishEngine::Component, "Component");
@@ -63,7 +112,7 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(FishEngine::Collider, FishEngine::SphereCol
 
 namespace FishEngine
 {
-    class FE_EXPORT Serialization
+    class FE_EXPORT Meta(NonSerializable) Serialization
     {
     public:
         Serialization() = delete;
@@ -267,5 +316,7 @@ namespace FishEngine
 #undef FE_SERIALIZE
 #endif
 }
+
+#endif
 
 #endif //Serialization_hpp

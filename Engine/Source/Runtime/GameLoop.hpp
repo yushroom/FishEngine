@@ -3,10 +3,11 @@
 
 #include "FishEngine.hpp"
 #include "GLEnvironment.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT GameLoop
+    class FE_EXPORT Meta(NonSerializable) GameLoop
     {
     public:
         GameLoop() = delete;

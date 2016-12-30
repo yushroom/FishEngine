@@ -2,10 +2,11 @@
 #define Screen_hpp
 
 #include "FishEngine.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class FE_EXPORT Screen
+    class FE_EXPORT Meta(NonSerializable) Screen
     {
     public:
         Screen() = delete;

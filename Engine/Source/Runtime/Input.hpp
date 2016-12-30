@@ -5,6 +5,7 @@
 #include "Vector3.hpp"
 #include "Screen.hpp"
 #include <glfw/glfw3.h>
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -54,7 +55,7 @@ namespace FishEngine
 
     constexpr int keyCount = 512;
 
-    class FE_EXPORT Input
+    class FE_EXPORT Meta(NonSerializable) Input
     {
     public:
         Input() = delete;

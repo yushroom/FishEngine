@@ -11,7 +11,7 @@ if sys.platform == 'darwin':
     libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
     #libclang_path = R'/Users/yushroom/Downloads/llvm-3.9.1.src/build/lib/libclang.dylib'
 else:
-    libclang_path = R'D:\Program Files (x86)\LLVM\3.8.0\bin\libclang.dll'
+    libclang_path = R'D:\Library\LLVM\3.9.1_win32\bin\libclang.dll'
 src_dirs = ['../Engine/Source/Runtime']
 
 clang.cindex.Config.set_library_file(libclang_path)
@@ -171,27 +171,27 @@ def internal_parse_class(node):
             # libclang(python binding) not recognize stl class(std::list, std::vector, std::map...)(or forward declared type) and treats it as 'int'
             # when this happens, get actual type from raw tokens
             member_type = child.type.spelling
-            maybe_error_type = (child.type.spelling == 'int')
-            #maybe_error_type = True
-            if maybe_error_type:
-                #print('\tFIELD_DECL', child.spelling, child.type.spelling)
-                toks = []
-                end = False
-                for tok in child.get_tokens():
-                    if child.spelling == tok.spelling:
-                        end = True
-                        break
-                    if tok not in ('mutable', 'volatile'):
-                        toks.append(tok.spelling)
-                if not end:
-                    raise ValueError(toks)
-                member_type = ''.join(toks)
-                print('\tFIELD_DECL', child.spelling, child.type.spelling, member_type)
+            # maybe_error_type = (child.type.spelling == 'int')
+            # #maybe_error_type = True
+            # if maybe_error_type:
+            #     #print('\tFIELD_DECL', child.spelling, child.type.spelling)
+            #     toks = []
+            #     end = False
+            #     for tok in child.get_tokens():
+            #         if child.spelling == tok.spelling:
+            #             end = True
+            #             break
+            #         if tok not in ('mutable', 'volatile'):
+            #             toks.append(tok.spelling)
+            #     if not end:
+            #         raise ValueError(toks)
+            #     member_type = ''.join(toks)
+            #     print('\tFIELD_DECL', child.spelling, child.type.spelling, member_type)
             NonSerializable = False
             HideInInspector = False
             for c in child.get_children():
-                if (maybe_error_type):
-                    print('\t\t', c.spelling, c.kind)
+                # if (maybe_error_type):
+                #     print('\t\t', c.spelling, c.kind)
                 if c.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
                     #print('\t', child.type.spelling, child.spelling)
                     if c.spelling not in all_attributes:
@@ -215,7 +215,7 @@ def internal_parse_class(node):
 
     if internal_is_derived_from_Object(class_name):
         if not (static_classname_injected and classname_injected):
-            msg = r''' Did you forget to add InjectClassName to class defination?
+            msg = r''' Did you forget to add InjectClassName to the defination of (...)?
                 eg.
                 class CameraController : public Script
                 {
@@ -231,11 +231,8 @@ def internal_find_typerefs(node):
     global classes
     """ Find all references to the type named 'typename'
     """
-    # if 'list' == node.spelling and node.is_definition():
-    #     print(node.spelling, node.kind, node.type.spelling, node.location.file.name)
-    #     for child in node.get_children():
-    #         print(child.spelling, child.kind, child.type.spelling)
-    #     return
+    #print(node.spelling)
+    #print('\t' + str(node.kind)[str(node.kind).index('.')+1:])
     if (node.location.file is not None) and ('FishEngine' not in node.location.file.name):
         return
     if node.kind in skip_cursor_types:
@@ -255,6 +252,22 @@ def internal_find_typerefs(node):
 def ExtractClasses(path):
     global classes
     #os.system(R'clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
+    header_path = (
+        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
+        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
+        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\include',
+        R'C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt',
+        R'C:\Program Files (x86)\Windows Kits\8.1\Include\um',
+        R'C:\Program Files (x86)\Windows Kits\8.1\Include\shared',
+        R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
+        R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
+        R'D:\program\FishEngine/Engine/ThirdParty/glfw-3.2.1/include',
+        R'D:\program\FishEngine/Engine/ThirdParty/',
+        R'D:\program\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+        R'D:\program\FishEngine\Engine\ThirdParty\glew-2.0.0\include',
+        );
+    path = ' '.join(['-I"{0}"'.format(x) for x in header_path])
+    assert(0 == os.system(R'D:\Library\LLVM\3.9.1_win32\bin\clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + path + ' temp/AllHeaders.hpp -o temp/AllHeaders.ast'))
     tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
     return classes
@@ -271,5 +284,5 @@ if __name__ == "__main__":
     print('dump classes')
     #print(json.dumps(classes['Animator'], indent = 4))
     #print(json.dumps(classes['Rigidbody'], indent = 4))
-    with open('/class.json', 'w') as f:
+    with open('temp/class.json', 'w') as f:
         f.write(json.dumps(classes, indent = 4))

@@ -234,7 +234,7 @@ namespace FishEngine
         t->m_GLNativeTexture = texture;
         auto name = path.stem().string();
         t->setName(name);
-        Texture::m_textures.push_back(t);
+        Texture::s_textures.push_back(t);
         return t;
     }
     
@@ -283,7 +283,7 @@ namespace FishEngine
         t->m_height = height;
         t->m_dimension = TextureDimension::Tex2D;
         
-        Texture::m_textures.push_back(t);
+        Texture::s_textures.push_back(t);
         return t;
     }
 }

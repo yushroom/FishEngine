@@ -45,6 +45,7 @@ namespace FishEngine
         
         Vector3 m_velocity{0, 0, 0};
         
+		Meta(NonSerializable)
         physx::PxRigidDynamic* m_physxRigidDynamic;
     };
 }

@@ -1,10 +1,21 @@
 #include "Serialization.hpp"
+#include "Scene.hpp"
+#include "Texture.hpp"
+#include "Shader.hpp"
 
 namespace FishEngine
 {
-    //template<>
-    //void Serialization::Serialize(const Vector3& v)
-    //{
+	void Serialization::SerializeScene(OutputArchive& archive)
+	{
+		// textures
+		auto const & textures = Texture::s_textures;
+		archive << textures.size();
+		for (auto const & t : textures)
+		{
+			archive << *t;
+		}
 
-    //}
+		// shaders
+		auto const & shaders = Shader::m_builtinShaders;
+	}
 }

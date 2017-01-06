@@ -105,6 +105,7 @@ namespace FishEngine
         bool FromFile(const Path& path);
 
         // cache
+		Meta(NonSerializable)
         unsigned int m_GLNativeProgram = 0;
         std::vector<UniformInfo> m_uniforms;
 

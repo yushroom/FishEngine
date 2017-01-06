@@ -25,8 +25,13 @@ namespace FishEngine
         
     protected:
         friend class Serialization;
+
+		Meta(NonSerializable)
         RigidbodyPtr m_attachedRigidbody;
+
+		Meta(NonSerializable)
         Bounds  m_bounds;
+
         float   m_contactOffset;
         bool    m_enabled;
         bool    m_isTrigger;
@@ -34,6 +39,7 @@ namespace FishEngine
         physx::PxShape* physicsShape();
         virtual void CreatePhysicsShape() = 0;
         
+		Meta(NonSerializable)
         physx::PxShape* m_physxShape = nullptr;
         //physx::PxRigidDynamic* m_physxRigidDynamic;
     };

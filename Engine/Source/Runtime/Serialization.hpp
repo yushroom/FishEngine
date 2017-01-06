@@ -3,26 +3,183 @@
 
 #include "FishEngine.hpp"
 
-#include "Vector3.hpp"
-#include "Quaternion.hpp"
-#include "Matrix4x4.hpp"
-#include "Object.hpp"
-#include "GameObject.hpp"
-#include "Component.hpp"
-#include "Behaviour.hpp"
-#include "Script.hpp"
-#include "Transform.hpp"
-#include "Camera.hpp"
-#include "CameraController.hpp"
-#include "Scene.hpp"
-#include "Light.hpp"
-#include "MeshRenderer.hpp"
-#include "MeshFilter.hpp"
-#include "SphereCollider.hpp"
+//#include "Vector3.hpp"
+//#include "Quaternion.hpp"
+//#include "Matrix4x4.hpp"
+//#include "Object.hpp"
+//#include "GameObject.hpp"
+//#include "Component.hpp"
+//#include "Behaviour.hpp"
+//#include "Script.hpp"
+//#include "Transform.hpp"
+//#include "Camera.hpp"
+//#include "CameraController.hpp"
+//#include "Scene.hpp"
+//#include "Light.hpp"
+//#include "MeshRenderer.hpp"
+//#include "MeshFilter.hpp"
+//#include "SphereCollider.hpp"
 
 #include "ReflectClass.hpp"
 
-#if 0
+#include "Texture.hpp"
+
+#if 1
+
+#include "Archive.hpp"
+//#include "ReflectEnum.hpp"
+
+namespace FishEngine
+{
+	class Meta(NonSerializable) Serialization
+	{
+	public:
+		Serialization() = delete;
+		~Serialization() = delete;
+
+		void SerializeScene(OutputArchive& archive);
+
+		template<typename T>
+		static void Serialize(OutputArchive& archive, const T & v)
+		{
+			abort();
+		}
+
+		template<typename T>
+		static void Deserialize(InputArchive& archive, T & v)
+		{
+			abort();
+		}
+
+		/************************************************************************/
+		/* std::unique_ptr                                                      */
+		/************************************************************************/
+
+		template<typename T>
+		static void Serialize(OutputArchive& archive, const std::unique_ptr<T> & v)
+		{
+			archive << *v;
+		}
+
+		template<typename T>
+		static void Deserialize(OutputArchive& archive, std::unique_ptr<T> & v)
+		{
+			if (v == nullptr)
+				v = std::make_unique<T>();
+			archive >> *v;
+		}
+
+		/************************************************************************/
+		/* raw pointers(disabled)                                               */
+		/************************************************************************/
+
+		template<typename T>
+		static void Serialize(OutputArchive& archive, T * v) = delete;
+
+		template<typename T>
+		static void Deserialize(OutputArchive& archive, T * v) = delete;
+
+		/************************************************************************/
+		/* std::shared_ptr                                                      */
+		/************************************************************************/
+
+		template<typename T, typename std::enable_if_t<std::is_base_of<Component, T>::value, int> = 0>
+		static void Serialize(OutputArchive& archive, const std::shared_ptr<T> & v)
+		{
+			archive << v->m_uuid;
+		}
+
+		template<typename T>
+		static void Deserialize(InputArchive& archive, std::shared_ptr<T> & v) {}
+
+		static void Serialize(OutputArchive& archive, const std::shared_ptr<Texture> & v)
+		{
+			archive << v->m_uuid;
+		}
+
+		/************************************************************************/
+		/* std::weak_ptr                                                        */
+		/************************************************************************/
+
+		template<typename T>
+		static void Serialize(OutputArchive& archive, const std::weak_ptr<T> & v)
+		{
+		}
+
+		template<typename T>
+		static void Deserialize(InputArchive& archive, std::weak_ptr<T> & v) {}
+
+		/************************************************************************/
+		/* std::vector                                                          */
+		/************************************************************************/
+
+		//! Serialization for std::vectors of arithmetic (but not bool) using binary serialization
+		template<typename T, typename std::enable_if_t<std::is_arithmetic<T>::value && !std::is_same<T, bool>::value, int> = 0>
+		static void Serialize(OutputArchive& archive, const std::vector<T> & v)
+		{
+			archive << v.size();
+			archive.SaveBinary(v.data(), v.size() * sizeof(T));
+		}
+
+		// std::vectors of arithmetic (but not bool)
+		template<typename T, typename std::enable_if_t<std::is_arithmetic<T>::value && !std::is_same<T, bool>::value, int> = 0>
+		static void Deserialize(InputArchive& archive, std::vector<T> & v)
+		{
+			std::size_t size;
+			archive >> size;
+			v.resize(size);
+			archive.LoadBinary(v.data(), size);
+		}
+
+		//! Serialization for non-arithmetic vector types
+		template<typename T, typename std::enable_if_t<!std::is_arithmetic<T>::value, int> = 0>
+		static void Serialize(OutputArchive& archive, const std::vector<T> & v)
+		{
+			archive << v.size();
+			for (auto && x : v)
+				archive << x;
+		}
+
+		// non-arithmetic vector types
+		template<typename T, typename std::enable_if_t<!std::is_arithmetic<T>::value, int> = 0>
+		static void Deserialize(InputArchive& archive, std::vector<T> & v)
+		{
+			std::size_t size;
+			archive >> size;
+			v.resize(size);
+			for (auto && x : v)
+				archive >> x;
+		}
+
+		/************************************************************************/
+		/* std::list                                                            */
+		/************************************************************************/
+
+		template<typename T>
+		static void Serialize(OutputArchive& archive, const std::list<T> & v)
+		{
+			archive << v.size();
+			for (auto const & i : v)
+				archive << i;
+		}
+
+		template<typename T>
+		static void Deserialize(InputArchive& archive, std::list<T> & v)
+		{
+			std::size_t size;
+			archive >> size;
+			v.resize(size);
+			for (auto & i : v)
+				archive >> i;
+		}
+	};
+}
+
+#ifndef __REFLECTION_PARSER__
+#include "generate/Class_Serialization.hpp"
+#endif
+
+#elif 0
 
 #ifndef __REFLECTION_PARSER__
 #include "generate/Class_Serialization.hpp"

@@ -188,9 +188,7 @@ namespace FishEngine {
             bool            load_uv,
             bool            load_tangent);
 
-        void
-        RemoveDummyNodeFBX(
-            AnimationPtr animation);
+        void RemoveDummyNodeFBX( AnimationPtr animation );
 
         ModelPtr      m_model;
 

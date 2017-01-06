@@ -92,7 +92,7 @@ namespace FishEngine
 
         static const std::vector<TexturePtr>& AllTextures()
         {
-            return m_textures;
+            return s_textures;
         }
 
         virtual void Resize(const int newWidth, const int newHeight)
@@ -117,12 +117,13 @@ namespace FishEngine
         // Wrap mode (Repeat or Clamp) of the texture.
         TextureWrapMode     m_wrapMode      = TextureWrapMode::Repeat;
         
-        //OpenGL
+        // OpenGL
+		Meta(NonSerializable)
         unsigned int        m_GLNativeTexture = 0;
 
         void BindSampler();
 
-        static std::vector<TexturePtr> m_textures;
+        static std::vector<TexturePtr> s_textures;
 
     private:
         friend class TextureImporter;

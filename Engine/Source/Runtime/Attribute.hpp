@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef __REFLECTION_PARSER__
+
 namespace FishEngine
 {
 
@@ -77,3 +79,5 @@ namespace FishEngine
     };
 #endif
 }
+
+#endif

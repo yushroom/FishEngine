@@ -47,8 +47,10 @@ namespace FishEngine
 
     typedef std::shared_ptr<Animation> AnimationPtr;
     
-    struct Avatar
+    class Avatar : public Object
     {
+	public:
+		InjectClassName(Avatar);
         std::map<std::string, int> m_boneToIndex;
         std::map<int, std::string> m_indexToBone;
     };

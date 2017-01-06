@@ -38,7 +38,7 @@
 #include <Texture.hpp>
 
 #include <Serialization.hpp>
-#include <cereal/archives/json.hpp>
+//#include <cereal/archives/json.hpp>
 
 #include "FishEditorWindow.hpp"
 #include "Selection.hpp"
@@ -840,9 +840,9 @@ namespace FishEditor
                     auto path = EditorUtility::SaveFilePanel("Save Scene", "", "Scene.scene", "scene");
                     if (path.size() > 0)
                     {
-                        std::ofstream fout(path);
-                        cereal::JSONOutputArchive oa(fout);
-                        oa << Scene::m_gameObjects;
+                        //std::ofstream fout(path);
+                        //cereal::JSONOutputArchive oa(fout);
+                        //oa << Scene::m_gameObjects;
                     }
                 }
                 ImGui::EndMenu();

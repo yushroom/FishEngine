@@ -13,7 +13,7 @@ namespace FishEngine
         glBindSampler(m_GLNativeTexture, sampler.m_nativeGLSampler);
     }
 
-    std::vector<TexturePtr> Texture::m_textures;
+    std::vector<TexturePtr> Texture::s_textures;
     
     Texture::~Texture()
     {
@@ -23,7 +23,7 @@ namespace FishEngine
     FishEngine::TexturePtr Texture::Create()
     {
         auto t = std::make_shared<Texture>();
-        m_textures.push_back(t);
+        s_textures.push_back(t);
         return t;
     }
 
@@ -31,7 +31,7 @@ namespace FishEngine
     std::shared_ptr<ColorBuffer> ColorBuffer::Create(const int width, const int height, TextureFormat  format /*= TextureFormat::RGBA32*/)
     {
         auto t = std::make_shared<ColorBuffer>();
-        Texture::m_textures.push_back(t);
+        Texture::s_textures.push_back(t);
         t->m_dimension = TextureDimension::Tex2D;
         t->m_format = format;
         t->m_width = width;
@@ -71,7 +71,7 @@ namespace FishEngine
     std::shared_ptr<DepthBuffer> DepthBuffer::Create(const int width, const int height)
     {
         auto t = std::make_shared<DepthBuffer>();
-        Texture::m_textures.push_back(t);
+        Texture::s_textures.push_back(t);
         t->m_dimension = TextureDimension::Tex2D;
         t->m_width = width;
         t->m_height = height;
@@ -137,7 +137,7 @@ namespace FishEngine
     std::shared_ptr<LayeredDepthBuffer> LayeredDepthBuffer::Create(const int width, const int height, const int depth, bool useStencil /*= true*/)
     {
         auto t = std::make_shared<LayeredDepthBuffer>();
-        Texture::m_textures.push_back(t);
+        Texture::s_textures.push_back(t);
         t->m_useStencil = useStencil;
         t->m_dimension = TextureDimension::Tex2DArray;
         t->m_width = width;

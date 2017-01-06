@@ -59,6 +59,8 @@ namespace FishEngine
     class Vector4;
     class Quaternion;
     class Matrix4x4;
+	class Bounds;
+	class Ray;
     class Light;
     class Color;
     class RenderTexture;
@@ -82,9 +84,7 @@ namespace FishEngine
     class LayeredColorBuffer;
     class LayeredDepthBuffer;
 
-    struct Avatar;
-    struct Ray;
-    struct Bounds;
+    class Avatar;
 
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<GameObject> GameObjectPtr;

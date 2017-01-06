@@ -6,8 +6,9 @@
 
 namespace FishEngine
 {
-    struct FE_EXPORT Bounds
+    class FE_EXPORT Bounds
     {
+	public:
         Bounds() : m_center(0, 0, 0), m_extents(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity) {}
         
         Bounds(const Vector3& center, const Vector3& size) : m_center(center), m_extents(size*0.5f)
@@ -114,6 +115,7 @@ namespace FishEngine
         }
 
     private:
+		friend class Serialization;
         Vector3 m_center;
         Vector3 m_extents;
     };

@@ -68,8 +68,6 @@ namespace FishEngine
 
         bool                    m_isReadable    = false;
         bool                    m_mipmapEnabled = false;
-
-        bool mipmapEnabled = true;
     };
 }
 

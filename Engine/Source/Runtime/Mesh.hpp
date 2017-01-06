@@ -5,6 +5,7 @@
 #include "GLEnvironment.hpp"
 #include "Matrix4x4.hpp"
 #include "Bounds.hpp"
+#include "IntVector.hpp"
 #include "ReflectClass.hpp"
 
 namespace FishEngine

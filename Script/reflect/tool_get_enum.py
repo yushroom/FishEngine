@@ -9,7 +9,7 @@ debug = False
 if sys.platform == 'darwin':
     libclang_path = R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib'
 else:
-    libclang_path = R'D:\Program Files (x86)\LLVM\3.8.0\bin\libclang.dll'
+    libclang_path = R'D:\Library\LLVM\3.9.1_win32\bin\libclang.dll'
 src_dirs = ['../Engine/Source/Runtime']
 
 clang.cindex.Config.set_library_file(libclang_path)

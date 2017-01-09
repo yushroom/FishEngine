@@ -31,6 +31,7 @@ xcuserdata/
 /Engine/ThirdParty/clang*
 /Engine/ThirdParty/fbxsdk*
 /Engine/ThirdParty/nativefiledialog/
+/Engine/ThirdParty/yaml-cpp/
 
 # generated
 /Engine/Source/Runtime/generate/

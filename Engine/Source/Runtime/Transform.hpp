@@ -295,7 +295,6 @@ namespace FishEngine
     private:
         friend class FishEditor::EditorGUI;
         friend class Scene;
-        friend class Serialization;
 
         Vector3                             m_localPosition;
         Vector3                             m_localScale;
@@ -319,6 +318,33 @@ namespace FishEngine
         //bool dirtyInHierarchy() const;
         void MakeDirty() const;
     };
+
+	/************************************************************************/
+	/* Transform Serialization                                              */
+	/************************************************************************/
+	template<typename Archive>
+	Archive & operator << (Archive& archive, Transform const & value)
+	{
+		//archive << value.m_gameObject;
+		archive << value.m_localPosition; // FishEngine::Vector3
+		archive << value.m_localScale; // FishEngine::Vector3
+		archive << value.m_localRotation; // FishEngine::Quaternion
+		archive << value.m_parent; // std::weak_ptr<Transform>
+		archive << value.m_children; // std::list<std::weak_ptr<Transform> >
+		return archive;
+	}
+
+	template<typename Archive>
+	Archive & operator >> (Archive& archive, Transform & value)
+	{
+		//archive >> value.m_gameObject;
+		archive >> value.m_localPosition; // FishEngine::Vector3
+		archive >> value.m_localScale; // FishEngine::Vector3
+		archive >> value.m_localRotation; // FishEngine::Quaternion
+		archive >> value.m_parent; // std::weak_ptr<Transform>
+		archive >> value.m_children; // std::list<std::weak_ptr<Transform> >
+		return archive;
+	}
 }
 
 #endif // Transform_hpp

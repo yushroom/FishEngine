@@ -132,7 +132,6 @@ namespace FishEngine
         friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::FishEditorWindow;
         friend class FishEditor::SceneViewEditor;
-        friend class Serialization;
 
         float m_fieldOfView         = 60.f;
 

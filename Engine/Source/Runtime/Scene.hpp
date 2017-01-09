@@ -149,7 +149,6 @@ namespace FishEngine
         friend class RenderSystem;
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
-        friend class Serialization;
 
         static std::list<GameObjectPtr>   m_gameObjects;
         static std::vector<GameObjectPtr> m_gameObjectsToBeDestroyed;

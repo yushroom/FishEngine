@@ -62,7 +62,6 @@ namespace FishEngine
         std::string m_name;
         UUID        m_uuid;
 
-        friend class Serialization;
     };
 }
 

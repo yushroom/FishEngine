@@ -118,7 +118,6 @@ namespace FishEngine
         static MaterialPtr defaultMaterial();
 
     private:
-        friend class Serialization;
         friend class FishEditor::EditorGUI;
 
         ShaderPtr                           m_shader = nullptr;

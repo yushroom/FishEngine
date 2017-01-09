@@ -42,7 +42,6 @@ namespace FishEngine
         friend class GameObject;
         friend class Scene;
         friend class FishEditor::SceneViewEditor;
-        friend class Serialization;
 
         std::weak_ptr<GameObject> m_gameObject;
         bool m_isStartFunctionCalled = false;

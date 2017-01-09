@@ -164,7 +164,6 @@ namespace FishEngine
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
-        friend class Serialization;
 
         std::list<ComponentPtr> m_components;
 

@@ -25,7 +25,6 @@ namespace FishEngine
     private:
         bool m_enabled = true;
 
-        friend class Serialization;
         //friend class boost::serialization::access;
         //template<class Archive>
         //inline void serialize(Archive& ar, const unsigned int version)

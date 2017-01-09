@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-	void Serialization::SerializeScene(OutputArchive& archive)
+	void Serialization::SerializeScene(BinaryOutputArchive& archive)
 	{
         std::map<UUID, uint32_t> serialized;
         

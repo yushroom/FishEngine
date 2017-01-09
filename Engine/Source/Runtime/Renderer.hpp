@@ -63,7 +63,6 @@ namespace FishEngine
         }
 
     protected:
-        friend class Serialization;
         friend class FishEditor::EditorGUI;
         std::vector<MaterialPtr> m_materials;
 

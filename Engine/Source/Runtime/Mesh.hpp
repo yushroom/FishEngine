@@ -100,7 +100,6 @@ namespace FishEngine
         }
 
     private:
-        friend class Serialization;
         friend class FishEditor::EditorGUI;
         friend class ModelImporter;
         friend class MeshRenderer;

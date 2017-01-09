@@ -5,11 +5,6 @@
 
 #include "Texture.hpp"
 #include "Archive.hpp"
-//#include "ReflectEnum.hpp"
-#include "Vector3.hpp"
-#include "Vector4.hpp"
-#include "Quaternion.hpp"
-#include "Color.hpp"
 #include "Object.hpp"
 
 #include "Serialization/types/map.hpp"
@@ -17,6 +12,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include "generate/Enum_LightType.hpp"
 //#include <boost/uuid/uuid_serialize.hpp>
 
 namespace FishEngine
@@ -26,21 +22,53 @@ namespace FishEngine
     public:
         Serialization() = delete;
         
-        void SerializeScene(OutputArchive& archive);
+        void SerializeScene(BinaryOutputArchive& archive);
 
     };
+
+
+	/************************************************************************/
+	/* std::string                                                          */
+	/************************************************************************/
+	static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, const std::string & str)
+	{
+		archive << str.size();
+		archive.SaveBinary(str.data(), str.size());
+		return archive;
+	}
+
+	static BinaryInputArchive & operator >> (BinaryInputArchive & archive, std::string & str)
+	{
+		std::size_t size = 0;
+		archive >> size;
+		str.resize(size);
+		archive.LoadBinary(const_cast<char *>(str.data()), size);
+		return archive;
+	}
+
+	TextOutputArchive & operator << (TextOutputArchive & archive, std::string const & t)
+	{
+		archive.Save(t);
+		return archive;
+	}
+
+	TextInputArchive & operator >> (TextInputArchive & archive, std::string & t)
+	{
+		archive.Load(t);
+		return archive;
+	}
     
     /************************************************************************/
     /* UUID                                                                 */
     /************************************************************************/
-    static OutputArchive & operator << ( OutputArchive& archive, FishEngine::UUID const & t )
+    static BinaryOutputArchive & operator << ( BinaryOutputArchive& archive, FishEngine::UUID const & t )
     {
         //static_assert(sizeof(t) == 16, "Error");
         archive.SaveBinary(t.data, sizeof(t));
         return archive;
     }
     
-    static InputArchive & operator >> (InputArchive& archive, FishEngine::UUID & t)
+    static BinaryInputArchive & operator >> (BinaryInputArchive& archive, FishEngine::UUID & t)
     {
         //static_assert(sizeof(t) == 16, "Error");
         archive.LoadBinary(t.data, sizeof(t));
@@ -52,26 +80,6 @@ namespace FishEngine
         archive << boost::uuids::to_string(t);
         return archive;
     }
-
-    
-    /************************************************************************/
-    /* std::string                                                          */
-    /************************************************************************/
-    static OutputArchive & operator << (OutputArchive & archive, const std::string & str)
-    {
-        archive << str.size();
-        archive.SaveBinary(str.data(), str.size());
-        return archive;
-    }
-    
-    static InputArchive & operator >> (InputArchive & archive, std::string & str)
-    {
-        std::size_t size = 0;
-        archive >> size;
-        str.resize(size);
-        archive.LoadBinary(const_cast<char *>(str.data()), size);
-        return archive;
-    }
     
     
     /************************************************************************/
@@ -79,17 +87,19 @@ namespace FishEngine
     /************************************************************************/
     
     template<typename T, typename std::enable_if_t<std::is_base_of<Component, T>::value, int> = 0>
-    static OutputArchive & operator <<(OutputArchive& archive, const std::shared_ptr<T> & v)
+    static BinaryOutputArchive & operator <<(BinaryOutputArchive& archive, const std::shared_ptr<T> & v)
     {
         archive << v->GetGUID();
+		return archive;
     }
     
     template<typename T>
-    static void Deserialize(InputArchive& archive, std::shared_ptr<T> & v) {}
+    static void Deserialize(BinaryInputArchive& archive, std::shared_ptr<T> & v) {}
     
-    static OutputArchive & operator <<(OutputArchive& archive, const std::shared_ptr<Texture> & v)
+    static BinaryOutputArchive & operator <<(BinaryOutputArchive& archive, const std::shared_ptr<Texture> & v)
     {
         archive << v->GetGUID();
+		return archive;
     }
     
     /************************************************************************/
@@ -99,6 +109,11 @@ namespace FishEngine
     template<class Archive, typename T>
     static Archive & operator << ( Archive& archive, const std::weak_ptr<T> & v )
     {
+		auto t = v.lock();
+		if (t != nullptr)
+		{
+			archive << t->GetGUID();
+		}
         return archive;
     }
     
@@ -111,32 +126,10 @@ namespace FishEngine
     
     
     template<class T>
-    static OutputArchive & operator << (OutputArchive & archive, T * v) = delete;
+    static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, T * v) = delete;
     
     template<class T>
-    static InputArchive & operator >> (InputArchive & archive, T * t) = delete;
-    
-    
-    /************************************************************************/
-    /* Enums                                                                */
-    /************************************************************************/
-    template<class T, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
-    inline OutputArchive & operator << (OutputArchive& archive, T const & t)
-    {
-        //archive << static_cast<uint32_t>(t);
-        archive.SaveBinary(&t, sizeof(t));
-        return archive;
-    }
-    
-    template<class T, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
-    inline InputArchive & operator >> (InputArchive& archive, T & t)
-    {
-        //uint32_t temp;
-        //archive >> temp;
-        //t = static_cast<T>(temp);
-        archive.LoadBinary(&t, sizeof(t));
-        return archive;
-    }
+    static BinaryInputArchive & operator >> (BinaryInputArchive & archive, T * t) = delete;
 }
 
 #ifndef __REFLECTION_PARSER__

@@ -93,7 +93,6 @@ namespace FishEngine
         }
         
     private:
-        friend class Serialization;
         AvatarPtr m_avatar;
         void RecursivelyUpdate(const GameObjectPtr& go);
         //void RecursivelyUpdate2(const std::shared_ptr<GameObject>& go);

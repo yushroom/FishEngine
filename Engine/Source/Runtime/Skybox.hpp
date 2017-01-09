@@ -26,7 +26,6 @@ namespace FishEngine
         }
 
     private:
-        friend class Serialization;
         // The material used by the skybox.
         MaterialPtr m_material;
     };

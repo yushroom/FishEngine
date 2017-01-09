@@ -20,15 +20,19 @@ serialization_function_template_str = '''
 	template<typename Archive>
 	Archive & operator << ( Archive& archive, ${T} const & value )
 	{
+		prologue( archive, value );
 		${serialize_seqs}
-        return archive;
+		epilogue( archive, value );
+		return archive;
 	}
 
 	template<typename Archive>
 	Archive & operator >> ( Archive& archive, ${T} & value )
 	{
+		prologue( archive, value );
 		${deserialize_seqs}
-        return archive;
+		epilogue( archive, value );
+		return archive;
 	}
 '''
 serialization_function_template = Template(serialization_function_template_str)
@@ -39,6 +43,7 @@ skip_types = (
     'Vector4',
     'Color',
     'Quaternion',
+    'Transform',
     )
 
 def GenSerializationFunctions(classinfo):

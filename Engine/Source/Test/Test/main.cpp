@@ -1,4 +1,8 @@
 #if 1
+
+
+#elif
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -58,30 +62,42 @@
 using namespace std;
 
 template<typename T>
-void test(const T& t)
+void test_binary(const T& t)
 {
 	cout << "type: " << typeid(T).name() << endl;
-    {
-        std::cout << "Text[";
-        FishEngine::TextOutputArchive ar(std::cout);
-        ar << t;
-        std::cout << "]" << std::endl;
-    }
 	ostringstream ss;
-	FishEngine::OutputArchive bar(ss);
+	FishEngine::BinaryOutputArchive bar(ss);
 	bar << t;
 	istringstream s_in(ss.str());
-	FishEngine::InputArchive bin(s_in);
+	FishEngine::BinaryInputArchive bin(s_in);
 	T x;
 	bin >> x;
 	//assert(x == t);
-    
-    {
-        std::cout << "Text[";
-        FishEngine::TextOutputArchive bar(std::cout);
-        bar << x;
-        std::cout << "]" << std::endl;
-    }
+}
+
+template<typename T>
+void test_text(const T& t)
+{
+	cout << "type: " << typeid(T).name() << endl;
+	ostringstream ss;
+	FishEngine::TextOutputArchive bar(ss);
+	bar << t;
+	istringstream s_in(ss.str());
+	FishEngine::TextInputArchive bin(s_in);
+	T x;
+	bin >> x;
+	{
+		FishEngine::TextOutputArchive bar(std::cout);
+		bar << x;
+	}
+	//assert(x == t);
+}
+
+template<typename T>
+void test(const T& t)
+{
+	test_binary(t);
+	test_text(t);
 }
 
 
@@ -97,7 +113,8 @@ int main()
 	test(std::string("Hello World!"));
 	//test("Hello World!");
 	test(FishEngine::Vector3(1, 2, 3));
-    test(FishEngine::Transform());
+	test(FishEngine::LightType::Directional);
+	test(FishEngine::Transform());
 	return 0;
 }
 

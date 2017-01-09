@@ -20,7 +20,6 @@ namespace FishEngine
         static const TextureSampler& GetSampler(FilterMode filterMode, TextureWrapMode wrapMode);
 
     private:
-        friend class Serialization;
         friend class Texture;
         unsigned int m_nativeGLSampler = 0;
 
@@ -101,7 +100,6 @@ namespace FishEngine
         }
 
     protected:
-        friend class Serialization;
         uint32_t            m_height;
         uint32_t            m_width;
         
@@ -183,7 +181,6 @@ namespace FishEngine
         }
 
     private:
-        friend class Serialization;
         
         // The format of the pixel data in the texture (Read Only).
         TextureFormat m_format;
@@ -215,7 +212,6 @@ namespace FishEngine
         }
         
     private:
-        friend class Serialization;
         // The format of the pixel data in the texture (Read Only).
         TextureFormat m_format;
         uint32_t m_mipmapCount;

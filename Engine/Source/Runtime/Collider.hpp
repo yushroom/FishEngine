@@ -24,7 +24,6 @@ namespace FishEngine
         virtual void Start() override;
         
     protected:
-        friend class Serialization;
 
 		Meta(NonSerializable)
         RigidbodyPtr m_attachedRigidbody;

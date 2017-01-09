@@ -257,7 +257,7 @@ def internal_find_typerefs(node):
 
 def ExtractClasses(path):
     global classes
-    if True:
+    if False:
         if sys.platform == 'darwin':
             header_path = (
                 R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1',

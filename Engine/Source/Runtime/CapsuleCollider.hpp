@@ -19,7 +19,6 @@ namespace FishEngine
         virtual void OnDrawGizmosSelected() override;
         
     private:
-        friend class Serialization;
         friend class FishEditor::EditorGUI;
         Vector3 m_center = {0, 0, 0};
         int m_direction = 1; // The value can be 0, 1 or 2 corresponding to the X, Y and Z axes, respectively.

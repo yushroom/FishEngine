@@ -73,6 +73,10 @@ include_directories(./ThirdParty/nativefiledialog/src/include)
 ADD_SUBDIRECTORY(./ThirdParty/nativefiledialog)
 SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "ThirdParty")
 
+include_directories(./ThirdParty/yaml-cpp/include)
+ADD_SUBDIRECTORY(./ThirdParty/yaml-cpp)
+SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES FOLDER "ThirdParty")
+
 #set(GLEW_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glew-2.0.0/lib/Release/Win32/glew32.lib)
 #IF(NOT EXISTS ${GLEW_LIBRARIES})
 #    message(FATAL_ERROR "GLEW lib does not exist: ${GLEW_LIBRARIES}")

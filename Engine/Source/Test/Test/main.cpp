@@ -1,3 +1,4 @@
+#if 1
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -59,7 +60,13 @@ using namespace std;
 template<typename T>
 void test(const T& t)
 {
-	cout << typeid(T).name() << endl;
+	cout << "type: " << typeid(T).name() << endl;
+    {
+        std::cout << "Text[";
+        FishEngine::TextOutputArchive ar(std::cout);
+        ar << t;
+        std::cout << "]" << std::endl;
+    }
 	ostringstream ss;
 	FishEngine::OutputArchive bar(ss);
 	bar << t;
@@ -67,12 +74,14 @@ void test(const T& t)
 	FishEngine::InputArchive bin(s_in);
 	T x;
 	bin >> x;
-	assert(x == t);
-	//if (x != t)
-	//{
-	//	cout << "Error: " << t;
-	//	abort();
-	//}
+	//assert(x == t);
+    
+    {
+        std::cout << "Text[";
+        FishEngine::TextOutputArchive bar(std::cout);
+        bar << x;
+        std::cout << "]" << std::endl;
+    }
 }
 
 
@@ -88,5 +97,48 @@ int main()
 	test(std::string("Hello World!"));
 	//test("Hello World!");
 	test(FishEngine::Vector3(1, 2, 3));
+    test(FishEngine::Transform());
 	return 0;
 }
+
+#elif 0
+
+#include <cereal/cereal.hpp>
+#include <cereal/access.hpp>
+#include <cereal/archives/json.hpp>
+
+class Data
+{
+public:
+    Data(int x, float y, double z) : x(x), y(y), z(z) {}
+private:
+    int x;
+    float y;
+    double z;
+    
+    template<typename Archive>
+    friend void serialize(Archive & archive, Data & m);
+};
+
+template<class Archive>
+void serialize(Archive & archive, Data & m)
+{
+    archive( m.x, m.y, m.z );
+}
+
+
+int main()
+{
+    Data d(1, 2.0f, 3.0);
+    cereal::JSONOutputArchive ar( std::cout );
+    ar( d );
+    return 0;
+}
+
+#else
+
+int main()
+{
+}
+
+#endif

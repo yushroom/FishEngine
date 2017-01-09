@@ -17,32 +17,44 @@ serialization_template = Template(serialization_template_str)
 
 serialization_function_template_str = '''
 	// ${T}
-	template<>
-	void Serialization::Serialize(OutputArchive& archive, const ${T} & value)
+	template<typename Archive>
+	Archive & operator << ( Archive& archive, ${T} const & value )
 	{
 		${serialize_seqs}
+        return archive;
 	}
 
-	template<>
-	void Serialization::Deserialize(InputArchive& archive, ${T} & value)
+	template<typename Archive>
+	Archive & operator >> ( Archive& archive, ${T} & value )
 	{
 		${deserialize_seqs}
+        return archive;
 	}
 '''
 serialization_function_template = Template(serialization_function_template_str)
+
+skip_types = (
+    'Vector2',
+    'Vector3',
+    'Vector4',
+    'Color',
+    'Quaternion',
+    )
 
 def GenSerializationFunctions(classinfo):
     headers = []
     functions = []
     visited = set()
-    def register(classname):
-        if classname in visited:
-            return
-        c = classinfo[classname]
-        visited.add(classname)
+    # def register(classname):
+    #     if classname in visited:
+    #         return
+    #     c = classinfo[classname]
+    #     visited.add(classname)
 
     for key in classinfo.keys():
-        register(key)
+        #register(key)
+        if key in skip_types:
+            continue
         c = classinfo[key]
         headers.append(c['header_file'])
         serialize_seqs_list = [x for x in c['members'] if not x['NonSerializable']]
@@ -62,7 +74,8 @@ def GenSerializationFunctions(classinfo):
 
 #register_teamplate
 componentInheritance_template_str = '''
-static std::map<std::string, std::string> s_componentInheritance = {
+static std::map<std::string, std::string> s_componentInheritance =
+{
     ${pairs}
 };
 '''

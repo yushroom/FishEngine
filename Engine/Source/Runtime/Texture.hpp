@@ -7,7 +7,7 @@
 
 namespace FishEngine
 {
-    class TextureSampler
+    class Meta(NonSerializable) TextureSampler
     {
     public:
         TextureSampler() = default;

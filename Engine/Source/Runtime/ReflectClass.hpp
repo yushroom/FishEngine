@@ -11,39 +11,16 @@
 
 namespace FishEngine
 {
-    bool IsDerivedFrom(const std::string& className, const std::string& baseClassName);
+    bool IsDerivedFrom(const std::string& derivedClassName, const std::string& baseClassName);
 
     template<typename BaseClass>
-    bool IsSubClassOf(const std::string& className)
+    bool IsSubClassOf(const std::string& derivedClassName)
     {
-        return IsDerivedFrom(className, BaseClass::StaticClassName());
+        return IsDerivedFrom(derivedClassName, BaseClass::StaticClassName());
     }
 
-    static bool IsScript(const std::string& className)
+    inline bool IsScript(const std::string& derivedClassName)
     {
-        return IsDerivedFrom(className, "Script");
+        return IsDerivedFrom(derivedClassName, "Script");
     }
-
-#if 0
-    class Archive
-    {
-        template<typename T>
-        friend operator<<(Archive& archive, const T& value);
-
-        template<typename T>
-        friend operator>>(Archive& archive, T& value);
-    };
-    
-    template<typename T>
-    static void Serialize(Archive& archive, const T& value);
-    
-    template<typename T>
-    static void Serialize(Archive& archive, const std::shared_ptr<T>& value);
-
-    template<typename T>
-    static void Deserialize(Archive& archive, T& value);
-
-    template<typename T>
-    static void Deserialize(Archive& archive, std::shared_ptr<T>& value);
-#endif
 }

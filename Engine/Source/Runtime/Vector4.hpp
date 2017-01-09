@@ -168,6 +168,24 @@ private:
     bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z) || isnan(w); }
 };
     
+    /************************************************************************/
+    /* Vector4 Serialization                                                */
+    /************************************************************************/
+    template<class Archive>
+    static Archive & operator << (Archive& archive, Vector4 const & t)
+    {
+        archive << t.x << t.y << t.z << t.w;
+        return archive;
+    }
+    
+    template<class Archive>
+    static Archive & operator >> (Archive& archive, Vector4 & t)
+    {
+        archive >> t.x >> t.y >> t.z >> t.w;
+        return archive;
+    }
+
+    
 } // namespace FishEngine
 
 #endif // Vector4_hpp

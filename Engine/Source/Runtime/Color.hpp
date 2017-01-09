@@ -127,6 +127,25 @@ namespace FishEngine
     private:
         static void RGBToHSVHelper(float offset, float dominantcolor, float colorone, float colortwo, float* H, float* S, float* V);
     };
+    
+    
+    /************************************************************************/
+    /* Color Serialization                                                  */
+    /************************************************************************/
+    template<class Archive>
+    static Archive & operator << (Archive& archive, Color const & t)
+    {
+        archive << t.r << t.g << t.b;
+        return archive;
+    }
+    
+    template<class Archive>
+    static Archive & operator >> (Archive& archive, Color & t)
+    {
+        archive >> t.r >> t.g >> t.b;
+        return archive;
+    }
+
 }
 
 

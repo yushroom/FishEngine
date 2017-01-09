@@ -3,6 +3,7 @@
 
 #include "FishEngine.hpp"
 #include "Vector3.hpp"
+#include "Macro.hpp"
 
 namespace FishEngine
 {
@@ -115,7 +116,7 @@ namespace FishEngine
         }
 
     private:
-		friend class Serialization;
+        InjectSerializationFunctions(Bounds);
         Vector3 m_center;
         Vector3 m_extents;
     };

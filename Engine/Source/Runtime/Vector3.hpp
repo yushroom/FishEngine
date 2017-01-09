@@ -238,6 +238,25 @@ public: // Static
 private:
     bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z); }
 };
+    
+    
+    /************************************************************************/
+    /* Vector3 Serialization                                                */
+    /************************************************************************/
+    template<class Archive>
+    static Archive & operator << (Archive& archive, Vector3 const & t)
+    {
+        archive << t.x << t.y << t.z;
+        return archive;
+    }
+    
+    template<class Archive>
+    static Archive & operator >> (Archive& archive, Vector3 & t)
+    {
+        archive >> t.x >> t.y >> t.z;
+        return archive;
+    }
+
 }
 
 #endif // Vector3_hpp

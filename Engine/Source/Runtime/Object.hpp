@@ -4,6 +4,7 @@
 #include "FishEngine.hpp"
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include "Macro.hpp"
 
 namespace FishEngine
 {
@@ -15,15 +16,28 @@ namespace FishEngine
         Object();
         virtual ~Object() = 0;
 
-        static std::string StaticClassName()
+        static const std::string StaticClassName()
         {
             return "Object";
         }
 
-        virtual std::string ClassName() const
+        virtual const std::string ClassName() const
         {
             return "Object";
         }
+        
+        UUID GetGUID() const
+        {
+            return m_uuid;
+        }
+        
+        // serialize
+        template <typename Archive>
+        friend Archive & operator << (Archive & archive, Object const & t);
+        
+        // deserialize
+        template <typename Archive>
+        friend Archive & operator >> (Archive & archive, Object & t);
         
         // The name of the object.
         virtual std::string name() const { return m_name; }
@@ -51,13 +65,5 @@ namespace FishEngine
         friend class Serialization;
     };
 }
-
-#define InjectClassName(name) \
-    static std::string StaticClassName() { \
-        return #name; \
-    } \
-    virtual std::string ClassName() const override { \
-        return StaticClassName(); \
-    }
 
 #endif // Object_hpp

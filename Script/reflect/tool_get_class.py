@@ -32,7 +32,7 @@ skip_cursor_types = (clang.cindex.CursorKind.ENUM_DECL,
 skip_class_internal_type = (clang.cindex.CursorKind.UNEXPOSED_DECL,
     clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL,
     clang.cindex.CursorKind.TYPEDEF_DECL,
-    clang.cindex.CursorKind.FUNCTION_TEMPLATE,
+    #clang.cindex.CursorKind.FUNCTION_TEMPLATE,
     clang.cindex.CursorKind.CONSTRUCTOR,
     clang.cindex.CursorKind.DESTRUCTOR,
     clang.cindex.CursorKind.ENUM_DECL,
@@ -120,7 +120,7 @@ def internal_parse_class(node):
     static_classname_injected = False
 
     for child in node.get_children():
-        # print('\t', child.kind, child.spelling, child.type.spelling)
+        print('\t', child.kind, child.spelling, child.type.spelling)
         if child.kind == clang.cindex.CursorKind.CXX_BASE_SPECIFIER:
             base_class = next(child.get_children()).spelling
             base_class = base_class.split(' ')[-1].split('::')[-1]
@@ -133,12 +133,14 @@ def internal_parse_class(node):
             classes[class_name]['parent'] = base_class
 
         elif child.kind == clang.cindex.CursorKind.CXX_METHOD:
-            #print('\t', 'method', child.spelling)
+            print('\t', 'method', child.spelling)
             if child.spelling == "ClassName":
                 classname_injected = True
             elif child.spelling == "StaticClassName":
                 static_classname_injected = True
             pass
+        elif child.kind == clang.cindex.CursorKind.FUNCTION_TEMPLATE:
+            print('\t', 'template', child.spelling)
 
         # elif child.kind == clang.cindex.CursorKind.UNION_DECL:
         #     ''' eg. Vector4, Color...
@@ -158,7 +160,8 @@ def internal_parse_class(node):
         elif child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
             #print('\t', child.type.spelling, child.spelling)
             if child.spelling not in all_attributes:
-                raise UnknownAttributeError()
+                msg = 'Unknown Attribute ' + child.spelling  + 'for class ' + class_name
+                raise UnknownAttributeError(msg)
             if child.spelling == 'DisallowMultipleComponent':
                 classes[class_name]['is_unique'] = True
             elif child.spelling == 'NonSerializable':
@@ -207,10 +210,13 @@ def internal_parse_class(node):
             members.append(member)
             # else:
             #     print("Unkown type,", child.type.spelling)
-
-        elif child.kind in skip_class_internal_type:
-            pass
+        elif child.kind == clang.cindex.CursorKind.UNEXPOSED_DECL:
+            for c in child.get_children():
+                print('\t\t', c.spelling)
+        #elif child.kind in skip_class_internal_type:
+        #    pass
         else:
+            print('\t', child.spelling)
             pass
 
     if internal_is_derived_from_Object(class_name):
@@ -251,23 +257,42 @@ def internal_find_typerefs(node):
 
 def ExtractClasses(path):
     global classes
-    #os.system(R'clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
-    header_path = (
-        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
-        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
-        R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\include',
-        R'C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt',
-        R'C:\Program Files (x86)\Windows Kits\8.1\Include\um',
-        R'C:\Program Files (x86)\Windows Kits\8.1\Include\shared',
-        R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
-        R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
-        R'D:\program\FishEngine/Engine/ThirdParty/glfw-3.2.1/include',
-        R'D:\program\FishEngine/Engine/ThirdParty/',
-        R'D:\program\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
-        R'D:\program\FishEngine\Engine\ThirdParty\glew-2.0.0\include',
-        );
-    path = ' '.join(['-I"{0}"'.format(x) for x in header_path])
-    assert(0 == os.system(R'D:\Library\LLVM\3.9.1_win32\bin\clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + path + ' temp/AllHeaders.hpp -o temp/AllHeaders.ast'))
+    if True:
+        if sys.platform == 'darwin':
+            header_path = (
+                R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1',
+                R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include',
+                R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
+                R'/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include',
+                R'/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+                )
+            clang_path = '/usr/local/opt/llvm/bin/clang'
+            #result = os.system(clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
+        else:
+            header_path = (
+                R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
+                R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include',
+                R'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\include',
+                R'C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt',
+                R'C:\Program Files (x86)\Windows Kits\8.1\Include\um',
+                R'C:\Program Files (x86)\Windows Kits\8.1\Include\shared',
+                R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
+                R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
+                R'D:\program\FishEngine/Engine/ThirdParty/glfw-3.2.1/include',
+                R'D:\program\FishEngine/Engine/ThirdParty/',
+                R'D:\program\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+                R'D:\program\FishEngine\Engine\ThirdParty\glew-2.0.0\include',
+                );
+            clang_path = R'D:\Library\LLVM\3.9.1_win32\bin\clang'
+        sys_headers_path = ' '.join(['-I"{0}"'.format(x) for x in header_path])
+        cmd = clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + sys_headers_path + ' temp/AllHeaders.hpp -o temp/AllHeaders.ast'
+        print(cmd)
+        result = os.system(cmd)
+        assert(result == 0)
     tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
     return classes

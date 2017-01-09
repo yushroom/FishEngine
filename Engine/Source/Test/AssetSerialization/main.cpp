@@ -1,5 +1,7 @@
 #include <TextureImporter.hpp>
+#include <iostream>
 
+using namespace std;
 using namespace FishEngine;
 
 void GenerateMetaFiles(FishEngine::Path const & path)

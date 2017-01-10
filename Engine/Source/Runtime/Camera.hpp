@@ -150,11 +150,15 @@ namespace FishEngine
         CameraType  m_cameraType = CameraType::Game;
         bool        m_orthographic = false;
 
+		Meta(NonSerializable)
         mutable Matrix4x4 m_projectMatrix;
 
         // temp
         // https://docs.unity3d.com/Manual/SceneViewNavigation.html
+		Meta(NonSerializable)
         mutable Vector3 m_focusPoint{ 0, 0, 0 };
+
+
         void FrameSelected(GameObjectPtr& selected);
 
         static CameraPtr m_mainCamera;

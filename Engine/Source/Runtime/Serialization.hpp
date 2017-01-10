@@ -18,103 +18,61 @@
 
 namespace FishEngine
 {
+	template <class T>
+	class Meta(NonSerializable) SizeTag
+	{
+	private:
+		// Store a reference if passed an lvalue reference, otherwise
+		// make a copy of the data
+		using Type = std::conditional_t<std::is_lvalue_reference<T>::value, T, std::decay_t<T>>;
+
+		SizeTag & operator=(SizeTag const &) = delete;
+
+	public:
+		SizeTag(T && sz) : size(std::forward<T>(sz)) {}
+
+		Type size;
+	};
+
+	template <class T>
+	inline SizeTag<T> make_size_tag(T && sz)
+	{
+		return{ std::forward<T>(sz) };
+	}
+
     class Meta(NonSerializable) Serialization
     {
     public:
         Serialization() = delete;
         
-        void SerializeScene(BinaryOutputArchive& archive);
-
+        //void SerializeScene(BinaryOutputArchive& archive);
     };
     
-//    template<class Archive, class T>
-//    Archive & operator << (Archive & archive, NameValuePair<T> const & nvp)
-//    {
-//        archive << nvp.name << nvp.value;
-//        return archive;
-//    }
-
-
-
-	/************************************************************************/
-	/* std::string                                                          */
-	/************************************************************************/
-	static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, const std::string & str)
+	template<class Archive, class T>
+	void Save (Archive & archive, NameValuePair<T> const & nvp)
 	{
-		archive << str.size();
-		archive.SaveBinary(str.data(), str.size());
-		return archive;
+		archive << nvp.name << nvp.value;
 	}
 
-	static BinaryInputArchive & operator >> (BinaryInputArchive & archive, std::string & str)
-	{
-		std::size_t size = 0;
-		archive >> size;
-		str.resize(size);
-		archive.LoadBinary(const_cast<char *>(str.data()), size);
-		return archive;
-	}
-
-	TextOutputArchive & operator << (TextOutputArchive & archive, std::string const & t)
-	{
-		archive.Save(t);
-		return archive;
-	}
-
-	TextInputArchive & operator >> (TextInputArchive & archive, std::string & t)
-	{
-		archive.Load(t);
-		return archive;
-	}
-    
-    /************************************************************************/
-    /* UUID                                                                 */
-    /************************************************************************/
-    static BinaryOutputArchive & operator << ( BinaryOutputArchive& archive, FishEngine::UUID const & t )
-    {
-        //static_assert(sizeof(t) == 16, "Error");
-        archive.SaveBinary(t.data, sizeof(t));
-        return archive;
-    }
-    
-    static BinaryInputArchive & operator >> (BinaryInputArchive& archive, FishEngine::UUID & t)
-    {
-        //static_assert(sizeof(t) == 16, "Error");
-        archive.LoadBinary(t.data, sizeof(t));
-        return archive;
-    }
-    
-    static TextOutputArchive & operator << ( TextOutputArchive & archive, FishEngine::UUID const & t)
-    {
-        archive << boost::uuids::to_string(t);
-        return archive;
-    }
-    
-    
     /************************************************************************/
     /* std::shared_ptr                                                      */
     /************************************************************************/
-    
-    template<typename T, typename std::enable_if_t<std::is_base_of<Component, T>::value, int> = 0>
-    static BinaryOutputArchive & operator <<(BinaryOutputArchive& archive, const std::shared_ptr<T> & v)
+	template<class Archive, typename T>
+    static void Save ( Archive& archive, std::shared_ptr<T> const & v )
     {
-        archive << v->GetGUID();
-		return archive;
-    }
-    
-    template<typename T>
-    static void Deserialize(BinaryInputArchive& archive, std::shared_ptr<T> & v) {}
-    
-    static BinaryOutputArchive & operator <<(BinaryOutputArchive& archive, const std::shared_ptr<Texture> & v)
-    {
-        archive << v->GetGUID();
-		return archive;
+		if (t != nullptr)
+		{
+			archive << t->GetGUID();
+		}
+		else
+		{
+			archive << nullptr;
+		}
     }
     
     /************************************************************************/
     /* std::weak_ptr                                                        */
     /************************************************************************/
-    
     template<class Archive, typename T>
     inline void Save ( Archive& archive, const std::weak_ptr<T> & v )
     {
@@ -122,6 +80,10 @@ namespace FishEngine
 		if (t != nullptr)
 		{
 			archive << t->GetGUID();
+		}
+		else
+		{
+			archive << nullptr;
 		}
     }
     
@@ -131,58 +93,19 @@ namespace FishEngine
         return archive;
     }
 
-    
-    template<class T>
-    static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, T * v) = delete;
-    
-    template<class T>
-    static BinaryInputArchive & operator >> (BinaryInputArchive & archive, T * t) = delete;
-    
-//    /************************************************************************/
-//    /* Vector3 Serialization                                                */
-//    /************************************************************************/
-//    template<class Archive>
-//    inline void Save (Archive& archive, Vector3 const & t)
-//    {
-//        archive << make_nvp("x", t.x) << make_nvp("y", t.y) << make_nvp("z", t.z);
-//    }
-//    
-//    template<class Archive>
-//    inline void Load (Archive& archive, Vector3 & t)
-//    {
-//        archive >> t.x >> t.y >> t.z;
-//    }
-//    
-//    /************************************************************************/
-//    /* Vector4 Serialization                                                */
-//    /************************************************************************/
-//    template<class Archive>
-//    static Archive & operator << (Archive& archive, Vector4 const & t)
-//    {
-//        archive << make_nvp("x", t.x) << make_nvp("y", t.y) << make_nvp("z", t.z) << make_nvp("w", t.w);
-//        return archive;
-//    }
-//    
-//    template<class Archive>
-//    static Archive & operator >> (Archive& archive, Vector4 & t)
-//    {
-//        archive >> t.x >> t.y >> t.z >> t.w;
-//        return archive;
-//    }
-    
-    
-//    // Quaternion
-//    template<typename Archive>
-//    void Save ( Archive& archive, Quaternion const & q )
-//    {
-//        archive << q.x << q.y << q.z << q.w;
-//    }
-//    
-//    template<typename Archive>
-//    void Load ( Archive& archive, Quaternion & q )
-//    {
-//        archive >> q.x >> q.y >> q.z >> q.w;
-//    }
+	template<class Archive>
+	static void DynamicSerializeObject(Archive archive, std::shared_ptr<Object> obj)
+	{
+		auto name = obj->ClassName();
+		if (name == "GameObject")
+		{
+			archive << *dynamic_pointer_cast<GameObject>(obj);
+		}
+		else if (name == "Transform")
+		{
+			archive << *dynamic_pointer_cast<Transform>(obj);
+		}
+	}
 }
 
 #ifndef __REFLECTION_PARSER__

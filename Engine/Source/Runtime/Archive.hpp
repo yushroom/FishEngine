@@ -10,6 +10,3 @@ namespace FishEngine
 	inline void epilogue(Archive& arhive, T const & t)
 	{ }
 }
-
-#include "Serialization/archives/binary.hpp"
-#include "Serialization/archives/text.hpp"

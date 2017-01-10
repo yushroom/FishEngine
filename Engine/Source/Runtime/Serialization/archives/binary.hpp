@@ -61,10 +61,54 @@ namespace FishEngine
 		return archive;
 	}
 
+
 	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value || std::is_enum<T>::value, int> = 0>
 	BinaryInputArchive & operator >> (BinaryInputArchive & archive, T & t)
 	{
 		archive.LoadBinary(std::addressof(t), sizeof(t));
 		return archive;
 	}
+
+	/************************************************************************/
+	/* std::string                                                          */
+	/************************************************************************/
+	static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, const std::string & str)
+	{
+		archive << str.size();
+		archive.SaveBinary(str.data(), str.size());
+		return archive;
+	}
+
+	static BinaryInputArchive & operator >> (BinaryInputArchive & archive, std::string & str)
+	{
+		std::size_t size = 0;
+		archive >> size;
+		str.resize(size);
+		archive.LoadBinary(const_cast<char *>(str.data()), size);
+		return archive;
+	}
+
+	/************************************************************************/
+	/* UUID                                                                 */
+	/************************************************************************/
+	static BinaryOutputArchive & operator << (BinaryOutputArchive& archive, FishEngine::UUID const & t)
+	{
+		//static_assert(sizeof(t) == 16, "Error");
+		archive.SaveBinary(t.data, sizeof(t));
+		return archive;
+	}
+
+	static BinaryInputArchive & operator >> (BinaryInputArchive& archive, FishEngine::UUID & t)
+	{
+		//static_assert(sizeof(t) == 16, "Error");
+		archive.LoadBinary(t.data, sizeof(t));
+		return archive;
+	}
+
+	template<class T>
+	static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, T * v) = delete;
+
+	template<class T>
+	static BinaryInputArchive & operator >> (BinaryInputArchive & archive, T * t) = delete;
+
 }

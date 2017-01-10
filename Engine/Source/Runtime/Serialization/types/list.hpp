@@ -5,7 +5,7 @@ namespace FishEngine
     template<class Archive, typename T>
     inline void Save (Archive& archive, std::list<T> const & v)
     {
-        archive << v.size();
+        archive << make_size_tag(v.size());
         for (auto const & i : v)
             archive << i;
     }
@@ -14,7 +14,7 @@ namespace FishEngine
     static Archive & operator >> (Archive& archive, std::list<T> & v)
     {
         std::size_t size;
-        archive >> size;
+        archive >> make_size_tag(size);
         v.resize(size);
         for (auto & i : v)
             archive >> i;

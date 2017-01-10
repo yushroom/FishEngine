@@ -23,4 +23,9 @@ namespace FishEngine
     {
         return IsDerivedFrom(derivedClassName, "Script");
     }
+
+	inline bool IsComponent(const std::string& derivedClassName)
+	{
+		return IsDerivedFrom(derivedClassName, "Component");
+	}
 }

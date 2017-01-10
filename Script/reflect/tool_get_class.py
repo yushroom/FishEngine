@@ -257,7 +257,7 @@ def internal_find_typerefs(node):
 
 def ExtractClasses(path):
     global classes
-    if False:
+    if True:
         if sys.platform == 'darwin':
             header_path = (
                 R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1',
@@ -298,10 +298,7 @@ def ExtractClasses(path):
         assert(result == 0)
     tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
-    return classes
 
-if __name__ == "__main__":
-    classes = ExtractClasses("temp/AllHeaders.hpp")
     for e in ('x', 'y'):
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['Vector2']['members'].append(member)
@@ -315,6 +312,11 @@ if __name__ == "__main__":
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['Vector4']['members'].append(member)
         classes['Quaternion']['members'].append(member)
+
+    return classes
+
+if __name__ == "__main__":
+    classes = ExtractClasses("temp/AllHeaders.hpp")
     #print(classes)
     #print(classes['Object'])
     #print(classes['Color'])

@@ -93,4 +93,29 @@ namespace FishEngine
 		t = static_cast<T>(e);
 		return archive;
 	}
+
+	/************************************************************************/
+	/* std::string                                                          */
+	/************************************************************************/
+
+	TextOutputArchive & operator << (TextOutputArchive & archive, std::string const & t)
+	{
+		archive.Save(t);
+		return archive;
+	}
+
+	TextInputArchive & operator >> (TextInputArchive & archive, std::string & t)
+	{
+		archive.Load(t);
+		return archive;
+	}
+
+	/************************************************************************/
+	/* UUID                                                                 */
+	/************************************************************************/
+	static TextOutputArchive & operator << (TextOutputArchive & archive, FishEngine::UUID const & t)
+	{
+		archive << boost::uuids::to_string(t);
+		return archive;
+	}
 }

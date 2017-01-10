@@ -31,13 +31,7 @@ namespace FishEngine
             return m_uuid;
         }
         
-        // serialize
-        template <typename Archive>
-        friend Archive & operator << (Archive & archive, Object const & t);
-        
-        // deserialize
-        template <typename Archive>
-        friend Archive & operator >> (Archive & archive, Object & t);
+        InjectSerializationFunctions(Object);
         
         // The name of the object.
         virtual std::string name() const { return m_name; }

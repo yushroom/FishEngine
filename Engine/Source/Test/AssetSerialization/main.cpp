@@ -36,6 +36,29 @@ int main()
 
 namespace FishEngine
 {
+    static YAML::Emitter & operator << (YAML::Emitter& archive, FishEngine::UUID const & t)
+    {
+        //static_assert(sizeof(t) == 16, "Error");
+        archive << boost::uuids::to_string(t);
+        return archive;
+    }
+    
+    template<class T, class B>
+    YAML::Emitter & operator << (YAML::Emitter& out, std::pair<T, B> const & v)
+    {
+    	//out << YAML::Flow;
+    	//out << YAML::Key << v.first << YAML::Value << v.second;
+    	out << v.first << v.second;
+    	return out;
+    }
+    
+    template<typename T>
+    struct emittable : std::conditional_t<
+        std::is_arithmetic<T>::value,
+        std::true_type, std::false_type>
+    {};
+    
+    
 	class YAMLOutputArchive
 	{
 	public:
@@ -47,92 +70,124 @@ namespace FishEngine
 		YAMLOutputArchive& operator = (YAMLOutputArchive const &) = delete;
 
 		~YAMLOutputArchive() noexcept = default;
+        
 
-		template<typename T>
-		void Save (T const & t)
+        template<typename T, std::enable_if_t<!emittable<T>::value, int> = 0>
+		YAMLOutputArchive & operator << (T const & t)
 		{
-			m_emitter << YAML::Flow;
-			m_emitter << YAML::BeginMap;
-			m_emitter << t;
-			m_emitter << YAML::EndMap;
+            prologue(*this, t);
+            Save(*this, t);
+            epilogue(*this, t);
+            return *this;
 		}
+        
+        template<typename T, std::enable_if_t<emittable<T>::value, int> = 0>
+        YAMLOutputArchive & operator << (T const & t)
+        {
+            m_emitter << t;
+            return *this;
+        }
+        
+        
+        YAMLOutputArchive & operator << (std::string const & t)
+        {
+            m_emitter << t;
+            return *this;
+        }
 
-	private:
+        YAMLOutputArchive & operator << (const char* t)
+        {
+            m_emitter << t;
+            return *this;
+        }
+
+//	private:
+//        //template <typename T>
+//        template <class T>
+//        friend inline void prologue(YAMLOutputArchive & archive, T const & t);
+//        
+//        template <class T>
+//        friend inline void epilogue(YAMLOutputArchive& archive, T const & t);
+        
 		YAML::Emitter & m_emitter;
 	};
+    
+    template <class T>
+    inline void Save (YAMLOutputArchive & archive, std::weak_ptr<T> const & t)
+    {
+        auto spt = t.lock();
+        archive << "fileID";
+        if (spt == nullptr)
+            archive << 0;
+        else
+            archive << spt->GetGUID();
+    }
+    
+    template <class T>
+    inline void Save (YAMLOutputArchive & archive, std::list<T> const & t)
+    {
+        for (auto & x : t)
+            archive << x;
+    }
 
-	/************************************************************************/
-	/* arithmetic                                                           */
-	/************************************************************************/
-	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-	YAMLOutputArchive & operator << (YAMLOutputArchive & archive, T const & t)
-	{
-		archive.Save(t);
-		return archive;
-	}
-
+    
 
 	/************************************************************************/
 	/* UUID                                                                 */
 	/************************************************************************/
 	YAMLOutputArchive & operator << (YAMLOutputArchive & archive, FishEngine::UUID const & t)
 	{
-		archive.Save(t);
+		//archive.Save(t);
 		return archive;
 	}
+    
+    
+    template<class T, class B>
+    YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::pair<T, B> const & v)
+    {
+        archive << v.first << v.second;
+        return archive;
+    }
+    
+    //! delete it
+    template<class T>
+    YAMLOutputArchive & operator << (YAMLOutputArchive & archive, NameValuePair<T> const & nvp)
+    {
+        archive << nvp.name << nvp.value;
+        return archive;
+    }
 
-	static YAML::Emitter & operator << (YAML::Emitter& archive, FishEngine::UUID const & t)
-	{
-		//static_assert(sizeof(t) == 16, "Error");
-		archive << boost::uuids::to_string(t);
-		return archive;
-	}
-
-	template <class T>
-	inline void prologue(YAML::Emitter& archive, T const & t)
-	{
-		archive << YAML::Flow;
-		archive << YAML::BeginMap;
-	}
-
-	template <class T>
-	inline void epilogue(YAML::Emitter& archive, T const & t)
-	{
-		archive << YAML::EndMap;
-	}
-
-
-
-	//inline void prologue(YAML::Emitter& archive, Vector3 const & t)
-	//{
-	//	archive << YAML::Flow;
-	//	archive << YAML::BeginMap;
-	//}
-
-	//inline void epilogue(YAML::Emitter& archive, Vector3 const & t)
-	//{
-	//	archive << YAML::EndMap;
-	//}
+    
+    template <class T>
+    inline void prologue(YAMLOutputArchive & archive, T const & t)
+    {
+        archive.m_emitter << YAML::Flow;
+        archive.m_emitter << YAML::BeginMap;
+    }
+    
+    template <class T>
+    inline void epilogue(YAMLOutputArchive& archive, T const & t)
+    {
+        archive.m_emitter << YAML::EndMap;
+    }
+    
+    template <class T>
+    inline void prologue(YAMLOutputArchive & archive, std::list<T> const & t)
+    {
+        archive.m_emitter << YAML::Flow;
+        archive.m_emitter << YAML::BeginSeq;
+    }
+    
+    template <class T>
+    inline void epilogue(YAMLOutputArchive& archive, std::list<T> const & t)
+    {
+        archive.m_emitter << YAML::EndSeq;
+    }
 }
 
 
 using namespace FishEngine;
 
-//template<class T, class B>
-//YAML::Emitter & operator << (YAML::Emitter& out, std::pair<T, B> const & v)
-//{
-//	//out << YAML::Flow;
-//	//out << YAML::Key << v.first << YAML::Value << v.second;
-//	out << v.first << v.second;
-//	return out;
-//}
-
-//YAML::Emitter & operator << (YAML::Emitter& out, Vector3 const & v)
-//{
-//	out << YAML::Flow;
-//	out << YAML::BeginMap << std::make_pair("x", v.x) << std::make_pair("y", v.y) << std::make_pair("z", v.z) << YAML::EndMap;
-//	return out;
-//}
 
 int main()
 {
@@ -140,7 +195,7 @@ int main()
 	YAMLOutputArchive archive(emitter);
 	archive << Vector3(1, 2, 3);
 	archive << Transform();
-	std::cout << emitter.c_str();
+    std::cout << emitter.c_str() << std::endl;
 
 	return 0;
 }

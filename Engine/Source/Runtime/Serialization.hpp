@@ -9,6 +9,7 @@
 
 #include "Serialization/types/map.hpp"
 #include "Serialization/types/list.hpp"
+#include "Serialization/NameValuePair.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -25,6 +26,14 @@ namespace FishEngine
         void SerializeScene(BinaryOutputArchive& archive);
 
     };
+    
+//    template<class Archive, class T>
+//    Archive & operator << (Archive & archive, NameValuePair<T> const & nvp)
+//    {
+//        archive << nvp.name << nvp.value;
+//        return archive;
+//    }
+
 
 
 	/************************************************************************/
@@ -107,14 +116,13 @@ namespace FishEngine
     /************************************************************************/
     
     template<class Archive, typename T>
-    static Archive & operator << ( Archive& archive, const std::weak_ptr<T> & v )
+    inline void Save ( Archive& archive, const std::weak_ptr<T> & v )
     {
 		auto t = v.lock();
 		if (t != nullptr)
 		{
 			archive << t->GetGUID();
 		}
-        return archive;
     }
     
     template<class Archive, typename T>
@@ -124,12 +132,57 @@ namespace FishEngine
     }
 
     
-    
     template<class T>
     static BinaryOutputArchive & operator << (BinaryOutputArchive & archive, T * v) = delete;
     
     template<class T>
     static BinaryInputArchive & operator >> (BinaryInputArchive & archive, T * t) = delete;
+    
+//    /************************************************************************/
+//    /* Vector3 Serialization                                                */
+//    /************************************************************************/
+//    template<class Archive>
+//    inline void Save (Archive& archive, Vector3 const & t)
+//    {
+//        archive << make_nvp("x", t.x) << make_nvp("y", t.y) << make_nvp("z", t.z);
+//    }
+//    
+//    template<class Archive>
+//    inline void Load (Archive& archive, Vector3 & t)
+//    {
+//        archive >> t.x >> t.y >> t.z;
+//    }
+//    
+//    /************************************************************************/
+//    /* Vector4 Serialization                                                */
+//    /************************************************************************/
+//    template<class Archive>
+//    static Archive & operator << (Archive& archive, Vector4 const & t)
+//    {
+//        archive << make_nvp("x", t.x) << make_nvp("y", t.y) << make_nvp("z", t.z) << make_nvp("w", t.w);
+//        return archive;
+//    }
+//    
+//    template<class Archive>
+//    static Archive & operator >> (Archive& archive, Vector4 & t)
+//    {
+//        archive >> t.x >> t.y >> t.z >> t.w;
+//        return archive;
+//    }
+    
+    
+//    // Quaternion
+//    template<typename Archive>
+//    void Save ( Archive& archive, Quaternion const & q )
+//    {
+//        archive << q.x << q.y << q.z << q.w;
+//    }
+//    
+//    template<typename Archive>
+//    void Load ( Archive& archive, Quaternion & q )
+//    {
+//        archive >> q.x >> q.y >> q.z >> q.w;
+//    }
 }
 
 #ifndef __REFLECTION_PARSER__

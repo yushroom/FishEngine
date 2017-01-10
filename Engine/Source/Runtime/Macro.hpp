@@ -1,11 +1,18 @@
 #pragma once
 
+//#define InjectSerializationFunctions(T) \
+//    template <typename Archive> \
+//    friend Archive & operator << (Archive & archive, T const & t); \
+//    \
+//    template <typename Archive> \
+//    friend Archive & operator >> (Archive & archive, T & t);
+
 #define InjectSerializationFunctions(T) \
     template <typename Archive> \
-    friend Archive & operator << (Archive & archive, T const & t); \
+    friend void Save (Archive & archive, T const & t); \
     \
     template <typename Archive> \
-    friend Archive & operator >> (Archive & archive, T & t);
+    friend void Load (Archive & archive, T & t);
 
 #define InjectClassName(T) \
     static const std::string StaticClassName() { return #T; }  \

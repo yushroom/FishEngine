@@ -293,12 +293,28 @@ def ExtractClasses(path):
         print(cmd)
         result = os.system(cmd)
         assert(result == 0)
+    else:
+        result = os.system(R'clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
+        assert(result == 0)
     tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
     return classes
 
 if __name__ == "__main__":
     classes = ExtractClasses("temp/AllHeaders.hpp")
+    for e in ('x', 'y'):
+        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        classes['Vector2']['members'].append(member)
+    for e in ('x', 'y', 'z'):
+        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        classes['Vector3']['members'].append(member)
+    for e in ('r', 'g', 'b'):
+        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        classes['Color']['members'].append(member)
+    for e in ('x', 'y', 'z', 'w'):
+        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        classes['Vector4']['members'].append(member)
+        classes['Quaternion']['members'].append(member)
     #print(classes)
     #print(classes['Object'])
     #print(classes['Color'])

@@ -1,5 +1,124 @@
 #if 1
 
+#include <iostream>
+
+using namespace std;
+
+class A
+{
+public:
+    A(int x, float y, double z) : x(x), y(y), z(z)
+    {
+        
+    }
+    
+private:
+    template<typename T>
+    friend void Save(T & ar, A const & v);
+    
+    int x;
+    float y;
+    double z;
+};
+
+class Archive
+{
+public:
+    template<typename T>
+    Archive & operator << (T const & t)
+    {
+        std::cout << t;
+        return *this;
+    }
+};
+
+template<typename T>
+void Save(T & ar, A const & v)
+{
+    ar << v.x << v.y << v.z;
+}
+
+int main()
+{
+//    A a(1, 2.0f, 3.0);
+//    Archive ar;
+//    Save(ar, a);
+    //cout << std::is_function<decltype(Save(Archive, A const & v))>::value;
+    return 0;
+}
+
+#elif 0
+#include "FishEngine.hpp"
+
+#define CEREAL_NOEXCEPT noexcept
+
+namespace FishEngine
+{
+    class OutputArchiveBase
+    {
+    public:
+        OutputArchiveBase() = default;
+        OutputArchiveBase( OutputArchiveBase && ) CEREAL_NOEXCEPT {}
+        OutputArchiveBase & operator=( OutputArchiveBase && ) CEREAL_NOEXCEPT { return *this; }
+        virtual ~OutputArchiveBase() CEREAL_NOEXCEPT = default;
+        
+    private:
+        virtual void rtti() {}
+    };
+    
+    template<class ArchiveType>
+    class OutputArchive : public OutputArchiveBase
+    {
+    public:
+        //! Construct the output archive
+        /*! @param derived A pointer to the derived ArchiveType (pass this from the derived archive) */
+        OutputArchive(ArchiveType * const derived) : self(derived), itsCurrentPointerId(1), itsCurrentPolymorphicTypeId(1)
+        { }
+        
+        OutputArchive & operator=( OutputArchive const & ) = delete;
+        
+        //! Serializes all passed in data
+        /*! This is the primary interface for serializing data with an archive */
+        template <class ... Types> inline
+        ArchiveType & operator()( Types && ... args )
+        {
+            self->process( std::forward<Types>( args )... );
+            return *self;
+        }
+        
+        template <class T> inline
+        ArchiveType & operator&( T && arg )
+        {
+            self->process( std::forward<T>( arg ) );
+            return *self;
+        }
+        
+        template <class T> inline
+        ArchiveType & operator<<( T && arg )
+        {
+            self->process( std::forward<T>( arg ) );
+            return *self;
+        }
+        
+        inline std::uint32_t registerSharedPointer( void const * addr )
+        {
+            // Handle null pointers by just returning 0
+            if(addr == 0) return 0;
+            
+            auto id = itsSharedPointerMap.find( addr );
+            if( id == itsSharedPointerMap.end() )
+            {
+                auto ptrId = itsCurrentPointerId++;
+                itsSharedPointerMap.insert( {addr, ptrId} );
+                return ptrId | detail::msb_32bit; // mask MSB to be 1
+            }
+            else
+                return id->second;
+        }
+
+
+}
+
 
 #elif
 

@@ -18,33 +18,20 @@ serialization_template = Template(serialization_template_str)
 serialization_function_template_str = '''
 	// ${T}
 	template<typename Archive>
-	Archive & operator << ( Archive& archive, ${T} const & value )
+	void Save ( Archive& archive, ${T} const & value )
 	{
-		prologue( archive, value );
 		${serialize_seqs}
-		epilogue( archive, value );
-		return archive;
 	}
 
 	template<typename Archive>
-	Archive & operator >> ( Archive& archive, ${T} & value )
+	void Load ( Archive& archive, ${T} & value )
 	{
-		prologue( archive, value );
 		${deserialize_seqs}
-		epilogue( archive, value );
-		return archive;
 	}
 '''
 serialization_function_template = Template(serialization_function_template_str)
 
-skip_types = (
-    'Vector2',
-    'Vector3',
-    'Vector4',
-    'Color',
-    'Quaternion',
-    'Transform',
-    )
+skip_types = ()
 
 def GenSerializationFunctions(classinfo):
     headers = []
@@ -63,7 +50,7 @@ def GenSerializationFunctions(classinfo):
         c = classinfo[key]
         headers.append(c['header_file'])
         serialize_seqs_list = [x for x in c['members'] if not x['NonSerializable']]
-        serialize_seqs = ['archive << value.{0}; // {1}'.format(x['name'], x['type']) for x in serialize_seqs_list]
+        serialize_seqs = ['archive << make_nvp("{0}", value.{0}); // {1}'.format(x['name'], x['type']) for x in serialize_seqs_list]
         # if 'parent' in c:
         #     p = 'Serialization::Serialize<{0}>(archive, value);'.format(c['parent'])
         #     serialize_seqs.insert(0, p)

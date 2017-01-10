@@ -122,24 +122,6 @@ public:
 
     static const Quaternion identity;
 };
-    
-    
-    // Quaternion
-    template<typename Archive>
-    Archive & operator << ( Archive& archive, Quaternion const & q )
-    {
-        archive << q.x << q.y << q.z << q.w;
-		return archive;
-    }
-    
-    template<typename Archive>
-    Archive & operator >> ( Archive& archive, Quaternion & q )
-    {
-        archive >> q.x >> q.y >> q.z >> q.w;
-		return archive;
-    }
-
-
 }
 
 #endif // Quaternion_hpp

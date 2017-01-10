@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "ReflectClass.hpp"
+#include "../../ReflectClass.hpp"
 
 namespace FishEngine
 {

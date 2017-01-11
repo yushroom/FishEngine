@@ -3,18 +3,17 @@
 namespace FishEngine
 {
     template<class Archive, class T, class B>
-    static Archive & operator << ( Archive & archive, std::map<T, B> const & v )
+    static void Save ( Archive & archive, std::map<T, B> const & v )
     {
         archive << v.size();
         for (auto& p : v)
         {
             archive << p.first << p.second;
         }
-        return archive;
     }
 
     template<class Archive, class T, class B>
-    static Archive & operator >> ( Archive & archive, std::map<T, B> & v )
+    static void Load ( Archive & archive, std::map<T, B> & v )
     {
         std::size_t size = 0;
         archive >> size;
@@ -27,6 +26,5 @@ namespace FishEngine
             archive >> key >> value;
             hint = v.emplace_hint(hint, std::move(key), std::move(value));
         }
-        return archive;
     }
 }

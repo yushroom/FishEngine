@@ -249,7 +249,7 @@ def internal_find_typerefs(node):
     #short_kind = str(node.kind).split('.')
     #print('short kind', short_kind)
 
-    if node.kind == clang.cindex.CursorKind.CLASS_DECL:
+    if node.kind == clang.cindex.CursorKind.CLASS_DECL or node.kind == clang.cindex.CursorKind.STRUCT_DECL:
         internal_parse_class(node)
 
     for c in node.get_children():

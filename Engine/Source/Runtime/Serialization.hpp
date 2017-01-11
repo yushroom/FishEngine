@@ -39,6 +39,20 @@ namespace FishEngine
 	{
 		return{ std::forward<T>(sz) };
 	}
+    
+    template<class Base>
+    struct base_class
+    {
+        template<class Derived>
+        base_class(Derived const & derived) :
+            base_ref(static_cast<Base const &>(derived))
+        {
+            static_assert( std::is_base_of<Base, Derived>::value, "Can only use base_class on a valid base class" );
+        }
+        
+        Base const & base_ref;
+    };
+
 
     class Meta(NonSerializable) Serialization
     {
@@ -53,12 +67,19 @@ namespace FishEngine
 	{
 		archive << nvp.name << nvp.value;
 	}
+    
+    template<class Archive, typename T>
+    static void Save ( Archive& archive, base_class<T> const & t )
+    {
+        archive << make_nvp(T::StaticClassName(), t.base_ref);
+        //archive << t.base_ref;
+    }
 
     /************************************************************************/
     /* std::shared_ptr                                                      */
     /************************************************************************/
 	template<class Archive, typename T>
-    static void Save ( Archive& archive, std::shared_ptr<T> const & v )
+    static void Save ( Archive& archive, std::shared_ptr<T> const & t )
     {
 		if (t != nullptr)
 		{
@@ -88,24 +109,10 @@ namespace FishEngine
     }
     
     template<class Archive, typename T>
-    static Archive & operator >> ( Archive& archive, std::weak_ptr<T> & v )
+    static Archive & operator >> ( Archive & archive, std::weak_ptr<T> & v )
     {
         return archive;
     }
-
-	template<class Archive>
-	static void DynamicSerializeObject(Archive archive, std::shared_ptr<Object> obj)
-	{
-		auto name = obj->ClassName();
-		if (name == "GameObject")
-		{
-			archive << *dynamic_pointer_cast<GameObject>(obj);
-		}
-		else if (name == "Transform")
-		{
-			archive << *dynamic_pointer_cast<Transform>(obj);
-		}
-	}
 }
 
 #ifndef __REFLECTION_PARSER__

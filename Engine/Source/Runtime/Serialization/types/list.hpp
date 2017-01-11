@@ -11,13 +11,12 @@ namespace FishEngine
     }
 
     template<class Archive, typename T>
-    static Archive & operator >> (Archive& archive, std::list<T> & v)
+    inline void Load (Archive& archive, std::list<T> & v)
     {
-        std::size_t size;
-        archive >> make_size_tag(size);
-        v.resize(size);
-        for (auto & i : v)
-            archive >> i;
-        return archive;
+//        std::size_t size;
+//        archive >> make_size_tag(size);
+//        v.resize(size);
+//        for (auto & i : v)
+//            archive >> i;
     }
 }

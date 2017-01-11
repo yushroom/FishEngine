@@ -8,7 +8,7 @@ namespace FishEngine
     
     //! Serialization for std::vectors of arithmetic (but not bool) using binary serialization
     template<typename T, typename std::enable_if_t<std::is_arithmetic<T>::value && !std::is_same<T, bool>::value, int> = 0>
-    static OutputArchive & operator << (OutputArchive& archive, const std::vector<T> & v)
+    static void Save (OutputArchive& archive, const std::vector<T> & v)
     {
         archive << v.size();
         archive.SaveBinary(v.data(), v.size() * sizeof(T));
@@ -26,7 +26,7 @@ namespace FishEngine
     
     //! Serialization for non-arithmetic vector types
     template<typename T, typename std::enable_if_t<!std::is_arithmetic<T>::value, int> = 0>
-    static OutputArchive & operator << (OutputArchive& archive, const std::vector<T> & v)
+    static void Save (OutputArchive& archive, const std::vector<T> & v)
     {
         archive << v.size();
         for (auto && x : v)

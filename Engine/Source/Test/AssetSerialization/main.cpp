@@ -11,6 +11,7 @@ using namespace std;
 
 void DefaultScene()
 {
+    Debug::setColorMode(false);
 	cout << "CWD: " << boost::filesystem::current_path() << endl;
 
 	auto camera = Camera::Create();
@@ -48,7 +49,7 @@ public:
 		YAMLOutputArchive archive(emitter);
 		emitter << YAML::BeginDoc;
 		archive << Vector3(1, 2, 3);
-		//emitter << YAML::BeginDoc;
+		emitter << YAML::BeginDoc;
 		archive << Transform();
 		//emitter << YAML::BeginDoc;
 		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);

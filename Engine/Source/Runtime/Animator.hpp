@@ -65,6 +65,8 @@ namespace FishEngine
         bool m_playingOnce = false;
         bool m_playOneFrame = false;
         int m_currentFrame = 0;
+
+		Meta(NonSerializable)
         AnimationPtr m_animation;
         
         //virtual void OnInspectorGUI() override;

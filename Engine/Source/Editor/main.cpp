@@ -9,7 +9,6 @@
 #include <CameraController.hpp>
 #include <Light.hpp>
 #include <RenderSettings.hpp>
-#include <App.hpp>
 #include <MeshRenderer.hpp>
 #include <ModelImporter.hpp>
 #include <TextureImporter.hpp>
@@ -20,6 +19,7 @@
 #include <future>
 
 #include "FishEditorWindow.hpp"
+#include "App.hpp"
 
 using namespace std;
 using namespace FishEngine;

@@ -135,6 +135,8 @@ namespace FishEngine
         std::map<std::string, int> m_boneNameToIndex;
 
         std::vector<Matrix4x4>  m_bindposes;
+
+		Meta(NonSerializable)
         std::vector<BoneWeight> m_boneWeights;
 
         GLuint m_VAO;

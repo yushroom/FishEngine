@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-namespace FishEngine
+namespace FishEditor
 {
     App::~App() = default;
 }

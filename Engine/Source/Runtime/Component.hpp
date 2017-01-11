@@ -2,6 +2,7 @@
 #define Component_hpp
 
 #include "Object.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
@@ -44,6 +45,8 @@ namespace FishEngine
         friend class FishEditor::SceneViewEditor;
 
         std::weak_ptr<GameObject> m_gameObject;
+
+		Meta(NonSerializable)
         bool m_isStartFunctionCalled = false;
     };
 }

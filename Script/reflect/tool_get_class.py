@@ -22,8 +22,9 @@ namespaces = ('FishEngine', 'FishEditor')
 classes = {}
 
 
-skip_cursor_types = (clang.cindex.CursorKind.ENUM_DECL,
-    clang.cindex.CursorKind.STRUCT_DECL,
+skip_cursor_types = (
+    clang.cindex.CursorKind.ENUM_DECL,
+    #clang.cindex.CursorKind.STRUCT_DECL,
     clang.cindex.CursorKind.FUNCTION_TEMPLATE,
     clang.cindex.CursorKind.UNEXPOSED_DECL,
     clang.cindex.CursorKind.TEMPLATE_REF
@@ -120,7 +121,7 @@ def internal_parse_class(node):
     static_classname_injected = False
 
     for child in node.get_children():
-        print('\t', child.kind, child.spelling, child.type.spelling)
+        #print('\t', child.kind, child.spelling, child.type.spelling)
         if child.kind == clang.cindex.CursorKind.CXX_BASE_SPECIFIER:
             base_class = next(child.get_children()).spelling
             base_class = base_class.split(' ')[-1].split('::')[-1]
@@ -133,7 +134,7 @@ def internal_parse_class(node):
             classes[class_name]['parent'] = base_class
 
         elif child.kind == clang.cindex.CursorKind.CXX_METHOD:
-            print('\t', 'method', child.spelling)
+            #print('\t', 'method', child.spelling)
             if child.spelling == "ClassName":
                 classname_injected = True
             elif child.spelling == "StaticClassName":
@@ -210,14 +211,14 @@ def internal_parse_class(node):
             members.append(member)
             # else:
             #     print("Unkown type,", child.type.spelling)
-        elif child.kind == clang.cindex.CursorKind.UNEXPOSED_DECL:
-            for c in child.get_children():
-                print('\t\t', c.spelling)
+        # elif child.kind == clang.cindex.CursorKind.UNEXPOSED_DECL:
+        #     for c in child.get_children():
+        #         print('\t\t', c.spelling)
         #elif child.kind in skip_class_internal_type:
         #    pass
-        else:
-            print('\t', child.spelling)
-            pass
+        # else:
+        #     print('\t', child.spelling)
+        #     pass
 
     if internal_is_derived_from_Object(class_name):
         if not (static_classname_injected and classname_injected):

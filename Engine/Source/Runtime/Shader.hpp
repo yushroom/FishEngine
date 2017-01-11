@@ -98,6 +98,7 @@ namespace FishEngine
         friend class Material;
         friend class RenderSystem;
 
+		Meta(NonSerializable)
         std::unique_ptr<ShaderImpl> m_impl;
 
         //void GetAllUniforms();

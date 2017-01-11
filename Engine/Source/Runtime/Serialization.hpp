@@ -7,53 +7,20 @@
 #include "Archive.hpp"
 #include "Object.hpp"
 
+#include "Serialization/helper.hpp"
 #include "Serialization/types/map.hpp"
 #include "Serialization/types/list.hpp"
+//#include "Serialization/types/vector.hpp"
 #include "Serialization/NameValuePair.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/filesystem.hpp>
 #include "generate/Enum_LightType.hpp"
 //#include <boost/uuid/uuid_serialize.hpp>
 
 namespace FishEngine
 {
-	template <class T>
-	class Meta(NonSerializable) SizeTag
-	{
-	private:
-		// Store a reference if passed an lvalue reference, otherwise
-		// make a copy of the data
-		using Type = std::conditional_t<std::is_lvalue_reference<T>::value, T, std::decay_t<T>>;
-
-		SizeTag & operator=(SizeTag const &) = delete;
-
-	public:
-		SizeTag(T && sz) : size(std::forward<T>(sz)) {}
-
-		Type size;
-	};
-
-	template <class T>
-	inline SizeTag<T> make_size_tag(T && sz)
-	{
-		return{ std::forward<T>(sz) };
-	}
-    
-    template<class Base>
-    struct base_class
-    {
-        template<class Derived>
-        base_class(Derived const & derived) :
-            base_ref(static_cast<Base const &>(derived))
-        {
-            static_assert( std::is_base_of<Base, Derived>::value, "Can only use base_class on a valid base class" );
-        }
-        
-        Base const & base_ref;
-    };
-
-
     class Meta(NonSerializable) Serialization
     {
     public:
@@ -69,7 +36,7 @@ namespace FishEngine
 	}
     
     template<class Archive, typename T>
-    static void Save ( Archive& archive, base_class<T> const & t )
+    static void Save ( Archive& archive, BaseClassWrapper<T> const & t )
     {
         archive << make_nvp(T::StaticClassName(), t.base_ref);
         //archive << t.base_ref;
@@ -113,6 +80,16 @@ namespace FishEngine
     {
         return archive;
     }
+
+	/************************************************************************/
+	/* boost::filesystem::path                                              */
+	/************************************************************************/
+	template<class Archive, typename T>
+	inline void Save(Archive& archive, boost::filesystem::path const & v)
+	{
+		archive << v.c_str();
+	}
+
 }
 
 #ifndef __REFLECTION_PARSER__

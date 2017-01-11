@@ -5,9 +5,13 @@
 #include "FishEngine.hpp"
 #include "GLEnvironment.hpp"
 #include <glfw/glfw3.h>
+#include "App.hpp"
 
 namespace FishEditor
 {
+
+	typedef std::shared_ptr<App> AppPtr;
+
     class FishEditorWindow
     {
     public:
@@ -19,7 +23,7 @@ namespace FishEditor
 
         static void Clean();
 
-        static void AddApp(FishEngine::AppPtr app)
+        static void AddApp(AppPtr app)
         {
             m_apps.push_back(app);
         }
@@ -70,7 +74,7 @@ namespace FishEditor
         static float m_pixelsPerPoint;
 
         static GLFWwindow* m_window;
-        static std::vector<FishEngine::AppPtr> m_apps;
+        static std::vector<AppPtr> m_apps;
 
         static float m_fixedFrameRate;
         static bool m_inPlayMode;

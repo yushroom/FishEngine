@@ -12,7 +12,6 @@
 #include "Material.hpp"
 #include "Time.hpp"
 #include "Scene.hpp"
-#include "App.hpp"
 #include <PhysicsSystem.hpp>
 #include <Camera.hpp>
 

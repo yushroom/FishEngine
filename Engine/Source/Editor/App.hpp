@@ -1,11 +1,9 @@
 #ifndef App_hpp
 #define App_hpp
 
-#include "FishEngine.hpp"
-
-namespace FishEngine
+namespace FishEditor
 {
-    class FE_EXPORT App
+    class App
     {
     public:
         virtual ~App() = 0;

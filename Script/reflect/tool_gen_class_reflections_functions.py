@@ -52,7 +52,7 @@ def GenSerializationFunctions(classinfo):
         serialize_seqs_list = [x for x in c['members'] if not x['NonSerializable']]
         serialize_seqs = ['archive << make_nvp("{0}", value.{0}); // {1}'.format(x['name'], x['type']) for x in serialize_seqs_list]
         if 'parent' in c:
-            p = 'archive << base_class<{0}>(value);'.format(c['parent'])
+            p = 'archive << BaseClassWrapper<{0}>(value);'.format(c['parent'])
             serialize_seqs.insert(0, p)
         serialize_seqs = '\n\t\t'.join(serialize_seqs)
         deserialize_seqs = serialize_seqs.replace('<<', '>>')
@@ -96,6 +96,8 @@ def GenComponentInheritance(class_info):
     print(Template(componentInheritance_template_str).render(pairs='\n\t'.join(pairs)))
 
 DynamicSerializeObject_template_str = '''
+namespace FishEngine
+{
     template<class Archive>
     static void DynamicSerializeObject(Archive & archive, std::shared_ptr<Object> obj)
     {
@@ -104,8 +106,9 @@ DynamicSerializeObject_template_str = '''
         {
             archive << obj;
         }
-        ${seqs}
+        ${dynamic_seqs}
     }
+}
 '''
 
 DynamicSerializeObject_seq = '''
@@ -127,14 +130,14 @@ def Gen_DynamicSerializeObject(class_info):
         if IsObject(key):
             Objects.append(key)
     seqs = ''.join([DynamicSerializeObject_seq.format(x) for x in Objects])
-    print(Template(DynamicSerializeObject_template_str).render(seqs = seqs))
+    return Template(DynamicSerializeObject_template_str).render(dynamic_seqs = seqs)
 
 
 if __name__ == "__main__":
     with open('temp/class.json') as f:
         class_info = json.loads(f.read())
     GenComponentInheritance(class_info)
-    Gen_DynamicSerializeObject(class_info)
+    dynamic_serialize = Gen_DynamicSerializeObject(class_info)
     with open('../../Engine/Source/Runtime/generate/Class_Serialization.hpp', 'w') as f:
-        f.write(GenSerializationFunctions(class_info))
+        f.write(GenSerializationFunctions(class_info) + dynamic_serialize)
 

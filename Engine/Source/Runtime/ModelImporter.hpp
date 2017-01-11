@@ -73,8 +73,12 @@ namespace FishEngine {
         std::vector<MaterialPtr> m_materials;
         std::vector<uint32_t> m_meterailIndexForEachMesh; // same size as m_meshes;
         std::vector<MeshPtr> m_meshes;
+
+		Meta(NonSerializable)
         std::vector<AnimationPtr> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
+
+		Meta(NonSerializable)
         ModelNodePtr m_rootNode;
         //std::vector<ModelNode::PModelNode> m_bones;
         //std::map<std::string, int> m_boneToIndex;
@@ -146,6 +150,8 @@ namespace FishEngine {
     class ModelImporter : public AssetImporter
     {
     public:
+		InjectClassName(ModelImporter)
+
         ModelImporter() = default;
         
         void

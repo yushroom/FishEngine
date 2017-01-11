@@ -3,6 +3,7 @@
 
 #include "Input.hpp"
 #include "Transform.hpp"
+#include "Camera.hpp"
 
 namespace FishEngine
 {

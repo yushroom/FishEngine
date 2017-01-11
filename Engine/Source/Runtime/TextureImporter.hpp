@@ -14,6 +14,8 @@ namespace FishEngine
     class FE_EXPORT TextureImporter : public AssetImporter
     {
     public:
+		InjectClassName(TextureImporter)
+
         TexturePtr FromFile(const Path& path);
 
         TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);

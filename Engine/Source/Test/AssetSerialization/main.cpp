@@ -5,13 +5,14 @@
 
 #include <GameApp.hpp>
 #include <RenderSettings.hpp>
+#include <TextureImporter.hpp>
 
 using namespace FishEngine;
 using namespace std;
 
 void DefaultScene()
 {
-    Debug::setColorMode(false);
+    //Debug::setColorMode(false);
 	cout << "CWD: " << boost::filesystem::current_path() << endl;
 
 	auto camera = Camera::Create();
@@ -46,16 +47,31 @@ public:
 	{
 		DefaultScene();
 		YAML::Emitter emitter;
+		//emitter << YAML::LocalTag("u") << "tag:FishEngine:";
+		//emitter.SetStringFormat(YAML::Auto);
+		//emitter << "%YAML 1.1";
+		//emitter << "%TAG !u! tag:FishEngine:";
 		YAMLOutputArchive archive(emitter);
 		emitter << YAML::BeginDoc;
+		emitter << YAML::LocalTag("u", "29");
+		emitter << YAML::Newline;
 		archive << Vector3(1, 2, 3);
+		emitter << YAML::EndDoc;
 		emitter << YAML::BeginDoc;
+		//emitter << YAML::LocalTag("u", "28");
 		archive << Transform();
-		//emitter << YAML::BeginDoc;
+		emitter << YAML::EndDoc;
+		//emitter << YAML::BeginDoc; 
 		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
 		cube->transform()->SetParent(Camera::main()->transform());
 		auto go = Camera::main()->gameObject();
 		archive << go;
+		auto importer = std::make_shared<TextureImporter>();
+		archive << importer;
+		if (!emitter.good())
+		{
+			Debug::LogWarning("%s", emitter.GetLastError().c_str());
+		}
 		std::cout << emitter.c_str() << std::endl;
 	}
 

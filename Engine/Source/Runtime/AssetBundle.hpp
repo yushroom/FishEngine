@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Object.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class AssetBundle : public Object
+    class Meta(NonSerializable) AssetBundle : public Object
     {
     public:
 

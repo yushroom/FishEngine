@@ -8,9 +8,10 @@
 
 namespace FishEngine
 {
-    class FE_EXPORT Meta(NonSerializable) AssetImporter : public Object
+    class AssetImporter : public Object
     {
     public:
+		InjectClassName(AssetImporter);
 
         AssetImporter() = default;
         virtual ~AssetImporter() {};

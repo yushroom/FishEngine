@@ -4,47 +4,10 @@
 
 using namespace std;
 
-class A
-{
-public:
-    A(int x, float y, double z) : x(x), y(y), z(z)
-    {
-        
-    }
-    
-private:
-    template<typename T>
-    friend void Save(T & ar, A const & v);
-    
-    int x;
-    float y;
-    double z;
-};
-
-class Archive
-{
-public:
-    template<typename T>
-    Archive & operator << (T const & t)
-    {
-        std::cout << t;
-        return *this;
-    }
-};
-
-template<typename T>
-void Save(T & ar, A const & v)
-{
-    ar << v.x << v.y << v.z;
-}
-
 int main()
 {
-//    A a(1, 2.0f, 3.0);
-//    Archive ar;
-//    Save(ar, a);
-    //cout << std::is_function<decltype(Save(Archive, A const & v))>::value;
-    return 0;
+	std::cout << L"\xCC\xCC" << std::endl;
+	return 0;
 }
 
 #elif 0

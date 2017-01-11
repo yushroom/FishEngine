@@ -52,7 +52,6 @@ namespace FishEngine
     class Texture3D;
     class Cubemap;
     class Time;
-    class App;
     class Mathf;
     class Vector2;
     class Vector3;
@@ -106,7 +105,6 @@ namespace FishEngine
     typedef std::shared_ptr<Texture2D> Texture2DPtr;
     typedef std::shared_ptr<Texture3D> Texture3DPtr;
     typedef std::shared_ptr<Cubemap> CubemapPtr;
-    typedef std::shared_ptr<App> AppPtr;
     typedef std::shared_ptr<Light> LightPtr;
     typedef std::shared_ptr<RenderTexture> RenderTexturePtr;
     typedef std::shared_ptr<Model> ModelPtr;

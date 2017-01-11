@@ -25,8 +25,8 @@ namespace FishEngine
 
     GLFWwindow* GameApp::m_window = nullptr;
 
-    int GameApp::m_windowWidth = 1280;
-int GameApp::m_windowHeight = 960;
+    int GameApp::m_windowWidth = 128;
+int GameApp::m_windowHeight = 128;
 
 int GameApp::Run()
 {

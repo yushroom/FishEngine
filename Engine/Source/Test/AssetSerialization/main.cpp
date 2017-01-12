@@ -12,7 +12,7 @@ using namespace std;
 
 void DefaultScene()
 {
-#if FISHENGINE_PLATFORM_WINDOWS
+#if FISHENGINE_PLATFORM_APPLE
     Debug::setColorMode(false);
 #endif
 	cout << "CWD: " << boost::filesystem::current_path() << endl;
@@ -48,33 +48,32 @@ public:
 	virtual void Init() override
 	{
 		DefaultScene();
-		YAML::Emitter emitter;
+		//YAML::Emitter emitter;
+        auto& emitter = cout;
 		//emitter << YAML::LocalTag("u") << "tag:FishEngine:";
 		//emitter.SetStringFormat(YAML::Auto);
 		//emitter << "%YAML 1.1";
 		//emitter << "%TAG !u! tag:FishEngine:";
 		YAMLOutputArchive archive(emitter);
-		emitter << YAML::BeginDoc;
-		emitter << YAML::LocalTag("u", "29");
-		//emitter << YAML::Newline;
-		archive << Vector3(1, 2, 3);
-		emitter << YAML::EndDoc;
-		emitter << YAML::BeginDoc;
-		//emitter << YAML::LocalTag("u", "28");
-		archive << Transform();
-		emitter << YAML::EndDoc;
-		//emitter << YAML::BeginDoc; 
+		archive.SetManipulator(YAML::BeginDoc);
+		archive.SetManipulator(YAML::BeginMap);
+		//emitter << YAML::LocalTag("u", "29");
+		archive << make_nvp("empty map", std::map<int, int>());
+		archive << make_nvp("vec", Vector3(1, 2, 3));
+		archive.SetManipulator(YAML::EndMap);
+		archive.SetManipulator(YAML::EndDoc);
+		archive << std::make_shared<Transform>();
 		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
 		cube->transform()->SetParent(Camera::main()->transform());
 		auto go = Camera::main()->gameObject();
 		archive << go;
 		auto importer = std::make_shared<TextureImporter>();
 		archive << importer;
-		if (!emitter.good())
-		{
-			Debug::LogWarning("%s", emitter.GetLastError().c_str());
-		}
-		std::cout << emitter.c_str() << std::endl;
+//		if (!emitter.good())
+//		{
+//			Debug::LogWarning("%s", emitter.GetLastError().c_str());
+//		}
+//		std::cout << emitter.c_str() << std::endl;
 	}
 
 	virtual void Update() override

@@ -1,9 +1,17 @@
 #pragma once
 
 //#include "ReflectClass.hpp"
-#include <yaml-cpp/yaml.h>
+//#include <yaml-cpp/yaml.h>
+#include "Object.hpp"
+#include "Serialization/NameValuePair.hpp"
+#include "Serialization/helper.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <cassert>
+#include <stack>
+#include <memory>
+#include <iostream>
 
 namespace FishEngine
 {
@@ -13,14 +21,250 @@ namespace FishEngine
 		std::true_type, std::false_type>
 	{};
 
+	namespace YAML
+	{
+		enum EMITTER_MANIP
+		{
+			Flow,
+			BeginDoc,
+			EndDoc,
+			BeginSeq,
+			EndSeq,
+			BeginMap,
+			EndMap,
+		};
+
+		enum class YAMLNodeType
+		{
+			None,
+			DocBegin,
+			DocEnd,
+			MapBegin,
+			MapKey,
+			MapValue,
+			//MapEnd,
+			SeqBegin,
+			SeqInside,
+			//SeqEnd,
+		};
+
+		class Emitter
+		{
+		public:
+			Emitter(std::ostream & stream) : m_stream(stream)
+			{
+
+			}
+
+			template<class T>
+			Emitter & operator << (T const & t)
+			{
+				switch (m_expectedNextNodeType)
+				{
+				case YAMLNodeType::MapKey:
+					NewLineIfNeeded();
+					Intent();
+					break;
+				case YAMLNodeType::MapValue:
+					break;
+				case YAMLNodeType::SeqBegin:
+					// fall through
+				case YAMLNodeType::SeqInside:
+					NewLineIfNeeded();
+					Intent();
+					m_stream << "-";
+					m_col = 1;
+				default:
+					break;
+				}
+				m_stream << t;
+				if (m_expectedNextNodeType == YAMLNodeType::MapKey)
+				{
+					m_stream << ": ";
+				}
+				m_col = 1;
+				ToNextStage();
+				return *this;
+			}
+
+
+			void SetManipulator (EMITTER_MANIP value)
+			{
+				if (value == YAML::BeginDoc)
+				{
+					assert(m_nodeTypeStack.empty());
+					//PushState(YAMLNodeType::DocEnd);
+					NewLineIfNeeded();
+					m_stream << "---\n";
+					m_col = 0;
+					//m_expectedNextNodeType = YAMLNodeType::None;
+					m_expectedNextNodeType = YAMLNodeType::DocEnd;
+				}
+				else if (value == YAML::EndDoc)
+				{
+					assert(m_expectedNextNodeType == YAMLNodeType::DocEnd);
+					assert(m_nodeTypeStack.empty());
+					NewLineIfNeeded();
+					m_stream << "...\n";
+					m_col = 0;
+					m_expectedNextNodeType = YAMLNodeType::None;
+				}
+				else if (value == YAML::BeginMap)
+				{
+					if (m_expectedNextNodeType != YAMLNodeType::DocEnd)
+					{
+						m_indentLevel++;
+					}
+					PushState(m_expectedNextNodeType);
+					PushState(YAMLNodeType::MapBegin);
+					NewLineIfNeeded();
+					//m_intentLevel++;
+					m_expectedNextNodeType = YAMLNodeType::MapKey;
+				}
+				else if (value == YAML::EndMap)
+				{
+					assert(m_expectedNextNodeType == YAMLNodeType::MapKey);
+					PopLastStateAndCheck(YAMLNodeType::MapBegin);
+					m_expectedNextNodeType = PopLastState();
+					m_indentLevel--;
+					if (m_indentLevel < 0)
+						m_indentLevel = 0;
+				}
+				else if (value == YAML::BeginSeq)
+				{
+					//if (m_expectedNextNodeType != YAMLNodeType::DocBegin)
+						m_indentLevel++;
+					PushState(m_expectedNextNodeType);
+					PushState(YAMLNodeType::SeqBegin);
+					NewLineIfNeeded();
+					//m_intentLevel++;
+					m_expectedNextNodeType = YAMLNodeType::SeqInside;
+				}
+				else if (value == YAML::EndSeq)
+				{
+					if (m_expectedNextNodeType == YAMLNodeType::SeqBegin)
+					{
+						Intent();
+						m_stream << "[]";
+						m_col = 1;
+					}
+					else
+					{
+						assert(m_expectedNextNodeType == YAMLNodeType::SeqInside);
+					}
+					//assert(PopLastState() == YAMLNodeType::MapBegin);
+					PopLastStateAndCheck(YAMLNodeType::SeqBegin);
+					m_expectedNextNodeType = PopLastState();
+					m_indentLevel--;
+				}
+			}
+
+		private:
+			std::ostream & m_stream;
+			int m_indentLevel = 0;
+			//int m_row;
+			int m_col = 0;
+			YAMLNodeType m_expectedNextNodeType = YAMLNodeType::None;
+			std::stack<YAMLNodeType> m_nodeTypeStack;
+
+			void ToNextStage()
+			{
+				switch (m_expectedNextNodeType)
+				{
+				case YAMLNodeType::MapKey:
+					//PushState(YAMLNodeType::MapKey);
+					m_expectedNextNodeType = YAMLNodeType::MapValue;
+					break;
+				case YAMLNodeType::MapValue:
+					NewLineIfNeeded();
+					//assert(PopLastState() == YAMLNodeType::MapKey);
+					m_expectedNextNodeType = YAMLNodeType::MapKey;
+					//PushState(YAMLNodeType::MapKey);
+					break;
+				case YAMLNodeType::SeqBegin:
+					//PushState(m_expectedNextNodeType);
+					m_expectedNextNodeType = YAMLNodeType::SeqInside;
+					break;
+				case YAMLNodeType::SeqInside:
+					// the first element of the sequence
+					if (m_nodeTypeStack.top() == YAMLNodeType::SeqBegin)
+					{
+						PushState(YAMLNodeType::SeqInside);
+					}
+					//m_nextNodeType = YAMLNodeType::SeqInside;
+					break;
+				default:
+					m_expectedNextNodeType = YAMLNodeType::None;
+					break;
+				}
+			}
+
+			void Intent()
+			{
+				assert(m_col == 0);
+				for (int i = 0; i < m_indentLevel; ++i)
+					m_stream << "  ";
+			}
+
+			void NewLineIfNeeded()
+			{
+				if (m_col != 0)
+				{
+					m_stream << "\n";
+					m_col = 0;
+				}
+			}
+
+			void PushState(YAMLNodeType state)
+			{
+				if (state == YAMLNodeType::MapValue)
+					state = YAMLNodeType::MapKey;
+				if (state != YAMLNodeType::None)
+				{
+					if (state == YAMLNodeType::SeqBegin)
+					{
+						int i = 1;
+					}
+					if (state == YAMLNodeType::SeqInside)
+					{
+						int i = 1;
+					}
+					//std::cout << "\n" << static_cast<std::underlying_type_t<YAMLNodeType>>(state) << "\n";
+					m_nodeTypeStack.push(state);
+				}
+			}
+
+			YAMLNodeType PopLastState()
+			{
+				YAMLNodeType ret = YAMLNodeType::None;
+				if (!m_nodeTypeStack.empty())
+				{
+					ret = m_nodeTypeStack.top();
+					m_nodeTypeStack.pop();
+				}
+				return ret;
+			}
+
+			void PopLastStateAndCheck(YAMLNodeType expected)
+			{
+				auto state = m_nodeTypeStack.top();
+				auto size = m_nodeTypeStack.size();
+				m_nodeTypeStack.pop();
+				if (state != expected)
+					abort();
+			}
+
+		};
+	}
+
 	class YAMLOutputArchive;
-	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, FishEngine::UUID const & t);
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::uuids::uuid const & t);
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::nullptr_t const & t);
 
 	class YAMLOutputArchive
 	{
 	public:
-		YAMLOutputArchive(YAML::Emitter & emitter) : m_emitter(emitter)
+        YAMLOutputArchive(std::ostream & emitter) : m_emitter(emitter)
 		{
 
 		}
@@ -28,7 +272,7 @@ namespace FishEngine
         YAMLOutputArchive(YAMLOutputArchive const &) = delete;
 		YAMLOutputArchive& operator = (YAMLOutputArchive const &) = delete;
 
-		~YAMLOutputArchive() noexcept = default;
+		~YAMLOutputArchive() = default;
         
 		template<typename T, std::enable_if_t<!emittable<T>::value, int> = 0>
 		YAMLOutputArchive & operator << (T const & t)
@@ -72,55 +316,15 @@ namespace FishEngine
 			return *this;
 		}
 
-		void SerializeObject(std::shared_ptr<Object> const & obj)
-		{
-			if (obj == nullptr)
-			{
-				(*this) << nullptr;
-				return;
-			}
-
-			//std::cout << "SerializeObject: " << obj->ClassName() << std::endl;
-
-			auto guid = obj->GetGUID();
-			auto find_result = m_serialized.find(guid);
-			if (find_result != m_serialized.end() && find_result->second)
-			{
-				if (m_isInsideDoc)
-					(*this) << guid;
-				return;
-			}
-
-			if (m_isInsideDoc)
-			{
-				m_objectsToBeSerialized.push_back(obj);
-                //std::cout << "SerializeObject: push, size=" << m_objectsToBeSerialized.size() << std::endl;
-				(*this) << guid;
-			}
-			else
-			{
-                m_serialized[guid] = true;
-				SetManipulator(YAML::BeginDoc);
-                m_emitter << YAML::LocalTag("u", boost::uuids::to_string(guid));
-                //assert(m_emitter.good());
-				//SetManipulator(YAML::BeginMap);
-				m_emitter << obj->ClassName();
-				//this->operator<<(*obj);
-				DynamicSerializeObject(*this, obj);
-				//SetManipulator(YAML::EndMap);
-				SetManipulator(YAML::EndDoc);
-			}
-		}
+		void SerializeObject(std::shared_ptr<Object> const & obj);
 
 		void SetManipulator(YAML::EMITTER_MANIP value)
 		{
-            m_emitter << value;
-            //assert(m_emitter.good());
+            m_emitter.SetManipulator(value);
             
 			if (value == YAML::BeginDoc)
 			{
-				if (m_isInsideDoc)
-					abort();
+				assert(!m_isInsideDoc);
 				m_isInsideDoc = true;
 			}
 			else if (value == YAML::EndDoc)
@@ -137,7 +341,7 @@ namespace FishEngine
 		}
 	
 	private:
-		YAML::Emitter & m_emitter;
+		YAML::Emitter m_emitter;
 		std::map<UUID, bool> m_serialized;
 		std::vector<std::shared_ptr<Object>> m_objectsToBeSerialized;
 		bool m_isInsideDoc = false;
@@ -257,7 +461,7 @@ namespace FishEngine
 	/************************************************************************/
 	/* UUID                                                                 */
 	/************************************************************************/
-	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, FishEngine::UUID const & t)
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::uuids::uuid const & t)
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
@@ -271,7 +475,7 @@ namespace FishEngine
 	void prologue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
 	void epilogue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
 
-	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, Path const & t)
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::filesystem::path const & t)
 	{
 		archive << "path[TODO]";
 		return archive;

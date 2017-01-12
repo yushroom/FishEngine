@@ -1,4 +1,5 @@
 #pragma once
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {

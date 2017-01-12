@@ -132,12 +132,16 @@ def Gen_DynamicSerializeObject(class_info):
     seqs = ''.join([DynamicSerializeObject_seq.format(x) for x in Objects])
     return Template(DynamicSerializeObject_template_str).render(dynamic_seqs = seqs)
 
+def GenSerialization(class_info):
+    dynamic_serialize = Gen_DynamicSerializeObject(class_info)
+    return GenSerializationFunctions(class_info) + dynamic_serialize
+
 
 if __name__ == "__main__":
     with open('temp/class.json') as f:
         class_info = json.loads(f.read())
     GenComponentInheritance(class_info)
-    dynamic_serialize = Gen_DynamicSerializeObject(class_info)
     with open('../../Engine/Source/Runtime/generate/Class_Serialization.hpp', 'w') as f:
-        f.write(GenSerializationFunctions(class_info) + dynamic_serialize)
+        f.write(GenSerialization(class_info))
+    
 

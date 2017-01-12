@@ -12,7 +12,9 @@ using namespace std;
 
 void DefaultScene()
 {
-    //Debug::setColorMode(false);
+#if FISHENGINE_PLATFORM_WINDOWS
+    Debug::setColorMode(false);
+#endif
 	cout << "CWD: " << boost::filesystem::current_path() << endl;
 
 	auto camera = Camera::Create();
@@ -54,7 +56,7 @@ public:
 		YAMLOutputArchive archive(emitter);
 		emitter << YAML::BeginDoc;
 		emitter << YAML::LocalTag("u", "29");
-		emitter << YAML::Newline;
+		//emitter << YAML::Newline;
 		archive << Vector3(1, 2, 3);
 		emitter << YAML::EndDoc;
 		emitter << YAML::BeginDoc;

@@ -4,7 +4,7 @@ import json
 from mako.template import Template
 from tool_get_all_headers import GetAllHeadersTo
 from tool_get_class import ExtractClasses
-from tool_gen_class_reflections_functions import GenSerializationFunctions
+from tool_gen_class_reflections_functions import GenSerialization
 
 debug = False
 
@@ -24,4 +24,4 @@ if debug:
         f.write(json.dumps(class_info, indent = 4))
 
 with open('../../Engine/Source/Runtime/generate/Class_Serialization.hpp', 'w') as f:
-    f.write(GenSerializationFunctions(class_info))
+    f.write(GenSerialization(class_info))

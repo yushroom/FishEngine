@@ -3,6 +3,7 @@
 //#include "ReflectClass.hpp"
 #include <yaml-cpp/yaml.h>
 #include <boost/uuid/uuid_io.hpp>
+#include <cassert>
 
 namespace FishEngine
 {
@@ -100,13 +101,13 @@ namespace FishEngine
 			{
                 m_serialized[guid] = true;
 				SetManipulator(YAML::BeginDoc);
-				m_emitter << YAML::LocalTag("u", boost::uuids::to_string(guid));
-				//m_emitter << YAML::Newline;
-				SetManipulator(YAML::BeginMap);
+                m_emitter << YAML::LocalTag("u", boost::uuids::to_string(guid));
+                //assert(m_emitter.good());
+				//SetManipulator(YAML::BeginMap);
 				m_emitter << obj->ClassName();
 				//this->operator<<(*obj);
 				DynamicSerializeObject(*this, obj);
-				SetManipulator(YAML::EndMap);
+				//SetManipulator(YAML::EndMap);
 				SetManipulator(YAML::EndDoc);
 			}
 		}
@@ -114,6 +115,7 @@ namespace FishEngine
 		void SetManipulator(YAML::EMITTER_MANIP value)
 		{
             m_emitter << value;
+            //assert(m_emitter.good());
             
 			if (value == YAML::BeginDoc)
 			{

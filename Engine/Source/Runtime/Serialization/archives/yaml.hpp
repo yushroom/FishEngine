@@ -12,6 +12,7 @@
 #include <stack>
 #include <memory>
 #include <iostream>
+#include <sstream>
 
 namespace FishEngine
 {
@@ -23,7 +24,29 @@ namespace FishEngine
 
 	namespace YAML
 	{
-		enum EMITTER_MANIP
+		enum class State
+		{
+			None,
+			InsideDoc,
+			InsideMap,
+			InsideSeq,
+		};
+
+		enum class NodeType
+		{
+			BeginDoc,
+			EndOfDoc,
+			BeginMap,
+			EndOfMap,
+			BeginSeq,
+			EndOfSeq,
+			MapValue,
+			Value,
+			FirstElement, // first element of a map/list
+			None,
+		};
+
+		enum Manipulator
 		{
 			Flow,
 			BeginDoc,
@@ -32,20 +55,6 @@ namespace FishEngine
 			EndSeq,
 			BeginMap,
 			EndMap,
-		};
-
-		enum class YAMLNodeType
-		{
-			None,
-			DocBegin,
-			DocEnd,
-			MapBegin,
-			MapKey,
-			MapValue,
-			//MapEnd,
-			SeqBegin,
-			SeqInside,
-			//SeqEnd,
 		};
 
 		class Emitter
@@ -59,151 +68,305 @@ namespace FishEngine
 			template<class T>
 			Emitter & operator << (T const & t)
 			{
-				switch (m_expectedNextNodeType)
-				{
-				case YAMLNodeType::MapKey:
-					NewLineIfNeeded();
-					Intent();
-					break;
-				case YAMLNodeType::MapValue:
-					break;
-				case YAMLNodeType::SeqBegin:
-					// fall through
-				case YAMLNodeType::SeqInside:
-					NewLineIfNeeded();
-					Intent();
-					m_stream << "-";
-					m_col = 1;
-				default:
-					break;
-				}
-				m_stream << t;
-				if (m_expectedNextNodeType == YAMLNodeType::MapKey)
-				{
-					m_stream << ": ";
-				}
-				m_col = 1;
-				ToNextStage();
+				ToNextStage(NodeType::Value);
+				//m_stream << t;
+				std::ostringstream sout;
+				sout << t;
+				m_col += sout.str().size();
+				m_stream << sout.str();
 				return *this;
 			}
 
 
-			void SetManipulator (EMITTER_MANIP value)
+			void SetManipulator (Manipulator value)
 			{
-				if (value == YAML::BeginDoc)
+				switch (value)
 				{
-					assert(m_nodeTypeStack.empty());
-					//PushState(YAMLNodeType::DocEnd);
-					NewLineIfNeeded();
-					m_stream << "---\n";
-					m_col = 0;
-					//m_expectedNextNodeType = YAMLNodeType::None;
-					m_expectedNextNodeType = YAMLNodeType::DocEnd;
-				}
-				else if (value == YAML::EndDoc)
-				{
-					assert(m_expectedNextNodeType == YAMLNodeType::DocEnd);
-					assert(m_nodeTypeStack.empty());
-					NewLineIfNeeded();
-					m_stream << "...\n";
-					m_col = 0;
-					m_expectedNextNodeType = YAMLNodeType::None;
-				}
-				else if (value == YAML::BeginMap)
-				{
-					if (m_expectedNextNodeType != YAMLNodeType::DocEnd)
-					{
-						m_indentLevel++;
-					}
-					PushState(m_expectedNextNodeType);
-					PushState(YAMLNodeType::MapBegin);
-					NewLineIfNeeded();
-					//m_intentLevel++;
-					m_expectedNextNodeType = YAMLNodeType::MapKey;
-				}
-				else if (value == YAML::EndMap)
-				{
-					assert(m_expectedNextNodeType == YAMLNodeType::MapKey);
-					PopLastStateAndCheck(YAMLNodeType::MapBegin);
-					m_expectedNextNodeType = PopLastState();
-					m_indentLevel--;
-					if (m_indentLevel < 0)
-						m_indentLevel = 0;
-				}
-				else if (value == YAML::BeginSeq)
-				{
-					//if (m_expectedNextNodeType != YAMLNodeType::DocBegin)
-						m_indentLevel++;
-					PushState(m_expectedNextNodeType);
-					PushState(YAMLNodeType::SeqBegin);
-					NewLineIfNeeded();
-					//m_intentLevel++;
-					m_expectedNextNodeType = YAMLNodeType::SeqInside;
-				}
-				else if (value == YAML::EndSeq)
-				{
-					if (m_expectedNextNodeType == YAMLNodeType::SeqBegin)
-					{
-						Intent();
-						m_stream << "[]";
-						m_col = 1;
-					}
-					else
-					{
-						assert(m_expectedNextNodeType == YAMLNodeType::SeqInside);
-					}
-					//assert(PopLastState() == YAMLNodeType::MapBegin);
-					PopLastStateAndCheck(YAMLNodeType::SeqBegin);
-					m_expectedNextNodeType = PopLastState();
-					m_indentLevel--;
+				case Manipulator::BeginDoc:
+					ToNextStage(NodeType::BeginDoc);
+					break;
+				case Manipulator::EndDoc:
+					ToNextStage(NodeType::EndOfDoc);
+					break;
+				case Manipulator::BeginMap:
+					ToNextStage(NodeType::BeginMap);
+					break;
+				case Manipulator::EndMap:
+					ToNextStage(NodeType::EndOfMap);
+					break;
+				case Manipulator::BeginSeq:
+					ToNextStage(NodeType::BeginSeq);
+					break;
+				case Manipulator::EndSeq:
+					ToNextStage(NodeType::EndOfSeq);
+					break;
+				default:
+					break;
 				}
 			}
 
 		private:
 			std::ostream & m_stream;
 			int m_indentLevel = 0;
-			//int m_row;
 			int m_col = 0;
-			YAMLNodeType m_expectedNextNodeType = YAMLNodeType::None;
-			std::stack<YAMLNodeType> m_nodeTypeStack;
 
-			void ToNextStage()
+			// parent node of current node (if exists)
+			// State m_parentNode = State::Nono;
+			State m_state = State::None;
+			NodeType m_expectedType = NodeType::None;
+			std::stack<State> m_stateStack;
+			std::stack<NodeType> m_expectedTypeStack;
+
+			void PrepareBeginMap()
 			{
-				switch (m_expectedNextNodeType)
+				m_indentLevel++;
+				m_stateStack.push(m_state);
+				m_expectedTypeStack.push(m_expectedType);
+				m_state = State::InsideMap;
+				m_expectedType = NodeType::FirstElement;
+			}
+
+			void PrepareMapKey()
+			{
+				assert(m_state == State::InsideMap);
+				NewLineIfNeeded();
+				Indent();
+				m_expectedType = NodeType::MapValue;
+			}
+
+			void PrepareMapValue()
+			{
+				assert(m_state == State::InsideMap);
+				m_stream << ": ";
+				m_expectedType = NodeType::EndOfMap;
+			}
+			
+			void PrepareEndMap()
+			{
+				assert(m_state == State::InsideMap);
+				if (m_indentLevel >= 1)
+					m_indentLevel--;
+				m_state = m_stateStack.top();
+				m_stateStack.pop();
+				m_expectedType = m_expectedTypeStack.top();
+				m_expectedTypeStack.pop();
+			}
+
+			void PrepareBeginSeq()
+			{
+				m_indentLevel++;
+				m_stateStack.push(m_state);
+				m_expectedTypeStack.push(m_expectedType);
+				m_state = State::InsideSeq;
+				m_expectedType = NodeType::FirstElement;
+			}
+
+//			void PrepareSeqElement()
+//			{
+//				//m_stream << ", ";
+//				NewLineIfNeeded();
+//				Indent();
+//			}
+
+			void PrepareEndSeq()
+			{
+				assert(m_state == State::InsideSeq);
+				if (m_indentLevel >= 1)
+					m_indentLevel--;
+				m_state = m_stateStack.top();
+				m_stateStack.pop();
+				m_expectedType = m_expectedTypeStack.top();
+				m_expectedTypeStack.pop();
+			}
+
+			void ToNextStage(NodeType input)
+			{
+				if (m_state == State::None)
 				{
-				case YAMLNodeType::MapKey:
-					//PushState(YAMLNodeType::MapKey);
-					m_expectedNextNodeType = YAMLNodeType::MapValue;
-					break;
-				case YAMLNodeType::MapValue:
-					NewLineIfNeeded();
-					//assert(PopLastState() == YAMLNodeType::MapKey);
-					m_expectedNextNodeType = YAMLNodeType::MapKey;
-					//PushState(YAMLNodeType::MapKey);
-					break;
-				case YAMLNodeType::SeqBegin:
-					//PushState(m_expectedNextNodeType);
-					m_expectedNextNodeType = YAMLNodeType::SeqInside;
-					break;
-				case YAMLNodeType::SeqInside:
-					// the first element of the sequence
-					if (m_nodeTypeStack.top() == YAMLNodeType::SeqBegin)
+					assert(m_expectedType == NodeType::None);
+					switch (input)
 					{
-						PushState(YAMLNodeType::SeqInside);
+					case NodeType::BeginDoc:
+						NewLineIfNeeded();
+						m_stream << "---";
+						m_col += 3;
+						m_state = State::InsideDoc;
+						m_expectedType = NodeType::EndOfDoc;
+						break;
+					case NodeType::BeginMap:
+						PrepareBeginMap();
+						break;
+					case NodeType::BeginSeq:
+						PrepareBeginSeq();
+						break;
+					default:
+						abort();
 					}
-					//m_nextNodeType = YAMLNodeType::SeqInside;
-					break;
-				default:
-					m_expectedNextNodeType = YAMLNodeType::None;
-					break;
+				}
+				else if (m_state == State::InsideDoc)
+				{
+					assert(m_expectedType == NodeType::EndOfDoc);
+					switch (input)
+					{
+					case NodeType::EndOfDoc:
+						// EmitEndDoc();
+						NewLineIfNeeded();
+						m_stream << "...";
+						m_col += 3;
+						m_state = State::None;
+						m_expectedType = NodeType::None;
+						break;
+					case NodeType::BeginMap:
+						PrepareBeginMap();
+						break;
+					case NodeType::BeginSeq:
+						PrepareBeginSeq();
+						break;
+					default:
+						abort();
+					}
+				}
+				else if (m_state == State::InsideMap)
+				{
+					if (m_expectedType == NodeType::EndOfMap || m_expectedType == NodeType::FirstElement)
+					{
+						if (input == NodeType::EndOfMap)
+						{
+							// PrepareEndMap();
+							if (m_expectedType == NodeType::FirstElement)
+							{
+								//m_expectedType = NodeType::EndOfMap;
+								NewLineIfNeeded();
+								Indent();
+								m_stream << "{}";
+								m_col += 2;
+							}
+							if (m_indentLevel >= 1)
+								m_indentLevel--;
+							m_state = m_stateStack.top();
+							m_stateStack.pop();
+							m_expectedType = m_expectedTypeStack.top();
+							m_expectedTypeStack.pop();
+						}
+						switch (input)
+						{
+							case NodeType::EndOfMap:
+								break;
+							case NodeType::Value:
+								PrepareMapKey();
+								break;
+							case NodeType::BeginMap:
+								PrepareBeginMap();
+								break;
+							case NodeType::BeginSeq:
+								PrepareBeginSeq();
+								break;
+							default:
+								abort();
+						}
+					}
+					else if (m_expectedType == NodeType::MapValue)
+					{
+						m_expectedType = NodeType::EndOfMap;
+						switch (input)
+						{
+						case NodeType::Value:
+							PrepareMapValue();
+							break;
+						case NodeType::BeginMap:
+                            m_stream << ": ";
+                            m_col += 2;
+							PrepareBeginMap();
+							break;
+						case NodeType::BeginSeq:
+							m_stream << ": ";
+							m_col += 2;
+							PrepareBeginSeq();
+							break;
+						default:
+							abort();
+						}
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else if (m_state == State::InsideSeq)
+				{
+					if (m_expectedType == NodeType::EndOfSeq || m_expectedType == NodeType::FirstElement)
+					{
+						m_expectedType = NodeType::EndOfSeq;
+						if (input == NodeType::EndOfSeq)
+						{
+							if (m_expectedType == NodeType::FirstElement)
+							{
+								NewLineIfNeeded();
+								Indent();
+								m_stream << "[]";
+								m_col += 2;
+							}
+							if (m_indentLevel >= 1)
+								m_indentLevel--;
+							m_state = m_stateStack.top();
+							m_stateStack.pop();
+							m_expectedType = m_expectedTypeStack.top();
+							m_expectedTypeStack.pop();
+						}
+						switch (input)
+						{
+						case NodeType::EndOfSeq:
+							//PrepareEndSeq();
+							break;
+						case NodeType::Value:
+							//PrepareSeqElement();
+							NewLineIfNeeded();
+							Indent();
+							//m_stream << "- ";
+							//m_col += 2;
+							break;
+						case NodeType::BeginMap:
+							PrepareBeginMap();
+							//NewLineIfNeeded();
+							//Indent();
+							//m_stream << "- ";
+							//m_col += 2;
+							break;
+						default:
+							abort();
+						}
+					}
+					else
+					{
+						abort();
+					}
 				}
 			}
 
-			void Intent()
+			void Indent()
 			{
 				assert(m_col == 0);
-				for (int i = 0; i < m_indentLevel; ++i)
+				if (m_indentLevel == 0)
+				{
+					return;
+				}
+
+				for (int i = 0; i < m_indentLevel-1; ++i)
+				{
 					m_stream << "  ";
+					m_col += 2;
+				}
+				// parent node is a list
+				if (!m_stateStack.empty() && m_stateStack.top() == State::InsideSeq)
+				{
+					m_stream << "- ";
+					m_col += 2;
+				}
+				else
+				{
+					m_stream << "  ";
+					m_col += 2;
+				}
 			}
 
 			void NewLineIfNeeded()
@@ -214,46 +377,6 @@ namespace FishEngine
 					m_col = 0;
 				}
 			}
-
-			void PushState(YAMLNodeType state)
-			{
-				if (state == YAMLNodeType::MapValue)
-					state = YAMLNodeType::MapKey;
-				if (state != YAMLNodeType::None)
-				{
-					if (state == YAMLNodeType::SeqBegin)
-					{
-						int i = 1;
-					}
-					if (state == YAMLNodeType::SeqInside)
-					{
-						int i = 1;
-					}
-					//std::cout << "\n" << static_cast<std::underlying_type_t<YAMLNodeType>>(state) << "\n";
-					m_nodeTypeStack.push(state);
-				}
-			}
-
-			YAMLNodeType PopLastState()
-			{
-				YAMLNodeType ret = YAMLNodeType::None;
-				if (!m_nodeTypeStack.empty())
-				{
-					ret = m_nodeTypeStack.top();
-					m_nodeTypeStack.pop();
-				}
-				return ret;
-			}
-
-			void PopLastStateAndCheck(YAMLNodeType expected)
-			{
-				auto state = m_nodeTypeStack.top();
-				auto size = m_nodeTypeStack.size();
-				m_nodeTypeStack.pop();
-				if (state != expected)
-					abort();
-			}
-
 		};
 	}
 
@@ -318,7 +441,7 @@ namespace FishEngine
 
 		void SerializeObject(std::shared_ptr<Object> const & obj);
 
-		void SetManipulator(YAML::EMITTER_MANIP value)
+		void SetManipulator(YAML::Manipulator value)
 		{
             m_emitter.SetManipulator(value);
             

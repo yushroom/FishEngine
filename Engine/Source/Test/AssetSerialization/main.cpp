@@ -48,19 +48,23 @@ public:
 	virtual void Init() override
 	{
 		DefaultScene();
-		//YAML::Emitter emitter;
-        auto& emitter = cout;
-		//emitter << YAML::LocalTag("u") << "tag:FishEngine:";
-		//emitter.SetStringFormat(YAML::Auto);
-		//emitter << "%YAML 1.1";
-		//emitter << "%TAG !u! tag:FishEngine:";
-		YAMLOutputArchive archive(emitter);
+		std::ofstream fout("test.yaml");
+		YAMLOutputArchive archive(cout);
 		archive.SetManipulator(YAML::BeginDoc);
 		archive.SetManipulator(YAML::BeginMap);
-		//emitter << YAML::LocalTag("u", "29");
+		archive << make_nvp("int", 3110103671);
+		archive << make_nvp("bool", true);
+		archive << make_nvp("bool", false);
+		archive << make_nvp("float", 1.0f);
+		archive << make_nvp("double", 2.0);
+		archive << make_nvp("cstring", "Hello World!");
+		archive << make_nvp("std::string", std::string("This is a std::string."));
+		archive << make_nvp("empty list", std::vector<int>());
+		archive << make_nvp("list", std::vector<int>{1, 2, 3, 4, 5});
 		archive << make_nvp("empty map", std::map<int, int>());
-		archive << make_nvp("vec", Vector3(1, 2, 3));
+		archive << make_nvp("Vector3", Vector3(1, 2, 3));
 		archive.SetManipulator(YAML::EndMap);
+		archive << std::vector<std::string>{"eggs", "bread", "mild"};
 		archive.SetManipulator(YAML::EndDoc);
 		archive << std::make_shared<Transform>();
 		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
@@ -69,11 +73,6 @@ public:
 		archive << go;
 		auto importer = std::make_shared<TextureImporter>();
 		archive << importer;
-//		if (!emitter.good())
-//		{
-//			Debug::LogWarning("%s", emitter.GetLastError().c_str());
-//		}
-//		std::cout << emitter.c_str() << std::endl;
 	}
 
 	virtual void Update() override

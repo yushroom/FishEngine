@@ -17,4 +17,6 @@
 #define InjectClassName(T) \
     static const std::string StaticClassName() { return #T; }  \
     virtual const std::string ClassName() const override { return StaticClassName(); } \
+	virtual int ClassID() const override { return FishEngine::ClassID<T>(); } \
     InjectSerializationFunctions(T)
+

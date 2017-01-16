@@ -27,7 +27,7 @@ xcuserdata/
 /Engine/ThirdParty/boost*
 /Engine/ThirdParty/assimp-3.3.1*
 /Engine/ThirdParty/glew-2.0.0*
-/Engine/ThirdParty/glfw-3.2.1*
+/Engine/ThirdParty/glfw*
 /Engine/ThirdParty/clang*
 /Engine/ThirdParty/fbxsdk*
 /Engine/ThirdParty/nativefiledialog/

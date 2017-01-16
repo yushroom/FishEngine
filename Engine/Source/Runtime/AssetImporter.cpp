@@ -2,6 +2,6 @@
 
 namespace FishEngine
 {
-    Path AssetImporter::s_assetsRootDirectory;
+    //Path AssetImporter::s_assetsRootDirectory;
 }
 

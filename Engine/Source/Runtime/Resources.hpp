@@ -78,6 +78,8 @@ namespace FishEngine
         static bool FindSystemFile(const std::string& filename, Path& out_path);
 
         static void Init();
+		
+		//static std::map<boost::uuids::uuid, >
 
     private:
         friend FishEditor::EditorGUI;

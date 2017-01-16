@@ -13,6 +13,8 @@
 #include "Gizmos.hpp"
 #include "Shader.hpp"
 #include "QualitySettings.hpp"
+#include "Serialization.hpp"
+#include "Serialization/archives/yaml.hpp"
 
 
 namespace FishEngine
@@ -343,5 +345,15 @@ namespace FishEngine
         
         return selected;
     }
+	
+	void Scene::Serialize(std::string const & path)
+	{
+		std::ofstream fout(path);
+		YAMLOutputArchive archive(fout);
+		for (auto & go : m_gameObjects)
+		{
+			archive << go;
+		}
+	}
 }
 

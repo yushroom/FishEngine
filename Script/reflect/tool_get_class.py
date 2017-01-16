@@ -214,8 +214,8 @@ def internal_parse_class(node):
         # elif child.kind == clang.cindex.CursorKind.UNEXPOSED_DECL:
         #     for c in child.get_children():
         #         print('\t\t', c.spelling)
-        #elif child.kind in skip_class_internal_type:
-        #    pass
+        elif child.kind in skip_class_internal_type:
+           pass
         # else:
         #     print('\t', child.spelling)
         #     pass
@@ -258,7 +258,7 @@ def internal_find_typerefs(node):
 
 def ExtractClasses(path):
     global classes
-    if True:
+    if False:
         if sys.platform == 'darwin':
             header_path = (
                 R'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1',

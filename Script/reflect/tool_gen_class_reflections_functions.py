@@ -101,21 +101,21 @@ namespace FishEngine
     template<class Archive>
     static void DynamicSerializeObject(Archive & archive, std::shared_ptr<Object> obj)
     {
-        auto name = obj->ClassName();
-        if (name == "Object")
+        const int id = obj->ClassID();
+        switch (id)
         {
-            archive << obj;
+        ${dynamic_seqs};
+        default:
+            abort();
         }
-        ${dynamic_seqs}
     }
 }
 '''
 
 DynamicSerializeObject_seq = '''
-        else if (name == "{0}")
-        {{
+        case ClassID<{0}>():
             archive << *std::dynamic_pointer_cast<{0}>(obj);
-        }}'''
+            break;'''
 
 def Gen_DynamicSerializeObject(class_info):
     def IsObject(name):
@@ -129,6 +129,7 @@ def Gen_DynamicSerializeObject(class_info):
     for key in class_info.keys():
         if IsObject(key):
             Objects.append(key)
+    Objects.remove("Object")
     seqs = ''.join([DynamicSerializeObject_seq.format(x) for x in Objects])
     return Template(DynamicSerializeObject_template_str).render(dynamic_seqs = seqs)
 

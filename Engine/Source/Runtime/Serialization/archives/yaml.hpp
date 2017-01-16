@@ -1,7 +1,11 @@
 #pragma once
 
+#define USE_yaml_cpp 1
+
 //#include "ReflectClass.hpp"
-//#include <yaml-cpp/yaml.h>
+#if USE_yaml_cpp
+#include <yaml-cpp/yaml.h>
+#endif
 #include "Object.hpp"
 #include "Serialization/NameValuePair.hpp"
 #include "Serialization/helper.hpp"
@@ -22,11 +26,12 @@ namespace FishEngine
 		std::true_type, std::false_type>
 	{};
 
-//#define DebugYAML(str)	m_stream << str
-#define DebugYAML(str)
-
+#if !USE_yaml_cpp
 	namespace YAML
 	{
+	//#define DebugYAML(str)	m_stream << str
+	#define DebugYAML(str)
+		
 		enum class State
 		{
 			None,
@@ -50,7 +55,7 @@ namespace FishEngine
 			None,
 		};
 
-		enum Manipulator
+		enum EMITTER_MANIP
 		{
 			Flow,
 			BeginDoc,
@@ -94,37 +99,37 @@ namespace FishEngine
 				return *this;
 			}
 
-			void SetManipulator (Manipulator value)
+			Emitter & operator << (EMITTER_MANIP value)
 			{
 				switch (value)
 				{
-				case Manipulator::BeginDoc:
+				case EMITTER_MANIP::BeginDoc:
 					DebugYAML("[BeginDoc]");
 					ToNextStage(NodeType::BeginDoc);
 					break;
-				case Manipulator::EndDoc:
+				case EMITTER_MANIP::EndDoc:
 					DebugYAML("[EndDoc]");
 					ToNextStage(NodeType::EndOfDoc);
 					break;
-				case Manipulator::BeginMap:
+				case EMITTER_MANIP::BeginMap:
 					DebugYAML("[BeginMap]");
 					ToNextStage(NodeType::BeginMap);
 					break;
-				case Manipulator::EndMap:
+				case EMITTER_MANIP::EndMap:
 					DebugYAML("[EndMap]");
 					ToNextStage(NodeType::EndOfMap);
 					break;
-				case Manipulator::BeginSeq:
+				case EMITTER_MANIP::BeginSeq:
 					DebugYAML("[BeginSeq]");
 					ToNextStage(NodeType::BeginSeq);
 					break;
-				case Manipulator::EndSeq:
+				case EMITTER_MANIP::EndSeq:
 					DebugYAML("[EndSeq]");
 					ToNextStage(NodeType::EndOfSeq);
 					break;
-				case Manipulator::Flow:
-					DebugYAML("Flow");
-					m_flowMode = true;
+				case EMITTER_MANIP::Flow:
+					DebugYAML("[Flow]");
+					m_nextNodeIsFlow = true;
 				default:
 					break;
 				}
@@ -134,6 +139,7 @@ namespace FishEngine
 			std::ostream & m_stream;
 			int m_indentLevel = 0;
 			int m_col = 0;
+			bool m_nextNodeIsFlow = false;
 			bool m_flowMode = false;
 
 			// parent node of current node (if exists)
@@ -143,29 +149,29 @@ namespace FishEngine
 			//std::stack<State> m_stateStack;
 			//std::stack<NodeType> m_expectedTypeStack;
 			//std::stack<bool> m_indentStack;
-			LocalState m_localState = { State::None, NodeType::None, false, false};
+			LocalState m_nextState = { State::None, NodeType::None, false, false};
+			LocalState m_currentState = { State::None, NodeType::None, false, false};
 			std::stack<LocalState> m_localStateStack;
 
 			void PopStates()
 			{
 				auto s = m_localStateStack.top();
 				m_localStateStack.pop();
-				m_state = s.state;
-				m_expectedType= s.nodeType;
-				m_flowMode = s.flow;
-				//m_state = m_stateStack.top();
-				//m_stateStack.pop();
-				//m_expectedType = m_expectedTypeStack.top();
-				//m_expectedTypeStack.pop();
-				//bool unindent = m_indentStack.top();
-				bool unindent = s.indent;
-				//m_indentStack.pop();
+				m_state			= s.state;
+				m_expectedType	= s.nodeType;
+				m_flowMode		= s.flow;
+				bool unindent	= s.indent;
 				if (unindent)
 				{
 					m_indentLevel--;
 					DebugYAML("[indent--]");
 				}
 			}
+//			
+//			void PrepareNewMapOrSeq(bool isMap)
+//			{
+//				
+//			}
 
 			void PrepareNewMapBegin(bool addIndent)
 			{
@@ -175,9 +181,8 @@ namespace FishEngine
 					DebugYAML("[indent++]");
 				}
 				m_localStateStack.emplace(LocalState{ m_state, m_expectedType, addIndent, m_flowMode });
-				//m_indentStack.push(addIndent);
-				//m_stateStack.push(m_state);
-				//m_expectedTypeStack.push(m_expectedType);
+				m_flowMode = m_nextNodeIsFlow;
+				m_nextNodeIsFlow = false;
 				m_state = State::InsideMap;
 				m_expectedType = NodeType::FirstElement;
 			}
@@ -190,9 +195,8 @@ namespace FishEngine
 					DebugYAML("[indent++]");
 				}
 				m_localStateStack.emplace(LocalState{ m_state, m_expectedType, addIndent, m_flowMode });
-				//m_indentStack.push(addIndent);
-				//m_stateStack.push(m_state);
-				//m_expectedTypeStack.push(m_expectedType);
+				m_flowMode = m_nextNodeIsFlow;
+				m_nextNodeIsFlow = false;
 				m_state = State::InsideSeq;
 				m_expectedType = NodeType::FirstElement;
 			}
@@ -204,8 +208,8 @@ namespace FishEngine
 				{
 				case NodeType::BeginDoc:
 					NewLineIfNeeded();
-					m_stream << "---";
-					m_col += 3;
+					m_stream << "---\n";
+					m_col = 0;
 					m_state = State::InsideDoc;
 					m_expectedType = NodeType::EndOfDoc;
 					break;
@@ -228,8 +232,8 @@ namespace FishEngine
 				case NodeType::EndOfDoc:
 					// EmitEndDoc();
 					NewLineIfNeeded();
-					m_stream << "...";
-					m_col += 3;
+					m_stream << "...\n";
+					m_col = 0;
 					m_state = State::None;
 					m_expectedType = NodeType::None;
 					m_flowMode = false;
@@ -255,13 +259,23 @@ namespace FishEngine
 						// output empty map
 						if (m_expectedType == NodeType::FirstElement)
 						{
-							NewLineIfNeeded();
-							OutputIndent();
+//							if (!m_flowMode)
+//							{
+//								NewLineIfNeeded();
+//								OutputIndent();
+//							}
 							m_stream << "{}";
 							m_col += 2;
 						}
+						else
+						{
+							if (m_flowMode) {
+								m_stream << "}";
+								m_col += 2;
+							}
+						}
 						PopStates();
-						m_flowMode = true;
+						//m_flowMode = false;
 					}
 					switch (input)
 					{
@@ -269,12 +283,23 @@ namespace FishEngine
 						break;
 					case NodeType::Value:
 						//PrepareMapKey();
-						NewLineIfNeeded();
-						OutputIndent();
+						if (!m_flowMode)
+						{
+							NewLineIfNeeded();
+							OutputIndent();
+						}
+						else
+						{
+							if (m_expectedType == NodeType::FirstElement)
+								m_stream << "{";
+							else
+								m_stream << ", ";
+							m_col += 2;
+						}
 						m_expectedType = NodeType::MapValue;
 						break;
 					case NodeType::BeginMap:
-						PrepareNewMapBegin(false);
+						PrepareNewMapBegin(true);
 						break;
 					case NodeType::BeginSeq:
 						PrepareNewSeqBegin(true);
@@ -312,37 +337,55 @@ namespace FishEngine
 			{
 				if (m_expectedType == NodeType::EndOfSeq || m_expectedType == NodeType::FirstElement)
 				{
-					m_expectedType = NodeType::EndOfSeq;
 					if (input == NodeType::EndOfSeq)
 					{
 						// output empty list
 						if (m_expectedType == NodeType::FirstElement)
 						{
-							NewLineIfNeeded();
-							OutputIndent();
+//							if (!m_flowMode)
+//							{
+//								NewLineIfNeeded();
+//								OutputIndent();
+//							}
 							m_stream << "[]";
 							m_col += 2;
 						}
 						PopStates();
+						//m_flowMode = false;
 					}
 
 					switch (input)
 					{
 					case NodeType::EndOfSeq:
 						//PrepareEndSeq();
-						
 						break;
 					case NodeType::Value:
 						//PrepareSeqElement();
-						NewLineIfNeeded();
-						//OutputIndent();
-						OutputIndent2();
-						m_stream << "- ";
+						if (!m_flowMode)
+						{
+							NewLineIfNeeded();
+							OutputIndent();
+						}
+						m_expectedType = NodeType::EndOfSeq;
+						//OutputIndent2();
+						//m_stream << "- ";
 						break;
 					case NodeType::BeginMap:
+						if (!m_flowMode)
+						{
+							NewLineIfNeeded();
+							OutputIndent();
+						}
+						m_expectedType = NodeType::EndOfSeq;
 						PrepareNewMapBegin(false);
 						break;
 					case NodeType::BeginSeq:
+						if (!m_flowMode)
+						{
+							NewLineIfNeeded();
+							OutputIndent();
+						}
+						m_expectedType = NodeType::EndOfSeq;
 						PrepareNewSeqBegin(false);
 						break;
 					default:
@@ -374,24 +417,21 @@ namespace FishEngine
 					PrepareSeqNode(input);
 				}
 			}
-
-			void OutputIndent2()
+			
+			void AfterOutputNode()
 			{
-				assert(m_col == 0);
-				if (m_indentLevel == 0)
-				{
-					return;
-				}
-				for (int i = 0; i < m_indentLevel; ++i)
-				{
-					m_stream << "  ";
-					m_col += 2;
-				}
+				
 			}
 
 			void OutputIndent()
 			{
 				assert(m_col == 0);
+				// 1. element is arithmetic or a string
+				// 2. key of a map && parent node is a list
+				bool isBeginOfAListElement =
+					(m_state == State::InsideSeq) ||
+					(m_state ==State::InsideMap && m_expectedType != NodeType::EndOfMap && !m_localStateStack.empty() && m_localStateStack.top().state == State::InsideSeq);
+				
 				if (m_indentLevel == 0)
 				{
 					return;
@@ -402,13 +442,8 @@ namespace FishEngine
 					m_stream << "  ";
 					m_col += 2;
 				}
-				// parent node is a list
-				if (!m_stateStack.empty() && m_stateStack.top() == State::InsideSeq && m_expectedType != NodeType::EndOfMap)
-				{
-					m_stream << "- ";
-					m_col += 2;
-				}
-				else if (m_state == State::InsideSeq)
+				
+				if (isBeginOfAListElement)
 				{
 					m_stream << "- ";
 					m_col += 2;
@@ -429,9 +464,10 @@ namespace FishEngine
 				}
 			}
 		};
-	}
-
+		
 #undef DebugYAML
+	}
+#endif
 	 
 	class YAMLOutputArchive;
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::uuids::uuid const & t);
@@ -494,9 +530,10 @@ namespace FishEngine
 
 		void SerializeObject(std::shared_ptr<Object> const & obj);
 
-		void SetManipulator(YAML::Manipulator value)
+		void SetManipulator(YAML::EMITTER_MANIP value)
 		{
-            m_emitter.SetManipulator(value);
+            //m_emitter.SetManipulator(value);
+			m_emitter << value;
             
 			if (value == YAML::BeginDoc)
 			{
@@ -653,7 +690,11 @@ namespace FishEngine
 
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::filesystem::path const & t)
 	{
+#if USE_yaml_cpp
+		archive << "path(todo)";
+#else
 		archive << t.string();
+#endif
 		return archive;
 	}
 

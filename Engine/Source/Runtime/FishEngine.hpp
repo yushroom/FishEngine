@@ -25,6 +25,8 @@
 #include <list>
 #include <memory>
 
+#include "ClassID.hpp"
+
 namespace FishEngine
 {
     class Object;

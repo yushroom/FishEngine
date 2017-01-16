@@ -144,6 +144,8 @@ namespace FishEngine
         {
             return m_bounds;
         }
+		
+		static void Serialize(std::string const & path);
 
     private:
         friend class RenderSystem;

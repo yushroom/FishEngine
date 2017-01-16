@@ -16,6 +16,8 @@ namespace FishEngine
     public:
 		InjectClassName(TextureImporter)
 
+		virtual void SaveAndReimport() override {};
+		
         TexturePtr FromFile(const Path& path);
 
         TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);

@@ -160,10 +160,10 @@ namespace FishEngine
 
 
     // position buffer array
-    class FE_EXPORT Meta(NonSerializable) SimpleMesh : public Object
+    class FE_EXPORT Meta(NonSerializable) SimpleMesh
     {
     public:
-        InjectClassName(SimpleMesh)
+        //InjectClassName(SimpleMesh)
 
         // 3 components(float) for each vertex
         SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode);
@@ -182,10 +182,10 @@ namespace FishEngine
         GLuint m_VBO = 0;
     };
 
-    class Meta(NonSerializable) DynamicMesh : public Object
+    class Meta(NonSerializable) DynamicMesh
     {
     public:
-        InjectClassName(DynamicMesh)
+        //InjectClassName(DynamicMesh)
 
         DynamicMesh() = default;
 

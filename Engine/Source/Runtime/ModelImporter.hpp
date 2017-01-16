@@ -30,10 +30,10 @@ namespace FishEngine {
     typedef std::shared_ptr<ModelNode> ModelNodePtr;
     
 
-    class FE_EXPORT Model : public Object
+    class FE_EXPORT Meta(NonSerializable) Model
     {
     public:
-        InjectClassName(Model)
+        //InjectClassName(Model)
 
         Model() : m_avatar(std::make_shared<Avatar>()) {}
         
@@ -63,6 +63,7 @@ namespace FishEngine {
         
     private:
         friend class ModelImporter;
+		std::string m_name;
 
         void AddMesh(MeshPtr& mesh);
 
@@ -153,7 +154,9 @@ namespace FishEngine {
 		InjectClassName(ModelImporter)
 
         ModelImporter() = default;
-        
+		
+		virtual void SaveAndReimport() override {};
+		
         void
         setFileScale(
             const float fileScale)
@@ -195,6 +198,7 @@ namespace FishEngine {
 
         void RemoveDummyNodeFBX( AnimationPtr animation );
 
+		Meta(NonSerializable)
         ModelPtr      m_model;
 
         //VertexUsages m_vertexUsages = (int)VertexUsage::PNUT;

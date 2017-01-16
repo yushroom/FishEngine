@@ -16,7 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/filesystem.hpp>
-#include "generate/Enum_LightType.hpp"
+//#include "generate/Enum_LightType.hpp"
 //#include <boost/uuid/uuid_serialize.hpp>
 
 namespace FishEngine

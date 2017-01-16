@@ -833,7 +833,9 @@ namespace FishEditor
                 }
                 if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
                 {
-                    Debug::LogWarning("Save Scene: Not Implemented");
+                    //Debug::LogWarning("Save Scene: Not Implemented");
+					Scene::Serialize("Sponza.yaml");
+					Debug::LogWarning("Scene serialization: done!");
                 }
                 if (ImGui::MenuItem("Save Scene as...", "Shift+Ctrl+S"))
                 {

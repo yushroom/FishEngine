@@ -1,12 +1,49 @@
 #if 1
 
 #include <iostream>
+#include <yaml-cpp/yaml.h>
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include "Serialization.hpp"
+#include "TextureImporter.hpp"
+#include "Archive.hpp"
+#include "Serialization/NameValuePair.hpp"
+#include "Serialization/helper.hpp"
+#include "Serialization/archives/YAMLInputArchive.hpp"
 
+namespace YAML
+{
+	//template<class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	//struct convert
+	//{
+	//	static bool decode(const Node& node, T & rhs)
+	//	{
+	//		if (!node.IsScalar())
+	//		{
+	//			return false;
+	//		}
+	//		rhs = static_cast<T>(node.as<std::underlying_type<T>>());
+	//	}
+	//};
+}
+
+using namespace FishEngine;
 using namespace std;
 
 int main()
 {
-	std::cout << L"\xCC\xCC" << std::endl;
+	const char* path = R"(D:\program\FishEngine\Example\Sponza\crytek-sponza\textures\background.png.meta)";
+	auto p = boost::filesystem::path(path);
+	auto t = (uint32_t)boost::filesystem::last_write_time(p);
+	cout << "last write time: " << t << std::endl;
+	FishEngine::YAMLInputArchive archive{ std::ifstream(path) };
+	//archive.CurrentNode();
+	uint32_t created_time;
+	archive >> make_nvp("timeCreated", created_time);
+	std::cout << created_time << endl;
+	archive.ToNextNode();
+	auto importer = archive.DeserializeObject<TextureImporter>();
+	std::cout << importer->GetGUID() << std::endl;
 	return 0;
 }
 

@@ -522,11 +522,11 @@ namespace FishEngine
 			return *this;
 		}
 
-		YAMLOutputArchive & operator << (const wchar_t* t)
-		{
-			m_emitter << t;
-			return *this;
-		}
+		//YAMLOutputArchive & operator << (const wchar_t* t)
+		//{
+		//	m_emitter << t;
+		//	return *this;
+		//}
 
 		void SerializeObject(std::shared_ptr<Object> const & obj);
 
@@ -559,6 +559,14 @@ namespace FishEngine
 		std::vector<std::shared_ptr<Object>> m_objectsToBeSerialized;
 		bool m_isInsideDoc = false;
 	};
+
+	//class YAMLInputArchive
+	//{
+	//public:
+
+
+	//private:
+	//};
 
 	// If you want to call prologue and epilogue automatically, override Save(archive, T) for type T,
 	// otherwise override operator<< directly.
@@ -690,11 +698,11 @@ namespace FishEngine
 
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::filesystem::path const & t)
 	{
-#if USE_yaml_cpp
-		archive << "path(todo)";
-#else
+//#if USE_yaml_cpp
+//		archive << "path(todo)";
+//#else
 		archive << t.string();
-#endif
+//#endif
 		return archive;
 	}
 

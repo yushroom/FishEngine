@@ -1,11 +1,13 @@
 #include "Resources.hpp"
-#include "Debug.hpp"
 #include <iostream>
+#include <ctime>
+#include "Debug.hpp"
 #include "TextureImporter.hpp"
 #include "ModelImporter.hpp"
 #include "Timer.hpp"
 
 #include "Serialization/archives/yaml.hpp"
+#include "Serialization/archives/YAMLInputArchive.hpp"
 #include "Serialization.hpp"
 
 namespace FishEngine
@@ -41,19 +43,42 @@ namespace FishEngine
 		{
 			return AssetType::Material;
 		}
-		else if (ext == ".hpp")
+		else if (ext == ".hpp" || ext == ".cpp")
 		{
 			return AssetType::Script;
 		}
 		return AssetType::Unknown;
 	}
 	
-	void GenerateMetaFile(Path const & path, std::shared_ptr<AssetImporter> importer)
+	template<class AssetImporterType>
+	std::shared_ptr<AssetImporterType> GetAssetImporter(Path const & assetPath)
 	{
-		auto meta_path = path.string() + ".meta";
+		//bool need_generate = true;
+		auto meta_path = assetPath.string() + ".meta";
+		if (boost::filesystem::exists(meta_path))
+		{
+			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
+			YAMLInputArchive archive{ std::ifstream(meta_path) };
+			uint32_t meta_created_time;
+			archive >> make_nvp("timeCreated", meta_created_time);
+			if (asset_modified_time <= meta_created_time)
+			{
+				Debug::Log("Load .meta file: %s", meta_path.c_str());
+				archive.ToNextNode();
+				return archive.DeserializeObject<AssetImporterType>();
+			}
+		}
+		
+		Debug::Log("Generate .meta file: %s", meta_path.c_str());
+		auto importer = std::make_shared<AssetImporterType>();
 		std::ofstream fout(meta_path);
+		uint32_t time_created = static_cast<uint32_t>(time(NULL));
 		YAMLOutputArchive archive(fout);
+		archive.SetManipulator(YAML::BeginMap);
+		archive << make_nvp("timeCreated", time_created);
+		archive.SetManipulator(YAML::EndMap);
 		archive << importer;
+		return importer;
 	}
 	
     void FileNode::BuildNodeTree(const Path path)
@@ -64,9 +89,15 @@ namespace FishEngine
             for (auto& it : boost::filesystem::directory_iterator(path))
             {
                 //std::cout << "\t" << it.path() << '\n';
-                children.emplace_back();
-                children.back().parent = this;
-                children.back().BuildNodeTree(it.path());
+				auto & p = it.path();
+				//std::cout << p << std::endl;
+				if (p.extension() != ".meta")
+				{
+					//std::cout << "[" << p.extension().string() << "]" << std::endl;
+					children.emplace_back();
+					children.back().parent = this;
+					children.back().BuildNodeTree(it.path());
+				}
             }
         }
 		else
@@ -75,15 +106,21 @@ namespace FishEngine
 			auto type = GetAssetType(ext);
 			if (type == AssetType::Texture)
 			{
-				auto importer = std::make_shared<TextureImporter>();
-				importer->FromFile(path);
-				GenerateMetaFile(path, importer);
+				Timer t(path.string());
+				auto importer = GetAssetImporter<TextureImporter>(path);
+				auto tex = importer->FromFile(path);
+				t.StopAndPrint();
+				Resources::s_uuidToImporter[tex->GetGUID()] = importer;
+				Resources::s_pathToAsset[path] = tex;
 			}
 			else if (type == AssetType::Model)
 			{
-				auto importer = std::make_shared<ModelImporter>();
-				importer->LoadFromFile(path);
-				GenerateMetaFile(path, importer);
+				Timer t(path.string());
+				auto importer = GetAssetImporter<ModelImporter>(path);
+				auto model = importer->LoadFromFile(path);
+				t.StopAndPrint();
+				//Resources::s_uuidToImporter[importer->GetGUID()] = importer;
+				//Resources::s_pathToAsset[path] = model;
 			}
 		}
     }
@@ -130,7 +167,9 @@ namespace FishEngine
         s_rootSystemDirectory = cwd;
     }
 
-    Path Resources::s_assetsDirectory;
+	std::map<boost::uuids::uuid, std::shared_ptr<AssetImporter>> Resources::s_uuidToImporter;
+	std::map<boost::filesystem::path, std::weak_ptr<Object>> Resources::s_pathToAsset;
+	Path Resources::s_assetsDirectory;
     Path Resources::s_rootSystemDirectory;
 
 }

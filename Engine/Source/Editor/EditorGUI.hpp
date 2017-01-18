@@ -62,7 +62,7 @@ namespace FishEditor
         static void DrawMainMenu();
 
         static void DrawInspectorWindow(FishEngine::GameObjectPtr gameObject);
-        //static void DrawInspectorWindow(FishEngine::TextureImporter& textureImporter);
+        static void DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter>& textureImporter);
 
         static void GUIStyleTweakWindow();
 

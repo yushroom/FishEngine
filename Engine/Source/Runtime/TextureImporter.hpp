@@ -18,6 +18,8 @@ namespace FishEngine
 
 		virtual void SaveAndReimport() override {};
 		
+		TextureImporter() = default;
+
         TexturePtr FromFile(const Path& path);
 
         TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);

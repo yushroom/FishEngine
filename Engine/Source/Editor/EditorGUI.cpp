@@ -52,6 +52,7 @@
 
 #include "../Runtime/generate/Enum_ShadowCastingMode.hpp"
 #include "../Runtime/generate/Enum_LightType.hpp"
+#include "../Runtime/generate/Enum_TextureImporterType.hpp"
 
 using namespace FishEngine;
 
@@ -477,14 +478,13 @@ namespace FishEditor
         else
         {
             auto asset = Selection::activeAsset();
-            //if (asset != nullptr && asset->ClassName() == "Texture")
-            //    DrawInspectorWindow(std::dynamic_pointer_cast<Texture>(asset));
+            if (asset != nullptr && asset->ClassID() == ClassID<TextureImporter>())
+                DrawInspectorWindow(std::dynamic_pointer_cast<TextureImporter>(asset));
         }
 
         ImGui::EndDock(); // Inspector Editor
         //ImGui::End();
     }
-
 
     void EditorGUI::DrawInspectorWindow(FishEngine::GameObjectPtr selectedGO)
     {
@@ -607,7 +607,7 @@ namespace FishEditor
     }
 
 
-    void EditorGUI::DrawProjectWindow()
+	void EditorGUI::DrawProjectWindow()
     {
         ImGui::BeginDock("Project", nullptr);
         
@@ -753,6 +753,22 @@ namespace FishEditor
                     selected_item_id == item_count, flags))
                 {
                     selected_item_id = item_count;
+					std::shared_ptr<Object> importer = nullptr;
+					{
+						auto result = Resources::s_pathToAsset.find(node.path);
+						if (result != Resources::s_pathToAsset.end())
+							importer = result->second.lock();
+					}
+					//auto asset = Resources::s_pathToAsset[node.path].lock();
+					if (importer != nullptr)
+					{
+						auto result = Resources::s_uuidToImporter.find(importer->GetGUID());
+						if (result != Resources::s_uuidToImporter.end())
+						{
+							auto a = result->second;
+							Selection::setActiveAsset(a);
+						}
+					}
                     if (ImGui::IsMouseDoubleClicked(0))
                     {
                         current_dir = &node;
@@ -1118,6 +1134,11 @@ namespace FishEditor
         }
     }
 
+	void EditorGUI::DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter>& textureImporter)
+	{
+		Enum("Texture Type", textureImporter->textureType());
+	}
+
     template<>
     void EditorGUI::OnInspectorGUI(const FishEngine::TransformPtr& transform)
     {
@@ -1356,9 +1377,9 @@ namespace FishEditor
     template<>
     void EditorGUI::OnInspectorGUI(const FishEngine::ComponentPtr& component)
     {
-#define Case(T) else if (component->ClassName() == FishEngine::T::StaticClassName()) { OnInspectorGUI(std::static_pointer_cast<FishEngine::T>(component)); }
+#define Case(T) else if (component->ClassID() == FishEngine::ClassID<T>()) { OnInspectorGUI(std::static_pointer_cast<FishEngine::T>(component)); }
 
-        if (component->ClassName() == FishEngine::Transform::StaticClassName()) {
+        if (component->ClassID() == FishEngine::ClassID<Transform>()) {
             OnInspectorGUI(std::static_pointer_cast<FishEngine::Transform>(component));
         }
         Case(Camera)

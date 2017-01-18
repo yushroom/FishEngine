@@ -34,7 +34,7 @@ namespace FishEngine
 		static Path GUIDToAssetPath(Path const & guid);
 		
 		static bool CopyAsset(Path const & path, Path const & newPath);
-		static void CreateAsset(Object asset, Path const & path);
+		static void CreateAsset(ObjectPtr asset, Path const & path);
 		static Path CreateFolder(Path const & parentFolder, Path const & newFolderName);
 		static bool DeleteAsset(Path const & path);
 		

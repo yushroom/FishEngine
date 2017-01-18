@@ -45,7 +45,7 @@ namespace FishEditor
         }
         
         static void
-        setActiveAsset(FishEngine::ObjectPtr assetObject)
+        setActiveAsset(std::weak_ptr<FishEngine::Object> assetObject)
         {
             m_activeAsset = assetObject;
             if (!m_isActiveGameObjectLocked)

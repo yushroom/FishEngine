@@ -111,7 +111,7 @@ namespace FishEngine
             frustum.maxRange = split_far;
 
             Gizmos::setMatrix(camera_to_world);
-            Gizmos::setColor(Color::cyan * i / 3);
+            Gizmos::setColor(Color::cyan * i / 3.0f);
             Gizmos::DrawFrustum(frustum);
             Gizmos::setMatrix(Matrix4x4::identity);
 

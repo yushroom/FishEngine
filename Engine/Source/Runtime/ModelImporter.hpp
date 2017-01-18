@@ -210,10 +210,11 @@ namespace FishEngine {
         ModelImporterTangents m_importTangents  = ModelImporterTangents::Calculate;
         
         // Existing material search setting.
-        ModelImporterMaterialSearch materialSearch;
+        ModelImporterMaterialSearch m_materialSearch;
 
 
         // remove dummy nodes
+		Meta(NonSerializable)
         std::map<std::string, std::map<std::string, Matrix4x4>> m_nodeTransformations;
     };
 }

@@ -5,6 +5,7 @@
 
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include "ReflectClass.hpp"
 
@@ -79,7 +80,11 @@ namespace FishEngine
 
         static void Init();
 		
-		//static std::map<boost::uuids::uuid, >
+		// uuid of AssetImporter -> AssetImporter
+		static std::map<boost::uuids::uuid, std::shared_ptr<AssetImporter>> s_uuidToImporter;
+
+		// asset path -> asset object
+		static std::map<boost::filesystem::path, std::weak_ptr<Object>> s_pathToAsset;
 
     private:
         friend FishEditor::EditorGUI;

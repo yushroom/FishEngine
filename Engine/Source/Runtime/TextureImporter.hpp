@@ -59,21 +59,27 @@ namespace FishEngine
 
         
     private:
-
+		friend class FishEditor::EditorGUI;
         // Which type of texture are we dealing with here.
         TextureImporterType     m_textureType   = TextureImporterType::Default;
 
         // Shape of imported texture.
-        TextureImporterShape    m_textureShadpe = TextureImporterShape::Texture2D;
+        TextureImporterShape    m_textureShape = TextureImporterShape::Texture2D;
 
         // Filtering mode of the texture.
         FilterMode              m_filterMode    = FilterMode::Trilinear;
 
         // Wrap mode (Repeat or Clamp) of the texture.
         TextureWrapMode         m_wrapMode      = TextureWrapMode::Repeat;
+		
+		// Is texture storing color data?
+		bool					m_sRGBTexture	= true;
 
+		// Set this to true if you want texture data to be readable from scripts. Set it to false to prevent scripts from reading texture data.
         bool                    m_isReadable    = false;
-        bool                    m_mipmapEnabled = false;
+		
+		// Select this to enable mip-map generation. Mip maps are smaller versions of the Texture that get used when the Texture is very small on screen.
+        bool                    m_mipmapEnabled = true;
     };
 }
 

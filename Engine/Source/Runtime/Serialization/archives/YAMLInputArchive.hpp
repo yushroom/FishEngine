@@ -7,10 +7,14 @@ namespace FishEngine
 	class YAMLInputArchive
 	{
 	public:
-		YAMLInputArchive(std::istream & stream)
+		YAMLInputArchive(std::string const & filename)
 		{
-			m_nodes = YAML::LoadAll(stream);
+			m_nodes = YAML::LoadAllFromFile(filename);
 		}
+		
+		YAMLInputArchive(YAMLInputArchive const &) = delete;
+		
+		YAMLInputArchive operator=(YAMLInputArchive const &) = delete;
 
 		YAML::Node CurrentNode()
 		{
@@ -64,8 +68,8 @@ namespace FishEngine
 	void convert(YAML::Node const & node, boost::uuids::uuid & t)
 	{
 		assert(node.IsMap());
-		t = boost::lexical_cast<boost::uuids::uuid>(node["fileId"].as<std::string>());
-		//std::istringstream sin(node["fileId"].as<std::string>());
+		t = boost::lexical_cast<boost::uuids::uuid>(node["fileID"].as<std::string>());
+		//std::istringstream sin(node["fileID"].as<std::string>());
 		//sin >> t;
 	}
 
@@ -77,7 +81,7 @@ namespace FishEngine
 	}
 
 	template<class T>
-	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, NameValuePair<T&> & nvp)
+	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, NameValuePair<T>  && nvp)
 	{
 		//std::cout << nvp.name << endl;
 		//nvp.value = archive.CurrentNode()[nvp.name].as<T>();

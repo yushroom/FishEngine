@@ -575,7 +575,7 @@ namespace FishEngine
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
-		archive << make_nvp("fileId", 0);
+		archive << make_nvp("fileID", 0);
 		archive.SetManipulator(YAML::EndMap);
 		return archive;
 	}
@@ -686,7 +686,7 @@ namespace FishEngine
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
-		archive << make_nvp("fileId", boost::uuids::to_string(t));
+		archive << make_nvp("fileID", boost::uuids::to_string(t));
 		archive.SetManipulator(YAML::EndMap);
 		return archive;
 	}

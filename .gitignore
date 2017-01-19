@@ -32,6 +32,7 @@ xcuserdata/
 /Engine/ThirdParty/fbxsdk*
 /Engine/ThirdParty/nativefiledialog/
 /Engine/ThirdParty/yaml-cpp/
+/Engine/ThirdParty/FBX SDK/
 
 # generated
 /Engine/Source/Runtime/generate/

@@ -53,6 +53,10 @@
 #include "../Runtime/generate/Enum_ShadowCastingMode.hpp"
 #include "../Runtime/generate/Enum_LightType.hpp"
 #include "../Runtime/generate/Enum_TextureImporterType.hpp"
+#include "../Runtime/generate/Enum_TextureImporterShape.hpp"
+#include "../Runtime/generate/Enum_TextureImporterCompression.hpp"
+#include "../Runtime/generate/Enum_FilterMode.hpp"
+#include "../Runtime/generate/Enum_TextureWrapMode.hpp"
 
 using namespace FishEngine;
 
@@ -1134,9 +1138,17 @@ namespace FishEditor
         }
     }
 
-	void EditorGUI::DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter>& textureImporter)
+	void EditorGUI::DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter> textureImporter)
 	{
-		Enum("Texture Type", textureImporter->textureType());
+		Enum("Texture Type", textureImporter->m_textureType);
+		Enum("Texture Shape", textureImporter->m_textureShape);
+		Bool("Read/Write Enabled", textureImporter->m_isReadable);
+		Bool("Generate Mip Maps", textureImporter->m_mipmapEnabled);
+		Enum("Filter Mode", textureImporter->m_filterMode);
+		Enum("Wrap Mode", textureImporter->m_wrapMode);
+		ImGui::Button("Revert");
+		ImGui::SameLine();
+		ImGui::Button("Apply");
 	}
 
     template<>

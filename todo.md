@@ -30,7 +30,7 @@
 
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
-- [ ] 将资源loader和Shader、Mesh、Texture之类的具体类分离（Model已经分离，动画导入WIP）
+- [x] 将资源loader和Shader、Mesh、Texture之类的具体类分离（Model已经分离，动画导入WIP）
 
 - [ ] depth \in (-1, 1)，下次换成D3D的时候小心
 
@@ -40,7 +40,7 @@
 
 - [x] 将Scene里面的Script和Component合并到一起去（~~需要在运行时知道是不是某个类的子类~~，搞定，用enable_if)
 
-- [ ] 不依赖代码生成和外部工具的（自动）反射可行吗？
+- [x] 不依赖代码生成和外部工具的（自动）反射可行吗？
 
 - [ ] 把不该开放的API隐藏掉（尤其是FishEngine）
 
@@ -56,11 +56,13 @@
 
 - [ ] const的位置
 
-- [ ] class Graphics
+- [x] class Graphics
 
-- [ ] class CommandBuffer
+- [x] class CommandBuffer
 
-- [ ] 我需要一个动态的反射操作
+- [ ] class UnityEditor.DockArea
+
+- [x] 我需要一个动态的反射操作
 
       1: "MeshFilter" ==> make_shared<MeshFilter>() 而且要运行期动态生成或者变成dll动态加载
 
@@ -100,7 +102,7 @@
 
 - [x] 场景中的网格平面
 
-- [ ] 场景的序列化和反序列化（~~要依赖反射~~，内部的component可以不依赖反射，直接手写序列化，但是user defined的类需要反射来做自动序列化和反序列化）
+- [x] 场景的序列化和反序列化（~~要依赖反射~~，内部的component可以不依赖反射，直接手写序列化，但是user defined的类需要反射来做自动序列化和反序列化）
 
 - [x] Docking GUI
 

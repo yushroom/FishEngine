@@ -55,10 +55,11 @@ namespace FishEngine
 	{
 		//bool need_generate = true;
 		auto meta_path = assetPath.string() + ".meta";
+#if 0
 		if (boost::filesystem::exists(meta_path))
 		{
 			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
-			YAMLInputArchive archive{ std::ifstream(meta_path) };
+			YAMLInputArchive archive{meta_path};
 			uint32_t meta_created_time;
 			archive >> make_nvp("timeCreated", meta_created_time);
 			if (asset_modified_time <= meta_created_time)
@@ -68,6 +69,7 @@ namespace FishEngine
 				return archive.DeserializeObject<AssetImporterType>();
 			}
 		}
+#endif
 		
 		Debug::Log("Generate .meta file: %s", meta_path.c_str());
 		auto importer = std::make_shared<AssetImporterType>();

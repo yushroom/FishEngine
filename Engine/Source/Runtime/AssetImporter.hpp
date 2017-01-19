@@ -8,18 +8,17 @@
 
 namespace FishEngine
 {
-    class AssetImporter : public Object
-    {
-    public:
+	class AssetImporter : public Object
+	{
+	public:
 		InjectClassName(AssetImporter);
 
-        AssetImporter() = default;
-        virtual ~AssetImporter() {};
-        
-//        static Path assetsRootDirectory()
-//        {
-//            return s_assetsRootDirectory;
-//        }
+		AssetImporter() = default;
+		virtual ~AssetImporter() = default;
+
+		// noncopyable
+		AssetImporter(AssetImporter const &) = delete;
+		AssetImporter& operator=(AssetImporter const &) = delete;
 		
 		virtual void SaveAndReimport() = 0;
 		
@@ -29,22 +28,28 @@ namespace FishEngine
 		// Retrieves the asset importer for the asset at path.
 		static std::shared_ptr<AssetImporter> GetAtPath(Path const & path);
 		
-    private:
+	protected:
+
+		// dirty flag for SaveAndReimport()
 		Meta(NonSerializable)
-        std::string m_assetBundleName;
-		
+		bool			m_isDirty = false;
+
+		//Get or set the AssetBundle name.
 		Meta(NonSerializable)
-        std::string m_assetBundelVariant;
+		std::string		m_assetBundleName;
 		
+		// Get or set the AssetBundle variant.
 		Meta(NonSerializable)
-        Path		m_assetPath;
+		std::string		m_assetBundelVariant;
 		
+		// The path name of the asset for this importer. (Read Only)
 		Meta(NonSerializable)
-		std::string m_userData;
+		Path			m_assetPath;
 		
-		
-		//static Path s_assetsRootDirectory;
-    };
+		// Get or set any user data.
+		Meta(NonSerializable)
+		std::string		m_userData;
+	};
 }
 
 #endif /* AssetImporter_hpp */

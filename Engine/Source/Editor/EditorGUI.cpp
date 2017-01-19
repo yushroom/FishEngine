@@ -1121,9 +1121,23 @@ namespace FishEditor
         ImGui::InputFloat3(label, value.data(), -1, ImGuiInputTextFlags_ReadOnly);
     }
     
+	template<typename T>
+	bool Enum2(const char* label, T& e)
+	{
+		//static_assert(std::is_enum<T>::type, "T must be an enum type");
+		int index = EnumToIndex<T>(e);
+		bool changed = ImGui::Combo(label, &index, EnumToCStringArray<T>(), EnumCount<T>());
+		if (changed)
+		{
+			e = ToEnum<T>(index);
+		}
+		return changed;
+	}
+
     template<typename T>
     void Enum(const char* label, const T& e)
     {
+		//static_assert(std::is_enum<T>::type, "T must be an enum type");
         int index = EnumToIndex<T>(e);
         ImGui::Combo(label, &index, EnumToCStringArray<T>(), EnumCount<T>());
     }
@@ -1131,6 +1145,7 @@ namespace FishEditor
     template<typename T>
     void Enum(const char* label, T* e)
     {
+		//static_assert(std::is_enum<T>::type, "T must be an enum type");
         int index = EnumToIndex<T>(*e);
         if (ImGui::Combo(label, &index, EnumToCStringArray<T>(), EnumCount<T>()))
         {
@@ -1140,7 +1155,10 @@ namespace FishEditor
 
 	void EditorGUI::DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter> textureImporter)
 	{
-		Enum("Texture Type", textureImporter->m_textureType);
+		if (Enum2("Texture Type", textureImporter->m_textureType))
+		{
+			textureImporter->m_isDirty = true;
+		}
 		Enum("Texture Shape", textureImporter->m_textureShape);
 		Bool("Read/Write Enabled", textureImporter->m_isReadable);
 		Bool("Generate Mip Maps", textureImporter->m_mipmapEnabled);

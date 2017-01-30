@@ -11,6 +11,12 @@ namespace FishEngine
     public:
         Screen() = delete;
 
+		static void set(int width, int height)
+		{
+			m_width = width;
+			m_height = height;
+		}
+		
         // The current width of the screen window in pixels (Read Only).
         static int width() { return m_width; }
 
@@ -23,7 +29,7 @@ namespace FishEngine
         static float dpi() { return m_dpi; }
         
         static float pixelsPerPoint() { return m_pixelsPerPoint; }
-        //static void setPixelsPerPoint(const float value) { m_pixelsPerPoint = value; }
+		static void setPixelsPerPoint(const float value) { m_pixelsPerPoint = value; }
         
     private:
         friend class FishEditor::FishEditorWindow;

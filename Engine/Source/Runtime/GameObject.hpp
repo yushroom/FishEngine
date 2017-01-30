@@ -29,10 +29,15 @@ namespace FishEngine
         InjectClassName(GameObject)
 
         //private:
+		GameObject();
         GameObject(const std::string& name);
+		
+		// noncopyable
         GameObject(const GameObject&) = delete;
         GameObject& operator=(const GameObject&) = delete;
 
+		static GameObjectPtr Create();
+		
     public:
         ~GameObject() = default;
         // {
@@ -64,15 +69,8 @@ namespace FishEngine
         }
 
         // The tag of this game object.
-        std::string tag() const
-        {
-            return m_tag;
-        }
-
-        void setTag(const std::string& tag)
-        {
-            m_tag = tag;
-        }
+		std::string const & tag() const;
+		void setTag(const std::string& tag);
 
         // The Transform attached to this GameObject.
         TransformPtr transform() const
@@ -138,7 +136,8 @@ namespace FishEngine
         }
 
         // Activates/Deactivates the GameObject (activeSelf).
-        void SetActive(bool value) {
+		void SetActive(bool value)
+		{
             m_activeSelf = value;
         }
 
@@ -161,6 +160,7 @@ namespace FishEngine
         void OnDrawGizmosSelected();
 
     private:
+		friend class ::GameObjectInspector;
         friend class FishEditor::EditorGUI;
         friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
@@ -170,8 +170,9 @@ namespace FishEngine
         bool m_activeSelf = true;
         int m_layer = 0;
 
-        std::string m_tag;
-        TransformPtr m_transform;
+        //std::string m_tag;
+		int				m_tagIndex;	// index in TagManager
+        TransformPtr	m_transform;
     };
 }
 

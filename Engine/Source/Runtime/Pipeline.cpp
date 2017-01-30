@@ -8,6 +8,8 @@
 #include "RenderTexture.hpp"
 #include "RenderTarget.hpp"
 
+#include <cassert>
+
 namespace FishEngine
 {
     PerDrawUniforms     Pipeline::s_perDrawUniforms;
@@ -27,6 +29,7 @@ namespace FishEngine
     void Pipeline::Init()
     {
         glGenBuffers(1, &s_perCameraUBO);
+		assert(s_perCameraUBO > 0);
         glGenBuffers(1, &s_perDrawUBO);
         glGenBuffers(1, &s_lightingUBO);
         glGenBuffers(1, &s_bonesUBO);

@@ -33,7 +33,7 @@ namespace FishEngine
         // The position of the transform in world space.
         Vector3 position() const
         {
-            Update();
+            UpdateMatrix();
             //return m_localToWorldMatrix.MultiplyPoint(0, 0, 0);
             auto& l2w = m_localToWorldMatrix;
             return Vector3(l2w.m[0][3], l2w.m[1][3], l2w.m[2][3]);
@@ -51,7 +51,7 @@ namespace FishEngine
         // The rotation of the transform in world space stored as a Quaternion.
         Quaternion rotation() const
         {
-            Update();
+            UpdateMatrix();
             return m_localToWorldMatrix.ToRotation();
         }
 
@@ -163,8 +163,9 @@ namespace FishEngine
         void setEulerAngles(const Vector3& eulerAngles);
 
         // Matrix that transforms a point from local space into world space (Read Only).
-        Matrix4x4 localToWorldMatrix() const {
-            Update();
+        Matrix4x4 localToWorldMatrix() const
+		{
+            UpdateMatrix();
             return m_localToWorldMatrix;
         }
         
@@ -186,7 +187,7 @@ namespace FishEngine
 
         Matrix4x4 worldToLocalMatrix() const
         {
-            Update();
+            UpdateMatrix();
             return m_worldToLocalMatrix;
         }
 
@@ -215,7 +216,7 @@ namespace FishEngine
         //    m_isDirty = true;
         //}
 
-        void Update() const;
+		void UpdateMatrix() const;
         void UpdateFast() const;
 
         // Rotates the transform so the forward vector points at /target/'s current position.
@@ -264,7 +265,7 @@ namespace FishEngine
             return m_parent.lock();
         }
 
-        void SetParent(TransformPtr parent);
+        void SetParent(TransformPtr const & parent);
 
         //========== Public Functions ==========//
 

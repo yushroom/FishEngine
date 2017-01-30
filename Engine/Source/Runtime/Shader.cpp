@@ -31,6 +31,7 @@ CompileShader(
 {
     const GLchar* shader_c_str = shader_str.c_str();
     GLuint shader = glCreateShader(shader_type);
+	assert(shader > 0);
     glShaderSource(shader, 1, &shader_c_str, NULL);
     glCompileShader(shader);
     GLint success = GL_FALSE;
@@ -261,7 +262,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
-                Debug::Log("%s", "use PerCameraUniforms");
+                //Debug::Log("%s", "use PerCameraUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::PerCameraUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(PerCameraUniforms));
@@ -272,7 +273,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
-                Debug::Log("%s", "use PerDrawUniforms");
+                //Debug::Log("%s", "use PerDrawUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::PerDrawUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(PerDrawUniforms));
@@ -282,7 +283,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
-                Debug::Log("%s", "use LightingUniforms");
+                //Debug::Log("%s", "use LightingUniforms");
                 glUniformBlockBinding(program, blockID, Pipeline::LightingUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(LightingUniforms));
@@ -292,7 +293,7 @@ namespace FishEngine
             //assert(blockID != GL_INVALID_INDEX);
             if (blockID != GL_INVALID_INDEX)
             {
-                Debug::Log("%s", "use Bones");
+                //Debug::Log("%s", "use Bones");
                 glUniformBlockBinding(program, blockID, Pipeline::BonesUBOBindingPoint);
                 glGetActiveUniformBlockiv(program, blockID, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
                 assert(blockSize == sizeof(Bones));
@@ -314,7 +315,7 @@ namespace FishEngine
                 GLint loc = glGetUniformLocation(program, name);
                 if (loc != GL_INVALID_INDEX)
                 {
-                    Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type), name, loc);
+                    //Debug::Log("Uniform #%d Type: %s Name: %s Loc: %d", i, GLenumToString(type), name, loc);
                     UniformInfo u;
                     u.type = type;
                     u.name = name;

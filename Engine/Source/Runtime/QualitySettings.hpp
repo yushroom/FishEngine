@@ -36,7 +36,7 @@ namespace FishEngine
         // Shadow resolution	Shadows can be rendered at several different resolutions : Low, Medium, High and Very High.The higher the resolution, the greater the processing overhead.
         static ShadowResolution m_shadowResolution;
 
-        // Shadow Projection	There are two different methods for projecting shadows from a directional light.Close Fit renders higher resolution shadows but they can sometimes wobble slightly if the camera moves.Stable Fit renders lower resolution shadows but they don¡¯t wobble with camera movements.
+        // Shadow Projection	There are two different methods for projecting shadows from a directional light.Close Fit renders higher resolution shadows but they can sometimes wobble slightly if the camera moves.Stable Fit renders lower resolution shadows but they don't wobble with camera movements.
         
         
         // Shadow Cascades	The number of shadow cascades can be set to zero, two or four.A higher number of cascades gives better quality but at the expense of processing overhead(see Directional Light Shadows for further details).

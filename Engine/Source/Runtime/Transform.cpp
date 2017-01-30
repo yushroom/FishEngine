@@ -18,7 +18,7 @@ namespace FishEngine
         //}
     }
 
-    void Transform::Update() const
+    void Transform::UpdateMatrix() const
     {
         if (!m_isDirty)
             return;
@@ -58,13 +58,13 @@ namespace FishEngine
 
     Vector3 Transform::TransformDirection(const Vector3& direction) const
     {
-        Update();
+        UpdateMatrix();
         return m_localToWorldMatrix.MultiplyVector(direction);
     }
 
     Vector3 FishEngine::Transform::InverseTransformDirection(const Vector3& direction) const
     {
-        Update();
+        UpdateMatrix();
         return m_worldToLocalMatrix.MultiplyVector(direction);
     }
     
@@ -149,7 +149,7 @@ namespace FishEngine
     }
 
 
-    void Transform::SetParent(TransformPtr parent)
+    void Transform::SetParent(TransformPtr const & parent)
     {
         auto p = m_parent.lock();
         if (parent == p) {

@@ -137,9 +137,11 @@ namespace FishEngine
 		t.StopAndPrint();
     }
 
-    void Resources::Init()
+    void Resources::Init(Path const & path)
     {
-        auto cwd = boost::filesystem::current_path();
+		Path cwd = path;
+		if (path.empty())
+			cwd = boost::filesystem::current_path();
 		std::cout << cwd << std::endl;
         bool found;
         do

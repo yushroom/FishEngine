@@ -62,7 +62,7 @@ namespace FishEngine
         // How far light is emitted from the center of the object (Point and Spot lights only).
         float m_range;
 
-        // Determines the angle(in degrees) at the base of a spot light¡¯s cone(Spot light only).
+        // Determines the angle(in degrees) at the base of a spot lights cone(Spot light only).
         float m_spotAngle;
 
         // The color of the light emitted.

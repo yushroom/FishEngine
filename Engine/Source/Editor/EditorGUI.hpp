@@ -1,90 +1,96 @@
-#ifndef EditorGUI_hpp
-#define EditorGUI_hpp
+#pragma once
+
+#include <type_traits>
+
 
 #include "FishEditor.hpp"
-#include <functional>
+#include <Color.hpp>
 
-#include <Vector3.hpp>
-#include <Command.hpp>
-
-#include "SceneViewEditor.hpp"
+class QTreeWidget;
+class QTreeWidgetItem;
 
 namespace FishEditor
 {
-    enum class AssetType
+    template< class T>
+    struct can_be_enabled : std::integral_constant< bool,
+            std::is_base_of<FishEngine::Behaviour, T>::value ||
+            std::is_base_of<FishEngine::Renderer, T>::value >
     {
-        Model,
-        Material,
-        Texture,
-        AudioClip,
-        Font,
-        Script,
-        Shader,
     };
 
     class EditorGUI
     {
-    public:
         EditorGUI() = delete;
 
-        static void Init();
+    public:
 
-        static void Update();
+        static QTreeWidget*     s_treeWidget;
 
-        static void Clean();
+        static int              s_indentLevel;
 
-        static bool Button(const char* text);
-
-        static void Matrix4x4(const std::string& label, FishEngine::Matrix4x4& mat);
-
-        static void SelectMeshDialogBox(std::function<void(FishEngine::MeshPtr)> callback);
-
-        static void OnWindowSizeChanged(const int width, const int height);
-        
-        // return Vector4(x, y, w, h), in pixels
-        // the origin is at the left-bottom corner of the window(OpenGL)
-        static FishEngine::Int2 sceneViewSize();
+        static void BindGameObject(FishEngine::GameObjectPtr const & go);
 
     private:
-        friend class FishEditorWindow;
-        //static int m_idCount;   // temp
 
-        static SceneViewEditorPtr m_mainSceneViewEditor;
+        static int              s_topLevelItemIndex;
+        static int              s_localItemIndex;
+        static QTreeWidgetItem* s_currentHeaderItem;
 
-        static void HierarchyItem(FishEngine::GameObjectPtr gameObject);
+        template<class T, class... Args>
+        static T* CheckNextWidget(Args&&... args );
 
-        // https://docs.unity3d.com/Manual/LearningtheInterface.html
-        static void DrawInspectorWindow();
-        static void DrawHierarchyWindow();
-        static void DrawProjectWindow();
-        static void DrawSceneView();
-        static void DrawMainToolbar();
-        static void DrawMainMenu();
+        // show left checkBox
+        // return value: isExpanded
+        static bool Foldout(std::string const & name, bool & enabled, bool & changed);
 
-        static void DrawInspectorWindow(FishEngine::GameObjectPtr gameObject);
-        static void DrawInspectorWindow(std::shared_ptr<FishEngine::TextureImporter> textureImporter);
+        // hide left checkBox
+        // return value: isExpanded
+        static bool Foldout(std::string const & name);
 
-        static void GUIStyleTweakWindow();
+        static bool Toggle(const std::string &label, bool * value);
 
-        static bool s_locked;       // temp
+        static bool ColorField(std::string const & label, FishEngine::Color * color);
 
-        // hierarchy
-        static bool s_isAnyItemClicked;
-        static bool s_openMenuPopup;
+        template<typename T>
+        static bool EnumPopup(std::string const & label, T * e);
 
-        static bool m_showAssectSelectionDialogBox;
+        // index: the index in the array(not the underlying value)
+        static bool EnumPopup(std::string const & label, int* index, const char* const* enumStringArray, int arraySize);
+
+        static bool Vector3Field(std::string const & label, FishEngine::Vector3 & v);
+
+        static bool FloatField(std::string const & label, float * v);
+        static bool FloatField(std::string const & label, float v);// const version
+
+        static bool Slider(std::string const & label, float * value, float leftValue, float rightValue);
+
+        //static bool ObjectField(const std::string &label, std::shared_ptr<> obj);
+
+        //template< class T >
+        static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
+
+//        static void OnInspectorGUI(FishEngine::ComponentPtr const & component)
+//        {
+//        }
 
         template<class T>
-        static void OnInspectorGUI(const std::shared_ptr<T>& component);
+        static void OnInspectorGUI(std::shared_ptr<T> const & component);
 
-        static FishEngine::Int2 m_sceneViewSize;
+        static void BeginComponent(FishEngine::ComponentPtr const & component);
+
+        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
+
+        // for component derived from behaviour
+        template<class T, std::enable_if_t<can_be_enabled<T>::value, int> = 0>
+        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
+
+        // for component not derived from behaviour
+        template<class T, std::enable_if_t<!can_be_enabled<T>::value, int> = 0>
+        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
+
+        template<class T, std::enable_if_t<!std::is_base_of<FishEngine::Component, T>::value, int> = 0>
+        static void BeginComponentImpl(FishEngine::ComponentPtr const & component) = delete;
+
+        static void HideRedundantChildItems();
     };
-
-    template<>
-    void EditorGUI::OnInspectorGUI(const FishEngine::ComponentPtr& component);
-
-    template<>
-    void EditorGUI::OnInspectorGUI(const FishEngine::TransformPtr& transform);
 }
-
-#endif // EditorGUI_hpp

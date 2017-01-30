@@ -6,6 +6,8 @@
 #include "SphereCollider.hpp"
 #include "CapsuleCollider.hpp"
 
+#include "TagManager.hpp"
+
 namespace FishEngine
 {
     //GameObject::PGameObject GameObject::m_root = std::make_shared<GameObject>("Root");
@@ -18,13 +20,35 @@ namespace FishEngine
         }
         return m_activeSelf;
     }
+	
+	GameObject::GameObject() : GameObject("")
+	{
+		
+	}
 
-    GameObject::GameObject(const std::string& name) : m_tag("Untagged")
+    GameObject::GameObject(const std::string& name) : m_tagIndex(0)
     {
         //m_transform->m_gameObject = this;
         m_transform = std::make_shared<Transform>();
         m_name = name;
     }
+	
+	GameObjectPtr GameObject::Create()
+	{
+		auto go = std::make_shared<GameObject>();
+		go->transform()->m_gameObject = go;
+		return go;
+	}
+	
+	std::string const & GameObject::tag() const
+	{
+		return TagManager::IndexToTag(m_tagIndex);
+	}
+	
+	void GameObject::setTag(const std::string& tag)
+	{
+		m_tagIndex = TagManager::TagToIndex(tag);
+	}
 
     FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
     {

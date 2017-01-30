@@ -116,6 +116,12 @@ namespace FishEngine
         static CameraPtr main();
 
         static CameraPtr mainGameCamera();
+		
+		// TODO: delete it
+		static void setMainCamera(CameraPtr camera)
+		{
+			m_mainCamera = camera;
+		}
 
         static void OnWindowSizeChanged(const int width, const int height);
 

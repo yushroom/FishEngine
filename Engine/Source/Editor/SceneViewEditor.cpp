@@ -20,10 +20,11 @@
 #include <CameraController.hpp>
 #include <Graphics.hpp>
 #include <RenderTarget.hpp>
+#include <Command.hpp>
 
 #include "Selection.hpp"
-#include "FishEditorWindow.hpp"
-#include "EditorGUI.hpp"
+//#include "FishEditorWindow.hpp"
+//#include "EditorGUI.hpp"
 
 using namespace FishEngine;
 
@@ -37,21 +38,32 @@ namespace FishEditor
 
     void SceneViewEditor::Init()
     {
+        Input::Init();
+
+        // temp
+        m_size.x = Screen::width();
+        m_size.y = Screen::height();
+        Debug::LogWarning("size: x = %d, y = %d", m_size.x, m_size.y);
+
         m_camera = Camera::Create(60.0, 0.3f, 1000.f, CameraType::SceneView);
         m_cameraGameObject = std::make_shared<GameObject>("EditorCamera");
         m_cameraGameObject->transform()->m_gameObject = m_cameraGameObject;
         //auto camera_go = Scene::CreateGameObject("MainCamera");
-        m_cameraGameObject->AddComponent<CameraController>();
+        auto controller = m_cameraGameObject->AddComponent<CameraController>();
+        //controller->m_isRotating = true;
         m_cameraGameObject->AddComponent(m_camera);
         m_cameraGameObject->transform()->setLocalPosition(5, 5, 5);
         m_cameraGameObject->transform()->LookAt(0, 0, 0);
         //m_cameraGameObject->SetTag("MainCamera");
 
+        // temp
+        Camera::setMainCamera(m_camera);
+
         sceneGizmoMaterial = Material::InstantiateBuiltinMaterial("VertexLit-Internal");
         cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
         coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
-        m_size = EditorGUI::sceneViewSize();
+//        m_size = EditorGUI::sceneViewSize();
         //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
         m_colorBuffer = ColorBuffer::Create(m_size.x, m_size.y);
         m_colorBuffer->setName("SceneViewColor");
@@ -101,26 +113,15 @@ namespace FishEditor
 
     void SceneViewEditor::Update()
     {
+        //Input::Update();
         m_cameraGameObject->GetComponent<CameraController>()->Update();
+        Scene::Update();
     }
 
     void SceneViewEditor::Render()
     {
-        auto tsize = EditorGUI::sceneViewSize();
-        if (tsize.x != m_size.x || tsize.y != m_size.y)
-        {
-            m_size = tsize;
-            const int ix = static_cast<int>(m_size.x * Screen::pixelsPerPoint());
-            const int iy = static_cast<int>(m_size.y * Screen::pixelsPerPoint());
-            m_colorBuffer->Resize(ix, iy);
-            m_depthBuffer->Resize(ix, iy);
-            m_selectionOutlineDepthBuffer->Resize(ix, iy);
-            m_selectionOutlineColorBuffer2->Resize(ix, iy);
-            RenderSystem::ResizeBufferSize(ix, iy);
-            Camera::OnWindowSizeChanged(ix, iy);
-            Screen::m_width = ix;
-            Screen::m_height = iy;
-        }
+        //Debug::Log("SceneViewEditor::Render");
+        Update();
         Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
         glViewport(0, 0, Screen::m_width, Screen::m_height);
 
@@ -140,7 +141,7 @@ namespace FishEditor
         /************************************************************************/
         /* Grid                                                                 */
         /************************************************************************/
-        if (false)
+        if (true)
         {
             auto view = Camera::main()->worldToCameraMatrix();
             auto proj = Camera::main()->projectionMatrix();
@@ -216,15 +217,18 @@ namespace FishEditor
             glDisable(GL_POLYGON_OFFSET_LINE);
         }
 #endif
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
-        if (m_highlightSelections && selectedGO != nullptr)
+        auto selection = Selection::transforms();
+        if (m_highlightSelections && !selection.empty())
         {
             Pipeline::PushRenderTarget(m_selectionOutlineRT);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             auto material = Material::builtinMaterial("SolidColor");
             material->SetVector4("Color", Vector4(1, 0, 1, 1));
+
             std::list<GameObjectPtr> selections;
-            selections.push_back(selectedGO);
+            for (auto const & t : selection)
+                selections.push_back(t.lock()->gameObject());
+
             while (!selections.empty())
             {
                 auto go = selections.front();
@@ -250,7 +254,8 @@ namespace FishEditor
                     if (skinnedMeshRenderer != nullptr)
                     {
                         mesh = skinnedMeshRenderer->sharedMesh();
-                        bool useSkinnedVersion = FishEditorWindow::InPlayMode();
+                        //bool useSkinnedVersion = FishEditorWindow::InPlayMode();
+                        bool useSkinnedVersion = false;
                         if (useSkinnedVersion)
                         {
                             material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
@@ -264,8 +269,10 @@ namespace FishEditor
                     Graphics::DrawMesh(mesh, model, material);
                 }
             }
+
             Pipeline::PopRenderTarget();
 
+            // draw outline
             Pipeline::PushRenderTarget(m_selectionOutlineRT2);
             glClear(GL_COLOR_BUFFER_BIT);
             auto selection_outline_mtl = Material::builtinMaterial("PostProcessSelectionOutline");
@@ -298,15 +305,16 @@ namespace FishEditor
         /************************************************************************/
         /* Selection Gizmos                                                     */
         /************************************************************************/
-        auto go = Selection::selectedGameObjectInHierarchy();
-        if (go != nullptr)
-            go->OnDrawGizmosSelected();
+//        auto go = Selection::selectedGameObjectInHierarchy();
+//        if (go != nullptr)
+//            go->OnDrawGizmosSelected();
 
         /************************************************************************/
         /* Camera Preview                                                       */
         /************************************************************************/
         //glClear(GL_DEPTH_BUFFER_BIT);
         //auto selectedGO = Selection::selectedGameObjectInHierarchy();
+#if 0
         auto camera_preview = selectedGO == nullptr ? nullptr : selectedGO->GetComponent<Camera>();
         if (camera_preview != nullptr)
         {
@@ -330,10 +338,16 @@ namespace FishEditor
             Screen::m_width = w;
             Screen::m_height = h;
         }
+#endif
 
         glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
 
+        GameObjectPtr selectedGO = nullptr;
+        if (!selection.empty())
+        {
+            selectedGO = selection.front().lock()->gameObject();
+        }
         if (selectedGO != nullptr)
         {
             if (m_transformToolType == TransformToolType::Translate)
@@ -348,7 +362,15 @@ namespace FishEditor
         {
             Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
             auto go = Scene::IntersectRay(ray);
-            Selection::setActiveGameObject(go);
+            if (go == nullptr)
+            {
+                if (!Selection::transforms().empty())
+                    Selection::setTransforms({});  // empty selection
+            }
+            else
+            {
+                Selection::setTransforms({go->transform()});
+            }
         }
 
         Pipeline::PopRenderTarget();
@@ -533,7 +555,7 @@ namespace FishEditor
                 Debug::LogWarning("Redo translation");
                 selectedGO->transform()->setPosition(position);
             };
-            CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
+            //CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
         }
     }
 
@@ -790,5 +812,19 @@ namespace FishEditor
         int w = Screen::width();
         int h = Screen::height();
         glViewport(GLint(w*v.x), GLint(h*v.y), GLsizei(w*v.z), GLsizei(h*v.w));
+    }
+
+    void SceneViewEditor::Resize(int width, int height)
+    {
+        FishEngine::Debug::LogWarning("SceneViewEditor::Resize %d %d", width, height);
+        m_size.x = width;
+        m_size.y = height;
+        Screen::set(width, height);
+        m_colorBuffer->Resize(width, height);
+        m_depthBuffer->Resize(width, height);
+        m_selectionOutlineDepthBuffer->Resize(width, height);
+        m_selectionOutlineColorBuffer2->Resize(width, height);
+        RenderSystem::ResizeBufferSize(width, height);
+        Camera::OnWindowSizeChanged(width, height);
     }
 }

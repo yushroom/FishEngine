@@ -18,6 +18,11 @@ namespace FishEngine
     {
         return IsDerivedFrom(derivedClassName, BaseClass::StaticClassName());
     }
+	
+	inline bool IsBehaviour(const std::string& derivedClassName)
+	{
+		return IsDerivedFrom(derivedClassName, "Behaviour");
+	}
 
     inline bool IsScript(const std::string& derivedClassName)
     {

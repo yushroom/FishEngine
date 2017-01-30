@@ -2,6 +2,7 @@
 #include "GLEnvironment.hpp"
 #include "Texture.hpp"
 #include "Debug.hpp"
+#include <cassert>
 
 namespace FishEngine
 {
@@ -59,6 +60,7 @@ namespace FishEngine
     void RenderTarget::Init()
     {
         glGenFramebuffers(1, &m_fbo);
+		assert(m_fbo > 0);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
         if (m_useDepthBuffer)

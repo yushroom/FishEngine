@@ -147,6 +147,11 @@ namespace FishEngine
 		
 		static void Serialize(std::string const & path);
 
+		static std::list<GameObjectPtr> const & GameObjects()
+		{
+			return m_gameObjects;
+		}
+
     private:
         friend class RenderSystem;
         friend class FishEditor::EditorGUI;

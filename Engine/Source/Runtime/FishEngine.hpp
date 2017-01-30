@@ -134,6 +134,9 @@ namespace FishEditor {
     class EditorInput;
 }
 
+class GameObjectInspector;
+class GLWidget;
+
 #if defined(_DEBUG) || defined(DEBUG)
 #include <cassert>
 #define Assert(exp) assert(exp)

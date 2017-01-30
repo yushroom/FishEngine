@@ -131,7 +131,7 @@ namespace FishEngine
                     boost::to_lower(name);
                     if (name == "deferred")
                     {
-                        cout << "Keyword " << name << endl;
+                        //cout << "Keyword " << name << endl;
                         m_settings[name] = "on";
                     }
                     else
@@ -139,7 +139,7 @@ namespace FishEngine
                         ignoreSpace(shaderText, cursor);
                         auto setting = nextTok(shaderText, cursor);
                         boost::to_lower(setting);
-                        cout << "Keyword " << name << " " << setting << endl;
+                        //cout << "Keyword " << name << " " << setting << endl;
                         // TODO: override if smaller depth
                         // do NOT override settings;
                         auto it = m_settings.find(name);

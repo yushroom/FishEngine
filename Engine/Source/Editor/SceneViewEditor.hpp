@@ -4,6 +4,7 @@
 #include "Vector3.hpp"
 #include "Vector2.hpp"
 #include "IntVector.hpp"
+#include "Input.hpp"
 
 namespace FishEditor
 {
@@ -31,7 +32,7 @@ namespace FishEditor
     class SceneViewEditor
     {
     public:
-        FishEngine::Vector2             m_position;
+        //FishEngine::Vector2             m_position;
         FishEngine::Int2                m_size{128, 128};
 
         FishEngine::RenderTargetPtr     m_sceneViewRenderTarget;
@@ -52,10 +53,17 @@ namespace FishEditor
 
         void Clean();
 
+        void Resize(int width, int height);
+
         FishEngine::CameraPtr camera()
         {
             return m_camera;
         }
+
+//        auto ColorBuffer() const
+//        {
+//            return m_colorBuffer;
+//        }
 
         // this scene view is focused, so it may receive keyboard event.
         bool focused() const
@@ -88,9 +96,9 @@ namespace FishEditor
         bool        m_isWireFrameMode;
         bool        m_useGammaCorrection;
         bool        m_showShadowMap;
-        bool        m_highlightSelections   = false;
+        bool        m_highlightSelections   = true;
 
-        bool        m_mouseEventHandled;
+        bool        m_mouseEventHandled     = false;
         
         ShadingMode m_shadingMode           = ShadingMode::Shaded;
         bool        m_showGizmos            = true;

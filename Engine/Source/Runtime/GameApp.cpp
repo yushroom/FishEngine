@@ -168,7 +168,7 @@ void FishEngine::GameApp::MouseScrollCallback(GLFWwindow* window, double xoffset
     Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
     //if (Input::m_mainSceneViewEditor->isMouseHovered())
     //{
-    Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
+    //Input::UpdateAxis(Axis::MouseScrollWheel, (float)yoffset);
     //}
 }
 
@@ -179,7 +179,7 @@ void GameApp::MouseButtonCallback(GLFWwindow* window, int button, int action, in
     Input::UpdateMouseButtonState(button, s);
     //if (Input::m_mainSceneViewEditor->isMouseHovered())
     //{
-    Input::UpdateMouseButtonState(button, s);
+    //Input::UpdateMouseButtonState(button, s);
     //}
 }
 

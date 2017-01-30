@@ -37,6 +37,7 @@ namespace FishEngine
         t->m_width = width;
         t->m_height = height;
         glGenTextures(1, &t->m_GLNativeTexture);
+		assert(t->m_GLNativeTexture > 0);
         glBindTexture(GL_TEXTURE_2D, t->m_GLNativeTexture);
         GLenum internal_format, external_format, pixel_type;
         TextureFormat2GLFormat(format, internal_format, external_format, pixel_type);

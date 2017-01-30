@@ -29,25 +29,41 @@ namespace FishEngine
 
         virtual void Render() const = 0;
 
-        void AddMaterial(MaterialPtr material) {
+        void AddMaterial(MaterialPtr material)
+		{
             m_materials.push_back(material);
         }
 
-        MaterialPtr material() const {
+        MaterialPtr material() const
+		{
             return m_materials.size() > 0 ? m_materials[0] : nullptr;
         }
 
-        std::vector<MaterialPtr>& materials() {
+        std::vector<MaterialPtr>& materials()
+		{
             return m_materials;
         }
 
-        void SetMaterial(MaterialPtr material) {
+        void SetMaterial(MaterialPtr material)
+		{
             m_materials.clear();
             m_materials.push_back(material);
         }
 
         virtual Bounds localBounds() const = 0;
         Bounds bounds() const;
+		
+		// Makes the rendered 3D object visible if enabled.
+		bool enabled() const
+		{
+			return m_enabled;
+		}
+		
+		// Makes the rendered 3D object visible if enabled.
+		void setEnabled(bool enabled)
+		{
+			m_enabled = enabled;
+		}
 
         //virtual void OnInspectorGUI() override;
         virtual void OnDrawGizmosSelected() override;
@@ -64,9 +80,11 @@ namespace FishEngine
 
     protected:
         friend class FishEditor::EditorGUI;
+		bool m_enabled = true;	// Makes the rendered 3D object visible if enabled.
         std::vector<MaterialPtr> m_materials;
 
-        ShadowCastingMode m_shadowCastingMode = ShadowCastingMode::On;
+        ShadowCastingMode	m_shadowCastingMode = ShadowCastingMode::On;
+		bool				m_receiveShadows	= true;
     };
 }
 

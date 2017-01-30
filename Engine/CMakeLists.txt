@@ -33,7 +33,7 @@ find_package(Boost 1.59 REQUIRED
     filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 
-#message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
+message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
 
 include_directories(./Source/Runtime)
 #include_directories(./ThirdParty/boost_1_61_0/)
@@ -140,7 +140,7 @@ set(ASSIMP_BUILD_STL_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TERRAGEN_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_XGL_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(./ThirdParty/assimp-3.3.1)
 SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "ThirdParty")
 
@@ -180,5 +180,6 @@ endif()
 
 ADD_SUBDIRECTORY(./Source/Runtime)
 ADD_SUBDIRECTORY(./Source/Editor)
+ADD_SUBDIRECTORY(./Source/Editor_old)
 ADD_SUBDIRECTORY(./Source/Tool)
 ADD_SUBDIRECTORY(./Source/Test)

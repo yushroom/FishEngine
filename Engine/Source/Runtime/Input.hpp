@@ -113,6 +113,8 @@ namespace FishEngine
         friend class GameApp;
         friend class FishEditor::FishEditorWindow;
         friend class FishEditor::EditorInput;
+		friend class FishEditor::SceneViewEditor;
+		friend class ::GLWidget;
 
         static KeyState m_keyStates[keyCount];
 

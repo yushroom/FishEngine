@@ -78,7 +78,7 @@ namespace FishEngine
 
         static bool FindSystemFile(const std::string& filename, Path& out_path);
 
-        static void Init();
+        static void Init(Path const & path = Path());
 		
 		// uuid of AssetImporter -> AssetImporter
 		static std::map<boost::uuids::uuid, std::shared_ptr<AssetImporter>> s_uuidToImporter;

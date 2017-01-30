@@ -44,7 +44,7 @@ namespace FishEngine
 
         // Start is only called once for a given script
         // Start is called before the first frame update only if the script instance is enabled.
-        virtual void Start() {}
+		virtual void Start() override {}
 
 
         /********** Physics **********/

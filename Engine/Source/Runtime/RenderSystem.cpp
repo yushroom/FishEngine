@@ -89,7 +89,7 @@ namespace FishEngine
         glCheckError();
         float white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         float black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        float error_color[] = { 1.0f, 0.0f, 1.0f, 1.0f };
+        float error_color[] = { 1.0f, 1.0f, 0.0f, 1.0f };
         glClearBufferfv(GL_COLOR, 0, error_color);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -135,23 +135,28 @@ namespace FishEngine
             if (renderer == nullptr)
             {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
-                if (renderer == nullptr)
-                    continue;
             }
+			if (renderer == nullptr || !renderer->enabled())
+				continue;
+			
+			if (renderer->material() == nullptr)
+			{
+				// TODO
+				// draw error material;
+				continue;
+			}
 
-            if (renderer->material() != nullptr)
-            {
-                if (renderer->material()->shader()->IsTransparent())
-                {
-                    transparentQueue.push_back(go);
-                    continue;
-                }
-                else if (!renderer->material()->shader()->IsDeferred())
-                {
-                    forwardQueue.push_back(go);
-                    continue;
-                }
-            }
+			if (renderer->material()->shader()->IsTransparent())
+			{
+				transparentQueue.push_back(go);
+				continue;
+			}
+			else if (!renderer->material()->shader()->IsDeferred())
+			{
+				forwardQueue.push_back(go);
+				continue;
+			}
+			
             // Deferred
             deferred_enabled = true;
             renderer->Render();
@@ -193,7 +198,8 @@ namespace FishEngine
             {
                 renderer = go->GetComponent<SkinnedMeshRenderer>();
             }
-            renderer->Render();
+			if (renderer->enabled())
+				renderer->Render();
         }
         forwardQueue.clear();
 

@@ -83,7 +83,7 @@ namespace FishEngine
         /********** Decommissioning **********/
         virtual void OnApplicationQuit() {};
         //virtual void OnDisable() {}
-        virtual void OnDestroy() {}
+        //virtual void OnDestroy() {}
     };
 }
 

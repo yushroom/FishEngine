@@ -15,6 +15,7 @@
 #include "QualitySettings.hpp"
 #include "Serialization.hpp"
 #include "Serialization/archives/yaml.hpp"
+#include "Camera.hpp"
 
 
 namespace FishEngine
@@ -32,6 +33,16 @@ namespace FishEngine
         m_gameObjects.push_back(go);
         return go;
     }
+
+	GameObjectPtr Scene::CreateCamera()
+	{
+		auto camera_go = Scene::CreateGameObject("Camera");
+		//camera_go->AddComponent<Camera>();
+		auto camera = Camera::Create();	// make sure camera is in Camera::allcameras
+		camera_go->AddComponent(camera);
+		camera_go->AddComponent<CameraController>();
+		return camera_go;
+	}
 
     void Scene::Init()
     {

@@ -107,7 +107,7 @@
     <item>
      <widget class="GLWidget" name="sceneView">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>1</horstretch>
         <verstretch>1</verstretch>
        </sizepolicy>
@@ -131,15 +131,81 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_Scene"/>
+    <addaction name="actionSave_Scene"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Scene_2"/>
+    <addaction name="actionSave_Scene_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="separator"/>
+    <addaction name="actionBuild_Settings"/>
+    <addaction name="actionBuild_Run"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAsset">
+    <property name="title">
+     <string>Asset</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuGameObject">
+    <property name="title">
+     <string>GameObject</string>
+    </property>
+    <addaction name="actionCreat_Empty"/>
+    <addaction name="actionCreate_Empty_Child"/>
+   </widget>
+   <widget class="QMenu" name="menuComponent">
+    <property name="title">
+     <string>Component</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuAsset"/>
+   <addaction name="menuGameObject"/>
+   <addaction name="menuComponent"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionHand"/>
+   <addaction name="actionTranslate"/>
+   <addaction name="actionRotation"/>
+   <addaction name="actionScale"/>
    <addaction name="separator"/>
+   <addaction name="actionPlay"/>
+   <addaction name="actionPause"/>
+   <addaction name="actionStep"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="projectDockWidget">
@@ -185,7 +251,7 @@
          </sizepolicy>
         </property>
         <attribute name="headerVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
        </widget>
        <widget class="QListView" name="listView">
@@ -217,18 +283,6 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="hierarchyDockWidget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>200</width>
-     <height>0</height>
-    </size>
-   </property>
    <property name="features">
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
@@ -256,19 +310,51 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="HierarchyView" name="hierarchyView" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>0</number>
        </property>
+       <item>
+        <widget class="QToolButton" name="toolButton">
+         <property name="text">
+          <string>Create</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="HierarchyTreeView" name="hierarchyTreeView">
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>0</height>
+         <height>200</height>
         </size>
        </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::EditKeyPressed</set>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DragDrop</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="autoExpandDelay">
+        <number>100</number>
+       </property>
+       <property name="indentation">
+        <number>12</number>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
       </widget>
      </item>
     </layout>
@@ -277,8 +363,8 @@
   <widget class="QDockWidget" name="InspectorDockWidget">
    <property name="minimumSize">
     <size>
-     <width>288</width>
-     <height>401</height>
+     <width>250</width>
+     <height>200</height>
     </size>
    </property>
    <property name="features">
@@ -310,19 +396,108 @@
     </layout>
    </widget>
   </widget>
+  <action name="actionNew_Scene">
+   <property name="text">
+    <string>New Scene</string>
+   </property>
+  </action>
+  <action name="actionSave_Scene">
+   <property name="text">
+    <string>Open Scene</string>
+   </property>
+  </action>
+  <action name="actionSave_Scene_2">
+   <property name="text">
+    <string>Save Scene</string>
+   </property>
+  </action>
+  <action name="actionSave_Scene_As">
+   <property name="text">
+    <string>Save Scene As...</string>
+   </property>
+  </action>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>New Project</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+  </action>
+  <action name="actionBuild_Settings">
+   <property name="text">
+    <string>Build Settings</string>
+   </property>
+  </action>
+  <action name="actionBuild_Run">
+   <property name="text">
+    <string>Build &amp; Run</string>
+   </property>
+  </action>
+  <action name="actionCreat_Empty">
+   <property name="text">
+    <string>Create Empty</string>
+   </property>
+  </action>
+  <action name="actionCreate_Empty_Child">
+   <property name="text">
+    <string>Create Empty Child</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionStep">
+   <property name="text">
+    <string>Step</string>
+   </property>
+  </action>
+  <action name="actionHand">
+   <property name="text">
+    <string>Hand</string>
+   </property>
+  </action>
+  <action name="actionTranslate">
+   <property name="text">
+    <string>Translate</string>
+   </property>
+  </action>
+  <action name="actionRotation">
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionScale">
+   <property name="text">
+    <string>Scale</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>HierarchyTreeView</class>
+   <extends>QTreeView</extends>
+   <header>HierarchyTreeView.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>GLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>glwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>HierarchyView</class>
-   <extends>QWidget</extends>
-   <header>HierarchyView.hpp</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

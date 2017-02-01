@@ -23,16 +23,14 @@ CapsuleCollider(const Vector3&  center,
     }
 }
 
-void FishEngine::CapsuleCollider::
-OnDrawGizmosSelected()
+void FishEngine::CapsuleCollider::OnDrawGizmosSelected()
 {
     Gizmos::setColor(Color::green);
     auto center = m_center + transform()->position();
     Gizmos::DrawWireCapsule(center, m_radius, m_height);
 }
 
-void FishEngine::CapsuleCollider::
-CreatePhysicsShape()
+void FishEngine::CapsuleCollider::CreatePhysicsShape()
 {
     //if (m_physxShape == nullptr) {
         //PxTransform relativePose(PxQuat(PxHalfPi, PxVec3(0, 0, 1))); // standing upright

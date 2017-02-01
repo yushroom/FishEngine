@@ -4,9 +4,17 @@
 
 2.terrain->csm->vsm
 
-3.undo/redo
+3.**undo/redo**
 
 
+
+UnityEditor::DragAndDrop
+
+模拟imgui的时候expand属性有问题
+
+**去掉QSlider的wheel响应**
+
+**Asset**
 
 
 
@@ -24,9 +32,11 @@
 
       ​	暂时的解决方案：节点变化（第一次变脏）时将所有子节点标记为脏（递归过程，会把子孙所有节点标记为脏）。
 
-- [ ] SceneView按F选中的物体会自动居中，并且按boundingbox调整相机距离
+- [ ] SceneView按F/Hierarchy中双击选中的物体会自动居中，并且按boundingbox调整相机距离
 
 - [x] 高分屏的处理（尤其是高分屏移动到普通屏）
+
+- [ ] **cmake将qt项目移到xcode/VS**
 
 - [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
@@ -44,7 +54,7 @@
 
 - [ ] 把不该开放的API隐藏掉（尤其是FishEngine）
 
-- [ ] transform父子关系改变时的操作，应该维持子节点在world space下的T、R、S都不变
+- [x] transform父子关系改变时的操作，应该维持子节点在world space下的T、R、S都不变
 
 - [x] assimp导入的fbx动画有冗余的（骨骼？）结点（~~done，导入时加参数~~），解析每个节点的local transformation。
 
@@ -76,7 +86,7 @@
 
 ## Editor
 
-- [x] GameObject inactive时在Hierarchy中颜色变灰色​
+- [ ] GameObject inactive时在Hierarchy中颜色变灰色​
 
 - [x] skybox遮挡了（写depth buffer的问题？）
 
@@ -84,7 +94,7 @@
 
 - [x] SceneGizmo：遮挡问题（clear depth buffer解决），鼠标hover事件，点击后旋转相机、切换相机的透视模式
 
-- [x] 鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）
+- [x] ~~鼠标等的事件被Editor处理后不再被分发到场景中（wantCapture...或者说判断鼠标在不在scene window中）~~
 
 - [x] Inspector窗口中的Headers的缩进（OK，用imgui::indent()），一行显示不全的问题（暂时解决，Unity也没有解决label多长的问题）
 
@@ -106,17 +116,19 @@
 
 - [x] Docking GUI
 
-- [ ] hierarchy中的方向键的移动
+- [ ] ~~hierarchy中的方向键的移动~~
 
 - [ ] hierarchy中过滤器（名字，类型。。。）
 
-- [x] ToolBar
+- [ ] ToolBar
 
-- [x] 区分read-only的属性 ImGuiInputTextFlags_ReadOnly
+- [ ] 区分read-only的属性 ~~ImGuiInputTextFlags_ReadOnly~~
 
 - [x] undo/redo
 
-- [ ] 鼠标样式，比如改变dock尺寸的时候
+- [ ] ~~鼠标样式，比如改变dock尺寸的时候~~
+
+- [ ] hierarchy 里面go的顺序问题，现在不能调整问题
 
       ​
 
@@ -142,7 +154,7 @@
 
 - [x] 复杂场景的渲染，如sponza
 
-- [x] 更完善的shader include，现在是单纯的查找替换，没有语义，会把注释里面的替换掉，甚至中间不能加空格。区分<>和""，系统目录和当前目录。(boost::wave)
+- [x] 更完善的shader include，现在是单纯的查找替换，没有语义，会把注释里面的替换掉，甚至中间不能加空格。区分<>和""，系统目录和当前目录。~~(boost::wave)~~
 
 - [ ] 考虑用bison做shader代码生成
 

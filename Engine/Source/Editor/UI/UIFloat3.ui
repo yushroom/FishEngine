@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>226</width>
-    <height>24</height>
+    <height>21</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,17 +105,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="x">
+       <widget class="FloatLineEdit" name="x">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
          </font>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
-        <property name="decimals">
-         <number>2</number>
         </property>
        </widget>
       </item>
@@ -138,14 +132,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="y">
+       <widget class="FloatLineEdit" name="y">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
          </font>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
         </property>
        </widget>
       </item>
@@ -168,14 +159,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="z">
+       <widget class="FloatLineEdit" name="z">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
          </font>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
         </property>
        </widget>
       </item>
@@ -184,6 +172,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FloatLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">UI/FloatLineEdit.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -3,6 +3,8 @@
 
 #include <Object.hpp>
 
+#include "../UIDebug.hpp"
+
 UIObjecField::UIObjecField(std::string const & label, std::string const & objectName, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::UIObjecField),
@@ -18,4 +20,30 @@ UIObjecField::UIObjecField(std::string const & label, std::string const & object
 UIObjecField::~UIObjecField()
 {
     delete ui;
+}
+
+bool UIObjecField::CheckUpdate(const std::string &label, const std::string &objectName)
+{
+//    if (m_changed)
+//    {
+//        Debug::LogError("[UIObjecField] value changed");
+//        value = m_value;
+//        m_changed = false;
+//        return true;
+//    }
+
+    if (m_label != label)
+    {
+        Debug::LogError("[UIObjecField] new label: %s", m_label.c_str());
+        m_label = label;
+        LOG;
+        ui->label->setText(m_label.c_str());
+    }
+
+    if (m_objectName != objectName)
+    {
+        m_objectName = objectName;
+        LOG;
+        ui->lineEdit->setText(objectName.c_str());
+    }
 }

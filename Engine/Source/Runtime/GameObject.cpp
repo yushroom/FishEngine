@@ -5,6 +5,7 @@
 #include "BoxCollider.hpp"
 #include "SphereCollider.hpp"
 #include "CapsuleCollider.hpp"
+#include "Rigidbody.hpp"
 
 #include "TagManager.hpp"
 
@@ -53,6 +54,7 @@ namespace FishEngine
     FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
     {
         auto go = Model::builtinModel(type)->CreateGameObject();
+		//go->AddComponent<Rigidbody>();
         if (type == PrimitiveType::Cube)
             go->AddComponent<BoxCollider>();
         else if (type == PrimitiveType::Sphere)
@@ -75,7 +77,7 @@ namespace FishEngine
         {
             if (!c->m_isStartFunctionCalled)
             {
-                if (IsScript(c->ClassName()))
+                if (IsScript(c->ClassID()))
                 {
                     auto s = std::static_pointer_cast<Script>(c);
                     // TODO
@@ -113,7 +115,7 @@ namespace FishEngine
     {
         for (auto& c : m_components)
         {
-            if (IsScript(c->ClassName()))
+            if (IsScript(c->ClassID()))
             {
                 // // TODO:
                 auto s = std::static_pointer_cast<Script>(c);
@@ -122,6 +124,20 @@ namespace FishEngine
             }
             c->Start();
             c->m_isStartFunctionCalled = true;
-        }
-    }
+		}
+	}
+
+//	bool GameObject::AddComponent(const std::string &typeName)
+//	{
+//		if (typeName == Rigidbody::StaticClassName())
+//		{
+//			return AddComponent<Rigidbody>() != nullptr;
+//		}
+//		else
+//		{
+//			Debug::LogError("GameObject::AddComponent, unknown typeNmae %s", typeName.c_str());
+//			abort();
+//			return false;
+//		}
+//	}
 }

@@ -17,8 +17,13 @@
 #include <Mesh.hpp>
 #include <MeshRenderer.hpp>
 #include <CameraController.hpp>
+#include <Rigidbody.hpp>
+#include <Collider.hpp>
+#include <BoxCollider.hpp>
+#include <SphereCollider.hpp>
 
 #include <QTreeWidget>
+#include <QMenu>
 
 #include "UI/UIHeader.hpp"
 #include "UI/UIFloat3.hpp"
@@ -28,6 +33,7 @@
 #include "UI/UIObjecField.hpp"
 #include "UI/UIColor.hpp"
 #include "UI/UIBool.hpp"
+#include "UI/UIButton.hpp"
 
 #include <generate/Enum_LightType.hpp>
 #include <generate/Enum_ShadowCastingMode.hpp>
@@ -46,7 +52,7 @@ QTreeWidgetItem*    EditorGUI::s_currentHeaderItem  = nullptr;
 template<class T, class... Args>
 T* EditorGUI::CheckNextWidget(Args&&... args )
 {
-    static_assert(std::is_base_of<QWidget, T>(), "T must be a QWidget");
+    static_assert(std::is_base_of<QWidget, T>::value, "T must be a QWidget");
 
     QTreeWidgetItem * item;
     if (s_localItemIndex < s_currentHeaderItem->childCount())  // exists, reuse it
@@ -88,18 +94,18 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 template<>
 void EditorGUI::OnInspectorGUI(std::shared_ptr<Transform> const & t)
 {
-    if (Vector3Field("Position", t->m_localPosition))
+    if (Vector3Field("Position", &t->m_localPosition))
     {
         t->MakeDirty();
     }
 
     auto localEulerAngles = t->m_localRotation.eulerAngles();
-    if (Vector3Field("Rotation", localEulerAngles))
+    if (Vector3Field("Rotation", &localEulerAngles))
     {
         t->setLocalEulerAngles(localEulerAngles);
     }
 
-    if (Vector3Field("Scale", t->m_localScale))
+    if (Vector3Field("Scale", &t->m_localScale))
     {
         t->MakeDirty();
     }
@@ -159,7 +165,6 @@ void EditorGUI::OnInspectorGUI(const FishEngine::LightPtr& light)
 template<>
 void EditorGUI::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 {
-    //ObjectPtr obj = meshFilter->m_mesh;
     ObjectField("Mesh", meshFilter->m_mesh);
 }
 
@@ -177,17 +182,52 @@ void EditorGUI::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 }
 
 template<>
-void EditorGUI::OnInspectorGUI(const std::shared_ptr<CameraController>& renderer)
+void EditorGUI::OnInspectorGUI(const std::shared_ptr<CameraController>&)
 {
 }
 
+template<>
+void EditorGUI::OnInspectorGUI(const FishEngine::RigidbodyPtr& rigidBody)
+{
+    FloatField("Mass", &rigidBody->m_mass);
+    FloatField("Drag", &rigidBody->m_drag);
+    FloatField("Angular", &rigidBody->m_angularDrag);
+    Toggle("Use Gravity", &rigidBody->m_useGravity);
+    Toggle("Is Kinematic", &rigidBody->m_isKinematic);
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const FishEngine::ColliderPtr& collider)
+{
+    Toggle("Is Trigger", &collider->m_isTrigger);
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const FishEngine::BoxColliderPtr& boxCollider)
+{
+    OnInspectorGUI<Collider>(boxCollider);
+    Vector3Field("Center", &boxCollider->m_center);
+    Vector3Field("Size", &boxCollider->m_size);
+}
+
+template<>
+void EditorGUI::OnInspectorGUI(const FishEngine::SphereColliderPtr& collider)
+{
+    OnInspectorGUI<Collider>(collider);
+    Vector3Field("Center", &collider->m_center);
+    FloatField("Radius", &collider->m_radius);
+}
+
+ComponentPtr componentToBeDestroyed;
 
 void FishEditor::EditorGUI::BindGameObject(const FishEngine::GameObjectPtr &go)
 {
     FishEditor::EditorGUI::s_topLevelItemIndex = 0;
     FishEditor::EditorGUI::s_localItemIndex = 0;
     auto t = go->transform();
-    if (Foldout("Transform"))
+
+    UIHeaderState state;    // ignore state
+    if (Foldout("Transform", state))
     {
         OnInspectorGUI<Transform>(t);
     }
@@ -224,9 +264,30 @@ void FishEditor::EditorGUI::BindGameObject(const FishEngine::GameObjectPtr &go)
     {
         BeginComponent(comp);
     }
+
+    if (componentToBeDestroyed != nullptr)
+    {
+        Object::DestroyImmediate(componentToBeDestroyed);
+        componentToBeDestroyed = nullptr;
+    }
+
+//    //UIHeaderState state;
+//    if (Foldout("llll", state))
+//    {
+//        auto button = CheckNextWidget<UIButton>("Add Component");
+//        if (button->CheckClicked())
+//        {
+//            Debug::LogError("clicked");
+//            auto const & name = ShowAddComponentMenu();
+//            if (name == "Rigidbody")
+//            {
+//                go->AddComponent<Rigidbody>();
+//            }
+//        }
+//    }
 }
 
-bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, bool &changed)
+bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, UIHeaderState &state)
 {
     QTreeWidgetItem * item;
     bool expanded = true;
@@ -242,7 +303,7 @@ bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, bool
         expanded = item->isExpanded();
         UIHeader * header = qobject_cast<UIHeader*>(s_treeWidget->itemWidget(item, 0));
         assert(header != nullptr);
-        changed = header->CheckUpdate(name, enabled);
+        state = header->CheckUpdate(name, enabled);
     }
     else
     {
@@ -252,7 +313,7 @@ bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, bool
         UIHeader * header = new UIHeader(name, enabled);
         s_treeWidget->setItemWidget(item, 0, header);
         item->setExpanded(true);
-        changed = false;
+        //changed = false;
         //return true;
     }
     s_topLevelItemIndex ++;
@@ -261,7 +322,7 @@ bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, bool
     return expanded;
 }
 
-bool EditorGUI::Foldout(const std::string &name)
+bool EditorGUI::Foldout(const std::string &name, UIHeaderState &state)
 {
     QTreeWidgetItem * item;
     bool expanded = true;
@@ -276,7 +337,7 @@ bool EditorGUI::Foldout(const std::string &name)
         expanded = item->isExpanded();
         UIHeader * header = qobject_cast<UIHeader*>(s_treeWidget->itemWidget(item, 0));
         assert(header != nullptr);
-        header->CheckUpdate(name);
+        state = header->CheckUpdate(name);
     }
     else
     {
@@ -357,28 +418,49 @@ bool EditorGUI::Slider(const std::string &label, float *value, float leftValue, 
 }
 
 
-bool FishEditor::EditorGUI::Vector3Field(const std::string &label, FishEngine::Vector3 &v)
+bool FishEditor::EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
 {
     //return false;
-    UIFloat3 * float3 = CheckNextWidget<UIFloat3>(label, v.x, v.y, v.z);
-    return float3->CheckUpdate(label, v.x, v.y, v.z);
+    UIFloat3 * float3 = CheckNextWidget<UIFloat3>(label, v->x, v->y, v->z);
+    return float3->CheckUpdate(label, v->x, v->y, v->z);
 }
 
 
 bool EditorGUI::ObjectField(const std::string &label, const ObjectPtr &obj)
 {
     UIObjecField * objField = CheckNextWidget<UIObjecField>(label, obj->name());
-    return false;
+    return objField->CheckUpdate(label, obj->name());
+}
+
+
+std::string EditorGUI::ShowAddComponentMenu()
+{
+    static QMenu* menu = nullptr;
+    if (menu == nullptr)
+    {
+        menu = new QMenu(s_treeWidget);
+        menu->addAction("Rigidbody");
+    }
+
+    auto action = menu->exec(QCursor::pos());
+    return action->text().toStdString();
 }
 
 
 void EditorGUI::BeginComponentImpl(const ComponentPtr &component)
 {
     Debug::LogError("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
-    if ( Foldout( component->ClassName() ) )
+    UIHeaderState state;
+    if ( Foldout( component->ClassName(), state ) )
     {
         //OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
         HideRedundantChildItems();
+    }
+
+    if (state == UIHeaderState::remove)
+    {
+        //Object::Destroy(component);
+        componentToBeDestroyed = component;
     }
 }
 
@@ -389,14 +471,23 @@ void EditorGUI::BeginComponentImpl(FishEngine::ComponentPtr const & component)
     //static_assert(std::is_base_of<Behaviour, T>(), "T must be derived from Behaviour");
     auto p = std::static_pointer_cast<T>(component);
     bool enabled = p->enabled();
-    bool changed = false;
-    bool expanded = Foldout( T::StaticClassName(), enabled, changed );
+    //bool changed = false;
+    UIHeaderState state;
+    bool expanded = Foldout( T::StaticClassName(), enabled, state );
     if ( expanded )
     {
         OnInspectorGUI<T>(p);
         HideRedundantChildItems();
     }
-    if (changed) { p->setEnabled(enabled); }
+    if (state == UIHeaderState::enabledChanged)
+    {
+        p->setEnabled(enabled);
+    }
+    else if (state == UIHeaderState::remove)
+    {
+        //Object::Destroy(component);
+        componentToBeDestroyed = component;
+    }
 }
 
 // for component not derived from behaviour
@@ -405,7 +496,8 @@ void EditorGUI::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
     static_assert(std::is_base_of<Component, T>(), "T must be derived from Component");
     //static_assert(!std::is_base_of<Behaviour, T>(), "T must *not* be derived from Behaviour");
-    if ( Foldout( T::StaticClassName() ) )
+    UIHeaderState state;
+    if ( Foldout( T::StaticClassName(), state ) )
     {
         OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
         HideRedundantChildItems();
@@ -414,6 +506,12 @@ void EditorGUI::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 //    {
 //        Debug::LogError("up");
 //    }
+
+    if ( state == UIHeaderState::remove)
+    {
+         //Object::Destroy(component);
+        componentToBeDestroyed = component;
+    }
 }
 
 void EditorGUI::BeginComponent(const ComponentPtr &component)
@@ -427,6 +525,9 @@ void EditorGUI::BeginComponent(const ComponentPtr &component)
         CASE(MeshFilter)
         CASE(MeshRenderer)
         CASE(CameraController)
+        CASE(Rigidbody)
+        CASE(BoxCollider)
+        CASE(SphereCollider)
         default:
             //Foldout( component->ClassName() );
             BeginComponentImpl(component);

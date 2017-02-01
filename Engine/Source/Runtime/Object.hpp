@@ -77,14 +77,12 @@ namespace FishEngine
         // Removes a component.
         static void Destroy(ComponentPtr component, float t = 0.0f);
 
-        static void Destroy(ScriptPtr script, float t = 0.0f);
-
         static void DestroyImmediate(GameObjectPtr obj);
         // Removes a component.
         static void DestroyImmediate(ComponentPtr component);
         static void DestroyImmediate(ScriptPtr script);
 
-    protected:
+	protected:
 		// Should the object be hidden, saved with the scene or modifiable by the user?
 		HideFlags	m_hideFlags;
         std::string m_name;

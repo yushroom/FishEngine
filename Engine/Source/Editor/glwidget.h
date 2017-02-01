@@ -3,9 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <FishEngine.hpp>
 
-#include "SceneViewEditor.hpp"
 
 namespace FishEditor
 {
@@ -18,10 +16,8 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0);
+    explicit GLWidget(QWidget *parent = 0);
     ~GLWidget() = default;
-
-    void Init();
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -35,10 +31,6 @@ protected:
 
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-
-    //QOpenGLContext * m_context;
-
-    std::shared_ptr<FishEditor::SceneViewEditor>  m_mainSceneViewEditor;
 };
 
 #endif // GLWIDGET_H

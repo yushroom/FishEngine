@@ -117,7 +117,7 @@ namespace FishEngine
             const float         height);
 
     private:
-        friend FishEditor::EditorRenderSystem;
+		//friend FishEditor::EditorRenderSystem;
         friend FishEditor::EditorGUI;
         friend FishEngine::RenderSystem;
         

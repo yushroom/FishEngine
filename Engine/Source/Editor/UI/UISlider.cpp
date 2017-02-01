@@ -23,7 +23,7 @@ UISlider::UISlider(const std::string &label, float value, float leftValue, float
     ui->spinBox->setMaximum(rightValue);
     ui->spinBox->setValue(value);
 
-    connect(ui->spinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSpinBoxValueChanged(double)));
+    connect(ui->spinBox, &FloatLineEdit::valueChanged, this, &UISlider::OnSpinBoxValueChanged);
     connect(ui->slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 }
 
@@ -65,9 +65,9 @@ bool UISlider::CheckUpdate(const std::string &label, float &value)
     return false;
 }
 
-void UISlider::OnSpinBoxValueChanged(double v)
+void UISlider::OnSpinBoxValueChanged(float v)
 {
-    m_value = static_cast<float>(v);
+    m_value = v;
     ui->slider->blockSignals(true);
     int int_value = static_cast<int>((m_value - m_leftValue) / (m_rightValue - m_leftValue) * 100);
     ui->slider->setValue(int_value);

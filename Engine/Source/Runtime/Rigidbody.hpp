@@ -19,10 +19,10 @@ namespace FishEngine
     public:
         InjectClassName(Rigidbody);
         Rigidbody() = default;
-        
-        void Start(physx::PxShape* shape);
+		
         virtual void Start() override;
         virtual void Update() override;
+		virtual void OnDestroy() override;
       
         void setUseGravity(bool value)
         {
@@ -35,6 +35,10 @@ namespace FishEngine
         }
         
     private:
+		
+		bool IsInitialized() const;
+		void Initialize(physx::PxShape* shape);
+		
         friend class FishEditor::EditorGUI;
         float m_mass = 2;
         float m_drag = 0;
@@ -45,7 +49,7 @@ namespace FishEngine
         Vector3 m_velocity{0, 0, 0};
         
 		Meta(NonSerializable)
-        physx::PxRigidDynamic* m_physxRigidDynamic;
+        physx::PxRigidDynamic* m_physxRigidDynamic = nullptr;
     };
 }
 

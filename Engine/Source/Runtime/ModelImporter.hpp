@@ -36,6 +36,9 @@ namespace FishEngine {
         //InjectClassName(Model)
 
         Model() : m_avatar(std::make_shared<Avatar>()) {}
+		
+		Model(const Model&) = delete;
+		Model& operator=(const Model& model) = delete;
         
         GameObjectPtr CreateGameObject() const;
         

@@ -128,8 +128,8 @@ namespace FishEngine
 // hack: inject FishEditor namespace
 namespace FishEditor {
     class EditorGUI;
-    class EditorRenderSystem;
-    class FishEditorWindow;
+	//class EditorRenderSystem;
+	class MainEditor;
     class SceneViewEditor;
     class EditorInput;
 }

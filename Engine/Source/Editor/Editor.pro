@@ -25,14 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-INCLUDEPATH += /Users/yushroom/program/graphics/FishEngine/Engine/Source/Runtime \
-    #/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/imgui \
-    /usr/local/include
+INCLUDEPATH += ../Runtime \
+    ../../ThirdParty/PhysXSDK/Include \
+    /usr/local/include	#boost
 
 LIBS += /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libFishEngine.a \
     /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libyaml-cpp.a \
     /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libassimp.a \
-    #/Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libimgui.a \
     /Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Lib/osx64/*.a \
     /usr/local/lib/libboost_filesystem-mt.a \
     /usr/local/lib/libboost_system-mt.a \
@@ -45,7 +44,6 @@ SOURCES += main.cpp\
     Selection.cpp \
     SceneViewEditor.cpp \
     GameObjectInspector.cpp \
-    HierarchyView.cpp \
     EditorGUI.cpp \
     UI/UIComboBox.cpp \
     UI/UIBool.cpp \
@@ -56,7 +54,12 @@ SOURCES += main.cpp\
     UI/UIFloat.cpp \
     UI/UISlider.cpp \
     UI/UIObjecField.cpp \
-    UI/UIColor.cpp
+    UI/UIColor.cpp \
+    HierarchyTreeView.cpp \
+    MainEditor.cpp \
+    AddComponentDialog.cpp \
+    UI/UIButton.cpp \
+    UI/FloatLineEdit.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -65,7 +68,6 @@ HEADERS  += mainwindow.h \
     FishEditor.hpp \
     SceneViewEditor.hpp \
     GameObjectInspector.hpp \
-    HierarchyView.hpp \
     EditorGUI.hpp \
     UI/UIComboBox.hpp \
     UI/UIBool.hpp \
@@ -76,11 +78,17 @@ HEADERS  += mainwindow.h \
     UI/UIFloat.hpp \
     UI/UISlider.hpp \
     UI/UIObjecField.hpp \
-    UI/UIColor.hpp
+    UI/UIColor.hpp \
+    HierarchyTreeView.hpp \
+    MainEditor.hpp \
+    AddComponentDialog.hpp \
+    UI/UIButton.hpp \
+    UIDebug.hpp \
+    UIHeaderState.hpp \
+    UI/FloatLineEdit.hpp
 
 FORMS    += mainwindow.ui \
     GameObjectInspector.ui \
-    HierarchyView.ui \
     UI/UIComboBox.ui \
     UI/UIBool.ui \
     UI/UIFloat3.ui \
@@ -90,7 +98,8 @@ FORMS    += mainwindow.ui \
     UI/UIFloat.ui \
     UI/UISlider.ui \
     UI/UIObjecField.ui \
-    UI/UIColor.ui
+    UI/UIColor.ui \
+    AddComponentDialog.ui
 
 #QMAKE_CXXFLAGS += -std=c++14
 #QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12 # no effect, set QMAKE_MACOSX_DEPLOYMENT_TARGET in <QtDir>/clang_64/mkspecs/macx-clang/qmake.conf instead

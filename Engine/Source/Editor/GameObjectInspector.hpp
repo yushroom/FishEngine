@@ -15,13 +15,17 @@ public:
     explicit GameObjectInspector(QWidget *parent = 0);
     ~GameObjectInspector();
 
-public Q_SLOTS:
+    virtual QSize sizeHint() const override;
+
+private Q_SLOTS:
     void UpdateInspector();
 
     void OnNameChanged();
     void OnActiveCheckBoxChanged(bool);
     void OnLayerChanged(int);
     void OnTagChanged(int);
+
+    void OnAddComponentButtonClicked();
 
 private:
     Ui::GameObjectInspector *ui;
@@ -37,6 +41,8 @@ private:
 
     int m_tagIndex      = -1;
     int m_tagDirtyFlag  = -1;
+
+    bool m_addComponentButtonClicked = false;
 };
 
 #endif // GAMEOBJECTINSPECTOR_HPP

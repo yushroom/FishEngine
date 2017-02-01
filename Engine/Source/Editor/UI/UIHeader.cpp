@@ -15,6 +15,7 @@ UIHeader::UIHeader(std::string const & componentTypeName, bool enabled, QWidget 
     ui->checkBox->setChecked(m_enabled);
 
     connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(OnCheckBoxChanged(bool)));
+    connect(ui->toolButton, SIGNAL(clicked()), this, SLOT(OnRemoveActionTrigered()));
 }
 
 UIHeader::UIHeader(std::string const & componentTypeName, QWidget *parent) :
@@ -28,15 +29,28 @@ UIHeader::~UIHeader()
     delete ui;
 }
 
-bool UIHeader::CheckUpdate(const std::string &componentTypeName, bool &enabled)
+FishEditor::UIHeaderState UIHeader::CheckUpdate(const std::string &componentTypeName, bool &enabled)
 {
-    if (m_changed)
+    if (m_enabledChanged)
     {
-        Debug::LogError("[Header] enabled changed");
         enabled = m_enabled;
-        m_changed = false;
-        return true;
+        m_enabledChanged = false;
+        return FishEditor::UIHeaderState::enabledChanged;
     }
+
+    if (m_removeActionTrigered)
+    {
+        m_removeActionTrigered = false;
+        return FishEditor::UIHeaderState::remove;
+    }
+
+//    if (m_changed)
+//    {
+//        Debug::LogError("[Header] enabled changed");
+//        enabled = m_enabled;
+//        m_changed = false;
+//        return true;
+//    }
 
     if (ui->checkBox->isHidden())
     {
@@ -59,11 +73,17 @@ bool UIHeader::CheckUpdate(const std::string &componentTypeName, bool &enabled)
         LOG;
         ui->label->setText(QString(componentTypeName.c_str()));
     }
-    return false;
+    return FishEditor::UIHeaderState::none;
 }
 
-void UIHeader::CheckUpdate(const std::string &componentTypeName)
+FishEditor::UIHeaderState UIHeader::CheckUpdate(const std::string &componentTypeName)
 {
+    if (m_removeActionTrigered)
+    {
+        m_removeActionTrigered = false;
+        return FishEditor::UIHeaderState::remove;
+    }
+
     if (!ui->checkBox->isHidden())
     {
         LOG;
@@ -77,10 +97,11 @@ void UIHeader::CheckUpdate(const std::string &componentTypeName)
         LOG;
         ui->label->setText(QString(componentTypeName.c_str()));
     }
+    return FishEditor::UIHeaderState::none;
 }
 
 void UIHeader::OnCheckBoxChanged(bool value)
 {
     m_enabled = value;
-    m_changed = true;
+    m_enabledChanged = true;
 }

@@ -23,7 +23,7 @@ private slots:
 
 private:
 
-    bool eventFilter(QObject *watched, QEvent *event);
+    //bool eventFilter(QObject *watched, QEvent *event);
 
     void Init();
 

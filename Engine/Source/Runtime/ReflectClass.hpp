@@ -12,6 +12,9 @@
 namespace FishEngine
 {
     bool IsDerivedFrom(const std::string& derivedClassName, const std::string& baseClassName);
+	
+	bool IsDerivedFrom(int derivedClassID, int baseClassID);
+
 
     template<typename BaseClass>
     bool IsSubClassOf(const std::string& derivedClassName)
@@ -19,18 +22,39 @@ namespace FishEngine
         return IsDerivedFrom(derivedClassName, BaseClass::StaticClassName());
     }
 	
+	template<typename BaseClass>
+	bool IsSubClassOf(int derivedClassID)
+	{
+		return IsDerivedFrom(derivedClassID, ClassID<BaseClass>());
+	}
+	
 	inline bool IsBehaviour(const std::string& derivedClassName)
 	{
 		return IsDerivedFrom(derivedClassName, "Behaviour");
+	}
+	
+	inline bool IsBehaviour(int derivedClassID)
+	{
+		return IsSubClassOf<Behaviour>(derivedClassID);
 	}
 
     inline bool IsScript(const std::string& derivedClassName)
     {
         return IsDerivedFrom(derivedClassName, "Script");
     }
+	
+	inline bool IsScript(int derivedClassID)
+	{
+		return IsSubClassOf<Script>(derivedClassID);
+	}
 
 	inline bool IsComponent(const std::string& derivedClassName)
 	{
 		return IsDerivedFrom(derivedClassName, "Component");
+	}
+	
+	inline bool IsComponent(int derivedClassID)
+	{
+		return IsSubClassOf<Component>(derivedClassID);
 	}
 }

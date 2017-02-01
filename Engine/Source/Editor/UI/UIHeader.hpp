@@ -4,9 +4,12 @@
 #include <QWidget>
 #include <string>
 
+#include "UIHeaderState.hpp"
+
 namespace Ui {
 class UIHeader;
 }
+
 
 class UIHeader : public QWidget
 {
@@ -22,19 +25,31 @@ public:
     ~UIHeader();
 
     // show checkBox
-    bool CheckUpdate(std::string const & componentTypeName, bool & enabled);
+    FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName, bool & enabled);
 
     // hide checkBox
-    void CheckUpdate(std::string const & componentTypeName);
+    FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName);
+
 
 private slots:
     void OnCheckBoxChanged(bool value);
+    void OnRemoveActionTrigered() { m_removeActionTrigered = true; }
 
 private:
     Ui::UIHeader *ui;
 
-    bool m_changed = false;
+    //bool m_changed = false;
     bool m_enabled = true;
+
+    bool m_enabledChanged = false;
+    bool m_removeActionTrigered = false;
+
+//    void ResetState()
+//    {
+//        m_enabledChanged = false;
+//        m_removeActionTrigered = false;
+//    }
+
     std::string m_componentTypeName;
 };
 

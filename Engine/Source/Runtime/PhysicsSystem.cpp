@@ -55,8 +55,7 @@ PxVisualDebuggerConnection*
 gConnection	= NULL;
 
 
-void FishEngine::PhysicsSystem::
-Init()
+void FishEngine::PhysicsSystem::Init()
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
     PxProfileZoneManager* profileZoneManager = &PxProfileZoneManager::createProfileZoneManager(gFoundation);
@@ -82,15 +81,13 @@ Init()
     gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
-void FishEngine::PhysicsSystem::
-FixedUpdate()
+void FishEngine::PhysicsSystem::FixedUpdate()
 {
     gScene->simulate(1.0f/30.f);
     gScene->fetchResults(true);
 }
 
-void FishEngine::PhysicsSystem::
-Clean()
+void FishEngine::PhysicsSystem::Clean()
 {
     gScene->release();
     gDispatcher->release();

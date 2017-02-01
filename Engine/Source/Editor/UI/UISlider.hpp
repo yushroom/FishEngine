@@ -19,7 +19,7 @@ public:
     bool CheckUpdate(std::string const & label, float & value);
 
 private Q_SLOTS:
-    void OnSpinBoxValueChanged(double v);
+    void OnSpinBoxValueChanged(float v);
 
     void OnSliderValueChanged(int v);
 

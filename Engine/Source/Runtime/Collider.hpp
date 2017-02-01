@@ -22,9 +22,13 @@ namespace FishEngine
         //bool Raycast(const Ray& ray, RaycastHit* out_hitInfo, const float maxDistance);
 
         virtual void Start() override;
+
+		inline bool enabled() const { return m_enabled; }
+		void setEnabled(bool enabled) { m_enabled = enabled; }
         
     protected:
-
+		friend class FishEditor::EditorGUI;
+		friend class Rigidbody;
 		Meta(NonSerializable)
         RigidbodyPtr m_attachedRigidbody;
 
@@ -32,10 +36,10 @@ namespace FishEngine
         Bounds  m_bounds;
 
         float   m_contactOffset;
-        bool    m_enabled;
-        bool    m_isTrigger;
+        bool    m_enabled		= true;
+        bool    m_isTrigger		= false;
         
-        physx::PxShape* physicsShape();
+		physx::PxShape* physicsShape() { return m_physxShape; }
         virtual void CreatePhysicsShape() = 0;
         
 		Meta(NonSerializable)

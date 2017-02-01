@@ -32,8 +32,8 @@ namespace FishEngine
 		static void setPixelsPerPoint(const float value) { m_pixelsPerPoint = value; }
         
     private:
-        friend class FishEditor::FishEditorWindow;
-        friend class FishEditor::EditorRenderSystem;
+		//friend class FishEditor::FishEditorWindow;
+		//friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
         friend class GameApp;
         static int m_width;

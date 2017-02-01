@@ -40,15 +40,60 @@ namespace FishEngine {
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif
+		{
         ModelImporter importer;
         //importer.setImportNormals(ModelImporterNormals::Calculate);
-        s_builtinModels[PrimitiveType::Cube]     = importer.LoadFromFile(root_dir+"cube.obj");
+		auto model = importer.LoadFromFile(root_dir+"cube.obj");
+		model->m_name = "Cube";
+		model->mainMesh()->setName("Cube");
+		s_builtinModels[PrimitiveType::Cube]     = model;
+		}
+		
+		{
+			ModelImporter importer;
         importer.setImportNormals(ModelImporterNormals::Calculate);
-        s_builtinModels[PrimitiveType::Sphere]   = importer.LoadFromFile(root_dir+"sphere.obj");
+		auto model = importer.LoadFromFile(root_dir+"sphere.obj");
+		model->m_name = "Sphere";
+		model->mainMesh()->setName("Sphere");
+        s_builtinModels[PrimitiveType::Sphere]   = model;
+		}
+		
+		{
+			ModelImporter importer;
         importer.setImportNormals(ModelImporterNormals::Import);
-        s_builtinModels[PrimitiveType::Plane]    = importer.LoadFromFile(root_dir+"plane.obj");
-        s_builtinModels[PrimitiveType::Quad]     = importer.LoadFromFile(root_dir+"quad.obj");
-        s_builtinModels[PrimitiveType::Cone]     = importer.LoadFromFile(root_dir+"cone.obj");
+		auto model = importer.LoadFromFile(root_dir+"plane.obj");
+		model->m_name = "Plane";
+		model->mainMesh()->setName("Plane");
+        s_builtinModels[PrimitiveType::Plane]    = model;
+		}
+		
+		{
+			ModelImporter importer;
+			importer.setImportNormals(ModelImporterNormals::Import);
+		auto model = importer.LoadFromFile(root_dir+"quad.obj");
+		model->m_name = "Quad";
+		model->mainMesh()->setName("Quad");
+        s_builtinModels[PrimitiveType::Quad]     = model;
+		}
+		
+		{
+			ModelImporter importer;
+			importer.setImportNormals(ModelImporterNormals::Import);
+		auto model = importer.LoadFromFile(root_dir+"cone.obj");
+		model->m_name = "Cone";
+		model->mainMesh()->setName("Cone");
+        s_builtinModels[PrimitiveType::Cone]     = model;
+		}
+		
+		{
+			ModelImporter importer;
+			importer.setImportNormals(ModelImporterNormals::Import);
+			auto model = importer.LoadFromFile(root_dir+"cylinder.obj");
+			model->m_name = "Cylinder";
+			model->mainMesh()->setName("Cylinder");
+			s_builtinModels[PrimitiveType::Cylinder]     = model;
+		}
+		
         for (auto& p : s_builtinModels)
         {
             for (auto& mesh : p.second->m_meshes)

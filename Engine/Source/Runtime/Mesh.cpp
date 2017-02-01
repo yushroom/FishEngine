@@ -109,6 +109,8 @@ namespace FishEngine
 
     void Mesh::UploadMeshData(bool markNoLogerReadable /*= true*/)
     {
+		if (m_uploaded)
+			return;
         GenerateBuffer();
         BindBuffer();
         glCheckError();
@@ -155,6 +157,7 @@ namespace FishEngine
     void Mesh::GenerateBuffer()
     {
         // VAO
+		assert(m_VAO == 0);
         glGenVertexArrays(1, &m_VAO);
 
         // index vbo

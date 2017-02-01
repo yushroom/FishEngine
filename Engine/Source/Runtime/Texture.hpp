@@ -94,7 +94,7 @@ namespace FishEngine
             return s_textures;
         }
 
-        virtual void Resize(const int newWidth, const int newHeight)
+		virtual void Resize(const int, const int)
         {
             abort();
         }

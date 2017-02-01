@@ -10,7 +10,7 @@
 #define NDEBUG
 #endif
 #endif
-#include <PhysXSDK/Include/PxPhysicsAPI.h>
+#include <PxPhysicsAPI.h>
 
 #include "ReflectClass.hpp"
 

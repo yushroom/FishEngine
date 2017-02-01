@@ -115,13 +115,13 @@ namespace FishEditor
     {
         //Input::Update();
         m_cameraGameObject->GetComponent<CameraController>()->Update();
-        Scene::Update();
+        //Scene::Update();
     }
 
     void SceneViewEditor::Render()
     {
         //Debug::Log("SceneViewEditor::Render");
-        Update();
+        //Update();
         Pipeline::PushRenderTarget(m_sceneViewRenderTarget);
         glViewport(0, 0, Screen::m_width, Screen::m_height);
 
@@ -378,7 +378,7 @@ namespace FishEditor
 
     void SceneViewEditor::DrawTranslateGizmo()
     {
-        constexpr float translate_gizmo_length = 0.1f;
+        constexpr float translate_gizmo_length = 0.2f;
         static Vector3 lastMousePosition;
         static Vector3 lastCenter;
 
@@ -420,25 +420,8 @@ namespace FishEditor
             view.IntersectPlane(axis[0], center, t);
             view.IntersectPlane(axis[1], center, t + 1);
             view.IntersectPlane(axis[2], center, t + 2);
-            float tmid;
-            if (t[0] >= t[1])
-            {
-                if (t[1] >= t[2])
-                    tmid = t[1];
-                else if (t[0] >= t[2])
-                    tmid = t[2];
-                else
-                    tmid = t[0];
-            }
-            else
-            {
-                if (t[0] >= t[2])
-                    tmid = t[0];
-                else if (t[1] >= t[2])
-                    tmid = t[2];
-                else
-                    tmid = t[1];
-            }
+            float tmid = *std::min_element(std::begin(t), std::end(t));
+
             Vector3 p = view.GetPoint(tmid);
             Vector3 d = p - center;
             if (d.magnitude() <= translate_gizmo_length * 1.3f)
@@ -463,8 +446,7 @@ namespace FishEditor
         auto proj = camera->projectionMatrix();
         auto vp = proj * view;
 
-        ShaderUniforms uniforms;
-
+        //ShaderUniforms uniforms;
 
         //Color colors[3] = { Color::red, Color::green, Color::blue };
 
@@ -481,7 +463,7 @@ namespace FishEditor
             int j = 6 * i;
             Vector3 pos = center + axis[i] * translate_gizmo_length;
             Quaternion rot = Quaternion::FromToRotation(Vector3::up, axis[i]);
-            model.SetTRS(pos, rot, Vector3(1, 1.5, 1) * 0.015f);
+            model.SetTRS(pos, rot, Vector3(1, 1.5, 1) * 0.02f);
             Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f + j);
             sceneGizmoMaterial->SetVector3("_Color", color);
             sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * model);
@@ -578,7 +560,7 @@ namespace FishEditor
         Vector3 dir = center - camera_pos;
         Vector3 gizmo_center = dir.normalized() + camera_pos;
 
-        constexpr float radius = 0.1f;
+        constexpr float radius = 0.2f;
 
         Vector3 axis[3];
         if (m_transformSpace == TransformSpace::Local)
@@ -683,7 +665,175 @@ namespace FishEditor
 
     void SceneViewEditor::DrawScaleGizmo()
     {
+        constexpr float translate_gizmo_length = 0.2f;
+        static Vector3 lastMousePosition;
+        static Vector3 lastCenter;
 
+        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        if (m_lastSelectedGameObject.lock() != selectedGO)
+        {
+            m_selectedAxis = -1;
+            m_lastSelectedGameObject = selectedGO;
+        }
+        if (selectedGO == nullptr)
+            return;
+
+        auto camera = Camera::main();
+        Vector3 center = selectedGO->transform()->position();
+        Vector3 camera_pos = camera->transform()->position();
+        Vector3 dir = center - camera_pos;
+        center = dir.normalized() + camera_pos;
+
+        // must be in local space
+        Vector3 axis[3] =
+        {
+            selectedGO->transform()->right(),     // +x
+            selectedGO->transform()->up(),        // +y
+            selectedGO->transform()->forward(),   // +z
+        };
+
+        // check if any axis is selected by mouse
+        if (Input::GetMouseButtonDown(0))
+        {
+            m_selectedAxis = -1;
+            Ray view = camera->ScreenPointToRay(Input::mousePosition());
+            float t[3];
+            view.IntersectPlane(axis[0], center, t);
+            view.IntersectPlane(axis[1], center, t + 1);
+            view.IntersectPlane(axis[2], center, t + 2);
+            float tmid = *std::min_element(std::begin(t), std::end(t));
+
+            Vector3 p = view.GetPoint(tmid);
+            Vector3 d = p - center;
+            if (d.magnitude() <= translate_gizmo_length * 1.3f)
+            {
+                d.Normalize();
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (Vector3::Dot(d, axis[i]) > 0.96f)
+                    {
+                        m_selectedAxis = i;
+                        //m_mouseEventHandled = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        auto shader = sceneGizmoMaterial->shader();
+        shader->Use();
+        //sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
+        auto view = camera->worldToCameraMatrix();
+        auto proj = camera->projectionMatrix();
+        auto vp = proj * view;
+
+        //ShaderUniforms uniforms;
+        //Color colors[3] = { Color::red, Color::green, Color::blue };
+
+        float f[] = {
+            1,  0,  0,   0, 0, -90,    // red axis, +x
+            0,  1,  0,   0, 0,   0,    // green axis, +y
+            0,  0,  1,  90, 0,   0,    // blue axis, +z
+        };
+
+        FishEngine::Matrix4x4 model;
+
+        static float axis_scale = 1.0f;
+
+        for (int i = 0; i < 3; ++i)
+        {
+            int j = 6 * i;
+            Vector3 pos = center + axis[i] * translate_gizmo_length * (m_selectedAxis == i ? axis_scale : 1.0f);
+            Quaternion rot = Quaternion::FromToRotation(Vector3::up, axis[i]);
+            model.SetTRS(pos, rot, Vector3(1, 1, 1) * 0.03f);
+            Vector3 color = m_selectedAxis == i ? Vector3(1, 1, 0) : Vector3(f + j);
+            sceneGizmoMaterial->SetVector3("_Color", color);
+            sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * model);
+            sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view*model).inverse().transpose());
+            shader->Use();
+            shader->PreRender();
+            sceneGizmoMaterial->BindProperties();
+            shader->CheckStatus();
+            cubeMesh->Render();
+
+            Gizmos::setColor(Color(color.x, color.y, color.z, 1.0f));
+            Gizmos::DrawLine(center, pos);
+        }
+
+        if (m_selectedAxis < 0)
+            return;
+
+        // get intersected point of two Rays
+        // solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
+        auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
+        {
+            float x = dir1.x;
+            float y = dir1.y;
+            float z = dir1.z;
+            float test = dir2.z*y - dir2.y*z;
+            if (!Mathf::Approximately(test, 0.0f))
+                return ((o1.z*y - o1.y*z) - (o2.z*y - o2.y*z)) / test;
+            else
+                return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
+        };
+
+        //center = selectedGO->transform()->position();
+
+        auto& axis_selected = axis[m_selectedAxis];
+
+        //static std::function<void(void)> undo_function;
+        //static std::function<void(void)> redo_function;
+
+        static float t_old = 0;
+        static float scale_old = 1;
+
+        // handle mouse movement event
+        if (Input::GetMouseButtonDown(0))   // start
+        {
+            m_mouseEventHandled = true;
+            lastCenter = center;
+            Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
+            //float t = solve(center, axis_selected, camera_pos, ray.direction);
+            //lastMousePosition = ray.GetPoint(t);
+            t_old = solve(camera_pos, ray.direction, center, axis_selected);
+            lastMousePosition = center + axis_selected * t_old;
+            scale_old =  selectedGO->transform()->localScale()[m_selectedAxis];
+//            const auto position = selectedGO->transform()->position();
+//            undo_function = [selectedGO, position]() {
+//                Debug::LogWarning("Undo translation");
+//                selectedGO->transform()->setPosition(position);
+//            };
+            //Debug::LogWarning("t_old = %f", t_old);
+        }
+        else if (Input::GetMouseButton(0))       // moving
+        {
+            Vector3 mouse_movement(Input::GetAxis(Axis::MouseX)*Screen::width(), Input::GetAxis(Axis::MouseY)*Screen::height(), 0); // in piexls
+            Vector3 axis_on_plane = vp.MultiplyVector(axis_selected);
+            axis_on_plane.z = 0;
+            axis_on_plane.Normalize();                              // axis on the near clip plane
+            Vector3 p = Input::mousePosition() - mouse_movement + Vector3::Project(mouse_movement, axis_on_plane);   // new mouse position(along the axis)
+            Vector3 new_view_dir = Camera::main()->ScreenPointToRay(p).direction;
+
+            // solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
+            float t_new = solve(camera_pos, new_view_dir, center, axis_selected);
+            //selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
+            Vector3 scale = selectedGO->transform()->localScale();
+            axis_scale = t_new / t_old;
+            scale[m_selectedAxis] = scale_old * axis_scale;
+            selectedGO->transform()->setLocalScale(scale);
+            //Debug::LogWarning("t_new = %f", t_new);
+        }
+        else if (Input::GetMouseButtonUp(0))    // end
+        {
+            m_mouseEventHandled = false;
+            axis_scale = 1.0f;
+//            const auto position = selectedGO->transform()->position();
+//            redo_function = [selectedGO, position]() {
+//                Debug::LogWarning("Redo translation");
+//                selectedGO->transform()->setPosition(position);
+//            };
+            //CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
+        }
     }
 
     void SceneViewEditor::DrawSceneGizmo()

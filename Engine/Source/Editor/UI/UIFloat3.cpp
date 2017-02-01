@@ -36,9 +36,11 @@ UIFloat3::UIFloat3(const std::string &label, float x, float y, float z, QWidget 
 //    QString s;
 //    s.number(s, 'f', 8);
 
-    connect(ui->x, SIGNAL(valueChanged(double)), this, SLOT(setX(double)));
-    connect(ui->y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)));
-    connect(ui->z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)));
+    connect(ui->x, &FloatLineEdit::valueChanged, this, &UIFloat3::setX);
+    connect(ui->y, &FloatLineEdit::valueChanged, this, &UIFloat3::setY);
+    connect(ui->z, &FloatLineEdit::valueChanged, this, &UIFloat3::setZ);
+    //connect(ui->y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)));
+    //connect(ui->z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)));
 }
 
 UIFloat3::~UIFloat3()

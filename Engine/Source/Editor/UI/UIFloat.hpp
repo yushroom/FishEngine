@@ -18,8 +18,9 @@ public:
     // return true if the value is modified by Inspector
     bool CheckUpdate(std::string const & label, float & value);
 
-private Q_SLOTS:
-    inline void setValue(double v) { m_value = static_cast<float>(v); m_changed = true; }
+private:
+//private Q_SLOTS:
+    inline void OnValueChanged(float);
 
 private:
     Ui::UIFloat *ui;

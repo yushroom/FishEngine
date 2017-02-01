@@ -35,6 +35,7 @@ namespace FishEngine
         //virtual void Init() {}
         virtual void Start() {}
         virtual void Update() {}
+		virtual void OnDestroy() {}
 
         //static PComponent CreateComponent(const std::string& componentClassName);
 

@@ -124,9 +124,13 @@ namespace FishEngine
 
         static GameObjectPtr CreateGameObject(const std::string& name);
 
+		static GameObjectPtr CreateCamera();
+
         static void Init();
         static void Start();
         static void Update();
+		static void Clean();
+		
         static void RenderShadow(LightPtr& light);
         static void OnDrawGizmos();
 
@@ -155,7 +159,7 @@ namespace FishEngine
     private:
         friend class RenderSystem;
         friend class FishEditor::EditorGUI;
-        friend class FishEditor::EditorRenderSystem;
+		//friend class FishEditor::EditorRenderSystem;
 
         static std::list<GameObjectPtr>   m_gameObjects;
         static std::vector<GameObjectPtr> m_gameObjectsToBeDestroyed;

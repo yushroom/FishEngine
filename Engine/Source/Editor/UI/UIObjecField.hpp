@@ -20,6 +20,8 @@ public:
     explicit UIObjecField(std::string const & label, std::string const & objectName, QWidget *parent = 0);
     ~UIObjecField();
 
+    bool CheckUpdate(std::string const & label, std::string const & objectName);
+
 private:
     Ui::UIObjecField *ui;
 

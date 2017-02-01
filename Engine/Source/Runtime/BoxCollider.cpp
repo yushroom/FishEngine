@@ -20,8 +20,7 @@ BoxCollider(const Vector3& center,
     //m_physxShape = gPhysics->createShape(PxBoxGeometry(size.x*0.5f, size.y*0.5f, size.z*0.5f), *gMaterial);
 }
 
-void FishEngine::BoxCollider::
-CreatePhysicsShape()
+void FishEngine::BoxCollider::CreatePhysicsShape()
 {
     //if (m_physxShape == nullptr) {
         const auto& s = transform()->lossyScale();
@@ -31,8 +30,7 @@ CreatePhysicsShape()
 }
 
 
-void FishEngine::BoxCollider::
-OnDrawGizmosSelected()
+void FishEngine::BoxCollider::OnDrawGizmosSelected()
 {
     //const auto& s = transform()->lossyScale();
     Gizmos::setColor(Color::green);

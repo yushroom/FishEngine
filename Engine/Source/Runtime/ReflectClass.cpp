@@ -17,4 +17,17 @@ namespace FishEngine
         } while (name.size() > 0);
         return false;
     }
+	
+	bool IsDerivedFrom(int derivedClassID, int baseClassID)
+	{
+		int name = derivedClassID;
+		do {
+			if (name == baseClassID)
+			{
+				return true;
+			}
+			name = s_componentInheritance_int[name];
+		} while (name > 0);
+		return false;
+	}
 }

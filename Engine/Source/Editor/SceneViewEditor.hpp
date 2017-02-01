@@ -65,6 +65,16 @@ namespace FishEditor
 //            return m_colorBuffer;
 //        }
 
+        TransformToolType transformToolType()
+        {
+            return m_transformToolType;
+        }
+
+        void setTransformToolType(TransformToolType type)
+        {
+            m_transformToolType = type;
+        }
+
         // this scene view is focused, so it may receive keyboard event.
         bool focused() const
         {

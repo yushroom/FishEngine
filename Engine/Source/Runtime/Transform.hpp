@@ -265,7 +265,14 @@ namespace FishEngine
             return m_parent.lock();
         }
 
-        void SetParent(TransformPtr const & parent);
+		inline void setParent(TransformPtr const & parent, bool worldPositionStays = true)
+		{
+			SetParent(parent, worldPositionStays);
+		}
+
+		// parent: The parent Transform to use.
+		// worldPositionStays: If true, the parent-relative position, scale and rotation are modified such that the object keeps the same world space position, rotation and scale as before.
+        void SetParent(TransformPtr const & parent, bool worldPositionStays = true);
 
         //========== Public Functions ==========//
 

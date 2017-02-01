@@ -6,7 +6,9 @@
 #include <chrono>
 
 namespace FishEditor {
-    
+	
+	class FishEditorWindow;
+	
     class EditorTime
     {
     public:
@@ -21,7 +23,7 @@ namespace FishEditor {
         }
         
     private:
-        friend class FishEditor::FishEditorWindow;
+        friend class FishEditorWindow;
         
         static float m_deltaTime;
         //static float m_fixedDeltaTime;

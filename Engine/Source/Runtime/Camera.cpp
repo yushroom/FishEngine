@@ -107,7 +107,7 @@ namespace FishEngine
         {
             for (auto& c : m_allCameras)
             {
-                if (c->tag() == "MainCamera")
+				if (c->tag() == "MainCamera")
                 {
                     m_mainCamera = c;
                     return m_mainCamera;

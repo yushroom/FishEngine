@@ -149,26 +149,57 @@ namespace FishEngine
     }
 
 
-    void Transform::SetParent(TransformPtr const & parent)
+    void Transform::SetParent(TransformPtr const & parent, bool worldPositionStays)
     {
-        auto p = m_parent.lock();
-        if (parent == p) {
+		auto old_parent = m_parent.lock();
+		if (parent == old_parent)
+		{
             return;
         }
+		
+		// new parent can not be child of this
+		auto p = parent;
+		while (p != nullptr)
+		{
+			if (p.get() == this)
+			{
+				Debug::LogError("%s", "new parent can not be child of this");
+				return;
+			}
+			p = p->parent();
+		}
+		
+		
         // remove from old parent
-        if (p != nullptr) {
+		if (old_parent != nullptr)
+		{
             //p->m_children.remove(this);
-            p->m_children.remove_if([this](std::weak_ptr<Transform> c) {
+			// TODO: remove first, not remove all
+			old_parent->m_children.remove_if([this](std::weak_ptr<Transform> c) {
                 return c.lock().get() == this;
             });
         }
+		
+		// old_parent.localToWorld * old_localToWorld = new_parent.localToWorld * new_localToWorld
+		// ==> new_localToWorld = new_parent.worldToLocal * old_parent.localToWorld * old_localToWorld
 
         m_parent = parent;
-        if (parent == nullptr) {
-            return;
+		if (parent != nullptr)
+		{
+			parent->m_children.push_back(gameObject()->transform());
         }
-        parent->m_children.push_back(gameObject()->transform());
-        MakeDirty();
+		
+		if ( worldPositionStays )
+		{
+			Matrix4x4 mat = Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale);
+			if (old_parent != nullptr)
+				mat = old_parent->localToWorldMatrix() * mat;
+			if ( parent != nullptr )
+				mat = parent->worldToLocalMatrix() * m_localToWorldMatrix;
+			Matrix4x4::Decompose(mat, &m_localPosition, &m_localRotation, &m_localScale);
+		}
+		//UpdateMatrix();
+		MakeDirty();
     }
 
     //std::shared_ptr<Transform>

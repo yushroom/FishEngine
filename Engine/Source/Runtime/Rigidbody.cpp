@@ -4,6 +4,7 @@
 #include "Gizmos.hpp"
 #include "Transform.hpp"
 #include "PhysicsSystem.hpp"
+#include "Collider.hpp"
 
 using namespace FishEngine;
 using namespace physx;
@@ -12,24 +13,32 @@ extern physx::PxPhysics*				gPhysics;
 extern physx::PxScene*				gScene;
 extern physx::PxMaterial*				gMaterial;
 
-static physx::PxVec3 PxVec3(const FishEngine::Vector3& v)
+inline physx::PxVec3 PxVec3(const FishEngine::Vector3& v)
 {
     return physx::PxVec3(v.x, v.y, v.z);
 }
 
-void FishEngine::Rigidbody::
-Start(PxShape* shape)
+void FishEngine::Rigidbody::Initialize(PxShape* shape)
 {
     const auto& t = transform();
     const Vector3 p = t->position();
     const auto& q = t->rotation();
     m_physxRigidDynamic = gPhysics->createRigidDynamic(PxTransform(p.x, p.y, p.z, PxQuat(q.x, q.y, q.z, q.w)));
-    m_physxRigidDynamic->attachShape(*shape);
-    shape->release();
+	if (shape)
+	{
+		m_physxRigidDynamic->attachShape(*shape);
+		shape->release();
+	}
 }
 
 void FishEngine::Rigidbody::Start()
 {
+	auto collider = gameObject()->GetComponent<Collider>();
+	if (collider != nullptr)
+		Initialize(collider->physicsShape());
+	else
+		Initialize(nullptr);
+	
     const auto& t = transform();
     const Vector3 p = t->position();
     const auto& q = t->rotation();
@@ -39,12 +48,21 @@ void FishEngine::Rigidbody::Start()
     gScene->addActor(*m_physxRigidDynamic);
 }
 
-void FishEngine::Rigidbody::
-Update()
+void FishEngine::Rigidbody::Update()
 {
     //m_physxRigidDynamic->user
     const auto& t = m_physxRigidDynamic->getGlobalPose();
     //const auto& pt = t.actor2World;
     transform()->setPosition(t.p.x, t.p.y, t.p.z);
     transform()->setLocalRotation(Quaternion(t.q.x, t.q.y, t.q.z, t.q.w));
+}
+
+void Rigidbody::OnDestroy()
+{
+	m_physxRigidDynamic = nullptr;
+}
+
+bool Rigidbody::IsInitialized() const
+{
+	return m_physxRigidDynamic != nullptr;
 }

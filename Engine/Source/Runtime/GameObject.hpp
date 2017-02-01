@@ -6,6 +6,8 @@
 #include "Object.hpp"
 #include "ReflectClass.hpp"
 #include "generate/Class_ConponentInfo.hpp"
+#include "Component_gen.hpp"
+
 #include <memory>
 
 namespace FishEngine
@@ -89,7 +91,9 @@ namespace FishEngine
             static_assert(std::is_base_of<Component, T>::value, "Component only");
             for (auto& comp : m_components)
             {
-                if (comp->ClassName() == T::StaticClassName())
+				int id = comp->ClassID();
+				if ( IsSubClassOf<T>(id) )
+                //if (comp->ClassName() == T::StaticClassName())
                 {
                     return std::static_pointer_cast<T>(comp);
                 }
@@ -97,10 +101,13 @@ namespace FishEngine
             return nullptr;
         }
 
+		//bool AddComponent(std::string const & typeName);
+
 #if 1
         // Adds a component class named className to the game object.
         bool AddComponent(ComponentPtr component)
         {
+			// TODO
             //if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
             //{
             //    return false;
@@ -162,7 +169,7 @@ namespace FishEngine
     private:
 		friend class ::GameObjectInspector;
         friend class FishEditor::EditorGUI;
-        friend class FishEditor::EditorRenderSystem;
+		//friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
 
         std::list<ComponentPtr> m_components;

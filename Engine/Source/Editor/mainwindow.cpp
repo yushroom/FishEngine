@@ -13,6 +13,8 @@
 #include <Input.hpp>
 
 #include "GameObjectInspector.hpp"
+#include "MainEditor.hpp"
+#include "SceneViewEditor.hpp"
 
 using namespace FishEngine;
 
@@ -20,9 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-//    auto context = new QOpenGLContext;
-//    context->create();
-//    context->makeCurrent(this);
     FishEngine::Debug::Log("MainWindow::ctor");
     Init();
     ui->setupUi(this);
@@ -55,17 +54,37 @@ MainWindow::MainWindow(QWidget *parent) :
     listView->setIconSize(QSize(64, 64));
     listView->setRootIndex(fileModel->setRootPath(dir));
 
-    //qApp->installEventFilter(this);
-    //Init();
-    //ui->openGLWidget->Init();
-
     m_gameObjectInspector = new GameObjectInspector;
     ui->InspectorContents->layout()->addWidget(m_gameObjectInspector);
 
-    //model = new QStandardItemModel(ui->hierarchyTreeView);
-//    QStandardItem* item = new QStandardItem("GameObject");
-//    model->appendRow(item);
-//    item->appendRow(new QStandardItem("1"));
+    connect(ui->actionPlay, &QAction::triggered, [this](){
+        if (FishEditor::MainEditor::InPlayMode())
+        {
+            this->ui->actionPlay->setText("Play");
+            FishEditor::MainEditor::Stop();
+        }
+        else
+        {
+            this->ui->actionPlay->setText("Stop");
+            FishEditor::MainEditor::Play();
+        }
+    });
+
+    connect(ui->actionHand, &QAction::triggered, [](){
+        FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::None);
+    });
+
+    connect(ui->actionTranslate, &QAction::triggered, [](){
+        FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Translate);
+    });
+
+    connect(ui->actionRotation, &QAction::triggered, [](){
+        FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Rotate);
+    });
+
+    connect(ui->actionScale, &QAction::triggered, [](){
+        FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Scale);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -80,26 +99,26 @@ void MainWindow::on_treeView_clicked(const QModelIndex &index)
     ui->listView->setRootIndex(fileModel->setRootPath(path));
 }
 
-bool MainWindow::eventFilter(QObject *watched, QEvent *event)
-{
-    Q_UNUSED(watched);
-    auto type = event->type();
-    if (type == QEvent::MouseMove)
-    {
-        //auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
-        //statusBar()->showMessage(QString("Mouse move (%1 %2)").arg(mouseEvent->pos().x()).arg(mouseEvent->pos().y()));
-    }
-    else if (type == QEvent::MouseButtonPress)
-    {
-        statusBar()->showMessage("MousePress");
-    }
-    else if (type == QEvent::MouseButtonRelease)
-    {
-        statusBar()->showMessage("MouseRelease");
-    }
+//bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+//{
+//    Q_UNUSED(watched);
+//    auto type = event->type();
+//    if (type == QEvent::MouseMove)
+//    {
+//        //auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+//        //statusBar()->showMessage(QString("Mouse move (%1 %2)").arg(mouseEvent->pos().x()).arg(mouseEvent->pos().y()));
+//    }
+//    else if (type == QEvent::MouseButtonPress)
+//    {
+//        statusBar()->showMessage("MousePress");
+//    }
+//    else if (type == QEvent::MouseButtonRelease)
+//    {
+//        statusBar()->showMessage("MouseRelease");
+//    }
 
-    return false;
-}
+//    return false;
+//}
 
 void MainWindow::Init()
 {

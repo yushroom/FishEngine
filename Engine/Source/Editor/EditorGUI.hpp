@@ -4,6 +4,8 @@
 
 
 #include "FishEditor.hpp"
+#include "UIHeaderState.hpp"
+
 #include <Color.hpp>
 
 class QTreeWidget;
@@ -14,7 +16,8 @@ namespace FishEditor
     template< class T>
     struct can_be_enabled : std::integral_constant< bool,
             std::is_base_of<FishEngine::Behaviour, T>::value ||
-            std::is_base_of<FishEngine::Renderer, T>::value >
+            std::is_base_of<FishEngine::Renderer, T>::value ||
+            std::is_base_of<FishEngine::Collider, T>::value >
     {
     };
 
@@ -30,6 +33,9 @@ namespace FishEditor
 
         static void BindGameObject(FishEngine::GameObjectPtr const & go);
 
+        // return component name
+        static std::string ShowAddComponentMenu();
+
     private:
 
         static int              s_topLevelItemIndex;
@@ -41,11 +47,11 @@ namespace FishEditor
 
         // show left checkBox
         // return value: isExpanded
-        static bool Foldout(std::string const & name, bool & enabled, bool & changed);
+        static bool Foldout(std::string const & name, bool & enabled, UIHeaderState & state);
 
         // hide left checkBox
         // return value: isExpanded
-        static bool Foldout(std::string const & name);
+        static bool Foldout(std::string const & name, UIHeaderState &state);
 
         static bool Toggle(const std::string &label, bool * value);
 
@@ -57,7 +63,7 @@ namespace FishEditor
         // index: the index in the array(not the underlying value)
         static bool EnumPopup(std::string const & label, int* index, const char* const* enumStringArray, int arraySize);
 
-        static bool Vector3Field(std::string const & label, FishEngine::Vector3 & v);
+        static bool Vector3Field(std::string const & label, FishEngine::Vector3 * v);
 
         static bool FloatField(std::string const & label, float * v);
         static bool FloatField(std::string const & label, float v);// const version
@@ -69,9 +75,6 @@ namespace FishEditor
         //template< class T >
         static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
 
-//        static void OnInspectorGUI(FishEngine::ComponentPtr const & component)
-//        {
-//        }
 
         template<class T>
         static void OnInspectorGUI(std::shared_ptr<T> const & component);

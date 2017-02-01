@@ -15,7 +15,7 @@
     friend void Load (Archive & archive, T & t);
 
 #define InjectClassName(T) \
-    static const std::string StaticClassName() { return #T; }  \
+    static constexpr const char * StaticClassName() { return #T; }  \
     virtual const std::string ClassName() const override { return StaticClassName(); } \
 	virtual int ClassID() const override { return FishEngine::ClassID<T>(); } \
     InjectSerializationFunctions(T)

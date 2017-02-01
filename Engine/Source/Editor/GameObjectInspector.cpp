@@ -30,6 +30,7 @@ GameObjectInspector::GameObjectInspector(QWidget *parent) :
     connect(ui->layer, SIGNAL(currentIndexChanged(int)), this, SLOT(OnLayerChanged(int)));
     connect(ui->tag,   SIGNAL(currentIndexChanged(int)), this, SLOT(OnTagChanged(int)));
     connect(ui->activeCheckBox, SIGNAL(toggled(bool)),   this, SLOT(OnActiveCheckBoxChanged(bool)));
+    connect(ui->addComponentButton, SIGNAL(clicked()),   this, SLOT(OnAddComponentButtonClicked()));
 
     UpdateInspector();
 
@@ -41,6 +42,11 @@ GameObjectInspector::GameObjectInspector(QWidget *parent) :
 GameObjectInspector::~GameObjectInspector()
 {
     delete ui;
+}
+
+QSize GameObjectInspector::sizeHint() const
+{
+    return QSize(250, 400);
 }
 
 
@@ -147,6 +153,20 @@ SKIP_EDITOR:
 
     FishEditor::EditorGUI::s_treeWidget = ui->ComponentArea;
     FishEditor::EditorGUI::BindGameObject(go);
+
+    if (m_addComponentButtonClicked)
+    {
+
+        Debug::LogError("clicked");
+        auto const & name = FishEditor::EditorGUI::ShowAddComponentMenu();
+//        if (name == "Rigidbody")
+//        {
+//            go->AddComponent<FishEngine::Rigidbody>();
+//        }
+        //go->AddComponent(name);
+		AddComponentToGameObject(name, go);
+        m_addComponentButtonClicked = false;
+    }
 }
 
 void GameObjectInspector::OnNameChanged()
@@ -179,4 +199,9 @@ void GameObjectInspector::OnTagChanged(int index)
     m_tagIndex = index;
     LOG;
     m_changed = true;
+}
+
+void GameObjectInspector::OnAddComponentButtonClicked()
+{
+    m_addComponentButtonClicked = true;
 }

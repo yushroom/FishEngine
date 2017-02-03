@@ -30,13 +30,21 @@ namespace FishEngine
 		friend class FishEditor::EditorGUI;
 		friend class Rigidbody;
 		Meta(NonSerializable)
-        RigidbodyPtr m_attachedRigidbody;
+		
+		// The rigidbody the collider is attached to.
+		std::weak_ptr<Rigidbody> m_attachedRigidbody;
 
+		// The world space bounding volume of the collider.
 		Meta(NonSerializable)
         Bounds  m_bounds;
 
+		// Contact offset value of this collider.
         float   m_contactOffset;
+		
+		// Enabled Colliders will collide with other colliders, disabled Colliders won't.
         bool    m_enabled		= true;
+		
+		// Is the collider a trigger?
         bool    m_isTrigger		= false;
         
 		physx::PxShape* physicsShape() { return m_physxShape; }

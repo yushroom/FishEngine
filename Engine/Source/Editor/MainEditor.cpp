@@ -1,5 +1,8 @@
 #include "MainEditor.hpp"
 
+#include <QDir>
+#include <QCoreApplication>
+
 #include <Debug.hpp>
 #include <Camera.hpp>
 #include <GameObject.hpp>
@@ -14,6 +17,8 @@
 #include <MeshRenderer.hpp>
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
+
+#include <Application.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -91,12 +96,18 @@ void DefaultScene()
 #endif
 }
 
-    bool MainEditor::m_inPlayMode = false;
+    //bool MainEditor::m_inPlayMode = false;
 
+    Action MainEditor::OnInitialized;
     std::unique_ptr<SceneViewEditor>  MainEditor::m_mainSceneViewEditor;
 
     void MainEditor::Init()
     {
+        Applicaiton::s_isEditor = true;
+        QDir cwd = QCoreApplication::applicationDirPath();
+        cwd.cdUp();
+        //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
+        Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
         m_mainSceneViewEditor = std::make_unique<SceneViewEditor>();
         //Screen::set(width(), height());
 
@@ -107,20 +118,10 @@ void DefaultScene()
         m_mainSceneViewEditor->Init();
         DefaultScene();
 
-    //    for (auto &go : Scene::GameObjects())
-    //    {
-    //        //QStandardItem* item = new QStandardItem(QString(go->name().c_str()));
-    //        auto item = CreateHierarchyItem(go->transform());
-    //        m_hierarchyModel->appendRow( item );
-    //        //item->appendRow(new QStandardItem("1"));
-    //    }
-        //UpdateHierarchyModel();
-        //QStandardItem* item = new QStandardItem("GameObject");
-        //m_hierarchyModel->appendRow(item);
-        //item->appendRow(new QStandardItem("1"));
-
         glClearColor(1.0f, 0.0f, 0.0f, 1);
+        //FishEngine::Resources::SetAssetsDirectory("/Users/yushroom/program/graphics/FishEngine/Example/Sponza");
 
+        OnInitialized();
     }
 
     void MainEditor::Run()
@@ -131,7 +132,7 @@ void DefaultScene()
         //Input::Update();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (m_inPlayMode)
+        if (Applicaiton::isPlaying())
         {
             Scene::Update();
             PhysicsSystem::FixedUpdate();
@@ -156,8 +157,9 @@ void DefaultScene()
 
     void MainEditor::Play()
     {
+        Applicaiton::s_isPlaying = true;
         PhysicsSystem::Init();
-        m_inPlayMode = true;
+        //m_inPlayMode = true;
         Camera::setMainCamera(nullptr);
         //Camera::m_mainCamera = nullptr;
         Scene::Start();
@@ -165,7 +167,8 @@ void DefaultScene()
 
     void MainEditor::Stop()
     {
-        m_inPlayMode = false;
+        //m_inPlayMode = false;
+        Applicaiton::s_isPlaying = false;
         //Camera::m_mainCamera = EditorGUI::m_mainSceneViewEditor->camera();
         Camera::setMainCamera(m_mainSceneViewEditor->camera());
         PhysicsSystem::Clean();

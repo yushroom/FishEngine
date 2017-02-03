@@ -14,8 +14,8 @@ UIHeader::UIHeader(std::string const & componentTypeName, bool enabled, QWidget 
     ui->label->setText(QString(componentTypeName.c_str()));
     ui->checkBox->setChecked(m_enabled);
 
-    connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(OnCheckBoxChanged(bool)));
-    connect(ui->toolButton, SIGNAL(clicked()), this, SLOT(OnRemoveActionTrigered()));
+    connect(ui->checkBox, &QCheckBox::toggled, this, &UIHeader::OnCheckBoxChanged);
+    connect(ui->pushButton, &QPushButton::clicked, this, &UIHeader::OnRemoveActionTrigered);
 }
 
 UIHeader::UIHeader(std::string const & componentTypeName, QWidget *parent) :

@@ -27,20 +27,9 @@ UIFloat3::UIFloat3(const std::string &label, float x, float y, float z, QWidget 
     ui->y->setValue(y);
     ui->z->setValue(z);
 
-    // http://stackoverflow.com/questions/13422995/set-qlineedit-to-accept-only-numbers
-    // http://blog.csdn.net/a_sungirl/article/details/17373405
-    //ui->x->setValidator(new QDoubleValidator(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), 10));
-    //ui->y->setValidator(new QDoubleValidator);
-    //ui->z->setValidator(new QDoubleValidator);
-
-//    QString s;
-//    s.number(s, 'f', 8);
-
     connect(ui->x, &FloatLineEdit::valueChanged, this, &UIFloat3::setX);
     connect(ui->y, &FloatLineEdit::valueChanged, this, &UIFloat3::setY);
     connect(ui->z, &FloatLineEdit::valueChanged, this, &UIFloat3::setZ);
-    //connect(ui->y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)));
-    //connect(ui->z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)));
 }
 
 UIFloat3::~UIFloat3()

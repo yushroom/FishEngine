@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <FishEditor.hpp>
+
 namespace FishEditor
 {
     class SceneViewEditor;
@@ -23,15 +25,17 @@ namespace FishEditor
 
         static void Play();
         static void Stop();
-        static bool InPlayMode()
-        {
-            return m_inPlayMode;
-        }
+//        static bool InPlayMode()
+//        {
+//            return m_inPlayMode;
+//        }
 
         static void Resize(int width, int height);
 
+        static Action OnInitialized;
+
     private:
-        static bool m_inPlayMode;
+        //static bool m_inPlayMode;
 
     public:
         static std::unique_ptr<SceneViewEditor>  m_mainSceneViewEditor;

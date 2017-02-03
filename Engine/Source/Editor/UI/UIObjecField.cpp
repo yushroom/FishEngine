@@ -46,4 +46,5 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
         LOG;
         ui->lineEdit->setText(objectName.c_str());
     }
+	return false;
 }

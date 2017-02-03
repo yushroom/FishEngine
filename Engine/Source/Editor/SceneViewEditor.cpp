@@ -67,6 +67,7 @@ namespace FishEditor
         //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
         m_colorBuffer = ColorBuffer::Create(m_size.x, m_size.y);
         m_colorBuffer->setName("SceneViewColor");
+		//m_colorBuffer->setWrapMode(TextureWrapMode::Clamp);
         m_depthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
         m_depthBuffer->setName("SceneViewDepth");
         m_sceneViewRenderTarget = std::make_shared<RenderTarget>();
@@ -76,7 +77,7 @@ namespace FishEditor
         m_selectionOutlineDepthBuffer = DepthBuffer::Create(m_size.x, m_size.y);
         m_selectionOutlineDepthBuffer->setName("SelectionOutlineDepth");
         m_selectionOutlineDepthBuffer->setFilterMode(FilterMode::Point);
-        m_selectionOutlineDepthBuffer->setWrapMode(TextureWrapMode::Repeat);
+        m_selectionOutlineDepthBuffer->setWrapMode(TextureWrapMode::Clamp);
         m_selectionOutlineRT->SetDepthBufferOnly(m_selectionOutlineDepthBuffer);
 
         m_selectionOutlineRT2 = std::make_shared<RenderTarget>();

@@ -11,6 +11,7 @@
 #include <Resources.hpp>
 #include <RenderSystem.hpp>
 #include <Input.hpp>
+#include <Application.hpp>
 
 #include "GameObjectInspector.hpp"
 #include "MainEditor.hpp"
@@ -22,50 +23,25 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    FishEngine::Debug::Log("MainWindow::ctor");
+    //FishEngine::Debug::Log("MainWindow::ctor");
     Init();
     ui->setupUi(this);
-
-    auto tree = ui->treeView;
-    const QString dir = "/Users/yushroom/program/graphics/FishEngine/Example";
-
-    dirModel = new QFileSystemModel(this);
-    dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-    dirModel->setRootPath(dir);
-
-    tree->setModel(dirModel);
-    const QModelIndex rootIndex = dirModel->index(QDir::cleanPath(dir));
-    if (rootIndex.isValid())
-        tree->setRootIndex(rootIndex);
-
-    for (int i = 1; i < tree->header()->count(); ++i)
-    {
-        tree->hideColumn(i);
-    }
-    tree->header()->hide();
-
-    auto listView = ui->listView;
-
-    fileModel = new QFileSystemModel(this);
-    fileModel->setRootPath(dir);
-
-    listView->setModel(fileModel);
-    listView->setViewMode(QListView::IconMode);
-    listView->setIconSize(QSize(64, 64));
-    listView->setRootIndex(fileModel->setRootPath(dir));
 
     m_gameObjectInspector = new GameObjectInspector;
     ui->InspectorContents->layout()->addWidget(m_gameObjectInspector);
 
     connect(ui->actionPlay, &QAction::triggered, [this](){
-        if (FishEditor::MainEditor::InPlayMode())
+        if (Applicaiton::isPlaying())
         {
-            this->ui->actionPlay->setText("Play");
+            //this->ui->actionPlay->setText("Play");
+            this->ui->actionPlay->setIcon(QIcon(":/Resources/Play_black.png"));
+            //this->ui->actionPlay->set
             FishEditor::MainEditor::Stop();
         }
         else
         {
-            this->ui->actionPlay->setText("Stop");
+            //this->ui->actionPlay->setText("Stop");
+            this->ui->actionPlay->setIcon(QIcon(":/Resources/Stop_100.png"));
             FishEditor::MainEditor::Play();
         }
     });
@@ -85,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionScale, &QAction::triggered, [](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Scale);
     });
+
+//    FishEditor::MainEditor::OnInitialized += [this](){
+//        ui->projectView->SetRootPath(FishEngine::Applicaiton::dataPath());
+//    };
 }
 
 MainWindow::~MainWindow()
@@ -92,12 +72,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-void MainWindow::on_treeView_clicked(const QModelIndex &index)
-{
-    auto path = dirModel->fileInfo(index).absoluteFilePath();
-    ui->listView->setRootIndex(fileModel->setRootPath(path));
-}
 
 //bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 //{

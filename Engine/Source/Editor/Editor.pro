@@ -59,7 +59,11 @@ SOURCES += main.cpp\
     MainEditor.cpp \
     AddComponentDialog.cpp \
     UI/UIButton.cpp \
-    UI/FloatLineEdit.cpp
+    UI/FloatLineEdit.cpp \
+    ProjectView.cpp \
+    UI/OpenProjectDialog.cpp \
+    ProjectFileIconProvider.cpp \
+    ProjectViewFileModel.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -85,7 +89,11 @@ HEADERS  += mainwindow.h \
     UI/UIButton.hpp \
     UIDebug.hpp \
     UIHeaderState.hpp \
-    UI/FloatLineEdit.hpp
+    UI/FloatLineEdit.hpp \
+    ProjectView.hpp \
+    UI/OpenProjectDialog.hpp \
+    ProjectFileIconProvider.hpp \
+    ProjectViewFileModel.hpp
 
 FORMS    += mainwindow.ui \
     GameObjectInspector.ui \
@@ -99,9 +107,14 @@ FORMS    += mainwindow.ui \
     UI/UISlider.ui \
     UI/UIObjecField.ui \
     UI/UIColor.ui \
-    AddComponentDialog.ui
+    AddComponentDialog.ui \
+    ProjectView.ui \
+    UI/OpenProjectDialog.ui
 
 #QMAKE_CXXFLAGS += -std=c++14
 #QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12 # no effect, set QMAKE_MACOSX_DEPLOYMENT_TARGET in <QtDir>/clang_64/mkspecs/macx-clang/qmake.conf instead
 
 DISTFILES +=
+
+RESOURCES += \
+    resources.qrc

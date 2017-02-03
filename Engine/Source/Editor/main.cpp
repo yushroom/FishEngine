@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSurfaceFormat>
+//#include <Resources.hpp>
 
 int main(int argc, char *argv[])
 {
+    //FishEngine::Resources::SetAssetsDirectory("/Users/yushroom/program/graphics/FishEngine/Example/Sponza");
+
     QApplication a(argc, argv);
     QSurfaceFormat format;
     format.setDepthBufferSize(24);

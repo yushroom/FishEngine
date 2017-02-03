@@ -224,63 +224,7 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QSplitter" name="splitter">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <widget class="QTreeView" name="treeView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <attribute name="headerVisible">
-         <bool>false</bool>
-        </attribute>
-       </widget>
-       <widget class="QListView" name="listView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>4</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="movement">
-         <enum>QListView::Snap</enum>
-        </property>
-        <property name="resizeMode">
-         <enum>QListView::Adjust</enum>
-        </property>
-        <property name="gridSize">
-         <size>
-          <width>72</width>
-          <height>80</height>
-         </size>
-        </property>
-        <property name="viewMode">
-         <enum>QListView::IconMode</enum>
-        </property>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+   <widget class="ProjectView" name="projectView"/>
   </widget>
   <widget class="QDockWidget" name="hierarchyDockWidget">
    <property name="features">
@@ -452,36 +396,64 @@
    </property>
   </action>
   <action name="actionPlay">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Play_black.png</normaloff>:/Resources/Play_black.png</iconset>
+   </property>
    <property name="text">
     <string>Play</string>
    </property>
   </action>
   <action name="actionPause">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Pause_black.png</normaloff>:/Resources/Pause_black.png</iconset>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
   </action>
   <action name="actionStep">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/End_black.png</normaloff>:/Resources/End_black.png</iconset>
+   </property>
    <property name="text">
     <string>Step</string>
    </property>
   </action>
   <action name="actionHand">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Whole Hand_000000_100.png</normaloff>:/Resources/Whole Hand_000000_100.png</iconset>
+   </property>
    <property name="text">
     <string>Hand</string>
    </property>
   </action>
   <action name="actionTranslate">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Resize Four Directions_000000_100 2.png</normaloff>:/Resources/Resize Four Directions_000000_100 2.png</iconset>
+   </property>
    <property name="text">
     <string>Translate</string>
    </property>
   </action>
   <action name="actionRotation">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Rotate_000000_100.png</normaloff>:/Resources/Rotate_000000_100.png</iconset>
+   </property>
    <property name="text">
     <string>Rotation</string>
    </property>
   </action>
   <action name="actionScale">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/Expand_000000_100 2.png</normaloff>:/Resources/Expand_000000_100 2.png</iconset>
+   </property>
    <property name="text">
     <string>Scale</string>
    </property>
@@ -499,7 +471,15 @@
    <extends>QOpenGLWidget</extends>
    <header>glwidget.h</header>
   </customwidget>
+  <customwidget>
+   <class>ProjectView</class>
+   <extends>QWidget</extends>
+   <header>ProjectView.hpp</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

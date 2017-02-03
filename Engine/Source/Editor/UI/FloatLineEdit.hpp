@@ -17,10 +17,17 @@ public:
 signals:
     void valueChanged(float);
 
-private slots:
+private:
+
     void OnEditingFinished();
+    // OnEditingFinished is more efficient,
+    // but OnTextChanged is safer
+    void OnTextChanged(const QString &);
 
 private:
+
+    void mousePressEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+
     float m_value = 0;
     float m_min = std::numeric_limits<float>::lowest();
     float m_max = std::numeric_limits<float>::max();

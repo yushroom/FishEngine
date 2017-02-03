@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/cancel.png</file>
+        <file>Resources/cancelActive.png</file>
+        <file>Resources/End_black.png</file>
+        <file>Resources/End_blue.png</file>
+        <file>Resources/Play_blue.png</file>
+        <file>Resources/Pause_black.png</file>
+        <file>Resources/Pause_blue.png</file>
+        <file>Resources/Play_black.png</file>
+        <file>Resources/Stop_100.png</file>
+        <file>Resources/Rotate_000000_100.png</file>
+        <file>Resources/Resize Four Directions_000000_100.png</file>
+        <file>Resources/Whole Hand_000000_100.png</file>
+        <file>Resources/Expand_000000_100.png</file>
+        <file>Resources/Expand_000000_100 2.png</file>
+        <file>Resources/Resize Four Directions_000000_100 2.png</file>
+        <file>Resources/folder.png</file>
+        <file>Resources/unknown_file.png</file>
+    </qresource>
+</RCC>

@@ -48,4 +48,5 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
         ui->checkBox->setChecked(value);
         ui->checkBox->blockSignals(false);
     }
+	return false;
 }

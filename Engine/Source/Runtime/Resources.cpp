@@ -115,15 +115,15 @@ namespace FishEngine
 				Resources::s_uuidToImporter[tex->GetGUID()] = importer;
 				Resources::s_pathToAsset[path] = tex;
 			}
-			else if (type == AssetType::Model)
-			{
-				Timer t(path.string());
-				auto importer = GetAssetImporter<ModelImporter>(path);
-				auto model = importer->LoadFromFile(path);
-				t.StopAndPrint();
-				//Resources::s_uuidToImporter[importer->GetGUID()] = importer;
-				//Resources::s_pathToAsset[path] = model;
-			}
+//			else if (type == AssetType::Model)
+//			{
+//				Timer t(path.string());
+//				auto importer = GetAssetImporter<ModelImporter>(path);
+//				auto model = importer->LoadFromFile(path);
+//				t.StopAndPrint();
+//				//Resources::s_uuidToImporter[importer->GetGUID()] = importer;
+//				//Resources::s_pathToAsset[path] = model;
+//			}
 		}
     }
 

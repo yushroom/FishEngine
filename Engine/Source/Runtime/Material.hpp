@@ -118,7 +118,7 @@ namespace FishEngine
         static MaterialPtr defaultMaterial();
 
     private:
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
 
         ShaderPtr                           m_shader = nullptr;
         std::map<std::string, TexturePtr>   m_textures;

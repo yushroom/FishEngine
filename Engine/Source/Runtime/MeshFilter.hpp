@@ -27,7 +27,7 @@ namespace FishEngine
         //virtual void OnInspectorGUI() override;
 
     private:
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
         MeshPtr m_mesh = nullptr;
     };
 }

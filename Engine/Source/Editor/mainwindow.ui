@@ -337,6 +337,9 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
+     <item>
+      <widget class="InspectorWidget" name="inspectorWidget" native="true"/>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -475,6 +478,12 @@
    <class>ProjectView</class>
    <extends>QWidget</extends>
    <header>ProjectView.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>UI/InspectorWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -23,7 +23,7 @@ namespace FishEngine
         bool isActiveAndEnabled() const;
 
     private:
-		friend class FishEditor::EditorGUI;
+		friend class FishEditor::Inspector;
         bool m_enabled = true;
 
         //friend class boost::serialization::access;

@@ -167,8 +167,9 @@ namespace FishEngine
         void OnDrawGizmosSelected();
 
     private:
-		friend class ::GameObjectInspector;
-        friend class FishEditor::EditorGUI;
+		friend class ::UIGameObjectHeader;
+        friend class FishEditor::Inspector;
+		friend class FishEditor::EditorGUI;
 		//friend class FishEditor::EditorRenderSystem;
         friend class FishEditor::SceneViewEditor;
 

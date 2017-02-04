@@ -3,6 +3,7 @@
 
 #include <Object.hpp>
 
+#include "SelectObjectDialog.hpp"
 #include "../UIDebug.hpp"
 
 UIObjecField::UIObjecField(std::string const & label, std::string const & objectName, QWidget *parent) :
@@ -15,6 +16,7 @@ UIObjecField::UIObjecField(std::string const & label, std::string const & object
 
     ui->label->setText(m_label.c_str());
     ui->lineEdit->setText(objectName.c_str());
+    connect(ui->picker, &QPushButton::clicked, this, &UIObjecField::OnPickerClicked);
 }
 
 UIObjecField::~UIObjecField()
@@ -46,5 +48,11 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
         LOG;
         ui->lineEdit->setText(objectName.c_str());
     }
-	return false;
+    return false;
+}
+
+void UIObjecField::OnPickerClicked()
+{
+    SelectObjectDialog dialog;
+    dialog.exec();
 }

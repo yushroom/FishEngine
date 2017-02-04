@@ -128,14 +128,17 @@ namespace FishEngine
 // hack: inject FishEditor namespace
 namespace FishEditor {
     class EditorGUI;
+	class Inspector;
 	//class EditorRenderSystem;
 	class MainEditor;
     class SceneViewEditor;
-    class EditorInput;
+	//class EditorInput;
+	//class MainWindow;
 }
 
-class GameObjectInspector;
+class UIGameObjectHeader;
 class GLWidget;
+class MainWindow;
 
 #if defined(_DEBUG) || defined(DEBUG)
 #include <cassert>

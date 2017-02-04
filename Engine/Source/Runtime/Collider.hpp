@@ -27,7 +27,7 @@ namespace FishEngine
 		void setEnabled(bool enabled) { m_enabled = enabled; }
         
     protected:
-		friend class FishEditor::EditorGUI;
+		friend class FishEditor::Inspector;
 		friend class Rigidbody;
 		Meta(NonSerializable)
 		

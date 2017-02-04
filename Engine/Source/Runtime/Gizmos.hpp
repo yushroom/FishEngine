@@ -118,7 +118,7 @@ namespace FishEngine
 
     private:
 		//friend FishEditor::EditorRenderSystem;
-        friend FishEditor::EditorGUI;
+        friend FishEditor::Inspector;
         friend FishEngine::RenderSystem;
         
         static void

@@ -27,6 +27,7 @@ namespace FishEngine
 
     private:
         friend class FishEditor::MainEditor;
+		friend class ::MainWindow;
         static std::string  s_dataPath;
         static bool         s_isEditor;
         static bool         s_isPlaying;

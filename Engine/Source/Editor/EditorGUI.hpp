@@ -6,6 +6,8 @@
 #include "FishEditor.hpp"
 #include "UIHeaderState.hpp"
 
+#include <ReflectEnum.hpp>
+
 #include <Color.hpp>
 
 class QTreeWidget;
@@ -13,14 +15,6 @@ class QTreeWidgetItem;
 
 namespace FishEditor
 {
-    template< class T>
-    struct can_be_enabled : std::integral_constant< bool,
-            std::is_base_of<FishEngine::Behaviour, T>::value ||
-            std::is_base_of<FishEngine::Renderer, T>::value ||
-            std::is_base_of<FishEngine::Collider, T>::value >
-    {
-    };
-
     class EditorGUI
     {
         EditorGUI() = delete;
@@ -31,19 +25,14 @@ namespace FishEditor
 
         static int              s_indentLevel;
 
-        static void BindGameObject(FishEngine::GameObjectPtr const & go);
+        static void Begin();
+
+        static void End();
+
+        //static void BindGameObject(FishEngine::GameObjectPtr const & go);
 
         // return component name
         static std::string ShowAddComponentMenu();
-
-    private:
-
-        static int              s_topLevelItemIndex;
-        static int              s_localItemIndex;
-        static QTreeWidgetItem* s_currentHeaderItem;
-
-        template<class T, class... Args>
-        static T* CheckNextWidget(Args&&... args );
 
         // show left checkBox
         // return value: isExpanded
@@ -75,25 +64,30 @@ namespace FishEditor
         //template< class T >
         static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
 
+    private:
 
-        template<class T>
-        static void OnInspectorGUI(std::shared_ptr<T> const & component);
+        static int              s_topLevelItemIndex;
+        static int              s_localItemIndex;
+        static bool             s_currentHeaderItemIsExpanded;
+        static QTreeWidgetItem* s_currentHeaderItem;
 
-        static void BeginComponent(FishEngine::ComponentPtr const & component);
-
-        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
-
-        // for component derived from behaviour
-        template<class T, std::enable_if_t<can_be_enabled<T>::value, int> = 0>
-        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
-
-        // for component not derived from behaviour
-        template<class T, std::enable_if_t<!can_be_enabled<T>::value, int> = 0>
-        static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
-
-        template<class T, std::enable_if_t<!std::is_base_of<FishEngine::Component, T>::value, int> = 0>
-        static void BeginComponentImpl(FishEngine::ComponentPtr const & component) = delete;
+        template<class T, class... Args>
+        static T* CheckNextWidget(Args&&... args );
 
         static void HideRedundantChildItems();
     };
+
+    template<typename T>
+    bool EditorGUI::EnumPopup(const std::string &label, T *e)
+    {
+        static_assert(std::is_enum<T>(), "T must be an enum type");
+        int index = FishEngine::EnumToIndex<T>(*e);
+        bool changed = EnumPopup(label, &index, FishEngine::EnumToCStringArray<T>(), FishEngine::EnumCount<T>());
+        if (changed)
+        {
+            *e = FishEngine::ToEnum<T>(index);
+            return true;
+        }
+        return false;
+    }
 }

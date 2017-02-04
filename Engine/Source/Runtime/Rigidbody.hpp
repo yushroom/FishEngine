@@ -39,7 +39,7 @@ namespace FishEngine
 		bool IsInitialized() const;
 		void Initialize(physx::PxShape* shape);
 		
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
         float m_mass = 2;
         float m_drag = 0;
         float m_angularDrag = 0.05f;

@@ -158,7 +158,7 @@ namespace FishEngine
 
     private:
         friend class RenderSystem;
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
 		//friend class FishEditor::EditorRenderSystem;
 
         static std::list<GameObjectPtr>   m_gameObjects;

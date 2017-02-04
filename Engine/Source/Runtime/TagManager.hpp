@@ -73,7 +73,7 @@ namespace FishEngine
 		}
 
     private:
-		friend class ::GameObjectInspector;
+		friend class ::UIGameObjectHeader;
 		
 		static constexpr int InternalTagCount = 7;
 		

@@ -79,7 +79,8 @@ namespace FishEngine
         }
 
     protected:
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
+		friend class FishEditor::EditorGUI;
 		bool m_enabled = true;	// Makes the rendered 3D object visible if enabled.
         std::vector<MaterialPtr> m_materials;
 

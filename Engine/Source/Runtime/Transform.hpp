@@ -301,7 +301,7 @@ namespace FishEngine
     //    }
 
     private:
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
         friend class Scene;
 
         Vector3                             m_localPosition;

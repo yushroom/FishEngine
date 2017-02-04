@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UIHeader</class>
- <widget class="QWidget" name="UIHeader">
+ <class>UIComponentHeader</class>
+ <widget class="QWidget" name="UIComponentHeader">
   <property name="geometry">
    <rect>
     <x>0</x>

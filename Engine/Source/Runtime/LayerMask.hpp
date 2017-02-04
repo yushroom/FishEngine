@@ -60,7 +60,7 @@ namespace FishEngine
 		static std::array<std::string, 32> s_layerNames;
 		
 		
-		friend class ::GameObjectInspector;
+		friend class ::UIGameObjectHeader;
 		// Editor
 		static void SetLayer(int index, std::string const & name);
 		

@@ -87,7 +87,7 @@ namespace FishEngine
 		static std::map<boost::filesystem::path, std::weak_ptr<Object>> s_pathToAsset;
 
     private:
-        friend FishEditor::EditorGUI;
+        friend FishEditor::Inspector;
 
         static Path s_assetsDirectory;
         static Path s_rootSystemDirectory;

@@ -17,5 +17,8 @@
         <file>Resources/Resize Four Directions_000000_100 2.png</file>
         <file>Resources/folder.png</file>
         <file>Resources/unknown_file.png</file>
+        <file>Resources/circled_dot.png</file>
+        <file>Resources/M.png</file>
+        <file>Resources/settings.png</file>
     </qresource>
 </RCC>

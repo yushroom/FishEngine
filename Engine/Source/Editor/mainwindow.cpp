@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QStandardItemModel>
 //#include <QPalette>
+#include <QDir>
 
 #include <FishEngine.hpp>
 #include <Debug.hpp>
@@ -13,9 +14,10 @@
 #include <Input.hpp>
 #include <Application.hpp>
 
-#include "GameObjectInspector.hpp"
+#include "Inspector.hpp"
 #include "MainEditor.hpp"
 #include "SceneViewEditor.hpp"
+#include "FileInfo.hpp"
 
 using namespace FishEngine;
 
@@ -27,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Init();
     ui->setupUi(this);
 
-    m_gameObjectInspector = new GameObjectInspector;
-    ui->InspectorContents->layout()->addWidget(m_gameObjectInspector);
+    FishEditor::Inspector::s_inspectorWidget = ui->inspectorWidget;
 
     connect(ui->actionPlay, &QAction::triggered, [this](){
         if (Applicaiton::isPlaying())
@@ -97,8 +98,14 @@ MainWindow::~MainWindow()
 void MainWindow::Init()
 {
     FishEngine::Debug::Init();
-    FishEngine::Resources::Init("/Users/yushroom/program/graphics/FishEngine/Engine");
+    QDir cwd = QCoreApplication::applicationDirPath();
+    cwd.cdUp();
+    FishEngine::Resources::Init(cwd.absolutePath().toStdString());
     //FishEngine::Input::Init();
 
 //    RenderSystem::Init();
+    Applicaiton::s_isEditor = true;
+    //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
+    Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
+    FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
 }

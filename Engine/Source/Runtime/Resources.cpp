@@ -132,9 +132,9 @@ namespace FishEngine
         s_assetsDirectory = path;
 		Debug::Log("%s", "Loading assets...");
 		Timer t("Loadd all assets");
-		t.Start();
-        s_assetsDirectoryRootNode.BuildNodeTree(path);
-		t.StopAndPrint();
+		//t.Start();
+        //s_assetsDirectoryRootNode.BuildNodeTree(path);
+		//t.StopAndPrint();
     }
 
     void Resources::Init(Path const & path)

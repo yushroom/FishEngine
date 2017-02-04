@@ -8,6 +8,8 @@
 
 #include <Debug.hpp>
 
+#include <Application.hpp>
+
 using namespace FishEngine;
 
 ProjectView::ProjectView(QWidget *parent) :
@@ -38,9 +40,9 @@ ProjectView::ProjectView(QWidget *parent) :
 //    cwd.cdUp();
 
     //SetRootPath(cwd.absolutePath());
-    const char * rootPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
-    FileInfo::SetAssetRootPath(rootPath);
-    SetRootPath(QString(rootPath));
+    //const char * rootPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
+    auto const & rootPath = FishEngine::Applicaiton::dataPath();
+    SetRootPath(QString::fromStdString(rootPath));
 
     connect(ui->dirTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnDirTreeViewSelectionChanged);
     connect(ui->listView, &QListView::doubleClicked, this, &ProjectView::OnListTreeViewDoubleClicked);
@@ -79,7 +81,7 @@ void ProjectView::SetRootPath(const QString &path)
 
 void ProjectView::OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
-    auto path = dirModel->fileInfo(current)->absoluteFilePath();
+    auto path = QString::fromStdString(dirModel->fileInfo(current)->absoluteFilePath().string());
     ui->listView->setRootIndex(fileModel->setRootPath(path));
 }
 
@@ -91,7 +93,8 @@ void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
     if (info->isDir())
     {
         //ui->dirTreeView->selection
-        ui->listView->setRootIndex(fileModel->setRootPath(info->absoluteFilePath()));
+        auto path = QString::fromStdString(info->absoluteFilePath().string());
+        ui->listView->setRootIndex(fileModel->setRootPath(path));
     }
     //ui->fileNameLabel->setText(info.canonicalPath());
 	ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(info->path()));
@@ -100,7 +103,7 @@ void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
 void ProjectView::OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
     auto info = fileModel->fileInfo(current);
-    ui->fileNameLabel->setText(info->fileName());
+    ui->fileNameLabel->setText(QString::fromStdString(info->fileName()));
 }
 
 void ProjectView::OnIconSizeChanged(int size)

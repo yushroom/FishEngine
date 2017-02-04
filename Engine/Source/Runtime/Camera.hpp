@@ -134,7 +134,7 @@ namespace FishEngine
 
     private:
         friend class RenderSystem;
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
 		//friend class FishEditor::EditorRenderSystem;
 		//friend class FishEditor::FishEditorWindow;
         friend class FishEditor::SceneViewEditor;

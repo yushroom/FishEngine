@@ -112,7 +112,7 @@ namespace FishEngine
     private:
         friend class GameApp;
 		friend class FishEditor::MainEditor;
-        friend class FishEditor::EditorInput;
+		//friend class FishEditor::EditorInput;
 		friend class FishEditor::SceneViewEditor;
 		friend class ::GLWidget;
 

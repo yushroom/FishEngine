@@ -50,7 +50,7 @@ namespace FishEngine
         friend class Scene;
         //friend class FishEditor::EditorRenderSystem;
         friend class RenderSystem;
-        friend class FishEditor::EditorGUI;
+        friend class FishEditor::Inspector;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
         friend class Graphics;

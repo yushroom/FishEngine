@@ -27,12 +27,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 INCLUDEPATH += ../Runtime \
     ../../ThirdParty/PhysXSDK/Include \
+    ../../ThirdParty/stb \
     /usr/local/include	#boost
 
-LIBS += /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libFishEngine.a \
-    /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libyaml-cpp.a \
-    /Users/yushroom/program/graphics/FishEngine/Engine/Binary/lib/RelWithDebInfo/libassimp.a \
-    /Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Lib/osx64/*.a \
+LIBS += ../../Binary/lib/RelWithDebInfo/libFishEngine.a \
+    ../../Binary/lib/RelWithDebInfo/libyaml-cpp.a \
+    ../../Binary/lib/RelWithDebInfo/libassimp.a \
+    ../../ThirdParty/PhysXSDK/Lib/osx64/*.a \
     /usr/local/lib/libboost_filesystem-mt.a \
     /usr/local/lib/libboost_system-mt.a \
     -lz
@@ -43,12 +44,11 @@ SOURCES += main.cpp\
     App.cpp \
     Selection.cpp \
     SceneViewEditor.cpp \
-    GameObjectInspector.cpp \
     EditorGUI.cpp \
     UI/UIComboBox.cpp \
     UI/UIBool.cpp \
     UI/UIFloat3.cpp \
-    UI/UIHeader.cpp \
+    UI/UIComponentHeader.cpp \
     UI/UIInt.cpp \
     UI/UIString.cpp \
     UI/UIFloat.cpp \
@@ -63,7 +63,14 @@ SOURCES += main.cpp\
     ProjectView.cpp \
     UI/OpenProjectDialog.cpp \
     ProjectFileIconProvider.cpp \
-    ProjectViewFileModel.cpp
+    ProjectViewFileModel.cpp \
+    FileInfo.cpp \
+    UI/SelectObjectDialog.cpp \
+    ObjectListModel.cpp \
+    UI/UIMaterialHeader.cpp \
+    UI/InspectorWidget.cpp \
+    UI/UIGameObjectHeader.cpp \
+    Inspector.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -71,12 +78,11 @@ HEADERS  += mainwindow.h \
     Selection.hpp \
     FishEditor.hpp \
     SceneViewEditor.hpp \
-    GameObjectInspector.hpp \
     EditorGUI.hpp \
     UI/UIComboBox.hpp \
     UI/UIBool.hpp \
     UI/UIFloat3.hpp \
-    UI/UIHeader.hpp \
+    UI/UIComponentHeader.hpp \
     UI/UIInt.hpp \
     UI/UIString.hpp \
     UI/UIFloat.hpp \
@@ -93,14 +99,20 @@ HEADERS  += mainwindow.h \
     ProjectView.hpp \
     UI/OpenProjectDialog.hpp \
     ProjectFileIconProvider.hpp \
-    ProjectViewFileModel.hpp
+    ProjectViewFileModel.hpp \
+    FileInfo.hpp \
+    UI/SelectObjectDialog.hpp \
+    ObjectListModel.hpp \
+    UI/UIMaterialHeader.hpp \
+    Inspector.hpp \
+    UI/InspectorWidget.hpp \
+    UI/UIGameObjectHeader.hpp
 
 FORMS    += mainwindow.ui \
-    GameObjectInspector.ui \
     UI/UIComboBox.ui \
     UI/UIBool.ui \
     UI/UIFloat3.ui \
-    UI/UIHeader.ui \
+    UI/UIComponentHeader.ui \
     UI/UIInt.ui \
     UI/UIString.ui \
     UI/UIFloat.ui \
@@ -109,7 +121,10 @@ FORMS    += mainwindow.ui \
     UI/UIColor.ui \
     AddComponentDialog.ui \
     ProjectView.ui \
-    UI/OpenProjectDialog.ui
+    UI/OpenProjectDialog.ui \
+    UI/SelectObjectDialog.ui \
+    UI/UIMaterialHeader.ui \
+    UI/UIGameObjectHeader.ui
 
 #QMAKE_CXXFLAGS += -std=c++14
 #QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12 # no effect, set QMAKE_MACOSX_DEPLOYMENT_TARGET in <QtDir>/clang_64/mkspecs/macx-clang/qmake.conf instead

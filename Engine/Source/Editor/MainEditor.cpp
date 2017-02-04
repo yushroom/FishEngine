@@ -24,6 +24,7 @@
 #include "Selection.hpp"
 #include "EditorGUI.hpp"
 #include "SceneViewEditor.hpp"
+#include "Inspector.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -103,29 +104,23 @@ void DefaultScene()
 
     void MainEditor::Init()
     {
-        Applicaiton::s_isEditor = true;
-        QDir cwd = QCoreApplication::applicationDirPath();
-        cwd.cdUp();
-        //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
-        Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
         m_mainSceneViewEditor = std::make_unique<SceneViewEditor>();
         //Screen::set(width(), height());
-
         //PhysicsSystem::Init();
-
         RenderSystem::Init();
 
         m_mainSceneViewEditor->Init();
         DefaultScene();
 
         glClearColor(1.0f, 0.0f, 0.0f, 1);
-        //FishEngine::Resources::SetAssetsDirectory("/Users/yushroom/program/graphics/FishEngine/Example/Sponza");
-
         OnInitialized();
     }
 
     void MainEditor::Run()
     {
+        auto go = Selection::activeGameObject();
+        Inspector::Bind(go);
+
 		GLint framebuffer; // qt's framebuffer
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &framebuffer);
 		

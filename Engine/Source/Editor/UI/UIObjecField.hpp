@@ -23,6 +23,9 @@ public:
     bool CheckUpdate(std::string const & label, std::string const & objectName);
 
 private:
+
+    void OnPickerClicked();
+
     Ui::UIObjecField *ui;
 
     bool        m_changed = false;

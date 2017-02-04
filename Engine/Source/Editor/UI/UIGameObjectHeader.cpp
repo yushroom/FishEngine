@@ -1,65 +1,33 @@
-#include "GameObjectInspector.hpp"
-#include "ui_GameObjectInspector.h"
-
-#include <QTreeWidget>
-#include <QTimer>
-
-#include "Selection.hpp"
-#include "EditorGUI.hpp"
+#include "UIGameObjectHeader.hpp"
+#include "ui_UIGameObjectHeader.h"
 
 #include <GameObject.hpp>
 #include <LayerMask.hpp>
 #include <TagManager.hpp>
 
-#include "UIDebug.hpp"
+#include "../UIDebug.hpp"
 
-//typedef std::weak_ptr<FishEngine::Component> ComponentRef;
-////Q_DECLARE_METATYPE(ComponentRef);
-
-GameObjectInspector::GameObjectInspector(QWidget *parent) :
+UIGameObjectHeader::UIGameObjectHeader(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::GameObjectInspector)
+    ui(new Ui::UIGameObjectHeader)
 {
     ui->setupUi(this);
 
-//    FishEditor::Selection::activeObjectChanged += [this]() {
-//        FishEngine::Debug::Log("1");
-//        this->UpdateInspector();
-//    };
-    connect(ui->name,  SIGNAL(editingFinished()),        this, SLOT(OnNameChanged()));
-    connect(ui->layer, SIGNAL(currentIndexChanged(int)), this, SLOT(OnLayerChanged(int)));
-    connect(ui->tag,   SIGNAL(currentIndexChanged(int)), this, SLOT(OnTagChanged(int)));
-    connect(ui->activeCheckBox, SIGNAL(toggled(bool)),   this, SLOT(OnActiveCheckBoxChanged(bool)));
-    connect(ui->addComponentButton, SIGNAL(clicked()),   this, SLOT(OnAddComponentButtonClicked()));
+    connect(ui->name,  &QLineEdit::editingFinished,     this, &UIGameObjectHeader::OnNameChanged);
+    connect(ui->layer, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &UIGameObjectHeader::OnLayerChanged);
+    connect(ui->tag,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &UIGameObjectHeader::OnTagChanged);
+    connect(ui->activeCheckBox, &QCheckBox::toggled,    this, &UIGameObjectHeader::OnActiveCheckBoxChanged);
+    //connect(ui->addComponentButton, SIGNAL(clicked()),   this, SLOT(OnAddComponentButtonClicked()));
 
-    UpdateInspector();
-
-    auto timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(UpdateInspector()));
-    timer->start(1000 / 15.0f); // 15 fps
 }
 
-GameObjectInspector::~GameObjectInspector()
+UIGameObjectHeader::~UIGameObjectHeader()
 {
     delete ui;
 }
 
-QSize GameObjectInspector::sizeHint() const
+void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
 {
-    return QSize(250, 400);
-}
-
-
-void GameObjectInspector::UpdateInspector()
-{
-    auto go = FishEditor::Selection::activeGameObject();
-
-    if (go == nullptr)
-    {
-        hide();
-        return;
-    }
-
     if (m_changed)
     {
         Debug::LogError("[UpdateInspector] changed from UI");
@@ -69,7 +37,7 @@ void GameObjectInspector::UpdateInspector()
         go->m_tagIndex = m_tagIndex;
         go->SetActive(m_isActive);
         m_changed = false;
-        goto SKIP_EDITOR;
+        return;
     }
 
     if (m_isActive != go->activeSelf())
@@ -143,33 +111,9 @@ void GameObjectInspector::UpdateInspector()
         ui->tag->setCurrentIndex(m_tagIndex);
         ui->tag->blockSignals(false);
     }
-
-//    ui->Tag->clear();
-//    ui->Tag->addItem("Untagged");
-
-SKIP_EDITOR:
-    if (isHidden())
-        show();
-
-    FishEditor::EditorGUI::s_treeWidget = ui->ComponentArea;
-    FishEditor::EditorGUI::BindGameObject(go);
-
-    if (m_addComponentButtonClicked)
-    {
-
-        Debug::LogError("clicked");
-        auto const & name = FishEditor::EditorGUI::ShowAddComponentMenu();
-//        if (name == "Rigidbody")
-//        {
-//            go->AddComponent<FishEngine::Rigidbody>();
-//        }
-        //go->AddComponent(name);
-		AddComponentToGameObject(name, go);
-        m_addComponentButtonClicked = false;
-    }
 }
 
-void GameObjectInspector::OnNameChanged()
+void UIGameObjectHeader::OnNameChanged()
 {
     auto name = ui->name->text().toStdString();
     if (m_name != name)
@@ -180,28 +124,24 @@ void GameObjectInspector::OnNameChanged()
     }
 }
 
-void GameObjectInspector::OnActiveCheckBoxChanged(bool active)
+void UIGameObjectHeader::OnActiveCheckBoxChanged(bool active)
 {
     m_isActive = active;
     LOG;
     m_changed = true;
 }
 
-void GameObjectInspector::OnLayerChanged(int index)
+void UIGameObjectHeader::OnLayerChanged(int index)
 {
     m_layerIndex = index;
     LOG;
     m_changed = true;
 }
 
-void GameObjectInspector::OnTagChanged(int index)
+void UIGameObjectHeader::OnTagChanged(int index)
 {
     m_tagIndex = index;
     LOG;
     m_changed = true;
 }
 
-void GameObjectInspector::OnAddComponentButtonClicked()
-{
-    m_addComponentButtonClicked = true;
-}

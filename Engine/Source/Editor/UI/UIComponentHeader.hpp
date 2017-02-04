@@ -7,22 +7,22 @@
 #include "UIHeaderState.hpp"
 
 namespace Ui {
-class UIHeader;
+class UIComponentHeader;
 }
 
 
-class UIHeader : public QWidget
+class UIComponentHeader : public QWidget
 {
     Q_OBJECT
 
 public:
     // show checkbox
-    explicit UIHeader(std::string const & componentTypeName, bool enabled, QWidget *parent = 0);
+    explicit UIComponentHeader(std::string const & componentTypeName, bool enabled, QWidget *parent = 0);
 
     // hide checkbox
-    explicit UIHeader(std::string const & componentTypeName, QWidget *parent = 0);
+    explicit UIComponentHeader(std::string const & componentTypeName, QWidget *parent = 0);
 
-    ~UIHeader();
+    ~UIComponentHeader();
 
     // show checkBox
     FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName, bool & enabled);
@@ -36,7 +36,7 @@ private slots:
     void OnRemoveActionTrigered() { m_removeActionTrigered = true; }
 
 private:
-    Ui::UIHeader *ui;
+    Ui::UIComponentHeader *ui;
 
     //bool m_changed = false;
     bool m_enabled = true;

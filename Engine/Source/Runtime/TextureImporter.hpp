@@ -109,7 +109,7 @@ namespace FishEngine
 		}
 		
 	private:
-		friend class FishEditor::EditorGUI;
+		friend class FishEditor::Inspector;
 		// Which type of texture are we dealing with here.
 		TextureImporterType		m_textureType   = TextureImporterType::Default;
 

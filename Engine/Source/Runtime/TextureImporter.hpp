@@ -16,8 +16,6 @@ namespace FishEngine
 	public:
 		InjectClassName(TextureImporter)
 
-		virtual void SaveAndReimport() override {};
-		
 		TextureImporter() = default;
 
 		TexturePtr FromFile(const Path& path);

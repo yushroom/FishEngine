@@ -57,12 +57,9 @@ SOURCES += main.cpp\
     UI/UIColor.cpp \
     HierarchyTreeView.cpp \
     MainEditor.cpp \
-    AddComponentDialog.cpp \
     UI/UIButton.cpp \
     UI/FloatLineEdit.cpp \
     ProjectView.cpp \
-    UI/OpenProjectDialog.cpp \
-    ProjectFileIconProvider.cpp \
     ProjectViewFileModel.cpp \
     FileInfo.cpp \
     UI/SelectObjectDialog.cpp \
@@ -91,14 +88,11 @@ HEADERS  += mainwindow.h \
     UI/UIColor.hpp \
     HierarchyTreeView.hpp \
     MainEditor.hpp \
-    AddComponentDialog.hpp \
     UI/UIButton.hpp \
     UIDebug.hpp \
     UIHeaderState.hpp \
     UI/FloatLineEdit.hpp \
     ProjectView.hpp \
-    UI/OpenProjectDialog.hpp \
-    ProjectFileIconProvider.hpp \
     ProjectViewFileModel.hpp \
     FileInfo.hpp \
     UI/SelectObjectDialog.hpp \
@@ -119,9 +113,7 @@ FORMS    += mainwindow.ui \
     UI/UISlider.ui \
     UI/UIObjecField.ui \
     UI/UIColor.ui \
-    AddComponentDialog.ui \
     ProjectView.ui \
-    UI/OpenProjectDialog.ui \
     UI/SelectObjectDialog.ui \
     UI/UIMaterialHeader.ui \
     UI/UIGameObjectHeader.ui

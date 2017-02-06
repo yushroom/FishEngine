@@ -20,7 +20,7 @@ namespace FishEngine
 		AssetImporter(AssetImporter const &) = delete;
 		AssetImporter& operator=(AssetImporter const &) = delete;
 		
-		virtual void SaveAndReimport() = 0;
+		void SaveAndReimport();
 		
 		// Set the AssetBundle name and variant.
 		void SetAssetBundleNameAndVariant(std::string const & assetBundleName, std::string const & assetBundleVariant);
@@ -49,6 +49,8 @@ namespace FishEngine
 		// Get or set any user data.
 		Meta(NonSerializable)
 		std::string		m_userData;
+
+		static std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> s_pathToImpoter;
 	};
 }
 

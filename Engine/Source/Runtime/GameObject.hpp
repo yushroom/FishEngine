@@ -5,7 +5,7 @@
 #include "Script.hpp"
 #include "Object.hpp"
 #include "ReflectClass.hpp"
-#include "generate/Class_ConponentInfo.hpp"
+#include "generate/Class_ComponentInfo.hpp"
 #include "Component_gen.hpp"
 
 #include <memory>

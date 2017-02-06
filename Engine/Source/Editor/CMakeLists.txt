@@ -15,7 +15,15 @@ target_link_libraries(FishEditor2 yaml-cpp)
 target_link_libraries(FishEditor2 ${PhysXSDK_LIBRARIES})
 target_link_libraries(FishEditor2 ${Boost_LIBRARIES})
 
-set_target_properties(FishEditor2 PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+if (MSVC)
+    target_link_libraries(FishEditor2 opengl32.lib)
+    target_link_libraries(FishEditor2 glew_s)
+else()
+    #set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+    #set(CMAKE_CXX_FLAGS "-I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/mkspecs/macx-clang")
+    #set_target_properties(FishEditor2 PROPERTIES LINK_FLAGS "-F/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib -lz -framework QtWidgets -framework QtGui -framework QtCore -framework DiskArbitration -framework IOKit -framework OpenGL -framework AGL")
+    set_target_properties(FishEditor2 PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+endif()
 
 target_link_libraries(FishEditor2 Qt5::Widgets)
 

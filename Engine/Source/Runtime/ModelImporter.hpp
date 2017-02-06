@@ -158,8 +158,6 @@ namespace FishEngine {
 
         ModelImporter() = default;
 		
-		virtual void SaveAndReimport() override {};
-		
         void
         setFileScale(
             const float fileScale)
@@ -167,9 +165,7 @@ namespace FishEngine {
             m_fileScale = fileScale;
         }
         
-        ModelPtr
-        LoadFromFile(
-            const Path& path);
+        ModelPtr LoadFromFile( const Path& path );
 
         void
         setImportNormals(

@@ -3,8 +3,10 @@
 #include <boost/filesystem.hpp>
 #include <map>
 #include <array>
+#include <Resources.hpp>
 
-typedef boost::filesystem::path Path;
+//typedef boost::filesystem::path Path;
+using FishEngine::Path;
 
 namespace FishEditor
 {

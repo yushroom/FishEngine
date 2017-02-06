@@ -2,6 +2,7 @@
 #define FishEditor_hpp
 
 #include <FishEngine.hpp>
+#include <functional>
 
 namespace FishEditor
 {

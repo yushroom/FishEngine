@@ -28,7 +28,7 @@
 #include <Material.hpp>
 
 #include "EditorGUI.hpp"
-#include "private/EditorGUI_p.hpp"
+//#include "private/EditorGUI_p.hpp"
 
 #include <ReflectEnum.hpp>
 #include <generate/Enum_LightType.hpp>
@@ -259,11 +259,11 @@ void Inspector::Bind(const GameObjectPtr & go)
     if (EditorGUI::Button("Add Component"))
     {
         Debug::LogError("clicked");
-        auto const & name = ShowAddComponentMenu();
-        if (name == "Rigidbody")
-        {
-            go->AddComponent<Rigidbody>();
-        }
+        //auto const & name = ShowAddComponentMenu();
+        //if (name == "Rigidbody")
+        //{
+        //    go->AddComponent<Rigidbody>();
+        //}
     }
 
     EditorGUI::End();

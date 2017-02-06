@@ -2,6 +2,7 @@
 #define HIERARCHYTREEVIEW_HPP
 
 #include <QTreeView>
+#include <memory>
 
 namespace FishEngine
 {

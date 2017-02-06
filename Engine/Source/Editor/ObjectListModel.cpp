@@ -8,10 +8,10 @@ ObjectListModel::ObjectListModel(QObject *parent)
 
 int ObjectListModel::rowCount(const QModelIndex &parent) const
 {
-
+    return 0;
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const
 {
-
+    return QVariant();
 }

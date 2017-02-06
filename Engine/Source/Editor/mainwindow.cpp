@@ -1,7 +1,8 @@
+#include <GLEnvironment.hpp>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QFileIconProvider>
+//#include <QFileIconProvider>
 #include <QMouseEvent>
 #include <QStandardItemModel>
 //#include <QPalette>
@@ -27,7 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     //FishEngine::Debug::Log("MainWindow::ctor");
     Init();
+	this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
     ui->setupUi(this);
+	//this->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
 
     FishEditor::Inspector::s_inspectorWidget = ui->inspectorWidget;
 

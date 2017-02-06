@@ -88,16 +88,13 @@ void ProjectView::OnDirTreeViewSelectionChanged(const QModelIndex &current, cons
 
 void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
 {
-    //return;
     auto info = fileModel->fileInfo(index);
     if (info->isDir())
     {
-        //ui->dirTreeView->selection
         auto path = QString::fromStdString(info->absoluteFilePath().string());
         ui->listView->setRootIndex(fileModel->setRootPath(path));
+		ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(info->path()));
     }
-    //ui->fileNameLabel->setText(info.canonicalPath());
-	ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(info->path()));
 }
 
 void ProjectView::OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)

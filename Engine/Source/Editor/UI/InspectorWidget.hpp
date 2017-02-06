@@ -2,6 +2,7 @@
 #define INSPECTORWIDGET_HPP
 
 #include <QWidget>
+#include <memory>
 
 class QTreeWidget;
 class UIGameObjectHeader;

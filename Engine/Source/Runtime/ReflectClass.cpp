@@ -1,7 +1,7 @@
 #include "ReflectClass.hpp"
 #include <map>
 
-#include "generate/Class_ConponentInfo.hpp"
+#include "generate/Class_ComponentInfo.hpp"
 
 namespace FishEngine
 {

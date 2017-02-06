@@ -35,6 +35,7 @@
 #include "UI/UIColor.hpp"
 #include "UI/UIBool.hpp"
 #include "UI/UIButton.hpp"
+#include "UI/UIMaterialHeader.hpp"
 
 
 #include "Inspector.hpp"
@@ -56,23 +57,55 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 {
     static_assert(std::is_base_of<QWidget, T>::value, "T must be a QWidget");
 
+    // get the item
     QTreeWidgetItem * item;
-    if (s_localItemIndex < s_currentHeaderItem->childCount())  // exists, reuse it
+    if (s_localItemIndex == -1) // is top item
     {
-        item = s_currentHeaderItem->child(s_localItemIndex);
-        if (item->isHidden())
+        //HideRedundantChildItems();
+        if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
+        {
+            item = s_treeWidget->topLevelItem(s_topLevelItemIndex);
+            if (item->isHidden())
+            {
+                LOG;
+                item->setHidden(false);
+            }
+        }
+        else
         {
             LOG;
-            item->setHidden(false);
+            Debug::LogError("[Foldout] add new QTreeWidgetItem");
+            item = new QTreeWidgetItem;
+            s_treeWidget->addTopLevelItem(item);
+            //UIComponentHeader * header = new UIComponentHeader(name, enabled);
+            //s_treeWidget->setItemWidget(item, 0, header);
+            item->setExpanded(true);
+            //s_currentHeaderItemIsExpanded = true;
         }
+        s_topLevelItemIndex ++;
+        s_localItemIndex = 0;
+        s_currentHeaderItem = item;
+        s_currentHeaderItemIsExpanded = item->isExpanded();
     }
     else
     {
-        LOG;
-        item = new QTreeWidgetItem;
-        s_currentHeaderItem->addChild(item);
+        if (s_localItemIndex < s_currentHeaderItem->childCount())  // exists, reuse it
+        {
+            item = s_currentHeaderItem->child(s_localItemIndex);
+            if (item->isHidden())
+            {
+                LOG;
+                item->setHidden(false);
+            }
+        }
+        else
+        {
+            LOG;
+            item = new QTreeWidgetItem;
+            s_currentHeaderItem->addChild(item);
+        }
+        s_localItemIndex ++;
     }
-    s_localItemIndex ++;
 
     auto widget = qobject_cast<T*>(s_treeWidget->itemWidget(item, 0));
 
@@ -99,14 +132,14 @@ ComponentPtr componentToBeDestroyed;
 void EditorGUI::Begin()
 {
     s_topLevelItemIndex = 0;
-    s_localItemIndex = 0;
+    s_localItemIndex = -1;
     s_currentHeaderItem = nullptr;
     s_currentHeaderItemIsExpanded = false;
 }
 
 void EditorGUI::End()
 {
-    HideRedundantChildItems();
+    StartNewTopItem();
     int rowCount = s_treeWidget->topLevelItemCount();
     int componentCount = s_topLevelItemIndex;
     // hide redundant item
@@ -121,11 +154,13 @@ void EditorGUI::End()
     }
 }
 
+#if 1
 
-bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, UIHeaderState &state)
+bool FishEditor::EditorGUI::ComponentGroup(const std::string &name, bool &enabled, UIHeaderState &state)
 {
-    HideRedundantChildItems();
+    StartNewTopItem();
 
+#if 0
     QTreeWidgetItem * item;
     bool expanded = true;
     if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
@@ -154,17 +189,21 @@ bool FishEditor::EditorGUI::Foldout(const std::string &name, bool &enabled, UIHe
         //return true;
     }
     s_topLevelItemIndex ++;
-    s_localItemIndex = 0;
+    s_localItemIndex = -1;
     s_currentHeaderItem = item;
     s_currentHeaderItemIsExpanded = expanded;
-    return expanded;
+#endif
+    CheckNextWidget<UIComponentHeader>(name, enabled);
+    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
+    return s_currentHeaderItemIsExpanded;
 }
 
-bool EditorGUI::Foldout(const std::string &name, UIHeaderState &state)
+bool EditorGUI::ComponentGroup(const std::string &name, UIHeaderState &state)
 {
     // hide redundant child items of the last top item
-    HideRedundantChildItems();
+    StartNewTopItem();
 
+#if 0
     QTreeWidgetItem * item;
     bool expanded = true;
     if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
@@ -191,11 +230,22 @@ bool EditorGUI::Foldout(const std::string &name, UIHeaderState &state)
         //return true;
     }
     s_topLevelItemIndex ++;
-    s_localItemIndex = 0;
+    s_localItemIndex = -1;
     s_currentHeaderItem = item;
     s_currentHeaderItemIsExpanded = expanded;
-    return expanded;
+#endif
+    CheckNextWidget<UIComponentHeader>(name);
+    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
+    return s_currentHeaderItemIsExpanded;
 }
+
+bool EditorGUI::Button(const std::string &text)
+{
+    UIButton * button = CheckNextWidget<UIButton>(QString::fromStdString(text));
+    return button->CheckClicked();
+}
+
+#endif
 
 bool EditorGUI::Toggle(const std::string & label, bool *value)
 {
@@ -262,6 +312,15 @@ bool EditorGUI::ObjectField(const std::string &label, const ObjectPtr &obj)
     return objField->CheckUpdate(label, obj->name());
 }
 
+bool EditorGUI::MaterialHeader(std::string const &text)
+{
+    StartNewTopItem();
+    UIMaterialHeader * header = CheckNextWidget<UIMaterialHeader>(text);
+    header->CheckUpdate(text);
+    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
+    return s_currentHeaderItemIsExpanded;
+}
+
 
 std::string EditorGUI::ShowAddComponentMenu()
 {
@@ -277,15 +336,17 @@ std::string EditorGUI::ShowAddComponentMenu()
 }
 
 
-void EditorGUI::HideRedundantChildItems()
+void EditorGUI::StartNewTopItem()
 {
-    if (s_currentHeaderItem == nullptr || !s_currentHeaderItemIsExpanded)
+    if (s_currentHeaderItem == nullptr || !s_currentHeaderItemIsExpanded || s_localItemIndex < 0)
     {
+        s_localItemIndex = -1;
         return;
     }
     int rowCount = s_currentHeaderItem->childCount();
     for (int i = s_localItemIndex ; i < rowCount; i++)
     {
+        //assert(s_localItemIndex >= 0);
         auto item = s_currentHeaderItem->child(i);
         if (item->isHidden())
             break;  // do not check the rest of rows
@@ -293,5 +354,6 @@ void EditorGUI::HideRedundantChildItems()
         LOG;
         Debug::LogWarning("[HideRedundantChildItems] hide %d", i);
     }
+    s_localItemIndex = -1;
 }
 

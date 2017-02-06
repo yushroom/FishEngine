@@ -45,7 +45,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
      <item>
       <widget class="QSlider" name="slider">
        <property name="orientation">

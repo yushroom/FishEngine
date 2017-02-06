@@ -1,6 +1,8 @@
 #include "Inspector.hpp"
 
 #include <QLayout>
+#include <QMenu>
+#include <QTreeWidget>
 #include "UI/InspectorWidget.hpp"
 
 #include <Debug.hpp>
@@ -223,17 +225,14 @@ void Inspector::Bind(const GameObjectPtr & go)
     EditorGUI::Begin();
     auto t = go->transform();
 
-    UIHeaderState state;    // ignore state
-    if (EditorGUI::Foldout("Transform", state))
-    {
-        Inspector::OnInspectorGUI<Transform>(t);
-    }
+    BeginComponentImpl<Transform>(t);
 
     for (auto const & comp : go->m_components)
     {
         Inspector::BeginComponent(comp);
     }
 
+    //UIHeaderState state;    // ignore state
     // material
     auto renderer = go->GetComponent<Renderer>();
     if ( renderer != nullptr )
@@ -241,11 +240,11 @@ void Inspector::Bind(const GameObjectPtr & go)
         for (auto const & material : renderer->m_materials)
         {
             assert(material != nullptr);
-            UIHeaderState state;
-            if ( EditorGUI::Foldout( material->name(), state ) )
+            //UIHeaderState state;
+            //if ( EditorGUI::ComponentGroup( material->name(), state ) )
+            if ( EditorGUI::MaterialHeader( material->name() ))
             {
                 Inspector::OnInspectorGUI<Material>(material);
-                //HideRedundantChildItems();
             }
         }
     }
@@ -256,35 +255,31 @@ void Inspector::Bind(const GameObjectPtr & go)
 //        componentToBeDestroyed = nullptr;
 //    }
 
-//    //UIHeaderState state;
-//    if (Foldout("llll", state))
-//    {
-//        auto button = CheckNextWidget<UIButton>("Add Component");
-//        if (button->CheckClicked())
-//        {
-//            Debug::LogError("clicked");
-//            auto const & name = ShowAddComponentMenu();
-//            if (name == "Rigidbody")
-//            {
-//                go->AddComponent<Rigidbody>();
-//            }
-//        }
-//    }
+    EditorGUI::StartNewTopItem();
+    if (EditorGUI::Button("Add Component"))
+    {
+        Debug::LogError("clicked");
+        auto const & name = ShowAddComponentMenu();
+        if (name == "Rigidbody")
+        {
+            go->AddComponent<Rigidbody>();
+        }
+    }
 
     EditorGUI::End();
 }
 
 std::string Inspector::ShowAddComponentMenu()
 {
-//        static QMenu* menu = nullptr;
-//        if (menu == nullptr)
-//        {
-//            menu = new QMenu(s_treeWidget);
-//            menu->addAction("Rigidbody");
-//        }
+    static QMenu* menu = nullptr;
+    if (menu == nullptr)
+    {
+        menu = new QMenu(s_inspectorWidget->m_treeWidget);
+        menu->addAction("Rigidbody");
+    }
 
-//        auto action = menu->exec(QCursor::pos());
-//        return action->text().toStdString();
+    auto action = menu->exec(QCursor::pos());
+    return action->text().toStdString();
 }
 
 #if 1
@@ -293,7 +288,7 @@ void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
     Debug::LogError("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
     UIHeaderState state;
-    if ( EditorGUI::Foldout( component->ClassName(), state ) )
+    if ( EditorGUI::ComponentGroup( component->ClassName(), state ) )
     {
         //OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
         //HideRedundantChildItems();
@@ -310,16 +305,14 @@ void Inspector::BeginComponentImpl(const ComponentPtr &component)
 template<class T, std::enable_if_t<can_be_enabled<T>::value, int>>
 void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
-    //static_assert(std::is_base_of<Behaviour, T>(), "T must be derived from Behaviour");
     auto p = std::static_pointer_cast<T>(component);
     bool enabled = p->enabled();
     //bool changed = false;
     UIHeaderState state;
-    bool expanded = EditorGUI::Foldout( T::StaticClassName(), enabled, state );
+    bool expanded = EditorGUI::ComponentGroup( T::StaticClassName(), enabled, state );
     if ( expanded )
     {
         OnInspectorGUI<T>(p);
-        //HideRedundantChildItems();
     }
     if (state == UIHeaderState::enabledChanged)
     {
@@ -337,17 +330,11 @@ template<class T, std::enable_if_t<!can_be_enabled<T>::value, int>>
 void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
     static_assert(std::is_base_of<Component, T>(), "T must be derived from Component");
-    //static_assert(!std::is_base_of<Behaviour, T>(), "T must *not* be derived from Behaviour");
     UIHeaderState state;
-    if ( EditorGUI::Foldout( T::StaticClassName(), state ) )
+    if ( EditorGUI::ComponentGroup( T::StaticClassName(), state ) )
     {
         OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
-        //HideRedundantChildItems();
     }
-//    else
-//    {
-//        Debug::LogError("up");
-//    }
 
 //        if ( state == UIHeaderState::remove)
 //        {

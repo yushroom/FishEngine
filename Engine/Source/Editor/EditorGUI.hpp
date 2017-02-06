@@ -20,11 +20,6 @@ namespace FishEditor
         EditorGUI() = delete;
 
     public:
-
-        static QTreeWidget*     s_treeWidget;
-
-        static int              s_indentLevel;
-
         static void Begin();
 
         static void End();
@@ -34,15 +29,19 @@ namespace FishEditor
         // return component name
         static std::string ShowAddComponentMenu();
 
+#if 1
         // show left checkBox
         // return value: isExpanded
-        static bool Foldout(std::string const & name, bool & enabled, UIHeaderState & state);
+        static bool ComponentGroup(std::string const & name, bool & enabled, UIHeaderState & state);
 
         // hide left checkBox
         // return value: isExpanded
-        static bool Foldout(std::string const & name, UIHeaderState &state);
+        static bool ComponentGroup(std::string const & name, UIHeaderState &state);
+#endif
 
-        static bool Toggle(const std::string &label, bool * value);
+        static bool Button(std::string const & text);
+
+        static bool Toggle(std::string const &label, bool * value);
 
         static bool ColorField(std::string const & label, FishEngine::Color * color);
 
@@ -66,6 +65,11 @@ namespace FishEditor
 
     private:
 
+        static bool MaterialHeader(const std::string &text);
+
+        friend class Inspector;
+        static QTreeWidget*     s_treeWidget;
+        static int              s_indentLevel;
         static int              s_topLevelItemIndex;
         static int              s_localItemIndex;
         static bool             s_currentHeaderItemIsExpanded;
@@ -74,7 +78,7 @@ namespace FishEditor
         template<class T, class... Args>
         static T* CheckNextWidget(Args&&... args );
 
-        static void HideRedundantChildItems();
+        static void StartNewTopItem();
     };
 
     template<typename T>

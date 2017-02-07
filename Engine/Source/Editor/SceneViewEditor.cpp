@@ -306,9 +306,9 @@ namespace FishEditor
         /************************************************************************/
         /* Selection Gizmos                                                     */
         /************************************************************************/
-//        auto go = Selection::selectedGameObjectInHierarchy();
-//        if (go != nullptr)
-//            go->OnDrawGizmosSelected();
+		auto go = Selection::activeGameObject();
+		if (go != nullptr)
+			go->OnDrawGizmosSelected();
 
         /************************************************************************/
         /* Camera Preview                                                       */
@@ -383,7 +383,7 @@ namespace FishEditor
         static Vector3 lastMousePosition;
         static Vector3 lastCenter;
 
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        auto selectedGO = Selection::activeGameObject();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
             m_selectedAxis = -1;
@@ -546,7 +546,7 @@ namespace FishEditor
     {
         static Vector3 lastFromDir;
         static Quaternion lastRotation;
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        auto selectedGO = Selection::activeGameObject();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
             m_selectedAxis = -1;
@@ -670,7 +670,7 @@ namespace FishEditor
         static Vector3 lastMousePosition;
         static Vector3 lastCenter;
 
-        auto selectedGO = Selection::selectedGameObjectInHierarchy();
+        auto selectedGO = Selection::activeGameObject();
         if (m_lastSelectedGameObject.lock() != selectedGO)
         {
             m_selectedAxis = -1;

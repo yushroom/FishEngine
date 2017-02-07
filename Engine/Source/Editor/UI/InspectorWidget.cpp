@@ -7,10 +7,13 @@
 #include "UI/UIMaterialHeader.hpp"
 #include "UI/UIAssetHeader.hpp"
 
+#include <TextureImporter.hpp>
+
 InspectorWidget::InspectorWidget(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout * rootLayout = new QVBoxLayout(this);
     rootLayout->setMargin(0);
+	//rootLayout->setContentsMargins(0, 0, 4, 0);
     rootLayout->setSpacing(0);
     setLayout(rootLayout);
     m_treeWidget = new QTreeWidget();
@@ -50,4 +53,16 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::GameObject> go)
         m_assetHeader->setHidden(true);
 
     m_gameObjectHeader->Bind(go);
+}
+
+void InspectorWidget::Bind(std::shared_ptr<FishEngine::TextureImporter> importer)
+{
+	if (!m_gameObjectHeader->isHidden())
+		m_gameObjectHeader->setHidden(true);
+	if (!m_materialHeader->isHidden())
+		m_materialHeader->setHidden(true);
+	if (m_assetHeader->isHidden())
+		m_assetHeader->setHidden(false);
+
+	m_assetHeader->CheckUpdate(importer->name());
 }

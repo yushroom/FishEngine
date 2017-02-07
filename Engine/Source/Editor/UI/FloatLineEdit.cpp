@@ -18,6 +18,7 @@ void FloatLineEdit::setValue(float f)
     m_value = f;
     blockSignals(true);
     setText(QString::fromStdString(floatToStdString(m_value)));
+    home(false);
     blockSignals(false);
 }
 
@@ -42,6 +43,7 @@ void FloatLineEdit::OnEditingFinished()
         setText("0");
         blockSignals(false);
     }
+	home(false);
 }
 
 void FloatLineEdit::OnTextChanged(QString const & s)
@@ -67,6 +69,7 @@ void FloatLineEdit::OnTextChanged(QString const & s)
     // re-format
     blockSignals(true);
     setText(QString::fromStdString(floatToStdString(m_value)));
+	home(false);
     blockSignals(false);
 }
 

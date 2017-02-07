@@ -80,11 +80,9 @@ namespace FishEngine
 
         static void Init(Path const & path = Path());
 		
-		// uuid of AssetImporter -> AssetImporter
-		static std::map<boost::uuids::uuid, std::shared_ptr<AssetImporter>> s_uuidToImporter;
+		static std::map<boost::uuids::uuid, std::shared_ptr<Object>> s_importerGUIDToAsset;
 
-		// asset path -> asset object
-		static std::map<boost::filesystem::path, std::weak_ptr<Object>> s_pathToAsset;
+		static std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> s_pathToImporter;
 
     private:
         friend FishEditor::Inspector;

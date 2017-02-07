@@ -40,6 +40,22 @@ using namespace std;
 namespace FishEditor
 {
 
+	GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
+	{
+		auto& children = root->transform()->children();
+		for (auto& c : children) {
+			const auto& g = c.lock();
+			//Debug::Log("Name: %s", g->name().c_str());
+			if (g->name() == name) {
+				return g->gameObject();
+			}
+			auto r = FindNamedChild(g->gameObject(), name);
+			if (r != nullptr) {
+				return r;
+			}
+		}
+		return nullptr;
+	}
 
 void DefaultScene()
 {
@@ -74,7 +90,7 @@ void DefaultScene()
     material->SetFloat("_Exposure", 1.3f);
     RenderSettings::setSkybox(material);
 
-#if 1
+#if 0
 
     //auto go = GameObject::CreatePrimitive(PrimitiveType::Cube);
     QualitySettings::setShadowDistance(20);
@@ -96,6 +112,89 @@ void DefaultScene()
     //material->setMainTexture(bakedAO);
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
+#else
+	QualitySettings::setShadowDistance(30);
+	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
+	Path sponza_assets_root = sponza_root / "crytek-sponza";
+	Resources::SetAssetsDirectory(sponza_root);
+
+#if 1
+
+	ModelImporter importer;
+	importer.setFileScale(0.01f);
+	//auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+	//auto sponza_go = sponza_model->CreateGameObject();
+
+	//auto handle = std::async(std::launch::async,
+	//	[&importer, &sponza_assets_root]() {
+	//	return importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+	//}
+	//);
+
+	TextureImporter tex_importer;
+	Path textures_root = sponza_assets_root / "textures";
+	auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
+
+	auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+	//auto sponza_model = handle.get();
+	auto sponza_go = sponza_model->CreateGameObject();
+
+	auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
+	(const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
+	{
+		auto mesh0 = FindNamedChild(sponza_go, go_name);
+		auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+		mtl->SetShader(shader1);
+		auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+		auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+		mtl->SetTexture("DiffuseTex", diffuse);
+		mtl->SetTexture("MaskTex", mask);
+	};
+
+	ApplyMateril1("mesh0", "sponza_thorn_diff", "sponza_thorn_mask");
+	ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
+	ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
+
+	auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.shader");
+	auto ApplyMateril2 = [&sponza_go, &tex_importer, &shader2, &textures_root]
+	(const char* go_name, const std::string& diffuse_tex)
+	{
+		auto mesh0 = FindNamedChild(sponza_go, go_name);
+		auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+		mtl->SetShader(shader2);
+		auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+		mtl->SetTexture("DiffuseTex", diffuse);
+	};
+
+	ApplyMateril2("mesh2", "vase_round");
+	ApplyMateril2("mesh3", "background");
+	ApplyMateril2("mesh4", "spnza_bricks_a_diff");
+	ApplyMateril2("mesh5", "sponza_arch_diff");
+	ApplyMateril2("mesh6", "sponza_ceiling_a_diff");
+	ApplyMateril2("mesh7", "sponza_column_a_diff");
+	ApplyMateril2("mesh8", "sponza_floor_a_diff");
+	ApplyMateril2("mesh9", "sponza_column_c_diff");
+	ApplyMateril2("mesh10", "sponza_details_diff");
+	ApplyMateril2("mesh11", "sponza_column_b_diff");
+	ApplyMateril2("mesh13", "sponza_flagpole_diff");
+	ApplyMateril2("mesh14", "sponza_fabric_green_diff");
+	ApplyMateril2("mesh15", "sponza_fabric_blue_diff");
+	ApplyMateril2("mesh16", "sponza_fabric_diff");
+	ApplyMateril2("mesh17", "sponza_curtain_blue_diff");
+	ApplyMateril2("mesh18", "sponza_curtain_diff");
+	ApplyMateril2("mesh19", "sponza_curtain_green_diff");
+	ApplyMateril2("mesh21", "vase_hanging");
+	ApplyMateril2("mesh22", "vase_dif");
+	ApplyMateril2("mesh23", "lion");
+	ApplyMateril2("mesh24", "sponza_roof_diff");
+#endif
+	auto transform = Camera::main()->gameObject()->transform();
+	transform->setPosition(5, 8, 0);
+	transform->setLocalEulerAngles(30, -90, 0);
+
+	transform = Camera::mainGameCamera()->gameObject()->transform();
+	transform->setPosition(5, 8, 0);
+	transform->setLocalEulerAngles(30, -90, 0);
 #endif
 
 #endif
@@ -123,7 +222,18 @@ void DefaultScene()
     void MainEditor::Run()
     {
         auto go = Selection::activeGameObject();
-        Inspector::Bind(go);
+		if (go != nullptr)
+		{
+			Inspector::Bind(go);
+		}
+		else
+		{
+			auto object = Selection::activeObject();
+			if (object != nullptr)
+				Inspector::Bind(object);
+			else
+				Inspector::HideAll();
+		}
 
 		GLint framebuffer; // qt's framebuffer
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &framebuffer);

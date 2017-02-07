@@ -10,19 +10,6 @@
 #include <ReflectClass.hpp>
 #include <Vector3.hpp>
 
-#include <Camera.hpp>
-#include <Light.hpp>
-#include <MeshFilter.hpp>
-#include <Mesh.hpp>
-#include <MeshRenderer.hpp>
-#include <CameraController.hpp>
-#include <Rigidbody.hpp>
-#include <Collider.hpp>
-#include <BoxCollider.hpp>
-#include <SphereCollider.hpp>
-#include <Shader.hpp>
-#include <Material.hpp>
-
 #include <QTreeWidget>
 #include <QMenu>
 
@@ -37,34 +24,41 @@
 #include "UI/UIButton.hpp"
 #include "UI/UIMaterialHeader.hpp"
 
-
 #include "Inspector.hpp"
+#include "UIDebug.hpp"
 
 using namespace FishEditor;
 using namespace FishEngine;
 
-#include "UIDebug.hpp"
 
-int                 EditorGUI::s_indentLevel        = 0;
-int                 EditorGUI::s_topLevelItemIndex  = 0;
-int                 EditorGUI::s_localItemIndex     = 0;
 QTreeWidget*        EditorGUI::s_treeWidget         = nullptr;
-bool                EditorGUI::s_currentHeaderItemIsExpanded = false;
-QTreeWidgetItem*    EditorGUI::s_currentHeaderItem  = nullptr;
+
+std::stack<QTreeWidgetItem*> EditorGUI::s_itemStack;
+std::stack<int>		EditorGUI::s_itemIndexStack;
+QTreeWidgetItem*	EditorGUI::s_currentItem;
+QTreeWidgetItem*	EditorGUI::s_currentGroupHeaderItem;
+int					EditorGUI::s_currentGroupHeaderItemChildIndex;
+bool				EditorGUI::s_expectNewGroup;
+
 
 template<class T, class... Args>
 T* EditorGUI::CheckNextWidget(Args&&... args )
 {
     static_assert(std::is_base_of<QWidget, T>::value, "T must be a QWidget");
 
+	if (s_expectNewGroup)
+	{
+		HideAllChildOfLastItem();
+		s_expectNewGroup = false;
+	}
+
     // get the item
     QTreeWidgetItem * item;
-    if (s_localItemIndex == -1) // is top item
+    if (s_currentGroupHeaderItem == nullptr) // is top item
     {
-        //HideRedundantChildItems();
-        if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
+        if (s_currentGroupHeaderItemChildIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
         {
-            item = s_treeWidget->topLevelItem(s_topLevelItemIndex);
+            item = s_treeWidget->topLevelItem(s_currentGroupHeaderItemChildIndex);
             if (item->isHidden())
             {
                 LOG;
@@ -74,24 +68,17 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
         else
         {
             LOG;
-            Debug::LogError("[Foldout] add new QTreeWidgetItem");
+            Debug::LogError("[CheckNextWidget] add new QTreeWidgetItem");
             item = new QTreeWidgetItem;
             s_treeWidget->addTopLevelItem(item);
-            //UIComponentHeader * header = new UIComponentHeader(name, enabled);
-            //s_treeWidget->setItemWidget(item, 0, header);
             item->setExpanded(true);
-            //s_currentHeaderItemIsExpanded = true;
         }
-        s_topLevelItemIndex ++;
-        s_localItemIndex = 0;
-        s_currentHeaderItem = item;
-        s_currentHeaderItemIsExpanded = item->isExpanded();
     }
     else
     {
-        if (s_localItemIndex < s_currentHeaderItem->childCount())  // exists, reuse it
+        if (s_currentGroupHeaderItemChildIndex < s_currentGroupHeaderItem->childCount())  // exists, reuse it
         {
-            item = s_currentHeaderItem->child(s_localItemIndex);
+            item = s_currentGroupHeaderItem->child(s_currentGroupHeaderItemChildIndex);
             if (item->isHidden())
             {
                 LOG;
@@ -102,22 +89,20 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
         {
             LOG;
             item = new QTreeWidgetItem;
-            s_currentHeaderItem->addChild(item);
+			s_currentGroupHeaderItem->addChild(item);
         }
-        s_localItemIndex ++;
     }
+
+	s_currentGroupHeaderItemChildIndex++;
+	s_currentItem = item;
+	s_expectNewGroup = (s_currentItem->childCount() > 0);
+
+	if (item == nullptr) abort();
 
     auto widget = qobject_cast<T*>(s_treeWidget->itemWidget(item, 0));
 
     if (widget == nullptr)
     {
-        if (item == nullptr)
-        {
-            LOG;
-            Debug::LogWarning("[CheckNextWidget] new QTreeWidgetItem");
-            item = new QTreeWidgetItem;
-            s_treeWidget->addTopLevelItem(item); // TODO
-        }
         LOG;
         Debug::LogWarning("[CheckNextWidget] new widget");
         widget = new T(args...);
@@ -131,18 +116,25 @@ ComponentPtr componentToBeDestroyed;
 
 void EditorGUI::Begin()
 {
-    s_topLevelItemIndex = 0;
-    s_localItemIndex = -1;
-    s_currentHeaderItem = nullptr;
-    s_currentHeaderItemIsExpanded = false;
+	s_currentGroupHeaderItem = nullptr;
+	s_currentGroupHeaderItemChildIndex = 0;
+	s_expectNewGroup = false;
 }
 
 void EditorGUI::End()
 {
-    StartNewTopItem();
+	if (!s_itemStack.empty() || !s_itemIndexStack.empty())
+		abort();
+
+	if (s_expectNewGroup)
+	{
+		HideAllChildOfLastItem();
+		s_expectNewGroup = false;
+	}
+
     int rowCount = s_treeWidget->topLevelItemCount();
-    int componentCount = s_topLevelItemIndex;
-    // hide redundant item
+    int componentCount = s_currentGroupHeaderItemChildIndex;
+    // hide redundant top item
     for (int i = componentCount; i < rowCount; i++)
     {
         auto item = s_treeWidget->topLevelItem(i);
@@ -152,100 +144,44 @@ void EditorGUI::End()
         LOG;
         Debug::LogError("[EditorGUI::End]hide %d", i);
     }
+
+
 }
 
-#if 1
-
-bool FishEditor::EditorGUI::ComponentGroup(const std::string &name, bool &enabled, UIHeaderState &state)
+bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName)
 {
-    StartNewTopItem();
-
-#if 0
-    QTreeWidgetItem * item;
-    bool expanded = true;
-    if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
-    {
-        item = s_treeWidget->topLevelItem(s_topLevelItemIndex);
-        if (item->isHidden())
-        {
-            Debug::LogWarning("[Foldout] hide");
-            LOG;
-            item->setHidden(false);
-        }
-        expanded = item->isExpanded();
-        UIComponentHeader * header = qobject_cast<UIComponentHeader*>(s_treeWidget->itemWidget(item, 0));
-        assert(header != nullptr);
-        state = header->CheckUpdate(name, enabled);
-    }
-    else
-    {
-        Debug::LogError("[Foldout] add new QTreeWidgetItem");
-        item = new QTreeWidgetItem;
-        s_treeWidget->addTopLevelItem(item);
-        UIComponentHeader * header = new UIComponentHeader(name, enabled);
-        s_treeWidget->setItemWidget(item, 0, header);
-        item->setExpanded(true);
-        //changed = false;
-        //return true;
-    }
-    s_topLevelItemIndex ++;
-    s_localItemIndex = -1;
-    s_currentHeaderItem = item;
-    s_currentHeaderItemIsExpanded = expanded;
-#endif
-    CheckNextWidget<UIComponentHeader>(name, enabled);
-    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
-    return s_currentHeaderItemIsExpanded;
+	auto header = CheckNextWidget<UIComponentHeader>(componentTypeName);
+	header->CheckUpdate(componentTypeName);
+	bool expanded = s_currentItem->isExpanded();
+	PushGroup();
+	return expanded;
 }
 
-bool EditorGUI::ComponentGroup(const std::string &name, UIHeaderState &state)
+void FishEditor::EditorGUI::EndComponent()
 {
-    // hide redundant child items of the last top item
-    StartNewTopItem();
-
-#if 0
-    QTreeWidgetItem * item;
-    bool expanded = true;
-    if (s_topLevelItemIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
-    {
-        item = s_treeWidget->topLevelItem(s_topLevelItemIndex);
-        if (item->isHidden())
-        {
-            LOG;
-            item->setHidden(false);
-        }
-        expanded = item->isExpanded();
-        UIComponentHeader * header = qobject_cast<UIComponentHeader*>(s_treeWidget->itemWidget(item, 0));
-        assert(header != nullptr);
-        state = header->CheckUpdate(name);
-    }
-    else
-    {
-        Debug::LogError("[Foldout] add new QTreeWidgetItem");
-        item = new QTreeWidgetItem;
-        s_treeWidget->addTopLevelItem(item);
-        UIComponentHeader * header = new UIComponentHeader(name);
-        s_treeWidget->setItemWidget(item, 0, header);
-        item->setExpanded(true);
-        //return true;
-    }
-    s_topLevelItemIndex ++;
-    s_localItemIndex = -1;
-    s_currentHeaderItem = item;
-    s_currentHeaderItemIsExpanded = expanded;
-#endif
-    CheckNextWidget<UIComponentHeader>(name);
-    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
-    return s_currentHeaderItemIsExpanded;
+	PopGroup();
 }
+
+bool FishEditor::EditorGUI::BeginMaterial(std::string const & materialName)
+{
+	auto header = CheckNextWidget<UIMaterialHeader>(materialName);
+	header->CheckUpdate(materialName);
+	bool expanded = s_currentItem->isExpanded();
+	PushGroup();
+	return expanded;
+}
+
+void FishEditor::EditorGUI::EndMaterial()
+{
+	PopGroup();
+}
+
 
 bool EditorGUI::Button(const std::string &text)
 {
     UIButton * button = CheckNextWidget<UIButton>(QString::fromStdString(text));
     return button->CheckClicked();
 }
-
-#endif
 
 bool EditorGUI::Toggle(const std::string & label, bool *value)
 {
@@ -276,9 +212,6 @@ bool EditorGUI::EnumPopup(const std::string &label, int *index, const char * con
     return combo->CheckUpdate(label, *index, enumStringArray, arraySize);
 }
 
-
-
-
 bool EditorGUI::FloatField(const std::string &label, float * v)
 {
     UIFloat * float_row = CheckNextWidget<UIFloat>(label, *v);
@@ -297,8 +230,7 @@ bool EditorGUI::Slider(const std::string &label, float *value, float leftValue, 
     return slider->CheckUpdate(label, *value);
 }
 
-
-bool FishEditor::EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
+bool EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
 {
     //return false;
     UIFloat3 * float3 = CheckNextWidget<UIFloat3>(label, v->x, v->y, v->z);
@@ -306,19 +238,39 @@ bool FishEditor::EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
 }
 
 
+void EditorGUI::PushGroup()
+{
+	if (s_currentItem == nullptr)
+	{
+		abort();
+	}
+	s_itemStack.push(s_currentGroupHeaderItem);
+	s_itemIndexStack.push(s_currentGroupHeaderItemChildIndex);
+	s_currentGroupHeaderItem = s_currentItem;
+	s_currentGroupHeaderItemChildIndex = 0;
+	s_expectNewGroup = false;
+}
+
+void EditorGUI::PopGroup()
+{
+	// Hide Redundant Child Items
+	HideRedundantChildItemsOfLastGroup();
+
+	if (s_itemStack.empty() || s_itemIndexStack.empty())
+	{
+		abort();
+	}
+	//s_currentItem = s_currentGroupHeaderItem;	// ?
+	s_currentGroupHeaderItem = s_itemStack.top();
+	s_itemStack.pop();
+	s_currentGroupHeaderItemChildIndex = s_itemIndexStack.top();
+	s_itemIndexStack.pop();
+}
+
 bool EditorGUI::ObjectField(const std::string &label, const ObjectPtr &obj)
 {
     UIObjecField * objField = CheckNextWidget<UIObjecField>(label, obj->name());
     return objField->CheckUpdate(label, obj->name());
-}
-
-bool EditorGUI::MaterialHeader(std::string const &text)
-{
-    StartNewTopItem();
-    UIMaterialHeader * header = CheckNextWidget<UIMaterialHeader>(text);
-    header->CheckUpdate(text);
-    s_currentHeaderItemIsExpanded = s_currentHeaderItem->isExpanded();
-    return s_currentHeaderItemIsExpanded;
 }
 
 
@@ -336,24 +288,34 @@ std::string EditorGUI::ShowAddComponentMenu()
 }
 
 
-void EditorGUI::StartNewTopItem()
+void FishEditor::EditorGUI::HideRedundantChildItemsOfLastGroup()
 {
-    if (s_currentHeaderItem == nullptr || !s_currentHeaderItemIsExpanded || s_localItemIndex < 0)
-    {
-        s_localItemIndex = -1;
-        return;
-    }
-    int rowCount = s_currentHeaderItem->childCount();
-    for (int i = s_localItemIndex ; i < rowCount; i++)
-    {
-        //assert(s_localItemIndex >= 0);
-        auto item = s_currentHeaderItem->child(i);
-        if (item->isHidden())
-            break;  // do not check the rest of rows
-        item->setHidden(true);
-        LOG;
-        Debug::LogWarning("[HideRedundantChildItems] hide %d", i);
-    }
-    s_localItemIndex = -1;
+	if (!s_currentGroupHeaderItem->isExpanded())
+	{
+		return;
+	}
+	int rowCount = s_currentGroupHeaderItem->childCount();
+	for (int i = s_currentGroupHeaderItemChildIndex; i < rowCount; i++)
+	{
+		auto item = s_currentGroupHeaderItem->child(i);
+		if (item->isHidden())
+			break;  // do not check the rest of rows
+		item->setHidden(true);
+		LOG;
+		Debug::LogWarning("[EditorGUI::PopGroup] hide %d", i);
+	}
 }
 
+void FishEditor::EditorGUI::HideAllChildOfLastItem()
+{
+	int rowCount = s_currentItem->childCount();
+	for (int i = 0; i < rowCount; i++)
+	{
+		auto item = s_currentItem->child(i);
+		if (item->isHidden())
+			break;  // do not check the rest of rows
+		item->setHidden(true);
+		LOG;
+		Debug::LogWarning("[EditorGUI::PopGroup] hide %d", i);
+	}
+}

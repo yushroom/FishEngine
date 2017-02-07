@@ -7,16 +7,21 @@
 #include <QDir>
 
 #include <Debug.hpp>
-
 #include <Application.hpp>
+#include <AssetImporter.hpp>
+#include <TextureImporter.hpp>
+#include "Selection.hpp"
 
 using namespace FishEngine;
+using namespace FishEditor;
 
 ProjectView::ProjectView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ProjectView)
 {
     ui->setupUi(this);
+
+	ui->listView->setResizeMode(QListView::Adjust);
 
     dirModel = new ProjectViewDirModel(this);
     //dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -46,6 +51,7 @@ ProjectView::ProjectView(QWidget *parent) :
 
     connect(ui->dirTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnDirTreeViewSelectionChanged);
     connect(ui->listView, &QListView::doubleClicked, this, &ProjectView::OnListTreeViewDoubleClicked);
+	//connect(ui->listView, &QListView::clicked, this, &ProjectView::OnListTreeViewClicked);
     connect(ui->listView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnListTreeViewSelectionChanged);
     connect(ui->iconSizeSlider, &QSlider::valueChanged, this, &ProjectView::OnIconSizeChanged);
 }
@@ -97,10 +103,31 @@ void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
     }
 }
 
+//void ProjectView::OnListTreeViewClicked(const QModelIndex &index)
+//{
+//	auto info = fileModel->fileInfo(index);
+//	auto path = boost::filesystem::absolute(info->path());
+//	//auto ext = path.extension();
+//	//if (ext == ".png" || ext == ".jpg")
+//	//{
+//	//	//auto importer = AssetImporter::GetAtPath(path);
+//	//	//Selection::setActiveObject(importer);
+//	//	auto importer = std::make_shared<TextureImporter>();
+//	//	importer->FromFile(path);
+//	//}
+//	auto importer = AssetImporter::GetAtPath(path);
+//	Selection::setTransforms({});
+//	Selection::setActiveObject(importer);
+//}
+
 void ProjectView::OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
     auto info = fileModel->fileInfo(current);
     ui->fileNameLabel->setText(QString::fromStdString(info->fileName()));
+	auto path = boost::filesystem::absolute(info->path());
+	auto importer = AssetImporter::GetAtPath(path);
+	Selection::setTransforms({});
+	Selection::setActiveObject(importer);
 }
 
 void ProjectView::OnIconSizeChanged(int size)

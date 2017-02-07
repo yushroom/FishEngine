@@ -7,7 +7,7 @@ namespace FishEngine
     namespace SceneManagement
     {
         // Run-time data structure for *.unity file.
-        class Scene2
+        struct Scene2
         {
         public:
             // Returns the index of the scene in the Build Settings.
@@ -38,7 +38,16 @@ namespace FishEngine
             // In this case, the scene returned from EditorSceneManager.OpenScene would return False for IsValid.
             bool IsValid() const;
 
-        public:
+        private:
+        	enum class LoadingState
+        	{
+        		NotLoaded,
+        		Loading,
+        		Loaded
+        	}
+
+        	int m_handle;
+
             //int m_buildIndex;
         };
     }

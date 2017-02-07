@@ -20,6 +20,10 @@ UnityEditor::DragAndDrop
 
 **SceneManager**
 
+GameObjectInspector
+
+
+
 
 
 ## Engine

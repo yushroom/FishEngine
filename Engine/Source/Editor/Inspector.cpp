@@ -34,6 +34,13 @@
 #include <generate/Enum_LightType.hpp>
 #include <generate/Enum_ShadowCastingMode.hpp>
 
+#include <TextureImporter.hpp>
+#include <generate/Enum_TextureImporterType.hpp>
+#include <generate/Enum_TextureImporterShape.hpp>
+#include <generate/Enum_TextureImporterType.hpp>
+#include <generate/Enum_TextureWrapMode.hpp>
+#include <generate/Enum_FilterMode.hpp>
+
 using namespace FishEngine;
 using namespace FishEditor;
 
@@ -109,7 +116,7 @@ void Inspector::OnInspectorGUI(const FishEngine::LightPtr& light)
     EditorGUI::FloatField("Range",         &light->m_range);
     EditorGUI::Slider("Bias",              &light->m_shadowBias, 0, 2);
     EditorGUI::Slider("Normal Bias",       &light->m_shadowNormalBias, 0, 3);
-    EditorGUI::Slider("Shadow Near Plane", &light->m_shadowNearPlane, 0.1, 10);
+    EditorGUI::Slider("Shadow Near Plane", &light->m_shadowNearPlane, 0.1f, 10.f);
 }
 
 
@@ -204,14 +211,23 @@ void Inspector::OnInspectorGUI(const FishEngine::SphereColliderPtr& collider)
     EditorGUI::FloatField("Radius", &collider->m_radius);
 }
 
+template<>
+void Inspector::OnInspectorGUI(std::shared_ptr<FishEngine::TextureImporter> const & importer)
+{
+	EditorGUI::EnumPopup("Texture Type", &importer->m_textureType);
+	EditorGUI::EnumPopup("Texture Shape", &importer->m_textureShape);
+	EditorGUI::Toggle("Read/Write Enabled", &importer->m_isReadable);
+	EditorGUI::Toggle("Generate Mip Maps", &importer->m_mipmapEnabled);
+	EditorGUI::EnumPopup("Filter Mode", &importer->m_filterMode);
+	EditorGUI::EnumPopup("Wrap Mode", &importer->m_wrapMode);
+}
 
 
 void Inspector::Bind(const GameObjectPtr & go)
 {
     if (go == nullptr)
     {
-        if ( !s_inspectorWidget->isHidden() )
-            s_inspectorWidget->setHidden(true);
+		HideAll();
         return;
     }
     else
@@ -240,12 +256,11 @@ void Inspector::Bind(const GameObjectPtr & go)
         for (auto const & material : renderer->m_materials)
         {
             assert(material != nullptr);
-            //UIHeaderState state;
-            //if ( EditorGUI::ComponentGroup( material->name(), state ) )
-            if ( EditorGUI::MaterialHeader( material->name() ))
+            if ( EditorGUI::BeginMaterial( material->name() ))
             {
                 Inspector::OnInspectorGUI<Material>(material);
             }
+			EditorGUI::EndMaterial();
         }
     }
 
@@ -255,7 +270,6 @@ void Inspector::Bind(const GameObjectPtr & go)
 //        componentToBeDestroyed = nullptr;
 //    }
 
-    EditorGUI::StartNewTopItem();
     if (EditorGUI::Button("Add Component"))
     {
         Debug::LogError("clicked");
@@ -267,6 +281,45 @@ void Inspector::Bind(const GameObjectPtr & go)
     }
 
     EditorGUI::End();
+}
+
+void FishEditor::Inspector::Bind(FishEngine::ObjectPtr const & object)
+{
+	if (object->ClassID() == ClassID<GameObject>())
+	{
+		Bind(std::dynamic_pointer_cast<GameObject>(object));
+	}
+	else if (object->ClassID() == ClassID<TextureImporter>())
+	{
+		Bind(std::dynamic_pointer_cast<TextureImporter>(object));
+	}
+}
+
+void FishEditor::Inspector::HideAll()
+{
+	if (!s_inspectorWidget->isHidden())
+		s_inspectorWidget->setHidden(true);
+}
+
+void FishEditor::Inspector::Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer)
+{
+	if (importer == nullptr)
+	{
+		HideAll();
+		return;
+	}
+	else
+	{
+		if (s_inspectorWidget->isHidden())
+			s_inspectorWidget->setHidden(false);
+	}
+
+	EditorGUI::s_treeWidget = s_inspectorWidget->m_treeWidget;
+	s_inspectorWidget->Bind(importer);
+
+	EditorGUI::Begin();
+	OnInspectorGUI<TextureImporter>(importer);
+	EditorGUI::End();
 }
 
 std::string Inspector::ShowAddComponentMenu()
@@ -287,12 +340,13 @@ std::string Inspector::ShowAddComponentMenu()
 void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
     Debug::LogError("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
-    UIHeaderState state;
-    if ( EditorGUI::ComponentGroup( component->ClassName(), state ) )
+    //UIHeaderState state;
+    if ( EditorGUI::BeginComponent( component->ClassName() ) )
     {
         //OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
         //HideRedundantChildItems();
     }
+	EditorGUI::EndComponent();
 
 //        if (state == UIHeaderState::remove)
 //        {
@@ -308,16 +362,18 @@ void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
     auto p = std::static_pointer_cast<T>(component);
     bool enabled = p->enabled();
     //bool changed = false;
-    UIHeaderState state;
-    bool expanded = EditorGUI::ComponentGroup( T::StaticClassName(), enabled, state );
+    //UIHeaderState state;
+    //bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, state );
+	bool expanded = EditorGUI::BeginComponent(T::StaticClassName());
     if ( expanded )
     {
         OnInspectorGUI<T>(p);
     }
-    if (state == UIHeaderState::enabledChanged)
-    {
-        p->setEnabled(enabled);
-    }
+	EditorGUI::EndComponent();
+    //if (state == UIHeaderState::enabledChanged)
+    //{
+    //    p->setEnabled(enabled);
+    //}
 //        else if (state == UIHeaderState::remove)
 //        {
 //            //Object::Destroy(component);
@@ -330,11 +386,12 @@ template<class T, std::enable_if_t<!can_be_enabled<T>::value, int>>
 void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
     static_assert(std::is_base_of<Component, T>(), "T must be derived from Component");
-    UIHeaderState state;
-    if ( EditorGUI::ComponentGroup( T::StaticClassName(), state ) )
+    //UIHeaderState state;
+    if ( EditorGUI::BeginComponent( T::StaticClassName() ) )
     {
         OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
     }
+	EditorGUI::EndComponent();
 
 //        if ( state == UIHeaderState::remove)
 //        {

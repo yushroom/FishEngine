@@ -31,6 +31,8 @@ namespace FishEditor
         static void Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer);
         static void Bind(std::shared_ptr<FishEngine::ModelImporter> const & importer);
 
+		static void HideAll();
+
         template<class T>
         static void OnInspectorGUI(std::shared_ptr<T> const & component);
 

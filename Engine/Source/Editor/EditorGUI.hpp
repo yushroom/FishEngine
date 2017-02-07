@@ -1,7 +1,7 @@
 #pragma once
 
 #include <type_traits>
-
+#include <stack>
 
 #include "FishEditor.hpp"
 #include "UIHeaderState.hpp"
@@ -24,20 +24,14 @@ namespace FishEditor
 
         static void End();
 
-        //static void BindGameObject(FishEngine::GameObjectPtr const & go);
-
         // return component name
         static std::string ShowAddComponentMenu();
 
-#if 1
-        // show left checkBox
-        // return value: isExpanded
-        static bool ComponentGroup(std::string const & name, bool & enabled, UIHeaderState & state);
+		static bool BeginComponent(std::string const & componentTypeName);
+		static void EndComponent();
 
-        // hide left checkBox
-        // return value: isExpanded
-        static bool ComponentGroup(std::string const & name, UIHeaderState &state);
-#endif
+		static bool BeginMaterial(std::string const & materialName);
+		static void EndMaterial();
 
         static bool Button(std::string const & text);
 
@@ -64,21 +58,24 @@ namespace FishEditor
         static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
 
     private:
-
-        static bool MaterialHeader(const std::string &text);
-
         friend class Inspector;
-        static QTreeWidget*     s_treeWidget;
-        static int              s_indentLevel;
-        static int              s_topLevelItemIndex;
-        static int              s_localItemIndex;
-        static bool             s_currentHeaderItemIsExpanded;
-        static QTreeWidgetItem* s_currentHeaderItem;
+        static QTreeWidget*					s_treeWidget;
+
+		static std::stack<QTreeWidgetItem*> s_itemStack;
+		static std::stack<int>				s_itemIndexStack;
+		static QTreeWidgetItem *			s_currentItem;
+		static QTreeWidgetItem *			s_currentGroupHeaderItem;
+		static int							s_currentGroupHeaderItemChildIndex;
+		static bool							s_expectNewGroup;
+
+		static void PushGroup();
+		static void PopGroup();
 
         template<class T, class... Args>
         static T* CheckNextWidget(Args&&... args );
 
-        static void StartNewTopItem();
+		static void HideRedundantChildItemsOfLastGroup();
+		static void HideAllChildOfLastItem();
     };
 
     template<typename T>

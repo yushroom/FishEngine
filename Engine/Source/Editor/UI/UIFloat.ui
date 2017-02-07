@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>200</width>
-    <height>21</height>
+    <height>24</height>
    </rect>
   </property>
   <property name="font">
@@ -39,24 +39,13 @@
        <height>0</height>
       </size>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
      <property name="text">
       <string>TextLabel</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="FloatLineEdit" name="value">
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-    </widget>
+    <widget class="FloatLineEdit" name="value"/>
    </item>
   </layout>
  </widget>

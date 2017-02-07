@@ -59,13 +59,13 @@ namespace FishEngine
 		t = node.as<T>();
 	}
 
-	void convert(YAML::Node const & node, std::string & t)
+	inline void convert(YAML::Node const & node, std::string & t)
 	{
 		t = node.as<std::string>();
 		std::cout << "as string: " << t << std::endl;
 	}
 
-	void convert(YAML::Node const & node, boost::uuids::uuid & t)
+	inline void convert(YAML::Node const & node, boost::uuids::uuid & t)
 	{
 		assert(node.IsMap());
 		t = boost::lexical_cast<boost::uuids::uuid>(node["fileID"].as<std::string>());
@@ -89,7 +89,7 @@ namespace FishEngine
 		return archive;
 	}
 
-	YAMLInputArchive& operator >> (YAMLInputArchive& archive, std::shared_ptr<TextureImporter> importer)
+	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, std::shared_ptr<TextureImporter> importer)
 	{
 		Load(archive, *importer);
 		return archive;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>226</width>
-    <height>21</height>
+    <height>20</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
    <property name="spacing">
-    <number>-1</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -42,11 +42,6 @@
        <width>72</width>
        <height>0</height>
       </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
      </property>
      <property name="text">
       <string>TextLabel</string>
@@ -94,24 +89,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>x</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="FloatLineEdit" name="x">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-       </widget>
+       <widget class="FloatLineEdit" name="x"/>
       </item>
       <item>
        <widget class="QLabel" name="label_y">
@@ -121,24 +105,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>y</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="FloatLineEdit" name="y">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-       </widget>
+       <widget class="FloatLineEdit" name="y"/>
       </item>
       <item>
        <widget class="QLabel" name="label_z">
@@ -148,24 +121,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>z</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="FloatLineEdit" name="z">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-       </widget>
+       <widget class="FloatLineEdit" name="z"/>
       </item>
      </layout>
     </widget>

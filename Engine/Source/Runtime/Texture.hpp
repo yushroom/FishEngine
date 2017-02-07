@@ -2,31 +2,12 @@
 #define Texture_hpp
 
 #include "Object.hpp"
+#include "TextureSampler.hpp"
 #include "TextureProperty.hpp"
 #include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class Meta(NonSerializable) TextureSampler
-    {
-    public:
-        TextureSampler() = default;
-        TextureSampler(const TextureSampler&) = delete;
-        TextureSampler& operator=(const TextureSampler&) = delete;
-        ~TextureSampler();
-
-        static void Init();
-
-        static const TextureSampler& GetSampler(FilterMode filterMode, TextureWrapMode wrapMode);
-
-    private:
-        friend class Texture;
-        unsigned int m_nativeGLSampler = 0;
-
-        static TextureSampler s_samplers[6];
-    };
-
-
     class FE_EXPORT Texture : public Object
     {
     public:

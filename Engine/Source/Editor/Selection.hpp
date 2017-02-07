@@ -25,7 +25,15 @@ namespace FishEditor
 
 
         // Returns the actual object selection. Includes prefabs, non-modifyable objects.
-        static ObjectPtr        activeObject();
+		static ObjectPtr activeObject()
+		{
+			return s_activeObject.lock();
+		}
+
+		static void setActiveObject(ObjectPtr const & obj)
+		{
+			s_activeObject = obj;
+		}
 
         // Returns the instanceID of the actual object selection. Includes prefabs, non-modifyable objects.
         static int              activeInstanceID();
@@ -36,7 +44,7 @@ namespace FishEditor
         // Returns the active transform. (The one shown in the inspector).
         static TransformPtr     activeTransform()
         {
-            return m_activeTransform.lock();
+            return s_activeTransform.lock();
         }
 
 
@@ -49,23 +57,15 @@ namespace FishEditor
         // Returns the actual game object selection. Includes prefabs, non-modifyable objects.
         static std::list<GameObjectPtr> gameObjects();
 
-        static std::list<std::weak_ptr<Transform>> const &
-        transforms()
+        static std::list<std::weak_ptr<Transform>> const & transforms()
         {
-            return m_transforms;
+            return s_transforms;
         }
 
         // todo, move
         static void setTransforms(std::list<std::weak_ptr<Transform>> const & transforms);
-
-
-        static GameObjectPtr    selectedGameObjectInHierarchy();
-        //static ObjectPtr        activeAsset();
-
         static void setActiveGameObject(GameObjectPtr gameObject);
         static void setActiveTransform(TransformPtr transform);
-        //static void setSelectedGameObjectInHierarchy(GameObjectPtr gameObject);
-        //static void setActiveAsset(std::weak_ptr<Object> assetObject);
 
         static bool Contains(int instanceID);
         static bool Contains(TransformPtr transform);
@@ -79,25 +79,16 @@ namespace FishEditor
 
         static bool m_isActiveGameObjectLocked;
 
-        //static std::weak_ptr<Transform>     m_activeTransform;
-
-        static std::weak_ptr<Object>        m_objectInInspector;
-
-        //friend class EditorGUI;
+		static std::weak_ptr<Object>		s_activeObject;
 
         // Returns the active transform. (The one shown in the inspector).
-        static std::weak_ptr<Transform>     m_activeTransform;
+        static std::weak_ptr<Transform>     s_activeTransform;
 
         // Returns the active game object. (The one shown in the inspector).
-        static std::weak_ptr<GameObject>    m_activeGameObject;
-
-        //static std::weak_ptr<FishEngine::Object>        m_activeObject;
-
-        static std::weak_ptr<GameObject>    m_selectedGameObjectInHierarchy;
-        static std::weak_ptr<Object>        m_activeAsset;
+        static std::weak_ptr<GameObject>    s_activeGameObject;
 
         // This is the most common selection type when working with scene objects.
-        static std::list<std::weak_ptr<Transform>> m_transforms;
+        static std::list<std::weak_ptr<Transform>> s_transforms;
 
     };
 }

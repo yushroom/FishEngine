@@ -12,19 +12,19 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>2</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="up">
@@ -61,11 +61,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
       </widget>
      </item>
      <item>
@@ -84,45 +79,23 @@
      </property>
      <item>
       <widget class="QLabel" name="tagLabel">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Tag</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="tag">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="tag"/>
      </item>
      <item>
       <widget class="QLabel" name="layerLabel">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Layer</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="layer">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="layer"/>
      </item>
     </layout>
    </item>

@@ -26,6 +26,7 @@ public:
 private:
     void OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void OnListTreeViewDoubleClicked(const QModelIndex &index);
+	//void OnListTreeViewClicked(const QModelIndex &index);
     void OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void OnIconSizeChanged(int size);
 

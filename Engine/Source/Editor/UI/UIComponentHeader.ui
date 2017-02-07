@@ -37,7 +37,7 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -68,24 +68,18 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>12</width>
-       <height>12</height>
-      </size>
-     </property>
      <property name="maximumSize">
       <size>
-       <width>12</width>
-       <height>12</height>
+       <width>22</width>
+       <height>22</height>
       </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{border-image: url(:/Resources/cancel.png);}
-QPushButton:pressed{border-image: url(:/Resources/cancelActive.png);}</string>
      </property>
      <property name="text">
       <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources.qrc">
+       <normaloff>:/Resources/settings.png</normaloff>:/Resources/settings.png</iconset>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -94,6 +88,8 @@ QPushButton:pressed{border-image: url(:/Resources/cancelActive.png);}</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

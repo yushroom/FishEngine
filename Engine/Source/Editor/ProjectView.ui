@@ -114,11 +114,6 @@
        </item>
        <item>
         <widget class="QListView" name="listView">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::EditKeyPressed</set>
          </property>

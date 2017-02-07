@@ -128,7 +128,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
-    auto delta = 1.0f * event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep;
+    auto delta = 5.0f * event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep;
     //Debug::LogWarning("mouse scroll: %lf", delta);
     Input::UpdateAxis(Axis::MouseScrollWheel, delta);
 }

@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 //#include <QPalette>
 #include <QDir>
+#include <QFileDialog>
 
 #include <FishEngine.hpp>
 #include <Debug.hpp>
@@ -19,6 +20,10 @@
 #include "MainEditor.hpp"
 #include "SceneViewEditor.hpp"
 #include "FileInfo.hpp"
+
+#include <fstream>
+#include <Serialization.hpp>
+#include <Serialization/archives/yaml.hpp>
 
 using namespace FishEngine;
 
@@ -33,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	//this->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
 
     FishEditor::Inspector::s_inspectorWidget = ui->inspectorWidget;
+
+    connect(ui->actionSaveSceneAs, &QAction::triggered, this, &MainWindow::SaveSaveAs);
 
     connect(ui->actionPlay, &QAction::triggered, [this](){
         if (Applicaiton::isPlaying())
@@ -111,4 +118,20 @@ void MainWindow::Init()
     //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
     Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
     FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
+}
+
+void MainWindow::SaveSaveAs()
+{
+    //QFileDialog::Options options = QFlag(fileDialogOptionsWidget->value());
+    //options |= QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
+    QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath());
+    path = QFileDialog::getSaveFileName(this, "Save Scene", path);
+    if (path.isEmpty())
+        return;
+    std::ofstream fout(path.toStdString());
+    FishEngine::YAMLOutputArchive archive(fout);
+    for (auto const & go : Scene::GameObjects())
+    {
+        archive << go;
+    }
 }

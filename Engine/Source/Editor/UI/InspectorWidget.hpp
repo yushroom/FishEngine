@@ -7,6 +7,7 @@
 class QTreeWidget;
 class UIGameObjectHeader;
 class UIMaterialHeader;
+class UIAssetHeader;
 
 namespace FishEditor
 {
@@ -16,6 +17,7 @@ namespace FishEditor
 namespace FishEngine
 {
     class GameObject;
+    class Object;
 }
 
 
@@ -25,6 +27,7 @@ class InspectorWidget : public QWidget
 public:
     explicit InspectorWidget(QWidget *parent = 0);
 
+    void Bind(std::shared_ptr<FishEngine::Object> obj);
     void Bind(std::shared_ptr<FishEngine::GameObject> go);
 
     virtual QSize sizeHint() const override
@@ -39,6 +42,7 @@ private:
     QTreeWidget         * m_treeWidget;
     UIGameObjectHeader  * m_gameObjectHeader;
     UIMaterialHeader    * m_materialHeader;
+    UIAssetHeader       * m_assetHeader;
 };
 
 #endif // INSPECTORWIDGET_HPP

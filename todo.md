@@ -12,9 +12,13 @@ UnityEditor::DragAndDrop
 
 模拟imgui的时候expand属性有问题
 
-**去掉QSlider的wheel响应**
+**去掉QSlider/QCombox(windows)的wheel响应**
 
 **Asset**
+
+**EditorSceneManager**
+
+**SceneManager**
 
 
 

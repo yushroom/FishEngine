@@ -135,18 +135,18 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_Scene"/>
-    <addaction name="actionSave_Scene"/>
+    <addaction name="actionNewScene"/>
+    <addaction name="actionOpenScene"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_Scene_2"/>
-    <addaction name="actionSave_Scene_As"/>
+    <addaction name="actionSaveScene"/>
+    <addaction name="actionSaveSceneAs"/>
     <addaction name="separator"/>
-    <addaction name="actionNew_Project"/>
-    <addaction name="actionOpen_Project"/>
-    <addaction name="actionSave_Project"/>
+    <addaction name="actionNewProject"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="actionSaveProject"/>
     <addaction name="separator"/>
-    <addaction name="actionBuild_Settings"/>
-    <addaction name="actionBuild_Run"/>
+    <addaction name="actionBuildSettings"/>
+    <addaction name="actionBuildRun"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -162,8 +162,8 @@
     <property name="title">
      <string>GameObject</string>
     </property>
-    <addaction name="actionCreat_Empty"/>
-    <addaction name="actionCreate_Empty_Child"/>
+    <addaction name="actionCreatEmpty"/>
+    <addaction name="actionCreateEmptyChild"/>
    </widget>
    <widget class="QMenu" name="menuComponent">
     <property name="title">
@@ -343,57 +343,57 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionNew_Scene">
+  <action name="actionNewScene">
    <property name="text">
     <string>New Scene</string>
    </property>
   </action>
-  <action name="actionSave_Scene">
+  <action name="actionOpenScene">
    <property name="text">
     <string>Open Scene</string>
    </property>
   </action>
-  <action name="actionSave_Scene_2">
+  <action name="actionSaveScene">
    <property name="text">
     <string>Save Scene</string>
    </property>
   </action>
-  <action name="actionSave_Scene_As">
+  <action name="actionSaveSceneAs">
    <property name="text">
     <string>Save Scene As...</string>
    </property>
   </action>
-  <action name="actionNew_Project">
+  <action name="actionNewProject">
    <property name="text">
     <string>New Project</string>
    </property>
   </action>
-  <action name="actionOpen_Project">
+  <action name="actionOpenProject">
    <property name="text">
     <string>Open Project</string>
    </property>
   </action>
-  <action name="actionSave_Project">
+  <action name="actionSaveProject">
    <property name="text">
     <string>Save Project</string>
    </property>
   </action>
-  <action name="actionBuild_Settings">
+  <action name="actionBuildSettings">
    <property name="text">
     <string>Build Settings</string>
    </property>
   </action>
-  <action name="actionBuild_Run">
+  <action name="actionBuildRun">
    <property name="text">
     <string>Build &amp; Run</string>
    </property>
   </action>
-  <action name="actionCreat_Empty">
+  <action name="actionCreatEmpty">
    <property name="text">
     <string>Create Empty</string>
    </property>
   </action>
-  <action name="actionCreate_Empty_Child">
+  <action name="actionCreateEmptyChild">
    <property name="text">
     <string>Create Empty Child</string>
    </property>

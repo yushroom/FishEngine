@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <boost/filesystem.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,8 @@ public:
 private:
     //bool eventFilter(QObject *watched, QEvent *event);
     void Init();
+
+    void SaveSaveAs();
 
     Ui::MainWindow *ui;
 };

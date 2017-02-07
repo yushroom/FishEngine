@@ -30,6 +30,10 @@
 
 #include <iostream>
 
+//#include <Serialization/archives/binary.hpp>
+#include <Serialization.hpp>
+#include <Serialization/archives/yaml.hpp>
+
 using namespace FishEngine;
 using namespace std;
 
@@ -152,6 +156,13 @@ void DefaultScene()
 
     void MainEditor::Play()
     {
+//		ofstream fout("temp.yaml");
+//		YAMLOutputArchive archive(fout);
+//		for (auto const & go : Scene::GameObjects())
+//		{
+//			archive << go;
+//		}
+		
         Applicaiton::s_isPlaying = true;
         PhysicsSystem::Init();
         //m_inPlayMode = true;

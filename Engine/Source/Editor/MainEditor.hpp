@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <FishEditor.hpp>
+//#include <boost/filesystem.hpp>
 
 namespace FishEditor
 {

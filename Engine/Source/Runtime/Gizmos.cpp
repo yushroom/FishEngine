@@ -143,6 +143,7 @@ DrawIcon(
     const std::string&    name,
     bool                  allowScaling)
 {
+#if 1
     auto shader = Shader::builtinShader("Alpha-Internal");
     static ModelPtr quad = Model::builtinModel(PrimitiveType::Quad);
     shader->Use();
@@ -165,6 +166,7 @@ DrawIcon(
     shader->PreRender();
     quad->mainMesh()->Render();
     shader->PostRender();
+#endif
 }
 
 

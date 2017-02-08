@@ -16,6 +16,8 @@ ProjectViewFileModel::ProjectViewFileModel(QObject *parent)
 
 int ProjectViewFileModel::rowCount(const QModelIndex &) const
 {
+	if (m_rootNode == nullptr)
+		return 0;
 	return m_rootNode->childCount();
 }
 

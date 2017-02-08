@@ -11,11 +11,13 @@
 #include "CapsuleCollider.hpp"
 #include "SphereCollider.hpp"
 #include "Rigidbody.hpp"
+#include "Light.hpp"
+#include "CameraController.hpp"
 
 FishEngine::ComponentPtr FishEngine::
 AddComponentToGameObject(
-    const std::string&  componentClassName, 
-    GameObjectPtr&        gameObject)
+    std::string const &		componentClassName, 
+    GameObjectPtr const &	gameObject)
 {
 #define CASE(T) if (componentClassName == #T) { return gameObject->AddComponent<T>(); }
     CASE(Camera)
@@ -28,7 +30,9 @@ AddComponentToGameObject(
     CASE(CapsuleCollider)
     //CASE(MeshCollider)
     CASE(SphereCollider)
+	CASE(Light)
+	CASE(CameraController)
 #undef CASE
     Debug::LogError("UNKNOWN component type name: %s", componentClassName.c_str());
-    abort();
+    //abort();
 }

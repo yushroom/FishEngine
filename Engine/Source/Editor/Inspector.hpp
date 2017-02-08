@@ -60,8 +60,6 @@ namespace FishEditor
 
         template<class T, std::enable_if_t<!std::is_base_of<FishEngine::Component, T>::value, int> = 0>
         static void BeginComponentImpl(FishEngine::ComponentPtr const & component) = delete;
-
-//        static void HideRedundantChildItems();
     };
 
 }

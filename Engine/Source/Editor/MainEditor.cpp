@@ -17,22 +17,21 @@
 #include <MeshRenderer.hpp>
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
-
 #include <Application.hpp>
+//#include <Serialization/archives/binary.hpp>
+#include <Serialization.hpp>
+#include <Serialization/archives/yaml.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
 #include "EditorGUI.hpp"
 #include "SceneViewEditor.hpp"
-#include "Inspector.hpp"
+//#include "Inspector.hpp"
+#include "AssetDataBase.hpp"
 
 #include <boost/filesystem.hpp>
 
 #include <iostream>
-
-//#include <Serialization/archives/binary.hpp>
-#include <Serialization.hpp>
-#include <Serialization/archives/yaml.hpp>
 
 using namespace FishEngine;
 using namespace std;
@@ -131,7 +130,7 @@ void DefaultScene()
 	//}
 	//);
 
-	TextureImporter tex_importer;
+	//TextureImporter tex_importer;
 	Path textures_root = sponza_assets_root / "textures";
 	auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
 
@@ -139,14 +138,16 @@ void DefaultScene()
 	//auto sponza_model = handle.get();
 	auto sponza_go = sponza_model->CreateGameObject();
 
-	auto ApplyMateril1 = [&sponza_go, &tex_importer, &shader1, &textures_root]
+	auto ApplyMateril1 = [&sponza_go, &shader1, &textures_root]
 	(const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
 	{
 		auto mesh0 = FindNamedChild(sponza_go, go_name);
 		auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
 		mtl->SetShader(shader1);
-		auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
-		auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+		auto diffuse = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (diffuse_tex + ".png"));
+		auto mask = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (mask_tex + ".png"));
+		//auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+		//auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
 		mtl->SetTexture("DiffuseTex", diffuse);
 		mtl->SetTexture("MaskTex", mask);
 	};
@@ -156,13 +157,14 @@ void DefaultScene()
 	ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
 
 	auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.shader");
-	auto ApplyMateril2 = [&sponza_go, &tex_importer, &shader2, &textures_root]
+	auto ApplyMateril2 = [&sponza_go, &shader2, &textures_root]
 	(const char* go_name, const std::string& diffuse_tex)
 	{
 		auto mesh0 = FindNamedChild(sponza_go, go_name);
 		auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
 		mtl->SetShader(shader2);
-		auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+		auto diffuse = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (diffuse_tex + ".png"));
+		//auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
 		mtl->SetTexture("DiffuseTex", diffuse);
 	};
 
@@ -221,20 +223,6 @@ void DefaultScene()
 
     void MainEditor::Run()
     {
-        auto go = Selection::activeGameObject();
-		if (go != nullptr)
-		{
-			Inspector::Bind(go);
-		}
-		else
-		{
-			auto object = Selection::activeObject();
-			if (object != nullptr)
-				Inspector::Bind(object);
-			else
-				Inspector::HideAll();
-		}
-
 		GLint framebuffer; // qt's framebuffer
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &framebuffer);
 		

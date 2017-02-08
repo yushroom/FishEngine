@@ -18,6 +18,8 @@ namespace FishEngine
 
 		TextureImporter() = default;
 
+		TexturePtr Import(Path const & path);
+
 		TexturePtr FromFile(const Path& path);
 
 		TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);

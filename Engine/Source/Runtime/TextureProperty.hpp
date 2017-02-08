@@ -36,16 +36,19 @@ namespace FishEngine
 
     enum class TextureFormat
     {
-        RGB32,
+		//Alpha8,
+		//ARGB4444,
+        RGB24,	// Color texture format, 8-bits per channel.
         RGBA32, // Color with alpha texture format, 8-bits per channel.
         ARGB32, // Color with an alpha channel texture format.
         R16,    // A 16 bit color texture format that only has a red channel.
         DXT1,   // Compressed color texture format.
         DXT5,   // Compressed color with alpha channel texture format.
-        R8,
+        //RGBA4444,
+		R8,
         R32,    // **New**, float * 1
-        RG8,    // **New**, uint8_t * 2
-        RG16,   // **New**, uint16_t * 2
+        RG16,    // **New**, uint8_t * 2
+        RG32,   // **New**, uint16_t * 2
         RGHalf,	// Two color (RG) texture format, 16 bit floating point per channel.
         RGFloat	// Two color (RG) texture format, 32 bit floating point per channel.
     };

@@ -30,7 +30,7 @@ void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
 {
     if (m_changed)
     {
-        Debug::LogError("[UpdateInspector] changed from UI");
+        Debug::Log("[UpdateInspector] changed from UI");
         go->setName(m_name);
         go->setLayer(m_layerIndex);
         //go->setTag();
@@ -61,7 +61,7 @@ void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
     // update Layer items
     if (m_layerDirtyFlag != FishEngine::LayerMask::s_editorFlag)
     {
-        Debug::LogError("[UpdateInspector] Update Layers");
+        Debug::Log("[UpdateInspector] Update Layers");
         QStringList layers;
         auto const & layerNames = FishEngine::LayerMask::allLayerNames();
         for (auto const & n : layerNames)
@@ -88,7 +88,7 @@ void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
     // update Tag items
     if (m_tagDirtyFlag != FishEngine::TagManager::s_editorFlag)
     {
-        Debug::LogError("[UpdateInspector] Update Tags");
+        Debug::Log("[UpdateInspector] Update Tags");
         QStringList tags;
         //auto const & all_tags = FishEngine::TagManager::s_tags;
         for (auto const & n : FishEngine::TagManager::s_tags)

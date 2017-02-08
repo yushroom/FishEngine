@@ -30,6 +30,8 @@ namespace FishEngine
 		
 	protected:
 
+		friend class FishEditor::AssetDatabase;
+
 		// dirty flag for SaveAndReimport()
 		Meta(NonSerializable)
 		bool			m_isDirty = false;
@@ -50,6 +52,8 @@ namespace FishEngine
 		Meta(NonSerializable)
 		std::string		m_userData;
 
+		static std::map<boost::uuids::uuid, TexturePtr> s_importerGuidToTexture;
+		static std::map<boost::uuids::uuid, GameObjectPtr> s_importerGuidToModel;
 		static std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> s_pathToImpoter;
 	};
 }

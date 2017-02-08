@@ -12,6 +12,7 @@ UIColor::UIColor(std::string const & label, QColor const & value, QWidget *paren
     m_value(value)
 {
     ui->setupUi(this);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     ui->label->setText(label.c_str());
 

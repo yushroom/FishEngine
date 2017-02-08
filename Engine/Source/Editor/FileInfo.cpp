@@ -1,46 +1,18 @@
 #include "FileInfo.hpp"
+#include "Resources.hpp"
+#include "AssetImporter.hpp"
+#include "TextureImporter.hpp"
+#include "AssetDataBase.hpp"
+
+#include <QImage>
+#include <QIcon>
+
+using namespace FishEngine;
 
 namespace FishEditor
 {
     std::map<std::string, FileInfo*> FileInfo::s_nameToNode;
     FileInfo * FileInfo::s_assetRoot = nullptr;
-
-    enum class AssetType
-    {
-        Unknown,
-        Texture,
-        Model,
-        Shader,
-        Material,
-        Script,
-    };
-
-    AssetType GetAssetType(Path const & ext)
-    {
-        //auto ext = path.extension();
-        if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga")
-        {
-            return AssetType::Texture;
-        }
-        else if (ext == ".obj" || ext == ".fbx")
-        {
-            return AssetType::Model;
-        }
-        else if (ext == ".shader")
-        {
-            return AssetType::Shader;
-        }
-        else if (ext == ".mat")
-        {
-            return AssetType::Material;
-        }
-        else if (ext == ".hpp" || ext == ".cpp")
-        {
-            return AssetType::Script;
-        }
-        return AssetType::Unknown;
-    }
-
 
     void FileInfo::SetAssetRootPath(const std::string &path)
     {
@@ -74,7 +46,7 @@ namespace FishEditor
         }
         else
         {
-            auto type = GetAssetType(node->m_path.extension());
+            auto type = Resources::GetAssetType(node->m_path.extension());
             if (type == AssetType::Texture)
             {
                 node->m_hasThumbnail = true;
@@ -114,6 +86,15 @@ namespace FishEditor
             {
                 m_fileChildren.emplace_back(fileNode);
                 fileNode->m_isDirectory = false;
+				auto ext = p.extension();
+				if (Resources::GetAssetType(ext) == AssetType::Texture)
+				{
+					auto texture = AssetDatabase::LoadAssetAtPath<Texture>(p);
+					//auto importer = AssetImporter::GetAtPath(p);
+					//auto texture = AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
+					//auto data = texture->rawdata().data();
+					//AssetDatabase::m_cacheIcons[p] = QIcon(QPixmap::fromImage(QImage(data, texture->width(), texture->height(), QImage::Format_RGB888)));
+				}
             }
         }
     }

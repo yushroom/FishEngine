@@ -3,7 +3,10 @@
 #include <Resources.hpp>
 #include <QIcon>
 
-using Path = FishEngine::Path;
+namespace FishEngine
+{
+	class Texture;
+};
 
 namespace FishEditor
 {
@@ -33,13 +36,13 @@ namespace FishEditor
     public:
         AssetDatabase() = delete;
 		
-		static Path AssetPathToGUID(Path const & path);
-		static Path GUIDToAssetPath(Path const & guid);
+		static FishEngine::Path AssetPathToGUID(FishEngine::Path const & path);
+		static FishEngine::Path GUIDToAssetPath(FishEngine::Path const & guid);
 		
-		static bool CopyAsset(Path const & path, Path const & newPath);
-		static void CreateAsset(FishEngine::ObjectPtr asset, Path const & path);
-		static Path CreateFolder(Path const & parentFolder, Path const & newFolderName);
-		static bool DeleteAsset(Path const & path);
+		static bool CopyAsset(FishEngine::Path const & path, FishEngine::Path const & newPath);
+		static void CreateAsset(FishEngine::ObjectPtr asset, FishEngine::Path const & path);
+		static FishEngine::Path CreateFolder(FishEngine::Path const & parentFolder, FishEngine::Path const & newFolderName);
+		static bool DeleteAsset(FishEngine::Path const & path);
 		
 		//Returns the path name relative to the project folder where the asset is stored.
 		//All paths are relative to the project folder, for example: "Assets/MyTextures/hello.png".
@@ -47,10 +50,19 @@ namespace FishEditor
 		static std::string GetAssetPath(FishEngine::ObjectPtr assetObject);
 		
         //static TexturePtr GetCacheIcon(std::string const & path);
-		static QIcon const & GetCacheIcon(Path path);
+		static QIcon const & GetCacheIcon(FishEngine::Path path);
 		
-		static void ImportAsset(Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
+		static void ImportAsset(FishEngine::Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
 
-        static std::map<Path, QIcon> m_cacheIcons;
+		template <class T>
+		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path);
+
+        static std::map<FishEngine::Path, QIcon> m_cacheIcons;
     };
+
+	template <>
+	static std::shared_ptr<FishEngine::Texture> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
+
+	//template <>
+	//static std::shared_ptr<Texture> AssetDatabase::LoadAssetAtPath(Path const & path);
 }

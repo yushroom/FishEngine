@@ -36,7 +36,7 @@ void GLWidget::initializeGL()
 	auto err = glewInit();
 	if (err != GLEW_OK)
 	{
-	    Debug::LogError("%s", glewGetErrorString(err));
+	    Debug::Log("%s", glewGetErrorString(err));
 	}
 	else
 	{

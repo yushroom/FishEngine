@@ -12,6 +12,7 @@ UISlider::UISlider(const std::string &label, float value, float leftValue, float
     m_rightValue(rightValue)
 {
     ui->setupUi(this);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     ui->label->setText(m_label.c_str());
     ui->slider->setMinimum(0);

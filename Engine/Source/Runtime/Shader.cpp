@@ -576,6 +576,7 @@ namespace FishEngine
                     type = GL_TEXTURE_2D_ARRAY;
                 //BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
                 glActiveTexture(GLenum(GL_TEXTURE0 + u.textureBindPoint));
+				glCheckError();
                 glBindTexture(type, it->second->GetNativeTexturePtr());
                 u.binded = true;
                 glCheckError();

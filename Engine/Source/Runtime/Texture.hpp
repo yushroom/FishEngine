@@ -33,6 +33,9 @@ namespace FishEngine
         
         unsigned int GetNativeTexturePtr() const
         {
+			if (!m_uploaded)
+				UploadToGPU();
+			if (m_GLNativeTexture == 0) abort();
             return m_GLNativeTexture;
         }
 
@@ -80,6 +83,10 @@ namespace FishEngine
             abort();
         }
 
+		std::vector<std::uint8_t> const & rawdata() { return m_data; };
+
+		//void UploadTextureData() { if (!m_uploaded) UploadToGPU(); }
+
     protected:
         uint32_t            m_height;
         uint32_t            m_width;
@@ -98,15 +105,24 @@ namespace FishEngine
         
         // OpenGL
 		Meta(NonSerializable)
-        unsigned int        m_GLNativeTexture = 0;
+        mutable unsigned int        m_GLNativeTexture = 0;
 
         void BindSampler();
 
         static std::vector<TexturePtr> s_textures;
 
+		virtual void UploadToGPU() const { m_uploaded = true; };
+
+		Meta(NonSerializable)
+		std::vector<std::uint8_t> m_data;
+
+		Meta(NonSerializable)
+		mutable bool m_uploaded = false;
+
     private:
         friend class TextureImporter;
     };
+
 
     class Meta(NonSerializable) ColorBuffer : public Texture
     {
@@ -126,6 +142,7 @@ namespace FishEngine
     //    int m_layers;
     //};
 
+
     class Meta(NonSerializable) DepthBuffer : public Texture
     {
     public:
@@ -133,6 +150,7 @@ namespace FishEngine
         virtual void Resize(const int newWidth, const int newHeight) override;
         bool m_useStencil = true;
     };
+
 
     class LayeredDepthBuffer : public DepthBuffer
     {
@@ -143,35 +161,6 @@ namespace FishEngine
         int m_depth;
     };
     
-    class Texture2D : public Texture
-    {
-    public:
-        
-        InjectClassName(Texture2D)
-
-        // The format of the pixel data in the texture (Read Only).
-        TextureFormat format() const
-        {
-            return m_format;
-        }
-        
-        // How many mipmap levels are in this texture (Read Only).
-        uint32_t mipmapCount() const
-        {
-            return m_mipmapCount;
-        }
-
-    private:
-        
-        // The format of the pixel data in the texture (Read Only).
-        TextureFormat m_format;
-        
-        // How many mipmap levels are in this texture (Read Only).
-        uint32_t m_mipmapCount;
-        
-        static Texture2DPtr m_blackTexture;
-        static Texture2DPtr m_whiteTexture;
-    };
 
     class Cubemap : public Texture
     {

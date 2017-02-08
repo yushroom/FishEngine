@@ -73,15 +73,8 @@ void ProjectView::SetRootPath(const std::string &path)
 
 void ProjectView::SetRootPath(const QString &path)
 {
-    //auto dir = QDir::cleanPath(path);
-    //Debug::LogError("ProjectView::SetRootPath %s", path.toStdString().c_str());
-    //ui->dirTreeView->setRootIndex(dirModel->setRootPath(path));
-//    const auto & rootIndex = dirModel->index(dir);
-//    if (rootIndex.isValid())
-//        ui->dirTreeView->setRootIndex(rootIndex);
-//    fileModel->setRootPath(dir);
-//    ui->listView->setRootIndex(fileModel->setRootPath(dir));
     ui->listView->setRootIndex(fileModel->setRootPath(path));
+	ui->listView->selectionModel()->clearSelection();
     //ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(path));
 }
 
@@ -89,6 +82,7 @@ void ProjectView::OnDirTreeViewSelectionChanged(const QModelIndex &current, cons
 {
     auto path = QString::fromStdString(dirModel->fileInfo(current)->absoluteFilePath().string());
     ui->listView->setRootIndex(fileModel->setRootPath(path));
+	ui->listView->selectionModel()->clearSelection();
 }
 
 
@@ -99,6 +93,7 @@ void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
     {
         auto path = QString::fromStdString(info->absoluteFilePath().string());
         ui->listView->setRootIndex(fileModel->setRootPath(path));
+		ui->listView->selectionModel()->clearSelection();
 		ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(info->path()));
     }
 }

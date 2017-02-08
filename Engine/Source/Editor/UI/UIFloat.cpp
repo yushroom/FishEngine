@@ -11,6 +11,7 @@ UIFloat::UIFloat(const std::string &label, float value, QWidget *parent) :
     m_value(value)
 {
     ui->setupUi(this);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     ui->label->setText(m_label.c_str());
 
@@ -27,7 +28,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 {
     if (m_changed)
     {
-        Debug::LogError("[float] value changed");
+        Debug::Log("[float] value changed");
         value = m_value;
         m_changed = false;
         return true;
@@ -35,7 +36,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 
     if (m_label != label)
     {
-        Debug::LogError("[float] new label: %s", m_label.c_str());
+        Debug::Log("[float] new label: %s", m_label.c_str());
         m_label = label;
         LOG;
         ui->label->setText(m_label.c_str());
@@ -45,7 +46,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
     {
         if (!ui->value->hasFocus())
         {
-            Debug::LogError("[float] new value");
+            Debug::Log("[float] new value");
             LOG;
             m_value = value;
             //ui->value->blockSignals(true);

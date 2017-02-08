@@ -22,8 +22,6 @@ namespace FishEngine
 		Material,
 		Script,
 	};
-	
-	
 
     enum class SystemDirectoryType
     {

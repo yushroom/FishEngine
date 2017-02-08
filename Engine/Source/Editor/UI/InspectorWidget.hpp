@@ -8,6 +8,7 @@ class QTreeWidget;
 class UIGameObjectHeader;
 class UIMaterialHeader;
 class UIAssetHeader;
+class QMenu;
 
 namespace FishEditor
 {
@@ -40,11 +41,16 @@ public:
 signals:
 
 private:
+	void Update();
+	//std::string ShowAddComponentMenu();
+
     friend class FishEditor::Inspector;
     QTreeWidget         * m_treeWidget;
     UIGameObjectHeader  * m_gameObjectHeader;
     UIMaterialHeader    * m_materialHeader;
     UIAssetHeader       * m_assetHeader;
+
+    //QMenu               * m_menu;
 };
 
 #endif // INSPECTORWIDGET_HPP

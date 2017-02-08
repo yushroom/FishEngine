@@ -11,6 +11,7 @@ UIFloat3::UIFloat3(const std::string &label, float x, float y, float z, QWidget 
     m_label(label)
 {
     ui->setupUi(this);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     m_x = x;
     m_y = y;

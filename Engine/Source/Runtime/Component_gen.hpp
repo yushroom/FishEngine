@@ -6,9 +6,7 @@
 namespace FishEngine
 {
     FE_EXPORT ComponentPtr
-    AddComponentToGameObject(
-        const std::string&  componentClassName,
-        GameObjectPtr&      gameObject);
+    AddComponentToGameObject( std::string const & componentClassName, GameObjectPtr const & gameObject);
 }
 
 #endif // Component_gen_hpp

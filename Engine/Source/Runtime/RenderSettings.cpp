@@ -1,6 +1,7 @@
 #include "RenderSettings.hpp"
 #include "Material.hpp"
-#include "TextureImporter.hpp"
+//#include "TextureImporter.hpp"
+#include "Texture2D.hpp"
 
 namespace FishEngine
 {
@@ -19,10 +20,11 @@ namespace FishEngine
     
     TexturePtr MakePreintegratedGF()
     {
-        auto texture_format = TextureFormat::RG16;
-        constexpr uint32_t bytes_per_pixel = 4;    // 2 * 2 for RG16, and 4*2 for RGFloat
+        auto texture_format = TextureFormat::RG32;
+        constexpr uint32_t bytes_per_pixel = 4;    // 2 * 2 for RG32, and 4*2 for RGFloat
         constexpr uint32_t size = 128;
         
+		auto byte_count = size * size * bytes_per_pixel;
         uint8_t DestBuffer[size * size * bytes_per_pixel];
         constexpr uint16_t DestStride = size * bytes_per_pixel;
         
@@ -83,7 +85,7 @@ namespace FishEngine
                 A /= NumSamples;
                 B /= NumSamples;
                 
-                if (texture_format == TextureFormat::RG16)
+                if (texture_format == TextureFormat::RG32)
                 {
                     uint16_t* Dest = (uint16_t*)(DestBuffer + x * bytes_per_pixel + y * DestStride);
                     Dest[0] = (uint32_t)(Mathf::Clamp01(A) * 65535.0f + 0.5f);
@@ -97,11 +99,14 @@ namespace FishEngine
                 }
             }
         }
-        
+#if 0
         TextureImporter importer;
         importer.setWrapMode(TextureWrapMode::Clamp);
         importer.setFilterMode(FilterMode::Bilinear);
         return importer.FromRawData((uint8_t*)DestBuffer, size, size, texture_format);
+#else
+		return std::make_shared<Texture2D>(size, size, texture_format, (uint8_t*)DestBuffer, byte_count);
+#endif
     }
 
     void RenderSettings::setSkybox(MaterialPtr& skybox)

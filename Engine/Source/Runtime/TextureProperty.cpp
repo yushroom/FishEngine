@@ -16,12 +16,12 @@ namespace FishEngine
 			out_externalFormat = GL_RGBA;
 			out_pixelType = GL_UNSIGNED_BYTE;
 			break;
-		case TextureFormat::RG16:
+		case TextureFormat::RG32:
 			out_internalFormat = GL_RG16;
 			out_externalFormat = GL_RG;
 			out_pixelType = GL_UNSIGNED_SHORT;
 			break;
-		case TextureFormat::RG8:
+		case TextureFormat::RG16:
 			out_internalFormat = GL_RG8;
 			out_externalFormat = GL_RG;
 			out_pixelType = GL_UNSIGNED_BYTE;

@@ -1,9 +1,13 @@
 #include "AssetDataBase.hpp"
 #include <Debug.hpp>
+#include <Texture.hpp>
+#include <AssetImporter.hpp>
+
+using namespace FishEngine;
 
 namespace FishEditor
 {
-    std::map<Path, QIcon> AssetDatabase::m_cacheIcons;
+    std::map<FishEngine::Path, QIcon> AssetDatabase::m_cacheIcons;
 	
 	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
@@ -22,6 +26,12 @@ namespace FishEditor
 		m_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
 		return m_cacheIcons[path];
 	}
+
+	template <>
+	static std::shared_ptr<Texture>
+		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
+	{
+		auto importer = AssetImporter::GetAtPath(path);
+		return AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
+	}
 }
-
-

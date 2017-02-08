@@ -60,7 +60,7 @@ foreach (x Collider MeshCollider PhysicsSystem SphereCollider BoxCollider Capsul
 endforeach()
 SOURCE_GROUP(Physics FILES ${Physics_SRCS})
 
-foreach (x GL GLEnvironment Graphics Color Light Material Mesh MeshFilter MeshRenderer Pipeline QualitySettings RenderSettings RenderSystem RenderTarget RenderTexture Renderer Shader ShaderCompiler ShaderProperty ShaderVariables_gen SkinnedMeshRenderer Skybox Texture TextureProperty Gizmos)
+foreach (x GL GLEnvironment Graphics Color Light Material Mesh MeshFilter MeshRenderer Pipeline QualitySettings RenderSettings RenderSystem RenderTarget RenderTexture Renderer Shader ShaderCompiler ShaderProperty ShaderVariables_gen SkinnedMeshRenderer Skybox Texture Texture2D TextureProperty Gizmos)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Render_SRCS ${Render_SRCS} ${f})

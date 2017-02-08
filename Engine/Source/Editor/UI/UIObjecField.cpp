@@ -13,6 +13,7 @@ UIObjecField::UIObjecField(std::string const & label, std::string const & object
     m_objectName(objectName)
 {
     ui->setupUi(this);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     ui->label->setText(m_label.c_str());
     ui->lineEdit->setText(objectName.c_str());
@@ -36,7 +37,7 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
 
     if (m_label != label)
     {
-        Debug::LogError("[UIObjecField] new label: %s", m_label.c_str());
+        Debug::Log("[UIObjecField] new label: %s", m_label.c_str());
         m_label = label;
         LOG;
         ui->label->setText(m_label.c_str());

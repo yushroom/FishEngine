@@ -43,7 +43,7 @@ namespace FishEditor
         // temp
         m_size.x = Screen::width();
         m_size.y = Screen::height();
-        Debug::LogWarning("size: x = %d, y = %d", m_size.x, m_size.y);
+        Debug::Log("size: x = %d, y = %d", m_size.x, m_size.y);
 
         m_camera = Camera::Create(60.0, 0.3f, 1000.f, CameraType::SceneView);
         m_cameraGameObject = std::make_shared<GameObject>("EditorCamera");
@@ -967,7 +967,7 @@ namespace FishEditor
 
     void SceneViewEditor::Resize(int width, int height)
     {
-        FishEngine::Debug::LogWarning("SceneViewEditor::Resize %d %d", width, height);
+        FishEngine::Debug::Log("SceneViewEditor::Resize %d %d", width, height);
         m_size.x = width;
         m_size.y = height;
         Screen::set(width, height);

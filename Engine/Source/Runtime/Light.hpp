@@ -57,16 +57,16 @@ namespace FishEngine
         friend class Pipeline;
 
         // The current type of light. Possible values are Directional, Point, Spot and Area
-        LightType m_type = LightType::Directional;
+        LightType m_type			= LightType::Directional;
 
         // How far light is emitted from the center of the object (Point and Spot lights only).
-        float m_range;
+        float m_range				= 10.0f;
 
         // Determines the angle(in degrees) at the base of a spot lights cone(Spot light only).
-        float m_spotAngle;
+        float m_spotAngle			= 30.0f;
 
         // The color of the light emitted.
-        Color m_color;
+        Color m_color				= Color::white;
 
         // Brightness of the light. The default value for a Point, Spot or Area light is 1 but for a Directional light, it is 0.5.
         float m_intensity           = 1.0f;

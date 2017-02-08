@@ -7,6 +7,7 @@
 #include "Debug.hpp"
 #include "Common.hpp"
 #include "Mathf.hpp"
+#include "Texture2D.hpp"
 
 
 namespace FishEngine
@@ -208,17 +209,71 @@ namespace FishEngine
         return t;
     }
 
-    TexturePtr TextureImporter::FromFile(const Path& path)
+	FishEngine::TexturePtr TextureImporter::Import(Path const & path)
+	{
+		//std::shared_ptr<Texture> texture;
+		auto ext = path.extension();
+		if (ext == ".dds")
+		{
+			abort();
+		}
+		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
+		{
+			int width, height, components;
+			uint8_t *data = stbi_load(path.string().c_str(), &width, &height, &components, 0);
+			if (data == nullptr)
+			{
+				Debug::LogError("Texture not found, path: %s", path.c_str());
+				abort();
+			}
+			//TextureImporter::FromRawData(data, width, height, TextureFormat::RGBA32);
+
+			auto texture = std::make_shared<Texture2D>();
+			int length = width * height * components;
+			texture->m_data.resize(length);
+			std::copy(data, data + length, texture->m_data.begin());
+			free(data);
+			texture->m_width = width;
+			texture->m_height = height;
+
+			switch (components)
+			{
+			case 1:
+				texture->m_format = TextureFormat::R8;
+				break;
+			case 2:
+				texture->m_format = TextureFormat::RG16;
+				break;
+			case 3:
+				texture->m_format = TextureFormat::RGB24;
+				break;
+			case 4:
+				texture->m_format = TextureFormat::RGBA32;
+				break;
+			default:
+				abort();
+			}
+			return texture;
+		}
+		else
+		{
+			abort();
+		}
+
+		return nullptr;
+	}
+
+	TexturePtr TextureImporter::FromFile(const Path& path)
     {
         auto t = std::make_shared<Texture>();
         GLuint texture;
         auto ext = path.extension();
         if (ext == ".dds")
         {
+			//abort();
             TextureDimension format;
             texture = CreateTextureFromDDS(path.string().c_str(), &format);
             t->m_dimension = format;
- 
         }
         else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
         {

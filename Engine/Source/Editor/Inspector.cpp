@@ -110,10 +110,18 @@ void Inspector::OnInspectorGUI(std::shared_ptr<Camera> const & camera)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::LightPtr& light)
 {
-    EditorGUI::EnumPopup<LightType>("Type", &light->m_type);
+	EditorGUI::EnumPopup<LightType>("Type", &light->m_type);
+	if (light->m_type != LightType::Directional)
+	{
+		EditorGUI::FloatField("Range", &light->m_range);
+	}
+	if (light->m_type == LightType::Spot)
+	{
+		EditorGUI::Slider("Spot Angle", &light->m_spotAngle, 1, 179);
+	}
     EditorGUI::ColorField("Color",         &light->m_color);
     EditorGUI::Slider("Intensity",         &light->m_intensity, 0, 8);
-    EditorGUI::FloatField("Range",         &light->m_range);
+    
     EditorGUI::Slider("Bias",              &light->m_shadowBias, 0, 2);
     EditorGUI::Slider("Normal Bias",       &light->m_shadowNormalBias, 0, 3);
     EditorGUI::Slider("Shadow Near Plane", &light->m_shadowNearPlane, 0.1f, 10.f);
@@ -272,18 +280,16 @@ void Inspector::Bind(const GameObjectPtr & go)
 
     if (EditorGUI::Button("Add Component"))
     {
-        Debug::LogError("clicked");
-        //auto const & name = ShowAddComponentMenu();
-        //if (name == "Rigidbody")
-        //{
-        //    go->AddComponent<Rigidbody>();
-        //}
+        Debug::Log("clicked");
+		//auto name = s_inspectorWidget->ShowAddComponentMenu();
+		auto const & name = ShowAddComponentMenu();
+		AddComponentToGameObject(name, go);
     }
 
     EditorGUI::End();
 }
 
-void FishEditor::Inspector::Bind(FishEngine::ObjectPtr const & object)
+void Inspector::Bind(FishEngine::ObjectPtr const & object)
 {
 	if (object->ClassID() == ClassID<GameObject>())
 	{
@@ -295,13 +301,7 @@ void FishEditor::Inspector::Bind(FishEngine::ObjectPtr const & object)
 	}
 }
 
-void FishEditor::Inspector::HideAll()
-{
-	if (!s_inspectorWidget->isHidden())
-		s_inspectorWidget->setHidden(true);
-}
-
-void FishEditor::Inspector::Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer)
+void Inspector::Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer)
 {
 	if (importer == nullptr)
 	{
@@ -322,16 +322,31 @@ void FishEditor::Inspector::Bind(std::shared_ptr<FishEngine::TextureImporter> co
 	EditorGUI::End();
 }
 
+void Inspector::HideAll()
+{
+	if (!s_inspectorWidget->isHidden())
+		s_inspectorWidget->setHidden(true);
+}
+
 std::string Inspector::ShowAddComponentMenu()
 {
     static QMenu* menu = nullptr;
     if (menu == nullptr)
     {
         menu = new QMenu(s_inspectorWidget->m_treeWidget);
-        menu->addAction("Rigidbody");
+        menu->addAction(FishEngine::Rigidbody::StaticClassName());
+		menu->addAction(FishEngine::MeshFilter::StaticClassName());
+		menu->addAction(FishEngine::BoxCollider::StaticClassName());
+		menu->addAction(FishEngine::SphereCollider::StaticClassName());
+		menu->addAction(FishEngine::MeshRenderer::StaticClassName());
+		menu->addAction(FishEngine::Camera::StaticClassName());
+		menu->addAction(FishEngine::Light::StaticClassName());
+		menu->addAction(FishEngine::CameraController::StaticClassName());
     }
 
     auto action = menu->exec(QCursor::pos());
+	if (action == nullptr)
+		return "";
     return action->text().toStdString();
 }
 
@@ -339,7 +354,7 @@ std::string Inspector::ShowAddComponentMenu()
 
 void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
-    Debug::LogError("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
+    Debug::Log("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
     //UIHeaderState state;
     if ( EditorGUI::BeginComponent( component->ClassName() ) )
     {
@@ -421,20 +436,5 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 #undef CASE
 
 }
-
-
-//void Inspector::HideRedundantChildItems()
-//{
-//    int rowCount = s_currentHeaderItem->childCount();
-//    for (int i = s_localItemIndex ; i < rowCount; i++)
-//    {
-//        auto item = s_currentHeaderItem->child(i);
-//        if (item->isHidden())
-//            break;  // do not check the rest of rows
-//        item->setHidden(true);
-//        LOG;
-//        Debug::LogWarning("[HideRedundantChildItems] hide %d", i);
-//    }
-//}
 
 #endif

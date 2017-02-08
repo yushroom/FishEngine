@@ -132,6 +132,7 @@ namespace FishEditor {
 	//class EditorRenderSystem;
 	class MainEditor;
     class SceneViewEditor;
+	class AssetDatabase;
 	//class EditorInput;
 	//class MainWindow;
 }

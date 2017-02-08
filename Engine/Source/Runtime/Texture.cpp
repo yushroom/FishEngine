@@ -1,11 +1,12 @@
 #include "Texture.hpp"
 #include "GLEnvironment.hpp"
 #include "Debug.hpp"
+#include "Mathf.hpp"
+
 #include <cassert>
 
 namespace FishEngine
 {
-
     void Texture::BindSampler()
     {
         assert(m_GLNativeTexture != 0);
@@ -14,8 +15,8 @@ namespace FishEngine
     }
 
     std::vector<TexturePtr> Texture::s_textures;
-    
-    Texture::~Texture()
+
+	Texture::~Texture()
     {
         glDeleteTextures(1, &m_GLNativeTexture);
     }

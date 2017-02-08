@@ -1,6 +1,7 @@
 #include "AssetImporter.hpp"
 //#include "AssetDataBase.hpp"
 #include "TextureImporter.hpp"
+#include "Timer.hpp"
 
 #include "Serialization.hpp"
 #include "Serialization/archives/yaml.hpp"
@@ -66,11 +67,16 @@ namespace FishEngine
 			//auto tex = importer->FromFile(path);
 			//t.StopAndPrint();
 			s_pathToImpoter[path] = importer;
+			//Timer t(path.string());
+			s_importerGuidToTexture[importer->GetGUID()] = importer->Import(path);
+			//t.StopAndPrint();
 			return importer;
 		}
 
 		return nullptr;
 	}
+
+	std::map<boost::uuids::uuid, TexturePtr> AssetImporter::s_importerGuidToTexture;
 
 	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
 

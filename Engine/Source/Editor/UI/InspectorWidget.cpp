@@ -1,5 +1,8 @@
 #include "InspectorWidget.hpp"
 
+#include <QTimer>
+#include <QMenu>
+#include <QCursor>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTreeWidget>
@@ -8,9 +11,15 @@
 #include "UI/UIAssetHeader.hpp"
 
 #include <TextureImporter.hpp>
+#include "Selection.hpp"
+#include "Inspector.hpp"
 
-InspectorWidget::InspectorWidget(QWidget *parent) : QWidget(parent)
+InspectorWidget::InspectorWidget(QWidget *parent) 
+	: QWidget(parent)
 {
+	//m_menu = new QMenu(this);
+	//m_menu->addAction("Rigidbody");
+
     QVBoxLayout * rootLayout = new QVBoxLayout(this);
     rootLayout->setMargin(0);
 	//rootLayout->setContentsMargins(0, 0, 4, 0);
@@ -31,6 +40,10 @@ InspectorWidget::InspectorWidget(QWidget *parent) : QWidget(parent)
     m_materialHeader->setHidden(true);
     m_assetHeader->setHidden(true);
     rootLayout->addWidget(m_treeWidget);
+
+	auto timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, this, &InspectorWidget::Update);
+	timer->start(1000 / 15.0f); // 15 fps
 }
 
 void InspectorWidget::Bind(std::shared_ptr<FishEngine::Object> obj)
@@ -66,3 +79,28 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::TextureImporter> importer
 
 	m_assetHeader->CheckUpdate(importer->name());
 }
+
+void InspectorWidget::Update()
+{
+	auto go = FishEditor::Selection::activeGameObject();
+	if (go != nullptr)
+	{
+		FishEditor::Inspector::Bind(go);
+	}
+	else
+	{
+		auto object = FishEditor::Selection::activeObject();
+		if (object != nullptr)
+			FishEditor::Inspector::Bind(object);
+		else
+			FishEditor::Inspector::HideAll();
+	}
+}
+
+//std::string InspectorWidget::ShowAddComponentMenu()
+//{
+//	auto action = m_menu->exec(QCursor::pos());
+//	if (action == nullptr)
+//		return "";
+//	return action->text().toStdString();
+//}

@@ -1,4 +1,4 @@
-#include "TextureImporter.hpp"
+#include "TextureSampler.hpp"
 
 namespace FishEngine
 {

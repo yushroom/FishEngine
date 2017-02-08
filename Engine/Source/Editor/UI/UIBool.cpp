@@ -12,6 +12,7 @@ UIBool::UIBool(const std::string &label, bool value, QWidget *parent) :
     ui->setupUi(this);
     ui->label->setText(label.c_str());
     ui->checkBox->setChecked(value);
+    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
     connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(OnCheckBoxChanged(bool)));
 }
@@ -25,7 +26,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
 {
     if (m_changed)
     {
-        Debug::LogError("[UIBool] value changed");
+        Debug::Log("[UIBool] value changed");
         value = m_value;
         m_changed = false;
         return true;
@@ -33,7 +34,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
 
     if (m_label != label)
     {
-        Debug::LogError("[UIBool] new label: %s", m_label.c_str());
+        Debug::Log("[UIBool] new label: %s", m_label.c_str());
         m_label = label;
         LOG;
         ui->label->setText(m_label.c_str());
@@ -42,7 +43,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
     if (m_value != value)
     {
         m_value = value;
-        Debug::LogError("[UIBool] new value");
+        Debug::Log("[UIBool] new value");
         LOG;
         ui->checkBox->blockSignals(true);
         ui->checkBox->setChecked(value);

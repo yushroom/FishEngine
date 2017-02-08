@@ -2,6 +2,7 @@
 
 #include <QIcon>
 #include <Debug.hpp>
+#include "AssetDataBase.hpp"
 
 using namespace FishEngine;
 using namespace FishEditor;
@@ -38,7 +39,8 @@ QVariant ProjectViewFileModel::data(const QModelIndex &index, int role) const
     case Qt::DecorationRole:
         if (node->isDir())
             return QIcon(":/Resources/folder.png");
-        return QIcon(":/Resources/unknown_file.png");
+        //return QIcon(":/Resources/unknown_file.png");
+        return FishEditor::AssetDatabase::GetCacheIcon(node->absoluteFilePath());
         break;
     }
 

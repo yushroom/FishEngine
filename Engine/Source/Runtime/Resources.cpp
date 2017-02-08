@@ -12,126 +12,37 @@
 
 namespace FishEngine
 {
-    FishEngine::FileNode Resources::s_assetsDirectoryRootNode;
-
-	//enum class AssetType
-	//{
-	//	Unknown,
-	//	Texture,
-	//	Model,
-	//	Shader,
-	//	Material,
-	//	Script,
-	//};
-	//
-	//AssetType GetAssetType(Path const & ext)
-	//{
-	//	//auto ext = path.extension();
-	//	if (ext == ".jpg" || ext == ".png")
-	//	{
-	//		return AssetType::Texture;
-	//	}
-	//	else if (ext == ".obj" || ext == ".fbx")
-	//	{
-	//		return AssetType::Model;
-	//	}
-	//	else if (ext == ".shader")
-	//	{
-	//		return AssetType::Shader;
-	//	}
-	//	else if (ext == ".mat")
-	//	{
-	//		return AssetType::Material;
-	//	}
-	//	else if (ext == ".hpp" || ext == ".cpp")
-	//	{
-	//		return AssetType::Script;
-	//	}
-	//	return AssetType::Unknown;
-	//}
-	
-//	template<class AssetImporterType>
-//	std::shared_ptr<AssetImporterType> GetAssetImporter(Path const & assetPath)
-//	{
-//		//bool need_generate = true;
-//		auto meta_path = assetPath.string() + ".meta";
-//#if 0
-//		if (boost::filesystem::exists(meta_path))
-//		{
-//			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
-//			YAMLInputArchive archive{meta_path};
-//			uint32_t meta_created_time;
-//			archive >> make_nvp("timeCreated", meta_created_time);
-//			if (asset_modified_time <= meta_created_time)
-//			{
-//				Debug::Log("Load .meta file: %s", meta_path.c_str());
-//				archive.ToNextNode();
-//				return archive.DeserializeObject<AssetImporterType>();
-//			}
-//		}
-//#endif
-//		
-//		Debug::Log("Generate .meta file: %s", meta_path.c_str());
-//		auto importer = std::make_shared<AssetImporterType>();
-//		std::ofstream fout(meta_path);
-//		uint32_t time_created = static_cast<uint32_t>(time(NULL));
-//		YAMLOutputArchive archive(fout);
-//		archive.SetManipulator(YAML::BeginMap);
-//		archive << make_nvp("timeCreated", time_created);
-//		archive.SetManipulator(YAML::EndMap);
-//		archive << importer;
-//		return importer;
-//	}
-	
-    void FileNode::BuildNodeTree(const Path path)
-    {
-		this->path = path;
-        if (boost::filesystem::is_directory(path))
-        {
-            for (auto& it : boost::filesystem::directory_iterator(path))
-            {
-                //std::cout << "\t" << it.path() << '\n';
-				auto & p = it.path();
-				//std::cout << p << std::endl;
-				if (p.extension() != ".meta")
-				{
-					//std::cout << "[" << p.extension().string() << "]" << std::endl;
-					children.emplace_back();
-					children.back().parent = this;
-					children.back().BuildNodeTree(it.path());
-				}
-            }
-        }
-		else
+	AssetType Resources::GetAssetType(Path const & ext)
+	{
+		//auto ext = path.extension();
+		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga")
 		{
-			//auto ext = path.extension();
-			//auto type = GetAssetType(ext);
-			//if (type == AssetType::Texture)
-			//{
-			//	Timer t(path.string());
-			//	auto importer = GetAssetImporter<TextureImporter>(path);
-			//	auto tex = importer->FromFile(path);
-			//	t.StopAndPrint();
-			//	Resources::s_uuidToImporter[tex->GetGUID()] = importer;
-			//	Resources::s_pathToAsset[path] = tex;
-			//}
-//			else if (type == AssetType::Model)
-//			{
-//				Timer t(path.string());
-//				auto importer = GetAssetImporter<ModelImporter>(path);
-//				auto model = importer->LoadFromFile(path);
-//				t.StopAndPrint();
-//				//Resources::s_uuidToImporter[importer->GetGUID()] = importer;
-//				//Resources::s_pathToAsset[path] = model;
-//			}
+			return AssetType::Texture;
 		}
-    }
+		else if (ext == ".obj" || ext == ".fbx")
+		{
+			return AssetType::Model;
+		}
+		else if (ext == ".shader")
+		{
+			return AssetType::Shader;
+		}
+		else if (ext == ".mat")
+		{
+			return AssetType::Material;
+		}
+		else if (ext == ".hpp" || ext == ".cpp")
+		{
+			return AssetType::Script;
+		}
+		return AssetType::Unknown;
+	}
 
     void Resources::SetAssetsDirectory(const Path& path)
     {
         s_assetsDirectory = path;
-		Debug::Log("%s", "Loading assets...");
-		Timer t("Loadd all assets");
+		//Debug::Log("%s", "Loading assets...");
+		//Timer t("Loadd all assets");
 		//t.Start();
         //s_assetsDirectoryRootNode.BuildNodeTree(path);
 		//t.StopAndPrint();

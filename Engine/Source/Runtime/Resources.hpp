@@ -13,19 +13,17 @@ namespace FishEngine
 {
     typedef boost::filesystem::path Path;
 
-    struct FileNode
-    {
-        Path path;
-        FileNode* parent;
-        std::list<FileNode> children;
-
-        void BuildNodeTree(const Path path);
-
-        bool IsDirectory() const
-        {
-            return children.size() > 0;
-        }
-    };
+	enum class AssetType
+	{
+		Unknown,
+		Texture,
+		Model,
+		Shader,
+		Material,
+		Script,
+	};
+	
+	
 
     enum class SystemDirectoryType
     {
@@ -84,14 +82,14 @@ namespace FishEngine
 
 		static std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> s_pathToImporter;
 
+		static AssetType GetAssetType(Path const & ext);
+		
     private:
         friend FishEditor::Inspector;
 
         static Path s_assetsDirectory;
         static Path s_rootSystemDirectory;
         const static Path s_textureRootDirectory;
-
-        static FileNode s_assetsDirectoryRootNode;
     };
 }
 

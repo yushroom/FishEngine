@@ -1,5 +1,6 @@
 #include "AssetImporter.hpp"
-#include "AssetDataBase.hpp"
+//#include "AssetDataBase.hpp"
+#include "TextureImporter.hpp"
 
 #include "Serialization.hpp"
 #include "Serialization/archives/yaml.hpp"
@@ -7,43 +8,6 @@
 
 namespace FishEngine
 {
-
-	enum class AssetType
-	{
-		Unknown,
-		Texture,
-		Model,
-		Shader,
-		Material,
-		Script,
-	};
-
-	AssetType GetAssetType(Path const & ext)
-	{
-		//auto ext = path.extension();
-		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga")
-		{
-			return AssetType::Texture;
-		}
-		else if (ext == ".obj" || ext == ".fbx")
-		{
-			return AssetType::Model;
-		}
-		else if (ext == ".shader")
-		{
-			return AssetType::Shader;
-		}
-		else if (ext == ".mat")
-		{
-			return AssetType::Material;
-		}
-		else if (ext == ".hpp" || ext == ".cpp")
-		{
-			return AssetType::Script;
-		}
-		return AssetType::Unknown;
-	}
-
 	//void AssetImporter::SaveAndReimport()
 	//{
 	//	AssetDatabase::ImportAsset(m_assetPath);
@@ -94,7 +58,7 @@ namespace FishEngine
 		}
 
 		auto ext = path.extension();
-		auto type = GetAssetType(ext);
+		auto type = Resources::GetAssetType(ext);
 		if (type == AssetType::Texture)
 		{
 			//Timer t(path.string());

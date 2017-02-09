@@ -25,7 +25,7 @@ foreach (x ${Serialization_SRCS})
 endforeach ()
 SOURCE_GROUP(Serialization FILES ${Serialization_SRCS})
 
-foreach (x AssetBundle AssetImporter TextureImporter ModelImporter Resources)
+foreach (x AssetBundle Resources)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})

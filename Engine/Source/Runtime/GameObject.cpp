@@ -1,7 +1,9 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "Gizmos.hpp"
-#include "ModelImporter.hpp"
+//#include "ModelImporter.hpp"
+#include "Mesh.hpp"
+#include "MeshFilter.hpp"
 #include "BoxCollider.hpp"
 #include "SphereCollider.hpp"
 #include "CapsuleCollider.hpp"
@@ -9,6 +11,7 @@
 #include "MeshRenderer.hpp"
 
 #include "TagManager.hpp"
+#include "generate/Enum_PrimitiveType.hpp"
 
 namespace FishEngine
 {
@@ -53,8 +56,8 @@ namespace FishEngine
 
     FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
     {
-        auto mesh = Model::builtinMesh(type);
-        auto go = Scene::CreateGameObject("GameObject");
+        auto mesh = Mesh::builtinMesh(type);
+        auto go = Scene::CreateGameObject(EnumToString(type));
         go->AddComponent<MeshFilter>()->SetMesh(mesh);
 		go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
         return go;

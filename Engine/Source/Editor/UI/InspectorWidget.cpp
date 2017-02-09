@@ -10,7 +10,7 @@
 #include "UI/UIMaterialHeader.hpp"
 #include "UI/UIAssetHeader.hpp"
 
-#include <TextureImporter.hpp>
+#include "TextureImporter.hpp"
 #include "Selection.hpp"
 #include "Inspector.hpp"
 
@@ -68,7 +68,7 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::GameObject> go)
     m_gameObjectHeader->Bind(go);
 }
 
-void InspectorWidget::Bind(std::shared_ptr<FishEngine::TextureImporter> importer)
+void InspectorWidget::Bind(std::shared_ptr<FishEditor::TextureImporter> importer)
 {
 	if (!m_gameObjectHeader->isHidden())
 		m_gameObjectHeader->setHidden(true);

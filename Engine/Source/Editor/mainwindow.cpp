@@ -116,8 +116,11 @@ void MainWindow::Init()
 //    RenderSystem::Init();
     Applicaiton::s_isEditor = true;
     //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
+#if FISHENGINE_PLATFORM_APPLE
     Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
-	//Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
+#else
+	Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
+#endif
     FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
 }
 

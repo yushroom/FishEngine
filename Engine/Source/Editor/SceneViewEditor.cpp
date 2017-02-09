@@ -60,8 +60,8 @@ namespace FishEditor
         Camera::setMainCamera(m_camera);
 
         sceneGizmoMaterial = Material::InstantiateBuiltinMaterial("VertexLit-Internal");
-        cubeMesh = Model::builtinMesh(PrimitiveType::Cube);
-        coneMesh = Model::builtinMesh(PrimitiveType::Cone);
+        cubeMesh = Mesh::builtinMesh(PrimitiveType::Cube);
+        coneMesh = Mesh::builtinMesh(PrimitiveType::Cone);
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
 //        m_size = EditorGUI::sceneViewSize();
         //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);
@@ -277,7 +277,7 @@ namespace FishEditor
             Pipeline::PushRenderTarget(m_selectionOutlineRT2);
             glClear(GL_COLOR_BUFFER_BIT);
             auto selection_outline_mtl = Material::builtinMaterial("PostProcessSelectionOutline");
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             selection_outline_mtl->SetTexture("StencilTexture", m_selectionOutlineDepthBuffer);
             selection_outline_mtl->SetTexture("ColorTexture", m_colorBuffer);
             selection_outline_mtl->SetTexture("DepthTexture", RenderSystem::m_mainDepthBuffer);

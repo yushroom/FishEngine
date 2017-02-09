@@ -5,7 +5,8 @@
 #include "Pipeline.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
-#include "ModelImporter.hpp"
+//#include "ModelImporter.hpp"
+#include "Mesh.hpp"
 #include "Gizmos.hpp"
 #include "RenderSettings.hpp"
 #include "Camera.hpp"
@@ -43,7 +44,7 @@ namespace FishEngine
         Pipeline::Init();
         Shader::Init();
         Material::Init();
-        Model::Init();
+        Mesh::Init();
         Gizmos::Init();
         Scene::Init();
         glFrontFace(GL_CW);
@@ -177,7 +178,7 @@ namespace FishEngine
         {
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             auto mtl = Material::builtinMaterial("Deferred");
             mtl->SetTexture("DBufferATexture", m_GBuffer[0]);
             mtl->SetTexture("DBufferBTexture", m_GBuffer[1]);
@@ -217,7 +218,7 @@ namespace FishEngine
             glDepthMask(GL_FALSE);
             auto light = Light::lights().front();
             glClearBufferfv(GL_COLOR, 0, white);
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
             mtl->SetTexture("CascadedShadowMap", light->m_shadowMap);
             mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
@@ -234,7 +235,7 @@ namespace FishEngine
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
             glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
             Vector2 direction(1.0f / static_cast<float>(m_screenShadowMap->width()), 0);
             mtl->SetVector2("Direction", direction);
@@ -252,7 +253,7 @@ namespace FishEngine
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
             glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
             Vector2 direction(0, 1.0f / static_cast<float>(m_screenShadowMap->height()));
             mtl->SetVector2("Direction", direction);
@@ -269,7 +270,7 @@ namespace FishEngine
             glDepthMask(GL_FALSE);
             //Pipeline::PushRenderTarget(m_addShadowRenderTarget);
             //glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Model::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
             auto mtl = Material::builtinMaterial("PostProcessShadow");
             mtl->setMainTexture(m_mainColorBuffer);
             mtl->SetTexture("ScreenShadow", m_screenShadowMap);
@@ -293,7 +294,7 @@ namespace FishEngine
         /* Skybox                                                               */
         /************************************************************************/
         Matrix4x4 model = Matrix4x4::Scale(100);
-        Graphics::DrawMesh(Model::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
+        Graphics::DrawMesh(Mesh::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
 
         /************************************************************************/

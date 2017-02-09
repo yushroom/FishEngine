@@ -1,5 +1,11 @@
-
 #pragma once
+
+namespace FishEditor
+{
+	class AssetImporter;
+	class ModelImporter;
+	class TextureImporter;
+}
 
 namespace FishEngine
 {
@@ -778,9 +784,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<EditorExtensionImpl>() { return 1002; }
 	
-	class AssetImporter;
+	//class AssetImporter;
 	template<>
-	constexpr int ClassID<AssetImporter>() { return 1003; }
+	constexpr int ClassID<FishEditor::AssetImporter>() { return 1003; }
 	
 	class AssetDatabase;
 	template<>
@@ -790,9 +796,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<Mesh3DSImporter>() { return 1005; }
 	
-	class TextureImporter;
+	//class TextureImporter;
 	template<>
-	constexpr int ClassID<TextureImporter>() { return 1006; }
+	constexpr int ClassID<FishEditor::TextureImporter>() { return 1006; }
 	
 	class ShaderImporter;
 	template<>
@@ -854,9 +860,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<LibraryAssetImporter>() { return 1038; }
 	
-	class ModelImporter;
+	//class ModelImporter;
 	template<>
-	constexpr int ClassID<ModelImporter>() { return 1040; }
+	constexpr int ClassID<FishEditor::ModelImporter>() { return 1040; }
 	
 	class FBXImporter;
 	template<>

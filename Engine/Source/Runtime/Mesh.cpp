@@ -5,15 +5,15 @@
 #include <sstream>
 #include <cstdio>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 #include "Shader.hpp"
 #include "Debug.hpp"
 #include "Common.hpp"
 #include "ShaderVariables_gen.hpp"
-#include "Serialization/archives/binary.hpp"
+//#include "Serialization/archives/binary.hpp"
 
 using namespace std;
 
@@ -43,6 +43,7 @@ namespace FishEngine
         Debug::LogError("BoneWeight::AddBoneData");
     }
 
+	std::map<PrimitiveType, MeshPtr> Mesh::s_builtinMeshes;
 
     //std::map<std::string, Mesh::PMesh> Mesh::m_meshes;
 
@@ -250,7 +251,89 @@ namespace FishEngine
 		return mesh;
     }
 
-    //void Model::renderPatch(const Shader &shader) {
+	FishEngine::MeshPtr Mesh::FromText(std::istream & is)
+	{
+		auto mesh = std::make_shared<Mesh>();
+		is >> mesh->m_vertexCount >> mesh->m_triangleCount;
+		mesh->m_positionBuffer.resize(mesh->m_vertexCount * 3);
+		mesh->m_normalBuffer.resize(mesh->m_vertexCount * 3);
+		mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
+		mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
+		mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
+		for (auto & f : mesh->m_positionBuffer)
+			is >> f;
+		for (auto & f : mesh->m_normalBuffer)
+			is >> f;
+		for (auto & f : mesh->m_uvBuffer)
+			is >> f;
+		for (auto & f : mesh->m_tangentBuffer)
+			is >> f;
+		for (auto & f : mesh->m_indexBuffer)
+			is >> f;
+		return mesh;
+	}
+
+	void Mesh::Init()
+	{
+		{
+			std::ifstream is("D:/program/unity/Test/Sphere.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Sphere");
+			s_builtinMeshes[PrimitiveType::Sphere] = mesh;
+		}
+		{
+			std::ifstream is("D:/program/unity/Test/Capsule.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Capsule");
+			s_builtinMeshes[PrimitiveType::Capsule] = mesh;
+		}
+		{
+			std::ifstream is("D:/program/unity/Test/Cylinder.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Cylinder");
+			s_builtinMeshes[PrimitiveType::Cylinder] = mesh;
+		}
+		{
+			std::ifstream is("D:/program/unity/Test/Cube.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Cube");
+			s_builtinMeshes[PrimitiveType::Cube] = mesh;
+		}
+		{
+			std::ifstream is("D:/program/unity/Test/Plane.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Plane");
+			s_builtinMeshes[PrimitiveType::Plane] = mesh;
+		}
+		{
+			std::ifstream is("D:/program/unity/Test/Cone.txt");
+			auto mesh = Mesh::FromText(is);
+			mesh->setName("Cone");
+			s_builtinMeshes[PrimitiveType::Cone] = mesh;
+		}
+		{
+			std::vector<float> p = { -1,-1,0,  1,-1,0,  -1,1,0,  1,1,0 };
+			std::vector<float> n = { 0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1 };
+			std::vector<float> uv = { 0,1,  1,1,  0,0,  1,0 };
+			std::vector<float> t = { 1,0,0,  1,0,0,  1,0,0,  1,0,0 };
+			std::vector<uint32_t> index = { 2,1,0,  3,1,2 };
+			auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+			mesh->setName("Quad");
+			s_builtinMeshes[PrimitiveType::Quad] = mesh;
+		}
+
+		for (auto& pair : s_builtinMeshes)
+		{
+			pair.second->UploadMeshData();
+		}
+	}
+
+	FishEngine::MeshPtr Mesh::builtinMesh(const PrimitiveType type)
+	{
+		return s_builtinMeshes[type];
+	}
+
+	//void Model::renderPatch(const Shader &shader) {
     //    glBindVertexArray(m_VAO);
     //    glDrawElements(GL_PATCHES, (GLsizei)m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
     //    glBindVertexArray(0);

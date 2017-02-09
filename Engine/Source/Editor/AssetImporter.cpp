@@ -1,13 +1,26 @@
 #include "AssetImporter.hpp"
 //#include "AssetDataBase.hpp"
 #include "TextureImporter.hpp"
-#include "Timer.hpp"
+#include <Timer.hpp>
 
-#include "Serialization.hpp"
-#include "Serialization/archives/yaml.hpp"
-#include "Serialization/archives/YAMLInputArchive.hpp"
+#include <Serialization.hpp>
+#include <Serialization/archives/yaml.hpp>
+#include <Serialization/archives/YAMLInputArchive.hpp>
+
+#include "generate/EditorClassSerialization.hpp"
 
 namespace FishEngine
+{
+	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, FishEditor::TextureImporterPtr importer)
+	{
+		Load(archive, *importer);
+		return archive;
+	}
+}
+
+using namespace FishEngine;
+
+namespace FishEditor
 {
 	//void AssetImporter::SaveAndReimport()
 	//{

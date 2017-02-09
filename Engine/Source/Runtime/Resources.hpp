@@ -76,9 +76,9 @@ namespace FishEngine
 
         static void Init(Path const & path = Path());
 		
-		static std::map<boost::uuids::uuid, std::shared_ptr<Object>> s_importerGUIDToAsset;
+		//static std::map<boost::uuids::uuid, std::shared_ptr<Object>> s_importerGUIDToAsset;
 
-		static std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> s_pathToImporter;
+		//static std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> s_pathToImporter;
 
 		static AssetType GetAssetType(Path const & ext);
 		

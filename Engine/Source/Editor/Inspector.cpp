@@ -220,7 +220,7 @@ void Inspector::OnInspectorGUI(const FishEngine::SphereColliderPtr& collider)
 }
 
 template<>
-void Inspector::OnInspectorGUI(std::shared_ptr<FishEngine::TextureImporter> const & importer)
+void Inspector::OnInspectorGUI(TextureImporterPtr const & importer)
 {
 	EditorGUI::EnumPopup("Texture Type", &importer->m_textureType);
 	EditorGUI::EnumPopup("Texture Shape", &importer->m_textureShape);
@@ -301,7 +301,7 @@ void Inspector::Bind(FishEngine::ObjectPtr const & object)
 	}
 }
 
-void Inspector::Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer)
+void Inspector::Bind(TextureImporterPtr const & importer)
 {
 	if (importer == nullptr)
 	{

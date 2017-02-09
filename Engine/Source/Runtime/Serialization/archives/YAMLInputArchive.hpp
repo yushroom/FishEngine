@@ -89,12 +89,6 @@ namespace FishEngine
 		return archive;
 	}
 
-	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, std::shared_ptr<TextureImporter> importer)
-	{
-		Load(archive, *importer);
-		return archive;
-	}
-
 	template<class T>
 	YAMLInputArchive& operator >> (YAMLInputArchive& archive, BaseClassWrapper<T> t)
 	{

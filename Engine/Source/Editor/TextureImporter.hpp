@@ -1,14 +1,12 @@
 #ifndef TextureImporter_hpp
 #define TextureImporter_hpp
 
-#include "FishEngine.hpp"
 #include "AssetImporter.hpp"
-#include "Texture.hpp"
-#include "Resources.hpp"
+#include <Texture.hpp>
+#include <Resources.hpp>
 
-namespace FishEngine
+namespace FishEditor
 {
-	
 	// Texture importer lets you modify Texture2D import settings from editor scripts.
 	// Settings of this class match the ones exposed in Texture Import Settings.
 	class FE_EXPORT TextureImporter : public AssetImporter
@@ -18,58 +16,58 @@ namespace FishEngine
 
 		TextureImporter() = default;
 
-		TexturePtr Import(Path const & path);
+		FishEngine::TexturePtr Import(FishEngine::Path const & path);
 
-		TexturePtr FromFile(const Path& path);
+		FishEngine::TexturePtr FromFile(const FishEngine::Path& path);
 
-		TexturePtr FromRawData(const uint8_t* data, int width, int height, TextureFormat format);
+		FishEngine::TexturePtr FromRawData(const uint8_t* data, int width, int height, FishEngine::TextureFormat format);
 		
 		/************************************************************************/
 		/* properties                                                           */
 		/************************************************************************/
 
 		// Which type of texture are we dealing with here.
-		TextureImporterType textureType() const
+		FishEngine::TextureImporterType textureType() const
 		{
 			return m_textureType;
 		}
 		
-		void setTextureType(const TextureImporterType textureType)
+		void setTextureType(const FishEngine::TextureImporterType textureType)
 		{
 			m_textureType = textureType;
 			m_isDirty = true;
 		}
 
-		TextureImporterShape textureShape() const
+		FishEngine::TextureImporterShape textureShape() const
 		{
 			return m_textureShape;
 		}
 
-		void setTextureShape(const TextureImporterShape textureShape)
+		void setTextureShape(const FishEngine::TextureImporterShape textureShape)
 		{
 			m_textureShape = textureShape;
 			m_isDirty = true;
 		}
 		
 		// Filtering mode of the texture.
-		FilterMode filterMode() const
+		FishEngine::FilterMode filterMode() const
 		{
 			return m_filterMode;
 		}
 		
-		void setFilterMode(const FilterMode filterMode)
+		void setFilterMode(const FishEngine::FilterMode filterMode)
 		{
 			m_filterMode = filterMode;
 			m_isDirty = true;
 		}
 		
 		// Wrap mode (Repeat or Clamp) of the texture.
-		TextureWrapMode wrapMode() const
+		FishEngine::TextureWrapMode wrapMode() const
 		{
 			return m_wrapMode;
 		}
 		
-		void setWrapMode(const TextureWrapMode wrapMode)
+		void setWrapMode(const FishEngine::TextureWrapMode wrapMode)
 		{
 			m_wrapMode = wrapMode;
 			m_isDirty = true;
@@ -109,18 +107,18 @@ namespace FishEngine
 		}
 		
 	private:
-		friend class FishEditor::Inspector;
+		friend class Inspector;
 		// Which type of texture are we dealing with here.
-		TextureImporterType		m_textureType   = TextureImporterType::Default;
+		FishEngine::TextureImporterType m_textureType = FishEngine::TextureImporterType::Default;
 
 		// Shape of imported texture.
-		TextureImporterShape	m_textureShape	= TextureImporterShape::Texture2D;
+		FishEngine::TextureImporterShape m_textureShape = FishEngine::TextureImporterShape::Texture2D;
 
 		// Filtering mode of the texture.
-		FilterMode				m_filterMode    = FilterMode::Trilinear;
+		FishEngine::FilterMode m_filterMode = FishEngine::FilterMode::Trilinear;
 
 		// Wrap mode (Repeat or Clamp) of the texture.
-		TextureWrapMode			m_wrapMode      = TextureWrapMode::Repeat;
+		FishEngine::TextureWrapMode m_wrapMode = FishEngine::TextureWrapMode::Repeat;
 		
 		// Is texture storing color data?
 		bool					m_sRGBTexture	= true;
@@ -131,6 +129,7 @@ namespace FishEngine
 		// Select this to enable mip-map generation. Mip maps are smaller versions of the Texture that get used when the Texture is very small on screen.
 		bool					m_mipmapEnabled = true;
 	};
+
 }
 
 #endif /* TextureImporter_hpp */

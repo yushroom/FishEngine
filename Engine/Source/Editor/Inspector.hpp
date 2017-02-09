@@ -28,8 +28,8 @@ namespace FishEditor
         static void Bind(FishEngine::GameObjectPtr const & gameObject);
         static void Bind(FishEngine::Material const & material);
         static void Bind(FishEngine::Shader const & shader);
-        static void Bind(std::shared_ptr<FishEngine::TextureImporter> const & importer);
-        static void Bind(std::shared_ptr<FishEngine::ModelImporter> const & importer);
+        static void Bind(TextureImporterPtr const & importer);
+        static void Bind(ModelImporterPtr const & importer);
 
 		static void HideAll();
 

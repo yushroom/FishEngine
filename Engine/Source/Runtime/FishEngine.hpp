@@ -65,9 +65,6 @@ namespace FishEngine
     class Light;
     class Color;
     class RenderTexture;
-    class AssetImporter;
-    class Model;
-    class ModelImporter;
     class Rigidbody;
     class Collider;
     class BoxCollider;
@@ -78,7 +75,6 @@ namespace FishEngine
     class Serialization;
     class RenderSystem;
     class Graphics;
-
     class RenderTarget;
     class ColorBuffer;
     class DepthBuffer;
@@ -109,7 +105,6 @@ namespace FishEngine
     typedef std::shared_ptr<Cubemap> CubemapPtr;
     typedef std::shared_ptr<Light> LightPtr;
     typedef std::shared_ptr<RenderTexture> RenderTexturePtr;
-    typedef std::shared_ptr<Model> ModelPtr;
     typedef std::shared_ptr<Rigidbody> RigidbodyPtr;
     typedef std::shared_ptr<Collider> ColliderPtr;
     typedef std::shared_ptr<BoxCollider> BoxColliderPtr;
@@ -126,7 +121,8 @@ namespace FishEngine
 }
 
 // hack: inject FishEditor namespace
-namespace FishEditor {
+namespace FishEditor
+{
     class EditorGUI;
 	class Inspector;
 	//class EditorRenderSystem;

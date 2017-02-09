@@ -1,14 +1,14 @@
 #ifndef AssetImporter_hpp
 #define AssetImporter_hpp
 
-#include "FishEngine.hpp"
-#include "Object.hpp"
-#include "Resources.hpp"
-#include "ReflectClass.hpp"
+#include "FishEditor.hpp"
+#include <Object.hpp>
+#include <Resources.hpp>
+#include <ReflectClass.hpp>
 
-namespace FishEngine
+namespace FishEditor
 {
-	class AssetImporter : public Object
+	class AssetImporter : public FishEngine::Object
 	{
 	public:
 		InjectClassName(AssetImporter);
@@ -26,7 +26,7 @@ namespace FishEngine
 		void SetAssetBundleNameAndVariant(std::string const & assetBundleName, std::string const & assetBundleVariant);
 		
 		// Retrieves the asset importer for the asset at path.
-		static std::shared_ptr<AssetImporter> GetAtPath(Path const & path);
+		static AssetImporterPtr GetAtPath(FishEngine::Path const & path);
 		
 	protected:
 
@@ -46,15 +46,15 @@ namespace FishEngine
 		
 		// The path name of the asset for this importer. (Read Only)
 		Meta(NonSerializable)
-		Path			m_assetPath;
+		FishEngine::Path			m_assetPath;
 		
 		// Get or set any user data.
 		Meta(NonSerializable)
 		std::string		m_userData;
 
-		static std::map<boost::uuids::uuid, TexturePtr> s_importerGuidToTexture;
-		static std::map<boost::uuids::uuid, GameObjectPtr> s_importerGuidToModel;
-		static std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> s_pathToImpoter;
+		static std::map<boost::uuids::uuid, FishEngine::TexturePtr> s_importerGuidToTexture;
+		static std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> s_importerGuidToModel;
+		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
 	};
 }
 

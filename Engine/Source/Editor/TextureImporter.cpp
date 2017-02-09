@@ -9,8 +9,9 @@
 #include "Mathf.hpp"
 #include "Texture2D.hpp"
 
+using namespace FishEngine;
 
-namespace FishEngine
+namespace FishEditor
 {
     // https://github.com/g-truc/gli/blob/master/manual.md
     // http://gli.g-truc.net/0.8.1/api/a00006.html

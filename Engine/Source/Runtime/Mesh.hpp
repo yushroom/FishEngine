@@ -7,6 +7,7 @@
 #include "Bounds.hpp"
 #include "IntVector.hpp"
 #include "ReflectClass.hpp"
+#include "PrimitiveType.hpp"
 
 namespace FishEngine
 {
@@ -107,13 +108,20 @@ namespace FishEngine
 		// temp
         void ToBinary(std::ostream & os);
         static MeshPtr FromBinary(std::istream & is);
+
+		static MeshPtr FromText(std::istream & is);
+
+		static void Init();
+		static MeshPtr builtinMesh(const PrimitiveType type);
 		
     private:
         friend class FishEditor::Inspector;
-        friend class ModelImporter;
+        friend class FishEditor::ModelImporter;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
 		//friend class Model;
+
+		static std::map<PrimitiveType, MeshPtr> s_builtinMeshes;
 
 //        enum class InternalShaderChannel
 //        {

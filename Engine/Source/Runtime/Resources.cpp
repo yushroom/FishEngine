@@ -2,7 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include "Debug.hpp"
-#include "ModelImporter.hpp"
+//#include "ModelImporter.hpp"
 #include "Timer.hpp"
 
 //#include "Serialization/archives/yaml.hpp"
@@ -81,9 +81,9 @@ namespace FishEngine
         s_rootSystemDirectory = cwd;
     }
 
-	std::map<boost::uuids::uuid, std::shared_ptr<Object>> Resources::s_importerGUIDToAsset;
+	//std::map<boost::uuids::uuid, std::shared_ptr<Object>> Resources::s_importerGUIDToAsset;
 
-	std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> Resources::s_pathToImporter;
+	//std::map<boost::filesystem::path, std::weak_ptr<AssetImporter>> Resources::s_pathToImporter;
 
 	//std::map<boost::uuids::uuid, std::shared_ptr<AssetImporter>> Resources::s_uuidToImporter;
 	//std::map<boost::filesystem::path, std::weak_ptr<Object>> Resources::s_pathToAsset;

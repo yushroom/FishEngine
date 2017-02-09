@@ -31,7 +31,7 @@ namespace FishEngine
 
     private:
 
-		friend class TextureImporter;
+		friend class FishEditor::TextureImporter;
         
         // The format of the pixel data in the texture (Read Only).
         TextureFormat m_format;

@@ -6,6 +6,21 @@
 
 namespace FishEditor
 {
+	class Model;
+	typedef std::shared_ptr<Model> ModelPtr;
+
+	class ModelNode;
+	typedef std::shared_ptr<ModelNode> ModelNodePtr;
+
+	class AssetImporter;
+	typedef std::shared_ptr<AssetImporter> AssetImporterPtr;
+
+	class TextureImporter;
+	typedef std::shared_ptr<TextureImporter> TextureImporterPtr;
+
+	class ModelImporter;
+	typedef std::shared_ptr<ModelImporter> ModelImporterPtr;
+
 
     //typedef std::list<Actor> Action;
 

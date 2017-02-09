@@ -2,19 +2,19 @@
 #define ModelImporter_hpp
 
 #include "AssetImporter.hpp"
-#include "Mesh.hpp"
-#include "GameObject.hpp"
-#include "Scene.hpp"
-#include "Material.hpp"
-#include "MeshFilter.hpp"
-#include "Animator.hpp"
+#include <Mesh.hpp>
+#include <Scene.hpp>
+#include <Material.hpp>
+#include <MeshFilter.hpp>
+#include <Animator.hpp>
+#include <PrimitiveType.hpp>
 
 struct aiNode;
 struct aiMesh;
 struct aiAnimation;
 
-namespace FishEngine {
-
+namespace FishEditor
+{
     struct ModelNode
     {
         uint32_t                index;
@@ -23,11 +23,11 @@ namespace FishEngine {
         std::vector<std::shared_ptr<ModelNode>> children;
         std::vector<uint32_t>   meshesIndices;
         //uint32_t                materialIndices;
-        Matrix4x4               transform;
+        FishEngine::Matrix4x4	transform;
         bool                    isBone;
     };
 
-    typedef std::shared_ptr<ModelNode> ModelNodePtr;
+    
     
 
     class FE_EXPORT Meta(NonSerializable) Model
@@ -35,64 +35,56 @@ namespace FishEngine {
     public:
         //InjectClassName(Model)
 
-        Model() : m_avatar(std::make_shared<Avatar>()) {}
+        Model() : m_avatar(std::make_shared<FishEngine::Avatar>()) {}
 		
 		Model(const Model&) = delete;
 		Model& operator=(const Model& model) = delete;
         
-        GameObjectPtr CreateGameObject() const;
+		FishEngine::GameObjectPtr CreateGameObject() const;
         
-        MeshPtr mainMesh() const
+		FishEngine::MeshPtr mainMesh() const
         {
             return m_meshes[0];
         }
         
-        AnimationPtr mainAnimation() const
+		FishEngine::AnimationPtr mainAnimation() const
         {
             if (m_animations.empty())
                 return nullptr;
             return m_animations.front();
         }
 
-        AvatarPtr avatar() const
+		FishEngine::AvatarPtr avatar() const
         {
             return m_avatar;
         }
-        
-        static void Init();
-        
-        static ModelPtr builtinModel(const PrimitiveType type);
-        static MeshPtr builtinMesh(const PrimitiveType type);
         
     private:
         friend class ModelImporter;
 		std::string m_name;
 
-        void AddMesh(MeshPtr& mesh);
+        void AddMesh(FishEngine::MeshPtr& mesh);
 
-        GameObjectPtr
+		FishEngine::GameObjectPtr
         ResursivelyCreateGameObject(const ModelNodePtr& node,
-                                    std::map<std::string, std::weak_ptr<GameObject>>& nameToGameObject) const;
+                                    std::map<std::string, std::weak_ptr<FishEngine::GameObject>>& nameToGameObject) const;
         
-        std::vector<MaterialPtr> m_materials;
+        std::vector<FishEngine::MaterialPtr> m_materials;
         std::vector<uint32_t> m_meterailIndexForEachMesh; // same size as m_meshes;
-        std::vector<MeshPtr> m_meshes;
+        std::vector<FishEngine::MeshPtr> m_meshes;
 
 		Meta(NonSerializable)
-        std::vector<AnimationPtr> m_animations;
+        std::vector<FishEngine::AnimationPtr> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
 
 		Meta(NonSerializable)
         ModelNodePtr m_rootNode;
         //std::vector<ModelNode::PModelNode> m_bones;
         //std::map<std::string, int> m_boneToIndex;
-        AvatarPtr m_avatar;
+		FishEngine::AvatarPtr m_avatar;
 
-        mutable std::weak_ptr<GameObject>   m_rootGameObject; // temp
+        mutable std::weak_ptr<FishEngine::GameObject>   m_rootGameObject; // temp
         //mutable std::vector<std::weak_ptr<SkinnedMeshRenderer>> m_skinnedMeshRenderersToFindLCA;
-        
-        static std::map<PrimitiveType, ModelPtr> s_builtinModels;
-        static std::map<PrimitiveType, MeshPtr> s_builtinMeshes;
     };
 
     // Vertex normal generation options for ModelImporter.
@@ -159,25 +151,19 @@ namespace FishEngine {
 
         ModelImporter() = default;
 		
-        void
-        setFileScale(
-            const float fileScale)
+        void setFileScale( const float fileScale )
         {
             m_fileScale = fileScale;
         }
         
-        ModelPtr LoadFromFile( const Path& path );
+        ModelPtr LoadFromFile( const FishEngine::Path& path );
 
-        void
-        setImportNormals(
-            ModelImporterNormals importNormals) 
+        void setImportNormals( ModelImporterNormals importNormals )
         {
             m_importNormals = importNormals;
         }
 
-        void
-        setImportTangents(
-            ModelImporterTangents importTangents) 
+        void setImportTangents( ModelImporterTangents importTangents )
         {
             m_importTangents = importTangents;
         }
@@ -190,13 +176,13 @@ namespace FishEngine {
         buildModelTree(
             const aiNode*   assimp_node);
         
-        MeshPtr
+		FishEngine::MeshPtr
         ParseMesh(
             const aiMesh*   assimp_mesh,
             bool            load_uv,
             bool            load_tangent);
 
-        void RemoveDummyNodeFBX( AnimationPtr animation );
+        void RemoveDummyNodeFBX(FishEngine::AnimationPtr animation );
 
 		Meta(NonSerializable)
         ModelPtr      m_model;
@@ -215,7 +201,7 @@ namespace FishEngine {
 
         // remove dummy nodes
 		Meta(NonSerializable)
-        std::map<std::string, std::map<std::string, Matrix4x4>> m_nodeTransformations;
+        std::map<std::string, std::map<std::string, FishEngine::Matrix4x4>> m_nodeTransformations;
     };
 }
 

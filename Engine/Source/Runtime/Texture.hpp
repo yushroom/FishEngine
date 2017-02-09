@@ -120,7 +120,7 @@ namespace FishEngine
 		mutable bool m_uploaded = false;
 
     private:
-        friend class TextureImporter;
+        friend class FishEditor::TextureImporter;
     };
 
 

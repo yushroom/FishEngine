@@ -247,7 +247,7 @@ void DefaultScene()
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         //Graphics::Blit()
         glViewport(0, 0, Screen::width(), Screen::height());
-        auto quad = Model::builtinMesh(PrimitiveType::Quad);
+        auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
         auto mtl = Material::builtinMaterial("DrawQuad");
         mtl->setMainTexture(m_mainSceneViewEditor->m_colorBuffer);
         Graphics::DrawMesh(quad, mtl);

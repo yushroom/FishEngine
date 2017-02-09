@@ -7,7 +7,7 @@ from tool_get_enum import ExtractEnums
 from tool_gen_enum_reflections_functions import GenEnumFunctions
 from tool_helper import UpdateFile
 
-debug = False
+debug = True
 
 all_headers_file_path = "temp/AllHeaders.hpp"
 enum_json_file_path = 'temp/enum.json'
@@ -16,7 +16,7 @@ all_headers_file_dir = os.path.dirname(all_headers_file_path)
 if not os.path.exists(all_headers_file_dir):
     os.makedirs(all_headers_file_dir)
 
-GetAllHeadersTo("../../Engine/Source/Runtime", all_headers_file_path)
+GetAllHeadersTo(all_headers_file_path)
 enums = ExtractEnums(all_headers_file_path)
 
 if debug:
@@ -26,23 +26,31 @@ if debug:
 
 template_str = '''#pragma once
 
-#include "../ReflectEnum.hpp"
-#include "../${header}"
+#include <ReflectEnum.hpp>
+#include <${header}>
 
-namespace ${scope}
+namespace FishEngine
 {
+
 ${functions}
-} // {scope}
+
+} // namespace FishEngine
 '''
 template = Template(template_str)
 
-output_hpp_dir = '../../Engine/Source/Runtime/generate/'
-if not os.path.exists(output_hpp_dir):
-    os.mkdir(output_hpp_dir)
+runtime_root_dir = os.path.abspath('../../Engine/Source/Runtime')
+editor_root_dir = os.path.abspath('../../Engine/Source/Editor')
+
+output_hpp_dir = os.path.join(runtime_root_dir, "generate")
+output_hpp_dir_editor = os.path.join(editor_root_dir, "generate")
 
 for e in enums.keys():
     item = enums[e]
-    enum_functions = GenEnumFunctions(e, enums[e]['data'])
+    enum_functions = GenEnumFunctions(e, item['scope_prefix'], enums[e]['data'])
     s = template.render(header=item['header_file'], scope=item['scope_prefix'], functions=enum_functions)
-    output_file_path = os.path.join(output_hpp_dir, "Enum_{}.hpp".format(e))
+    d = output_hpp_dir
+    #print(item['path'], editor_root_dir)
+    if item['path'].startswith(editor_root_dir):
+    	d = output_hpp_dir_editor
+    output_file_path = os.path.join(d, "Enum_{}.hpp".format(e))
     UpdateFile(output_file_path, s)

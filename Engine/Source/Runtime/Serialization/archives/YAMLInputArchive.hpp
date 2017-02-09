@@ -62,7 +62,7 @@ namespace FishEngine
 	inline void convert(YAML::Node const & node, std::string & t)
 	{
 		t = node.as<std::string>();
-		std::cout << "as string: " << t << std::endl;
+		//std::cout << "as string: " << t << std::endl;
 	}
 
 	inline void convert(YAML::Node const & node, boost::uuids::uuid & t)

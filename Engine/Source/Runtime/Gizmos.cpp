@@ -130,8 +130,8 @@ void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
     vertices[4] = to.y;
     vertices[5] = to.z;
     //glLineWidth(50);  // TODO, no effect
-    auto view = Camera::main()->worldToCameraMatrix();
-    auto proj = Camera::main()->projectionMatrix();
+    auto const & view = Camera::main()->worldToCameraMatrix();
+    auto const & proj = Camera::main()->projectionMatrix();
     shader->Use();
     shader->BindUniformMat4("MATRIX_MVP", proj*view*s_matrix);
     shader->BindUniformVec4("_Color", s_color);
@@ -147,7 +147,7 @@ DrawIcon(
 {
 #if 0
     auto shader = Shader::builtinShader("Alpha-Internal");
-    static auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+    static auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
     shader->Use();
     //auto cameraPos = Camera::main()->transform()->position();
     auto view = Camera::main()->worldToCameraMatrix();
@@ -178,8 +178,8 @@ DrawWireSphere(
     const float         radius)
 {
     Matrix4x4 m;
-    auto view = Camera::main()->worldToCameraMatrix();
-    auto proj = Camera::main()->projectionMatrix();
+    auto const & view = Camera::main()->worldToCameraMatrix();
+	auto const & proj = Camera::main()->projectionMatrix();
     auto shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     shader->BindUniformVec4("_Color", s_color);
@@ -209,8 +209,8 @@ DrawHalfWireSphere(
 {
     auto shader = Shader::builtinShader("SolidColor-Internal");
     Matrix4x4 m;
-    auto v = Camera::main()->worldToCameraMatrix();
-    auto p = Camera::main()->projectionMatrix();
+	auto const & v = Camera::main()->worldToCameraMatrix();
+	auto const & p = Camera::main()->projectionMatrix();
 
     float euler_angles[] = {
         0, 0, 90,
@@ -250,8 +250,8 @@ DrawWireCube(
     Matrix4x4 m;
     m.SetTRS(center, Quaternion::identity, size);
     ShaderUniforms uniforms;
-    auto v = Camera::main()->worldToCameraMatrix();
-    auto p = Camera::main()->projectionMatrix();
+	auto const & v = Camera::main()->worldToCameraMatrix();
+	auto const & p = Camera::main()->projectionMatrix();
     shader->BindUniformVec4("_Color", s_color);
     shader->BindUniformMat4("MATRIX_MVP", p * v * s_matrix * m);
     s_boxMesh->Render();
@@ -289,8 +289,8 @@ DrawHalfCircle(
 {
     const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
-    auto v = Camera::main()->worldToCameraMatrix();
-    auto p = Camera::main()->projectionMatrix();
+	auto const & v = Camera::main()->worldToCameraMatrix();
+	auto const & p = Camera::main()->projectionMatrix();
 
     Vector3 y = Vector3::Normalize(dir1);
     Vector3 x = Vector3::Normalize(dir2);
@@ -324,8 +324,8 @@ DrawCircle(
 {
     const auto& shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
-    auto v = Camera::main()->worldToCameraMatrix();
-    auto p = Camera::main()->projectionMatrix();
+	auto const & v = Camera::main()->worldToCameraMatrix();
+	auto const & p = Camera::main()->projectionMatrix();
     Matrix4x4 m;
     m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3(radius, radius, radius));
     shader->BindUniformMat4("MATRIX_MVP", p * v * m);
@@ -344,8 +344,8 @@ DrawLight(
     float scale = getScaleForConstantSizeGeometry(center, 0.02f);
     Matrix4x4 m;
     m.SetTRS(center, Quaternion::FromToRotation(Vector3::up, direction), Vector3::one*scale);
-    auto view = Camera::main()->worldToCameraMatrix();
-    auto proj = Camera::main()->projectionMatrix();
+	auto const & view = Camera::main()->worldToCameraMatrix();
+	auto const & proj = Camera::main()->projectionMatrix();
     shader->Use();
     shader->BindUniformMat4("MATRIX_MVP", proj*view*m);
     shader->BindUniformVec4("_Color", s_color);
@@ -399,8 +399,8 @@ DrawFrustum(
         *p = v3.z; p++;
     }
 
-    auto view = Camera::main()->worldToCameraMatrix();
-    auto proj = Camera::main()->projectionMatrix();
+	auto const & view = Camera::main()->worldToCameraMatrix();
+	auto const & proj = Camera::main()->projectionMatrix();
     auto shader = Shader::builtinShader("SolidColor-Internal");
     shader->Use();
     shader->BindUniformMat4("MATRIX_MVP", proj*view);

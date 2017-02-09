@@ -37,8 +37,8 @@ namespace FishEngine
 
     void Pipeline::BindCamera(const CameraPtr& camera)
     {
-        auto proj = camera->projectionMatrix();
-        auto view = camera->worldToCameraMatrix();
+		auto const & proj = camera->projectionMatrix();
+		auto const & view = camera->worldToCameraMatrix();
         s_perCameraUniforms.MATRIX_P = proj;
         s_perCameraUniforms.MATRIX_V = view;
         s_perCameraUniforms.MATRIX_I_V = view.inverse();

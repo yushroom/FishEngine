@@ -2,12 +2,20 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <stb/stb_image_resize.h>
+
 #include <gli/gli.hpp>
-#include "GLEnvironment.hpp"
-#include "Debug.hpp"
-#include "Common.hpp"
-#include "Mathf.hpp"
-#include "Texture2D.hpp"
+
+//#include <GLEnvironment.hpp>
+#include <Debug.hpp>
+#include <Common.hpp>
+#include <Mathf.hpp>
+#include <Texture2D.hpp>
+
+#include "AssetDataBase.hpp"
+
+#include <QImage>
 
 using namespace FishEngine;
 
@@ -220,6 +228,74 @@ namespace FishEditor
 		}
 		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
 		{
+#if 1
+			QImage image(QString::fromStdString(path.string()));
+			auto texture = std::make_shared<Texture2D>();
+			int width = image.width();
+			int height = image.height();
+			texture->m_width = width;
+			texture->m_height = height;
+			bool needResize = false;
+			if ( ! Mathf::IsPowerOfTwo(width) )
+			{
+				width = Mathf::NextPowerOfTwo(width);
+				needResize = true;
+			}
+			if ( ! Mathf::IsPowerOfTwo(height) )
+			{
+				height = Mathf::NextPowerOfTwo(height);
+				needResize = true;
+			}
+
+			if (needResize)
+			{
+				Debug::LogWarning("resize image");
+				image = image.scaled(width, height);
+			}
+
+			//int bytesPerLine = image.bytesPerLine();
+			//int bytes = image.byteCount();
+			int expectedBytes = 0;
+
+			auto format = image.format();
+			
+			// QImage is 32-bit aligned
+			switch (format)
+			{
+			case QImage::Format_RGB32:
+				//image.convertToFormat(QImage::Format_RGB888);
+				//texture->m_format = TextureFormat::RGB24;
+				//expectedBytes = width * height * 3;
+				//break;
+			case QImage::Format_ARGB32:
+				image = image.convertToFormat(QImage::Format_RGBA8888);
+				texture->m_format = TextureFormat::RGBA32;
+				expectedBytes = width * height * 4;
+				break;
+			case QImage::Format_Mono:
+				image = image.convertToFormat(QImage::Format_Grayscale8);
+				//break;
+			case QImage::Format_Grayscale8:
+				texture->m_format = TextureFormat::R8;
+				expectedBytes = width * height;
+				break;
+			default:
+				abort();
+			}
+			
+			int length = image.byteCount();
+			if (expectedBytes != length)
+			{
+				abort();
+			}
+			auto data = image.bits();
+			texture->m_data.resize(length);
+			std::copy(data, data + length, texture->m_data.begin());
+			
+			AssetDatabase::m_cacheIcons[path] = QIcon(QPixmap::fromImage(std::move(image)));
+			//AssetDatabase::m_cacheIcons.emplace({ path, QIcon(QPixmap::fromImage(std::move(image))) });
+			return texture;
+#else
 			int width, height, components;
 			uint8_t *data = stbi_load(path.string().c_str(), &width, &height, &components, 0);
 			if (data == nullptr)
@@ -255,14 +331,16 @@ namespace FishEditor
 				abort();
 			}
 			return texture;
+#endif
 		}
 		else
 		{
 			abort();
 		}
-
 		return nullptr;
 	}
+
+#if 0
 
 	TexturePtr TextureImporter::FromFile(const Path& path)
     {
@@ -342,4 +420,5 @@ namespace FishEditor
         Texture::s_textures.push_back(t);
         return t;
     }
+#endif
 }

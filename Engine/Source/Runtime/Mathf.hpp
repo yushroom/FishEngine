@@ -101,7 +101,7 @@ public:
 
     static int ClosestPowerOfTwo(int value);
 
-    inline bool IsPowerOfTwo(uint32_t value)
+    inline static bool IsPowerOfTwo(uint32_t value)
     {
         return (value & (value-1)) == 0;
     }

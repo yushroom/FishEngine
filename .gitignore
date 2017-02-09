@@ -36,6 +36,7 @@ xcuserdata/
 
 # generated
 /Engine/Source/Runtime/generate/
+/Engine/Source/Editor/generate/
 
 # binary
 /Engine/Binary
@@ -54,6 +55,7 @@ xcuserdata/
 *.tga
 *.jpg
 *.fbx
+*.obj
 *.meta
 *.md5anim
 *.md5mesh

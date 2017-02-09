@@ -44,8 +44,8 @@ namespace FishEditor
 		archive >> BaseClassWrapper<AssetImporter>(value);
 		archive >> make_nvp("m_textureType", value.m_textureType); // FishEngine::TextureImporterType
 		archive >> make_nvp("m_textureShape", value.m_textureShape); // FishEngine::TextureImporterShape
-		archive >> make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
-		archive >> make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
+		archive >> make_nvp("m_filterMode", value.m_textureSettings.m_filterMode); // FishEngine::FilterMode
+		archive >> make_nvp("m_wrapMode", value.m_textureSettings.m_wrapMode); // FishEngine::TextureWrapMode
 		archive >> make_nvp("m_sRGBTexture", value.m_sRGBTexture); // bool
 		archive >> make_nvp("m_isReadable", value.m_isReadable); // bool
 		archive >> make_nvp("m_mipmapEnabled", value.m_mipmapEnabled); // bool

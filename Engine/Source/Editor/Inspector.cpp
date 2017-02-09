@@ -226,8 +226,8 @@ void Inspector::OnInspectorGUI(TextureImporterPtr const & importer)
 	EditorGUI::EnumPopup("Texture Shape", &importer->m_textureShape);
 	EditorGUI::Toggle("Read/Write Enabled", &importer->m_isReadable);
 	EditorGUI::Toggle("Generate Mip Maps", &importer->m_mipmapEnabled);
-	EditorGUI::EnumPopup("Filter Mode", &importer->m_filterMode);
-	EditorGUI::EnumPopup("Wrap Mode", &importer->m_wrapMode);
+	EditorGUI::EnumPopup("Filter Mode", &importer->m_textureSettings.m_filterMode);
+	EditorGUI::EnumPopup("Wrap Mode", &importer->m_textureSettings.m_wrapMode);
 }
 
 

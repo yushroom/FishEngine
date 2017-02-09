@@ -10,6 +10,8 @@ namespace FishEngine
         Cube,
         Plane,
         Quad,
+
         Cone,
+		ScreenAlignedQuad,
     };
 }

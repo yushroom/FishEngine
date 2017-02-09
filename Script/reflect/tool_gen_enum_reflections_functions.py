@@ -9,7 +9,7 @@ template<>
 constexpr int EnumCount<${T}>() { return ${length}; }
 
 // string array
-static const char* ${T}Strings[] =
+static const char* ${SimpleT}Strings[] =
 {
     ${CStrings}
 };
@@ -18,7 +18,7 @@ static const char* ${T}Strings[] =
 template<>
 inline constexpr const char** EnumToCStringArray<${T}>()
 {
-    return ${T}Strings;
+    return ${SimpleT}Strings;
 }
 
 // index to enum
@@ -51,7 +51,7 @@ inline ${T} ToEnum<${T}>(const std::string& s)
 '''
 t = Template(t_str)
 
-def GenEnumFunctions(enum_name, enum_elements):
+def GenEnumFunctions(enum_name, enum_scope, enum_elements):
     #print(enum_name, enum_elements)
     index_to_enum_case  = "case {0}: return {1}::{2}; break;"
     enum_to_index_case  = "case {1}::{2}: return {0}; break;"
@@ -61,13 +61,15 @@ def GenEnumFunctions(enum_name, enum_elements):
     enum_to_index_cases = ''
     string_to_enum_cases = ''
 
+    full_type_name = enum_scope + '::' + enum_name
+
     for i in range(len(enum_elements)):
-        index_to_enum_cases  += index_to_enum_case.format(i, enum_name, enum_elements[i]) + '\n\t'
-        enum_to_index_cases  += enum_to_index_case.format(i, enum_name, enum_elements[i]) + '\n\t'
-        string_to_enum_cases += string_to_enum_case.format(enum_name, enum_elements[i]) + '\n\t'
+        index_to_enum_cases  += index_to_enum_case.format(i, full_type_name, enum_elements[i]) + '\n\t'
+        enum_to_index_cases  += enum_to_index_case.format(i, full_type_name, enum_elements[i]) + '\n\t'
+        string_to_enum_cases += string_to_enum_case.format(full_type_name, enum_elements[i]) + '\n\t'
 
     CStrings = ',\n\t'.join(['"{}"'.format(e) for e in enum_elements])
-    return t.render(T = enum_name, length = len(enum_elements), CStrings= CStrings, \
+    return t.render(T = full_type_name, SimpleT = enum_name, length = len(enum_elements), CStrings= CStrings, \
         IndexToEnumCases = index_to_enum_cases, EnumToIndexCases = enum_to_index_cases, \
         StringToEnumCases = string_to_enum_cases)
 

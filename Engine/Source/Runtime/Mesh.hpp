@@ -106,10 +106,10 @@ namespace FishEngine
         }
 
 		// temp
-        void ToBinary(std::ostream & os);
-        static MeshPtr FromBinary(std::istream & is);
+        void ToBinaryFile(std::ostream & os);
+        static MeshPtr FromBinaryFile(std::istream & is);
 
-		static MeshPtr FromText(std::istream & is);
+		static MeshPtr FromTextFile(std::istream & is);
 
 		static void Init();
 		static MeshPtr builtinMesh(const PrimitiveType type);

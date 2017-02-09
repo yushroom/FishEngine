@@ -185,7 +185,7 @@ namespace FishEngine
             MakeDirty();
         }
 
-        Matrix4x4 worldToLocalMatrix() const
+        const Matrix4x4 & worldToLocalMatrix() const
         {
             UpdateMatrix();
             return m_worldToLocalMatrix;

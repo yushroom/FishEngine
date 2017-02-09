@@ -93,10 +93,10 @@ namespace FishEngine
         }
 
         // Matrix that transforms from world to camera space (i.e. view matrix).
-        Matrix4x4 worldToCameraMatrix() const;
+        const Matrix4x4 & worldToCameraMatrix() const;
 
         // projection matrix.
-        Matrix4x4 projectionMatrix() const;
+        const Matrix4x4 & projectionMatrix() const;
 
         const Vector4& viewport() const
         {

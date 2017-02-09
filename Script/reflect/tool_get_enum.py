@@ -56,6 +56,7 @@ def find_typerefs(node):
             return
         print('enum:', node.type.spelling)
         #print type(node.location.file.name)
+        header_path = os.path.abspath( os.path.dirname( node.location.file.name ) )
         header_file = os.path.basename( node.location.file.name )
         #print header_file
         #print 'scope ' + scope_prefix
@@ -64,7 +65,7 @@ def find_typerefs(node):
             #print c.spelling, c.kind, c.access_specifier
             if c.kind == clang.cindex.CursorKind.ENUM_CONSTANT_DECL:
                 enum_member_list.append(c.spelling)
-        enum_types[node.spelling] = { 'data' : enum_member_list, 'header_file' : header_file, 'scope_prefix' : scope_prefix}
+        enum_types[node.spelling] = { 'data' : enum_member_list, 'header_file' : header_file, 'path': header_path, 'scope_prefix' : scope_prefix}
         return
 
     for c in node.get_children():
@@ -83,3 +84,4 @@ if __name__ == "__main__":
     if debug:
         for key in count:
             print(key, count[key])
+

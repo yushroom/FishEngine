@@ -5,15 +5,12 @@
 #include <sstream>
 #include <cstdio>
 
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
-//#include <assimp/postprocess.h>
-
 #include "Shader.hpp"
 #include "Debug.hpp"
 #include "Common.hpp"
 #include "ShaderVariables_gen.hpp"
 //#include "Serialization/archives/binary.hpp"
+#include "generate/Enum_PrimitiveType.hpp"
 
 using namespace std;
 
@@ -161,47 +158,8 @@ namespace FishEngine
         glBindVertexArray(0);
     }
 
-	void Mesh::ToBinary(std::ostream & os)
+	void Mesh::ToBinaryFile(std::ostream & os)
     {
-#if 0
-		printf("%s", name().c_str());
-		auto p = m_positionBuffer.data();
-		for (int i = 0; i < vertexCount(); ++i)
-		{
-			printf("%ff,%ff,%fff,", *p, *(p+1), *(p+2));
-			p +=3;
-		}
-		printf("\n");
-		p = m_normalBuffer.data();
-		for (int i = 0; i < vertexCount(); ++i)
-		{
-			printf("%ff,%ff,%ff,", *p, *(p+1), *(p+2));
-			p +=3;
-		}
-		printf("\n");
-		p = m_uvBuffer.data();
-		for (int i = 0; i < vertexCount(); ++i)
-		{
-			printf("%ff,%ff,", *p, *(p+1));
-			p +=2;
-		}
-		printf("\n");
-		p = m_tangentBuffer.data();
-		for (int i = 0; i < vertexCount(); ++i)
-		{
-			printf("%ff,%ff,%ff,", *p, *(p+1), *(p+2));
-			p +=3;
-		}
-		printf("\n");
-		auto pp = m_indexBuffer.data();
-		for (int i = 0; i < m_triangleCount; ++i)
-		{
-			printf("%d,%d,%d,", *pp, *(pp+1), *(pp+2));
-			pp +=3;
-		}
-#else
-		//std::ofstream fout(m_name+".bin", std::ios::binary);
-		//os << m_vertexCount << m_triangleCount;
 		os.write((char*)&m_vertexCount, sizeof(m_vertexCount));
 		os.write((char*)&m_triangleCount, sizeof(m_triangleCount));
 		os.write((char*)m_positionBuffer.data(), sizeof(decltype(m_positionBuffer)::value_type) * m_positionBuffer.size());
@@ -209,23 +167,11 @@ namespace FishEngine
 		os.write((char*)m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * m_uvBuffer.size());
 		os.write((char*)m_tangentBuffer.data(), sizeof(decltype(m_tangentBuffer)::value_type) * m_tangentBuffer.size());
 		os.write((char*)m_indexBuffer.data(), sizeof(decltype(m_indexBuffer)::value_type) * m_indexBuffer.size());
-//		for (auto const f : m_positionBuffer)
-//			os << f;
-//		for (auto const f : m_normalBuffer)
-//			os << f;
-//		for (auto const f : m_uvBuffer)
-//			os << f;
-//		for (auto const f : m_tangentBuffer)
-//			os << f;
-//		for (auto const f : m_indexBuffer)
-//			os << f;
-#endif
     }
 
-    MeshPtr Mesh::FromBinary(std::istream &is)
+    MeshPtr Mesh::FromBinaryFile(std::istream &is)
     {
 		auto mesh = std::make_shared<Mesh>();
-        //is >> mesh->m_vertexCount >> mesh->m_triangleCount;
 		is.read((char*)&mesh->m_vertexCount, sizeof(mesh->m_vertexCount));
 		is.read((char*)&mesh->m_triangleCount, sizeof(mesh->m_triangleCount));
         mesh->m_positionBuffer.resize(mesh->m_vertexCount * 3);
@@ -233,16 +179,6 @@ namespace FishEngine
         mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
         mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
         mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
-//        for (auto & f : mesh->m_positionBuffer)
-//            is >> f;
-//        for (auto & f : mesh->m_normalBuffer)
-//            is >> f;
-//        for (auto & f : mesh->m_uvBuffer)
-//            is >> f;
-//        for (auto & f : mesh->m_tangentBuffer)
-//            is >> f;
-//        for (auto & f : mesh->m_indexBuffer)
-//            is >> f;
 		is.read((char*)mesh->m_positionBuffer.data(), sizeof(decltype(mesh->m_positionBuffer)::value_type) * mesh->m_positionBuffer.size());
 		is.read((char*)mesh->m_normalBuffer.data(), sizeof(decltype(m_normalBuffer)::value_type) * mesh->m_normalBuffer.size());
 		is.read((char*)mesh->m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * mesh->m_uvBuffer.size());
@@ -251,7 +187,7 @@ namespace FishEngine
 		return mesh;
     }
 
-	FishEngine::MeshPtr Mesh::FromText(std::istream & is)
+	FishEngine::MeshPtr Mesh::FromTextFile(std::istream & is)
 	{
 		auto mesh = std::make_shared<Mesh>();
 		is >> mesh->m_vertexCount >> mesh->m_triangleCount;
@@ -260,8 +196,25 @@ namespace FishEngine
 		mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
 		mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
 		mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
-		for (auto & f : mesh->m_positionBuffer)
-			is >> f;
+		float vx, vy, vz;
+		Vector3 vmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
+		Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
+		for (int i = 0; i < mesh->m_vertexCount; ++i)
+		{
+			is >> vx >> vy >> vz;
+			if (vmin.x > vx) vmin.x = vx;
+			if (vmin.y > vy) vmin.y = vy;
+			if (vmin.z > vz) vmin.z = vz;
+			if (vmax.x < vx) vmax.x = vx;
+			if (vmax.y < vy) vmax.y = vy;
+			if (vmax.z < vz) vmax.z = vz;
+			mesh->m_positionBuffer[i * 3] = vx;
+			mesh->m_positionBuffer[i * 3 + 1] = vy;
+			mesh->m_positionBuffer[i * 3 + 2] = vz;
+		}
+		mesh->m_bounds.SetMinMax(vmin, vmax);
+		//for (auto & f : mesh->m_positionBuffer)
+		//	is >> f;
 		for (auto & f : mesh->m_normalBuffer)
 			is >> f;
 		for (auto & f : mesh->m_uvBuffer)
@@ -275,42 +228,17 @@ namespace FishEngine
 
 	void Mesh::Init()
 	{
+		auto dir = Resources::modelRootDirectory();
+
+		for (auto & t : {PrimitiveType::Sphere, PrimitiveType::Capsule, PrimitiveType::Cylinder, PrimitiveType::Quad, PrimitiveType::Cube, PrimitiveType::Plane, PrimitiveType::Cone})
 		{
-			std::ifstream is("D:/program/unity/Test/Sphere.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Sphere");
-			s_builtinMeshes[PrimitiveType::Sphere] = mesh;
+			std::string n = FishEngine::EnumToString(t);
+			std::ifstream is((dir / (n+".txt")).string());
+			auto mesh = Mesh::FromTextFile(is);
+			mesh->setName(n);
+			s_builtinMeshes[t] = mesh;
 		}
-		{
-			std::ifstream is("D:/program/unity/Test/Capsule.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Capsule");
-			s_builtinMeshes[PrimitiveType::Capsule] = mesh;
-		}
-		{
-			std::ifstream is("D:/program/unity/Test/Cylinder.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Cylinder");
-			s_builtinMeshes[PrimitiveType::Cylinder] = mesh;
-		}
-		{
-			std::ifstream is("D:/program/unity/Test/Cube.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Cube");
-			s_builtinMeshes[PrimitiveType::Cube] = mesh;
-		}
-		{
-			std::ifstream is("D:/program/unity/Test/Plane.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Plane");
-			s_builtinMeshes[PrimitiveType::Plane] = mesh;
-		}
-		{
-			std::ifstream is("D:/program/unity/Test/Cone.txt");
-			auto mesh = Mesh::FromText(is);
-			mesh->setName("Cone");
-			s_builtinMeshes[PrimitiveType::Cone] = mesh;
-		}
+
 		{
 			std::vector<float> p = { -1,-1,0,  1,-1,0,  -1,1,0,  1,1,0 };
 			std::vector<float> n = { 0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1 };
@@ -318,8 +246,8 @@ namespace FishEngine
 			std::vector<float> t = { 1,0,0,  1,0,0,  1,0,0,  1,0,0 };
 			std::vector<uint32_t> index = { 2,1,0,  3,1,2 };
 			auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
-			mesh->setName("Quad");
-			s_builtinMeshes[PrimitiveType::Quad] = mesh;
+			mesh->setName("ScreenAlignedQuad");
+			s_builtinMeshes[PrimitiveType::ScreenAlignedQuad] = mesh;
 		}
 
 		for (auto& pair : s_builtinMeshes)

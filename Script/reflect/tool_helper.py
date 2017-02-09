@@ -20,10 +20,15 @@ def unittest_CamelCaseToReadable():
 
 def UpdateFile(out_path, content):
 	need_update = True
+
+	directory = os.path.dirname(out_path)
+	if not os.path.exists(directory):
+		os.makedirs(directory)
+
 	if os.path.exists(out_path):
 		with open(out_path) as f:
 			old_content = f.read()
-			need_update = content!= old_content
+			need_update = (content != old_content)
 	if need_update:
 		print("update", out_path)
 		with open(out_path, 'w') as f:

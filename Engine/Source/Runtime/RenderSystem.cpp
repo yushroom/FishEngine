@@ -178,7 +178,7 @@ namespace FishEngine
         {
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             auto mtl = Material::builtinMaterial("Deferred");
             mtl->SetTexture("DBufferATexture", m_GBuffer[0]);
             mtl->SetTexture("DBufferBTexture", m_GBuffer[1]);
@@ -218,7 +218,7 @@ namespace FishEngine
             glDepthMask(GL_FALSE);
             auto light = Light::lights().front();
             glClearBufferfv(GL_COLOR, 0, white);
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
             mtl->SetTexture("CascadedShadowMap", light->m_shadowMap);
             mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
@@ -235,7 +235,7 @@ namespace FishEngine
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
             glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
             Vector2 direction(1.0f / static_cast<float>(m_screenShadowMap->width()), 0);
             mtl->SetVector2("Direction", direction);
@@ -253,7 +253,7 @@ namespace FishEngine
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
             glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
             Vector2 direction(0, 1.0f / static_cast<float>(m_screenShadowMap->height()));
             mtl->SetVector2("Direction", direction);
@@ -270,7 +270,7 @@ namespace FishEngine
             glDepthMask(GL_FALSE);
             //Pipeline::PushRenderTarget(m_addShadowRenderTarget);
             //glClearBufferfv(GL_COLOR, 0, black);
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             auto mtl = Material::builtinMaterial("PostProcessShadow");
             mtl->setMainTexture(m_mainColorBuffer);
             mtl->SetTexture("ScreenShadow", m_screenShadowMap);
@@ -315,7 +315,7 @@ namespace FishEngine
         glDepthFunc(GL_ALWAYS);
         auto display_csm_mtl = Material::builtinMaterial("DisplayCSM");
         constexpr float size = 0.25f;
-        auto quad = Model::builtinMesh(PrimitiveType::Quad);
+        auto quad = Model::builtinMesh(PrimitiveType::ScreenAlignedQuad);
         for (int i = 0; i < 4; ++i)
         {
             display_csm_mtl->SetFloat("Section", float(i));

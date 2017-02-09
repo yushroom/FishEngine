@@ -144,8 +144,8 @@ namespace FishEditor
         /************************************************************************/
         if (true)
         {
-            auto view = Camera::main()->worldToCameraMatrix();
-            auto proj = Camera::main()->projectionMatrix();
+			auto const & view = Camera::main()->worldToCameraMatrix();
+			auto const & proj = Camera::main()->projectionMatrix();
             auto shader = Shader::builtinShader("SolidColor-Internal");
             shader->Use();
             shader->BindUniformVec4("_Color", Color::gray);
@@ -277,7 +277,7 @@ namespace FishEditor
             Pipeline::PushRenderTarget(m_selectionOutlineRT2);
             glClear(GL_COLOR_BUFFER_BIT);
             auto selection_outline_mtl = Material::builtinMaterial("PostProcessSelectionOutline");
-            auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
             selection_outline_mtl->SetTexture("StencilTexture", m_selectionOutlineDepthBuffer);
             selection_outline_mtl->SetTexture("ColorTexture", m_colorBuffer);
             selection_outline_mtl->SetTexture("DepthTexture", RenderSystem::m_mainDepthBuffer);
@@ -344,11 +344,12 @@ namespace FishEditor
         glClear(GL_DEPTH_BUFFER_BIT);
         DrawSceneGizmo();
 
-        GameObjectPtr selectedGO = nullptr;
-        if (!selection.empty())
-        {
-            selectedGO = selection.front().lock()->gameObject();
-        }
+		auto selectedGO = Selection::activeGameObject();
+		if (m_lastSelectedGameObject.lock() != selectedGO)
+		{
+			m_selectedAxis = -1;
+			m_lastSelectedGameObject = selectedGO;
+		}
         if (selectedGO != nullptr)
         {
             if (m_transformToolType == TransformToolType::Translate)
@@ -377,20 +378,37 @@ namespace FishEditor
         Pipeline::PopRenderTarget();
     }
 
+	float MiddleElement(float t[3])
+	{
+		float tmid = t[0];
+		if (t[0] >= t[1])
+		{
+			if (t[1] >= t[2])
+				tmid = t[1];
+			else if (t[0] >= t[2])
+				tmid = t[2];
+			else
+				tmid = t[0];
+		}
+		else
+		{
+			if (t[0] >= t[2])
+				tmid = t[0];
+			else if (t[1] >= t[2])
+				tmid = t[2];
+			else
+				tmid = t[1];
+		}
+		return tmid;
+	}
+
     void SceneViewEditor::DrawTranslateGizmo()
     {
         constexpr float translate_gizmo_length = 0.2f;
         static Vector3 lastMousePosition;
         static Vector3 lastCenter;
 
-        auto selectedGO = Selection::activeGameObject();
-        if (m_lastSelectedGameObject.lock() != selectedGO)
-        {
-            m_selectedAxis = -1;
-            m_lastSelectedGameObject = selectedGO;
-        }
-        if (selectedGO == nullptr)
-            return;
+		auto selectedGO = Selection::activeGameObject();
 
         auto camera = Camera::main();
         Vector3 center = selectedGO->transform()->position();
@@ -421,7 +439,8 @@ namespace FishEditor
             view.IntersectPlane(axis[0], center, t);
             view.IntersectPlane(axis[1], center, t + 1);
             view.IntersectPlane(axis[2], center, t + 2);
-            float tmid = *std::min_element(std::begin(t), std::end(t));
+            //float tmid = *std::min_element(std::begin(t), std::end(t));
+			float tmid = MiddleElement(t);
 
             Vector3 p = view.GetPoint(tmid);
             Vector3 d = p - center;
@@ -430,7 +449,7 @@ namespace FishEditor
                 d.Normalize();
                 for (int i = 0; i < 3; ++i)
                 {
-                    if (Vector3::Dot(d, axis[i]) > 0.96f)
+                    if (Vector3::Dot(d, axis[i]) > 0.9f)
                     {
                         m_selectedAxis = i;
                         //m_mouseEventHandled = true;
@@ -443,8 +462,8 @@ namespace FishEditor
         auto shader = sceneGizmoMaterial->shader();
         shader->Use();
         //sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
-        auto view = camera->worldToCameraMatrix();
-        auto proj = camera->projectionMatrix();
+        auto const & view = camera->worldToCameraMatrix();
+        auto const & proj = camera->projectionMatrix();
         auto vp = proj * view;
 
         //ShaderUniforms uniforms;
@@ -547,13 +566,6 @@ namespace FishEditor
         static Vector3 lastFromDir;
         static Quaternion lastRotation;
         auto selectedGO = Selection::activeGameObject();
-        if (m_lastSelectedGameObject.lock() != selectedGO)
-        {
-            m_selectedAxis = -1;
-            m_lastSelectedGameObject = selectedGO;
-        }
-        if (selectedGO == nullptr)
-            return;
 
         auto camera = Camera::main();
         Vector3 center = selectedGO->transform()->position();
@@ -671,13 +683,6 @@ namespace FishEditor
         static Vector3 lastCenter;
 
         auto selectedGO = Selection::activeGameObject();
-        if (m_lastSelectedGameObject.lock() != selectedGO)
-        {
-            m_selectedAxis = -1;
-            m_lastSelectedGameObject = selectedGO;
-        }
-        if (selectedGO == nullptr)
-            return;
 
         auto camera = Camera::main();
         Vector3 center = selectedGO->transform()->position();
@@ -702,7 +707,8 @@ namespace FishEditor
             view.IntersectPlane(axis[0], center, t);
             view.IntersectPlane(axis[1], center, t + 1);
             view.IntersectPlane(axis[2], center, t + 2);
-            float tmid = *std::min_element(std::begin(t), std::end(t));
+            //float tmid = *std::min_element(std::begin(t), std::end(t));
+			float tmid = MiddleElement(t);
 
             Vector3 p = view.GetPoint(tmid);
             Vector3 d = p - center;
@@ -724,8 +730,8 @@ namespace FishEditor
         auto shader = sceneGizmoMaterial->shader();
         shader->Use();
         //sceneGizmoMaterial->SetVector3("unity_LightPosition", Vector3(0, 0, -1));
-        auto view = camera->worldToCameraMatrix();
-        auto proj = camera->projectionMatrix();
+		auto const & view = camera->worldToCameraMatrix();
+		auto const & proj = camera->projectionMatrix();
         auto vp = proj * view;
 
         //ShaderUniforms uniforms;

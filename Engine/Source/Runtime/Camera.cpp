@@ -43,7 +43,7 @@ namespace FishEngine
     }
 
 
-    Matrix4x4 Camera::projectionMatrix() const
+    const Matrix4x4 & Camera::projectionMatrix() const
     {
         if (m_isDirty) {
             if (m_orthographic) {
@@ -83,7 +83,7 @@ namespace FishEngine
         return Ray(transform()->position(), ray_world.normalized()); 
     }
 
-    Matrix4x4 Camera::worldToCameraMatrix() const
+    const Matrix4x4 & Camera::worldToCameraMatrix() const
     {
         return transform()->worldToLocalMatrix();
     }

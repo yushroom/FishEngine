@@ -112,7 +112,7 @@ void DefaultScene()
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 	
-#elif 0
+#elif 1
 	
 	QualitySettings::setShadowDistance(30);
 	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
@@ -247,7 +247,7 @@ void DefaultScene()
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         //Graphics::Blit()
         glViewport(0, 0, Screen::width(), Screen::height());
-        auto quad = Mesh::builtinMesh(PrimitiveType::Quad);
+        auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
         auto mtl = Material::builtinMaterial("DrawQuad");
         mtl->setMainTexture(m_mainSceneViewEditor->m_colorBuffer);
         Graphics::DrawMesh(quad, mtl);

@@ -6,6 +6,7 @@
 #include "SphereCollider.hpp"
 #include "CapsuleCollider.hpp"
 #include "Rigidbody.hpp"
+#include "MeshRenderer.hpp"
 
 #include "TagManager.hpp"
 
@@ -27,11 +28,10 @@ namespace FishEngine
 		
 	}
 
-    GameObject::GameObject(const std::string& name) : m_tagIndex(0)
+    GameObject::GameObject(const std::string& name)
+		: m_transform(std::make_shared<Transform>())
     {
-        //m_transform->m_gameObject = this;
-        m_transform = std::make_shared<Transform>();
-        m_name = name;
+		m_name = name;
     }
 	
 	GameObjectPtr GameObject::Create()
@@ -53,15 +53,20 @@ namespace FishEngine
 
     FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
     {
-        auto go = Model::builtinModel(type)->CreateGameObject();
-		//go->AddComponent<Rigidbody>();
-        if (type == PrimitiveType::Cube)
-            go->AddComponent<BoxCollider>();
-        else if (type == PrimitiveType::Sphere)
-            go->AddComponent<SphereCollider>();
-        else if (type == PrimitiveType::Capsule)
-            go->AddComponent<CapsuleCollider>();
+        auto mesh = Model::builtinMesh(type);
+        auto go = Scene::CreateGameObject("GameObject");
+        go->AddComponent<MeshFilter>()->SetMesh(mesh);
+		go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
         return go;
+//        auto go = Model::builtinModel(type)->CreateGameObject();
+//		//go->AddComponent<Rigidbody>();
+//        if (type == PrimitiveType::Cube)
+//            go->AddComponent<BoxCollider>();
+//        else if (type == PrimitiveType::Sphere)
+//            go->AddComponent<SphereCollider>();
+//        else if (type == PrimitiveType::Capsule)
+//            go->AddComponent<CapsuleCollider>();
+//        return go;
     }
 
     GameObjectPtr GameObject::Find(const std::string& name)

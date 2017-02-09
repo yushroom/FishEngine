@@ -28,7 +28,7 @@ namespace FishEditor
 	}
 
 	template <>
-	static std::shared_ptr<Texture>
+	std::shared_ptr<Texture>
 		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
 	{
 		auto importer = AssetImporter::GetAtPath(path);

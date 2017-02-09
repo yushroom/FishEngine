@@ -13,6 +13,7 @@
 #include "Debug.hpp"
 #include "Common.hpp"
 #include "ShaderVariables_gen.hpp"
+#include "Serialization/archives/binary.hpp"
 
 using namespace std;
 
@@ -68,6 +69,17 @@ namespace FishEngine
     //    GenerateBuffer((int)VertexUsage::PN);
     //    BindBuffer((int)VertexUsage::PN);
     //}
+
+    Mesh::Mesh(std::vector<float> &&positionBuffer, std::vector<float> &&normalBuffer, std::vector<float> &&uvBuffer, std::vector<float> &&tangentBuffer, std::vector<uint32_t> &&indexBuffer)
+        : m_positionBuffer(positionBuffer),
+          m_normalBuffer(normalBuffer),
+          m_uvBuffer(uvBuffer),
+          m_tangentBuffer(tangentBuffer),
+          m_indexBuffer(indexBuffer)
+    {
+		m_vertexCount = positionBuffer.size() / 3;
+		m_triangleCount = indexBuffer.size() / 3;
+    }
 
     Mesh::Mesh(Mesh&& m)
     {
@@ -146,6 +158,96 @@ namespace FishEngine
         glBindVertexArray(m_VAO);
         glDrawElements(GL_TRIANGLES, m_triangleCount*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+    }
+
+	void Mesh::ToBinary(std::ostream & os)
+    {
+#if 0
+		printf("%s", name().c_str());
+		auto p = m_positionBuffer.data();
+		for (int i = 0; i < vertexCount(); ++i)
+		{
+			printf("%ff,%ff,%fff,", *p, *(p+1), *(p+2));
+			p +=3;
+		}
+		printf("\n");
+		p = m_normalBuffer.data();
+		for (int i = 0; i < vertexCount(); ++i)
+		{
+			printf("%ff,%ff,%ff,", *p, *(p+1), *(p+2));
+			p +=3;
+		}
+		printf("\n");
+		p = m_uvBuffer.data();
+		for (int i = 0; i < vertexCount(); ++i)
+		{
+			printf("%ff,%ff,", *p, *(p+1));
+			p +=2;
+		}
+		printf("\n");
+		p = m_tangentBuffer.data();
+		for (int i = 0; i < vertexCount(); ++i)
+		{
+			printf("%ff,%ff,%ff,", *p, *(p+1), *(p+2));
+			p +=3;
+		}
+		printf("\n");
+		auto pp = m_indexBuffer.data();
+		for (int i = 0; i < m_triangleCount; ++i)
+		{
+			printf("%d,%d,%d,", *pp, *(pp+1), *(pp+2));
+			pp +=3;
+		}
+#else
+		//std::ofstream fout(m_name+".bin", std::ios::binary);
+		//os << m_vertexCount << m_triangleCount;
+		os.write((char*)&m_vertexCount, sizeof(m_vertexCount));
+		os.write((char*)&m_triangleCount, sizeof(m_triangleCount));
+		os.write((char*)m_positionBuffer.data(), sizeof(decltype(m_positionBuffer)::value_type) * m_positionBuffer.size());
+		os.write((char*)m_normalBuffer.data(), sizeof(decltype(m_normalBuffer)::value_type) * m_normalBuffer.size());
+		os.write((char*)m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * m_uvBuffer.size());
+		os.write((char*)m_tangentBuffer.data(), sizeof(decltype(m_tangentBuffer)::value_type) * m_tangentBuffer.size());
+		os.write((char*)m_indexBuffer.data(), sizeof(decltype(m_indexBuffer)::value_type) * m_indexBuffer.size());
+//		for (auto const f : m_positionBuffer)
+//			os << f;
+//		for (auto const f : m_normalBuffer)
+//			os << f;
+//		for (auto const f : m_uvBuffer)
+//			os << f;
+//		for (auto const f : m_tangentBuffer)
+//			os << f;
+//		for (auto const f : m_indexBuffer)
+//			os << f;
+#endif
+    }
+
+    MeshPtr Mesh::FromBinary(std::istream &is)
+    {
+		auto mesh = std::make_shared<Mesh>();
+        //is >> mesh->m_vertexCount >> mesh->m_triangleCount;
+		is.read((char*)&mesh->m_vertexCount, sizeof(mesh->m_vertexCount));
+		is.read((char*)&mesh->m_triangleCount, sizeof(mesh->m_triangleCount));
+        mesh->m_positionBuffer.resize(mesh->m_vertexCount * 3);
+        mesh->m_normalBuffer.resize(mesh->m_vertexCount * 3);
+        mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
+        mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
+        mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
+//        for (auto & f : mesh->m_positionBuffer)
+//            is >> f;
+//        for (auto & f : mesh->m_normalBuffer)
+//            is >> f;
+//        for (auto & f : mesh->m_uvBuffer)
+//            is >> f;
+//        for (auto & f : mesh->m_tangentBuffer)
+//            is >> f;
+//        for (auto & f : mesh->m_indexBuffer)
+//            is >> f;
+		is.read((char*)mesh->m_positionBuffer.data(), sizeof(decltype(mesh->m_positionBuffer)::value_type) * mesh->m_positionBuffer.size());
+		is.read((char*)mesh->m_normalBuffer.data(), sizeof(decltype(m_normalBuffer)::value_type) * mesh->m_normalBuffer.size());
+		is.read((char*)mesh->m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * mesh->m_uvBuffer.size());
+		is.read((char*)mesh->m_tangentBuffer.data(), sizeof(decltype(m_tangentBuffer)::value_type) * mesh->m_tangentBuffer.size());
+		is.read((char*)mesh->m_indexBuffer.data(), sizeof(decltype(m_indexBuffer)::value_type) * mesh->m_indexBuffer.size());
+		return mesh;
     }
 
     //void Model::renderPatch(const Shader &shader) {

@@ -9,20 +9,10 @@
 #include "Component_gen.hpp"
 
 #include <memory>
+#include "PrimitiveType.hpp"
 
 namespace FishEngine
 {
-    enum class PrimitiveType
-    {
-        Sphere,
-        Capsule,
-        Cylinder,
-        Cube,
-        Plane,
-        Quad,
-        Cone,
-    };
-
     // Base class for all entities in Unity scenes.
     // http://docs.unity3d.com/ScriptReference/GameObject.html
     class FE_EXPORT GameObject : public Object
@@ -175,11 +165,9 @@ namespace FishEngine
 
         std::list<ComponentPtr> m_components;
 
-        bool m_activeSelf = true;
-        int m_layer = 0;
-
-        //std::string m_tag;
-		int				m_tagIndex;	// index in TagManager
+        bool			m_activeSelf	= true;
+        int				m_layer			= 0;
+		int				m_tagIndex		= 0;		// index in TagManager
         TransformPtr	m_transform;
     };
 }

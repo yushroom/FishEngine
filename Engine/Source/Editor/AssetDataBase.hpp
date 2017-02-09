@@ -61,7 +61,7 @@ namespace FishEditor
     };
 
 	template <>
-	static std::shared_ptr<FishEngine::Texture> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
+	std::shared_ptr<FishEngine::Texture> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
 
 	//template <>
 	//static std::shared_ptr<Texture> AssetDatabase::LoadAssetAtPath(Path const & path);

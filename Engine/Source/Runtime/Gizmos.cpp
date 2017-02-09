@@ -145,7 +145,7 @@ DrawIcon(
 {
 #if 1
     auto shader = Shader::builtinShader("Alpha-Internal");
-    static ModelPtr quad = Model::builtinModel(PrimitiveType::Quad);
+    static auto quad = Model::builtinMesh(PrimitiveType::Quad);
     shader->Use();
     //auto cameraPos = Camera::main()->transform()->position();
     auto view = Camera::main()->worldToCameraMatrix();
@@ -164,7 +164,7 @@ DrawIcon(
         textures["_MainTex"] = lightGizmoTexture;
     shader->BindTextures(textures);
     shader->PreRender();
-    quad->mainMesh()->Render();
+    quad->Render();
     shader->PostRender();
 #endif
 }

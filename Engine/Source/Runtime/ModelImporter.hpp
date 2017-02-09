@@ -92,6 +92,7 @@ namespace FishEngine {
         //mutable std::vector<std::weak_ptr<SkinnedMeshRenderer>> m_skinnedMeshRenderersToFindLCA;
         
         static std::map<PrimitiveType, ModelPtr> s_builtinModels;
+        static std::map<PrimitiveType, MeshPtr> s_builtinMeshes;
     };
 
     // Vertex normal generation options for ModelImporter.

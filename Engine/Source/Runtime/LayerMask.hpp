@@ -2,10 +2,11 @@
 
 #include "FishEngine.hpp"
 #include <array>
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class LayerMask
+    class Meta(NonSerializable) LayerMask
     {
     public:
         explicit LayerMask(int layer);

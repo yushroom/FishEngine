@@ -60,8 +60,8 @@ namespace FishEditor
         Camera::setMainCamera(m_camera);
 
         sceneGizmoMaterial = Material::InstantiateBuiltinMaterial("VertexLit-Internal");
-        cubeMesh = Model::builtinModel(PrimitiveType::Cube)->mainMesh();
-        coneMesh = Model::builtinModel(PrimitiveType::Cone)->mainMesh();
+        cubeMesh = Model::builtinMesh(PrimitiveType::Cube);
+        coneMesh = Model::builtinMesh(PrimitiveType::Cone);
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
 //        m_size = EditorGUI::sceneViewSize();
         //m_sceneViewRenderTexture = RenderTexture::CreateColorMap(m_size.x, m_size.y);

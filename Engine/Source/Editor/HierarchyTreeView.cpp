@@ -113,7 +113,7 @@ HierarchyTreeView::HierarchyTreeView(QWidget *parent)
     connect(action, &QAction::triggered, [](){ CreatePrimitive(PrimitiveType::Sphere); });
     action = sub_menu->addAction("Capsule");
     connect(action, &QAction::triggered, [](){ CreatePrimitive(PrimitiveType::Capsule); });
-    action->setEnabled(false);
+    //action->setEnabled(false);
     action = sub_menu->addAction("Cylinder");
     connect(action, &QAction::triggered, [](){ CreatePrimitive(PrimitiveType::Cylinder); });
     action = sub_menu->addAction("Plane");

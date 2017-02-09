@@ -25,6 +25,7 @@ namespace FishEngine {
 
 
     std::map<PrimitiveType, ModelPtr> Model::s_builtinModels;
+    std::map<PrimitiveType, MeshPtr> Model::s_builtinMeshes;
 
     void Model::
     AddMesh(
@@ -40,21 +41,35 @@ namespace FishEngine {
 #else
         const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
 #endif
+
+#if 0
 		{
         ModelImporter importer;
         //importer.setImportNormals(ModelImporterNormals::Calculate);
 		auto model = importer.LoadFromFile(root_dir+"cube.obj");
 		model->m_name = "Cube";
 		model->mainMesh()->setName("Cube");
+        //model->mainMesh()->ToBinary();
 		s_builtinModels[PrimitiveType::Cube]     = model;
 		}
+
+        {
+        ModelImporter importer;
+        //importer.setImportNormals(ModelImporterNormals::Calculate);
+        auto model = importer.LoadFromFile(root_dir+"Capsule.obj");
+        model->m_name = "Capsule";
+        model->mainMesh()->setName("Capsule");
+        //model->mainMesh()->ToBinary();
+        s_builtinModels[PrimitiveType::Capsule]     = model;
+        }
 		
 		{
 			ModelImporter importer;
         importer.setImportNormals(ModelImporterNormals::Calculate);
-		auto model = importer.LoadFromFile(root_dir+"sphere.obj");
+        auto model = importer.LoadFromFile(root_dir+"sphere.obj");
 		model->m_name = "Sphere";
 		model->mainMesh()->setName("Sphere");
+        //model->mainMesh()->ToBinary();
         s_builtinModels[PrimitiveType::Sphere]   = model;
 		}
 		
@@ -64,6 +79,7 @@ namespace FishEngine {
 		auto model = importer.LoadFromFile(root_dir+"plane.obj");
 		model->m_name = "Plane";
 		model->mainMesh()->setName("Plane");
+        //model->mainMesh()->ToBinary();
         s_builtinModels[PrimitiveType::Plane]    = model;
 		}
 		
@@ -73,6 +89,7 @@ namespace FishEngine {
 		auto model = importer.LoadFromFile(root_dir+"quad.obj");
 		model->m_name = "Quad";
 		model->mainMesh()->setName("Quad");
+        //model->mainMesh()->ToBinary();
         s_builtinModels[PrimitiveType::Quad]     = model;
 		}
 		
@@ -82,6 +99,7 @@ namespace FishEngine {
 		auto model = importer.LoadFromFile(root_dir+"cone.obj");
 		model->m_name = "Cone";
 		model->mainMesh()->setName("Cone");
+        //model->mainMesh()->ToBinary();
         s_builtinModels[PrimitiveType::Cone]     = model;
 		}
 		
@@ -91,9 +109,28 @@ namespace FishEngine {
 			auto model = importer.LoadFromFile(root_dir+"cylinder.obj");
 			model->m_name = "Cylinder";
 			model->mainMesh()->setName("Cylinder");
+            //model->mainMesh()->ToBinary();
 			s_builtinModels[PrimitiveType::Cylinder]     = model;
 		}
-		
+
+		{
+		std::ofstream os("builtin_mesh.bin", std::ios::binary);
+		s_builtinModels[PrimitiveType::Sphere]->mainMesh()->ToBinary(os);
+        s_builtinModels[PrimitiveType::Capsule]->mainMesh()->ToBinary(os);
+		s_builtinModels[PrimitiveType::Cylinder]->mainMesh()->ToBinary(os);
+		s_builtinModels[PrimitiveType::Cube]->mainMesh()->ToBinary(os);
+		s_builtinModels[PrimitiveType::Plane]->mainMesh()->ToBinary(os);
+		s_builtinModels[PrimitiveType::Quad]->mainMesh()->ToBinary(os);
+		s_builtinModels[PrimitiveType::Cone]->mainMesh()->ToBinary(os);
+		}
+//		{
+//			std::ifstream is("builtin_mesh.bin", std::ios::binary);
+//			uint32_t i, j;
+//			is >> i;
+//			is >> j;
+//			printf("%d, %d", i, j);
+//		}
+//		
         for (auto& p : s_builtinModels)
         {
             for (auto& mesh : p.second->m_meshes)
@@ -101,21 +138,148 @@ namespace FishEngine {
                 mesh->UploadMeshData();
             }
         }
-    }
-    
+#elif 0
+        // uv.y = 1 - uv.y
+        // index (0,1,2)->(2,1,0)
+        // quad
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Quad");
+            s_builtinMeshes[PrimitiveType::Quad] = mesh;
+        }
 
-    ModelPtr Model::
-    builtinModel(
-        const PrimitiveType type)
-    {
-        return s_builtinModels[type];
-    }
+        // plane
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Plane");
+            s_builtinMeshes[PrimitiveType::Plane] = mesh;
+        }
 
-    MeshPtr Model::
-    builtinMesh(
-        const PrimitiveType type)
+        // Sphere
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Sphere");
+            s_builtinMeshes[PrimitiveType::Sphere] = mesh;
+        }
+
+        // Capsule
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Capsule");
+            s_builtinMeshes[PrimitiveType::Capsule] = mesh;
+        }
+
+        // Cylinder
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Cylinder");
+            s_builtinMeshes[PrimitiveType::Cylinder] = mesh;
+        }
+
+        // Cube
+        {
+            std::vector<float> p = {-0.5f,-0.5f,-0.5f,0.5f,-0.5f,-0.5f,-0.5f,0.5f,-0.5f,0.5f,0.5f,-0.5f,-0.5f,0.5f,-0.5f,0.5f,0.5f,-0.5f,-0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,-0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,-0.5f,-0.5f,0.5f,0.5f,-0.5f,0.5f,-0.5f,-0.5f,0.5f,0.5f,-0.5f,0.5f,-0.5f,-0.5f,-0.5f,0.5f,-0.5f,-0.5f,0.5f,-0.5f,-0.5f,0.5f,-0.5f,0.5f,0.5f,0.5f,-0.5f,0.5f,0.5f,0.5f,-0.5f,-0.5f,0.5f,-0.5f,-0.5f,-0.5f,-0.5f,0.5f,0.5f,-0.5f,0.5f,-0.5f,};
+            std::vector<float> n = {0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,};
+            std::vector<float> uv = {0,1,1,1,0,0,1,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,0,1,0,1,1,1,0,0,1,0,0,1,1,1,0,0,1,0,0,1,1,1,0,0,1,0,};
+            std::vector<float> t = {1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,};
+            std::vector<uint32_t> index = {2,1,0,3,1,2,6,5,4,7,5,6,10,9,8,11,9,10,14,13,12,15,13,14,18,17,16,19,17,18,22,21,20,23,21,22,};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Cube");
+            s_builtinMeshes[PrimitiveType::Cube] = mesh;
+        }
+
+        // Cone
+        {
+            std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+            std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+            std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+            std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+            std::vector<uint32_t> index = {2,1,0,  3,1,2};
+            auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+            mesh->setName("Cone");
+            s_builtinMeshes[PrimitiveType::Cone] = mesh;
+        }
+#else
+		std::ifstream is("builtin_mesh.bin", std::ios::binary);
+		auto mesh = Mesh::FromBinary(is);
+		mesh->setName("Sphere");
+        s_builtinMeshes[PrimitiveType::Sphere] = mesh;
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Capsule");
+        s_builtinMeshes[PrimitiveType::Capsule] = mesh;
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Cylinder");
+        s_builtinMeshes[PrimitiveType::Cylinder] = mesh;
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Cube");
+        s_builtinMeshes[PrimitiveType::Cube] = mesh;
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Plane");
+        s_builtinMeshes[PrimitiveType::Plane] = mesh;
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Quad");
+        //s_builtinMeshes[PrimitiveType::Quad] = mesh;
+		// uv.y = 1 - uv.y
+		// index (0,1,2)->(2,1,0)
+		// quad
+		{
+			std::vector<float> p = {-1,-1,0,  1,-1,0,  -1,1,0,  1,1,0};
+			std::vector<float> n = {0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};
+			std::vector<float> uv= {0,1,  1,1,  0,0,  1,0};
+			std::vector<float> t = {1,0,0,  1,0,0,  1,0,0,  1,0,0};
+			std::vector<uint32_t> index = {2,1,0,  3,1,2};
+			auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+			mesh->setName("Quad");
+			s_builtinMeshes[PrimitiveType::Quad] = mesh;
+		}
+		mesh = Mesh::FromBinary(is);
+		mesh->setName("Cone");
+        s_builtinMeshes[PrimitiveType::Cone] = mesh;
+		
+		for (auto& pair : s_builtinMeshes)
+		{
+			pair.second->UploadMeshData();
+		}
+#endif
+
+    }
+	
+
+//    ModelPtr Model::
+//    builtinModel(
+//        const PrimitiveType type)
+//    {
+//        return s_builtinModels[type];
+//    }
+
+    MeshPtr Model::builtinMesh(const PrimitiveType type)
     {
-        return s_builtinModels[type]->mainMesh();
+        return s_builtinMeshes[type];
     }
 
 
@@ -377,6 +541,7 @@ namespace FishEngine {
         auto fileExtention = path.extension();
         Assimp::Importer importer;
         unsigned int load_option = aiProcess_Triangulate;
+#if 1
         load_option |= aiProcess_LimitBoneWeights;
         load_option |= aiProcess_JoinIdenticalVertices;
         load_option |= aiProcess_ValidateDataStructure;
@@ -396,12 +561,12 @@ namespace FishEngine {
         //load_option |= aiProcess_FixInfacingNormals;
         //load_option |= aiProcess_OptimizeGraph;
         //load_option |= aiProcess_FlipUVs;
-        
+
         if (fileExtention == ".obj")
         {
             load_option |= aiProcess_OptimizeGraph;
         }
-
+#endif
         //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         //importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_MATERIALS, false);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);

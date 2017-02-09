@@ -111,7 +111,9 @@ void DefaultScene()
     //material->setMainTexture(bakedAO);
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
-#else
+	
+#elif 0
+	
 	QualitySettings::setShadowDistance(30);
 	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
 	Path sponza_assets_root = sponza_root / "crytek-sponza";
@@ -198,7 +200,9 @@ void DefaultScene()
 	transform->setPosition(5, 8, 0);
 	transform->setLocalEulerAngles(30, -90, 0);
 #endif
-
+	
+#else
+	
 #endif
 }
 

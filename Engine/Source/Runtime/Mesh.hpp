@@ -50,6 +50,11 @@ namespace FishEngine
         //Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
         //Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
         //Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
+        Mesh(std::vector<float>      && positionBuffer,
+             std::vector<float>      && normalBuffer,
+             std::vector<float>      && uvBuffer,
+             std::vector<float>      && tangentBuffer,
+             std::vector<uint32_t>   && indexBuffer);
 
         Mesh(const Mesh&) = delete;
         void operator=(const Mesh&) = delete;
@@ -99,23 +104,28 @@ namespace FishEngine
             return m_bindposes;
         }
 
+		// temp
+        void ToBinary(std::ostream & os);
+        static MeshPtr FromBinary(std::istream & is);
+		
     private:
         friend class FishEditor::Inspector;
         friend class ModelImporter;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
+		//friend class Model;
 
-        enum class InternalShaderChannel
-        {
-            Vertex,
-            Normal,
-            //Color,
-            TexCoord0,
-            //TexCoord1,
-            //TexCoord2,
-            //TexCoord3,
-            Tangent
-        };
+//        enum class InternalShaderChannel
+//        {
+//            Vertex,
+//            Normal,
+//            //Color,
+//            TexCoord0,
+//            //TexCoord1,
+//            //TexCoord2,
+//            //TexCoord3,
+//            Tangent
+//        };
 
         bool m_isReadable = false;
         bool m_uploaded = false;
@@ -139,14 +149,29 @@ namespace FishEngine
 		Meta(NonSerializable)
         std::vector<BoneWeight> m_boneWeights;
 
-        GLuint m_VAO;
-        GLuint m_indexVBO;
-        GLuint m_positionVBO;
-        GLuint m_normalVBO;
-        GLuint m_uvVBO;
-        GLuint m_tangentVBO;
-        GLuint m_boneIndexVBO;
-        GLuint m_boneWeightVBO;
+		Meta(NonSerializable)
+        GLuint m_VAO			= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_indexVBO		= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_positionVBO	= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_normalVBO		= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_uvVBO			= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_tangentVBO		= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_boneIndexVBO	= 0;
+		
+		Meta(NonSerializable)
+        GLuint m_boneWeightVBO	= 0;
 
         //GLuint m_TFBO;              // transform feedback buffer object, for Animation
         //GLuint m_animationOutputVAO;

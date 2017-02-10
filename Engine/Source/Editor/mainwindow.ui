@@ -152,6 +152,29 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionDuplicate"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionFrameSelected"/>
+    <addaction name="actionLock_View_To_Selected"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionSelect_All"/>
+    <addaction name="separator"/>
+    <addaction name="actionPlay"/>
+    <addaction name="actionPause"/>
+    <addaction name="actionStep"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelection"/>
+    <addaction name="separator"/>
+    <addaction name="actionProject_Settings"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuAsset">
     <property name="title">
@@ -347,20 +370,32 @@
    <property name="text">
     <string>New Scene</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpenScene">
    <property name="text">
     <string>Open Scene</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSaveScene">
    <property name="text">
     <string>Save Scene</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionSaveSceneAs">
    <property name="text">
     <string>Save Scene As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionNewProject">
@@ -382,10 +417,16 @@
    <property name="text">
     <string>Build Settings</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+B</string>
+   </property>
   </action>
   <action name="actionBuildRun">
    <property name="text">
     <string>Build &amp; Run</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="actionCreatEmpty">
@@ -406,6 +447,9 @@
    <property name="text">
     <string>Play</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="actionPause">
    <property name="icon">
@@ -414,6 +458,9 @@
    </property>
    <property name="text">
     <string>Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
    </property>
   </action>
   <action name="actionStep">
@@ -424,6 +471,9 @@
    <property name="text">
     <string>Step</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+P</string>
+   </property>
   </action>
   <action name="actionHand">
    <property name="icon">
@@ -432,6 +482,9 @@
    </property>
    <property name="text">
     <string>Hand</string>
+   </property>
+   <property name="shortcut">
+    <string>Q</string>
    </property>
   </action>
   <action name="actionTranslate">
@@ -442,6 +495,9 @@
    <property name="text">
     <string>Translate</string>
    </property>
+   <property name="shortcut">
+    <string>W</string>
+   </property>
   </action>
   <action name="actionRotation">
    <property name="icon">
@@ -451,6 +507,9 @@
    <property name="text">
     <string>Rotation</string>
    </property>
+   <property name="shortcut">
+    <string>E</string>
+   </property>
   </action>
   <action name="actionScale">
    <property name="icon">
@@ -459,6 +518,104 @@
    </property>
    <property name="text">
     <string>Scale</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionFrameSelected">
+   <property name="text">
+    <string>Frame Selected</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionDuplicate">
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Backspace</string>
+   </property>
+  </action>
+  <action name="actionLock_View_To_Selected">
+   <property name="text">
+    <string>Lock View To Selected</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+V</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+  </action>
+  <action name="actionSelection">
+   <property name="text">
+    <string>Selection</string>
+   </property>
+  </action>
+  <action name="actionProject_Settings">
+   <property name="text">
+    <string>Project Settings</string>
    </property>
   </action>
  </widget>

@@ -29,8 +29,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-    void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    //void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    //void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 };
 
 #endif // GLWIDGET_H

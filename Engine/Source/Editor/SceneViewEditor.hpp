@@ -97,6 +97,8 @@ namespace FishEditor
             m_highlightSelections = value;
         }
 
+        void FrameSelected(FishEngine::GameObjectPtr const & selected);
+
     private:
         friend class EditorGUI;
 

@@ -14,13 +14,13 @@ namespace FishEditor
 	template<typename Archive>
 	void Save ( Archive& archive, AssetImporter const & value )
 	{
-		archive << BaseClassWrapper<Object>(value);
+		archive << FishEngine::BaseClassWrapper<FishEngine::Object>(value);
 	}
 
 	template<typename Archive>
 	void Load ( Archive& archive, AssetImporter & value )
 	{
-		archive >> BaseClassWrapper<Object>(value);
+		archive >> FishEngine::BaseClassWrapper<FishEngine::Object>(value);
 	}
 
 
@@ -28,27 +28,27 @@ namespace FishEditor
 	template<typename Archive>
 	void Save ( Archive& archive, TextureImporter const & value )
 	{
-		archive << BaseClassWrapper<AssetImporter>(value);
-		archive << make_nvp("m_textureType", value.m_textureType); // FishEngine::TextureImporterType
-		archive << make_nvp("m_textureShape", value.m_textureShape); // FishEngine::TextureImporterShape
-		archive << make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
-		archive << make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
-		archive << make_nvp("m_sRGBTexture", value.m_sRGBTexture); // bool
-		archive << make_nvp("m_isReadable", value.m_isReadable); // bool
-		archive << make_nvp("m_mipmapEnabled", value.m_mipmapEnabled); // bool
+		archive << FishEngine::BaseClassWrapper<AssetImporter>(value);
+		archive << FishEngine::make_nvp("m_textureType", value.m_textureType); // FishEngine::TextureImporterType
+		archive << FishEngine::make_nvp("m_textureShape", value.m_textureShape); // FishEngine::TextureImporterShape
+		archive << FishEngine::make_nvp("m_filterMode", value.m_textureSettings.m_filterMode); // FishEngine::FilterMode
+		archive << FishEngine::make_nvp("m_wrapMode", value.m_textureSettings.m_wrapMode); // FishEngine::TextureWrapMode
+		archive << FishEngine::make_nvp("m_sRGBTexture", value.m_sRGBTexture); // bool
+		archive << FishEngine::make_nvp("m_isReadable", value.m_isReadable); // bool
+		archive << FishEngine::make_nvp("m_mipmapEnabled", value.m_mipmapEnabled); // bool
 	}
 
 	template<typename Archive>
 	void Load ( Archive& archive, TextureImporter & value )
 	{
-		archive >> BaseClassWrapper<AssetImporter>(value);
-		archive >> make_nvp("m_textureType", value.m_textureType); // FishEngine::TextureImporterType
-		archive >> make_nvp("m_textureShape", value.m_textureShape); // FishEngine::TextureImporterShape
+		archive >> FishEngine::BaseClassWrapper<AssetImporter>(value);
+		archive >> FishEngine::make_nvp("m_textureType", value.m_textureType); // FishEngine::TextureImporterType
+		archive >> FishEngine::make_nvp("m_textureShape", value.m_textureShape); // FishEngine::TextureImporterShape
 		archive >> make_nvp("m_filterMode", value.m_textureSettings.m_filterMode); // FishEngine::FilterMode
 		archive >> make_nvp("m_wrapMode", value.m_textureSettings.m_wrapMode); // FishEngine::TextureWrapMode
-		archive >> make_nvp("m_sRGBTexture", value.m_sRGBTexture); // bool
-		archive >> make_nvp("m_isReadable", value.m_isReadable); // bool
-		archive >> make_nvp("m_mipmapEnabled", value.m_mipmapEnabled); // bool
+		archive >> FishEngine::make_nvp("m_sRGBTexture", value.m_sRGBTexture); // bool
+		archive >> FishEngine::make_nvp("m_isReadable", value.m_isReadable); // bool
+		archive >> FishEngine::make_nvp("m_mipmapEnabled", value.m_mipmapEnabled); // bool
 	}
 
 
@@ -56,21 +56,21 @@ namespace FishEditor
 	template<typename Archive>
 	void Save ( Archive& archive, ModelImporter const & value )
 	{
-		archive << BaseClassWrapper<AssetImporter>(value);
-		archive << make_nvp("m_fileScale", value.m_fileScale); // float
-		archive << make_nvp("m_importNormals", value.m_importNormals); // FishEngine::ModelImporterNormals
-		archive << make_nvp("m_importTangents", value.m_importTangents); // FishEngine::ModelImporterTangents
-		archive << make_nvp("m_materialSearch", value.m_materialSearch); // FishEngine::ModelImporterMaterialSearch
+		archive << FishEngine::BaseClassWrapper<AssetImporter>(value);
+		archive << FishEngine::make_nvp("m_fileScale", value.m_fileScale); // float
+		archive << FishEngine::make_nvp("m_importNormals", value.m_importNormals); // FishEngine::ModelImporterNormals
+		archive << FishEngine::make_nvp("m_importTangents", value.m_importTangents); // FishEngine::ModelImporterTangents
+		archive << FishEngine::make_nvp("m_materialSearch", value.m_materialSearch); // FishEngine::ModelImporterMaterialSearch
 	}
 
 	template<typename Archive>
 	void Load ( Archive& archive, ModelImporter & value )
 	{
-		archive >> BaseClassWrapper<AssetImporter>(value);
-		archive >> make_nvp("m_fileScale", value.m_fileScale); // float
-		archive >> make_nvp("m_importNormals", value.m_importNormals); // FishEngine::ModelImporterNormals
-		archive >> make_nvp("m_importTangents", value.m_importTangents); // FishEngine::ModelImporterTangents
-		archive >> make_nvp("m_materialSearch", value.m_materialSearch); // FishEngine::ModelImporterMaterialSearch
+		archive >> FishEngine::BaseClassWrapper<AssetImporter>(value);
+		archive >> FishEngine::make_nvp("m_fileScale", value.m_fileScale); // float
+		archive >> FishEngine::make_nvp("m_importNormals", value.m_importNormals); // FishEngine::ModelImporterNormals
+		archive >> FishEngine::make_nvp("m_importTangents", value.m_importTangents); // FishEngine::ModelImporterTangents
+		archive >> FishEngine::make_nvp("m_materialSearch", value.m_materialSearch); // FishEngine::ModelImporterMaterialSearch
 	}
 
 } // namespace FishEngine
@@ -83,14 +83,14 @@ namespace FishEngine
         const int id = obj->ClassID();
         switch (id)
         {
-        case ClassID<AssetImporter>():
-            archive << *std::dynamic_pointer_cast<AssetImporter>(obj);
+        case ClassID<FishEditor::AssetImporter>():
+            archive << *std::dynamic_pointer_cast<FishEditor::AssetImporter>(obj);
             break;
-        case ClassID<TextureImporter>():
-            archive << *std::dynamic_pointer_cast<TextureImporter>(obj);
+        case ClassID<FishEditor::TextureImporter>():
+            archive << *std::dynamic_pointer_cast<FishEditor::TextureImporter>(obj);
             break;
-        case ClassID<ModelImporter>():
-            archive << *std::dynamic_pointer_cast<ModelImporter>(obj);
+        case ClassID<FishEditor::ModelImporter>():
+            archive << *std::dynamic_pointer_cast<FishEditor::ModelImporter>(obj);
             break;
         default:
             abort();

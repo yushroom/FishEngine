@@ -133,7 +133,7 @@ namespace FishEngine
 
 
     void Camera::
-    FrameSelected(GameObjectPtr& selected)
+	FrameSelected(GameObjectPtr const & selected)
     {
         if (selected == nullptr)
             return;

@@ -133,12 +133,20 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     Input::UpdateAxis(Axis::MouseScrollWheel, delta);
 }
 
-void GLWidget::keyPressEvent(QKeyEvent *)
-{
+//void GLWidget::keyPressEvent(QKeyEvent * event)
+//{
+//    int key = event->key();
+//    if (key >= Qt::Key_A && key <= Qt::Key_Z)
+//    {
+//        Input::UpdateKeyState(key, KeyState::Down);
+//    }
+//}
 
-}
-
-void GLWidget::keyReleaseEvent(QKeyEvent *)
-{
-
-}
+//void GLWidget::keyReleaseEvent(QKeyEvent * event)
+//{
+//    int key = event->key();
+//    if (key >= Qt::Key_A && key <= Qt::Key_Z)
+//    {
+//        Input::UpdateKeyState(key, KeyState::Up);
+//    }
+//}

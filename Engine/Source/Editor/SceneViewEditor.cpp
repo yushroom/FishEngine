@@ -117,6 +117,24 @@ namespace FishEditor
         //Input::Update();
         m_cameraGameObject->GetComponent<CameraController>()->Update();
         //Scene::Update();
+
+//        if (Input::GetKeyDown(KeyCode::F))
+//        {
+//            Camera::main()->FrameSelected(Selection::activeGameObject());
+//        }
+
+//        if (Input::GetKeyDown(KeyCode::W))
+//        {
+//            m_transformToolType = TransformToolType::Translate;
+//        }
+//        else if (Input::GetKeyDown(KeyCode::E))
+//        {
+//            m_transformToolType = TransformToolType::Rotate;
+//        }
+//        else if (Input::GetKeyDown(KeyCode::R))
+//        {
+//            m_transformToolType = TransformToolType::Scale;
+//        }
     }
 
     void SceneViewEditor::Render()
@@ -983,5 +1001,18 @@ namespace FishEditor
         m_selectionOutlineColorBuffer2->Resize(width, height);
         RenderSystem::ResizeBufferSize(width, height);
         Camera::OnWindowSizeChanged(width, height);
+    }
+
+    void SceneViewEditor::FrameSelected(const GameObjectPtr &selected)
+    {
+        if (selected == nullptr)
+            return;
+        auto camera = m_cameraGameObject->transform();
+        float focus_distance = Vector3::Distance(camera->position(), m_camera->m_focusPoint);
+        m_camera->m_focusPoint = selected->transform()->position();
+        auto camera_dir = camera->forward().normalized();
+        auto target_camera_position = m_camera->m_focusPoint - camera_dir * focus_distance;
+        auto translation = target_camera_position - camera->position();
+        camera->Translate(translation, Space::World);
     }
 }

@@ -165,7 +165,7 @@ namespace FishEngine
         mutable Vector3 m_focusPoint{ 0, 0, 0 };
 
 
-        void FrameSelected(GameObjectPtr& selected);
+		void FrameSelected(GameObjectPtr const & selected);
 
         static CameraPtr m_mainCamera;
         static std::vector<CameraPtr> m_allCameras;

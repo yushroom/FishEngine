@@ -15,15 +15,18 @@
 #include <RenderSystem.hpp>
 #include <Input.hpp>
 #include <Application.hpp>
+#include <Camera.hpp>
 
 #include "Inspector.hpp"
 #include "MainEditor.hpp"
 #include "SceneViewEditor.hpp"
 #include "FileInfo.hpp"
+#include "Selection.hpp"
 
 #include <fstream>
 #include <Serialization.hpp>
 #include <Serialization/archives/yaml.hpp>
+#include <Timer.hpp>
 
 using namespace FishEngine;
 
@@ -37,9 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 	//this->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
 
+    ui->sceneView->setFocus();
+
     FishEditor::Inspector::s_inspectorWidget = ui->inspectorWidget;
 
-    connect(ui->actionSaveSceneAs, &QAction::triggered, this, &MainWindow::SaveSaveAs);
+    connect(ui->actionSaveSceneAs, &QAction::triggered, this, &MainWindow::SaveSceneAs);
 
     connect(ui->actionPlay, &QAction::triggered, [this](){
         if (Applicaiton::isPlaying())
@@ -73,6 +78,11 @@ MainWindow::MainWindow(QWidget *parent) :
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Scale);
     });
 
+    connect(ui->actionFrameSelected, &QAction::triggered, [](){
+        //FishEngine::Camera::main()->FrameSelected(FishEditor::Selection::activeGameObject());
+        FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected(FishEditor::Selection::activeGameObject());
+    });
+
 //    FishEditor::MainEditor::OnInitialized += [this](){
 //        ui->projectView->SetRootPath(FishEngine::Applicaiton::dataPath());
 //    };
@@ -82,6 +92,33 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//void MainWindow::keyPressEvent(QKeyEvent *event)
+//{
+//    Debug::LogError("Key Pressed");
+//    int key = event->key();
+//    if (key == Qt::Key_F)
+//    {
+//
+//    }
+//    else if (key == Qt::Key_W)
+//    {
+//        ui->actionTranslate->trigger();
+//    }
+//    else if (key == Qt::Key_E)
+//    {
+//        ui->actionRotation->trigger();
+//    }
+//    else if (key == Qt::Key_R)
+//    {
+//        ui->actionScale->trigger();
+//    }
+//}
+
+//void MainWindow::keyReleaseEvent(QKeyEvent *event)
+//{
+
+//}
 
 
 //bool MainWindow::eventFilter(QObject *watched, QEvent *event)
@@ -121,10 +158,12 @@ void MainWindow::Init()
 #else
 	Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
 #endif
+	FishEngine::Timer t("Load assets");
     FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
+	t.StopAndPrint();
 }
 
-void MainWindow::SaveSaveAs()
+void MainWindow::SaveSceneAs()
 {
     //QFileDialog::Options options = QFlag(fileDialogOptionsWidget->value());
     //options |= QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;

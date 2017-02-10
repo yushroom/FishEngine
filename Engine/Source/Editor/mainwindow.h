@@ -16,11 +16,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    //virtual void keyPressEvent(QKeyEvent * event) override;
+    //virtual void keyReleaseEvent(QKeyEvent * event) override;
+
 private:
     //bool eventFilter(QObject *watched, QEvent *event);
     void Init();
 
-    void SaveSaveAs();
+    void SaveSceneAs();
 
     Ui::MainWindow *ui;
 };

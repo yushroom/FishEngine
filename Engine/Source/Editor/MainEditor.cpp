@@ -112,15 +112,13 @@ void DefaultScene()
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 	
-#elif 1
+#elif 0
 	
 	QualitySettings::setShadowDistance(30);
 	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
 	Path sponza_assets_root = sponza_root / "crytek-sponza";
 	Resources::SetAssetsDirectory(sponza_root);
-
-#if 1
-
+	
 	ModelImporter importer;
 	importer.setFileScale(0.01f);
 	//auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
@@ -191,7 +189,7 @@ void DefaultScene()
 	ApplyMateril2("mesh22", "vase_dif");
 	ApplyMateril2("mesh23", "lion");
 	ApplyMateril2("mesh24", "sponza_roof_diff");
-#endif
+
 	auto transform = Camera::main()->gameObject()->transform();
 	transform->setPosition(5, 8, 0);
 	transform->setLocalEulerAngles(30, -90, 0);

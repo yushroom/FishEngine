@@ -9,12 +9,14 @@
 #include <LayerMask.hpp>
 #include <ReflectClass.hpp>
 #include <Vector3.hpp>
+#include <Texture.hpp>
 
 #include <QTreeWidget>
 #include <QMenu>
 
 #include "UI/UIComponentHeader.hpp"
 #include "UI/UIFloat3.hpp"
+#include "UI/UIFloat4.hpp"
 #include "UI/UIFloat.hpp"
 #include "UI/UIComboBox.hpp"
 #include "UI/UISlider.hpp"
@@ -23,6 +25,8 @@
 #include "UI/UIBool.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UIMaterialHeader.hpp"
+#include "UI/UITexture.hpp"
+#include "UI/SelectObjectDialog.hpp"
 
 #include "Inspector.hpp"
 #include "UIDebug.hpp"
@@ -144,14 +148,21 @@ void EditorGUI::End()
         LOG;
         Debug::Log("[EditorGUI::End]hide %d", i);
     }
-
-
 }
 
-bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName)
+bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName, UIHeaderState * outState)
 {
 	auto header = CheckNextWidget<UIComponentHeader>(componentTypeName);
-	header->CheckUpdate(componentTypeName);
+	*outState = header->CheckUpdate(componentTypeName);
+	bool expanded = s_currentItem->isExpanded();
+	PushGroup();
+	return expanded;
+}
+
+bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName, bool enabled, UIHeaderState * outState)
+{
+	auto header = CheckNextWidget<UIComponentHeader>(componentTypeName, enabled);
+	*outState = header->CheckUpdate(componentTypeName, enabled);
 	bool expanded = s_currentItem->isExpanded();
 	PushGroup();
 	return expanded;
@@ -179,64 +190,93 @@ void FishEditor::EditorGUI::EndMaterial()
 
 bool EditorGUI::Button(const std::string &text)
 {
-    UIButton * button = CheckNextWidget<UIButton>(QString::fromStdString(text));
-    return button->CheckClicked();
+	UIButton * button = CheckNextWidget<UIButton>(QString::fromStdString(text));
+	return button->CheckClicked();
 }
 
 bool EditorGUI::Toggle(const std::string & label, bool *value)
 {
-    UIBool * toggle = CheckNextWidget<UIBool>(label, *value);
-    return toggle->CheckUpdate(label, *value);
+	UIBool * toggle = CheckNextWidget<UIBool>(label, *value);
+	return toggle->CheckUpdate(label, *value);
 
 }
 
 bool EditorGUI::ColorField(const std::string &label, Color *color)
 {
-    QColor qcolor(color->r * 255, color->g * 255, color->b * 255);
-    UIColor * color_line = CheckNextWidget<UIColor>(label, qcolor);
-    bool changed = color_line->CheckUpdate(label, qcolor);
-    if (changed)
-    {
-        constexpr float inv_255 = 1.0f / 255.0f;
-        color->r = qcolor.red()   * inv_255;
-        color->g = qcolor.green() * inv_255;
-        color->b = qcolor.blue()  * inv_255;
-        return true;
-    }
-    return false;
+	QColor qcolor(color->r * 255, color->g * 255, color->b * 255);
+	UIColor * color_line = CheckNextWidget<UIColor>(label, qcolor);
+	bool changed = color_line->CheckUpdate(label, qcolor);
+	if (changed)
+	{
+		constexpr float inv_255 = 1.0f / 255.0f;
+		color->r = qcolor.red()   * inv_255;
+		color->g = qcolor.green() * inv_255;
+		color->b = qcolor.blue()  * inv_255;
+		return true;
+	}
+	return false;
 }
 
 bool EditorGUI::EnumPopup(const std::string &label, int *index, const char * const *enumStringArray, int arraySize)
 {
-    UIComboBox * combo = CheckNextWidget<UIComboBox>(label, *index, enumStringArray, arraySize);
-    return combo->CheckUpdate(label, *index, enumStringArray, arraySize);
+	UIComboBox * combo = CheckNextWidget<UIComboBox>(label, *index, enumStringArray, arraySize);
+	return combo->CheckUpdate(label, *index, enumStringArray, arraySize);
 }
 
 bool EditorGUI::FloatField(const std::string &label, float * v)
 {
-    UIFloat * float_row = CheckNextWidget<UIFloat>(label, *v);
-    return float_row->CheckUpdate(label, *v);
+	UIFloat * float_row = CheckNextWidget<UIFloat>(label, *v);
+	return float_row->CheckUpdate(label, *v);
 }
 
 bool EditorGUI::FloatField(const std::string &label, float v)
 {
-    UIFloat * float_row = CheckNextWidget<UIFloat>(label, v);
-    return float_row->CheckUpdate(label, v);
+	UIFloat * float_row = CheckNextWidget<UIFloat>(label, v);
+	return float_row->CheckUpdate(label, v);
 }
 
 bool EditorGUI::Slider(const std::string &label, float *value, float leftValue, float rightValue)
 {
-    UISlider * slider = CheckNextWidget<UISlider>(label, *value, leftValue, rightValue);
-    return slider->CheckUpdate(label, *value);
+	UISlider * slider = CheckNextWidget<UISlider>(label, *value, leftValue, rightValue);
+	return slider->CheckUpdate(label, *value);
 }
+
 
 bool EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
 {
-    //return false;
-    UIFloat3 * float3 = CheckNextWidget<UIFloat3>(label, v->x, v->y, v->z);
-    return float3->CheckUpdate(label, v->x, v->y, v->z);
+	UIFloat3 * float3 = CheckNextWidget<UIFloat3>(label, v->x, v->y, v->z);
+	return float3->CheckUpdate(label, v->x, v->y, v->z);
 }
 
+
+bool FishEditor::EditorGUI::Vector4Field(std::string const & label, FishEngine::Vector4 * v)
+{
+	UIFloat4 * float4 = CheckNextWidget<UIFloat4>(label, v->x, v->y, v->z, v->w);
+	return float4->CheckUpdate(label, v->x, v->y, v->z, v->w);
+}
+
+
+bool FishEditor::EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr * texture)
+{
+	//FishEngine::Debug::LogError("EditorGUI::TextureField");
+	UITexture * t = CheckNextWidget<UITexture>(label);
+	UITextureState state = t->CheckUpdate(label, (*texture)->GetGUID());
+	if (state == UITextureState::TextureClicked)
+	{
+
+	}
+	else if (state == UITextureState::SelectButtonClicked)
+	{
+		SelectObjectDialog dialog;
+		//dialog.exec();
+		dialog.ShowWithCallback( [&texture](FishEngine::ObjectPtr obj) {
+			auto tex = std::dynamic_pointer_cast<FishEngine::Texture>(obj);
+			*texture = tex;
+			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());
+		});
+	}
+	return false;
+}
 
 void EditorGUI::PushGroup()
 {

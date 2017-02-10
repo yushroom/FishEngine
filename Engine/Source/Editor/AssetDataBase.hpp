@@ -37,7 +37,7 @@ namespace FishEditor
         AssetDatabase() = delete;
 		
 		static FishEngine::Path AssetPathToGUID(FishEngine::Path const & path);
-		static FishEngine::Path GUIDToAssetPath(FishEngine::Path const & guid);
+        static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);
 		
 		static bool CopyAsset(FishEngine::Path const & path, FishEngine::Path const & newPath);
 		static void CreateAsset(FishEngine::ObjectPtr asset, FishEngine::Path const & path);

@@ -27,7 +27,8 @@ namespace FishEditor
         // return component name
         static std::string ShowAddComponentMenu();
 
-		static bool BeginComponent(std::string const & componentTypeName);
+		static bool BeginComponent(std::string const & componentTypeName, UIHeaderState * outState);
+		static bool BeginComponent(std::string const & componentTypeName, bool enabled, UIHeaderState * outState);
 		static void EndComponent();
 
 		static bool BeginMaterial(std::string const & materialName);
@@ -46,6 +47,7 @@ namespace FishEditor
         static bool EnumPopup(std::string const & label, int* index, const char* const* enumStringArray, int arraySize);
 
         static bool Vector3Field(std::string const & label, FishEngine::Vector3 * v);
+		static bool Vector4Field(std::string const & label, FishEngine::Vector4 * v);
 
         static bool FloatField(std::string const & label, float * v);
         static bool FloatField(std::string const & label, float v);// const version
@@ -56,6 +58,8 @@ namespace FishEditor
 
         //template< class T >
         static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
+
+		static bool TextureField(std::string const & label, FishEngine::TexturePtr * texture);
 
     private:
         friend class Inspector;

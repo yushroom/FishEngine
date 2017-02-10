@@ -4,7 +4,6 @@
 #include <QWidget>
 
 #include <string>
-#include "../UIDebug.hpp"
 
 namespace Ui {
 class UIFloat3;
@@ -26,9 +25,9 @@ public:
     bool CheckUpdate(std::string const & label, float & x, float & y, float & z);
 
 private Q_SLOTS:
-    inline void setX(float v) { LOG; m_x = v; m_changed = true; }
-    inline void setY(float v) { LOG; m_y = v; m_changed = true; }
-    inline void setZ(float v) { LOG; m_z = v; m_changed = true; }
+    inline void setX(float v) { m_x = v; m_changed = true; }
+    inline void setY(float v) { m_y = v; m_changed = true; }
+    inline void setZ(float v) { m_z = v; m_changed = true; }
 
 private:
     Ui::UIFloat3 *ui;

@@ -8,8 +8,13 @@ using namespace FishEngine;
 namespace FishEditor
 {
     std::map<FishEngine::Path, QIcon> AssetDatabase::m_cacheIcons;
-	
-	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
+
+    Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
+    {
+        return AssetImporter::s_objectGUIDToPath[guid];
+    }
+
+    const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
         static QIcon unknown_icon(":/Resources/unknown_file.png");
 

@@ -31,9 +31,9 @@ public:
     FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName);
 
 
-private slots:
+private:
     void OnCheckBoxChanged(bool value);
-    void OnRemoveActionTrigered() { m_removeActionTrigered = true; }
+    void OnRemoveActionTrigered() { m_menuButtonTrigered = true; }
 
 private:
     Ui::UIComponentHeader *ui;
@@ -42,7 +42,7 @@ private:
     bool m_enabled = true;
 
     bool m_enabledChanged = false;
-    bool m_removeActionTrigered = false;
+    bool m_menuButtonTrigered = false;
 
 //    void ResetState()
 //    {

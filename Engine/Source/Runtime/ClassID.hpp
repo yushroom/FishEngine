@@ -5,6 +5,7 @@ namespace FishEditor
 	class AssetImporter;
 	class ModelImporter;
 	class TextureImporter;
+	class AssetDatabase;
 }
 
 namespace FishEngine
@@ -788,9 +789,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<FishEditor::AssetImporter>() { return 1003; }
 	
-	class AssetDatabase;
+	//class AssetDatabase;
 	template<>
-	constexpr int ClassID<AssetDatabase>() { return 1004; }
+	constexpr int ClassID<FishEditor::AssetDatabase>() { return 1004; }
 	
 	class Mesh3DSImporter;
 	template<>

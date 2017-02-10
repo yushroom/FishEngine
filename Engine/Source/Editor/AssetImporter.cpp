@@ -81,13 +81,18 @@ namespace FishEditor
 			//t.StopAndPrint();
 			s_pathToImpoter[path] = importer;
 			//Timer t(path.string());
-			s_importerGuidToTexture[importer->GetGUID()] = importer->Import(path);
+			auto texture = importer->Import(path);
+			texture->setName(path.stem().string());
+			s_objectGUIDToPath[texture->GetGUID()] = path;
+			s_importerGuidToTexture[importer->GetGUID()] = texture;
 			//t.StopAndPrint();
 			return importer;
 		}
 
 		return nullptr;
 	}
+
+	std::map<boost::uuids::uuid, boost::filesystem::path> AssetImporter::s_objectGUIDToPath;
 
 	std::map<boost::uuids::uuid, TexturePtr> AssetImporter::s_importerGuidToTexture;
 

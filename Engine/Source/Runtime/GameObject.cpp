@@ -59,17 +59,20 @@ namespace FishEngine
         auto mesh = Mesh::builtinMesh(type);
         auto go = Scene::CreateGameObject(EnumToString(type));
         go->AddComponent<MeshFilter>()->SetMesh(mesh);
+		switch (type)
+		{
+		case PrimitiveType::Cube:
+			go->AddComponent<BoxCollider>();
+			break;
+		case PrimitiveType::Sphere:
+			go->AddComponent<SphereCollider>();
+			break;
+		case PrimitiveType::Capsule:
+			go->AddComponent<CapsuleCollider>();
+			break;
+		}
 		go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
         return go;
-//        auto go = Model::builtinModel(type)->CreateGameObject();
-//		//go->AddComponent<Rigidbody>();
-//        if (type == PrimitiveType::Cube)
-//            go->AddComponent<BoxCollider>();
-//        else if (type == PrimitiveType::Sphere)
-//            go->AddComponent<SphereCollider>();
-//        else if (type == PrimitiveType::Capsule)
-//            go->AddComponent<CapsuleCollider>();
-//        return go;
     }
 
     GameObjectPtr GameObject::Find(const std::string& name)

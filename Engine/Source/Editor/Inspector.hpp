@@ -37,6 +37,7 @@ namespace FishEditor
         static void OnInspectorGUI(std::shared_ptr<T> const & component);
 
         static std::string ShowAddComponentMenu();
+		static void ShowComponentMenu();
 
     private:
         friend class ::MainWindow;

@@ -15,7 +15,7 @@ UIComponentHeader::UIComponentHeader(std::string const & componentTypeName, bool
     ui->checkBox->setChecked(m_enabled);
 
     connect(ui->checkBox, &QCheckBox::toggled, this, &UIComponentHeader::OnCheckBoxChanged);
-    connect(ui->pushButton, &QPushButton::clicked, this, &UIComponentHeader::OnRemoveActionTrigered);
+    connect(ui->menuButton, &QPushButton::clicked, this, &UIComponentHeader::OnRemoveActionTrigered);
 }
 
 UIComponentHeader::UIComponentHeader(std::string const & componentTypeName, QWidget *parent) :
@@ -38,19 +38,11 @@ FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &comp
         return FishEditor::UIHeaderState::enabledChanged;
     }
 
-    if (m_removeActionTrigered)
+    if (m_menuButtonTrigered)
     {
-        m_removeActionTrigered = false;
-        return FishEditor::UIHeaderState::remove;
+        m_menuButtonTrigered = false;
+        return FishEditor::UIHeaderState::menuButtonClicked;
     }
-
-//    if (m_changed)
-//    {
-//        Debug::LogError("[Header] enabled changed");
-//        enabled = m_enabled;
-//        m_changed = false;
-//        return true;
-//    }
 
     if (ui->checkBox->isHidden())
     {
@@ -78,10 +70,10 @@ FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &comp
 
 FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &componentTypeName)
 {
-    if (m_removeActionTrigered)
+    if (m_menuButtonTrigered)
     {
-        m_removeActionTrigered = false;
-        return FishEditor::UIHeaderState::remove;
+        m_menuButtonTrigered = false;
+        return FishEditor::UIHeaderState::menuButtonClicked;
     }
 
     if (!ui->checkBox->isHidden())

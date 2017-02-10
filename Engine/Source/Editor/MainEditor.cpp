@@ -112,7 +112,7 @@ void DefaultScene()
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 	
-#elif 0
+#elif 1
 	
 	QualitySettings::setShadowDistance(30);
 	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
@@ -197,10 +197,10 @@ void DefaultScene()
 	transform = Camera::mainGameCamera()->gameObject()->transform();
 	transform->setPosition(5, 8, 0);
 	transform->setLocalEulerAngles(30, -90, 0);
-#endif
-	
 #else
-	
+	GameObject::CreatePrimitive(PrimitiveType::Cube);
+#endif
+
 #endif
 }
 

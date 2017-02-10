@@ -59,6 +59,9 @@ bool UISlider::CheckUpdate(const std::string &label, float &value)
             ui->spinBox->blockSignals(true);
             ui->spinBox->setValue(value);
             ui->spinBox->blockSignals(false);
+			ui->slider->blockSignals(true);
+			ui->slider->setValue(value);
+			ui->spinBox->blockSignals(false);
             m_value = value;
         }
     }

@@ -72,7 +72,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QSlider" name="horizontalSlider">
+      <widget class="QSlider" name="iconSizeSlider">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>

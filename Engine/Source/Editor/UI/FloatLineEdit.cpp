@@ -44,6 +44,7 @@ void FloatLineEdit::OnEditingFinished()
         blockSignals(false);
     }
 	home(false);
+	clearFocus();
 }
 
 void FloatLineEdit::OnTextChanged(QString const & s)

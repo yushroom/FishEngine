@@ -52,9 +52,11 @@ namespace FishEditor
 		Meta(NonSerializable)
 		std::string		m_userData;
 
+	public:
 		static std::map<boost::uuids::uuid, FishEngine::TexturePtr> s_importerGuidToTexture;
 		static std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> s_importerGuidToModel;
 		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
+		static std::map<boost::uuids::uuid, boost::filesystem::path> s_objectGUIDToPath;
 	};
 }
 

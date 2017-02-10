@@ -24,6 +24,7 @@
 #include <Collider.hpp>
 #include <BoxCollider.hpp>
 #include <SphereCollider.hpp>
+#include <CapsuleCollider.hpp>
 #include <Shader.hpp>
 #include <Material.hpp>
 
@@ -143,24 +144,27 @@ void Inspector::OnInspectorGUI(const FishEngine::MaterialPtr& material)
     {
         if (u.type == GL_FLOAT)
         {
-            EditorGUI::Slider(u.name.c_str(), &material->m_uniforms.floats[u.name], 0, 1);
+            //EditorGUI::Slider(u.name.c_str(), &material->m_uniforms.floats[u.name], 0, 1);
+			EditorGUI::FloatField(u.name, &material->m_uniforms.floats[u.name]);
         }
         else if (u.type == GL_FLOAT_VEC3)
         {
-            EditorGUI::Vector3Field(u.name.c_str(), &material->m_uniforms.vec3s[u.name]);
+            EditorGUI::Vector3Field(u.name, &material->m_uniforms.vec3s[u.name]);
         }
-//        else if (u.type == GL_FLOAT_VEC4)
-//        {
-//            ImGui::InputFloat4(u.name.c_str(), material->m_uniforms.vec4s[u.name].data());
-//        }
-//        else if (u.type == GL_SAMPLER_2D)
-//        {
-//            auto& tex = material->m_textures[u.name];
-//            ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
-//            ImGui::Image((void*)tex->GetNativeTexturePtr(), ImVec2(64, 64));
-//            ImGui::SameLine();
-//            ImGui::Button("Select");
-//        }
+		else if (u.type == GL_FLOAT_VEC4)
+		{
+			EditorGUI::Vector4Field(u.name, &material->m_uniforms.vec4s[u.name]);
+		}
+        else if (u.type == GL_SAMPLER_2D)
+        {
+            //auto& tex = material->m_textures[u.name];
+            //ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
+            //ImGui::Image((void*)tex->GetNativeTexturePtr(), ImVec2(64, 64));
+            //ImGui::SameLine();
+            //ImGui::Button("Select");
+			auto& tex = material->m_textures[u.name];
+			EditorGUI::TextureField(u.name, &tex);
+        }
     }
 }
 
@@ -217,6 +221,17 @@ void Inspector::OnInspectorGUI(const FishEngine::SphereColliderPtr& collider)
     OnInspectorGUI<Collider>(collider);
     EditorGUI::Vector3Field("Center", &collider->m_center);
     EditorGUI::FloatField("Radius", &collider->m_radius);
+}
+
+template<>
+void Inspector::OnInspectorGUI(const FishEngine::CapsuleColliderPtr& collider)
+{
+	OnInspectorGUI<Collider>(collider);
+	EditorGUI::Vector3Field("Center", &collider->m_center);
+	EditorGUI::FloatField("Radius", &collider->m_radius);
+	EditorGUI::FloatField("Height", &collider->m_height);
+	static const char * direction_enum[] = { "X-Axis", "Y-Axis", "Z-Axis" };
+	EditorGUI::EnumPopup("Direction", &collider->m_direction, direction_enum, 3);
 }
 
 template<>
@@ -350,13 +365,36 @@ std::string Inspector::ShowAddComponentMenu()
     return action->text().toStdString();
 }
 
+void FishEditor::Inspector::ShowComponentMenu()
+{
+	static QMenu* menu = nullptr;
+	if (menu == nullptr)
+	{
+		menu = new QMenu(s_inspectorWidget->m_treeWidget);
+		menu->addAction("Reset");
+		menu->addAction("Revert to Prefab");
+		menu->addSeparator();
+		menu->addAction("Move to Front");
+		menu->addAction("Move to back");
+		menu->addAction("Remove Component");
+		menu->addAction("Move Up");
+		menu->addAction("Move Down");
+		menu->addAction("Copy Component");
+		menu->addAction("Paste Component As New");
+		menu->addAction("Paste Component Value");
+		//menu->addAction("Select Material");
+	}
+	auto action = menu->exec(QCursor::pos());
+}
+
+
 #if 1
 
 void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
     Debug::Log("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
-    //UIHeaderState state;
-    if ( EditorGUI::BeginComponent( component->ClassName() ) )
+    UIHeaderState state;
+    if ( EditorGUI::BeginComponent( component->ClassName(), &state ) )
     {
         //OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
         //HideRedundantChildItems();
@@ -370,43 +408,49 @@ void Inspector::BeginComponentImpl(const ComponentPtr &component)
 //        }
 }
 
-// for component derived from behaviour
 template<class T, std::enable_if_t<can_be_enabled<T>::value, int>>
 void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
     auto p = std::static_pointer_cast<T>(component);
     bool enabled = p->enabled();
     //bool changed = false;
-    //UIHeaderState state;
+    UIHeaderState state;
     //bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, state );
-	bool expanded = EditorGUI::BeginComponent(T::StaticClassName());
+	bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, &state );
     if ( expanded )
     {
         OnInspectorGUI<T>(p);
     }
 	EditorGUI::EndComponent();
-    //if (state == UIHeaderState::enabledChanged)
-    //{
-    //    p->setEnabled(enabled);
-    //}
-//        else if (state == UIHeaderState::remove)
-//        {
-//            //Object::Destroy(component);
-//            componentToBeDestroyed = component;
-//        }
+	if (state == UIHeaderState::enabledChanged)
+	{
+		p->setEnabled(!enabled);
+	}
+    else if (state == UIHeaderState::menuButtonClicked)
+    {
+        //Object::Destroy(component);
+        //componentToBeDestroyed = component;
+		ShowComponentMenu();
+    }
 }
 
-// for component not derived from behaviour
 template<class T, std::enable_if_t<!can_be_enabled<T>::value, int>>
 void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
     static_assert(std::is_base_of<Component, T>(), "T must be derived from Component");
-    //UIHeaderState state;
-    if ( EditorGUI::BeginComponent( T::StaticClassName() ) )
+    UIHeaderState state;
+    if ( EditorGUI::BeginComponent( T::StaticClassName(), &state ) )
     {
         OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
     }
 	EditorGUI::EndComponent();
+
+	if (state == UIHeaderState::menuButtonClicked)
+	{
+		//Object::Destroy(component);
+		//componentToBeDestroyed = component;
+		ShowComponentMenu();
+	}
 
 //        if ( state == UIHeaderState::remove)
 //        {
@@ -429,6 +473,7 @@ void Inspector::BeginComponent(const ComponentPtr &component)
         CASE(Rigidbody)
         CASE(BoxCollider)
         CASE(SphereCollider)
+		CASE(CapsuleCollider)
         default:
             //Foldout( component->ClassName() );
             BeginComponentImpl(component);
@@ -436,5 +481,6 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 #undef CASE
 
 }
+
 
 #endif

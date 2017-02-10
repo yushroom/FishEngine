@@ -22,6 +22,7 @@
 #include "SceneViewEditor.hpp"
 #include "FileInfo.hpp"
 #include "Selection.hpp"
+//#include "UI/SelectObjectDialog.hpp"
 
 #include <fstream>
 #include <Serialization.hpp>
@@ -161,6 +162,12 @@ void MainWindow::Init()
 	FishEngine::Timer t("Load assets");
     FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
 	t.StopAndPrint();
+
+	//// http://stackoverflow.com/questions/37987426/qt-non-blocking-overlay-dialog
+	//auto dialog = new SelectObjectDialog(this);
+	//auto flags = dialog->windowFlags();
+	//dialog->setWindowFlags(flags | Qt::Tool);
+	//dialog->show();
 }
 
 void MainWindow::SaveSceneAs()

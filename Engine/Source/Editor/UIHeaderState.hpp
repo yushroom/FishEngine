@@ -6,6 +6,6 @@ namespace FishEditor
     {
         none,
         enabledChanged,
-        remove,
+        menuButtonClicked,
     };
 }

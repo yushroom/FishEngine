@@ -4,13 +4,14 @@
 #include <map>
 #include <array>
 #include <Resources.hpp>
+#include <ReflectClass.hpp>
 
 //typedef boost::filesystem::path Path;
 using FishEngine::Path;
 
 namespace FishEditor
 {
-    class FileInfo
+    class Meta(NonSerializable) FileInfo
     {
     public:
         FileInfo() = default;

@@ -1,9 +1,11 @@
 #ifndef App_hpp
 #define App_hpp
 
+#include <ReflectClass.hpp>
+
 namespace FishEditor
 {
-    class App
+    class Meta(NonSerializable) App
     {
     public:
         virtual ~App() = 0;

@@ -8,6 +8,7 @@
 #include <GameObject.hpp>
 #include <CameraController.hpp>
 #include <ModelImporter.hpp>
+#include <Shader.hpp>
 #include <Scene.hpp>
 #include <Screen.hpp>
 #include <Graphics.hpp>

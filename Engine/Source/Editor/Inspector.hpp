@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FishEditor.hpp"
+#include <ReflectClass.hpp>
 
 using namespace FishEngine;
 
@@ -19,7 +20,7 @@ namespace FishEditor
     };
 
 
-    class Inspector
+    class Meta(NonSerializable) Inspector
     {
     public:
         Inspector() = delete;

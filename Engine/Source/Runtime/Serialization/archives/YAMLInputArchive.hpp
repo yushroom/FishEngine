@@ -46,18 +46,6 @@ namespace FishEngine
 		YAML::Node * m_node = nullptr;
 	};
 
-	template<class T>
-	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, T & t)
-	{
-		Load(archive, t);
-		return archive;
-	}
-
-	template<class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-	void convert(YAML::Node const & node, T & t)
-	{
-		t = node.as<T>();
-	}
 
 	inline void convert(YAML::Node const & node, std::string & t)
 	{
@@ -73,11 +61,43 @@ namespace FishEngine
 		//sin >> t;
 	}
 
+
+	template<class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
+	void convert(YAML::Node const & node, T & t)
+	{
+		t = node.as<T>();
+	}
+
 	template<class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
 	void convert(YAML::Node const & node, T & t)
 	{
 		//std::cout << node.Scalar() << std::endl;
 		t = static_cast<T>(node.as<std::underlying_type_t<T>>());
+	}
+
+#if 0
+	template <class T>
+	inline YAML::Node const & nod operator >> (YAML::Node const & node, T & t)
+	{
+		//assert(node.IsSequence());
+		convert(node, t);
+	}
+
+	// user defined types?
+	template<class T, std::enable_if_t<!(std::is_enum<T>::value || std::is_arithmetic<T>::value), int> = 0>
+	void convert(YAML::Node const & node, T & t)
+	{
+		//std::cout << node.Scalar() << std::endl;
+		//t = static_cast<T>(node.as<std::underlying_type_t<T>>());
+		Load(node, t);
+	}
+#endif
+	
+	template<class T>
+	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, T & t)
+	{
+		Load(archive, t);
+		return archive;
 	}
 
 	template<class T>
@@ -90,7 +110,7 @@ namespace FishEngine
 	}
 
 	template<class T>
-	YAMLInputArchive& operator >> (YAMLInputArchive& archive, BaseClassWrapper<T> t)
+	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, BaseClassWrapper<T> t)
 	{
 		archive >> const_cast<T&>(t.base_ref);
 		return archive;

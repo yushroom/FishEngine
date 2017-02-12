@@ -3,7 +3,7 @@ import os
 import clang.cindex
 import json
 import sys
-from tool_helper import CamelCaseToReadable
+from tool_helper import CamelCaseToReadable, UpdateFile
 
 debug = False
 
@@ -104,8 +104,9 @@ def internal_parse_class(node):
     scope_prefix = '::'.join( node.type.spelling.split('::')[:-1] )
     #print('class', node.type.spelling)
     if scope_prefix not in namespaces:
+        #print("Unknown namespace:", scope_prefix)
         return
-    class_name = node.spelling
+    class_name = node.type.spelling
     print('class', class_name)
     header_file = os.path.basename( node.location.file.name )
 
@@ -123,8 +124,12 @@ def internal_parse_class(node):
     for child in node.get_children():
         #print('\t', child.kind, child.spelling, child.type.spelling)
         if child.kind == clang.cindex.CursorKind.CXX_BASE_SPECIFIER:
-            base_class = next(child.get_children()).spelling
-            base_class = base_class.split(' ')[-1].split('::')[-1]
+            for cc in child.get_children():
+                base_class = cc.spelling    # get the last element
+            #base_class = next(child.get_children()).spelling
+            print('\t', 'base class', base_class)
+            base_class = base_class.split(' ')[-1] # remove prefix: "class "
+            assert(base_class != '')
             if base_class not in classes:
                 ''' parent is NonSerializable
                 '''
@@ -161,7 +166,7 @@ def internal_parse_class(node):
         elif child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
             #print('\t', child.type.spelling, child.spelling)
             if child.spelling not in all_attributes:
-                msg = 'Unknown Attribute ' + child.spelling  + 'for class ' + class_name
+                msg = 'Unknown Attribute ' + child.spelling  + ' for class ' + class_name
                 raise UnknownAttributeError(msg)
             if child.spelling == 'DisallowMultipleComponent':
                 classes[class_name]['is_unique'] = True
@@ -269,9 +274,15 @@ def ExtractClasses(path):
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0',
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include',
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/yaml-cpp/include',
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+                R'/Users/yushroom/program/graphics/FishEngine/Engine/Source/Runtime',
+                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers',
+                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers',
+                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers'
                 )
-            clang_path = '/usr/local/opt/llvm/bin/clang'
+            #clang_path = '/usr/local/opt/llvm/bin/clang'
+            clang_path = "clang"
             #result = os.system(clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
         else:
             header_path = (
@@ -290,29 +301,26 @@ def ExtractClasses(path):
                 );
             clang_path = R'D:\Library\LLVM\3.9.1_win32\bin\clang'
         sys_headers_path = ' '.join(['-I"{0}"'.format(x) for x in header_path])
-        cmd = clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + sys_headers_path + ' temp/AllHeaders.hpp -o temp/AllHeaders.ast'
+        cmd = clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + sys_headers_path + ' -F/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib temp/AllHeaders.hpp -o temp/AllHeaders.ast'
         print(cmd)
         result = os.system(cmd)
-        assert(result == 0)
-    else:
-        result = os.system(R'clang -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/boost_1_61_0 -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/glfw/include -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/ -I/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include temp/AllHeaders.hpp -o temp/AllHeaders.ast')
         assert(result == 0)
     tu = index.read("temp/AllHeaders.ast")
     internal_find_typerefs(tu.cursor)
 
     for e in ('x', 'y'):
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
-        classes['Vector2']['members'].append(member)
+        classes['FishEngine::Vector2']['members'].append(member)
     for e in ('x', 'y', 'z'):
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
-        classes['Vector3']['members'].append(member)
+        classes['FishEngine::Vector3']['members'].append(member)
     for e in ('r', 'g', 'b'):
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
-        classes['Color']['members'].append(member)
+        classes['FishEngine::Color']['members'].append(member)
     for e in ('x', 'y', 'z', 'w'):
         member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
-        classes['Vector4']['members'].append(member)
-        classes['Quaternion']['members'].append(member)
+        classes['FishEngine::Vector4']['members'].append(member)
+        classes['FishEngine::Quaternion']['members'].append(member)
 
     return classes
 
@@ -322,11 +330,10 @@ if __name__ == "__main__":
     #print(classes['Object'])
     #print(classes['Color'])
     #print(json.dumps(classes, indent=4))
-    print('Transform.m_children: ', [x for x in classes['Transform']['members'] if x['name'] == 'm_children'][0]['type'])
+    print('Transform.m_children: ', [x for x in classes['FishEngine::Transform']['members'] if x['name'] == 'm_children'][0]['type'])
     #print(json.dumps(classes['Transform'], indent=4))
     #if debug:
     print('dump classes')
     #print(json.dumps(classes['Animator'], indent = 4))
     #print(json.dumps(classes['Rigidbody'], indent = 4))
-    with open('temp/class.json', 'w') as f:
-        f.write(json.dumps(classes, indent = 4))
+    UpdateFile('temp/class.json', json.dumps(classes, indent = 4))

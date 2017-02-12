@@ -3,6 +3,7 @@
 
 #include <FishEngine.hpp>
 #include <functional>
+#include <ReflectClass.hpp>
 
 namespace FishEditor
 {
@@ -24,7 +25,7 @@ namespace FishEditor
 
     //typedef std::list<Actor> Action;
 
-    class Action
+    class Meta(NonSerializable) Action
     {
     public:
         typedef std::function<void()> Actor;

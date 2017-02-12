@@ -1,10 +1,11 @@
 #pragma once
 
 #include "FishEditor.hpp"
-#include "Vector3.hpp"
-#include "Vector2.hpp"
+#include <Vector3.hpp>
+#include <Vector2.hpp>
 #include "IntVector.hpp"
-#include "Input.hpp"
+#include <Input.hpp>
+#include <ReflectClass.hpp>
 
 namespace FishEditor
 {
@@ -29,7 +30,7 @@ namespace FishEditor
         ShadedWireframe,
     };
 
-    class SceneViewEditor
+    class Meta(NonSerializable) SceneViewEditor
     {
     public:
         //FishEngine::Vector2             m_position;

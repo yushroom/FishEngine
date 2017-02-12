@@ -2,6 +2,7 @@
 
 #include <Resources.hpp>
 #include <QIcon>
+#include <ReflectClass.hpp>
 
 namespace FishEngine
 {
@@ -31,7 +32,7 @@ namespace FishEditor
 		ForceUncompressedImport,
 	};
 	
-    class AssetDatabase
+    class Meta(NonSerializable) AssetDatabase
     {
     public:
         AssetDatabase() = delete;

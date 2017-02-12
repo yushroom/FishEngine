@@ -7,7 +7,7 @@
 #include <Serialization/archives/yaml.hpp>
 #include <Serialization/archives/YAMLInputArchive.hpp>
 
-#include "generate/EditorClassSerialization.hpp"
+//#include "generate/EditorClassSerialization.hpp"
 
 namespace FishEngine
 {
@@ -33,7 +33,7 @@ namespace FishEditor
 		//bool need_generate = true;
 		auto meta_path = assetPath.string() + ".meta";
 		auto name = assetPath.stem().string();
-#if 1
+#if 0
 		if (boost::filesystem::exists(meta_path))
 		{
 			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));

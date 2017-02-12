@@ -3,14 +3,15 @@
 
 #include <memory>
 
-#include <FishEditor.hpp>
+#include "FishEditor.hpp"
+#include <ReflectClass.hpp>
 //#include <boost/filesystem.hpp>
 
 namespace FishEditor
 {
     class SceneViewEditor;
 
-    class MainEditor
+    class Meta(NonSerializable) MainEditor
     {
     public:
         MainEditor() = delete;

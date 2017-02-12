@@ -16,7 +16,7 @@ SET(
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/yaml.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/yaml.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLInputArchive.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/generate/Class_Serialization.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/generate/EngineClassSerialization.cpp
 )
 foreach (x ${Serialization_SRCS})
     IF(NOT EXISTS ${x})

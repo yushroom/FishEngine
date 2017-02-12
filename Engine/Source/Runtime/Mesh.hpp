@@ -34,7 +34,10 @@ namespace FishEngine
         //    float weight[4];
         //};
 
+		Meta(NonSerializable)
         int boneIndex[MaxBoneForEachVertex];
+		
+		Meta(NonSerializable)
         float weight[MaxBoneForEachVertex];
 
         BoneWeight();

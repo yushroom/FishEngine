@@ -9,13 +9,14 @@
 #include <ReflectEnum.hpp>
 
 #include <Color.hpp>
+#include <ReflectClass.hpp>
 
 class QTreeWidget;
 class QTreeWidgetItem;
 
 namespace FishEditor
 {
-    class EditorGUI
+    class Meta(NonSerializable) EditorGUI
     {
         EditorGUI() = delete;
 

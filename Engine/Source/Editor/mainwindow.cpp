@@ -16,6 +16,7 @@
 #include <Input.hpp>
 #include <Application.hpp>
 #include <Camera.hpp>
+#include <Scene.hpp>
 
 #include "Inspector.hpp"
 #include "MainEditor.hpp"
@@ -26,6 +27,7 @@
 
 #include <fstream>
 #include <Serialization.hpp>
+#include <GameObject.hpp>
 #include <Serialization/archives/yaml.hpp>
 #include <Timer.hpp>
 
@@ -180,8 +182,8 @@ void MainWindow::SaveSceneAs()
         return;
     std::ofstream fout(path.toStdString());
     FishEngine::YAMLOutputArchive archive(fout);
-    for (auto const & go : Scene::GameObjects())
-    {
-        archive << go;
-    }
+//    for (auto const & go : Scene::GameObjects())
+//    {
+//        archive << go;
+//    }
 }

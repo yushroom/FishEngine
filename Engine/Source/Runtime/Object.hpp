@@ -5,10 +5,14 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 #include "Macro.hpp"
+//#include <Archive.hpp>
 
 namespace FishEngine
 {
     using UUID = boost::uuids::uuid;
+	
+	class InputArchive;
+	class OutputArchive;
 	
 	enum class HideFlags
 	{
@@ -63,8 +67,14 @@ namespace FishEngine
             return m_uuid;
         }
         
-        InjectSerializationFunctions(Object);
-        
+        //InjectSerializationFunctions(Object);
+		template <typename Archive>
+		friend void Save (Archive & archive, Object const & t);
+		template <typename Archive>
+		friend void Load (Archive & archive, Object & t);
+		virtual void Serialize(OutputArchive & archive) const = 0;
+		virtual void Deserialize(InputArchive & archive) = 0;
+		
         // The name of the object.
         virtual std::string name() const { return m_name; }
         void setName(const std::string& name) { m_name = name; }

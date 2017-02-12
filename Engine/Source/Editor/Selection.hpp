@@ -2,6 +2,7 @@
 #define Selection_hpp
 
 #include "FishEditor.hpp"
+#include <ReflectClass.hpp>
 
 using FishEngine::GameObject;
 using FishEngine::GameObjectPtr;
@@ -13,7 +14,7 @@ using FishEngine::TransformPtr;
 namespace FishEditor
 {
     // Access to the selection in the editor.
-    class Selection
+    class Meta(NonSerializable) Selection
     {
     public:
 

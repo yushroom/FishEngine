@@ -1,12 +1,28 @@
 #pragma once
 
-namespace FishEngine
-{
-	template <class Archive, class T>
-	inline void prologue(Archive& arhive, T const & t)
-	{ }
+#include <type_traits>
+//#inlucde <iostream>
 
-	template <class Archive, class T>
-	inline void epilogue(Archive& arhive, T const & t)
-	{ }
+#include "Serialization/NameValuePair.hpp"
+#include "Serialization/helper.hpp"
+
+namespace FishEngine
+{	
+	template <class T>
+	constexpr int ArchiveID();
+	
+	class Meta(NonSerializable) InputArchive
+	{
+	public:
+		
+		virtual int ArchiveID() = 0;
+	};
+	
+	
+	class Meta(NonSerializable) OutputArchive
+	{
+	public:
+		
+		virtual int ArchiveID() = 0;
+	};
 }

@@ -2,6 +2,7 @@
 
 #include "FishEngine.hpp"
 #include "Resources.hpp"
+#include "Macro.hpp"
 
 namespace FishEngine
 {
@@ -24,6 +25,8 @@ namespace FishEngine
     class ShaderCompiler
     {
     public:
+		InjectSerializationFunctionsNonPolymorphic(ShaderCompiler);
+		
         bool                                m_hasGeometryShader = false;
         std::map<std::string, std::string>  m_settings;
         ShaderCompilerErrorCode             m_error = ShaderCompilerErrorCode::None;

@@ -82,6 +82,9 @@ namespace FishEngine
     class LayeredDepthBuffer;
 
     class Avatar;
+	
+	class InputArchive;
+	class OutputArchive;
 
     typedef std::shared_ptr<Object> ObjectPtr;
     typedef std::shared_ptr<GameObject> GameObjectPtr;

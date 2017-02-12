@@ -7,6 +7,10 @@ aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/../build-Editor-Desktop_Qt_5_8_0_
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
 find_package(Qt5Widgets)
 
+FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
+FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
+SOURCE_GROUP(Reflect FILES ${ReflectHeaders} ${ReflectFilesSources})
+
 include_directories(../build-Editor-Desktop_Qt_5_8_0_clang_64bit-Release/)
 foreach (x AssetImporter TextureImporter ModelImporter)
     foreach (ext hpp cpp)
@@ -21,7 +25,7 @@ SOURCE_GROUP(Asset FILES ${Asset_SRCS})
 
 SOURCE_GROUP( UI FILES ${UI_SRCS} )
 SOURCE_GROUP( MOC FILES ${MOC_SRCS} )
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${MOC_SRCS} ${HEADERS})
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${MOC_SRCS} ${HEADERS} ${ReflectHeaders} ${ReflectFilesSources})
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)

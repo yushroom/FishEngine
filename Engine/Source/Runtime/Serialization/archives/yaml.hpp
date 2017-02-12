@@ -7,8 +7,8 @@
 #include <yaml-cpp/yaml.h>
 #endif
 #include "Object.hpp"
-#include "Serialization/NameValuePair.hpp"
-#include "Serialization/helper.hpp"
+#include <Serialization/NameValuePair.hpp>
+#include <Serialization/helper.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -17,6 +17,8 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+
+#include <Archive.hpp>
 
 namespace FishEngine
 {
@@ -473,9 +475,21 @@ namespace FishEngine
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::uuids::uuid const & t);
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::nullptr_t const & t);
 
-	class YAMLOutputArchive
+	template <>
+	constexpr int ArchiveID<YAMLOutputArchive>()
+	{
+		return 1;
+	}
+
+	class YAMLOutputArchive : public OutputArchive
 	{
 	public:
+		
+		virtual int ArchiveID()
+		{
+			return FishEngine::ArchiveID<YAMLOutputArchive>();
+		}
+		
         YAMLOutputArchive(std::ostream & emitter) : m_emitter(emitter)
 		{
 			
@@ -486,14 +500,16 @@ namespace FishEngine
 
 		~YAMLOutputArchive() = default;
         
-		template<typename T, std::enable_if_t<!emittable<T>::value, int> = 0>
-		YAMLOutputArchive & operator << (T const & t)
-		{
-			prologue(*this, t);
-			Save(*this, t);
-			epilogue(*this, t);
-			return *this;
-		}
+//		template<typename T, std::enable_if_t<!emittable<T>::value, int> = 0>
+//		YAMLOutputArchive & operator << (T const & t)
+//		{
+//			prologue(*this, t);
+//			//Save(*this, t);
+//			//operator<<(T, t);
+//			t.Serialize(*this);
+//			epilogue(*this, t);
+//			return *this;
+//		}
 
 		template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
 		YAMLOutputArchive & operator << (T const & t)
@@ -560,18 +576,20 @@ namespace FishEngine
 		bool m_isInsideDoc = false;
 	};
 
-	//class YAMLInputArchive
-	//{
-	//public:
-
-
-	//private:
-	//};
 
 	// If you want to call prologue and epilogue automatically, override Save(archive, T) for type T,
 	// otherwise override operator<< directly.
 
-	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::nullptr_t const & t)
+	template <class T>
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, NameValuePair<T> const & t)
+	{
+		//archive.SetManipulator(YAML::BeginMap);
+		archive << t.name << t.value;
+		//archive.SetManipulator(YAML::EndMap);
+		return archive;
+	}
+	
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::nullptr_t const &)
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
@@ -581,7 +599,7 @@ namespace FishEngine
 	}
 
 	void Save    (YAMLOutputArchive & archive, std::nullptr_t const & t) = delete;
-	void prologue(YAMLOutputArchive & archive, std::nullptr_t const & t) = delete;
+	//void prologue(YAMLOutputArchive & archive, std::nullptr_t const & t) = delete;
 
 	template <class T>
 	inline void Save(YAMLOutputArchive & archive, SizeTag<T> const & t)
@@ -620,17 +638,17 @@ namespace FishEngine
 	template <class T>
 	inline void Save    (YAMLOutputArchive & archive, std::vector<T> const & t) = delete;
 
-	template<typename T>
-	inline void prologue(YAMLOutputArchive & archive, std::list<T>   const & t) = delete;
-
-	template <class T>
-	inline void epilogue(YAMLOutputArchive & archive, std::list<T>   const & t) = delete;
-
-	template<typename T>
-	inline void prologue(YAMLOutputArchive & archive, std::vector<T> const & t) = delete;
-
-	template <class T>
-	inline void epilogue(YAMLOutputArchive & archive, std::vector<T> const & t) = delete;
+//	template<typename T>
+//	inline void prologue(YAMLOutputArchive & archive, std::list<T>   const & t) = delete;
+//
+//	template <class T>
+//	inline void epilogue(YAMLOutputArchive & archive, std::list<T>   const & t) = delete;
+//
+//	template<typename T>
+//	inline void prologue(YAMLOutputArchive & archive, std::vector<T> const & t) = delete;
+//
+//	template <class T>
+//	inline void epilogue(YAMLOutputArchive & archive, std::vector<T> const & t) = delete;
 
 #if 1
 	template <class T, class B>
@@ -650,33 +668,34 @@ namespace FishEngine
 	template <class T, class B>
 	inline void Save(YAMLOutputArchive & archive, std::map<T, B> const & t) = delete;
 
-	template <class T, class B>
-	inline void epilogue(YAMLOutputArchive & archive, std::map<T, B> const & t) = delete;
-
-	template <class T, class B>
-	inline void prologue(YAMLOutputArchive & archive, std::map<T, B> const & t) = delete;
+//	template <class T, class B>
+//	inline void epilogue(YAMLOutputArchive & archive, std::map<T, B> const & t) = delete;
+//
+//	template <class T, class B>
+//	inline void prologue(YAMLOutputArchive & archive, std::map<T, B> const & t) = delete;
 #endif
 
 	/************************************************************************/
 	/* std::shared_ptr                                                      */
 	/************************************************************************/
 	template<typename T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
-	static void Save(YAMLOutputArchive& archive, std::shared_ptr<T> const & t)
+	static void operator << (YAMLOutputArchive& archive, std::shared_ptr<T> const & t)
 	{
 		archive.SerializeObject(t);
 	}
 
 	template<typename T, std::enable_if_t<!std::is_base_of<Object, T>::value, int> = 0>
-	static void Save(YAMLOutputArchive& archive, std::shared_ptr<T> const & t) = delete;
+	static void operator <<(YAMLOutputArchive& archive, std::shared_ptr<T> const & t) = delete;
 
 	/************************************************************************/
 	/* std::weak_ptr                                                        */
 	/************************************************************************/
 	template<typename T>
-	inline void Save(YAMLOutputArchive& archive, std::weak_ptr<T> const & v)
+	inline YAMLOutputArchive & operator << (YAMLOutputArchive& archive, std::weak_ptr<T> const & v)
 	{
 		auto t = v.lock();
 		archive.SerializeObject(t);
+		return archive;
 	}
 
 	/************************************************************************/
@@ -693,8 +712,8 @@ namespace FishEngine
 
 	// explicitly delete these function
 	void Save    (YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
-	void prologue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
-	void epilogue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
+//	void prologue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
+//	void epilogue(YAMLOutputArchive & archive, FishEngine::UUID const & t) = delete;
 
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::filesystem::path const & t)
 	{
@@ -707,14 +726,14 @@ namespace FishEngine
 	}
 
 	template <class T>
-	inline void prologue(YAMLOutputArchive & archive, T const & t)
+	inline void Prologue(YAMLOutputArchive & archive, T const & t)
 	{
 		//archive.m_emitter << YAML::Block;
 		archive.SetManipulator(YAML::BeginMap);
 	}
 
 	template <class T>
-	inline void epilogue(YAMLOutputArchive& archive, T const & t)
+	inline void Epilogue(YAMLOutputArchive& archive, T const & t)
 	{
 		archive.SetManipulator(YAML::EndMap);
 	}
@@ -729,68 +748,33 @@ namespace FishEngine
 		Save(archive, t.base_ref);
 		return archive;
 	}
+
 	
 	template <class T>
 	void Save    (YAMLOutputArchive & archive, BaseClassWrapper<T> const & t) = delete;
     
     template <class T>
-	void prologue(YAMLOutputArchive & archive, BaseClassWrapper<T> const & t) = delete;
+	void Prologue(YAMLOutputArchive & archive, BaseClassWrapper<T> const & t) = delete;
 
     template <class T>
-	void epilogue(YAMLOutputArchive & archive, BaseClassWrapper<T> const & t) = delete;
+	void Epilogue(YAMLOutputArchive & archive, BaseClassWrapper<T> const & t) = delete;
 
 
-	inline void prologue(YAMLOutputArchive& archive, Vector3 const & t)
+	inline void Prologue(YAMLOutputArchive& archive, Vector3 const & t)
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
 	}
 
-	inline void prologue(YAMLOutputArchive& archive, Vector4 const & t)
+	inline void Prologue(YAMLOutputArchive& archive, Vector4 const & t)
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
 	}
 
-	inline void prologue(YAMLOutputArchive& archive, Quaternion const & t)
+	inline void Prologue(YAMLOutputArchive& archive, Quaternion const & t)
 	{
 		archive.SetManipulator(YAML::Flow);
 		archive.SetManipulator(YAML::BeginMap);
-	}
-
-	template <class T>
-	inline void prologue(YAMLOutputArchive & archive, NameValuePair<T> const & t)
-	{
-		//archive.m_emitter << YAML::BeginMap;
-	}
-
-	template <class T>
-	inline void epilogue(YAMLOutputArchive& archive, NameValuePair<T> const & t)
-	{
-		//archive.m_emitter << YAML::EndMap;
-	}
-
-	template <class T>
-	inline void prologue(YAMLOutputArchive & archive, std::weak_ptr<T> const & t)
-	{
-		//archive.m_emitter << YAML::BeginMap;
-	}
-
-	template <class T>
-	inline void epilogue(YAMLOutputArchive& archive, std::weak_ptr<T> const & t)
-	{
-		//archive.m_emitter << YAML::EndMap;
-	}
-
-	template <class T>
-	inline void prologue(YAMLOutputArchive & archive, std::shared_ptr<T> const & t)
-	{
-		//archive.m_emitter << YAML::BeginMap;
-	}
-
-	template <class T>
-	inline void epilogue(YAMLOutputArchive& archive, std::shared_ptr<T> const & t)
-	{
-		//archive.m_emitter << YAML::EndMap;
 	}
 }

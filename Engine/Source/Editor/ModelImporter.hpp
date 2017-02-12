@@ -19,10 +19,17 @@ namespace FishEditor
     {
         uint32_t                index;
         std::string             name;
+		
+		Meta(NonSerializable)
         ModelNode*              parent;
+		
+		Meta(NonSerializable)
         std::vector<std::shared_ptr<ModelNode>> children;
+		
         std::vector<uint32_t>   meshesIndices;
         //uint32_t                materialIndices;
+		
+		Meta(NonSerializable)
         FishEngine::Matrix4x4	transform;
         bool                    isBone;
     };

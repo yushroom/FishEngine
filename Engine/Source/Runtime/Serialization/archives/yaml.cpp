@@ -36,7 +36,11 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 		SetManipulator(YAML::BeginMap);
 		m_emitter << obj->ClassName();
 		//this->operator<<(*obj);
-		DynamicSerializeObject(*this, obj);
+		//DynamicSerializeObject(*this, obj);
+		SetManipulator(YAML::BeginMap);
+		obj->Serialize(*this);
+		SetManipulator(YAML::EndMap);
+		//(*this) << obj;
 		SetManipulator(YAML::EndMap);
 		SetManipulator(YAML::EndDoc);
 	}

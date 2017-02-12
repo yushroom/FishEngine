@@ -2,12 +2,15 @@
 #define Ray_hpp
 
 #include "Vector3.hpp"
+//#include "Macro.hpp"
 
 namespace FishEngine
 {
     class FE_EXPORT Ray
     {
 	public:
+		//InjectSerializationFunctionsNonVirtual(Ray)
+		
         Vector3 origin;
         Vector3 direction;
 

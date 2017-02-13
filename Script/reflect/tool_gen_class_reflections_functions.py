@@ -60,10 +60,12 @@ def GenSerializationFuncionts_polymorphic(classinfo, key, scope):
     serialize_seqs_list = [x for x in c['members'] if not x['NonSerializable']]
     serialize_seqs = ['archive << FishEngine::make_nvp("{0}", {0}); // {1}'.format(x['name'], x['type']) for x in serialize_seqs_list]
     if 'parent' in c:
-        p = 'archive << FishEngine::BaseClassWrapper<{0}>(*this);'.format(c['parent'])
+        #p = 'archive << FishEngine::BaseClassWrapper<{0}>(*this);'.format(c['parent'])
+        p = '{0}::Serialize(archive);'.format(c['parent'])
         serialize_seqs.insert(0, p)
     serialize_seqs = '\n\t\t'.join(serialize_seqs)
     deserialize_seqs = serialize_seqs.replace('<<', '>>')
+    deserialize_seqs = deserialize_seqs.replace('Serialize', 'Deserialize')
     return serialization_function_template.render(namespace=c['scope_prefix'], T=key, serialize_seqs=serialize_seqs, deserialize_seqs=deserialize_seqs)
 
 def GenSerializationFuncionts_nonpolymorphic(classinfo, key, scope):
@@ -72,10 +74,12 @@ def GenSerializationFuncionts_nonpolymorphic(classinfo, key, scope):
     serialize_seqs_list = [x for x in c['members'] if not x['NonSerializable']]
     serialize_seqs = ['archive << FishEngine::make_nvp("{0}", value.{0}); // {1}'.format(x['name'], x['type']) for x in serialize_seqs_list]
     if 'parent' in c:
-        p = 'archive << FishEngine::BaseClassWrapper<{0}>(*this);'.format(c['parent'])
+        #p = 'archive << FishEngine::BaseClassWrapper<{0}>(*this);'.format(c['parent'])
+        p = '{0}::Serialize(archive);'.format(c['parent'])
         serialize_seqs.insert(0, p)
     serialize_seqs = '\n\t\t'.join(serialize_seqs)
     deserialize_seqs = serialize_seqs.replace('<<', '>>')
+    deserialize_seqs = deserialize_seqs.replace('Serialize', 'Deserialize')
     return serialization_function_template2.render(namespace=c['scope_prefix'], T=key, serialize_seqs=serialize_seqs, deserialize_seqs=deserialize_seqs)
 
 

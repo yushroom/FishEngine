@@ -1,10 +1,7 @@
 #pragma once
 
 #include <type_traits>
-//#inlucde <iostream>
-
-#include "Serialization/NameValuePair.hpp"
-#include "Serialization/helper.hpp"
+#include <ReflectClass.hpp>
 
 namespace FishEngine
 {	

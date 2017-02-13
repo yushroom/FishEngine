@@ -1,7 +1,7 @@
 #include "UIMaterialHeader.hpp"
 #include "ui_UIMaterialHeader.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIMaterialHeader::UIMaterialHeader(QWidget *parent)
     : UIMaterialHeader("", parent)

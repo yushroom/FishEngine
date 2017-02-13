@@ -72,8 +72,8 @@ namespace FishEngine
 		friend void Save (Archive & archive, Object const & t);
 		template <typename Archive>
 		friend void Load (Archive & archive, Object & t);
-		virtual void Serialize(OutputArchive & archive) const = 0;
-		virtual void Deserialize(InputArchive & archive) = 0;
+		virtual void Serialize(OutputArchive & archive) const;
+		virtual void Deserialize(InputArchive & archive);
 		
         // The name of the object.
         virtual std::string name() const { return m_name; }

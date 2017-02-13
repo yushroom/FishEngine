@@ -1,7 +1,7 @@
 #include "UISlider.hpp"
 #include "ui_UISlider.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UISlider::UISlider(const std::string &label, float value, float leftValue, float rightValue, QWidget *parent) :
     QWidget(parent),

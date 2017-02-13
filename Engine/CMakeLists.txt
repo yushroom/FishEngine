@@ -8,16 +8,14 @@ SET(FISHENGINE_VERSION_PATCH 0)
 SET(FISHENGINE_VERSION ${FISHENGINE_VERSION_MAJOR}.${FISHENGINE_VERSION_MINOR}.${FISHENGINE_VERSION_PATCH})
 
 # Global compile & linker flags
-## Compiler-agnostic settings
-### Target at least C++14
+
+# Target at least C++14
 set(CMAKE_CXX_STANDARD 14)
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Output
-
 set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_LIST_DIR}/Binary)
-# message("HHHHHHHHH" ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -27,23 +25,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(Boost_USE_STATIC_LIBS       ON) # find static libs
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost 1.59 REQUIRED
-    COMPONENTS
-    system
-    filesystem)
+find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 
-message("HHHHHHHHHH" ${Boost_INCLUDE_DIRS})
+message("Find Boost: " ${Boost_INCLUDE_DIRS})
 
 include_directories(./Source/Runtime)
-#include_directories(./ThirdParty/boost_1_61_0/)
 include_directories(./ThirdParty/)
 include_directories(./ThirdParty/PhysXSDK/Include/)
 include_directories(./ThirdParty/assimp-3.3.1/include)
-
-#set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-#set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-#set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
@@ -65,27 +55,12 @@ else()
     # link_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty/libs/osx/)
 endif()
 
-#ADD_SUBDIRECTORY(./ThirdParty/imgui)
-#SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "ThirdParty")
-
-include_directories(./ThirdParty/nativefiledialog/src/include)
-ADD_SUBDIRECTORY(./ThirdParty/nativefiledialog)
-SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "ThirdParty")
-
 include_directories(./ThirdParty/yaml-cpp/include)
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 #set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(./ThirdParty/yaml-cpp)
 SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES FOLDER "ThirdParty/yaml-cpp")
 SET_TARGET_PROPERTIES(format PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(run-tests PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(gmock_main PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(gmock PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(gtest PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(gtest_main PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(read PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(sandbox PROPERTIES FOLDER "ThirdParty/yaml-cpp")
-#SET_TARGET_PROPERTIES(parse PROPERTIES FOLDER "ThirdParty/yaml-cpp")
 
 
 #set(GLEW_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glew-2.0.0/lib/Release/Win32/glew32.lib)

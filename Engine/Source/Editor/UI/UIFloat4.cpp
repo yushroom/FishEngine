@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIFloat4::UIFloat4(std::string const & label, float x, float y, float z, float w, QWidget *parent) :
     QWidget(parent),

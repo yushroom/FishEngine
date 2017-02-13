@@ -141,7 +141,7 @@ namespace FishEditor
 		bool m_convertToNormalmap;
 
 		// Use crunched compression when available.
-		bool crunchedCompression;
+		bool m_crunchedCompression;
 
 		// Fade out mip levels to gray color?
 		bool m_fadeout;

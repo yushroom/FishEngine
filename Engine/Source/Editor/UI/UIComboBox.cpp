@@ -1,7 +1,7 @@
 #include "UIComboBox.hpp"
 #include "ui_UIComboBox.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIComboBox::UIComboBox(std::string const & label, int index, const char * const *enumStringArray, int arraySize, QWidget *parent) :
     QWidget(parent),

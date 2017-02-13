@@ -1,7 +1,7 @@
 #include "UIBool.hpp"
 #include "ui_UIBool.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIBool::UIBool(const std::string &label, bool value, QWidget *parent) :
     QWidget(parent),

@@ -1,7 +1,7 @@
 #include "UIInt.hpp"
 #include "ui_UIInt.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIInt::UIInt(QString const& label, int value, QWidget *parent) :
     QWidget(parent),

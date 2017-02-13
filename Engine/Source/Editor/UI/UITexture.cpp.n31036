@@ -1,7 +1,7 @@
 #include "UITexture.hpp"
 #include "ui_UITexture.h"
 
-#include "UIDebug.hpp"
+#include "../UIDebug.hpp"
 
 #include "AssetImporter.hpp"
 #include "AssetDataBase.hpp"
@@ -40,17 +40,6 @@ UITextureState UITexture::CheckUpdate(const std::string &label, const boost::uui
         auto path = FishEditor::AssetDatabase::GUIDToAssetPath(textureGUID);
         auto const & icon = FishEditor::AssetDatabase::GetCacheIcon(path);
         ui->iconLabel->setPixmap(icon.pixmap(64, 64));
-    }
-
-    if ( m_textureClicked )
-    {
-		m_textureClicked = false;
-        return UITextureState::TextureClicked;
-    }
-    if ( m_selectButtonClicked )
-    {
-		m_selectButtonClicked = false;
-        return UITextureState::SelectButtonClicked;
     }
 
     return UITextureState::None;

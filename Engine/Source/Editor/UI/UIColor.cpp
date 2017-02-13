@@ -3,7 +3,7 @@
 
 #include <QColorDialog>
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIColor::UIColor(std::string const & label, QColor const & value, QWidget *parent) :
     QWidget(parent),

@@ -5,7 +5,7 @@
 #include <LayerMask.hpp>
 #include <TagManager.hpp>
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIGameObjectHeader::UIGameObjectHeader(QWidget *parent) :
     QWidget(parent),

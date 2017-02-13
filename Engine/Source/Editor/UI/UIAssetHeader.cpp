@@ -1,7 +1,7 @@
 #include "UIAssetHeader.hpp"
 #include "ui_UIAssetHeader.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIAssetHeader::UIAssetHeader(QWidget *parent) :
     QWidget(parent),

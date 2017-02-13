@@ -277,9 +277,9 @@ def ExtractClasses(path):
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/yaml-cpp/include',
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/ThirdParty/PhysXSDK/Include',
                 R'/Users/yushroom/program/graphics/FishEngine/Engine/Source/Runtime',
-                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers',
-                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers',
-                R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers'
+                # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers',
+                # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers',
+                # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers'
                 )
             #clang_path = '/usr/local/opt/llvm/bin/clang'
             clang_path = "clang"
@@ -296,12 +296,18 @@ def ExtractClasses(path):
                 R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
                 R'D:\program\FishEngine/Engine/ThirdParty/glfw-3.2.1/include',
                 R'D:\program\FishEngine/Engine/ThirdParty/',
+                R'D:\program\FishEngine/Engine/Source/Runtime',
+                R'D:\program\FishEngine/Engine/ThirdParty/yaml-cpp/include',
                 R'D:\program\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
                 R'D:\program\FishEngine\Engine\ThirdParty\glew-2.0.0\include',
+                #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include',
+                #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtGui',
+                #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtWidgets',
+                #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtCore',
                 );
             clang_path = R'D:\Library\LLVM\3.9.1_win32\bin\clang'
         sys_headers_path = ' '.join(['-I"{0}"'.format(x) for x in header_path])
-        cmd = clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + sys_headers_path + ' -F/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib temp/AllHeaders.hpp -o temp/AllHeaders.ast'
+        cmd = clang_path + R' -x c++ -emit-ast -D__REFLECTION_PARSER__ -std=c++14 ' + sys_headers_path + ' -F/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib ' + path + ' -o temp/AllHeaders.ast'
         print(cmd)
         result = os.system(cmd)
         assert(result == 0)
@@ -325,10 +331,7 @@ def ExtractClasses(path):
     return classes
 
 if __name__ == "__main__":
-    classes = ExtractClasses("temp/AllHeaders.hpp")
-    #print(classes)
-    #print(classes['Object'])
-    #print(classes['Color'])
+    classes = ExtractClasses("temp/AllHeaders2.hpp")
     #print(json.dumps(classes, indent=4))
     print('Transform.m_children: ', [x for x in classes['FishEngine::Transform']['members'] if x['name'] == 'm_children'][0]['type'])
     #print(json.dumps(classes['Transform'], indent=4))

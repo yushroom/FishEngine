@@ -4,7 +4,7 @@
 #include <Object.hpp>
 
 #include "SelectObjectDialog.hpp"
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIObjecField::UIObjecField(std::string const & label, std::string const & objectName, QWidget *parent) :
     QWidget(parent),

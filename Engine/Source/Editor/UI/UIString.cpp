@@ -1,7 +1,7 @@
 #include "UIString.hpp"
 #include "ui_UIString.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIString::UIString(const QString &label, const QString &value, QWidget *parent) :
     QWidget(parent),

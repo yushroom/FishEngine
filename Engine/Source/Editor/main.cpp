@@ -1,7 +1,6 @@
-#include "mainwindow.h"
+#include "UI/MainWindow.hpp"
 #include <QApplication>
 #include <QSurfaceFormat>
-//#include <Resources.hpp>
 
 int main(int argc, char *argv[])
 {

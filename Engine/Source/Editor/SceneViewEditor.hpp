@@ -3,7 +3,7 @@
 #include "FishEditor.hpp"
 #include <Vector3.hpp>
 #include <Vector2.hpp>
-#include "IntVector.hpp"
+#include <IntVector.hpp>
 #include <Input.hpp>
 #include <ReflectClass.hpp>
 

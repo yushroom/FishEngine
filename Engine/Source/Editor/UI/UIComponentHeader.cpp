@@ -1,7 +1,7 @@
 #include "UIComponentHeader.hpp"
 #include "ui_UIComponentHeader.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 UIComponentHeader::UIComponentHeader(std::string const & componentTypeName, bool enabled, QWidget *parent) :
     QWidget(parent),

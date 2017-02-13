@@ -1,7 +1,7 @@
 #include "UIFloat.hpp"
 #include "ui_UIFloat.h"
 
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 #include "../Helper.hpp"
 
 UIFloat::UIFloat(const std::string &label, float value, QWidget *parent) :

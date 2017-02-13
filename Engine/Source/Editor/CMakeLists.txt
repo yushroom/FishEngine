@@ -1,17 +1,24 @@
+# Tell CMake to run moc when necessary:
+set(CMAKE_AUTOMOC ON)
+
+# As moc files are generated in the binary dir, tell CMake
+# to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC OFF)
 
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/UI UI_SRCS)
-aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/../build-Editor-Desktop_Qt_5_8_0_clang_64bit-Release MOC_SRCS)
-FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
-find_package(Qt5Widgets)
+#FILE(GLOB Heasers ${CMAKE_CURRENT_LIST_DIR}/UI/*.hpp)
+FILE(GLOB FORMS ${CMAKE_CURRENT_LIST_DIR}/UI/*.ui)
+SOURCE_GROUP(Forms FILES ${FORMS})
 
-FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
+
+# Widgets finds its own dependencies (QtGui and QtCore).
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+#FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
-SOURCE_GROUP(Reflect FILES ${ReflectHeaders} ${ReflectFilesSources})
+SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-include_directories(../build-Editor-Desktop_Qt_5_8_0_clang_64bit-Release/)
 foreach (x AssetImporter TextureImporter ModelImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
@@ -25,7 +32,9 @@ SOURCE_GROUP(Asset FILES ${Asset_SRCS})
 
 SOURCE_GROUP( UI FILES ${UI_SRCS} )
 SOURCE_GROUP( MOC FILES ${MOC_SRCS} )
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${MOC_SRCS} ${HEADERS} ${ReflectHeaders} ${ReflectFilesSources})
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources})
+
+include_directories(../build-Editor-Desktop_Qt_5_8_0_MSVC2015_64bit-Release/)
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)

@@ -29,7 +29,7 @@
 #include "UI/SelectObjectDialog.hpp"
 
 #include "Inspector.hpp"
-#include "UIDebug.hpp"
+#include "UI/UIDebug.hpp"
 
 using namespace FishEditor;
 using namespace FishEngine;

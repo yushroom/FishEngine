@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "FishEngine.hpp"
 #include "ReflectClass.hpp"
 
@@ -15,6 +17,7 @@
 #include "Serialization/types/list.hpp"
 //#include "Serialization/types/vector.hpp"
 #include "Serialization/NameValuePair.hpp"
+#include "Serialization/helper.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -70,26 +73,26 @@ namespace FishEngine
 	}
 	
 
-    template <class T, std::enable_if<std::is_arithmetic<T>::value, int> = 0>
+    template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
     InputArchive& operator>>( InputArchive& archive, T& value )
     {
         return archive;
     }
     
-    template <class T, std::enable_if<std::is_arithmetic<T>::value, int> = 0>
+    template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
     OutputArchive& operator<<( OutputArchive& archive, T& value )
     {
         return archive;
     }
     
-    template <class T, std::enable_if<std::is_enum<T>::value, int> = 0>
+    template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
     InputArchive& operator>>( InputArchive& archive, T& value )
     {
         archive << static_cast<std::underlying_type_t<T> > ( value );
         return archive;
     }
     
-    template <class T, std::enable_if<std::is_enum<T>::value, int> = 0>
+    template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
     OutputArchive& operator<<( OutputArchive& archive, T& value )
     {
         archive >> static_cast<std::underlying_type_t<T> > ( value );
@@ -119,17 +122,26 @@ namespace FishEngine
     }
     
     
-    template <class T>
-    InputArchive& operator>>( InputArchive& archive, BaseClassWrapper<T> && nvp)
-    {
-        return archive;
-    }
-    
-    template <class T>
-    OutputArchive& operator<<( OutputArchive& archive, BaseClassWrapper<T> const & nvp)
-    {
-        return archive;
-    }
+  //  template <class T>
+  //  InputArchive& operator>>( InputArchive& archive, BaseClassWrapper<T> && nvp)
+  //  {
+  //      return archive;
+  //  }
+  //  
+  //  template <class T>
+  //  OutputArchive& operator<<( OutputArchive& archive, BaseClassWrapper<T> const & base)
+  //  {
+		//if (archive.ArchiveID() == ArchiveID<YAMLOutputArchive>())
+		//{
+		//	auto & ar = dynamic_cast<YAMLOutputArchive&>(archive);
+		//	ar << base;
+		//}
+		//else
+		//{
+		//	abort();
+		//}
+  //      return archive;
+  //  }
 
     
 	// template<class Archive, class T>

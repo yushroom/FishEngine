@@ -2,7 +2,7 @@
 
 #include <QDoubleValidator>
 #include "../Helper.hpp"
-#include "../UIDebug.hpp"
+#include "UIDebug.hpp"
 
 FloatLineEdit::FloatLineEdit(QWidget *parent)
     : QLineEdit("0", parent), m_value(0)

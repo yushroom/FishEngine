@@ -37,6 +37,8 @@ SOURCE_GROUP( MOC   FILES ${MOC_SRCS}   )
 
 add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources} resources.qrc)
 
+target_link_libraries(FishEditor filesystem)
+target_link_libraries(FishEditor system)
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)

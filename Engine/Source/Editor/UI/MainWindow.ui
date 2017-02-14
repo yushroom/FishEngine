@@ -441,7 +441,7 @@
   </action>
   <action name="actionPlay">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Play_black.png</normaloff>:/Resources/Play_black.png</iconset>
    </property>
    <property name="text">
@@ -453,7 +453,7 @@
   </action>
   <action name="actionPause">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Pause_black.png</normaloff>:/Resources/Pause_black.png</iconset>
    </property>
    <property name="text">
@@ -465,7 +465,7 @@
   </action>
   <action name="actionStep">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/End_black.png</normaloff>:/Resources/End_black.png</iconset>
    </property>
    <property name="text">
@@ -477,7 +477,7 @@
   </action>
   <action name="actionHand">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Whole Hand_000000_100.png</normaloff>:/Resources/Whole Hand_000000_100.png</iconset>
    </property>
    <property name="text">
@@ -489,7 +489,7 @@
   </action>
   <action name="actionTranslate">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Resize Four Directions_000000_100 2.png</normaloff>:/Resources/Resize Four Directions_000000_100 2.png</iconset>
    </property>
    <property name="text">
@@ -501,7 +501,7 @@
   </action>
   <action name="actionRotation">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Rotate_000000_100.png</normaloff>:/Resources/Rotate_000000_100.png</iconset>
    </property>
    <property name="text">
@@ -513,7 +513,7 @@
   </action>
   <action name="actionScale">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Expand_000000_100 2.png</normaloff>:/Resources/Expand_000000_100 2.png</iconset>
    </property>
    <property name="text">
@@ -624,17 +624,17 @@
   <customwidget>
    <class>HierarchyTreeView</class>
    <extends>QTreeView</extends>
-   <header>HierarchyTreeView.hpp</header>
+   <header>UI/HierarchyTreeView.hpp</header>
   </customwidget>
   <customwidget>
    <class>GLWidget</class>
    <extends>QOpenGLWidget</extends>
-   <header>GLWidget.hpp</header>
+   <header>UI/GLWidget.hpp</header>
   </customwidget>
   <customwidget>
    <class>ProjectView</class>
    <extends>QWidget</extends>
-   <header>ProjectView.hpp</header>
+   <header>UI/ProjectView.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -645,7 +645,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections/>
 </ui>

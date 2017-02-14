@@ -70,6 +70,8 @@ namespace FishEngine
 		case PrimitiveType::Capsule:
 			go->AddComponent<CapsuleCollider>();
 			break;
+		default:
+			break;
 		}
 		go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
         return go;

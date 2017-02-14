@@ -1,5 +1,7 @@
-# Tell CMake to run moc when necessary:
+
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
@@ -28,13 +30,13 @@ foreach (x AssetImporter TextureImporter ModelImporter)
         ENDIF ()
     endforeach ()
 endforeach()
-SOURCE_GROUP(Asset FILES ${Asset_SRCS})
 
-SOURCE_GROUP( UI FILES ${UI_SRCS} )
-SOURCE_GROUP( MOC FILES ${MOC_SRCS} )
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources})
+SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
+SOURCE_GROUP( UI    FILES ${UI_SRCS}    )
+SOURCE_GROUP( MOC   FILES ${MOC_SRCS}   )
 
-include_directories(../build-Editor-Desktop_Qt_5_8_0_MSVC2015_64bit-Release/)
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources} resources.qrc)
+
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)
@@ -45,9 +47,6 @@ if (MSVC)
     target_link_libraries(FishEditor opengl32.lib)
     target_link_libraries(FishEditor glew_s)
 else()
-    #set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
-    #set(CMAKE_CXX_FLAGS "-I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers -I/Users/yushroom/program/library/Qt5.8/5.8/clang_64/mkspecs/macx-clang")
-    #set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-F/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib -lz -framework QtWidgets -framework QtGui -framework QtCore -framework DiskArbitration -framework IOKit -framework OpenGL -framework AGL")
     set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 endif()
 

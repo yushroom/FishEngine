@@ -1,37 +1,13 @@
-# Visual Studio
-.vs
-*.db
-*.opendb
-*.user
-*.opensdf
-*.sdf
-*.suo
-*.dll
-*.exp
-*.lib
-*.ilk
-
-*.exe
-
-# Xcode
-*.pbxuser
-*.xcuserstate
-project.xcworkspace/
-xcuserdata/
-
 *.DS_Store
+*.pro.user
 
 # 3rd parth libs
-/Engine/ThirdParty/cereal/
 /Engine/ThirdParty/PhysXSDK/
 /Engine/ThirdParty/boost*
 /Engine/ThirdParty/assimp-3.3.1*
 /Engine/ThirdParty/glew-2.0.0*
 /Engine/ThirdParty/glfw*
-/Engine/ThirdParty/clang*
 /Engine/ThirdParty/fbxsdk*
-/Engine/ThirdParty/nativefiledialog/
-/Engine/ThirdParty/yaml-cpp/
 /Engine/ThirdParty/FBX SDK/
 
 # generated
@@ -62,7 +38,6 @@ xcuserdata/
 
 # cmake build
 /Engine/[Bb]uild
-/Engine/build_xcode/
 [Bb]uild
 build-*
 CMakeLists.txt.user

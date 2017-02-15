@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //FishEngine::Debug::Log("MainWindow::ctor");
     Init();
 	this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+	
     ui->setupUi(this);
 	//this->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
 
@@ -153,17 +154,20 @@ void MainWindow::Init()
     FishEngine::Resources::Init(cwd.absolutePath().toStdString());
     //FishEngine::Input::Init();
 
+	Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
+
 //    RenderSystem::Init();
     Applicaiton::s_isEditor = true;
+
     //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
-#if FISHENGINE_PLATFORM_APPLE
-    Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
-#else
-	Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
-#endif
-	FishEngine::Timer t("Load assets");
-    FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
-	t.StopAndPrint();
+//#if FISHENGINE_PLATFORM_APPLE
+//    Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
+//#else
+//	Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
+//#endif
+	//FishEngine::Timer t("Load assets");
+	FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
+	//t.StopAndPrint();
 
 	//// http://stackoverflow.com/questions/37987426/qt-non-blocking-overlay-dialog
 	//auto dialog = new SelectObjectDialog(this);

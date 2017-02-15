@@ -113,7 +113,7 @@ void DefaultScene()
     terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
     }
 	
-#elif 1
+#elif 0
 	
 	QualitySettings::setShadowDistance(30);
 	Path sponza_root = Resources::exampleRootDirectory() / "Sponza";

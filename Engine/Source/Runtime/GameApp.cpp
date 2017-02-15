@@ -1,3 +1,4 @@
+#if 0
 #include <string>
 
 #include "GameApp.hpp"
@@ -216,3 +217,5 @@ void GameApp::WindowSizeCallback(GLFWwindow* window, int width, int height)
 //}
 
 }
+
+#endif

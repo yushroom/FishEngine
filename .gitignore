@@ -2,13 +2,6 @@
 *.pro.user
 
 # 3rd parth libs
-/Engine/ThirdParty/PhysXSDK/
-/Engine/ThirdParty/boost/lib
-/Engine/ThirdParty/assimp-3.3.1*
-/Engine/ThirdParty/glew-2.0.0*
-/Engine/ThirdParty/glfw*
-/Engine/ThirdParty/fbxsdk*
-/Engine/ThirdParty/FBX SDK/
 
 # generated
 # /Engine/Source/Runtime/generate/
@@ -23,25 +16,18 @@
 /Script/reflect/temp/
 
 # assets
-/assets/models/
-/assets/textures/
-/example/Content
-/Example/Sponza/crytek-sponza/
-*.dds
-*.png
-*.tga
-*.jpg
-*.fbx
-*.obj
+#/assets/models/
+#/assets/textures/
+#/example/Content
+#/Example/Sponza/crytek-sponza/
 *.meta
-*.md5anim
-*.md5mesh
 
 # cmake build
 /Engine/[Bb]uild
 [Bb]uild
 build-*
 CMakeLists.txt.user
+/Engine/ThirdParty/boost/lib
 
 # vscode
 /.vscode/

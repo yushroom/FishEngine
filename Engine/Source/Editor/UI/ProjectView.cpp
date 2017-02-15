@@ -73,6 +73,8 @@ void ProjectView::SetRootPath(const std::string &path)
 
 void ProjectView::SetRootPath(const QString &path)
 {
+	if (path.isEmpty() || path.isNull())
+		return;
     ui->listView->setRootIndex(fileModel->setRootPath(path));
 	ui->listView->selectionModel()->clearSelection();
     //ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(path));
@@ -81,6 +83,8 @@ void ProjectView::SetRootPath(const QString &path)
 void ProjectView::OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
     auto path = QString::fromStdString(dirModel->fileInfo(current)->absoluteFilePath().string());
+	if (path.isEmpty() || path.isNull())
+		return;
     ui->listView->setRootIndex(fileModel->setRootPath(path));
 	ui->listView->selectionModel()->clearSelection();
 }

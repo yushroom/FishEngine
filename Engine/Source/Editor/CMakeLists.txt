@@ -53,3 +53,47 @@ else()
 endif()
 
 target_link_libraries(FishEditor Qt5::Widgets)
+
+
+#https://gist.github.com/Rod-Persky/e6b93e9ee31f9516261b
+
+# find the release *.dll file
+get_target_property(Qt5_CoreLocation Qt5::Core LOCATION)
+get_target_property(Qt5_GuiLocation Qt5::Gui LOCATION)
+get_target_property(Qt5_WidgetsLocation Qt5::Widgets LOCATION)
+
+# find the debug *d.dll file
+get_target_property(Qt5_CoreLocationDebug Qt5::Core LOCATION)
+get_target_property(Qt5_GuiLocationDebug Qt5::Gui LOCATION)
+get_target_property(Qt5_WidgetsLocationDebug Qt5::Widgets LOCATION)
+
+# message(${Qt5_CoreLocation})
+# message(${Qt5_GuiLocation})
+# message(${Qt5_WidgetsLocation})
+
+if( WIN32 )
+    macro(qt5_copy_dll APP DLL)
+        # find the release *.dll file
+        get_target_property(Qt5_${DLL}Location Qt5::${DLL} LOCATION)
+        # find the debug *d.dll file
+        get_target_property(Qt5_${DLL}LocationDebug Qt5::${DLL} IMPORTED_LOCATION_DEBUG)
+
+        add_custom_command(TARGET ${APP} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${Qt5_${DLL}LocationDebug}> $<$<NOT:$<CONFIG:Debug>>:${Qt5_${DLL}Location}> $<TARGET_FILE_DIR:${APP}>)
+    endmacro()
+
+    qt5_copy_dll(FishEditor Core)
+    qt5_copy_dll(FishEditor Gui)
+    qt5_copy_dll(FishEditor Widgets)
+
+    set(PhysX_BIN_DIR ${PhysX_ROOT_DIR}/Bin/vc14win64)
+    message(${PhysX_BIN_DIR}/nvToolsExt64_1.dll)
+    message(${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll)
+    message(${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll)
+
+    add_custom_command(TARGET FishEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PhysX_BIN_DIR}/nvToolsExt64_1.dll $<TARGET_FILE_DIR:FishEditor>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CommonCHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
+    )
+endif()

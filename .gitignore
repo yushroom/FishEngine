@@ -11,8 +11,8 @@
 /Engine/ThirdParty/FBX SDK/
 
 # generated
-/Engine/Source/Runtime/generate/
-/Engine/Source/Editor/generate/
+# /Engine/Source/Runtime/generate/
+# /Engine/Source/Editor/generate/
 
 # binary
 /Engine/Binary

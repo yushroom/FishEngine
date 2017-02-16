@@ -50,10 +50,6 @@ OpenGEXExporter::OpenGEXExporter() {
 OpenGEXExporter::~OpenGEXExporter() {
 }
 
-bool OpenGEXExporter::exportScene( const char *filename, const aiScene* pScene ) {
-    return true;
-}
-
 #endif // ASSIMP_BUILD_NO_OPENGEX_EXPORTER
 
 } // Namespace OpenGEX

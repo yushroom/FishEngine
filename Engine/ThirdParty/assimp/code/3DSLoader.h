@@ -119,7 +119,7 @@ protected:
     * chunk behind afterwards. If no percentage chunk is found
     * QNAN is returned.
     */
-    ai_real ParsePercentageChunk();
+    float ParsePercentageChunk();
 
     // -------------------------------------------------------------------
     /** Parse a color chunk. mCurrent will point to the next
@@ -265,7 +265,7 @@ protected:
     aiColor3D mClrAmbient;
 
     /** Master scaling factor of the scene */
-    ai_real mMasterScale;
+    float mMasterScale;
 
     /** Path to the background image of the scene */
     std::string mBackgroundImage;

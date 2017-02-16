@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-#include <assimp/defs.h>
 
 struct aiColor3D;
 struct aiString;
@@ -86,7 +85,7 @@ private:
     /// Get illumination model from loaded data
     void getIlluminationModel( int &illum_model );
     /// Gets a float value from data.
-    void getFloatValue( ai_real &value );
+    void getFloatValue( float &value );
     /// Creates a new material from loaded data.
     void createMaterial();
     /// Get texture name from loaded data.

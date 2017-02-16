@@ -53,7 +53,7 @@ struct aiNode;
 struct aiMaterial;
 struct aiMesh;
 
-namespace Assimp {
+namespace Assimp    {
 
 
 using namespace PLY;
@@ -155,7 +155,7 @@ protected:
     /** Static helper to parse a color channel value. The input value
     *  is normalized to 0-1.
     */
-    static ai_real NormalizeColorValue (
+    static float NormalizeColorValue (
         PLY::PropertyInstance::ValueUnion val,
         PLY::EDataType eType);
 

@@ -731,7 +731,7 @@ void XFileParser::ParseDataObjectMaterial( Material* pMaterial)
     std::string matName;
     readHeadOfDataObject( &matName);
     if( matName.empty())
-        matName = std::string( "material") + to_string( mLineNumber );
+        matName = std::string( "material") + std::to_string( mLineNumber );
     pMaterial->mName = matName;
     pMaterial->mIsReference = false;
 
@@ -1326,7 +1326,7 @@ unsigned int XFileParser::ReadInt()
 }
 
 // ------------------------------------------------------------------------------------------------
-ai_real XFileParser::ReadFloat()
+float XFileParser::ReadFloat()
 {
     if( mIsBinaryFormat)
     {
@@ -1343,7 +1343,7 @@ ai_real XFileParser::ReadFloat()
         if( mBinaryFloatSize == 8)
         {
             if( End - P >= 8) {
-                ai_real result = (ai_real) (*(double*) P);
+                float result = (float) (*(double*) P);
                 P += 8;
                 return result;
             } else {
@@ -1353,7 +1353,7 @@ ai_real XFileParser::ReadFloat()
         } else
         {
             if( End - P >= 4) {
-                ai_real result = *(ai_real*) P;
+                float result = *(float*) P;
                 P += 4;
                 return result;
             } else {
@@ -1372,17 +1372,17 @@ ai_real XFileParser::ReadFloat()
     {
         P += 9;
         CheckForSeparator();
-        return 0.0;
+        return 0.0f;
     } else
     if( strncmp( P, "1.#QNAN0", 8) == 0)
     {
         P += 8;
         CheckForSeparator();
-        return 0.0;
+        return 0.0f;
     }
 
-    ai_real result = 0.0;
-    P = fast_atoreal_move<ai_real>( P, result);
+    float result = 0.0f;
+    P = fast_atoreal_move<float>( P, result);
 
     CheckForSeparator();
 

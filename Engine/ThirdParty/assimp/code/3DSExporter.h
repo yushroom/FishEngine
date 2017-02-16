@@ -80,7 +80,6 @@ private:
     void WriteString(const aiString& s);
     void WriteColor(const aiColor3D& color);
     void WritePercentChunk(float f);
-    void WritePercentChunk(double f);
 
 private:
 

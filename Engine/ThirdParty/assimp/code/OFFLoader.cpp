@@ -161,9 +161,9 @@ void OFFImporter::InternReadFile( const std::string& pFile,
         aiVector3D& v = tempPositions[i];
 
         sz = line; SkipSpaces(&sz);
-        sz = fast_atoreal_move<ai_real>(sz,(ai_real&)v.x); SkipSpaces(&sz);
-        sz = fast_atoreal_move<ai_real>(sz,(ai_real&)v.y); SkipSpaces(&sz);
-        fast_atoreal_move<ai_real>(sz,(ai_real&)v.z);
+        sz = fast_atoreal_move<float>(sz,(float&)v.x); SkipSpaces(&sz);
+        sz = fast_atoreal_move<float>(sz,(float&)v.y); SkipSpaces(&sz);
+        fast_atoreal_move<float>(sz,(float&)v.z);
     }
 
 
@@ -242,7 +242,7 @@ void OFFImporter::InternReadFile( const std::string& pFile,
     pScene->mMaterials = new aiMaterial*[pScene->mNumMaterials];
     aiMaterial* pcMat = new aiMaterial();
 
-    aiColor4D clr( ai_real( 0.6 ), ai_real( 0.6 ), ai_real( 0.6 ), ai_real( 1.0 ) );
+    aiColor4D clr(0.6f,0.6f,0.6f,1.0f);
     pcMat->AddProperty(&clr,1,AI_MATKEY_COLOR_DIFFUSE);
     pScene->mMaterials[0] = pcMat;
 

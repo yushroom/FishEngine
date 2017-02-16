@@ -89,27 +89,12 @@ enum InputType
     IT_Bitangent
 };
 
-/** Supported controller types */
-enum ControllerType
-{
-    Skin,
-    Morph
-};
-
-/** Supported morph methods */
-enum MorphMethod
-{
-    Normalized,
-    Relative
-};
-
-
 /** Contains all data for one of the different transformation types */
 struct Transform
 {
     std::string mID;  ///< SID of the transform step, by which anim channels address their target node
     TransformType mType;
-    ai_real f[16]; ///< Interpretation of data depends on the type of the transformation
+    float f[16]; ///< Interpretation of data depends on the type of the transformation
 };
 
 /** A collada camera. */
@@ -131,16 +116,16 @@ struct Camera
     bool mOrtho;
 
     //! Horizontal field of view in degrees
-    ai_real mHorFov;
+    float mHorFov;
 
     //! Vertical field of view in degrees
-    ai_real mVerFov;
+    float mVerFov;
 
     //! Screen aspect
-    ai_real mAspect;
+    float mAspect;
 
     //! Near& far z
-    ai_real mZNear, mZFar;
+    float mZNear, mZFar;
 };
 
 #define ASSIMP_COLLADA_LIGHT_ANGLE_NOT_SET 1e9f
@@ -167,21 +152,21 @@ struct Light
     aiColor3D mColor;
 
     //! Light attenuation
-    ai_real mAttConstant,mAttLinear,mAttQuadratic;
+    float mAttConstant,mAttLinear,mAttQuadratic;
 
     //! Spot light falloff
-    ai_real mFalloffAngle;
-    ai_real mFalloffExponent;
+    float mFalloffAngle;
+    float mFalloffExponent;
 
     // -----------------------------------------------------
     // FCOLLADA extension from here
 
     //! ... related stuff from maja and max extensions
-    ai_real mPenumbraAngle;
-    ai_real mOuterAngle;
+    float mPenumbraAngle;
+    float mOuterAngle;
 
     //! Common light intensity
-    ai_real mIntensity;
+    float mIntensity;
 };
 
 /** Short vertex index description */
@@ -290,7 +275,7 @@ struct Node
 struct Data
 {
     bool mIsStringArray;
-    std::vector<ai_real> mValues;
+    std::vector<float> mValues;
     std::vector<std::string> mStrings;
 };
 
@@ -395,12 +380,6 @@ enum PrimitiveType
 /** A skeleton controller to deform a mesh with the use of joints */
 struct Controller
 {
-    // controller type
-    ControllerType mType;
-
-    // Morphing method if type is Morph
-    MorphMethod mMethod;
-
     // the URL of the mesh deformed by the controller.
     std::string mMeshId;
 
@@ -408,7 +387,7 @@ struct Controller
     std::string mJointNameSource;
 
     ///< The bind shape matrix, as array of floats. I'm not sure what this matrix actually describes, but it can't be ignored in all cases
-    ai_real mBindShapeMatrix[16];
+    float mBindShapeMatrix[16];
 
     // accessor URL of the joint inverse bind matrices
     std::string mJointOffsetMatrixSource;
@@ -423,9 +402,6 @@ struct Controller
 
     // JointIndex-WeightIndex pairs for all vertices
     std::vector< std::pair<size_t, size_t> > mWeights;
-
-    std::string mMorphTarget;
-    std::string mMorphWeight;
 };
 
 /** A collada material. Pretty much the only member is a reference to an effect. */
@@ -514,11 +490,11 @@ struct Sampler
 
     /** Weighting factor
      */
-    ai_real mWeighting;
+    float mWeighting;
 
     /** Mixing factor from OKINO
      */
-    ai_real mMixWithPrevious;
+    float mMixWithPrevious;
 };
 
 /** A collada effect. Can contain about anything according to the Collada spec,
@@ -537,8 +513,8 @@ struct Effect
         mTexTransparent, mTexBump, mTexReflective;
 
     // Scalar factory
-    ai_real mShininess, mRefractIndex, mReflectivity;
-    ai_real mTransparency;
+    float mShininess, mRefractIndex, mReflectivity;
+    float mTransparency;
     bool mHasTransparency;
     bool mRGBTransparency;
     bool mInvertTransparency;
@@ -601,12 +577,6 @@ struct AnimationChannel
     std::string mSourceTimes;
     /** Source URL of the value values. Collada calls them "output". */
     std::string mSourceValues;
-    /** Source URL of the IN_TANGENT semantic values. */
-    std::string mInTanValues;
-    /** Source URL of the OUT_TANGENT semantic values. */
-    std::string mOutTanValues;
-    /** Source URL of the INTERPOLATION semantic values. */
-    std::string mInterpolationValues;
 };
 
 /** An animation. Container for 0-x animation channels or 0-x animations */
@@ -675,7 +645,6 @@ struct Animation
 struct ChannelEntry
 {
     const Collada::AnimationChannel* mChannel; ///> the source channel
-    std::string mTargetId;
     std::string mTransformId;   // the ID of the transformation step of the node which is influenced
     size_t mTransformIndex; // Index into the node's transform chain to apply the channel to
     size_t mSubElement; // starting index inside the transform data

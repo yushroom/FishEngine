@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assimp/vector2.h>
 #include <assimp/vector3.h>
 #include <assimp/mesh.h>
-#include "IOStreamBuffer.h"
 
 namespace Assimp {
 
@@ -73,7 +72,7 @@ public:
 
 public:
     /// \brief  Constructor with data array.
-    ObjFileParser( IOStreamBuffer<char> &streamBuffer, const std::string &strModelName, IOSystem* io, ProgressHandler* progress, const std::string &originalObjFileName);
+    ObjFileParser(std::vector<char> &Data, const std::string &strModelName, IOSystem* io, ProgressHandler* progress, const std::string &originalObjFileName);
     /// \brief  Destructor
     ~ObjFileParser();
     /// \brief  Model getter.
@@ -81,17 +80,15 @@ public:
 
 private:
     /// Parse the loaded file
-    void parseFile( IOStreamBuffer<char> &streamBuffer );
+    void parseFile();
     /// Method to copy the new delimited word in the current line.
     void copyNextWord(char *pBuffer, size_t length);
     /// Method to copy the new line.
-//    void copyNextLine(char *pBuffer, size_t length);
+    void copyNextLine(char *pBuffer, size_t length);
     /// Stores the vector
     void getVector( std::vector<aiVector3D> &point3d_array );
     /// Stores the following 3d vector.
     void getVector3( std::vector<aiVector3D> &point3d_array );
-    /// Stores the following homogeneous vector as a 3D vector
-    void getHomogeneousVector3( std::vector<aiVector3D> &point3d_array );
     /// Stores the following two 3d vectors on the line.
     void getTwoVectors3( std::vector<aiVector3D> &point3d_array_a, std::vector<aiVector3D> &point3d_array_b );
     /// Stores the following 3d vector.

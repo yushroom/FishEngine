@@ -116,10 +116,10 @@ private:
 
         explicit Animator(AT t = UNKNOWN)
             : type              (t)
-            , speed             ( ai_real( 0.001 ) )
-            , direction         ( ai_real( 0.0 ), ai_real( 1.0 ), ai_real( 0.0 ) )
-            , circleRadius      ( ai_real( 1.0) )
-            , tightness         ( ai_real( 0.5 ) )
+            , speed             (0.001f)
+            , direction         (0.f,1.f,0.f)
+            , circleRadius      (1.f)
+            , tightness         (0.5f)
             , loop              (true)
             , timeForWay        (100)
         {
@@ -127,15 +127,15 @@ private:
 
 
         // common parameters
-        ai_real speed;
+        float speed;
         aiVector3D direction;
 
         // FLY_CIRCLE
         aiVector3D circleCenter;
-        ai_real circleRadius;
+        float circleRadius;
 
         // FOLLOW_SPLINE
-        ai_real tightness;
+        float tightness;
         std::vector<aiVectorKey> splineKeys;
 
         // ROTATION (angles given in direction)
@@ -166,11 +166,11 @@ private:
 
         explicit Node(ET t)
             :   type                (t)
-            ,   scaling             (1.0,1.0,1.0) // assume uniform scaling by default
+            ,   scaling             (1.f,1.f,1.f) // assume uniform scaling by default
             ,   parent()
-            ,   framesPerSecond     (0.0)
+            ,   framesPerSecond     (0.f)
             ,   id()
-            ,   sphereRadius        (1.0)
+            ,   sphereRadius        (1.f)
             ,   spherePolyCountX    (100)
             ,   spherePolyCountY    (100)
         {
@@ -202,7 +202,7 @@ private:
 
         // Animated meshes: frames per second
         // 0.f if not specified
-        ai_real framesPerSecond;
+        float framesPerSecond;
 
         // Meshes: path to the mesh to be loaded
         std::string meshPath;
@@ -213,7 +213,7 @@ private:
         std::vector< std::pair<aiMaterial*, unsigned int> > materials;
 
         // Spheres: radius of the sphere to be generates
-        ai_real sphereRadius;
+        float sphereRadius;
 
         // Spheres: Number of polygons in the x,y direction
         unsigned int spherePolyCountX,spherePolyCountY;
@@ -230,13 +230,13 @@ private:
         {}
 
         //! Construction from single vertex components
-        SkyboxVertex(ai_real px, ai_real py, ai_real pz,
-            ai_real nx, ai_real ny, ai_real nz,
-            ai_real uvx, ai_real uvy)
+        SkyboxVertex(float px, float py, float pz,
+            float nx, float ny, float nz,
+            float uvx, float uvy)
 
             :   position    (px,py,pz)
             ,   normal      (nx,ny,nz)
-            ,   uv          (uvx,uvy,0.0)
+            ,   uv          (uvx,uvy,0.f)
         {}
 
         aiVector3D position, normal, uv;

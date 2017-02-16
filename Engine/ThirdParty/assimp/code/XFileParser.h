@@ -127,7 +127,7 @@ protected:
     unsigned short ReadBinWord();
     unsigned int ReadBinDWord();
     unsigned int ReadInt();
-    ai_real ReadFloat();
+    float ReadFloat();
     aiVector2D ReadVector2();
     aiVector3D ReadVector3();
     aiColor3D ReadRGB();

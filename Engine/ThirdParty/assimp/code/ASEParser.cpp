@@ -25,8 +25,8 @@ conditions are met:
   derived from this software without specific prior
   written permission of the assimp team.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -431,7 +431,7 @@ void Parser::ParseLV1SoftSkinBlock()
                             ParseString(bone,"*MESH_SOFTSKINVERTS.Bone");
 
                             // Find the bone in the mesh's list
-                            std::pair<int,ai_real> me;
+                            std::pair<int,float> me;
                             me.first = -1;
 
                             for (unsigned int n = 0; n < curMesh->mBones.size();++n)
@@ -618,13 +618,12 @@ void Parser::ParseLV2MaterialBlock(ASE::Material& mat)
             if (TokenMatch(filePtr,"MATERIAL_TRANSPARENCY",21))
             {
                 ParseLV4MeshFloat(mat.mTransparency);
-                mat.mTransparency = ai_real( 1.0 ) - mat.mTransparency;
-                continue;
+                mat.mTransparency = 1.0f - mat.mTransparency;continue;
             }
             // material self illumination
             if (TokenMatch(filePtr,"MATERIAL_SELFILLUM",18))
             {
-                ai_real f = 0.0;
+                float f = 0.0f;
                 ParseLV4MeshFloat(f);
 
                 mat.mEmissive.r = f;
@@ -1135,7 +1134,7 @@ void Parser::ParseLV3ScaleAnimationBlock(ASE::Animation& anim)
             bool b = false;
 
             // For the moment we're just reading the three floats -
-            // we ignore the additional information for bezier's and TCBs
+            // we ignore the �dditional information for bezier's and TCBs
 
             // simple scaling keyframe
             if (TokenMatch(filePtr,"CONTROL_SCALE_SAMPLE" ,20))
@@ -1181,7 +1180,7 @@ void Parser::ParseLV3PosAnimationBlock(ASE::Animation& anim)
             bool b = false;
 
             // For the moment we're just reading the three floats -
-            // we ignore the additional information for bezier's and TCBs
+            // we ignore the �dditional information for bezier's and TCBs
 
             // simple scaling keyframe
             if (TokenMatch(filePtr,"CONTROL_POS_SAMPLE" ,18))
@@ -1227,7 +1226,7 @@ void Parser::ParseLV3RotAnimationBlock(ASE::Animation& anim)
             bool b = false;
 
             // For the moment we're just reading the  floats -
-            // we ignore the additional information for bezier's and TCBs
+            // we ignore the �dditional information for bezier's and TCBs
 
             // simple scaling keyframe
             if (TokenMatch(filePtr,"CONTROL_ROT_SAMPLE" ,18))
@@ -1252,7 +1251,7 @@ void Parser::ParseLV3RotAnimationBlock(ASE::Animation& anim)
             {
                 anim.akeyRotations.push_back(aiQuatKey());
                 aiQuatKey& key = anim.akeyRotations.back();
-                aiVector3D v;ai_real f;
+                aiVector3D v;float f;
                 ParseLV4MeshFloatTriple(&v.x,iIndex);
                 ParseLV4MeshFloat(f);
                 key.mTime = (double)iIndex;
@@ -1464,29 +1463,30 @@ void Parser::ParseLV2MeshBlock(ASE::Mesh& mesh)
                 continue;
             }
             // another mesh UV channel ...
-            if (TokenMatch(filePtr,"MESH_MAPPINGCHANNEL" ,19)) {
-                unsigned int iIndex( 0 );
+            if (TokenMatch(filePtr,"MESH_MAPPINGCHANNEL" ,19))
+            {
+
+                unsigned int iIndex = 0;
                 ParseLV4MeshLong(iIndex);
-                if ( 0 == iIndex ) {
-                    LogWarning( "Mapping channel has an invalid index. Skipping UV channel" );
+
+                if (iIndex < 2)
+                {
+                    LogWarning("Mapping channel has an invalid index. Skipping UV channel");
                     // skip it ...
                     SkipSection();
-                } else {
-                    if ( iIndex < 2 ) {
-                        LogWarning( "Mapping channel has an invalid index. Skipping UV channel" );
-                        // skip it ...
-                        SkipSection();
-                    }
-                    if ( iIndex > AI_MAX_NUMBER_OF_TEXTURECOORDS ) {
-                        LogWarning( "Too many UV channels specified. Skipping channel .." );
-                        // skip it ...
-                        SkipSection();
-                    } else {
-                        // parse the mapping channel
-                        ParseLV3MappingChannel( iIndex - 1, mesh );
-                    }
-                    continue;
                 }
+                if (iIndex > AI_MAX_NUMBER_OF_TEXTURECOORDS)
+                {
+                    LogWarning("Too many UV channels specified. Skipping channel ..");
+                    // skip it ...
+                    SkipSection();
+                }
+                else
+                {
+                    // parse the mapping channel
+                    ParseLV3MappingChannel(iIndex-1,mesh);
+                }
+                continue;
             }
             // mesh animation keyframe. Not supported
             if (TokenMatch(filePtr,"MESH_ANIMATION" ,14))
@@ -1604,7 +1604,7 @@ void Parser::ParseLV4MeshBonesVertices(unsigned int iNumVertices,ASE::Mesh& mesh
                 }
 
                 // --- ignored
-                ai_real afVert[3];
+                float afVert[3];
                 ParseLV4MeshFloatTriple(afVert);
 
                 std::pair<int,float> pairOut;
@@ -2102,7 +2102,7 @@ void Parser::ParseLV4MeshLongTriple(unsigned int* apOut, unsigned int& rIndexOut
     ParseLV4MeshLongTriple(apOut);
 }
 // ------------------------------------------------------------------------------------------------
-void Parser::ParseLV4MeshFloatTriple(ai_real* apOut, unsigned int& rIndexOut)
+void Parser::ParseLV4MeshFloatTriple(float* apOut, unsigned int& rIndexOut)
 {
     ai_assert(NULL != apOut);
 
@@ -2113,7 +2113,7 @@ void Parser::ParseLV4MeshFloatTriple(ai_real* apOut, unsigned int& rIndexOut)
     ParseLV4MeshFloatTriple(apOut);
 }
 // ------------------------------------------------------------------------------------------------
-void Parser::ParseLV4MeshFloatTriple(ai_real* apOut)
+void Parser::ParseLV4MeshFloatTriple(float* apOut)
 {
     ai_assert(NULL != apOut);
 
@@ -2121,19 +2121,19 @@ void Parser::ParseLV4MeshFloatTriple(ai_real* apOut)
         ParseLV4MeshFloat(apOut[i]);
 }
 // ------------------------------------------------------------------------------------------------
-void Parser::ParseLV4MeshFloat(ai_real& fOut)
+void Parser::ParseLV4MeshFloat(float& fOut)
 {
     // skip spaces and tabs
     if(!SkipSpaces(&filePtr))
     {
         // LOG
         LogWarning("Unable to parse float: unexpected EOL [#1]");
-        fOut = 0.0;
+        fOut = 0.0f;
         ++iLineNumber;
         return;
     }
     // parse the first float
-    filePtr = fast_atoreal_move<ai_real>(filePtr,fOut);
+    filePtr = fast_atoreal_move<float>(filePtr,fOut);
 }
 // ------------------------------------------------------------------------------------------------
 void Parser::ParseLV4MeshLong(unsigned int& iOut)

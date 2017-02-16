@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assimp/Importer.hpp>
 #include <assimp/mesh.h>
 #include <assimp/light.h>
-#include <memory>
 
 struct aiNode;
 
@@ -204,8 +203,12 @@ private:
     unsigned int ResolveMaterialRef(TempScope& scope);
 
 private:
-    std::shared_ptr<irr::io::IrrXMLReader> m_reader;
-    aiScene* m_scene;
+
+
+private:
+
+    irr::io::IrrXMLReader* reader;
+    aiScene* scene;
 };
 
 } // end of namespace Assimp

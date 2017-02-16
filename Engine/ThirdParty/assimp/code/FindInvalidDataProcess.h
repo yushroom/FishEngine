@@ -97,7 +97,7 @@ public:
     void ProcessAnimationChannel (aiNodeAnim* anim);
 
 private:
-    ai_real configEpsilon;
+    float configEpsilon;
 };
 
 } // end of namespace Assimp

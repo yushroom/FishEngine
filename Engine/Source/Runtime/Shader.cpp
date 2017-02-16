@@ -686,13 +686,9 @@ namespace FishEngine
         m_builtinShaders["SkyboxCubed"]         = Shader::CreateFromFile(root_dir / "Skybox-Cubed.shader");
         m_builtinShaders["SkyboxProcedural"]    = Shader::CreateFromFile(root_dir / "Skybox-Procedural.shader");
         m_builtinShaders["SolidColor-Internal"] = Shader::CreateFromFile(root_dir / "Editor/SolidColor.shader");
-        m_builtinShaders["Alpha-Internal"]      = Shader::CreateFromFile(root_dir / "Editor/Alpha.shader");
-        m_builtinShaders["VertexLit-Internal"]  = Shader::CreateFromFile(root_dir / "Editor/VertexLit.shader");
         m_builtinShaders["SkyboxProcedural"]->setName("SkyboxProcedural");
         m_builtinShaders["SkyboxCubed"]->setName("SkyboxCubed");
         m_builtinShaders["SolidColor-Internal"]->setName("SolidColor-Internal");
-        m_builtinShaders["Alpha-Internal"]->setName("Alpha-Internal");
-        m_builtinShaders["VertexLit-Internal"]->setName("VertexLit-Internal");
     }
 
 }

@@ -18,6 +18,7 @@
 #include <Camera.hpp>
 #include <Scene.hpp>
 
+#include "EditorResources.hpp"
 #include "Inspector.hpp"
 #include "MainEditor.hpp"
 #include "SceneViewEditor.hpp"
@@ -97,54 +98,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::keyPressEvent(QKeyEvent *event)
-//{
-//    Debug::LogError("Key Pressed");
-//    int key = event->key();
-//    if (key == Qt::Key_F)
-//    {
-//
-//    }
-//    else if (key == Qt::Key_W)
-//    {
-//        ui->actionTranslate->trigger();
-//    }
-//    else if (key == Qt::Key_E)
-//    {
-//        ui->actionRotation->trigger();
-//    }
-//    else if (key == Qt::Key_R)
-//    {
-//        ui->actionScale->trigger();
-//    }
-//}
-
-//void MainWindow::keyReleaseEvent(QKeyEvent *event)
-//{
-
-//}
-
-
-//bool MainWindow::eventFilter(QObject *watched, QEvent *event)
-//{
-//    Q_UNUSED(watched);
-//    auto type = event->type();
-//    if (type == QEvent::MouseMove)
-//    {
-//        //auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
-//        //statusBar()->showMessage(QString("Mouse move (%1 %2)").arg(mouseEvent->pos().x()).arg(mouseEvent->pos().y()));
-//    }
-//    else if (type == QEvent::MouseButtonPress)
-//    {
-//        statusBar()->showMessage("MousePress");
-//    }
-//    else if (type == QEvent::MouseButtonRelease)
-//    {
-//        statusBar()->showMessage("MouseRelease");
-//    }
-
-//    return false;
-//}
 
 void MainWindow::Init()
 {
@@ -152,7 +105,8 @@ void MainWindow::Init()
     QDir cwd = QCoreApplication::applicationDirPath();
     cwd.cdUp();
     FishEngine::Resources::Init(cwd.absolutePath().toStdString());
-    //FishEngine::Input::Init();
+	//FishEditor::EditorResources::Init(cwd.absolutePath().toStdString());
+	//FishEngine::Input::Init();
 
 	Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
 

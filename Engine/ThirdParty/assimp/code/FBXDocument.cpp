@@ -79,6 +79,12 @@ LazyObject::~LazyObject()
 }
 
 // ------------------------------------------------------------------------------------------------
+static void dumpObjectClassInfo( const char* obtype, const std::string &classtag ) {
+    DefaultLogger::get()->debug( "obtype: " + std::string(obtype ));
+    DefaultLogger::get()->debug( "Classtag: " + classtag );
+}
+
+// ------------------------------------------------------------------------------------------------
 const Object* LazyObject::Get(bool dieOnError)
 {
     if(IsBeingConstructed() || FailedToConstruct()) {
@@ -246,14 +252,16 @@ FileGlobalSettings::FileGlobalSettings(const Document& doc, std::shared_ptr<cons
 : props(props)
 , doc(doc)
 {
-    // empty
+
 }
+
 
 // ------------------------------------------------------------------------------------------------
 FileGlobalSettings::~FileGlobalSettings()
 {
-    // empty
+
 }
+
 
 // ------------------------------------------------------------------------------------------------
 Document::Document(const Parser& parser, const ImportSettings& settings)
@@ -276,6 +284,7 @@ Document::Document(const Parser& parser, const ImportSettings& settings)
     ReadObjects();
     ReadConnections();
 }
+
 
 // ------------------------------------------------------------------------------------------------
 Document::~Document()
@@ -306,7 +315,7 @@ void Document::ReadHeader()
     const Scope& shead = *ehead->Compound();
     fbxVersion = ParseTokenAsInt(GetRequiredToken(GetRequiredElement(shead,"FBXVersion",ehead),0));
 
-    // While we may have some success with newer files, we don't support
+    // While we maye have some success with newer files, we don't support
     // the older 6.n fbx format
     if(fbxVersion < LowerSupportedVersion ) {
         DOMError("unsupported, old format version, supported are only FBX 2011, FBX 2012 and FBX 2013");
@@ -321,6 +330,7 @@ void Document::ReadHeader()
                 " trying to read it nevertheless");
         }
     }
+
 
     const Element* const ecreator = shead["Creator"];
     if(ecreator) {

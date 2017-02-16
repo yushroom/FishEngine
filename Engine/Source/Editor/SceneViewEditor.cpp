@@ -23,6 +23,7 @@
 #include <Command.hpp>
 
 #include "Selection.hpp"
+#include "EditorResources.hpp"
 //#include "FishEditorWindow.hpp"
 //#include "EditorGUI.hpp"
 
@@ -59,7 +60,7 @@ namespace FishEditor
         // temp
         Camera::setMainCamera(m_camera);
 
-        sceneGizmoMaterial = Material::InstantiateBuiltinMaterial("VertexLit-Internal");
+        sceneGizmoMaterial = EditorResources::InstantiateBuiltinMaterial("VertexLit-Internal");
         cubeMesh = Mesh::builtinMesh(PrimitiveType::Cube);
         coneMesh = Mesh::builtinMesh(PrimitiveType::Cone);
         //ImGui::GetNamedDockPositionAndSize("Scene", &m_position.x, &m_position.y, &m_size.x, &m_size.y);
@@ -164,7 +165,7 @@ namespace FishEditor
         {
 			auto const & view = Camera::main()->worldToCameraMatrix();
 			auto const & proj = Camera::main()->projectionMatrix();
-            auto shader = Shader::builtinShader("SolidColor-Internal");
+            auto shader = EditorResources::builtinShader("SolidColor-Internal");
             shader->Use();
             shader->BindUniformVec4("_Color", Color::gray);
             shader->BindUniformMat4("MATRIX_MVP", proj*view);

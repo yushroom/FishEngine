@@ -117,7 +117,7 @@ public:
      * @param poResults The container to store the indices of the found positions.
      *   Will be emptied by the call so it may contain anything.
      * @return An iterator to iterate over all vertices in the given area.*/
-    void FindPositions( const aiVector3D& pPosition, ai_real pRadius,
+    void FindPositions( const aiVector3D& pPosition, float pRadius,
         std::vector<unsigned int>& poResults) const;
 
     // ------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ public:
      *   be counted in.
      *  @return Number of unique vertices (n).  */
     unsigned int GenerateMappingTable(std::vector<unsigned int>& fill,
-        ai_real pRadius) const;
+        float pRadius) const;
 
 protected:
     /** Normal of the sorting plane, normalized. The center is always at (0, 0, 0) */
@@ -151,10 +151,10 @@ protected:
     {
         unsigned int mIndex; ///< The vertex referred by this entry
         aiVector3D mPosition; ///< Position
-        ai_real mDistance; ///< Distance of this vertex to the sorting plane
+        float mDistance; ///< Distance of this vertex to the sorting plane
 
         Entry() { /** intentionally not initialized.*/ }
-        Entry( unsigned int pIndex, const aiVector3D& pPosition, ai_real pDistance)
+        Entry( unsigned int pIndex, const aiVector3D& pPosition, float pDistance)
             : mIndex( pIndex), mPosition( pPosition), mDistance( pDistance)
         {   }
 

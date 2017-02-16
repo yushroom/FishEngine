@@ -177,14 +177,12 @@ void RemoveRedundantMatsProcess::Execute( aiScene* pScene)
                     continue;
                 }
 
-                // generate new names for modified materials that had no names
+                // generate new names for all modified materials
                 const unsigned int idx = aiMappingTable[p];
                 if (ppcMaterials[idx]) {
                     aiString sz;
-                    if( ppcMaterials[idx]->Get(AI_MATKEY_NAME, sz) != AI_SUCCESS ) {
-                        sz.length = ::ai_snprintf(sz.data,MAXLEN,"JoinedMaterial_#%u",p);
-                        ((aiMaterial*)ppcMaterials[idx])->AddProperty(&sz,AI_MATKEY_NAME);
-                    }
+                    sz.length = ::ai_snprintf(sz.data,MAXLEN,"JoinedMaterial_#%u",p);
+                    ((aiMaterial*)ppcMaterials[idx])->AddProperty(&sz,AI_MATKEY_NAME);
                 } else {
                     ppcMaterials[idx] = pScene->mMaterials[p];
                 }

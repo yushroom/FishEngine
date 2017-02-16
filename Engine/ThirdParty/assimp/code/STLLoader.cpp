@@ -144,7 +144,7 @@ bool STLImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
         const char* tokens[] = {"STL","solid"};
         return SearchFileHeaderForToken(pIOHandler,pFile,tokens,2);
     }
-
+    
     return false;
 }
 
@@ -168,7 +168,8 @@ void addFacesToMesh(aiMesh* pMesh)
 
 // ------------------------------------------------------------------------------------------------
 // Imports the given file into the given scene structure.
-void STLImporter::InternReadFile( const std::string& pFile, aiScene* pScene, IOSystem* pIOHandler )
+void STLImporter::InternReadFile( const std::string& pFile,
+    aiScene* pScene, IOSystem* pIOHandler)
 {
     std::unique_ptr<IOStream> file( pIOHandler->Open( pFile, "rb"));
 
@@ -188,7 +189,7 @@ void STLImporter::InternReadFile( const std::string& pFile, aiScene* pScene, IOS
     this->mBuffer = &mBuffer2[0];
 
     // the default vertex color is light gray.
-    clrColorDefault.r = clrColorDefault.g = clrColorDefault.b = clrColorDefault.a = (ai_real) 0.6;
+    clrColorDefault.r = clrColorDefault.g = clrColorDefault.b = clrColorDefault.a = 0.6f;
 
     // allocate a single node
     pScene->mRootNode = new aiNode();
@@ -216,13 +217,13 @@ void STLImporter::InternReadFile( const std::string& pFile, aiScene* pScene, IOS
     s.Set(AI_DEFAULT_MATERIAL_NAME);
     pcMat->AddProperty(&s, AI_MATKEY_NAME);
 
-    aiColor4D clrDiffuse(ai_real(0.6),ai_real(0.6),ai_real(0.6),ai_real(1.0));
+    aiColor4D clrDiffuse(0.6f,0.6f,0.6f,1.0f);
     if (bMatClr) {
         clrDiffuse = clrColorDefault;
     }
     pcMat->AddProperty(&clrDiffuse,1,AI_MATKEY_COLOR_DIFFUSE);
     pcMat->AddProperty(&clrDiffuse,1,AI_MATKEY_COLOR_SPECULAR);
-    clrDiffuse = aiColor4D( ai_real( 0.05), ai_real( 0.05), ai_real( 0.05), ai_real( 1.0));
+    clrDiffuse = aiColor4D(0.05f,0.05f,0.05f,1.0f);
     pcMat->AddProperty(&clrDiffuse,1,AI_MATKEY_COLOR_AMBIENT);
 
     pScene->mNumMaterials = 1;
@@ -245,7 +246,7 @@ void STLImporter::LoadASCIIFile()
     positionBuffer.reserve(sizeEstimate);
     normalBuffer.reserve(sizeEstimate);
 
-    while (IsAsciiSTL(sz, static_cast<unsigned int>(bufferEnd - sz)))
+    while (IsAsciiSTL(sz, bufferEnd - sz))
     {
         aiMesh* pMesh = new aiMesh();
         pMesh->mMaterialIndex = 0;
@@ -274,7 +275,7 @@ void STLImporter::LoadASCIIFile()
         }
         else pScene->mRootNode->mName.Set("<STL_ASCII>");
 
-        unsigned int faceVertexCounter = 3;
+        unsigned int faceVertexCounter = 0;
         for ( ;; )
         {
             // go to the next token
@@ -306,11 +307,11 @@ void STLImporter::LoadASCIIFile()
                     }
                     sz += 7;
                     SkipSpaces(&sz);
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->x );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->x );
                     SkipSpaces(&sz);
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->y );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->y );
                     SkipSpaces(&sz);
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->z );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->z );
                     normalBuffer.push_back(*vn);
                     normalBuffer.push_back(*vn);
                 }
@@ -331,11 +332,11 @@ void STLImporter::LoadASCIIFile()
                     SkipSpaces(&sz);
                     positionBuffer.push_back(aiVector3D());
                     aiVector3D* vn = &positionBuffer.back();
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->x );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->x );
                     SkipSpaces(&sz);
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->y );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->y );
                     SkipSpaces(&sz);
-                    sz = fast_atoreal_move<ai_real>(sz, (ai_real&)vn->z );
+                    sz = fast_atoreal_move<float>(sz, (float&)vn->z );
                     faceVertexCounter++;
                 }
             }
@@ -367,8 +368,8 @@ void STLImporter::LoadASCIIFile()
             pMesh->mNumFaces = 0;
             throw DeadlyImportError("Normal buffer size does not match position buffer size");
         }
-        pMesh->mNumFaces = static_cast<unsigned int>(positionBuffer.size() / 3);
-        pMesh->mNumVertices = static_cast<unsigned int>(positionBuffer.size());
+        pMesh->mNumFaces = positionBuffer.size() / 3;
+        pMesh->mNumVertices = positionBuffer.size();
         pMesh->mVertices = new aiVector3D[pMesh->mNumVertices];
         memcpy(pMesh->mVertices, &positionBuffer[0].x, pMesh->mNumVertices * sizeof(aiVector3D));
         positionBuffer.clear();
@@ -415,11 +416,10 @@ bool STLImporter::LoadBinaryFile()
             // read the default vertex color for facets
             bIsMaterialise = true;
             DefaultLogger::get()->info("STL: Taking code path for Materialise files");
-            const ai_real invByte = (ai_real)1.0 / ( ai_real )255.0;
-            clrColorDefault.r = (*sz2++) * invByte;
-            clrColorDefault.g = (*sz2++) * invByte;
-            clrColorDefault.b = (*sz2++) * invByte;
-            clrColorDefault.a = (*sz2++) * invByte;
+            clrColorDefault.r = (*sz2++) / 255.0f;
+            clrColorDefault.g = (*sz2++) / 255.0f;
+            clrColorDefault.b = (*sz2++) / 255.0f;
+            clrColorDefault.a = (*sz2++) / 255.0f;
             break;
         }
     }
@@ -480,19 +480,18 @@ bool STLImporter::LoadBinaryFile()
                 DefaultLogger::get()->info("STL: Mesh has vertex colors");
             }
             aiColor4D* clr = &pMesh->mColors[0][i*3];
-            clr->a = 1.0;
-            const ai_real invVal( (ai_real)1.0 / ( ai_real )31.0 );
+            clr->a = 1.0f;
             if (bIsMaterialise) // this is reversed
             {
-                clr->r = (color & 0x31u) *invVal;
-                clr->g = ((color & (0x31u<<5))>>5u) *invVal;
-                clr->b = ((color & (0x31u<<10))>>10u) *invVal;
+                clr->r = (color & 0x31u) / 31.0f;
+                clr->g = ((color & (0x31u<<5))>>5u) / 31.0f;
+                clr->b = ((color & (0x31u<<10))>>10u) / 31.0f;
             }
             else
             {
-                clr->b = (color & 0x31u) *invVal;
-                clr->g = ((color & (0x31u<<5))>>5u) *invVal;
-                clr->r = ((color & (0x31u<<10))>>10u) *invVal;
+                clr->b = (color & 0x31u) / 31.0f;
+                clr->g = ((color & (0x31u<<5))>>5u) / 31.0f;
+                clr->r = ((color & (0x31u<<10))>>10u) / 31.0f;
             }
             // assign the color to all vertices of the face
             *(clr+1) = *clr;

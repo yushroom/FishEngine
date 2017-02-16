@@ -53,13 +53,12 @@ using namespace Assimp;
 using namespace Assimp::Blender;
 using namespace Assimp::Formatter;
 
-static bool match4(StreamReaderAny& stream, const char* string) {
-    ai_assert( nullptr != string );
+bool match4(StreamReaderAny& stream, const char* string) {
     char tmp[] = {
-        (const char)(stream).GetI1(),
-        (const char)(stream).GetI1(),
-        (const char)(stream).GetI1(),
-        (const char)(stream).GetI1()
+        (stream).GetI1(),
+        (stream).GetI1(),
+        (stream).GetI1(),
+        (stream).GetI1()
     };
     return (tmp[0]==string[0] && tmp[1]==string[1] && tmp[2]==string[2] && tmp[3]==string[3]);
 }
@@ -70,7 +69,7 @@ struct Type {
 };
 
 // ------------------------------------------------------------------------------------------------
-void DNAParser::Parse ()
+void DNAParser :: Parse ()
 {
     StreamReaderAny& stream = *db.reader.get();
     DNA& dna = db.dna;
@@ -346,10 +345,10 @@ void SectionParser :: Next()
     stream.SetCurrentPos(current.start + current.size);
 
     const char tmp[] = {
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1()
+        stream.GetI1(),
+        stream.GetI1(),
+        stream.GetI1(),
+        stream.GetI1()
     };
     current.id = std::string(tmp,tmp[3]?4:tmp[2]?3:tmp[1]?2:1);
 

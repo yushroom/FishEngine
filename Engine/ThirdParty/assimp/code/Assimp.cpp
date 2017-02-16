@@ -150,7 +150,7 @@ void ReportSceneNotFoundError()
     DefaultLogger::get()->error("Unable to find the Assimp::Importer for this aiScene. "
         "The C-API does not accept scenes produced by the C++ API and vice versa");
 
-    ai_assert(false);
+    assert(false);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -546,11 +546,11 @@ ASSIMP_API void aiSetImportPropertyInteger(aiPropertyStore* p, const char* szNam
 
 // ------------------------------------------------------------------------------------------------
 // Importer::SetPropertyFloat
-ASSIMP_API void aiSetImportPropertyFloat(aiPropertyStore* p, const char* szName, ai_real value)
+ASSIMP_API void aiSetImportPropertyFloat(aiPropertyStore* p, const char* szName, float value)
 {
     ASSIMP_BEGIN_EXCEPTION_REGION();
     PropertyMap* pp = reinterpret_cast<PropertyMap*>(p);
-    SetGenericProperty<ai_real>(pp->floats,szName,value);
+    SetGenericProperty<float>(pp->floats,szName,value);
     ASSIMP_END_EXCEPTION_REGION(void);
 }
 

@@ -228,8 +228,8 @@ void MD5Importer::MakeDataUnique (MD5::MeshDesc& meshSrc)
     std::vector<bool> abHad(meshSrc.mVertices.size(),false);
 
     // allocate enough storage to keep the output structures
-    const unsigned int iNewNum = static_cast<unsigned int>(meshSrc.mFaces.size()*3);
-    unsigned int iNewIndex = static_cast<unsigned int>(meshSrc.mVertices.size());
+    const unsigned int iNewNum = meshSrc.mFaces.size()*3;
+    unsigned int iNewIndex = meshSrc.mVertices.size();
     meshSrc.mVertices.resize(iNewNum);
 
     // try to guess how much storage we'll need for new weights
@@ -475,7 +475,7 @@ void MD5Importer::LoadMD5MeshFile ()
                 *pv = aiVector3D();
 
                 // there are models which have weights which don't sum to 1 ...
-                ai_real fSum = 0.0;
+                float fSum = 0.0f;
                 for (unsigned int jub = (*iter).mFirstWeight, w = jub; w < jub + (*iter).mNumWeights;++w)
                     fSum += meshSrc.mWeights[w].mWeight;
                 if (!fSum) {
@@ -493,7 +493,7 @@ void MD5Importer::LoadMD5MeshFile ()
                         continue;
                     }
 
-                    const ai_real fNewWeight = desc.mWeight / fSum;
+                    const float fNewWeight = desc.mWeight / fSum;
 
                     // transform the local position into worldspace
                     MD5::BoneDesc& boneSrc = meshParser.mJoints[desc.mBone];
@@ -501,7 +501,7 @@ void MD5Importer::LoadMD5MeshFile ()
 
                     // use the original weight to compute the vertex position
                     // (some MD5s seem to depend on the invalid weight values ...)
-                    *pv += ((boneSrc.mPositionXYZ+v)* (ai_real)desc.mWeight);
+                    *pv += ((boneSrc.mPositionXYZ+v)* desc.mWeight);
 
                     aiBone* bone = mesh->mBones[boneSrc.mMap];
                     *bone->mWeights++ = aiVertexWeight((unsigned int)(pv-mesh->mVertices),fNewWeight);
@@ -719,16 +719,16 @@ void MD5Importer::LoadMD5CameraFile ()
     // every cut is written to a separate aiAnimation
     if (!cuts.size()) {
         cuts.push_back(0);
-        cuts.push_back(static_cast<unsigned int>(frames.size()-1));
+        cuts.push_back(frames.size()-1);
     }
     else {
         cuts.insert(cuts.begin(),0);
 
         if (cuts.back() < frames.size()-1)
-            cuts.push_back(static_cast<unsigned int>(frames.size()-1));
+            cuts.push_back(frames.size()-1);
     }
 
-    pScene->mNumAnimations = static_cast<unsigned int>(cuts.size()-1);
+    pScene->mNumAnimations = cuts.size()-1;
     aiAnimation** tmp = pScene->mAnimations = new aiAnimation*[pScene->mNumAnimations];
     for (std::vector<unsigned int>::const_iterator it = cuts.begin(); it != cuts.end()-1; ++it) {
 

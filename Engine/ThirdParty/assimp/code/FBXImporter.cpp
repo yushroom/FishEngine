@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_FBX_IMPORTER
 
+#include <exception>
+#include <iterator>
+
 #include "FBXImporter.h"
 
 #include "FBXTokenizer.h"
@@ -55,9 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StreamReader.h"
 #include "MemoryIOWrapper.h"
 #include <assimp/Importer.hpp>
-
-#include <exception>
-#include <iterator>
 
 namespace Assimp {
     template<> const std::string LogFunctions<FBXImporter>::log_prefix = "FBX: ";
@@ -99,7 +99,7 @@ FBXImporter::~FBXImporter()
 bool FBXImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool checkSig) const
 {
     const std::string& extension = GetExtension(pFile);
-    if (extension == std::string( desc.mFileExtensions ) ) {
+    if (extension == "fbx") {
         return true;
     }
 
@@ -118,6 +118,7 @@ const aiImporterDesc* FBXImporter::GetInfo () const
     return &desc;
 }
 
+
 // ------------------------------------------------------------------------------------------------
 // Setup configuration properties for the loader
 void FBXImporter::SetupProperties(const Importer* pImp)
@@ -133,6 +134,7 @@ void FBXImporter::SetupProperties(const Importer* pImp)
     settings.preservePivots = pImp->GetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, true);
     settings.optimizeEmptyAnimationCurves = pImp->GetPropertyBool(AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES, true);
 }
+
 
 // ------------------------------------------------------------------------------------------------
 // Imports the given file into the given scene structure.
@@ -163,7 +165,7 @@ void FBXImporter::InternReadFile( const std::string& pFile,
         bool is_binary = false;
         if (!strncmp(begin,"Kaydara FBX Binary",18)) {
             is_binary = true;
-            TokenizeBinary(tokens,begin,static_cast<unsigned int>(contents.size()));
+            TokenizeBinary(tokens,begin,contents.size());
         }
         else {
             Tokenize(tokens,begin);

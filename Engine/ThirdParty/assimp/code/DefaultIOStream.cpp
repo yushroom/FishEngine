@@ -55,7 +55,6 @@ DefaultIOStream::~DefaultIOStream()
 {
     if (mFile) {
         ::fclose(mFile);
-        mFile = nullptr;
     }
 }
 
@@ -110,9 +109,9 @@ size_t DefaultIOStream::FileSize() const
         return 0;
     }
 
-    if (SIZE_MAX == mCachedSize ) {
+    if (SIZE_MAX == cachedSize) {
 
-        // Although fseek/ftell would allow us to reuse the existing file handle here,
+        // Although fseek/ftell would allow us to reuse the exising file handle here,
         // it is generally unsafe because:
         //  - For binary streams, it is not technically well-defined
         //  - For text files the results are meaningless
@@ -120,24 +119,21 @@ size_t DefaultIOStream::FileSize() const
         //
         // See here for details:
         // https://www.securecoding.cert.org/confluence/display/seccode/FIO19-C.+Do+not+use+fseek()+and+ftell()+to+compute+the+size+of+a+regular+file
-#if defined _WIN32 && (!defined __GNUC__ || __MSVCRT_VERSION__ >= 0x0601)
+#if defined _WIN32 && !defined __GNUC__
         struct __stat64 fileStat;
         int err = _stat64(  mFilename.c_str(), &fileStat );
         if (0 != err)
             return 0;
-        mCachedSize = (size_t) (fileStat.st_size);
-#elif defined __GNUC__ || defined __APPLE__ || defined __MACH__
+        cachedSize = (size_t) (fileStat.st_size);
+#else
         struct stat fileStat;
         int err = stat(mFilename.c_str(), &fileStat );
         if (0 != err)
             return 0;
-        const unsigned long long cachedSize = fileStat.st_size;
-        mCachedSize = static_cast< size_t >( cachedSize );
-#else
-#   error "Unknown platform"
+        cachedSize = (size_t) (fileStat.st_size);
 #endif
     }
-    return mCachedSize;
+    return cachedSize;
 }
 
 // ----------------------------------------------------------------------------------

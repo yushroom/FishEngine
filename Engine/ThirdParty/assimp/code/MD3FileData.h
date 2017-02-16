@@ -136,7 +136,7 @@ struct Frame
     aiVector3D origin;
 
     //! radius of bounding sphere
-    ai_real radius;
+    float radius;
 
     //! name of frame
     char name[ AI_MD3_MAXFRAME ];
@@ -154,7 +154,7 @@ struct Tag
 
     //! Local tag origin and orientation
     aiVector3D  origin;
-    ai_real  orientation[3][3];
+    float  orientation[3][3];
 
 } PACK_STRUCT;
 
@@ -231,7 +231,7 @@ struct Triangle
 struct TexCoord
 {
     //! UV coordinates
-    ai_real U,V;
+    float U,V;
 } PACK_STRUCT;
 
 
@@ -257,17 +257,17 @@ struct Vertex
  *
  *  @note This has been taken from q3 source (misc_model.c)
  */
-inline void LatLngNormalToVec3(uint16_t p_iNormal, ai_real* p_afOut)
+inline void LatLngNormalToVec3(uint16_t p_iNormal, float* p_afOut)
 {
-    ai_real lat = (ai_real)(( p_iNormal >> 8u ) & 0xff);
-    ai_real lng = (ai_real)(( p_iNormal & 0xff ));
-    const ai_real invVal( ai_real( 1.0 ) / ai_real( 128.0 ) );
-    lat *= ai_real( 3.141926 ) * invVal;
-    lng *= ai_real( 3.141926 ) * invVal;
+    float lat = (float)(( p_iNormal >> 8u ) & 0xff);
+    float lng = (float)(( p_iNormal & 0xff ));
+    lat *= 3.141926f/128.0f;
+    lng *= 3.141926f/128.0f;
 
-    p_afOut[ 0 ] = std::cos(lat) * std::sin(lng);
-    p_afOut[ 1 ] = std::sin(lat) * std::sin(lng);
-    p_afOut[ 2 ] = std::cos(lng);
+    p_afOut[0] = std::cos(lat) * std::sin(lng);
+    p_afOut[1] = std::sin(lat) * std::sin(lng);
+    p_afOut[2] = std::cos(lng);
+    return;
 }
 
 
@@ -298,10 +298,10 @@ inline void Vec3NormalToLatLng( const aiVector3D& p_vIn, uint16_t& p_iOut )
     {
         int a, b;
 
-        a = int(57.2957795f * ( std::atan2( p_vIn[1], p_vIn[0] ) ) * (255.0f / 360.0f ));
+        a = int(57.2957795f * ( atan2f( p_vIn[1], p_vIn[0] ) ) * (255.0f / 360.0f ));
         a &= 0xff;
 
-        b = int(57.2957795f * ( std::acos( p_vIn[2] ) ) * ( 255.0f / 360.0f ));
+        b = int(57.2957795f * ( acosf( p_vIn[2] ) ) * ( 255.0f / 360.0f ));
         b &= 0xff;
 
         ((unsigned char*)&p_iOut)[0] = b;   // longitude
@@ -313,3 +313,4 @@ inline void Vec3NormalToLatLng( const aiVector3D& p_vIn, uint16_t& p_iOut )
 }
 
 #endif // !! AI_MD3FILEHELPER_H_INC
+

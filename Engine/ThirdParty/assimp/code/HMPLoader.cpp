@@ -127,7 +127,8 @@ void HMPImporter::InternReadFile( const std::string& pFile,
         throw DeadlyImportError( "HMP File is too small.");
 
     // Allocate storage and copy the contents of the file to a memory buffer
-    mBuffer = new uint8_t[fileSize];
+    std::vector<uint8_t> buffer(fileSize);
+    mBuffer = &buffer[0];
     file->Read( (void*)mBuffer, 1, fileSize);
     iFileSize = (unsigned int)fileSize;
 
@@ -173,9 +174,7 @@ void HMPImporter::InternReadFile( const std::string& pFile,
     // Set the AI_SCENE_FLAGS_TERRAIN bit
     pScene->mFlags |= AI_SCENE_FLAGS_TERRAIN;
 
-    delete[] mBuffer;
-    mBuffer= nullptr;
-
+    // File buffer destructs automatically now
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -450,13 +449,11 @@ void HMPImporter::ReadFirstSkin(unsigned int iNumSkins, const unsigned char* szC
 
     // read the type of the skin ...
     // sometimes we need to skip 12 bytes here, I don't know why ...
-    uint32_t iType = *((uint32_t*)szCursor);
-    szCursor += sizeof(uint32_t);
+    uint32_t iType = *((uint32_t*)szCursor);szCursor += sizeof(uint32_t);
     if (0 == iType)
     {
         szCursor += sizeof(uint32_t) * 2;
-        iType = *((uint32_t*)szCursor);
-        szCursor += sizeof(uint32_t);
+        iType = *((uint32_t*)szCursor);szCursor += sizeof(uint32_t);
         if (!iType)
             throw DeadlyImportError("Unable to read HMP7 skin chunk");
 

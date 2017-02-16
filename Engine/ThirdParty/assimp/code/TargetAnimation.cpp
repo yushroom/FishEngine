@@ -83,7 +83,7 @@ KeyIterator::KeyIterator(const std::vector<aiVectorKey>* _objPos,
 
 // ------------------------------------------------------------------------------------------------
 template <class T>
-inline T Interpolate(const T& one, const T& two, ai_real val)
+inline T Interpolate(const T& one, const T& two, float val)
 {
     return one + (two-one)*val;
 }
@@ -100,8 +100,8 @@ void KeyIterator::operator ++()
     // to our current position on the time line
     double d0,d1;
 
-    d0 = objPos->at      ( std::min ( nextObjPos, static_cast<unsigned int>(objPos->size()-1))             ).mTime;
-    d1 = targetObjPos->at( std::min ( nextTargetObjPos, static_cast<unsigned int>(targetObjPos->size()-1)) ).mTime;
+    d0 = objPos->at      ( std::min<unsigned int> ( nextObjPos, objPos->size()-1)             ).mTime;
+    d1 = targetObjPos->at( std::min<unsigned int> ( nextTargetObjPos, targetObjPos->size()-1) ).mTime;
 
     // Easiest case - all are identical. In this
     // case we don't need to interpolate so we can
@@ -134,7 +134,7 @@ void KeyIterator::operator ++()
             const aiVectorKey& last  = targetObjPos->at(nextTargetObjPos);
             const aiVectorKey& first = targetObjPos->at(nextTargetObjPos-1);
 
-            curTargetPosition = Interpolate(first.mValue, last.mValue, (ai_real) (
+            curTargetPosition = Interpolate(first.mValue, last.mValue, (float) (
                 (curTime-first.mTime) / (last.mTime-first.mTime) ));
         }
 
@@ -155,7 +155,7 @@ void KeyIterator::operator ++()
             const aiVectorKey& last  = objPos->at(nextObjPos);
             const aiVectorKey& first = objPos->at(nextObjPos-1);
 
-            curPosition = Interpolate(first.mValue, last.mValue, (ai_real) (
+            curPosition = Interpolate(first.mValue, last.mValue, (float) (
                 (curTime-first.mTime) / (last.mTime-first.mTime)));
         }
 
@@ -220,7 +220,7 @@ void TargetAnimationHelper::Process(std::vector<aiVectorKey>* distanceTrack)
 
         // diff vector
         aiVector3D diff = tposition - position;
-        ai_real f = diff.Length();
+        float f = diff.Length();
 
         // output distance vector
         if (f)

@@ -113,6 +113,7 @@ struct LightObject {
     bool shadowFlag;
 };
 
+
 struct CameraObject {
     float focalLength;
     float nearDepth;
@@ -145,6 +146,7 @@ struct Name {
     std::string name;
 };
 
+
 struct ObjectRef {
     Object *targetStructure;
 };
@@ -170,6 +172,7 @@ struct BoneIndex {
     const unsigned short *boneIndexArray;
     unsigned short *arrayStorage;
 };
+
 
 struct BoneWeight {
     int boneWeightCount;

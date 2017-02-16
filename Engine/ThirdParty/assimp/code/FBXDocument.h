@@ -240,9 +240,6 @@ public:
     fbx_simple_property(FilmWidth, float, 1.0f)
     fbx_simple_property(FilmHeight, float, 1.0f)
 
-    fbx_simple_property(NearPlane, float, 0.1f)
-    fbx_simple_property(FarPlane, float, 100.0f)
-
     fbx_simple_property(FilmAspectRatio, float, 1.0f)
     fbx_simple_property(ApertureMode, int, 0)
 
@@ -305,12 +302,12 @@ public:
     fbx_simple_property(DrawVolumetricLight, bool, true)
     fbx_simple_property(DrawGroundProjection, bool, true)
     fbx_simple_property(DrawFrontFacingVolumetricLight, bool, false)
-    fbx_simple_property(Intensity, float, 100.0f)
+    fbx_simple_property(Intensity, float, 1.0f)
     fbx_simple_property(InnerAngle, float, 0.0f)
     fbx_simple_property(OuterAngle, float, 45.0f)
     fbx_simple_property(Fog, int, 50)
-    fbx_simple_enum_property(DecayType, Decay, 2)
-    fbx_simple_property(DecayStart, float, 1.0f)
+    fbx_simple_enum_property(DecayType, Decay, 0)
+    fbx_simple_property(DecayStart, int, 0)
     fbx_simple_property(FileName, std::string, "")
 
     fbx_simple_property(EnableNearAttenuation, bool, false)
@@ -597,24 +594,23 @@ public:
         BlendMode_BlendModeCount
     };
 
-    const Texture* getTexture(int index=0) const
+    const Texture* getTexture() const
     {
-		return textures[index];
-
+        return texture;
     }
-	const int textureCount() const {
-		return static_cast<int>(textures.size());
-	}
-    const BlendMode GetBlendMode() const
+
+    BlendMode GetBlendMode()
     {
         return blendMode;
     }
+    
     float Alpha()
     {
         return alpha;
     }
+
 private:
-	std::vector<const Texture*> textures;
+    const Texture* texture;
     BlendMode blendMode;
     float alpha;
 };

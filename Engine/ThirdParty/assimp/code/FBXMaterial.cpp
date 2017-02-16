@@ -227,6 +227,7 @@ Texture::~Texture()
 
 LayeredTexture::LayeredTexture(uint64_t id, const Element& element, const Document& /*doc*/, const std::string& name)
 : Object(id,element,name)
+,texture(0)
 ,blendMode(BlendMode_Modulate)
 ,alpha(1)
 {
@@ -248,7 +249,7 @@ LayeredTexture::LayeredTexture(uint64_t id, const Element& element, const Docume
 
 LayeredTexture::~LayeredTexture()
 {
-    
+
 }
 
 void LayeredTexture::fillTexture(const Document& doc)
@@ -266,7 +267,7 @@ void LayeredTexture::fillTexture(const Document& doc)
 
         const Texture* const tex = dynamic_cast<const Texture*>(ob);
 
-        textures.push_back(tex);
+        texture = tex;
     }
 }
 

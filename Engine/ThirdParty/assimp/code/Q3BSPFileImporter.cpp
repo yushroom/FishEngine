@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2008, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_Q3BSP_IMPORTER
 
+//#include <windows.h>
 #include "DefaultIOSystem.h"
 #include "Q3BSPFileImporter.h"
 #include "Q3BSPZipArchive.h"
@@ -74,6 +75,14 @@ static const aiImporterDesc desc = {
 };
 
 namespace Assimp {
+
+/*
+static void getSupportedExtensions(std::vector<std::string> &supportedExtensions) {
+    supportedExtensions.push_back( ".jpg" );
+    supportedExtensions.push_back( ".png" );
+    supportedExtensions.push_back( ".tga" );
+}
+*/
 
 using namespace Q3BSP;
 
@@ -166,7 +175,7 @@ Q3BSPFileImporter::~Q3BSPFileImporter() {
 bool Q3BSPFileImporter::CanRead( const std::string& rFile, IOSystem* /*pIOHandler*/, bool checkSig ) const
 {
     if(!checkSig) {
-        return SimpleExtensionCheck( rFile, "pk3", "bsp" );
+        return SimpleExtensionCheck( rFile, "pk3" );
     }
     // TODO perhaps add keyword based detection
     return false;
@@ -330,14 +339,14 @@ void Q3BSPFileImporter::CreateNodes( const Q3BSP::Q3BSPModel *pModel, aiScene* p
         }
     }
 
-    pParent->mNumChildren = static_cast<unsigned int>(MeshArray.size());
+    pParent->mNumChildren = MeshArray.size();
     pParent->mChildren = new aiNode*[ pScene->mRootNode->mNumChildren ];
     for ( size_t i=0; i<NodeArray.size(); i++ )
     {
         aiNode *pNode = NodeArray[ i ];
         pNode->mParent = pParent;
         pParent->mChildren[ i ] = pNode;
-        pParent->mChildren[ i ]->mMeshes[ 0 ] = static_cast<unsigned int>(i);
+        pParent->mChildren[ i ]->mMeshes[ 0 ] = i;
     }
 }
 
@@ -364,9 +373,9 @@ aiNode *Q3BSPFileImporter::CreateTopology( const Q3BSP::Q3BSPModel *pModel,
     pMesh->mPrimitiveTypes = aiPrimitiveType_TRIANGLE;
 
     pMesh->mFaces = new aiFace[ numTriangles ];
-    pMesh->mNumFaces = static_cast<unsigned int>(numTriangles);
+    pMesh->mNumFaces = numTriangles;
 
-    pMesh->mNumVertices = static_cast<unsigned int>(numVerts);
+    pMesh->mNumVertices = numVerts;
     pMesh->mVertices = new aiVector3D[ numVerts ];
     pMesh->mNormals =  new aiVector3D[ numVerts ];
     pMesh->mTextureCoords[ 0 ] = new aiVector3D[ numVerts ];
@@ -515,7 +524,7 @@ void Q3BSPFileImporter::createMaterials( const Q3BSP::Q3BSPModel *pModel, aiScen
         pScene->mMaterials[ pScene->mNumMaterials ] = pMatHelper;
         pScene->mNumMaterials++;
     }
-    pScene->mNumTextures = static_cast<unsigned int>(mTextures.size());
+    pScene->mNumTextures = mTextures.size();
     pScene->mTextures = new aiTexture*[ pScene->mNumTextures ];
     std::copy( mTextures.begin(), mTextures.end(), pScene->mTextures );
 }
@@ -649,7 +658,7 @@ bool Q3BSPFileImporter::importTextureFromArchive( const Q3BSP::Q3BSPModel *pMode
             size_t texSize = pTextureStream->FileSize();
             aiTexture *pTexture = new aiTexture;
             pTexture->mHeight = 0;
-            pTexture->mWidth = static_cast<unsigned int>(texSize);
+            pTexture->mWidth = texSize;
             unsigned char *pData = new unsigned char[ pTexture->mWidth ];
             size_t readSize = pTextureStream->Read( pData, sizeof( unsigned char ), pTexture->mWidth );
             (void)readSize;
@@ -663,7 +672,7 @@ bool Q3BSPFileImporter::importTextureFromArchive( const Q3BSP::Q3BSPModel *pMode
 
             aiString name;
             name.data[ 0 ] = '*';
-            name.length = 1 + ASSIMP_itoa10( name.data + 1, static_cast<unsigned int>(MAXLEN-1), static_cast<int32_t>(mTextures.size()) );
+            name.length = 1 + ASSIMP_itoa10( name.data + 1, MAXLEN-1, mTextures.size() );
 
             pArchive->Close( pTextureStream );
 
@@ -721,7 +730,7 @@ bool Q3BSPFileImporter::importLightmap( const Q3BSP::Q3BSPModel *pModel, aiScene
 
     aiString name;
     name.data[ 0 ] = '*';
-    name.length = 1 + ASSIMP_itoa10( name.data + 1, static_cast<unsigned int>(MAXLEN-1), static_cast<int32_t>(mTextures.size()) );
+    name.length = 1 + ASSIMP_itoa10( name.data + 1, MAXLEN-1,  mTextures.size() );
 
     pMatHelper->AddProperty( &name,AI_MATKEY_TEXTURE_LIGHTMAP( 1 ) );
     mTextures.push_back( pTexture );

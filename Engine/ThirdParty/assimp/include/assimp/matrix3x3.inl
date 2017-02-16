@@ -42,9 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file matrix3x3.inl
  *  @brief Inline implementation of the 3x3 matrix operators
  */
-#pragma once
-#ifndef AI_MATRIX3X3_INL_INC
-#define AI_MATRIX3X3_INL_INC
+#ifndef AI_MATRIX3x3_INL_INC
+#define AI_MATRIX3x3_INL_INC
 
 #ifdef __cplusplus
 #include "matrix3x3.h"
@@ -242,7 +241,7 @@ inline aiMatrix3x3t<TReal>& aiMatrix3x3t<TReal>::Translation( const aiVector2t<T
  * "from" into another vector called "to".
  * Input : from[3], to[3] which both must be *normalized* non-zero vectors
  * Output: mtx[3][3] -- a 3x3 matrix in colum-major form
- * Authors: Tomas Möller, John Hughes
+ * Authors: Tomas M�ller, John Hughes
  *          "Efficiently Building a Matrix to Rotate One Vector to Another"
  *          Journal of Graphics Tools, 4(4):1-4, 1999
  */
@@ -334,4 +333,4 @@ inline aiMatrix3x3t<TReal>& aiMatrix3x3t<TReal>::FromToMatrix(const aiVector3t<T
 
 
 #endif // __cplusplus
-#endif // AI_MATRIX3X3_INL_INC
+#endif // AI_MATRIX3x3_INL_INC

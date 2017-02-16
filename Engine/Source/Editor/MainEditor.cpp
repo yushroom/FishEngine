@@ -29,6 +29,7 @@
 #include "SceneViewEditor.hpp"
 //#include "Inspector.hpp"
 #include "AssetDataBase.hpp"
+#include "EditorResources.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -215,6 +216,7 @@ void DefaultScene()
         m_mainSceneViewEditor = std::make_unique<SceneViewEditor>();
         //Screen::set(width(), height());
         //PhysicsSystem::Init();
+		EditorResources::Init();
         RenderSystem::Init();
 
         m_mainSceneViewEditor->Init();

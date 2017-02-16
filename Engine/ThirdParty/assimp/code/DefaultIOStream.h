@@ -55,15 +55,15 @@ namespace Assimp    {
 //! @note   An instance of this class can exist without a valid file handle
 //!         attached to it. All calls fail, but the instance can nevertheless be
 //!         used with no restrictions.
-class ASSIMP_API DefaultIOStream : public IOStream
+class DefaultIOStream : public IOStream
 {
     friend class DefaultIOSystem;
 #if __ANDROID__
-# if __ANDROID_API__ > 9
-#  if defined(AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT)
+#if __ANDROID_API__ > 9
+#if defined(AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT)
     friend class AndroidJNIIOSystem;
-#  endif // defined(AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT)
-# endif // __ANDROID_API__ > 9
+#endif // defined(AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT)
+#endif // __ANDROID_API__ > 9
 #endif // __ANDROID__
 
 protected:
@@ -105,30 +105,32 @@ public:
     void Flush();
 
 private:
-    //  File data-structure, using clib
+    //  File datastructure, using clib
     FILE* mFile;
     //  Filename
     std::string mFilename;
 
     // Cached file size
-    mutable size_t mCachedSize;
+    mutable size_t cachedSize;
 };
+
 
 // ----------------------------------------------------------------------------------
 inline DefaultIOStream::DefaultIOStream () :
     mFile       (NULL),
     mFilename   (""),
-    mCachedSize(SIZE_MAX)
+    cachedSize  (SIZE_MAX)
 {
     // empty
 }
+
 
 // ----------------------------------------------------------------------------------
 inline DefaultIOStream::DefaultIOStream (FILE* pFile,
         const std::string &strFilename) :
     mFile(pFile),
     mFilename(strFilename),
-    mCachedSize(SIZE_MAX)
+    cachedSize  (SIZE_MAX)
 {
     // empty
 }

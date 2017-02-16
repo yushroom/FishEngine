@@ -142,8 +142,6 @@ private:
     struct VertexContainer {
         size_t m_numVerts;
         aiVector3D *m_vertices;
-        size_t m_numColors;
-        aiColor4D *m_colors;
         size_t m_numNormals;
         aiVector3D *m_normals;
         size_t m_numUVComps[ AI_MAX_NUMBER_OF_TEXTURECOORDS ];
@@ -152,8 +150,9 @@ private:
         VertexContainer();
         ~VertexContainer();
 
-        VertexContainer( const VertexContainer & ) = delete;
-        VertexContainer &operator = ( const VertexContainer & ) = delete;
+    private:
+        VertexContainer( const VertexContainer & );
+        VertexContainer &operator = ( const VertexContainer & );
     };
 
     struct RefInfo {
@@ -169,8 +168,9 @@ private:
         RefInfo( aiNode *node, Type type, std::vector<std::string> &names );
         ~RefInfo();
 
-        RefInfo( const RefInfo & ) = delete;
-        RefInfo &operator = ( const RefInfo & ) = delete;
+    private:
+        RefInfo( const RefInfo & );
+        RefInfo &operator = ( const RefInfo & );
     };
 
     struct ChildInfo {

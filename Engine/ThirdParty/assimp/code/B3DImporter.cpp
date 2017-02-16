@@ -331,7 +331,7 @@ void B3DImporter::ReadVRTS(){
     int sz=12+(_vflags&1?12:0)+(_vflags&2?16:0)+(_tcsets*_tcsize*4);
     int n_verts=ChunkSize()/sz;
 
-    int v0=static_cast<int>(_vertices.size());
+    int v0=_vertices.size();
     _vertices.resize( v0+n_verts );
 
     for( int i=0;i<n_verts;++i ){
@@ -404,7 +404,7 @@ void B3DImporter::ReadTRIS( int v0 ){
 void B3DImporter::ReadMESH(){
     /*int matid=*/ReadInt();
 
-    int v0= static_cast<int>(_vertices.size());
+    int v0=_vertices.size();
 
     while( ChunkSize() ){
         string t=ReadChunk();
@@ -462,17 +462,17 @@ void B3DImporter::ReadKEYS( aiNodeAnim *nodeAnim ){
     }
 
     if( flags & 1 ){
-        nodeAnim->mNumPositionKeys=static_cast<unsigned int>(trans.size());
+        nodeAnim->mNumPositionKeys=trans.size();
         nodeAnim->mPositionKeys=to_array( trans );
     }
 
     if( flags & 2 ){
-        nodeAnim->mNumScalingKeys=static_cast<unsigned int>(scale.size());
+        nodeAnim->mNumScalingKeys=scale.size();
         nodeAnim->mScalingKeys=to_array( scale );
     }
 
     if( flags & 4 ){
-        nodeAnim->mNumRotationKeys=static_cast<unsigned int>(rot.size());
+        nodeAnim->mNumRotationKeys=rot.size();
         nodeAnim->mRotationKeys=to_array( rot );
     }
 }
@@ -506,7 +506,7 @@ aiNode *B3DImporter::ReadNODE( aiNode *parent ){
 
     aiMatrix4x4 tform=trans * rot * scale;
 
-    int nodeid=static_cast<int>(_nodes.size());
+    int nodeid=_nodes.size();
 
     aiNode *node=new aiNode( name );
     _nodes.push_back( node );
@@ -521,9 +521,9 @@ aiNode *B3DImporter::ReadNODE( aiNode *parent ){
     while( ChunkSize() ){
         string t=ReadChunk();
         if( t=="MESH" ){
-            unsigned int n= static_cast<unsigned int>(_meshes.size());
+            int n=_meshes.size();
             ReadMESH();
-            for( unsigned int i=n;i<static_cast<unsigned int>(_meshes.size());++i ){
+            for( int i=n;i<(int)_meshes.size();++i ){
                 meshes.push_back( i );
             }
         }else if( t=="BONE" ){
@@ -544,10 +544,10 @@ aiNode *B3DImporter::ReadNODE( aiNode *parent ){
         ExitChunk();
     }
 
-    node->mNumMeshes= static_cast<unsigned int>(meshes.size());
+    node->mNumMeshes=meshes.size();
     node->mMeshes=to_array( meshes );
 
-    node->mNumChildren=static_cast<unsigned int>(children.size());
+    node->mNumChildren=children.size();
     node->mChildren=to_array( children );
 
     return node;
@@ -645,7 +645,7 @@ void B3DImporter::ReadBB3D( aiScene *scene ){
                 aiNode *bnode=_nodes[i];
 
                 bone->mName=bnode->mName;
-                bone->mNumWeights= static_cast<unsigned int>(weights.size());
+                bone->mNumWeights=weights.size();
                 bone->mWeights=to_array( weights );
 
                 aiMatrix4x4 mat=bnode->mTransformation;
@@ -655,7 +655,7 @@ void B3DImporter::ReadBB3D( aiScene *scene ){
                 }
                 bone->mOffsetMatrix=mat.Inverse();
             }
-            mesh->mNumBones= static_cast<unsigned int>(bones.size());
+            mesh->mNumBones=bones.size();
             mesh->mBones=to_array( bones );
         }
     }
@@ -667,21 +667,21 @@ void B3DImporter::ReadBB3D( aiScene *scene ){
     if( !_materials.size() ){
         _materials.push_back( new aiMaterial );
     }
-    scene->mNumMaterials= static_cast<unsigned int>(_materials.size());
+    scene->mNumMaterials=_materials.size();
     scene->mMaterials=to_array( _materials );
 
     //meshes
-    scene->mNumMeshes= static_cast<unsigned int>(_meshes.size());
+    scene->mNumMeshes=_meshes.size();
     scene->mMeshes=to_array( _meshes );
 
     //animations
     if( _animations.size()==1 && _nodeAnims.size() ){
 
         aiAnimation *anim=_animations.back();
-        anim->mNumChannels=static_cast<unsigned int>(_nodeAnims.size());
+        anim->mNumChannels=_nodeAnims.size();
         anim->mChannels=to_array( _nodeAnims );
 
-        scene->mNumAnimations=static_cast<unsigned int>(_animations.size());
+        scene->mNumAnimations=_animations.size();
         scene->mAnimations=to_array( _animations );
     }
 

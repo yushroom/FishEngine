@@ -117,12 +117,12 @@ MeshGeometry::MeshGeometry(uint64_t id, const Element& element, const std::strin
         return;
     }
 
-    m_vertices.reserve(tempFaces.size());
-    m_faces.reserve(tempFaces.size() / 3);
+    vertices.reserve(tempFaces.size());
+    faces.reserve(tempFaces.size() / 3);
 
-    m_mapping_offsets.resize(tempVerts.size());
-    m_mapping_counts.resize(tempVerts.size(),0);
-    m_mappings.resize(tempFaces.size());
+    mapping_offsets.resize(tempVerts.size());
+    mapping_counts.resize(tempVerts.size(),0);
+    mappings.resize(tempFaces.size());
 
     const size_t vertex_count = tempVerts.size();
 
@@ -135,29 +135,29 @@ MeshGeometry::MeshGeometry(uint64_t id, const Element& element, const std::strin
             DOMError("polygon vertex index out of range",&PolygonVertexIndex);
         }
 
-        m_vertices.push_back(tempVerts[absi]);
+        vertices.push_back(tempVerts[absi]);
         ++count;
 
-        ++m_mapping_counts[absi];
+        ++mapping_counts[absi];
 
         if (index < 0) {
-            m_faces.push_back(count);
+            faces.push_back(count);
             count = 0;
         }
     }
 
     unsigned int cursor = 0;
     for (size_t i = 0, e = tempVerts.size(); i < e; ++i) {
-        m_mapping_offsets[i] = cursor;
-        cursor += m_mapping_counts[i];
+        mapping_offsets[i] = cursor;
+        cursor += mapping_counts[i];
 
-        m_mapping_counts[i] = 0;
+        mapping_counts[i] = 0;
     }
 
     cursor = 0;
     for(int index : tempFaces) {
         const int absi = index < 0 ? (-index - 1) : index;
-        m_mappings[m_mapping_offsets[absi] + m_mapping_counts[absi]++] = cursor++;
+        mappings[mapping_offsets[absi] + mapping_counts[absi]++] = cursor++;
     }
 
     // if settings.readAllLayers is true:
@@ -191,84 +191,84 @@ MeshGeometry::~MeshGeometry()
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<aiVector3D>& MeshGeometry::GetVertices() const {
-    return m_vertices;
+    return vertices;
 }
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<aiVector3D>& MeshGeometry::GetNormals() const {
-    return m_normals;
+    return normals;
 }
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<aiVector3D>& MeshGeometry::GetTangents() const {
-    return m_tangents;
+    return tangents;
 }
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<aiVector3D>& MeshGeometry::GetBinormals() const {
-    return m_binormals;
+    return binormals;
 }
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<unsigned int>& MeshGeometry::GetFaceIndexCounts() const {
-    return m_faces;
+    return faces;
 }
 
 // ------------------------------------------------------------------------------------------------
 const std::vector<aiVector2D>& MeshGeometry::GetTextureCoords( unsigned int index ) const {
     static const std::vector<aiVector2D> empty;
-    return index >= AI_MAX_NUMBER_OF_TEXTURECOORDS ? empty : m_uvs[ index ];
+    return index >= AI_MAX_NUMBER_OF_TEXTURECOORDS ? empty : uvs[ index ];
 }
 
 std::string MeshGeometry::GetTextureCoordChannelName( unsigned int index ) const {
-    return index >= AI_MAX_NUMBER_OF_TEXTURECOORDS ? "" : m_uvNames[ index ];
+    return index >= AI_MAX_NUMBER_OF_TEXTURECOORDS ? "" : uvNames[ index ];
 }
 
 const std::vector<aiColor4D>& MeshGeometry::GetVertexColors( unsigned int index ) const {
     static const std::vector<aiColor4D> empty;
-    return index >= AI_MAX_NUMBER_OF_COLOR_SETS ? empty : m_colors[ index ];
+    return index >= AI_MAX_NUMBER_OF_COLOR_SETS ? empty : colors[ index ];
 }
 
 const MatIndexArray& MeshGeometry::GetMaterialIndices() const {
-    return m_materials;
+    return materials;
 }
 
 // ------------------------------------------------------------------------------------------------
 const unsigned int* MeshGeometry::ToOutputVertexIndex( unsigned int in_index, unsigned int& count ) const {
-    if ( in_index >= m_mapping_counts.size() ) {
+    if ( in_index >= mapping_counts.size() ) {
         return NULL;
     }
 
-    ai_assert( m_mapping_counts.size() == m_mapping_offsets.size() );
-    count = m_mapping_counts[ in_index ];
+    ai_assert( mapping_counts.size() == mapping_offsets.size() );
+    count = mapping_counts[ in_index ];
 
-//    ai_assert( count != 0 );
-    ai_assert( m_mapping_offsets[ in_index ] + count <= m_mappings.size() );
+    ai_assert( count != 0 );
+    ai_assert( mapping_offsets[ in_index ] + count <= mappings.size() );
 
-    return &m_mappings[ m_mapping_offsets[ in_index ] ];
+    return &mappings[ mapping_offsets[ in_index ] ];
 }
 
 // ------------------------------------------------------------------------------------------------
 unsigned int MeshGeometry::FaceForVertexIndex( unsigned int in_index ) const {
-    ai_assert( in_index < m_vertices.size() );
+    ai_assert( in_index < vertices.size() );
 
     // in the current conversion pattern this will only be needed if
     // weights are present, so no need to always pre-compute this table
-    if ( m_facesVertexStartIndices.empty() ) {
-        m_facesVertexStartIndices.resize( m_faces.size() + 1, 0 );
+    if ( facesVertexStartIndices.empty() ) {
+        facesVertexStartIndices.resize( faces.size() + 1, 0 );
 
-        std::partial_sum( m_faces.begin(), m_faces.end(), m_facesVertexStartIndices.begin() + 1 );
-        m_facesVertexStartIndices.pop_back();
+        std::partial_sum( faces.begin(), faces.end(), facesVertexStartIndices.begin() + 1 );
+        facesVertexStartIndices.pop_back();
     }
 
-    ai_assert( m_facesVertexStartIndices.size() == m_faces.size() );
+    ai_assert( facesVertexStartIndices.size() == faces.size() );
     const std::vector<unsigned int>::iterator it = std::upper_bound(
-        m_facesVertexStartIndices.begin(),
-        m_facesVertexStartIndices.end(),
+        facesVertexStartIndices.begin(),
+        facesVertexStartIndices.end(),
         in_index
         );
 
-    return static_cast< unsigned int >( std::distance( m_facesVertexStartIndices.begin(), it - 1 ) );
+    return static_cast< unsigned int >( std::distance( facesVertexStartIndices.begin(), it - 1 ) );
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -327,18 +327,18 @@ void MeshGeometry::ReadVertexData(const std::string& type, int index, const Scop
         }
 
         const Element* Name = source["Name"];
-        m_uvNames[index] = "";
+        uvNames[index] = "";
         if(Name) {
-            m_uvNames[index] = ParseTokenAsString(GetRequiredToken(*Name,0));
+            uvNames[index] = ParseTokenAsString(GetRequiredToken(*Name,0));
         }
 
-        ReadVertexDataUV(m_uvs[index],source,
+        ReadVertexDataUV(uvs[index],source,
             MappingInformationType,
             ReferenceInformationType
         );
     }
     else if (type == "LayerElementMaterial") {
-        if (m_materials.size() > 0) {
+        if (materials.size() > 0) {
             FBXImporter::LogError("ignoring additional material layer");
             return;
         }
@@ -362,37 +362,37 @@ void MeshGeometry::ReadVertexData(const std::string& type, int index, const Scop
             return;
         }
 
-        std::swap(temp_materials, m_materials);
+        std::swap(temp_materials, materials);
     }
     else if (type == "LayerElementNormal") {
-        if (m_normals.size() > 0) {
+        if (normals.size() > 0) {
             FBXImporter::LogError("ignoring additional normal layer");
             return;
         }
 
-        ReadVertexDataNormals(m_normals,source,
+        ReadVertexDataNormals(normals,source,
             MappingInformationType,
             ReferenceInformationType
         );
     }
     else if (type == "LayerElementTangent") {
-        if (m_tangents.size() > 0) {
+        if (tangents.size() > 0) {
             FBXImporter::LogError("ignoring additional tangent layer");
             return;
         }
 
-        ReadVertexDataTangents(m_tangents,source,
+        ReadVertexDataTangents(tangents,source,
             MappingInformationType,
             ReferenceInformationType
         );
     }
     else if (type == "LayerElementBinormal") {
-        if (m_binormals.size() > 0) {
+        if (binormals.size() > 0) {
             FBXImporter::LogError("ignoring additional binormal layer");
             return;
         }
 
-        ReadVertexDataBinormals(m_binormals,source,
+        ReadVertexDataBinormals(binormals,source,
             MappingInformationType,
             ReferenceInformationType
         );
@@ -404,7 +404,7 @@ void MeshGeometry::ReadVertexData(const std::string& type, int index, const Scop
             return;
         }
 
-        ReadVertexDataColors(m_colors[index],source,
+        ReadVertexDataColors(colors[index],source,
             MappingInformationType,
             ReferenceInformationType
         );
@@ -515,10 +515,10 @@ void MeshGeometry::ReadVertexDataNormals(std::vector<aiVector3D>& normals_out, c
     ResolveVertexDataArray(normals_out,source,MappingInformationType,ReferenceInformationType,
         "Normals",
         "NormalsIndex",
-        m_vertices.size(),
-        m_mapping_counts,
-        m_mapping_offsets,
-        m_mappings);
+        vertices.size(),
+        mapping_counts,
+        mapping_offsets,
+        mappings);
 }
 
 
@@ -530,10 +530,10 @@ void MeshGeometry::ReadVertexDataUV(std::vector<aiVector2D>& uv_out, const Scope
     ResolveVertexDataArray(uv_out,source,MappingInformationType,ReferenceInformationType,
         "UV",
         "UVIndex",
-        m_vertices.size(),
-        m_mapping_counts,
-        m_mapping_offsets,
-        m_mappings);
+        vertices.size(),
+        mapping_counts,
+        mapping_offsets,
+        mappings);
 }
 
 
@@ -545,10 +545,10 @@ void MeshGeometry::ReadVertexDataColors(std::vector<aiColor4D>& colors_out, cons
     ResolveVertexDataArray(colors_out,source,MappingInformationType,ReferenceInformationType,
         "Colors",
         "ColorIndex",
-        m_vertices.size(),
-        m_mapping_counts,
-        m_mapping_offsets,
-        m_mappings);
+        vertices.size(),
+        mapping_counts,
+        mapping_offsets,
+        mappings);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -564,10 +564,10 @@ void MeshGeometry::ReadVertexDataTangents(std::vector<aiVector3D>& tangents_out,
     ResolveVertexDataArray(tangents_out,source,MappingInformationType,ReferenceInformationType,
         str,
         strIdx,
-        m_vertices.size(),
-        m_mapping_counts,
-        m_mapping_offsets,
-        m_mappings);
+        vertices.size(),
+        mapping_counts,
+        mapping_offsets,
+        mappings);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -583,10 +583,10 @@ void MeshGeometry::ReadVertexDataBinormals(std::vector<aiVector3D>& binormals_ou
     ResolveVertexDataArray(binormals_out,source,MappingInformationType,ReferenceInformationType,
         str,
         strIdx,
-        m_vertices.size(),
-        m_mapping_counts,
-        m_mapping_offsets,
-        m_mappings);
+        vertices.size(),
+        mapping_counts,
+        mapping_offsets,
+        mappings);
 }
 
 
@@ -595,7 +595,7 @@ void MeshGeometry::ReadVertexDataMaterials(std::vector<int>& materials_out, cons
     const std::string& MappingInformationType,
     const std::string& ReferenceInformationType)
 {
-    const size_t face_count = m_faces.size();
+    const size_t face_count = faces.size();
     ai_assert(face_count);
 
     // materials are handled separately. First of all, they are assigned per-face
@@ -614,10 +614,10 @@ void MeshGeometry::ReadVertexDataMaterials(std::vector<int>& materials_out, cons
             materials_out.clear();
         }
 
-        m_materials.assign(m_vertices.size(),materials_out[0]);
+        materials.assign(vertices.size(),materials_out[0]);
     }
     else if (MappingInformationType == "ByPolygon" && ReferenceInformationType == "IndexToDirect") {
-        m_materials.resize(face_count);
+        materials.resize(face_count);
 
         if(materials_out.size() != face_count) {
             FBXImporter::LogError(Formatter::format("length of input data unexpected for ByPolygon mapping: ")

@@ -42,9 +42,9 @@ namespace FishEngine
     {
         TextureSampler::Init();
         Pipeline::Init();
-        Shader::Init();
+        //Shader::Init();
         Material::Init();
-        Mesh::Init();
+        //Mesh::Init();
         Gizmos::Init();
         Scene::Init();
         glFrontFace(GL_CW);

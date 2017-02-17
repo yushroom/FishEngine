@@ -156,6 +156,11 @@ namespace FishEngine
 			return m_gameObjects;
 		}
 
+		static void AddGameObject(GameObjectPtr const & go)
+		{
+			m_gameObjects.push_back(go);
+		}
+
     private:
         friend class RenderSystem;
         friend class FishEditor::Inspector;

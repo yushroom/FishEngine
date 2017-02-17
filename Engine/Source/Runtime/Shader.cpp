@@ -666,9 +666,9 @@ namespace FishEngine
 
     //========== Static Region ==========
 
-    void Shader::Init()
+    void Shader::Init(std::string const & rootDir)
     {
-        const auto& root_dir = Resources::shaderRootDirectory();
+		Path root_dir = rootDir;
         for (auto& n : { "PBR", "PBR-Reference", "Diffuse", "DebugCSM"})
         {
             m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));

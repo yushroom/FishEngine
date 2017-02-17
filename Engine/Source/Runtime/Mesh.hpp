@@ -63,7 +63,7 @@ namespace FishEngine
         Mesh(const Mesh&) = delete;
         void operator=(const Mesh&) = delete;
 
-        Mesh(Mesh&& m);
+        Mesh(Mesh&& m) = delete;
 
         ~Mesh();
         
@@ -114,7 +114,7 @@ namespace FishEngine
 
 		static MeshPtr FromTextFile(std::istream & is);
 
-		static void Init();
+		static void Init(std::string const & rootDir);
 		static MeshPtr builtinMesh(const PrimitiveType type);
 		
     private:

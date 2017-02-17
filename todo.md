@@ -24,6 +24,10 @@ GameObjectInspector
 
 
 
+Hierarchy中drag&drop在debug模式下会挂掉
+
+
+
 
 
 ## Engine

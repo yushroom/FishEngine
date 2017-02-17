@@ -2,12 +2,11 @@
 #include "MainWindow.hpp"
 #include "ui_mainwindow.h"
 
-//#include <QFileIconProvider>
 #include <QMouseEvent>
 #include <QStandardItemModel>
-//#include <QPalette>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <FishEngine.hpp>
 #include <Debug.hpp>
@@ -24,7 +23,6 @@
 #include "SceneViewEditor.hpp"
 #include "FileInfo.hpp"
 #include "Selection.hpp"
-//#include "UI/SelectObjectDialog.hpp"
 
 #include <fstream>
 #include <Serialization.hpp>
@@ -33,6 +31,7 @@
 #include <Timer.hpp>
 
 using namespace FishEngine;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -49,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     FishEditor::Inspector::s_inspectorWidget = ui->inspectorWidget;
 
+	connect(ui->actionNewScene, &QAction::triggered, this, &MainWindow::NewScene);
     connect(ui->actionSaveSceneAs, &QAction::triggered, this, &MainWindow::SaveSceneAs);
 
     connect(ui->actionPlay, &QAction::triggered, [this](){
@@ -102,23 +102,9 @@ MainWindow::~MainWindow()
 void MainWindow::Init()
 {
     FishEngine::Debug::Init();
-    QDir cwd = QCoreApplication::applicationDirPath();
-    cwd.cdUp();
-    FishEngine::Resources::Init(cwd.absolutePath().toStdString());
-	//FishEditor::EditorResources::Init(cwd.absolutePath().toStdString());
-	//FishEngine::Input::Init();
 
-	Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
-
-//    RenderSystem::Init();
     Applicaiton::s_isEditor = true;
 
-    //Applicaiton::s_dataPath = cwd.absolutePath().toStdString();
-//#if FISHENGINE_PLATFORM_APPLE
-//    Applicaiton::s_dataPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
-//#else
-//	Applicaiton::s_dataPath = R"(D:\program\FishEngine\Example\Sponza)";
-//#endif
 	//FishEngine::Timer t("Load assets");
 	FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
 	//t.StopAndPrint();
@@ -130,18 +116,39 @@ void MainWindow::Init()
 	//dialog->show();
 }
 
+bool MainWindow::CloseCurrentScene()
+{
+	int btn = QMessageBox::warning(this,
+		"Scene Have Been Modified",
+		"Do you want to save the changes you made in the scenes: \n Assets/<balbal.scene>\n\nYour changes will be lost if you don't save them.", "Save", "Don't Save", "Cancel", 0, 2);
+	if (btn == 0)	// save
+	{
+		return true;
+	}
+	else if (btn == 1) // don't save
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void MainWindow::NewScene()
+{
+	CloseCurrentScene();
+}
+
 void MainWindow::SaveSceneAs()
 {
-    //QFileDialog::Options options = QFlag(fileDialogOptionsWidget->value());
     //options |= QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
     QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath());
-    path = QFileDialog::getSaveFileName(this, "Save Scene", path);
+    path = QFileDialog::getSaveFileName(this, "Save Scene", path, "Scene (*.scene)");
     if (path.isEmpty())
         return;
     std::ofstream fout(path.toStdString());
     FishEngine::YAMLOutputArchive archive(fout);
-//    for (auto const & go : Scene::GameObjects())
-//    {
-//        archive << go;
-//    }
+    for (auto const & go : Scene::GameObjects())
+    {
+        archive << go;
+    }
 }

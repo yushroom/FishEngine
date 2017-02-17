@@ -4,9 +4,13 @@
 #include "Resources.hpp"
 #include "Macro.hpp"
 
+namespace FishEditor
+{
+	class EditorResources;
+}
+
 namespace FishEngine
 {
-
     enum class ShaderType
     {
         VertexShader,
@@ -74,5 +78,8 @@ namespace FishEngine
             const std::string&  target);
 
         static size_t findPair(const std::string& text, const size_t cursor);
+
+		friend class FishEditor::EditorResources;
+		static Path s_shaderIncludeDir;
     };
 }

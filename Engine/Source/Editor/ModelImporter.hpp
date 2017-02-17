@@ -177,6 +177,8 @@ namespace FishEditor
 
     private:
         
+		friend class Inspector;
+
         float m_fileScale = 1.0f;
         
         ModelNodePtr

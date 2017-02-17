@@ -2,6 +2,8 @@
 
 #include "FishEngine.hpp"
 
+class OpenProjectDialog;
+
 namespace FishEngine
 {
     // Access to application run-time data.
@@ -28,6 +30,7 @@ namespace FishEngine
     private:
         friend class FishEditor::MainEditor;
 		friend class ::MainWindow;
+		friend class ::OpenProjectDialog;
         static std::string  s_dataPath;
         static bool         s_isEditor;
         static bool         s_isPlaying;

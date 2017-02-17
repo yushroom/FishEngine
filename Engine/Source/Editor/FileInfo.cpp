@@ -96,6 +96,10 @@ namespace FishEditor
 					//auto data = texture->rawdata().data();
 					//AssetDatabase::m_cacheIcons[p] = QIcon(QPixmap::fromImage(QImage(data, texture->width(), texture->height(), QImage::Format_RGB888)));
 				}
+				else if (ext == ".fbx" || ext == ".FBX")
+				{
+					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(p);
+				}
 #endif
             }
         }

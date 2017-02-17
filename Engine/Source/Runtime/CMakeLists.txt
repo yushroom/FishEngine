@@ -1,4 +1,6 @@
-aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
+AUX_SOURCE_DIRECTORY( ${CMAKE_CURRENT_LIST_DIR}/SceneManagement SceneManagement_SRCS)
+SOURCE_GROUP(SceneManagement FILES ${SceneManagement_SRCS})
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
 SET(
     Serialization_SRCS
@@ -69,4 +71,4 @@ endforeach()
 SOURCE_GROUP(Render FILES ${Render_SRCS})
 
 
-add_library (FishEngine STATIC ${SRCS} ${HEADERS} ${Serialization_SRCS})
+add_library (FishEngine STATIC ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS})

@@ -62,7 +62,7 @@ namespace FishEngine
 		
 		virtual int ClassID() const = 0;
         
-        UUID GetGUID() const
+        inline UUID const & GetGUID() const
         {
             return m_uuid;
         }
@@ -99,6 +99,10 @@ namespace FishEngine
         UUID        m_uuid;
 
     };
+
+
+	inline bool operator== (Object const & lhs, Object const & rhs) { return lhs.GetGUID() == rhs.GetGUID(); }
+	inline bool operator< (Object const & lhs, Object const & rhs) { return lhs.GetGUID() < rhs.GetGUID(); }
 }
 
 #endif // Object_hpp

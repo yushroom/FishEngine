@@ -36,6 +36,11 @@
 #include <generate/Enum_ShadowCastingMode.hpp>
 
 #include <TextureImporter.hpp>
+#include <generate/Enum_ModelImporterMaterialSearch.hpp>
+#include <generate/Enum_ModelImporterNormals.hpp>
+#include <generate/Enum_ModelImporterTangents.hpp>
+
+#include <ModelImporter.hpp>
 #include <generate/Enum_TextureImporterType.hpp>
 #include <generate/Enum_TextureImporterShape.hpp>
 #include <generate/Enum_TextureImporterType.hpp>
@@ -47,7 +52,10 @@ using namespace FishEditor;
 
 InspectorWidget* Inspector::s_inspectorWidget;
 
-//ComponentPtr componentToBeDestroyed;
+std::weak_ptr<FishEngine::Component> FishEditor::Inspector::s_targetComponent;
+
+
+ComponentPtr componentToBeDestroyed;
 
 template<>
 void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
@@ -245,6 +253,19 @@ void Inspector::OnInspectorGUI(TextureImporterPtr const & importer)
 	EditorGUI::EnumPopup("Wrap Mode", &importer->m_textureSettings.m_wrapMode);
 }
 
+template<>
+void Inspector::OnInspectorGUI(ModelImporterPtr const & importer)
+{
+	EditorGUI::FloatField("File Scale", &importer->m_fileScale);
+	EditorGUI::EnumPopup("Normals", &importer->m_importNormals);
+	EditorGUI::EnumPopup("Tangents", &importer->m_importTangents);
+	EditorGUI::EnumPopup("Material Search", &importer->m_materialSearch);
+	//EditorGUI::Toggle("Read/Write Enabled", &importer->m_);
+	//EditorGUI::Toggle("Generate Mip Maps", &importer->m_mipmapEnabled);
+	//EditorGUI::EnumPopup("Filter Mode", &importer->m_textureSettings.m_filterMode);
+	//EditorGUI::EnumPopup("Wrap Mode", &importer->m_textureSettings.m_wrapMode);
+}
+
 
 void Inspector::Bind(const GameObjectPtr & go)
 {
@@ -287,11 +308,11 @@ void Inspector::Bind(const GameObjectPtr & go)
         }
     }
 
-//    if (componentToBeDestroyed != nullptr)
-//    {
-//        Object::DestroyImmediate(componentToBeDestroyed);
-//        componentToBeDestroyed = nullptr;
-//    }
+	if (componentToBeDestroyed != nullptr)
+	{
+		Object::DestroyImmediate(componentToBeDestroyed);
+		componentToBeDestroyed = nullptr;
+	}
 
     if (EditorGUI::Button("Add Component"))
     {
@@ -306,6 +327,11 @@ void Inspector::Bind(const GameObjectPtr & go)
 
 void Inspector::Bind(FishEngine::ObjectPtr const & object)
 {
+	if (object == nullptr)
+	{
+		HideAll();
+		return;
+	}
 	if (object->ClassID() == ClassID<GameObject>())
 	{
 		Bind(std::dynamic_pointer_cast<GameObject>(object));
@@ -313,6 +339,10 @@ void Inspector::Bind(FishEngine::ObjectPtr const & object)
 	else if (object->ClassID() == ClassID<TextureImporter>())
 	{
 		Bind(std::dynamic_pointer_cast<TextureImporter>(object));
+	}
+	else if (object->ClassID() == ClassID<ModelImporter>())
+	{
+		Bind(std::dynamic_pointer_cast<ModelImporter>(object));
 	}
 }
 
@@ -334,6 +364,28 @@ void Inspector::Bind(TextureImporterPtr const & importer)
 
 	EditorGUI::Begin();
 	OnInspectorGUI<TextureImporter>(importer);
+	EditorGUI::End();
+}
+
+
+void FishEditor::Inspector::Bind(ModelImporterPtr const & importer)
+{
+	if (importer == nullptr)
+	{
+		HideAll();
+		return;
+	}
+	else
+	{
+		if (s_inspectorWidget->isHidden())
+			s_inspectorWidget->setHidden(false);
+	}
+
+	EditorGUI::s_treeWidget = s_inspectorWidget->m_treeWidget;
+	s_inspectorWidget->Bind(importer);
+
+	EditorGUI::Begin();
+	OnInspectorGUI<ModelImporter>(importer);
 	EditorGUI::End();
 }
 
@@ -365,26 +417,29 @@ std::string Inspector::ShowAddComponentMenu()
     return action->text().toStdString();
 }
 
-void FishEditor::Inspector::ShowComponentMenu()
+
+QAction* FishEditor::Inspector::ShowComponentMenu()
 {
 	static QMenu* menu = nullptr;
 	if (menu == nullptr)
 	{
 		menu = new QMenu(s_inspectorWidget->m_treeWidget);
-		menu->addAction("Reset");
-		menu->addAction("Revert to Prefab");
+		auto action = menu->addAction("Reset");
+		action->setEnabled(false);
+		menu->addAction("Revert to Prefab")->setEnabled(false);
 		menu->addSeparator();
-		menu->addAction("Move to Front");
-		menu->addAction("Move to back");
+		menu->addAction("Move to Front")->setEnabled(false);
+		menu->addAction("Move to back")->setEnabled(false);
 		menu->addAction("Remove Component");
-		menu->addAction("Move Up");
-		menu->addAction("Move Down");
-		menu->addAction("Copy Component");
-		menu->addAction("Paste Component As New");
-		menu->addAction("Paste Component Value");
+		menu->addAction("Move Up")->setEnabled(false);
+		menu->addAction("Move Down")->setEnabled(false);
+		menu->addAction("Copy Component")->setEnabled(false);
+		menu->addAction("Paste Component As New")->setEnabled(false);
+		menu->addAction("Paste Component Value")->setEnabled(false);
 		//menu->addAction("Select Material");
 	}
 	auto action = menu->exec(QCursor::pos());
+	return action;
 }
 
 
@@ -430,7 +485,12 @@ void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
     {
         //Object::Destroy(component);
         //componentToBeDestroyed = component;
-		ShowComponentMenu();
+		auto action = ShowComponentMenu();
+		if (action != nullptr && action->text() == "Remove Component")
+		{
+			//Object::Destroy(component);
+			componentToBeDestroyed = component;
+		}
     }
 }
 
@@ -449,14 +509,13 @@ void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 	{
 		//Object::Destroy(component);
 		//componentToBeDestroyed = component;
-		ShowComponentMenu();
+		auto action = ShowComponentMenu();
+        if (action != nullptr && action->text() == "Remove Component")
+        {
+             //Object::Destroy(component);
+             componentToBeDestroyed = component;
+        }
 	}
-
-//        if ( state == UIHeaderState::remove)
-//        {
-//             //Object::Destroy(component);
-//            componentToBeDestroyed = component;
-//        }
 }
 
 void Inspector::BeginComponent(const ComponentPtr &component)

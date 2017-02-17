@@ -26,7 +26,8 @@ namespace FishEngine
 
         ~Shader();
 
-        static void Init();
+		// TODO: ->private
+        static void Init(std::string const & rootDir);
         
         static ShaderPtr CreateFromFile(const Path& path);
 

@@ -7,9 +7,11 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-    std::map<FishEngine::Path, QIcon> AssetDatabase::m_cacheIcons;
+    std::map<FishEngine::Path, QIcon> AssetDatabase::s_cacheIcons;
 
-    Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
+	std::set<std::shared_ptr<FishEngine::Object>> AssetDatabase::s_allAssetObjects;
+
+	Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
     {
         return AssetImporter::s_objectGUIDToPath[guid];
     }
@@ -23,13 +25,13 @@ namespace FishEditor
         {
             return unknown_icon;
         }
-		auto it = m_cacheIcons.find(path);
-		if (it != m_cacheIcons.end())
+		auto it = s_cacheIcons.find(path);
+		if (it != s_cacheIcons.end())
 		{
 			return it->second;
 		}
-		m_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
-		return m_cacheIcons[path];
+		s_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
+		return s_cacheIcons[path];
 	}
 
 	template <>
@@ -39,4 +41,13 @@ namespace FishEditor
 		auto importer = AssetImporter::GetAtPath(path);
 		return AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
 	}
+
+	template <>
+	std::shared_ptr<FishEngine::GameObject> 
+		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
+	{
+		auto importer = AssetImporter::GetAtPath(path);
+		return AssetImporter::s_importerGuidToModel[importer->GetGUID()];
+	}
+
 }

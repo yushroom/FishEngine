@@ -200,10 +200,13 @@ void DefaultScene()
 	transform->setPosition(5, 8, 0);
 	transform->setLocalEulerAngles(30, -90, 0);
 #else
-	GameObject::CreatePrimitive(PrimitiveType::Cube);
+	//GameObject::CreatePrimitive(PrimitiveType::Cube);
+	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>(R"(D:\FishEngine\Projects\Sponza\Assets\testFBX.fbx)");
+	Scene::AddGameObject(model);
 #endif
 
 #endif
+
 }
 
     //bool MainEditor::m_inPlayMode = false;
@@ -292,4 +295,9 @@ void DefaultScene()
     void MainEditor::Clean()
     {
     }
+
+	void MainEditor::NewScene()
+	{
+
+	}
 }

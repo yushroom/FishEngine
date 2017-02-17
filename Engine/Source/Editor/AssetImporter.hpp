@@ -26,7 +26,7 @@ namespace FishEditor
 		void SetAssetBundleNameAndVariant(std::string const & assetBundleName, std::string const & assetBundleVariant);
 		
 		// Retrieves the asset importer for the asset at path.
-		static AssetImporterPtr GetAtPath(FishEngine::Path const & path);
+		static AssetImporterPtr GetAtPath(FishEngine::Path path);
 		
 	protected:
 

@@ -73,8 +73,8 @@ namespace FishEngine
     
     void MeshRenderer::OnDrawGizmosSelected()
     {
-        Gizmos::setColor(Color::blue);
-        auto b = bounds();
-        Gizmos::DrawWireCube(b.center(), b.size());
+        //Gizmos::setColor(Color::blue);
+        //auto b = bounds();
+        //Gizmos::DrawWireCube(b.center(), b.size());
     }
 }

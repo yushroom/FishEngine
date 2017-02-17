@@ -23,7 +23,10 @@ protected:
 private:
     //bool eventFilter(QObject *watched, QEvent *event);
     void Init();
+	
+	bool CloseCurrentScene();
 
+	void NewScene();
     void SaveSceneAs();
 
     Ui::MainWindow *ui;

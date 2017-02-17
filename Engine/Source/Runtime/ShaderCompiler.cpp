@@ -26,6 +26,8 @@ namespace FishEngine
 
     std::map<std::string, std::string> ShaderCompiler::s_cachedHeaders;
 
+	Path ShaderCompiler::s_shaderIncludeDir;
+
     std::string ShaderCompiler::PreprocessShaderFile(const Path& path)
     {
         if (path.extension() == ".inc")
@@ -94,7 +96,7 @@ namespace FishEngine
                 auto header = tok.substr(1, tok.size() - 2);
                 //cout << "include " << header << " " << is_system_include << endl;
                 Path header_path = is_system_include ?
-                    (Resources::shaderHeaderDirectory() / header) : (localDir / header);
+                    (s_shaderIncludeDir / header) : (localDir / header);
                 m_includeDepth++;
                 string parsed_header_text = PreprocessShaderFile(header_path);
                 //out_parsedShaderText += shaderText.substr(begin_of_this_tok, begin-begin_of_this_tok);

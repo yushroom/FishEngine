@@ -113,7 +113,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QListView" name="listView">
+        <widget class="ProjectListView" name="listView">
          <property name="editTriggers">
           <set>QAbstractItemView::EditKeyPressed</set>
          </property>
@@ -165,6 +165,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ProjectListView</class>
+   <extends>QListView</extends>
+   <header>UI/ProjectListView.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

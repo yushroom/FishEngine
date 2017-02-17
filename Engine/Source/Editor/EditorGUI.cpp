@@ -116,7 +116,7 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 }
 
 
-ComponentPtr componentToBeDestroyed;
+//ComponentPtr componentToBeDestroyed;
 
 void EditorGUI::Begin()
 {

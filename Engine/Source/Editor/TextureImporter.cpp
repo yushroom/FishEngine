@@ -292,7 +292,7 @@ namespace FishEditor
 			texture->m_data.resize(length);
 			std::copy(data, data + length, texture->m_data.begin());
 			
-			AssetDatabase::m_cacheIcons[path] = QIcon(QPixmap::fromImage(std::move(image)));
+			AssetDatabase::s_cacheIcons[path] = QIcon(QPixmap::fromImage(std::move(image)));
 			//AssetDatabase::m_cacheIcons.emplace({ path, QIcon(QPixmap::fromImage(std::move(image))) });
 			return texture;
 #else

@@ -22,6 +22,9 @@ ProjectView::ProjectView(QWidget *parent) :
     ui->setupUi(this);
 
 	ui->listView->setResizeMode(QListView::Adjust);
+	ui->listView->setDragEnabled(true);
+	ui->listView->viewport()->setAcceptDrops(true);
+	ui->listView->setDropIndicatorShown(true);
 
     dirModel = new ProjectViewDirModel(this);
     //dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);

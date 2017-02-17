@@ -40,12 +40,6 @@ float getScaleForConstantSizeGeometry(const Vector3& center, float targetScale)
 
 void Gizmos::Init()
 {
-#if FISHENGINE_PLATFORM_WINDOWS
-    const std::string root_dir = "D:/program/FishEngine/Assets/";
-#else
-    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/";
-#endif
-    
 #if 0
     TextureImporter importer;
     cameraGizmoTexture = importer.FromFile(root_dir + "textures/Gizmos/camera.png");

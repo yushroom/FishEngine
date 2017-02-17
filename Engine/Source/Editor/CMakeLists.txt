@@ -35,27 +35,32 @@ SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
 SOURCE_GROUP( UI    FILES ${UI_SRCS}    )
 SOURCE_GROUP( MOC   FILES ${MOC_SRCS}   )
 
+
 SET( ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../assets)
-FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt)
-FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png)
 SET( SHADER_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Shaders)
-FILE( GLOB Shader_headers ${SHADER_DIR}/include/*.inc)
-FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.*)
-FILE( GLOB Shaders ${SHADER_DIR}/*.*)
-#FILE( GLOB Gizmos ${SHADER_DIR}/Textures/Gizmos/*.png)
-SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders})
+IF( NOT WIN32 )
+    FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt)
+    FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png)
+    FILE( GLOB Shader_headers ${SHADER_DIR}/include/*.inc)
+    FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.*)
+    FILE( GLOB Shaders ${SHADER_DIR}/*.*)
+    SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders})
+ENDIF()
 
 add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources} resources.qrc ${RESOURCE_FILES})
 
-SET_SOURCE_FILES_PROPERTIES(${Models} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Models)
-SET_SOURCE_FILES_PROPERTIES(${Gizmos} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Textures/Gizmos)
-SET_SOURCE_FILES_PROPERTIES(${Shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders)
-SET_SOURCE_FILES_PROPERTIES(${Shader_headers} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/include)
-SET_SOURCE_FILES_PROPERTIES(${Editor_shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/Editor)
+IF( NOT WIN32 )
+    SET_SOURCE_FILES_PROPERTIES(${Models} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Models)
+    SET_SOURCE_FILES_PROPERTIES(${Gizmos} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Textures/Gizmos)
+    SET_SOURCE_FILES_PROPERTIES(${Shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders)
+    SET_SOURCE_FILES_PROPERTIES(${Shader_headers} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/include)
+    SET_SOURCE_FILES_PROPERTIES(${Editor_shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/Editor)
+ENDIF()
 
-
-# target_link_libraries(FishEditor filesystem)
-# target_link_libraries(FishEditor system)
+IF( WIN32 )
+    target_link_libraries(FishEditor filesystem)
+    target_link_libraries(FishEditor system)
+ENDIF()
 target_link_libraries(FishEditor FishEngine)
 target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)
@@ -63,6 +68,7 @@ target_link_libraries(FishEditor ${PhysXSDK_LIBRARIES})
 target_link_libraries(FishEditor ${Boost_LIBRARIES})
 
 if (MSVC)
+    target_link_libraries(FishEditor ${FBXSDK_LIB})
     target_link_libraries(FishEditor opengl32.lib)
     target_link_libraries(FishEditor glew_s)
 else()
@@ -112,5 +118,13 @@ if( WIN32 )
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PhysX_BIN_DIR}/nvToolsExt64_1.dll $<TARGET_FILE_DIR:FishEditor>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CommonCHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
+    )
+
+    add_custom_command(TARGET FishEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:FishEditor>/Resources
+    )
+
+    add_custom_command(TARGET FishEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} $<TARGET_FILE_DIR:FishEditor>/Shaders
     )
 endif()

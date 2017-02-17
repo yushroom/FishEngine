@@ -79,26 +79,26 @@ namespace FishEngine
 		m_triangleCount = indexBuffer.size() / 3;
     }
 
-    Mesh::Mesh(Mesh&& m)
-    {
-        m_positionBuffer = std::move(m.m_positionBuffer);
-        m_normalBuffer = std::move(m.m_normalBuffer);
-        m_uvBuffer = std::move(m.m_uvBuffer);
-        m_tangentBuffer = std::move(m.m_tangentBuffer);
-        m_indexBuffer = std::move(m.m_indexBuffer);
-        m_VAO = m.m_VAO;
-        m_indexVBO = m.m_indexVBO;
-        m_positionVBO = m.m_positionVBO;
-        m_normalVBO = m.m_normalVBO;
-        m_uvVBO = m.m_uvVBO;
-        m_tangentVBO = m.m_tangentVBO;
-        m.m_VAO = 0;
-        m.m_indexVBO = 0;
-        m.m_positionVBO = 0;
-        m.m_normalVBO = 0;
-        m.m_uvVBO = 0;
-        m.m_tangentVBO = 0;
-    }
+    //Mesh::Mesh(Mesh&& m)
+    //{
+    //    m_positionBuffer = std::move(m.m_positionBuffer);
+    //    m_normalBuffer = std::move(m.m_normalBuffer);
+    //    m_uvBuffer = std::move(m.m_uvBuffer);
+    //    m_tangentBuffer = std::move(m.m_tangentBuffer);
+    //    m_indexBuffer = std::move(m.m_indexBuffer);
+    //    m_VAO = m.m_VAO;
+    //    m_indexVBO = m.m_indexVBO;
+    //    m_positionVBO = m.m_positionVBO;
+    //    m_normalVBO = m.m_normalVBO;
+    //    m_uvVBO = m.m_uvVBO;
+    //    m_tangentVBO = m.m_tangentVBO;
+    //    m.m_VAO = 0;
+    //    m.m_indexVBO = 0;
+    //    m.m_positionVBO = 0;
+    //    m.m_normalVBO = 0;
+    //    m.m_uvVBO = 0;
+    //    m.m_tangentVBO = 0;
+    //}
 
 
     //Mesh::Mesh(const std::string& objModelPath, int vertexUsage)
@@ -148,11 +148,9 @@ namespace FishEngine
 
     void Mesh::Render()
     {
-        //if (!m_uploaded)
-        //{
-        //    UploadMeshData();
-        //}
-        assert(m_uploaded);
+        //assert(m_uploaded);
+		if (m_uploaded)
+			UploadMeshData();
         glBindVertexArray(m_VAO);
         glDrawElements(GL_TRIANGLES, m_triangleCount*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
@@ -226,9 +224,9 @@ namespace FishEngine
 		return mesh;
 	}
 
-	void Mesh::Init()
+	void Mesh::Init(std::string const & rootDir)
 	{
-		auto dir = Resources::modelRootDirectory();
+		Path dir = rootDir;
 
 		for (auto & t : {PrimitiveType::Sphere, PrimitiveType::Capsule, PrimitiveType::Cylinder, PrimitiveType::Quad, PrimitiveType::Cube, PrimitiveType::Plane, PrimitiveType::Cone})
 		{

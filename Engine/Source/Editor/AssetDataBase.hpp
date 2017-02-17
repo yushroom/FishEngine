@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <Resources.hpp>
 #include <QIcon>
 #include <ReflectClass.hpp>
@@ -58,11 +59,18 @@ namespace FishEditor
 		template <class T>
 		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path);
 
-        static std::map<FishEngine::Path, QIcon> m_cacheIcons;
+        static std::map<FishEngine::Path, QIcon> s_cacheIcons;
+
+		static std::set<std::shared_ptr<FishEngine::Object>> s_allAssetObjects;
     };
 
+	// texture
 	template <>
 	std::shared_ptr<FishEngine::Texture> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
+
+	// 3d model
+	template <>
+	std::shared_ptr<FishEngine::GameObject> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
 
 	//template <>
 	//static std::shared_ptr<Texture> AssetDatabase::LoadAssetAtPath(Path const & path);

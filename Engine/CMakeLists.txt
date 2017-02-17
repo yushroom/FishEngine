@@ -25,19 +25,36 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #message("lib output directory: " ${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE})
 
 #boost
-set(Boost_USE_STATIC_LIBS       ON) # find static libs
-set(Boost_USE_MULTITHREADED     ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
-include_directories(${Boost_INCLUDE_DIRS})
+IF(WIN32)
+	ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
+	ADD_SUBDIRECTORY(./ThirdParty/boost/cmake)
+	include_directories(${Boost_INCLUDE_DIRS})
+	message("Boost root dir: " ${Boost_INCLUDE_DIRS})
+	link_directories(${Boost_LIBRARY_DIRS})
+	message("Boost lib dir: " ${Boost_LIBRARY_DIRS})
+ELSE()
+	set(Boost_USE_STATIC_LIBS       ON) # find static libs
+	set(Boost_USE_MULTITHREADED     ON)
+	set(Boost_USE_STATIC_RUNTIME    OFF)
+	find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
+	include_directories(${Boost_INCLUDE_DIRS})
+ENDIF()
 
+# Autodesk FBX sdk
+SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
+include_directories( ${FBXSDK_DIR}/include )
+SET( FBXSDK_LIB_DIR ${FBXSDK_DIR}/lib/vs2015/x64 )
+SET( FBXSDK_LIB_DEBUG ${FBXSDK_LIB_DIR}/debug/libfbxsdk-md.lib )
+SET( FBXSDK_LIB_RELEASE ${FBXSDK_LIB_DIR}/release/libfbxsdk-md.lib )
+SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
 
-# ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
-# ADD_SUBDIRECTORY(./ThirdParty/boost/cmake)
-# include_directories(${Boost_INCLUDE_DIRS})
-# message("Boost root dir: " ${Boost_INCLUDE_DIRS})
-# link_directories(${Boost_LIBRARY_DIRS})
-# message("Boost lib dir: " ${Boost_LIBRARY_DIRS})
+IF(NOT EXISTS ${FBXSDK_LIB_DEBUG})
+    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_DEBUG} not found")
+ENDIF ()
+
+IF(NOT EXISTS ${FBXSDK_LIB_RELEASE})
+    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_RELEASE} not found")
+ENDIF ()
 
 
 include_directories(./Source/Runtime)

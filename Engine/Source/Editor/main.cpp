@@ -1,6 +1,7 @@
 #include "UI/MainWindow.hpp"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "UI/OpenProjectDialog.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,14 @@ int main(int argc, char *argv[])
     format.setProfile(QSurfaceFormat::CoreProfile);
     //format.setSamples(4);
     QSurfaceFormat::setDefaultFormat(format);
+
+	OpenProjectDialog dialog;
+	int result = dialog.exec();
+	if (result == 0)
+	{
+		return 0;
+	}
+
     MainWindow w;
     w.show();
 

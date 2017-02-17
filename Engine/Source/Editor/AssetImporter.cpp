@@ -1,6 +1,10 @@
 #include "AssetImporter.hpp"
+
+#include <GameObject.hpp>
+
 //#include "AssetDataBase.hpp"
 #include "TextureImporter.hpp"
+#include "FBXImporter.hpp"
 #include <Timer.hpp>
 
 #include <Serialization.hpp>
@@ -63,8 +67,9 @@ namespace FishEditor
 		return importer;
 	}
 
-	std::shared_ptr<AssetImporter> AssetImporter::GetAtPath(Path const & path)
+	std::shared_ptr<AssetImporter> AssetImporter::GetAtPath(Path path)
 	{
+		path.make_preferred();
 		auto const & it = s_pathToImpoter.find(path);
 		if (it != s_pathToImpoter.end())
 		{
@@ -88,9 +93,22 @@ namespace FishEditor
 			//t.StopAndPrint();
 			return importer;
 		}
+		else if (ext == ".fbx" || ext == ".FBX")
+		{
+			//auto importer = std::make_shared<FBXImporter>();
+			auto importer = GetAssetImporter<FBXImporter>(path);
+			s_pathToImpoter[path] = importer;
+			auto model = importer->Load(path);
+			model->setName(path.stem().string());
+			s_objectGUIDToPath[model->GetGUID()] = path;
+			s_importerGuidToModel[importer->GetGUID()] = model;
+			return importer;
+		}
 
 		return nullptr;
 	}
+
+	std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> AssetImporter::s_importerGuidToModel;
 
 	std::map<boost::uuids::uuid, boost::filesystem::path> AssetImporter::s_objectGUIDToPath;
 

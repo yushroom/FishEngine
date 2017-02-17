@@ -7,6 +7,7 @@ using namespace FishEngine;
 
 class InspectorWidget;
 class MainWindow;
+class QAction;
 
 namespace FishEditor
 {
@@ -38,7 +39,7 @@ namespace FishEditor
         static void OnInspectorGUI(std::shared_ptr<T> const & component);
 
         static std::string ShowAddComponentMenu();
-		static void ShowComponentMenu();
+		static QAction* ShowComponentMenu();
 
     private:
         friend class ::MainWindow;
@@ -47,16 +48,16 @@ namespace FishEditor
 
         static InspectorWidget* s_inspectorWidget;
 
+		static std::weak_ptr<FishEngine::Component> s_targetComponent;
+
     public:
         static void BeginComponent(FishEngine::ComponentPtr const & component);
 
         static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 
-        // for component derived from behaviour
         template<class T, std::enable_if_t<can_be_enabled<T>::value, int> = 0>
         static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 
-        // for component not derived from behaviour
         template<class T, std::enable_if_t<!can_be_enabled<T>::value, int> = 0>
         static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 

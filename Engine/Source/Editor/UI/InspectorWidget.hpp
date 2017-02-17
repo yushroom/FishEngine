@@ -14,6 +14,7 @@ namespace FishEditor
 {
     class Inspector;
 	class TextureImporter;
+	class ModelImporter;
 }
 
 namespace FishEngine
@@ -32,6 +33,7 @@ public:
     void Bind(std::shared_ptr<FishEngine::Object> obj);
     void Bind(std::shared_ptr<FishEngine::GameObject> go);
 	void Bind(std::shared_ptr<FishEditor::TextureImporter> importer);
+	void Bind(std::shared_ptr<FishEditor::ModelImporter> importer);
 
     virtual QSize sizeHint() const override
     {

@@ -78,7 +78,7 @@ namespace FishEditor
             return m_dirChildren;
         }
 
-        static void SetAssetRootPath(std::string const & path);
+        static void SetAssetRootPath(Path const & path);
         static FileInfo* assetRoot() { return s_assetRoot; }
         static FileInfo* fileInfo(std::string const & path);
         static void UpdateThumbnail();

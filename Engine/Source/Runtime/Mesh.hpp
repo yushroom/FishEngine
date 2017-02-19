@@ -9,6 +9,14 @@
 #include "ReflectClass.hpp"
 #include "PrimitiveType.hpp"
 
+#include "Vector3.hpp"
+#include "Vector2.hpp"
+
+namespace FishEditor
+{
+	class FBXImporter;
+}
+
 namespace FishEngine
 {
     static constexpr int MaxBoneForEachVertex = 4;
@@ -54,11 +62,11 @@ namespace FishEngine
         //Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
         //Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
         //Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
-        Mesh(std::vector<float>      && positionBuffer,
-             std::vector<float>      && normalBuffer,
-             std::vector<float>      && uvBuffer,
-             std::vector<float>      && tangentBuffer,
-             std::vector<uint32_t>   && indexBuffer);
+        Mesh(std::vector<Vector3>	&& vertices,
+             std::vector<Vector3>	&& normals,
+             std::vector<Vector2>	&& uv,
+             std::vector<Vector3>	&& tangents,
+             std::vector<uint32_t>	&& triangles);
 
         Mesh(const Mesh&) = delete;
         void operator=(const Mesh&) = delete;
@@ -73,14 +81,15 @@ namespace FishEngine
             return m_isReadable;
         }
 
-        uint32_t vertexCount()
+        uint32_t vertexCount() const
         {
-            if (m_vertexCount == 0)
-            {
-                m_vertexCount = static_cast<uint32_t>(m_indexBuffer.size() / 3);
-            }
             return m_vertexCount;
         }
+		
+		uint32_t triangles() const
+		{
+			return m_triangleCount;
+		}
 
         // Upload previously done Mesh modifications to the graphics API.
         // <param name="markNoLongerReadable">Frees up system memory copy of mesh data when set to true.</param>
@@ -117,26 +126,31 @@ namespace FishEngine
 		static void Init(std::string const & rootDir);
 		static MeshPtr builtinMesh(const PrimitiveType type);
 		
+	public:
+		std::vector<Vector3>    m_vertices;
+		std::vector<Vector3>    m_normals;
+		std::vector<Vector2>    m_uv;
+		std::vector<Vector3>    m_tangents;
+		std::vector<uint32_t>   m_triangles;
+//		std::vector<Int4>       m_boneIndexBuffer;
+//		std::vector<Vector4>    m_boneWeightBuffer;
+		
+		std::map<std::string, int> m_boneNameToIndex;
+		
+		std::vector<Matrix4x4>  m_bindposes;
+		
+		Meta(NonSerializable)
+		std::vector<BoneWeight> m_boneWeights;
+		
     private:
         friend class FishEditor::Inspector;
         friend class FishEditor::ModelImporter;
+		friend class FishEditor::FBXImporter;
         friend class MeshRenderer;
         friend class SkinnedMeshRenderer;
 		//friend class Model;
 
 		static std::map<PrimitiveType, MeshPtr> s_builtinMeshes;
-
-//        enum class InternalShaderChannel
-//        {
-//            Vertex,
-//            Normal,
-//            //Color,
-//            TexCoord0,
-//            //TexCoord1,
-//            //TexCoord2,
-//            //TexCoord3,
-//            Tangent
-//        };
 
         bool m_isReadable = false;
         bool m_uploaded = false;
@@ -144,21 +158,6 @@ namespace FishEngine
         uint32_t m_triangleCount = 0;
 
         Bounds m_bounds;
-
-        std::vector<float>      m_positionBuffer;
-        std::vector<float>      m_normalBuffer;
-        std::vector<float>      m_uvBuffer;
-        std::vector<float>      m_tangentBuffer;
-        std::vector<uint32_t>   m_indexBuffer;
-        std::vector<Int4>       m_boneIndexBuffer;
-        std::vector<Vector4>    m_boneWeightBuffer;
-
-        std::map<std::string, int> m_boneNameToIndex;
-
-        std::vector<Matrix4x4>  m_bindposes;
-
-		Meta(NonSerializable)
-        std::vector<BoneWeight> m_boneWeights;
 
 		Meta(NonSerializable)
         GLuint m_VAO			= 0;

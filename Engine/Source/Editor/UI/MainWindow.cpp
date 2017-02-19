@@ -141,7 +141,7 @@ void MainWindow::NewScene()
 void MainWindow::SaveSceneAs()
 {
     //options |= QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
-    QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath());
+    QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath().string());
     path = QFileDialog::getSaveFileName(this, "Save Scene", path, "Scene (*.scene)");
     if (path.isEmpty())
         return;

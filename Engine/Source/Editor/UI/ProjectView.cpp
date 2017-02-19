@@ -50,7 +50,7 @@ ProjectView::ProjectView(QWidget *parent) :
     //SetRootPath(cwd.absolutePath());
     //const char * rootPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
     auto const & rootPath = FishEngine::Applicaiton::dataPath();
-    SetRootPath(QString::fromStdString(rootPath));
+    SetRootPath(QString::fromStdString(rootPath.string()));
 
     connect(ui->dirTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnDirTreeViewSelectionChanged);
     connect(ui->listView, &QListView::doubleClicked, this, &ProjectView::OnListTreeViewDoubleClicked);

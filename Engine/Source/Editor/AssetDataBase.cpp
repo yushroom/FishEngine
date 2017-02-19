@@ -2,6 +2,7 @@
 #include <Debug.hpp>
 #include <Texture.hpp>
 #include <AssetImporter.hpp>
+#include <Application.hpp>
 
 using namespace FishEngine;
 
@@ -38,7 +39,12 @@ namespace FishEditor
 	std::shared_ptr<Texture>
 		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
 	{
-		auto importer = AssetImporter::GetAtPath(path);
+		auto p = FishEngine::Applicaiton::dataPath().parent_path() / path;
+		if (!boost::filesystem::exists(p))
+		{
+			return nullptr;
+		}
+		auto importer = AssetImporter::GetAtPath(p);
 		return AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
 	}
 
@@ -46,7 +52,12 @@ namespace FishEditor
 	std::shared_ptr<FishEngine::GameObject> 
 		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
 	{
-		auto importer = AssetImporter::GetAtPath(path);
+		auto p = FishEngine::Applicaiton::dataPath().parent_path() / path;
+		if (!boost::filesystem::exists(p))
+		{
+			return nullptr;
+		}
+		auto importer = AssetImporter::GetAtPath(p);
 		return AssetImporter::s_importerGuidToModel[importer->GetGUID()];
 	}
 

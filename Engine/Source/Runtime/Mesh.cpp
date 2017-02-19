@@ -45,47 +45,51 @@ namespace FishEngine
     //std::map<std::string, Mesh::PMesh> Mesh::m_meshes;
 
     //Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices)
-    //    : m_positionBuffer(positions, positions + n_vertex * 3),
-    //    m_indexBuffer(indices, indices + n_face * 3)
+    //    : m_vertices(positions, positions + n_vertex * 3),
+    //    m_triangles(indices, indices + n_face * 3)
     //{
     //    GenerateBuffer((int)VertexUsage::Position);
     //    BindBuffer((int)VertexUsage::Position);
     //}
 
     //Mesh::Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer)
-    //    : m_positionBuffer(position_buffer), m_indexBuffer(index_buffer)
+    //    : m_vertices(position_buffer), m_triangles(index_buffer)
     //{
     //    GenerateBuffer((int)VertexUsage::Position);
     //    BindBuffer((int)VertexUsage::Position);
     //}
 
     //Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices)
-    //    : m_positionBuffer(positions, positions + n_vertex * 3),
-    //    m_normalBuffer(normals, normals + n_vertex * 3),
-    //    m_indexBuffer(indices, indices + n_face * 3)
+    //    : m_vertices(positions, positions + n_vertex * 3),
+    //    m_normals(normals, normals + n_vertex * 3),
+    //    m_triangles(indices, indices + n_face * 3)
     //{
     //    GenerateBuffer((int)VertexUsage::PN);
     //    BindBuffer((int)VertexUsage::PN);
     //}
 
-    Mesh::Mesh(std::vector<float> &&positionBuffer, std::vector<float> &&normalBuffer, std::vector<float> &&uvBuffer, std::vector<float> &&tangentBuffer, std::vector<uint32_t> &&indexBuffer)
-        : m_positionBuffer(positionBuffer),
-          m_normalBuffer(normalBuffer),
-          m_uvBuffer(uvBuffer),
-          m_tangentBuffer(tangentBuffer),
-          m_indexBuffer(indexBuffer)
+	Mesh::Mesh(std::vector<Vector3>	&& vertices,
+		 std::vector<Vector3>	&& normals,
+		 std::vector<Vector2>	&& uv,
+		 std::vector<Vector3>	&& tangents,
+		 std::vector<uint32_t>	&& triangles)
+        : m_vertices(vertices),
+          m_normals(normals),
+          m_uv(uv),
+          m_tangents(tangents),
+          m_triangles(triangles)
     {
-		m_vertexCount = positionBuffer.size() / 3;
-		m_triangleCount = indexBuffer.size() / 3;
+		m_vertexCount = vertices.size();
+		m_triangleCount = triangles.size() / 3;
     }
 
     //Mesh::Mesh(Mesh&& m)
     //{
-    //    m_positionBuffer = std::move(m.m_positionBuffer);
-    //    m_normalBuffer = std::move(m.m_normalBuffer);
-    //    m_uvBuffer = std::move(m.m_uvBuffer);
-    //    m_tangentBuffer = std::move(m.m_tangentBuffer);
-    //    m_indexBuffer = std::move(m.m_indexBuffer);
+    //    m_vertices = std::move(m.m_vertices);
+    //    m_normals = std::move(m.m_normals);
+    //    m_uv = std::move(m.m_uv);
+    //    m_tangents = std::move(m.m_tangents);
+    //    m_triangles = std::move(m.m_triangles);
     //    m_VAO = m.m_VAO;
     //    m_indexVBO = m.m_indexVBO;
     //    m_positionVBO = m.m_positionVBO;
@@ -125,8 +129,8 @@ namespace FishEngine
         BindBuffer();
         glCheckError();
 
-        m_vertexCount = static_cast<uint32_t>(m_positionBuffer.size() / 3);
-        m_triangleCount = static_cast<uint32_t>(m_indexBuffer.size() / 3);
+        //m_vertexCount = static_cast<uint32_t>(m_vertices.size());
+        //m_triangleCount = static_cast<uint32_t>(m_triangles.size() / 3);
         m_isReadable = !markNoLogerReadable;
         if (markNoLogerReadable)
         {
@@ -137,19 +141,20 @@ namespace FishEngine
 
     void Mesh::Clear()
     {
-        m_positionBuffer.clear();
-        m_normalBuffer.clear();
-        m_uvBuffer.clear();
-        m_tangentBuffer.clear();
-        m_indexBuffer.clear();
+        m_vertices.clear();
+        m_normals.clear();
+        m_uv.clear();
+        m_tangents.clear();
+        m_triangles.clear();
         //m_boneIndexBuffer.clear();
         //m_boneWeightBuffer.clear();
+		m_boneWeights.clear();
     }
 
     void Mesh::Render()
     {
         //assert(m_uploaded);
-		if (m_uploaded)
+		if (!m_uploaded)
 			UploadMeshData();
         glBindVertexArray(m_VAO);
         glDrawElements(GL_TRIANGLES, m_triangleCount*3, GL_UNSIGNED_INT, 0);
@@ -160,11 +165,11 @@ namespace FishEngine
     {
 		os.write((char*)&m_vertexCount, sizeof(m_vertexCount));
 		os.write((char*)&m_triangleCount, sizeof(m_triangleCount));
-		os.write((char*)m_positionBuffer.data(), sizeof(decltype(m_positionBuffer)::value_type) * m_positionBuffer.size());
-		os.write((char*)m_normalBuffer.data(), sizeof(decltype(m_normalBuffer)::value_type) * m_normalBuffer.size());
-		os.write((char*)m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * m_uvBuffer.size());
-		os.write((char*)m_tangentBuffer.data(), sizeof(decltype(m_tangentBuffer)::value_type) * m_tangentBuffer.size());
-		os.write((char*)m_indexBuffer.data(), sizeof(decltype(m_indexBuffer)::value_type) * m_indexBuffer.size());
+		os.write((char*)m_vertices.data(), sizeof(decltype(m_vertices)::value_type) * m_vertices.size());
+		os.write((char*)m_normals.data(), sizeof(decltype(m_normals)::value_type) * m_normals.size());
+		os.write((char*)m_uv.data(), sizeof(decltype(m_uv)::value_type) * m_uv.size());
+		os.write((char*)m_tangents.data(), sizeof(decltype(m_tangents)::value_type) * m_tangents.size());
+		os.write((char*)m_triangles.data(), sizeof(decltype(m_triangles)::value_type) * m_triangles.size());
     }
 
     MeshPtr Mesh::FromBinaryFile(std::istream &is)
@@ -172,16 +177,16 @@ namespace FishEngine
 		auto mesh = std::make_shared<Mesh>();
 		is.read((char*)&mesh->m_vertexCount, sizeof(mesh->m_vertexCount));
 		is.read((char*)&mesh->m_triangleCount, sizeof(mesh->m_triangleCount));
-        mesh->m_positionBuffer.resize(mesh->m_vertexCount * 3);
-        mesh->m_normalBuffer.resize(mesh->m_vertexCount * 3);
-        mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
-        mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
-        mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
-		is.read((char*)mesh->m_positionBuffer.data(), sizeof(decltype(mesh->m_positionBuffer)::value_type) * mesh->m_positionBuffer.size());
-		is.read((char*)mesh->m_normalBuffer.data(), sizeof(decltype(m_normalBuffer)::value_type) * mesh->m_normalBuffer.size());
-		is.read((char*)mesh->m_uvBuffer.data(), sizeof(decltype(m_uvBuffer)::value_type) * mesh->m_uvBuffer.size());
-		is.read((char*)mesh->m_tangentBuffer.data(), sizeof(decltype(m_tangentBuffer)::value_type) * mesh->m_tangentBuffer.size());
-		is.read((char*)mesh->m_indexBuffer.data(), sizeof(decltype(m_indexBuffer)::value_type) * mesh->m_indexBuffer.size());
+        mesh->m_vertices.resize(mesh->m_vertexCount);
+        mesh->m_normals.resize(mesh->m_vertexCount);
+        mesh->m_uv.resize(mesh->m_vertexCount);
+        mesh->m_tangents.resize(mesh->m_vertexCount);
+        mesh->m_triangles.resize(mesh->m_triangleCount * 3);
+		is.read((char*)mesh->m_vertices.data(), sizeof(decltype(mesh->m_vertices)::value_type) * mesh->m_vertices.size());
+		is.read((char*)mesh->m_normals.data(), sizeof(decltype(m_normals)::value_type) * mesh->m_normals.size());
+		is.read((char*)mesh->m_uv.data(), sizeof(decltype(m_uv)::value_type) * mesh->m_uv.size());
+		is.read((char*)mesh->m_tangents.data(), sizeof(decltype(m_tangents)::value_type) * mesh->m_tangents.size());
+		is.read((char*)mesh->m_triangles.data(), sizeof(decltype(m_triangles)::value_type) * mesh->m_triangles.size());
 		return mesh;
     }
 
@@ -189,11 +194,11 @@ namespace FishEngine
 	{
 		auto mesh = std::make_shared<Mesh>();
 		is >> mesh->m_vertexCount >> mesh->m_triangleCount;
-		mesh->m_positionBuffer.resize(mesh->m_vertexCount * 3);
-		mesh->m_normalBuffer.resize(mesh->m_vertexCount * 3);
-		mesh->m_uvBuffer.resize(mesh->m_vertexCount * 2);
-		mesh->m_tangentBuffer.resize(mesh->m_vertexCount * 3);
-		mesh->m_indexBuffer.resize(mesh->m_triangleCount * 3);
+		mesh->m_vertices.resize(mesh->m_vertexCount);
+		mesh->m_normals.resize(mesh->m_vertexCount);
+		mesh->m_uv.resize(mesh->m_vertexCount);
+		mesh->m_tangents.resize(mesh->m_vertexCount);
+		mesh->m_triangles.resize(mesh->m_triangleCount * 3);
 		float vx, vy, vz;
 		Vector3 vmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
 		Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
@@ -206,20 +211,21 @@ namespace FishEngine
 			if (vmax.x < vx) vmax.x = vx;
 			if (vmax.y < vy) vmax.y = vy;
 			if (vmax.z < vz) vmax.z = vz;
-			mesh->m_positionBuffer[i * 3] = vx;
-			mesh->m_positionBuffer[i * 3 + 1] = vy;
-			mesh->m_positionBuffer[i * 3 + 2] = vz;
+			auto & v = mesh->m_vertices[i];
+			v.x = vx;
+			v.y = vy;
+			v.z = vz;
 		}
 		mesh->m_bounds.SetMinMax(vmin, vmax);
-		//for (auto & f : mesh->m_positionBuffer)
+		//for (auto & f : mesh->m_vertices)
 		//	is >> f;
-		for (auto & f : mesh->m_normalBuffer)
-			is >> f;
-		for (auto & f : mesh->m_uvBuffer)
-			is >> f;
-		for (auto & f : mesh->m_tangentBuffer)
-			is >> f;
-		for (auto & f : mesh->m_indexBuffer)
+		for (auto & f : mesh->m_normals)
+			is >> f.x >> f.y >> f.z;
+		for (auto & f : mesh->m_uv)
+			is >> f.x >> f.y;
+		for (auto & f : mesh->m_tangents)
+			is >> f.x >> f.y >> f.z;
+		for (auto & f : mesh->m_triangles)
 			is >> f;
 		return mesh;
 	}
@@ -238,10 +244,10 @@ namespace FishEngine
 		}
 
 		{
-			std::vector<float> p = { -1,-1,0,  1,-1,0,  -1,1,0,  1,1,0 };
-			std::vector<float> n = { 0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1 };
-			std::vector<float> uv = { 0,1,  1,1,  0,0,  1,0 };
-			std::vector<float> t = { 1,0,0,  1,0,0,  1,0,0,  1,0,0 };
+			std::vector<Vector3> p = { {-1,-1,0},  {1,-1,0},  {-1,1,0},  {1,1,0} };
+			std::vector<Vector3> n = { {0,0,-1},  {0,0,-1},  {0,0,-1},  {0,0,-1} };
+			std::vector<Vector2> uv = { {0,1},  {1,1},  {0,0},  {1,0} };
+			std::vector<Vector3> t = { {1,0,0},  {1,0,0},  {1,0,0},  {1,0,0} };
 			std::vector<uint32_t> index = { 2,1,0,  3,1,2 };
 			auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
 			mesh->setName("ScreenAlignedQuad");
@@ -261,7 +267,7 @@ namespace FishEngine
 
 	//void Model::renderPatch(const Shader &shader) {
     //    glBindVertexArray(m_VAO);
-    //    glDrawElements(GL_PATCHES, (GLsizei)m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+    //    glDrawElements(GL_PATCHES, (GLsizei)m_triangles.size(), GL_UNSIGNED_INT, 0);
     //    glBindVertexArray(0);
     //}
 
@@ -274,28 +280,28 @@ namespace FishEngine
         // index vbo
         glGenBuffers(1, &m_indexVBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer.size() * 4, m_indexBuffer.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_triangles.size() * 4, m_triangles.data(), GL_STATIC_DRAW);
 
         glGenBuffers(1, &m_positionVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
-        glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size() * 4, m_positionBuffer.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, m_vertices.data(), GL_STATIC_DRAW);
 
         //if (vertexUsage & (int)VertexUsage::Normal) {
             glGenBuffers(1, &m_normalVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_normalBuffer.size() * 4, m_normalBuffer.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, m_normals.size() * 3 * 4, m_normals.data(), GL_STATIC_DRAW);
         //}
 
         //if (vertexUsage & (int)VertexUsage::UV) {
             glGenBuffers(1, &m_uvVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_uvBuffer.size() * 4, m_uvBuffer.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
         //}
 
         //if (vertexUsage & (int)VertexUsage::Tangent) {
             glGenBuffers(1, &m_tangentVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_tangentBuffer.size() * 4, m_tangentBuffer.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);
         //}
 
         if (m_skinned) {
@@ -306,15 +312,26 @@ namespace FishEngine
             ////glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
             //glGenBuffers(1, &m_animationOutputVBO);
             //glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputVBO);
-            //glBufferData(GL_ARRAY_BUFFER, m_positionBuffer.size() * 4, NULL, GL_DYNAMIC_COPY);
+            //glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 4, NULL, GL_DYNAMIC_COPY);
             ////glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputVAO); //bind as TF output
 
+			std::vector<Int4> boneIndexBuffer;
+			boneIndexBuffer.reserve(m_boneWeights.size());
+			std::vector<Vector4> boneWeightBuffer;
+			boneIndexBuffer.reserve(m_boneWeights.size());
+			
+			for (auto const & b : m_boneWeights)
+			{
+				boneIndexBuffer.emplace_back(b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]);
+				boneWeightBuffer.emplace_back(b.weight[0], b.weight[1], b.weight[2], b.weight[3]);
+			}
+			
             glGenBuffers(1, &m_boneIndexVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_boneIndexBuffer.size() * 4 * sizeof(int), m_boneIndexBuffer.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, boneIndexBuffer.size() * 4 * sizeof(int), boneIndexBuffer.data(), GL_STATIC_DRAW);
             glGenBuffers(1, &m_boneWeightVBO);
             glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_boneWeightBuffer.size() * 4 * sizeof(float), m_boneWeightBuffer.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(float), boneWeightBuffer.data(), GL_STATIC_DRAW);
         }
     }
 

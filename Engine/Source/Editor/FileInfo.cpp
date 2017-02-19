@@ -3,6 +3,7 @@
 #include "AssetImporter.hpp"
 #include "TextureImporter.hpp"
 #include "AssetDataBase.hpp"
+#include <Application.hpp>
 
 #include <QImage>
 #include <QIcon>
@@ -14,7 +15,7 @@ namespace FishEditor
     std::map<std::string, FileInfo*> FileInfo::s_nameToNode;
     FileInfo * FileInfo::s_assetRoot = nullptr;
 
-    void FileInfo::SetAssetRootPath(const std::string &path)
+    void FileInfo::SetAssetRootPath(const Path &path)
     {
         assert(boost::filesystem::is_directory(path));
         s_assetRoot = new FileInfo();
@@ -86,11 +87,12 @@ namespace FishEditor
             {
                 m_fileChildren.emplace_back(fileNode);
                 fileNode->m_isDirectory = false;
+				auto relative_path = boost::filesystem::relative(p, FishEngine::Applicaiton::dataPath().parent_path());
 #if 1
 				auto ext = p.extension();
 				if (Resources::GetAssetType(ext) == AssetType::Texture)
 				{
-					auto texture = AssetDatabase::LoadAssetAtPath<Texture>(p);
+					auto texture = AssetDatabase::LoadAssetAtPath<Texture>(relative_path);
 					//auto importer = AssetImporter::GetAtPath(p);
 					//auto texture = AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
 					//auto data = texture->rawdata().data();
@@ -98,7 +100,7 @@ namespace FishEditor
 				}
 				else if (ext == ".fbx" || ext == ".FBX")
 				{
-					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(p);
+					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(relative_path);
 				}
 #endif
             }

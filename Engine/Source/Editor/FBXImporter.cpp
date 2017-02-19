@@ -5,10 +5,12 @@
 
 #include <Debug.hpp>
 #include <GameObject.hpp>
-#include "AssetDataBase.hpp"
-
 #include <MeshFilter.hpp>
 #include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
+
+#include "AssetDataBase.hpp"
+#include "private/RawMesh.hpp"
 
 using namespace FishEngine;
 
@@ -68,7 +70,75 @@ void PrintAttribute(FbxNodeAttribute* pAttribute)
 	printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
 }
 
-MeshPtr MeshFromFbxMesh(FbxMesh* fbxMesh)
+//void ConvertMapping(FbxGeometryElementUV *pUVs, FbxMesh *pMesh)
+//{
+//	if (pUVs->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+//	{
+//		if (pUVs->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+//		{
+//			FbxSet<<#typename Type#>>
+//		}
+//	}
+//}
+
+// skinned data
+void FishEditor::FBXImporter::GetLinkData(FbxMesh* pGeometry, MeshPtr mesh)
+{
+	int lSkinCount = pGeometry->GetDeformerCount(FbxDeformer::eSkin);
+	if (lSkinCount <= 0)
+	{
+		mesh->m_skinned = false;
+	}
+	mesh->m_skinned = true;
+	
+	int n_vertices = mesh->vertexCount();
+	mesh->m_boneWeights.resize(n_vertices);
+//	mesh->m_boneIndexBuffer.resize(n_vertices);
+//	mesh->m_boneWeightBuffer.resize(n_vertices);
+	
+	for ( int i = 0; i < lSkinCount; ++i )
+	{
+		int lClusterCount = ((FbxSkin *) pGeometry->GetDeformer(i, FbxDeformer::eSkin))->GetClusterCount();
+		
+		for (int j = 0; j != lClusterCount; ++j)
+		{
+			FbxCluster* lCluster=((FbxSkin *) pGeometry->GetDeformer(i, FbxDeformer::eSkin))->GetCluster(j);
+			int lIndexCount = lCluster->GetControlPointIndicesCount();
+			int* lIndices = lCluster->GetControlPointIndices();
+			double* lWeights = lCluster->GetControlPointWeights();
+			
+			auto & boneToIndex = m_model.m_avatar->m_boneToIndex;
+			std::string boneName = (char *) lCluster->GetLink()->GetName();
+			int boneId;
+			auto it = boneToIndex.find(boneName);
+			if ( it != boneToIndex.end() )
+			{
+				boneId = it->second;
+			}
+			else
+			{
+				int boneId = m_boneCount;
+				m_model.m_avatar->m_boneToIndex[boneName] = boneId;
+				m_model.m_avatar->m_indexToBone[boneId] = boneName;
+				m_boneCount++;
+			}
+			
+			for ( int k = 0; k < lIndexCount; k++ )
+			{
+				mesh->m_boneWeights[lIndices[k]].AddBoneData(boneId, lWeights[k]);
+			}
+		}
+	}
+	
+//	for (uint32_t i = 0; i < n_vertices; ++i)
+//	{
+//		auto& b = mesh->m_boneWeights[i];
+//		mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
+//		mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
+//	}
+}
+
+MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 {
 	assert(fbxMesh->IsTriangleMesh());
 	fbxMesh->GenerateNormals(false, true, false);
@@ -81,12 +151,6 @@ MeshPtr MeshFromFbxMesh(FbxMesh* fbxMesh)
 
 	int polygonCount = fbxMesh->GetPolygonCount();
 	FbxVector4* controlPoints = fbxMesh->GetControlPoints();
-
-	std::vector<float>		positionBuffer;
-	std::vector<float>		normalBuffer;
-	std::vector<float>		uvBuffer;
-	std::vector<float>		tangentBuffer;
-	std::vector<uint32_t>	indexBuffer(polygonCount * 3);
 
 	if (fbxMesh->GetElementUVCount() == 0)
 	{
@@ -103,33 +167,38 @@ MeshPtr MeshFromFbxMesh(FbxMesh* fbxMesh)
 		leNormal0->GetMappingMode() == FbxGeometryElement::eByControlPoint &&
 		leTangent0->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 	{
+		// do not need a RawMesh, generate a Mesh directly
+		
+		std::vector<Vector3>	positionBuffer;
+		std::vector<Vector3>	normalBuffer;
+		std::vector<Vector2>	uvBuffer;
+		std::vector<Vector3>	tangentBuffer;
+		std::vector<uint32_t>	indexBuffer;
+		indexBuffer.reserve(polygonCount * 3);
+		
 		int vertexCount = fbxMesh->GetControlPointsCount();
-		positionBuffer.reserve(vertexCount * 3);
-		normalBuffer.reserve(vertexCount * 3);
-		uvBuffer.reserve(vertexCount * 2);
-		tangentBuffer.reserve(vertexCount * 3);
+		positionBuffer.reserve(vertexCount);
+		normalBuffer.reserve(vertexCount);
+		uvBuffer.reserve(vertexCount);
+		tangentBuffer.reserve(vertexCount);
 		for (int controlPointIndex = 0; controlPointIndex < vertexCount; ++controlPointIndex)
 		{
 			// Position
 			auto & p = controlPoints[controlPointIndex];
-			positionBuffer.push_back(p[0]);
-			positionBuffer.push_back(p[1]);
-			positionBuffer.push_back(p[2]);
+			positionBuffer.emplace_back(p[0], p[1], p[2]);
 
 			// UV
 			auto mode = leUV0->GetReferenceMode();
 			if (mode == FbxGeometryElement::eDirect)
 			{
 				auto uv = leUV0->GetDirectArray().GetAt(controlPointIndex);
-				uvBuffer.push_back(uv[0]);
-				uvBuffer.push_back(uv[1]);
+				uvBuffer.emplace_back(uv[0], uv[1]);
 			}
 			else if (mode == FbxGeometryElement::eIndexToDirect)
 			{
 				int id = leUV0->GetIndexArray().GetAt(controlPointIndex);
 				auto uv = leUV0->GetDirectArray().GetAt(id);
-				uvBuffer.push_back(uv[0]);
-				uvBuffer.push_back(uv[1]);
+				uvBuffer.emplace_back(uv[0], uv[1]);
 			}
 			else
 			{
@@ -141,17 +210,13 @@ MeshPtr MeshFromFbxMesh(FbxMesh* fbxMesh)
 			if (mode == FbxGeometryElement::eDirect)
 			{
 				auto n = leNormal0->GetDirectArray().GetAt(controlPointIndex);
-				normalBuffer.push_back(n[0]);
-				normalBuffer.push_back(n[1]);
-				normalBuffer.push_back(n[2]);
+				normalBuffer.emplace_back(n[0], n[1], n[2]);
 			}
 			else if (mode == FbxGeometryElement::eIndexToDirect)
 			{
 				int id = leNormal0->GetIndexArray().GetAt(controlPointIndex);
 				auto n = leNormal0->GetDirectArray().GetAt(id);
-				normalBuffer.push_back(n[0]);
-				normalBuffer.push_back(n[1]);
-				normalBuffer.push_back(n[2]);
+				normalBuffer.emplace_back(n[0], n[1], n[2]);
 			}
 			else
 			{
@@ -163,271 +228,317 @@ MeshPtr MeshFromFbxMesh(FbxMesh* fbxMesh)
 			if (mode == FbxGeometryElement::eDirect)
 			{
 				auto t = leTangent0->GetDirectArray().GetAt(controlPointIndex);
-				normalBuffer.push_back(t[0]);
-				normalBuffer.push_back(t[1]);
-				normalBuffer.push_back(t[2]);
+				tangentBuffer.emplace_back(t[0], t[1], t[2]);
 			}
 			else if (mode == FbxGeometryElement::eIndexToDirect)
 			{
 				int id = leTangent0->GetIndexArray().GetAt(controlPointIndex);
 				auto t = leTangent0->GetDirectArray().GetAt(id);
-				normalBuffer.push_back(t[0]);
-				normalBuffer.push_back(t[1]);
-				normalBuffer.push_back(t[2]);
+				tangentBuffer.emplace_back(t[0], t[1], t[2]);
 			}
 			else
 			{
 				abort();
 			}
 
-			for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonCount)
+			for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
 			{
 				indexBuffer.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 0) );
 				indexBuffer.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 1) );
 				indexBuffer.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 2) );
 			}
 		}
+		
+		auto mesh = std::make_shared<Mesh>(std::move(positionBuffer), std::move(normalBuffer), std::move(uvBuffer), std::move(tangentBuffer), std::move(indexBuffer));
+		mesh->setName(fbxMesh->GetName());
+		GetLinkData(fbxMesh, mesh);
+		return mesh;
 	}
-	else
+	
+	// use RawMesh to construct Mesh
+	
+	RawMesh rawMesh;
+	
+	int vertexCount = fbxMesh->GetControlPointsCount();
+	
+	rawMesh.SetFaceCount(polygonCount);
+	rawMesh.SetVertexCount(vertexCount);
+	
+	for (int controlPointIndex = 0; controlPointIndex < vertexCount; ++controlPointIndex)
 	{
-		int vertexCount = polygonCount * 3;
-		positionBuffer.reserve(vertexCount * 3);
-		normalBuffer.reserve(vertexCount * 3);
-		uvBuffer.reserve(vertexCount * 2);
-		tangentBuffer.reserve(vertexCount * 3);
+		// Position
+		auto & p = controlPoints[controlPointIndex];
+		rawMesh.VertexPositions.emplace_back(p[0], p[1], p[2]);
+	}
+	
+	for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
+	{
+		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 0) );
+		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 1) );
+		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 2) );
+	}
 
-		int vertexId = 0;
-		for (int i = 0; i < polygonCount; i++)
-		{
+	int vertexId = 0;
+	for (int i = 0; i < polygonCount; i++)
+	{
 #if 0
-			for (int l = 0; l < fbxMesh->GetElementPolygonGroupCount(); l++)
+		for (int l = 0; l < fbxMesh->GetElementPolygonGroupCount(); l++)
+		{
+			FbxGeometryElementPolygonGroup* lePolgrp = fbxMesh->GetElementPolygonGroup(l);
+			switch (lePolgrp->GetMappingMode())
 			{
-				FbxGeometryElementPolygonGroup* lePolgrp = fbxMesh->GetElementPolygonGroup(l);
-				switch (lePolgrp->GetMappingMode())
+			case FbxGeometryElement::eByPolygon:
+				if (lePolgrp->GetReferenceMode() == FbxGeometryElement::eIndex)
 				{
-				case FbxGeometryElement::eByPolygon:
-					if (lePolgrp->GetReferenceMode() == FbxGeometryElement::eIndex)
-					{
-						//FBXSDK_sprintf(header, 100, "        Assigned to group: ");
-						int polyGroupId = lePolgrp->GetIndexArray().GetAt(i);
-						//DisplayInt(header, polyGroupId);
-						break;
-					}
+					//FBXSDK_sprintf(header, 100, "        Assigned to group: ");
+					int polyGroupId = lePolgrp->GetIndexArray().GetAt(i);
+					//DisplayInt(header, polyGroupId);
+					break;
+				}
+			default:
+				// any other mapping modes don't make sense
+				//DisplayString("        \"unsupported group assignment\"");
+				break;
+			}
+		}
+#endif
+
+		int lPolygonSize = fbxMesh->GetPolygonSize(i);
+		//assert(lPolygonSize == 3);
+
+		for (int j = 0; j < lPolygonSize; j++)
+		{
+			int lControlPointIndex = fbxMesh->GetPolygonVertex(i, j);
+			//auto p = controlPoints[lControlPointIndex];
+			//rawMesh.VertexPositions.emplace_back(p[0], p[1], p[2]);
+
+			//Display3DVector("            Coordinates: ", lControlPoints[lControlPointIndex]);
+
+#if 0
+			for (int l = 0; l < fbxMesh->GetElementVertexColorCount(); l++)
+			{
+				FbxGeometryElementVertexColor* leVtxc = fbxMesh->GetElementVertexColor(l);
+				//FBXSDK_sprintf(header, 100, "            Color vertex: ");
+
+				switch (leVtxc->GetMappingMode())
+				{
 				default:
-					// any other mapping modes don't make sense
-					//DisplayString("        \"unsupported group assignment\"");
+					break;
+				case FbxGeometryElement::eByControlPoint:
+					switch (leVtxc->GetReferenceMode())
+					{
+					case FbxGeometryElement::eDirect:
+						//DisplayColor(header, leVtxc->GetDirectArray().GetAt(lControlPointIndex));
+						break;
+					case FbxGeometryElement::eIndexToDirect:
+					{
+						int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
+						//DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+					}
+					break;
+					default:
+						break; // other reference modes not shown here!
+					}
+					break;
+
+				case FbxGeometryElement::eByPolygonVertex:
+				{
+					switch (leVtxc->GetReferenceMode())
+					{
+					case FbxGeometryElement::eDirect:
+						//DisplayColor(header, leVtxc->GetDirectArray().GetAt(vertexId));
+						break;
+					case FbxGeometryElement::eIndexToDirect:
+					{
+						int id = leVtxc->GetIndexArray().GetAt(vertexId);
+						//DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+					}
+					break;
+					default:
+						break; // other reference modes not shown here!
+					}
+				}
+				break;
+
+				case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
+				case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
+				case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
 					break;
 				}
 			}
 #endif
-
-			int lPolygonSize = fbxMesh->GetPolygonSize(i);
-			//assert(lPolygonSize == 3);
-
-			for (int j = 0; j < lPolygonSize; j++)
+			for (int l = 0; l < fbxMesh->GetElementUVCount(); ++l)
 			{
-				int lControlPointIndex = fbxMesh->GetPolygonVertex(i, j);
-				auto p = controlPoints[lControlPointIndex];
-				positionBuffer.push_back(p[0]);
-				positionBuffer.push_back(p[1]);
-				positionBuffer.push_back(p[2]);
+				FbxGeometryElementUV* leUV = fbxMesh->GetElementUV(l);
+				//FBXSDK_sprintf(header, 100, "            Texture UV: ");
 
-				//Display3DVector("            Coordinates: ", lControlPoints[lControlPointIndex]);
+				int lTextureUVIndex = fbxMesh->GetTextureUVIndex(i, j);
+				if (leUV->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+				{
+					auto mode = leUV->GetReferenceMode();
+					if (mode == FbxGeometryElement::eDirect || mode == FbxGeometryElement::eIndexToDirect)
+					{
+						auto uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
+						rawMesh.WedgeTexCoords.emplace_back(uv[0], uv[1]);
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else
+				{
+					abort();
+				}
+			}
+
+			for (int l = 0; l < fbxMesh->GetElementNormalCount(); ++l)
+			{
+				FbxGeometryElementNormal* leNormal = fbxMesh->GetElementNormal(l);
+				//FBXSDK_sprintf(header, 100, "            Normal: ");
+
+				if (leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+				{
+					auto mode = leNormal->GetReferenceMode();
+					if (mode == FbxGeometryElement::eDirect)
+					{
+						//Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
+						auto n = leNormal->GetDirectArray().GetAt(vertexId);
+						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+					}
+					else if (mode == FbxGeometryElement::eIndexToDirect)
+					{
+						int id = leNormal->GetIndexArray().GetAt(vertexId);
+						//Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
+						auto n = leNormal->GetDirectArray().GetAt(id);
+						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else if (leNormal->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+				{
+					auto mode = leNormal0->GetReferenceMode();
+					if (mode == FbxGeometryElement::eDirect)
+					{
+						auto n = leNormal0->GetDirectArray().GetAt(lControlPointIndex);
+						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+					}
+					else if (mode == FbxGeometryElement::eIndexToDirect)
+					{
+						int id = leNormal0->GetIndexArray().GetAt(lControlPointIndex);
+						auto n = leNormal0->GetDirectArray().GetAt(id);
+						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else
+				{
+					abort();
+				}
+			}
+
+			for (int l = 0; l < fbxMesh->GetElementTangentCount(); ++l)
+			{
+				FbxGeometryElementTangent* leTangent = fbxMesh->GetElementTangent(l);
+				//FBXSDK_sprintf(header, 100, "            Tangent: ");
+
+				if (leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+				{
+					auto mode = leTangent->GetReferenceMode();
+					if (mode == FbxGeometryElement::eDirect)
+					{
+						//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
+						auto t = leTangent->GetDirectArray().GetAt(vertexId);
+						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+					}
+					else if (mode == FbxGeometryElement::eIndexToDirect)
+					{
+						int id = leTangent->GetIndexArray().GetAt(vertexId);
+						//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
+						auto t = leTangent->GetDirectArray().GetAt(id);
+						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else if (leTangent->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+				{
+					auto mode = leTangent0->GetReferenceMode();
+					if (mode == FbxGeometryElement::eDirect)
+					{
+						auto t = leTangent0->GetDirectArray().GetAt(lControlPointIndex);
+						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+					}
+					else if (mode == FbxGeometryElement::eIndexToDirect)
+					{
+						int id = leTangent0->GetIndexArray().GetAt(lControlPointIndex);
+						auto t = leTangent0->GetDirectArray().GetAt(id);
+						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+					}
+					else
+					{
+						abort();
+					}
+				}
+				else
+				{
+					abort();
+				}
+			}
 
 #if 0
-				for (int l = 0; l < fbxMesh->GetElementVertexColorCount(); l++)
+			for (int l = 0; l < fbxMesh->GetElementBinormalCount(); ++l)
+			{
+
+				FbxGeometryElementBinormal* leBinormal = fbxMesh->GetElementBinormal(l);
+
+				//FBXSDK_sprintf(header, 100, "            Binormal: ");
+				if (leBinormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 				{
-					FbxGeometryElementVertexColor* leVtxc = fbxMesh->GetElementVertexColor(l);
-					//FBXSDK_sprintf(header, 100, "            Color vertex: ");
-
-					switch (leVtxc->GetMappingMode())
+					switch (leBinormal->GetReferenceMode())
 					{
-					default:
+					case FbxGeometryElement::eDirect:
+						//Display3DVector(header, leBinormal->GetDirectArray().GetAt(vertexId));
 						break;
-					case FbxGeometryElement::eByControlPoint:
-						switch (leVtxc->GetReferenceMode())
-						{
-						case FbxGeometryElement::eDirect:
-							//DisplayColor(header, leVtxc->GetDirectArray().GetAt(lControlPointIndex));
-							break;
-						case FbxGeometryElement::eIndexToDirect:
-						{
-							int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
-							//DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
-						}
-						break;
-						default:
-							break; // other reference modes not shown here!
-						}
-						break;
-
-					case FbxGeometryElement::eByPolygonVertex:
+					case FbxGeometryElement::eIndexToDirect:
 					{
-						switch (leVtxc->GetReferenceMode())
-						{
-						case FbxGeometryElement::eDirect:
-							//DisplayColor(header, leVtxc->GetDirectArray().GetAt(vertexId));
-							break;
-						case FbxGeometryElement::eIndexToDirect:
-						{
-							int id = leVtxc->GetIndexArray().GetAt(vertexId);
-							//DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
-						}
-						break;
-						default:
-							break; // other reference modes not shown here!
-						}
+						int id = leBinormal->GetIndexArray().GetAt(vertexId);
+						//Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
 					}
 					break;
-
-					case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
-					case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
-					case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
-						break;
+					default:
+						break; // other reference modes not shown here!
 					}
 				}
+			}
 #endif
-				for (int l = 0; l < fbxMesh->GetElementUVCount(); ++l)
-				{
-					FbxGeometryElementUV* leUV = fbxMesh->GetElementUV(l);
-					//FBXSDK_sprintf(header, 100, "            Texture UV: ");
-
-					int lTextureUVIndex = fbxMesh->GetTextureUVIndex(i, j);
-					if (leUV->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-					{
-						auto mode = leUV->GetReferenceMode();
-						if (mode == FbxGeometryElement::eDirect || mode == FbxGeometryElement::eIndexToDirect)
-						{
-							auto uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
-							uvBuffer.push_back(uv[0]);
-							uvBuffer.push_back(uv[1]);
-						}
-						else
-						{
-							abort();
-						}
-					}
-					else
-					{
-						abort();
-					}
-				}
-
-				for (int l = 0; l < fbxMesh->GetElementNormalCount(); ++l)
-				{
-					FbxGeometryElementNormal* leNormal = fbxMesh->GetElementNormal(l);
-					//FBXSDK_sprintf(header, 100, "            Normal: ");
-
-					if (leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-					{
-						auto mode = leNormal->GetReferenceMode();
-						if (mode == FbxGeometryElement::eDirect)
-						{
-							//Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
-							auto n = leNormal->GetDirectArray().GetAt(vertexId);
-							normalBuffer.push_back(n[0]);
-							normalBuffer.push_back(n[1]);
-							normalBuffer.push_back(n[2]);
-						}
-						else if (mode == FbxGeometryElement::eIndexToDirect)
-						{
-							int id = leNormal->GetIndexArray().GetAt(vertexId);
-							//Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
-							auto n = leNormal->GetDirectArray().GetAt(id);
-							normalBuffer.push_back(n[0]);
-							normalBuffer.push_back(n[1]);
-							normalBuffer.push_back(n[2]);
-						}
-						else
-						{
-							abort();
-						}
-					}
-					else
-					{
-						abort();
-					}
-				}
-
-				for (int l = 0; l < fbxMesh->GetElementTangentCount(); ++l)
-				{
-					FbxGeometryElementTangent* leTangent = fbxMesh->GetElementTangent(l);
-					//FBXSDK_sprintf(header, 100, "            Tangent: ");
-
-					if (leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-					{
-						auto mode = leTangent->GetReferenceMode();
-						if (mode == FbxGeometryElement::eDirect)
-						{
-							//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
-							auto t = leTangent->GetDirectArray().GetAt(vertexId);
-							tangentBuffer.push_back(t[0]);
-							tangentBuffer.push_back(t[1]);
-							tangentBuffer.push_back(t[2]);
-						}
-						else if (mode == FbxGeometryElement::eIndexToDirect)
-						{
-							int id = leTangent->GetIndexArray().GetAt(vertexId);
-							//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
-							auto t = leTangent->GetDirectArray().GetAt(id);
-							tangentBuffer.push_back(t[0]);
-							tangentBuffer.push_back(t[1]);
-							tangentBuffer.push_back(t[2]);
-						}
-						else
-						{
-							abort();
-						}
-					}
-					else
-					{
-						abort();
-					}
-				}
-
-#if 0
-				for (int l = 0; l < fbxMesh->GetElementBinormalCount(); ++l)
-				{
-
-					FbxGeometryElementBinormal* leBinormal = fbxMesh->GetElementBinormal(l);
-
-					//FBXSDK_sprintf(header, 100, "            Binormal: ");
-					if (leBinormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-					{
-						switch (leBinormal->GetReferenceMode())
-						{
-						case FbxGeometryElement::eDirect:
-							//Display3DVector(header, leBinormal->GetDirectArray().GetAt(vertexId));
-							break;
-						case FbxGeometryElement::eIndexToDirect:
-						{
-							int id = leBinormal->GetIndexArray().GetAt(vertexId);
-							//Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
-						}
-						break;
-						default:
-							break; // other reference modes not shown here!
-						}
-					}
-				}
-#endif
-				indexBuffer.push_back(vertexId * 3);
-				indexBuffer.push_back(vertexId * 3 + 1);
-				indexBuffer.push_back(vertexId * 3 + 2);
-				vertexId++;
-			} // for polygonSize
-		} // for polygonCount
-	}
-
-	auto mesh = std::make_shared<Mesh>(std::move(positionBuffer), std::move(normalBuffer), std::move(uvBuffer), std::move(tangentBuffer), std::move(indexBuffer));
-	mesh->setName(fbxMesh->GetName());
+			//rawMesh.WedgeIndices.push_back(vertexId);
+			//indexBuffer.push_back(vertexId * 3 + 1);
+			//indexBuffer.push_back(vertexId * 3 + 2);
+			vertexId++;
+		} // for polygonSize
+	} // for polygonCount
+	
+	auto mesh = rawMesh.ToMesh();
+	
+	GetLinkData(fbxMesh, mesh);
+	
 	return mesh;
 }
+
 
 /**
 * Print a node, its attributes, and all its children recursively.
 */
-GameObjectPtr PrintNode(FbxNode* pNode)
+GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 {
 	PrintTabs();
 	const char* nodeName = pNode->GetName();
@@ -442,27 +553,44 @@ GameObjectPtr PrintNode(FbxNode* pNode)
 	go->transform()->setLocalScale(s[0], s[1], s[2]);
 	FishEditor::AssetDatabase::s_allAssetObjects.insert(go);
 
-	// Print the contents of the node.
-	printf("<node name='%s' translation='(%f, %f, %f)' rotation='(%f, %f, %f)' scaling='(%f, %f, %f)'>\n",
-		nodeName,
-		t[0], t[1], t[2],
-		r[0], r[1], r[2],
-		s[0], s[1], s[2]
-	);
-	numTabs++;
+//	// Print the contents of the node.
+//	printf("<node name='%s' translation='(%f, %f, %f)' rotation='(%f, %f, %f)' scaling='(%f, %f, %f)'>\n",
+//		nodeName,
+//		t[0], t[1], t[2],
+//		r[0], r[1], r[2],
+//		s[0], s[1], s[2]
+//	);
+//	numTabs++;
 
 	auto nodeAttribute = pNode->GetNodeAttribute();
 	if (nodeAttribute != nullptr)
 	{
-		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+		auto type = nodeAttribute->GetAttributeType();
+		if (type == FbxNodeAttribute::eMesh)
 		{
 			FbxMesh* lMesh = (FbxMesh*)nodeAttribute;
 			auto mesh = MeshFromFbxMesh(lMesh);
+			m_model.m_meshes.push_back(mesh);
 			if (mesh->name().empty())
 				mesh->setName(nodeName);
 			go->AddComponent<MeshFilter>()->SetMesh(mesh);
-			go->AddComponent<MeshRenderer>();
+//			if (mesh->m_skinned)
+//			{
+//				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
+//				srenderer->SetMaterial(Material::defaultMaterial());
+//				srenderer->setSharedMesh(mesh);
+//			}
+//			else
+				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 		}
+//		else if (type == FbxNodeAttribute::eSkeleton)
+//		{
+//			FbxSkeleton* lSkeleton = (FbxSkeleton*)nodeAttribute;
+//			std::string boneName = nodeName;
+//			m_model.m_avatar->m_boneToIndex[boneName] = m_boneCount;
+//			m_model.m_avatar->m_indexToBone[m_boneCount] = boneName;
+//			m_boneCount++;
+//		}
 	}
 
 	// Print the node's attributes.
@@ -479,19 +607,22 @@ GameObjectPtr PrintNode(FbxNode* pNode)
 	// Recursively print the children.
 	for (int j = 0; j < pNode->GetChildCount(); j++)
 	{
-		auto child = PrintNode(pNode->GetChild(j));
-		go->transform()->SetParent(child->transform(), false);
+		auto child = ParseNodeRecursively(pNode->GetChild(j));
+		child->transform()->SetParent(go->transform(), false);
 	}
 
-	numTabs--;
-	PrintTabs();
-	printf("</node>\n");
+//	numTabs--;
+//	PrintTabs();
+//	printf("</node>\n");
 	return go;
 }
 
 
 GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 {
+	if (m_model.m_avatar == nullptr)
+		m_model.m_avatar = std::make_shared<Avatar>();
+	
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_29C09995_47A9_4B49_9535_2F6BDC5C4107_htm
 	
 	// Initialize the SDK manager. This object handles memory management.
@@ -538,12 +669,14 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	{
 		for (int i = 0; i < lRootNode->GetChildCount(); i++)
 		{
-			auto child = PrintNode(lRootNode->GetChild(i));
+			auto child = ParseNodeRecursively(lRootNode->GetChild(i));
 			child->transform()->SetParent(root->transform(), false);
 		}
 	}
 	// Destroy the SDK manager and all the other objects it was handling.
 	lSdkManager->Destroy();
+	
+	m_model.m_rootNode = root;
 
 	return root;
 }

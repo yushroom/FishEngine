@@ -56,6 +56,8 @@ namespace FishEditor
 		
 		static void ImportAsset(FishEngine::Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
 
+		// Returns an array of all asset objects at assetPath.
+		// All paths are relative to the project folder, for example: "Assets/MyTextures/hello.png".
 		template <class T>
 		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path);
 

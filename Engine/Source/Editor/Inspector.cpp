@@ -141,6 +141,8 @@ template<>
 void Inspector::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 {
     EditorGUI::ObjectField("Mesh", meshFilter->m_mesh);
+	EditorGUI::FloatField("mesh verts", meshFilter->m_mesh->vertexCount());
+	EditorGUI::FloatField("mesh tris", meshFilter->m_mesh->triangles());
 }
 
 

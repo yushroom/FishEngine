@@ -10,7 +10,7 @@
 namespace FishEngine
 {
     std::map<std::string, MaterialPtr> Material::s_builtinMaterialInstance;
-    MaterialPtr Material::s_defaultMaterial = nullptr;
+    //MaterialPtr Material::s_defaultMaterial = nullptr;
 
     // https://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
     template<typename T>
@@ -245,13 +245,15 @@ namespace FishEngine
 
     MaterialPtr Material::defaultMaterial()
     {
-        return s_defaultMaterial;
+		static auto material = CreateMaterial();
+        return material;
     }
 
 
     void Material::Init()
     {
-        s_defaultMaterial = CreateMaterial();
+        //s_defaultMaterial = CreateMaterial();
+		auto s_defaultMaterial = defaultMaterial();
         s_defaultMaterial->setName("DefaultMaterial");
         s_defaultMaterial->SetShader(Shader::builtinShader("PBR"));
         s_defaultMaterial->SetFloat("Metallic", 0);

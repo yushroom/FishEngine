@@ -162,6 +162,16 @@ namespace FishEngine
         {
             return Vector2(lhs * rhs.x, lhs * rhs.y);
         }
+		
+		bool operator==(const Vector2 & rhs)
+		{
+			return Mathf::Approximately(x, rhs.x) && Mathf::Approximately(y, rhs.y);
+		}
+		
+		bool operator!=(const Vector2 & rhs)
+		{
+			return ! this->operator==(rhs);
+		}
     };
 
 }

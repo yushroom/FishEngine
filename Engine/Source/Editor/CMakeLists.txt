@@ -1,4 +1,3 @@
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -8,8 +7,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+FILE(GLOB Heasers ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/UI UI_SRCS)
-#FILE(GLOB Heasers ${CMAKE_CURRENT_LIST_DIR}/UI/*.hpp)
+FILE(GLOB UI_Heasers ${CMAKE_CURRENT_LIST_DIR}/UI/*.hpp)
 FILE(GLOB FORMS ${CMAKE_CURRENT_LIST_DIR}/UI/*.ui)
 SOURCE_GROUP(Forms FILES ${FORMS})
 
@@ -21,7 +21,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-foreach (x AssetImporter TextureImporter ModelImporter)
+foreach (x AssetImporter TextureImporter ModelImporter FBXImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})
@@ -30,11 +30,6 @@ foreach (x AssetImporter TextureImporter ModelImporter)
         ENDIF ()
     endforeach ()
 endforeach()
-
-SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
-SOURCE_GROUP( UI    FILES ${UI_SRCS}    )
-SOURCE_GROUP( MOC   FILES ${MOC_SRCS}   )
-
 
 SET( ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../assets)
 SET( SHADER_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Shaders)
@@ -47,7 +42,19 @@ IF( NOT WIN32 )
     SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders})
 ENDIF()
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${UI_SRCS} ${FORMS} ${ReflectFilesSources} resources.qrc ${RESOURCE_FILES})
+SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
+SOURCE_GROUP( UI    FILES ${UI_SRCS} ${UI_Heasers} )
+SOURCE_GROUP( MOC   FILES ${MOC_SRCS} )
+SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
+
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${ReflectFilesSources} resources.qrc ${RESOURCE_FILES})
+
+SET( INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
+MESSAGE("hhhh" ${INFO_PLIST})
+IF (NOT EXISTS ${INFO_PLIST})
+    MESSAGE(FATAL_ERROR "${INFO_PLIST} not found!")
+ENDIF()
+set_target_properties( FishEditor PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST}" )
 
 IF( NOT WIN32 )
     SET_SOURCE_FILES_PROPERTIES(${Models} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Models)
@@ -66,9 +73,9 @@ target_link_libraries(FishEditor assimp)
 target_link_libraries(FishEditor yaml-cpp)
 target_link_libraries(FishEditor ${PhysXSDK_LIBRARIES})
 target_link_libraries(FishEditor ${Boost_LIBRARIES})
+target_link_libraries(FishEditor ${FBXSDK_LIB})
 
 if (MSVC)
-    target_link_libraries(FishEditor ${FBXSDK_LIB})
     target_link_libraries(FishEditor opengl32.lib)
     target_link_libraries(FishEditor glew_s)
 else()

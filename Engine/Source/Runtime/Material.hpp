@@ -126,7 +126,7 @@ namespace FishEngine
         std::vector<MaterialProperty>       m_properties;
 
         static std::map<std::string, MaterialPtr>   s_builtinMaterialInstance;
-        static MaterialPtr                          s_defaultMaterial;
+        //static MaterialPtr                          s_defaultMaterial;
     };
 }
 

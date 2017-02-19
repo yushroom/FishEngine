@@ -128,8 +128,20 @@ namespace FishEngine
 
         bool deferred_enabled = false;
 
-        for (auto& go : Scene::m_gameObjects)
+		std::list<GameObjectPtr> gameObjects;
+		for (auto& go : Scene::m_gameObjects)
+		{
+			gameObjects.push_back(go);
+		}
+        while ( !gameObjects.empty() )
         {
+			auto go = gameObjects.front();
+			gameObjects.pop_front();
+			for (auto && child : go->transform()->children())
+			{
+				gameObjects.push_back(child.lock()->gameObject());
+			}
+			
             if (!go->activeInHierarchy()) continue;
             RendererPtr renderer = go->GetComponent<MeshRenderer>();
 

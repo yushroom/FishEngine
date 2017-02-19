@@ -16,7 +16,7 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 #if FISHENGINE_PLATFORM_WINDOWS
 	ui->locationLineEdit->setText("D:/FishEngine/Projects");
 #else
-	ui->locationLineEdit->setText("/");
+	ui->locationLineEdit->setText("~/FishEngine/Projects");
 #endif
 	ui->projectNameErrorLabel->hide();
 	ui->locationErrorLabel->hide();
@@ -35,7 +35,11 @@ OpenProjectDialog::~OpenProjectDialog()
 
 void OpenProjectDialog::OnCreateButtonClicked()
 {
+#if FISHENGINE_PLATFORM_WINDOWS
 	FishEngine::Applicaiton::s_dataPath = "D:/FishEngine/Projects/Sponza/Assets";
+#else
+	FishEngine::Applicaiton::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
+#endif
 	accept();
 
 	auto projectName = ui->projectNameLineEdit->text();

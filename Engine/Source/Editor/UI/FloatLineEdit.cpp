@@ -39,12 +39,17 @@ void FloatLineEdit::OnEditingFinished()
     if (text().size() == 0)
     {
         m_value = 0;
-        blockSignals(true);
-        setText("0");
-        blockSignals(false);
+//        blockSignals(true);
+//        setText("0");
+//        blockSignals(false);
     }
 	home(false);
 	clearFocus();
+	// re-format
+	blockSignals(true);
+	setText(QString::fromStdString(floatToStdString(m_value)));
+	home(false);
+	blockSignals(false);
 }
 
 void FloatLineEdit::OnTextChanged(QString const & s)
@@ -68,10 +73,10 @@ void FloatLineEdit::OnTextChanged(QString const & s)
         emit valueChanged(m_value);
     }
     // re-format
-    blockSignals(true);
-    setText(QString::fromStdString(floatToStdString(m_value)));
-	home(false);
-    blockSignals(false);
+    //blockSignals(true);
+    //setText(QString::fromStdString(floatToStdString(m_value)));
+	//home(false);
+    //blockSignals(false);
 }
 
 void FloatLineEdit::mousePressEvent(QMouseEvent *)

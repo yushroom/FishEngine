@@ -201,8 +201,13 @@ void DefaultScene()
 	transform->setLocalEulerAngles(30, -90, 0);
 #else
 	//GameObject::CreatePrimitive(PrimitiveType::Cube);
-	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>(R"(D:\FishEngine\Projects\Sponza\Assets\testFBX.fbx)");
+	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
 	Scene::AddGameObject(model);
+	
+	model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/unitychan.fbx");
+	Scene::AddGameObject(model);
+//	auto sphere = model->transform()->children().front().lock()->gameObject();
+//	sphere->GetComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 #endif
 
 #endif

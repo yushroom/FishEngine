@@ -116,11 +116,11 @@ namespace FishEditor
         auto n_bones = assimp_mesh->mNumBones;
         mesh->m_vertexCount = n_vertices;
         mesh->m_triangleCount = n_triangles;
-        mesh->m_positionBuffer.reserve(n_vertices * 3);
-        mesh->m_normalBuffer.reserve(n_vertices * 3);
-        mesh->m_uvBuffer.reserve(n_vertices * 2);
-        mesh->m_indexBuffer.reserve(n_triangles * 3);
-        mesh->m_tangentBuffer.reserve(n_vertices * 3);
+        mesh->m_vertices.reserve(n_vertices);
+        mesh->m_normals.reserve(n_vertices);
+        mesh->m_uv.reserve(n_vertices);
+        mesh->m_triangles.reserve(n_triangles * 3);
+        mesh->m_tangents.reserve(n_vertices);
 
         Vector3 vmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
         Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
@@ -138,28 +138,21 @@ namespace FishEditor
             if (vmax.x < vx) vmax.x = vx;
             if (vmax.y < vy) vmax.y = vy;
             if (vmax.z < vz) vmax.z = vz;
-            mesh->m_positionBuffer.push_back(vx);
-            mesh->m_positionBuffer.push_back(vy);
-            mesh->m_positionBuffer.push_back(vz);
+            mesh->m_vertices.emplace_back(vx, vy, vz);
 
             auto& n = assimp_mesh->mNormals[j];
-            mesh->m_normalBuffer.push_back(n.x);
-            mesh->m_normalBuffer.push_back(n.y);
-            mesh->m_normalBuffer.push_back(n.z);
+			mesh->m_normals.emplace_back(n.x, n.y, n.z);
 
             if (has_uv)
             {
                 auto& uv = assimp_mesh->mTextureCoords[0][j];
-                mesh->m_uvBuffer.push_back(uv.x);
-                mesh->m_uvBuffer.push_back(uv.y);
+				mesh->m_uv.emplace_back(uv.x, uv.y);
             }
 
             if (load_tangent)
             {
                 auto& t = assimp_mesh->mTangents[j];
-                mesh->m_tangentBuffer.push_back(t.x);
-                mesh->m_tangentBuffer.push_back(t.y);
-                mesh->m_tangentBuffer.push_back(t.z);
+				mesh->m_tangents.emplace_back(t.x, t.y, t.z);
             }
         }
 
@@ -172,7 +165,7 @@ namespace FishEditor
             assert(face.mNumIndices == 3);
             for (int fi = 0; fi < 3; ++fi)
             {
-                mesh->m_indexBuffer.push_back(face.mIndices[fi]);
+                mesh->m_triangles.push_back(face.mIndices[fi]);
             }
         }
 
@@ -184,8 +177,8 @@ namespace FishEditor
             //std::vector<BoneWeight> boneWeights;
             //mesh->m_bones.resize(n_bones);
             mesh->m_boneWeights.resize(n_vertices);
-            mesh->m_boneIndexBuffer.resize(n_vertices);
-            mesh->m_boneWeightBuffer.resize(n_vertices);
+            //mesh->m_boneIndexBuffer.resize(n_vertices);
+            //mesh->m_boneWeightBuffer.resize(n_vertices);
             mesh->bindposes().resize(assimp_mesh->mNumBones);
             //Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
             for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex)
@@ -208,12 +201,12 @@ namespace FishEditor
                 }
             }
             
-            for (uint32_t i = 0; i < n_vertices; ++i)
-            {
-                auto& b = mesh->m_boneWeights[i];
-                mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
-                mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
-            }
+//            for (uint32_t i = 0; i < n_vertices; ++i)
+//            {
+//                auto& b = mesh->m_boneWeights[i];
+//                mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
+//                mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
+//            }
         }
 
         return mesh;

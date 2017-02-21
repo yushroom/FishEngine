@@ -17,7 +17,8 @@ namespace FishEngine
         
         void getLocalCorners(Vector3 v[8]) const
         {
-            float tan2 = Mathf::Tan(fov * 0.5f);
+			float rad = Mathf::Radians(fov) * 0.5f;
+            float tan2 = Mathf::Tan(rad);
             float h1 = tan2 * minRange;
             float w1 = h1 * aspect;
             float h2 = tan2 * maxRange;

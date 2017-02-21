@@ -305,7 +305,9 @@ namespace FishEngine
         /************************************************************************/
         /* Skybox                                                               */
         /************************************************************************/
-        Matrix4x4 model = Matrix4x4::Scale(100);
+		Matrix4x4 model;
+		model.SetTRS(Camera::main()->transform()->position(), Quaternion::identity, Vector3::one * 2000);
+        //Matrix4x4 model = Matrix4x4::Scale(1000);
         Graphics::DrawMesh(Mesh::builtinMesh(PrimitiveType::Sphere), model, RenderSettings::skybox());
 
 

@@ -49,8 +49,8 @@ namespace FishEngine
 
     void SkinnedMeshRenderer::UpdateMatrixPalette() const
     {
-        m_matrixPalette.resize(m_sharedMesh->m_boneNameToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), m_sharedMesh->m_boneNameToIndex, m_matrixPalette);
+        m_matrixPalette.resize(m_avatar->m_boneToIndex.size());
+        RecursivelyGetTransformation(m_rootBone.lock(), m_avatar->m_boneToIndex, m_matrixPalette);
         const auto& invGlobalTransform = gameObject()->transform()->worldToLocalMatrix();
         const auto& bindposes = m_sharedMesh->bindposes();
         for (uint32_t i = 0; i < m_matrixPalette.size(); ++i)
@@ -88,11 +88,11 @@ namespace FishEngine
 
         // hack
         // TODO: remove this block
-        bool skinned = m_avatar != nullptr;
-        if (skinned && m_matrixPalette.size() == 0)
-        {
+        //bool skinned = m_avatar != nullptr;
+        //if (skinned && m_matrixPalette.size() == 0)
+        //{
             UpdateMatrixPalette();
-        }
+        //}
         
         Pipeline::UpdateBonesUniforms(m_matrixPalette);
 

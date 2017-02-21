@@ -37,7 +37,24 @@ namespace FishEngine
                 return;
             }
         }
-        Debug::LogError("BoneWeight::AddBoneData");
+		// more than MaxBoneForEachVertex
+		Debug::LogWarning("[BoneWeight::AddBoneData] more than %d bones", MaxBoneForEachVertex);
+
+		int minId = 0;
+		float minWeight = this->weight[0];
+		for (int i = 1; i < MaxBoneForEachVertex; ++i)
+		{
+			if (this->weight[i] < minWeight)
+			{
+				minId = i;
+				minWeight = this->weight[i];
+			}
+		}
+		if (minWeight < weight)
+		{
+			this->boneIndex[minId] = boneIndex;
+			this->weight[minId] = weight;
+		}
     }
 
 	std::map<PrimitiveType, MeshPtr> Mesh::s_builtinMeshes;
@@ -79,8 +96,8 @@ namespace FishEngine
           m_tangents(tangents),
           m_triangles(triangles)
     {
-		m_vertexCount = vertices.size();
-		m_triangleCount = triangles.size() / 3;
+		m_vertexCount = static_cast<uint32_t>( vertices.size() );
+		m_triangleCount = static_cast<uint32_t>( triangles.size() / 3 );
     }
 
     //Mesh::Mesh(Mesh&& m)
@@ -202,7 +219,7 @@ namespace FishEngine
 		float vx, vy, vz;
 		Vector3 vmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
 		Vector3 vmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
-		for (int i = 0; i < mesh->m_vertexCount; ++i)
+		for (uint32_t i = 0; i < mesh->m_vertexCount; ++i)
 		{
 			is >> vx >> vy >> vz;
 			if (vmin.x > vx) vmin.x = vx;

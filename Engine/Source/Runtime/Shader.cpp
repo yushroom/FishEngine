@@ -405,8 +405,8 @@ namespace FishEngine
                 cursor = text.find_first_of('\n', cursor) + 1;
             }
 
-            auto total = std::count(text.begin(), text.end(), '\n') + 1;
-            size_t last = line_number - start_line + 5;
+            int total = static_cast<int>( std::count(text.begin(), text.end(), '\n') + 1 );
+            int last = static_cast<int>( line_number - start_line + 5 );
             if (last >= total)
                 last = total - 1;
 

@@ -186,7 +186,7 @@ namespace FishEditor
                 auto& bone = assimp_mesh->mBones[boneIndex];
                 std::string boneName(bone->mName.C_Str());
                 //Debug::Log("    bone name: %s", boneName.c_str());
-                mesh->m_boneNameToIndex[boneName] = boneIndex;
+                //mesh->m_boneNameToIndex[boneName] = boneIndex;
 
                 auto offsetMat = ConvertMatrix(bone->mOffsetMatrix);
                 offsetMat.m[0][3] *= m_fileScale;
@@ -225,12 +225,12 @@ namespace FishEditor
     };
 
 
-    AnimationPtr
+	AnimationChannelPtr
     ParseAnimation(
         const aiAnimation* assimp_animation,
         const float fileScale)
     {
-        auto animation = std::make_shared<Animation>();
+        auto animation = std::make_shared<AnimationChannel>();
         auto& a = assimp_animation;
         animation->name = a->mName.C_Str();
 #ifdef DEBUG_ANIMATION
@@ -393,7 +393,7 @@ namespace FishEditor
 
     void ModelImporter::
     RemoveDummyNodeFBX(
-        AnimationPtr animation)
+		AnimationChannelPtr animation)
     {
         for (auto& it : m_nodeTransformations)
         {

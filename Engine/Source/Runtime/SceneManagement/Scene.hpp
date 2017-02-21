@@ -3,7 +3,7 @@
 #include "../FishEngine.hpp"
 #include <list>
 #include <string>
-#include <boost/filesystem.hpp>
+#include "Path.hpp"
 #include <memory>
 
 namespace FishEngine

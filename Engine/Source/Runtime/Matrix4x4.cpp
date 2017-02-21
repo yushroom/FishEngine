@@ -77,7 +77,40 @@ namespace FishEngine {
         Zero(m[3][0]) && Zero(m[3][1]) && Zero(m[3][2]) && One(m[3][3]);
     }
     
-    //Matrix4x4 translate(const Matrix4x4& m, float tx, float ty, float tz)
+	float Matrix4x4::Determinant(const Matrix4x4& m)
+	{
+		float SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+		float SubFactor01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+		float SubFactor02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+		float SubFactor03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+		float SubFactor04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+		float SubFactor05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+
+		Vector4 DetCof(
+			+(m[1][1] * SubFactor00 - m[1][2] * SubFactor01 + m[1][3] * SubFactor02),
+			-(m[1][0] * SubFactor00 - m[1][2] * SubFactor03 + m[1][3] * SubFactor04),
+			+(m[1][0] * SubFactor01 - m[1][1] * SubFactor03 + m[1][3] * SubFactor05),
+			-(m[1][0] * SubFactor02 - m[1][1] * SubFactor04 + m[1][2] * SubFactor05));
+
+		return
+			m[0][0] * DetCof[0] + m[0][1] * DetCof[1] +
+			m[0][2] * DetCof[2] + m[0][3] * DetCof[3];
+	}
+
+	FishEngine::Matrix4x4 Matrix4x4::Transpose(const Matrix4x4& mat)
+	{
+		Matrix4x4 result;
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				result.m[i][j] = mat.m[j][i];
+			}
+		}
+		return result;
+	}
+
+	//Matrix4x4 translate(const Matrix4x4& m, float tx, float ty, float tz)
     //{
     //    Matrix4x4 result = m;
     //    Vector4 col3(tx, ty, tz, 1.f);
@@ -88,24 +121,26 @@ namespace FishEngine {
     //    return result;
     //}
 
-    void Matrix4x4::SetTRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
-    {
-        *this = Matrix4x4::FromRotation(q);
+	FishEngine::Matrix4x4 Matrix4x4::TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
+	{
+		Matrix4x4 mat = Matrix4x4::FromRotation(q);
 
-        m[0][3] = pos.x;
-        m[1][3] = pos.y;
-        m[2][3] = pos.z;
-        m[0][0] *= s.x;
-        m[0][1] *= s.y;
-        m[0][2] *= s.z;
-        m[1][0] *= s.x;
-        m[1][1] *= s.y;
-        m[1][2] *= s.z;
-        m[2][0] *= s.x;
-        m[2][1] *= s.y;
-        m[2][2] *= s.z;
-        m[3][3] = 1.f;
-    }
+		mat.m[0][3] = pos.x;
+		mat.m[1][3] = pos.y;
+		mat.m[2][3] = pos.z;
+		mat.m[0][0] *= s.x;
+		mat.m[0][1] *= s.y;
+		mat.m[0][2] *= s.z;
+		mat.m[1][0] *= s.x;
+		mat.m[1][1] *= s.y;
+		mat.m[1][2] *= s.z;
+		mat.m[2][0] *= s.x;
+		mat.m[2][1] *= s.y;
+		mat.m[2][2] *= s.z;
+		mat.m[3][3] = 1.f;
+		return mat;
+	}
+
 
     void Matrix4x4::TRS(
         const Vector3&      translation,
@@ -169,7 +204,8 @@ namespace FishEngine {
         //}
     }
 
-    void Matrix4x4::Decompose(
+
+	void Matrix4x4::Decompose(
         const Matrix4x4&    transformation, 
         Vector3*            outTranslation,
         Quaternion*         outRotation, 

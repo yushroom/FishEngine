@@ -5,7 +5,6 @@
 
 #include "FishEditor.hpp"
 #include <ReflectClass.hpp>
-//#include <boost/filesystem.hpp>
 
 namespace FishEditor
 {

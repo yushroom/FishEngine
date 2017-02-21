@@ -17,6 +17,7 @@
 #include "Serialization/archives/yaml.hpp"
 #include "Camera.hpp"
 
+#include "GLEnvironment.hpp"
 
 namespace FishEngine
 {
@@ -122,7 +123,7 @@ namespace FishEngine
             frustum.maxRange = split_far;
 
             Gizmos::setMatrix(camera_to_world);
-            Gizmos::setColor(Color::cyan * i / 3.0f);
+            Gizmos::setColor(Color::cyan * (i / 3.0f));
             Gizmos::DrawFrustum(frustum);
             Gizmos::setMatrix(Matrix4x4::identity);
 
@@ -158,7 +159,7 @@ namespace FishEngine
             auto min_p = aabb.min();
             auto max_p = aabb.max();
 
-            Gizmos::setColor(Color::red * i / 3);
+            Gizmos::setColor(Color::red * (i / 3.0f));
             Gizmos::setMatrix(world_to_light.inverse());
             Gizmos::DrawWireCube(aabb.center(), aabb.size());
             Gizmos::setMatrix(Matrix4x4::identity);

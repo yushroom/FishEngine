@@ -35,4 +35,5 @@ AddComponentToGameObject(
 #undef CASE
     Debug::LogError("UNKNOWN component type name: %s", componentClassName.c_str());
     //abort();
+	return nullptr;
 }

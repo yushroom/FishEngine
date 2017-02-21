@@ -54,7 +54,7 @@ namespace FishEditor
             return m_meshes[0];
         }
         
-		FishEngine::AnimationPtr mainAnimation() const
+		FishEngine::AnimationChannelPtr mainAnimation() const
         {
             if (m_animations.empty())
                 return nullptr;
@@ -81,7 +81,7 @@ namespace FishEditor
         std::vector<FishEngine::MeshPtr> m_meshes;
 
 		Meta(NonSerializable)
-        std::vector<FishEngine::AnimationPtr> m_animations;
+        std::vector<FishEngine::AnimationChannelPtr> m_animations;
         //std::vector<ModelNode::PModelNode> m_modelNodes;
 
 		Meta(NonSerializable)
@@ -191,7 +191,7 @@ namespace FishEditor
             bool            load_uv,
             bool            load_tangent);
 
-        void RemoveDummyNodeFBX(FishEngine::AnimationPtr animation );
+        void RemoveDummyNodeFBX(FishEngine::AnimationChannelPtr animation );
 
 		Meta(NonSerializable)
         ModelPtr      m_model;

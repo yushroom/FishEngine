@@ -1,7 +1,8 @@
 #include "Vector3.hpp"
+#include "Time.hpp"
 
-namespace FishEngine {
-
+namespace FishEngine
+{
     const Vector3 Vector3::back(0, 0, -1);
     const Vector3 Vector3::down(0, -1, 0);
     const Vector3 Vector3::forward(0, 0, 1);
@@ -14,7 +15,7 @@ namespace FishEngine {
     Vector3 Vector3::Project(const Vector3& vector, const Vector3& onNormal)
     {
         float num = Dot(onNormal, onNormal);
-        if (num < 1e-5f)    // TODO: use Mathf::Epsilon
+        if (num < Mathf::Epsilon)    // TODO: use Mathf::Epsilon
         {
             return Vector3::zero;
         }
@@ -25,6 +26,12 @@ namespace FishEngine {
     {
         return vector - Vector3::Project(vector, planeNormal);
     }
+
+	FishEngine::Vector3 Vector3::SmoothDamp(const Vector3& current, const Vector3& target, Vector3& currentVelocity/*ref*/, float smoothTime, float maxSpeed /*= Mathf::PositiveInfinity*/)
+	{
+		float deltaTime = Time::deltaTime();
+		return Vector3::SmoothDamp(current, target, currentVelocity, smoothTime, maxSpeed, deltaTime);
+	}
 
     FishEngine::Vector3 Vector3::SmoothDamp(const Vector3& current, const Vector3& target, Vector3& currentVelocity/*ref*/, float smoothTime, float maxSpeed, float deltaTime)
     {
@@ -48,7 +55,7 @@ namespace FishEngine {
         return vector4;
     }
 
-    FishEngine::Vector3 Vector3::MoveTowards(const Vector3& current, const Vector3& target, float maxDistanceDelta)
+	FishEngine::Vector3 Vector3::MoveTowards(const Vector3& current, const Vector3& target, float maxDistanceDelta)
     {
         Vector3 a = target - current;
         float magnitude = a.magnitude();

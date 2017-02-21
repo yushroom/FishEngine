@@ -19,6 +19,7 @@
 #include <MeshFilter.hpp>
 #include <Mesh.hpp>
 #include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
 #include <CameraController.hpp>
 #include <Rigidbody.hpp>
 #include <Collider.hpp>
@@ -194,6 +195,14 @@ template<>
 void Inspector::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 {
     OnInspectorGUI<Renderer>(renderer);
+}
+
+template<>
+void Inspector::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& renderer)
+{
+	OnInspectorGUI<Renderer>(renderer);
+	EditorGUI::ObjectField( "Mesh", renderer->m_sharedMesh );
+	EditorGUI::ObjectField( "Root Bone", renderer->m_rootBone.lock() );
 }
 
 template<>
@@ -530,6 +539,7 @@ void Inspector::BeginComponent(const ComponentPtr &component)
         CASE(Light)
         CASE(MeshFilter)
         CASE(MeshRenderer)
+		CASE(SkinnedMeshRenderer)
         CASE(CameraController)
         CASE(Rigidbody)
         CASE(BoxCollider)

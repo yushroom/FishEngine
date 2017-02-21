@@ -8,6 +8,7 @@
 #include "../AssetImporter.hpp"
 #include "../ModelImporter.hpp"
 #include "../ModelImporter.hpp"
+#include "../ProjectSettings.hpp"
 #include "../TextureImporter.hpp"
 #include "../TextureImporter.hpp"
 
@@ -68,6 +69,24 @@ namespace FishEditor
 		archive >> FishEngine::make_nvp("m_importTangents", m_importTangents); // FishEditor::ModelImporterTangents
 		archive >> FishEngine::make_nvp("m_materialSearch", m_materialSearch); // FishEditor::ModelImporterMaterialSearch
 	}
+
+
+    // FishEditor::ProjectSettings
+    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ProjectSettings const & value )
+    {
+        Prologue(archive, value);
+        
+        Epilogue(archive, value);
+        return archive;
+    }
+
+    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::ProjectSettings & value )
+    {
+        Prologue(archive, value);
+        
+        Epilogue(archive, value);
+        return archive;
+    }
 
 
     // FishEditor::TextureSettings

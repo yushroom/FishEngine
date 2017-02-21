@@ -135,7 +135,7 @@ namespace FishEngine
 //		std::vector<Int4>       m_boneIndexBuffer;
 //		std::vector<Vector4>    m_boneWeightBuffer;
 		
-		std::map<std::string, int> m_boneNameToIndex;
+		//std::map<std::string, int> m_boneNameToIndex;
 		
 		std::vector<Matrix4x4>  m_bindposes;
 		

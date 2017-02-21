@@ -292,13 +292,14 @@ def ExtractClasses(path):
                 R'C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt',
                 R'C:\Program Files (x86)\Windows Kits\8.1\Include\um',
                 R'C:\Program Files (x86)\Windows Kits\8.1\Include\shared',
-                R'D:\program\FishEngine/Engine/ThirdParty/boost_1_61_0',
-                R'D:\program\FishEngine/Engine/ThirdParty/glfw-3.2.1/include',
-                R'D:\program\FishEngine/Engine/ThirdParty/',
-                R'D:\program\FishEngine/Engine/Source/Runtime',
-                R'D:\program\FishEngine/Engine/ThirdParty/yaml-cpp/include',
-                R'D:\program\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
-                R'D:\program\FishEngine\Engine\ThirdParty\glew-2.0.0\include',
+                R'D:\program\github\FishEngine/Engine/ThirdParty/boost',
+                R'D:\program\github\FishEngine/Engine/ThirdParty/glfw/include',
+                R'D:\program\github\FishEngine/Engine/ThirdParty/',
+                R'D:\program\github\FishEngine/Engine/Source/Runtime',
+                R'D:\program\github\FishEngine/Engine/ThirdParty/yaml-cpp/include',
+                R'D:\program\github\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+                R'D:\program\github\FishEngine\Engine\ThirdParty\glew\include',
+                R'D:\program\FishEngine\Engine\ThirdParty\PhysXSDK\Include',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtGui',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtWidgets',
@@ -330,7 +331,7 @@ def ExtractClasses(path):
     return classes
 
 if __name__ == "__main__":
-    classes = ExtractClasses("temp/AllHeaders2.hpp")
+    classes = ExtractClasses("temp/AllHeaders.hpp")
     #print(json.dumps(classes, indent=4))
     print('Transform.m_children: ', [x for x in classes['FishEngine::Transform']['members'] if x['name'] == 'm_children'][0]['type'])
     #print(json.dumps(classes['Transform'], indent=4))

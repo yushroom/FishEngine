@@ -31,40 +31,43 @@ namespace FishEngine
         uint32_t m_faceCount = 0;
 
         /** Position in local space. Array[VertexId] = float3(x,y,z) */
-        std::vector<Vector3> VertexPositions;
+        std::vector<Vector3> m_vertexPositions;
 
         /** Index of the vertex at this wedge. Array[WedgeId] = VertexId */
-        std::vector<uint32_t> WedgeIndices;
+        std::vector<uint32_t> m_wedgeIndices;
 
-        std::vector<Vector3> WedgeNormals;
+        std::vector<Vector3> m_wedgeNormals;
 
-        std::vector<Vector3> WedgeTangents;
+        std::vector<Vector3> m_wedgeTangents;
 
-        std::vector<Vector2> WedgeTexCoords;
+        std::vector<Vector2> m_wedgeTexCoords;
+
+		// disjoint set
+		std::map<uint32_t, uint32_t> m_vertexIndexRemapping;
 
         void SetVertexCount(uint32_t vertexCount)
         {
             m_vertexCount = vertexCount;
-            VertexPositions.reserve(vertexCount);
+            m_vertexPositions.reserve(vertexCount);
         }
 
         void SetFaceCount(uint32_t faceCount)
         {
             m_faceCount = faceCount;
-            WedgeIndices.reserve(faceCount * 3);    // 3 corners
-            WedgeNormals.reserve(faceCount * 3);
-            WedgeTangents.reserve(faceCount * 3);
-            WedgeTexCoords.reserve(faceCount * 2);
+            m_wedgeIndices.reserve(faceCount * 3);    // 3 corners
+            m_wedgeNormals.reserve(faceCount * 3);
+            m_wedgeTangents.reserve(faceCount * 3);
+            m_wedgeTexCoords.reserve(faceCount * 2);
         }
 
 
         std::shared_ptr<Mesh> ToMesh()
         {
-            std::vector<Vector3> positionBuffer(VertexPositions);
+            std::vector<Vector3> positionBuffer(m_vertexPositions);
             std::vector<Vector3> normalBuffer;
             std::vector<Vector3> tangentBuffer;
             std::vector<Vector2> uvBuffer;
-			std::vector<uint32_t> indexBuffer(WedgeIndices);
+			std::vector<uint32_t> indexBuffer(m_wedgeIndices);
 			
 			// used to combine vertex with the same position/uv/...
 			//std::map<uint32_t, uint32_t> indexRemapping;
@@ -79,38 +82,50 @@ namespace FishEngine
 
             std::vector<bool> vertexVisited(m_vertexCount, false);
 
-            for (int i = 0; i < m_faceCount; ++i)
+            for (uint32_t faceId = 0; faceId < m_faceCount; ++faceId)
             {
-                for (int j = 0; j < 3; ++j)
+                for (int cornerId = 0; cornerId < 3; ++cornerId)
                 {
-                    uint32_t wedgeId = i * 3 + j;
-                    uint32_t vertexId = WedgeIndices[wedgeId];
+                    uint32_t wedgeId = faceId * 3 + cornerId;
+                    uint32_t vertexId = m_wedgeIndices[wedgeId];
                     if ( ! vertexVisited[vertexId] )
                     {
-                        uvBuffer[vertexId] = WedgeTexCoords[wedgeId];
-                        normalBuffer[vertexId] = WedgeNormals[wedgeId];
-                        tangentBuffer[vertexId] = WedgeTangents[wedgeId];
+                        uvBuffer[vertexId] = m_wedgeTexCoords[wedgeId];
+                        normalBuffer[vertexId] = m_wedgeNormals[wedgeId];
+                        tangentBuffer[vertexId] = m_wedgeTangents[wedgeId];
 						vertexVisited[vertexId] = true;
                     }
                     else
                     {
-                        bool newVertex = (uvBuffer[vertexId] != WedgeTexCoords[wedgeId]);
-                        if (!newVertex)
+						int pid = vertexId;
+						while (true)
 						{
-                            newVertex = (normalBuffer[vertexId] != WedgeNormals[wedgeId]);
+							bool isSame = uvBuffer[pid] == m_wedgeTexCoords[wedgeId] &&
+								normalBuffer[pid] == m_wedgeNormals[wedgeId] &&
+								tangentBuffer[pid] == m_wedgeTangents[wedgeId];
+							if (isSame)
+							{
+								indexBuffer[wedgeId] = pid;
+								break;
+							}
+							else
+							{
+								auto it = m_vertexIndexRemapping.find(pid);
+								if (it == m_vertexIndexRemapping.end())
+								{
+									// make a new vertex
+									positionBuffer.push_back(positionBuffer[vertexId]);
+									uvBuffer.push_back(m_wedgeTexCoords[wedgeId]);
+									normalBuffer.push_back(m_wedgeNormals[wedgeId]);
+									tangentBuffer.push_back(m_wedgeTangents[wedgeId]);
+									uint32_t newVertexId = static_cast<uint32_t>( positionBuffer.size() - 1 );
+									indexBuffer[wedgeId] = newVertexId;
+									m_vertexIndexRemapping[pid] = newVertexId;
+									break;
+								}
+								pid = it->second;
+							}
 						}
-                        if (!newVertex)
-						{
-                            newVertex = (tangentBuffer[vertexId] != WedgeTangents[wedgeId]);
-						}
-                        if (newVertex)
-                        {
-							indexBuffer[wedgeId] = positionBuffer.size();
-                            positionBuffer.push_back(positionBuffer[vertexId]);
-                            uvBuffer.push_back( WedgeTexCoords[wedgeId] );
-                            normalBuffer.push_back( WedgeNormals[wedgeId] );
-                            tangentBuffer.push_back( WedgeTangents[wedgeId] );
-                        }
                     }
                 }
             }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace FishEditor
 {
 	class ProjectSettings
@@ -7,9 +9,6 @@ namespace FishEditor
 	public:
 		ProjectSettings() = delete;
 
-		static uint32_t NextFileID()
-		{
-
-		}
-	}
+		static uint32_t NextFileID();
+	};
 }

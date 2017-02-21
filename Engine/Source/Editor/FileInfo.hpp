@@ -38,12 +38,12 @@ namespace FishEditor
             return m_path.filename().string();
         }
 
-        int childCount() const
+        std::size_t childCount() const
         {
             return m_dirChildren.size() + m_fileChildren.size();
         }
 
-        int subDirCount() const
+		std::size_t subDirCount() const
         {
             return m_dirChildren.size();
         }

@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 #include "Macro.hpp"
-//#include <Archive.hpp>
+#include "HideFlags.hpp"
 
 namespace FishEngine
 {
@@ -13,37 +13,7 @@ namespace FishEngine
 	
 	class InputArchive;
 	class OutputArchive;
-	
-	enum class HideFlags
-	{
-		//A normal, visible object. This is the default.
-		None,
-		
-		//The object will not appear in the hierarchy.
-		HideInHierarchy,
-		
-		//It is not possible to view it in the inspector.
-		HideInInspector,
-		
-		//The object will not be saved to the scene in the editor.
-		DontSaveInEditor,
-		
-		//The object is not be editable in the inspector.
-		NotEditable,
-		
-		//The object will not be saved when building a player.
-		DontSaveInBuild,
-		
-		//The object will not be unloaded by Resources.UnloadUnusedAssets.
-		DontUnloadUnusedAsset,
-		
-		//The object will not be saved to the scene. It will not be destroyed when a new scene is loaded. It is a shortcut for HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.DontUnloadUnusedAsset.
-		DontSave,
-		
-		//A combination of not shown in the hierarchy, not saved to to scenes and not unloaded by The object will not be unloaded by Resources.UnloadUnusedAssets.
-		HideAndDontSave,
-	};
-    
+
     class FE_EXPORT Object
     {
     public:
@@ -68,10 +38,6 @@ namespace FishEngine
         }
         
         //InjectSerializationFunctions(Object);
-		template <typename Archive>
-		friend void Save (Archive & archive, Object const & t);
-		template <typename Archive>
-		friend void Load (Archive & archive, Object & t);
 		virtual void Serialize(OutputArchive & archive) const;
 		virtual void Deserialize(InputArchive & archive);
 		
@@ -101,8 +67,15 @@ namespace FishEngine
     };
 
 
-	inline bool operator== (Object const & lhs, Object const & rhs) { return lhs.GetGUID() == rhs.GetGUID(); }
-	inline bool operator< (Object const & lhs, Object const & rhs) { return lhs.GetGUID() < rhs.GetGUID(); }
+	inline bool operator== (Object const & lhs, Object const & rhs)
+	{ 
+		return lhs.GetGUID() == rhs.GetGUID();
+	}
+
+	inline bool operator< (Object const & lhs, Object const & rhs)
+	{
+		return lhs.GetGUID() < rhs.GetGUID();
+	}
 }
 
 #endif // Object_hpp

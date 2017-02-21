@@ -45,7 +45,7 @@ namespace FishEngine {
         w *= inv_len;
     }
 
-    FishEngine::Vector3 Quaternion::operator*(Vector3 point) const
+    FishEngine::Vector3 Quaternion::operator*(const Vector3 & point) const
     {
         float num = x * 2.f;
         float num2 = y * 2.f;
@@ -66,7 +66,7 @@ namespace FishEngine {
         return result;
     }
 
-    FishEngine::Quaternion Quaternion::operator*(Quaternion rhs) const
+    FishEngine::Quaternion Quaternion::operator*(const Quaternion & rhs) const
     {
         // [p.w*q.v + q.w*p.v + corss(p.v, q.v), p.w*q.w-dot(p.v, q.v)]
         return Quaternion(
@@ -81,9 +81,11 @@ namespace FishEngine {
         auto a = axis.normalized();
         Quaternion Result;
 
-        float s = Mathf::Sin(angle * 0.5f);
+		float angleHalf = Mathf::Radians(angle) * 0.5f;
 
-        Result.w = Mathf::Cos(angle * 0.5f);
+        float s = Mathf::Sin(angleHalf);
+
+        Result.w = Mathf::Cos(angleHalf);
         Result.x = a.x * s;
         Result.y = a.y * s;
         Result.z = a.z * s;

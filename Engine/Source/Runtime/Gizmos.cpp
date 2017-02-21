@@ -34,7 +34,7 @@ float getScaleForConstantSizeGeometry(const Vector3& center, float targetScale)
     // http://gamedev.stackexchange.com/questions/24968/constant-size-geometries
     auto camera = Camera::main();
     float camera_object_distance = Vector3::Distance(camera->transform()->position(), center);
-    float worldSize = 2.0f * Mathf::Tan(camera->fieldOfView() * 0.5f) * camera_object_distance;
+    float worldSize = 2.0f * Mathf::Tan(Mathf::Radians(camera->fieldOfView()) * 0.5f) * camera_object_distance;
     return targetScale * worldSize;
 }
 
@@ -358,7 +358,9 @@ DrawFrustum(
     static DynamicMesh frustumMesh;
     constexpr int numLines = 4 * 3;
     float vertices[numLines * 2 * 3];
-    float tan2 = Mathf::Tan(fov * 0.5f);
+	float rad = Mathf::Radians(fov) * 0.5f;
+	float tan2 = Mathf::Tan(rad);
+    //float tan2 = Mathf::Tan(fov * 0.5f);
     float h1 = tan2 * minRange;
     float w1 = h1 * aspect;
     float h2 = tan2 * maxRange;

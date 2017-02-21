@@ -3,16 +3,13 @@
 
 #include "FishEngine.hpp"
 
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-#include <boost/filesystem.hpp>
+#include "Path.hpp"
 #include <boost/uuid/uuid.hpp>
 
 #include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    typedef boost::filesystem::path Path;
-
 	enum class AssetType
 	{
 		Unknown,

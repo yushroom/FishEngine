@@ -23,15 +23,16 @@
 #include "../Shader.hpp"
 #include "../Texture.hpp"
 #include "../Matrix4x4.hpp"
-#include "../Rigidbody.hpp"
+#include "../Behaviour.hpp"
 #include "../Animator.hpp"
 #include "../Component.hpp"
-#include "../Behaviour.hpp"
+#include "../Rigidbody.hpp"
 #include "../Skybox.hpp"
 #include "../ShaderProperty.hpp"
 #include "../CapsuleCollider.hpp"
 #include "../Mesh.hpp"
 #include "../Transform.hpp"
+#include "../Animator.hpp"
 #include "../Material.hpp"
 #include "../SkinnedMeshRenderer.hpp"
 #include "../SphereCollider.hpp"
@@ -54,7 +55,7 @@
 #include "../Texture2D.hpp"
 #include "../Renderer.hpp"
 #include "../GameObject.hpp"
-#include "../Animator.hpp"
+#include "../TagManager.hpp"
 
 namespace FishEngine
 {
@@ -411,27 +412,17 @@ namespace FishEngine
     }
 
 
-	// FishEngine::Rigidbody
-	void FishEngine::Rigidbody::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Behaviour
+	void FishEngine::Behaviour::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_mass", m_mass); // float
-		archive << FishEngine::make_nvp("m_drag", m_drag); // float
-		archive << FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
-		archive << FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
-		archive << FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
-		archive << FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
+		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
 	}
 
-	void FishEngine::Rigidbody::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Behaviour::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_mass", m_mass); // float
-		archive >> FishEngine::make_nvp("m_drag", m_drag); // float
-		archive >> FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
-		archive >> FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
-		archive >> FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
-		archive >> FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
+		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
 	}
 
 
@@ -469,17 +460,27 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::Behaviour
-	void FishEngine::Behaviour::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Rigidbody
+	void FishEngine::Rigidbody::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive << FishEngine::make_nvp("m_mass", m_mass); // float
+		archive << FishEngine::make_nvp("m_drag", m_drag); // float
+		archive << FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
+		archive << FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
+		archive << FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
+		archive << FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
 	}
 
-	void FishEngine::Behaviour::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Rigidbody::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive >> FishEngine::make_nvp("m_mass", m_mass); // float
+		archive >> FishEngine::make_nvp("m_drag", m_drag); // float
+		archive >> FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
+		archive >> FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
+		archive >> FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
+		archive >> FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
 	}
 
 
@@ -548,36 +549,34 @@ namespace FishEngine
 	{
 		FishEngine::Object::Serialize(archive);
 		archive << FishEngine::make_nvp("m_skinned", m_skinned); // bool
-		archive << FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
-		archive << FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
-		archive << FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
-		archive << FishEngine::make_nvp("m_triangleCount", m_triangleCount); // uint32_t
-		archive << FishEngine::make_nvp("m_bounds", m_bounds); // FishEngine::Bounds
 		archive << FishEngine::make_nvp("m_vertices", m_vertices); // std::vector<Vector3>
 		archive << FishEngine::make_nvp("m_normals", m_normals); // std::vector<Vector3>
 		archive << FishEngine::make_nvp("m_uv", m_uv); // std::vector<Vector2>
 		archive << FishEngine::make_nvp("m_tangents", m_tangents); // std::vector<Vector3>
 		archive << FishEngine::make_nvp("m_triangles", m_triangles); // std::vector<uint32_t>
-		archive << FishEngine::make_nvp("m_boneNameToIndex", m_boneNameToIndex); // std::map<std::string, int>
 		archive << FishEngine::make_nvp("m_bindposes", m_bindposes); // std::vector<Matrix4x4>
+		archive << FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
+		archive << FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
+		archive << FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
+		archive << FishEngine::make_nvp("m_triangleCount", m_triangleCount); // uint32_t
+		archive << FishEngine::make_nvp("m_bounds", m_bounds); // FishEngine::Bounds
 	}
 
 	void FishEngine::Mesh::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Object::Deserialize(archive);
 		archive >> FishEngine::make_nvp("m_skinned", m_skinned); // bool
-		archive >> FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
-		archive >> FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
-		archive >> FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
-		archive >> FishEngine::make_nvp("m_triangleCount", m_triangleCount); // uint32_t
-		archive >> FishEngine::make_nvp("m_bounds", m_bounds); // FishEngine::Bounds
 		archive >> FishEngine::make_nvp("m_vertices", m_vertices); // std::vector<Vector3>
 		archive >> FishEngine::make_nvp("m_normals", m_normals); // std::vector<Vector3>
 		archive >> FishEngine::make_nvp("m_uv", m_uv); // std::vector<Vector2>
 		archive >> FishEngine::make_nvp("m_tangents", m_tangents); // std::vector<Vector3>
 		archive >> FishEngine::make_nvp("m_triangles", m_triangles); // std::vector<uint32_t>
-		archive >> FishEngine::make_nvp("m_boneNameToIndex", m_boneNameToIndex); // std::map<std::string, int>
 		archive >> FishEngine::make_nvp("m_bindposes", m_bindposes); // std::vector<Matrix4x4>
+		archive >> FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
+		archive >> FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
+		archive >> FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
+		archive >> FishEngine::make_nvp("m_triangleCount", m_triangleCount); // uint32_t
+		archive >> FishEngine::make_nvp("m_bounds", m_bounds); // FishEngine::Bounds
 	}
 
 
@@ -601,6 +600,30 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
 		archive >> FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
 	}
+
+
+    // FishEngine::AnimationChannel
+    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::AnimationChannel const & value )
+    {
+        Prologue(archive, value);
+        archive << FishEngine::make_nvp("name", value.name); // std::string
+		archive << FishEngine::make_nvp("duration", value.duration); // float
+		archive << FishEngine::make_nvp("ticksPerSecond", value.ticksPerSecond); // float
+		archive << FishEngine::make_nvp("channels", value.channels); // std::map<std::string, AnimationNode>
+        Epilogue(archive, value);
+        return archive;
+    }
+
+    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::AnimationChannel & value )
+    {
+        Prologue(archive, value);
+        archive >> FishEngine::make_nvp("name", value.name); // std::string
+		archive >> FishEngine::make_nvp("duration", value.duration); // float
+		archive >> FishEngine::make_nvp("ticksPerSecond", value.ticksPerSecond); // float
+		archive >> FishEngine::make_nvp("channels", value.channels); // std::map<std::string, AnimationNode>
+        Epilogue(archive, value);
+        return archive;
+    }
 
 
     // FishEngine::MaterialProperty
@@ -1081,25 +1104,19 @@ namespace FishEngine
 	}
 
 
-    // FishEngine::Animation
-    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Animation const & value )
+    // FishEngine::TagManager
+    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::TagManager const & value )
     {
         Prologue(archive, value);
-        archive << FishEngine::make_nvp("name", value.name); // std::string
-		archive << FishEngine::make_nvp("duration", value.duration); // float
-		archive << FishEngine::make_nvp("ticksPerSecond", value.ticksPerSecond); // float
-		archive << FishEngine::make_nvp("channels", value.channels); // std::map<std::string, AnimationNode>
+        
         Epilogue(archive, value);
         return archive;
     }
 
-    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::Animation & value )
+    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::TagManager & value )
     {
         Prologue(archive, value);
-        archive >> FishEngine::make_nvp("name", value.name); // std::string
-		archive >> FishEngine::make_nvp("duration", value.duration); // float
-		archive >> FishEngine::make_nvp("ticksPerSecond", value.ticksPerSecond); // float
-		archive >> FishEngine::make_nvp("channels", value.channels); // std::map<std::string, AnimationNode>
+        
         Epilogue(archive, value);
         return archive;
     }

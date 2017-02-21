@@ -54,7 +54,6 @@ namespace FishEngine
     class Texture3D;
     class Cubemap;
     class Time;
-    class Mathf;
     class Vector2;
     class Vector3;
     class Vector4;

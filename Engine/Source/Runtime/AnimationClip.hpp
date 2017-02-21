@@ -1,4 +1,5 @@
 #include "FishEngine.hpp"
+#include "Object.hpp"
 
 namespace FishEngine
 {

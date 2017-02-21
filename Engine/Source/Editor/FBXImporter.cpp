@@ -14,18 +14,6 @@
 
 using namespace FishEngine;
 
-/* Tab character ("\t") counter */
-int numTabs = 0;
-
-/**
-* Print the required number of tabs.
-*/
-void PrintTabs()
-{
-	for (int i = 0; i < numTabs; i++)
-		printf("\t");
-}
-
 /**
 * Return a string-based representation based on the attribute type.
 */
@@ -56,53 +44,46 @@ FbxString GetAttributeTypeName(FbxNodeAttribute::EType type)
 	}
 }
 
-/**
-* Print an attribute.
-*/
-void PrintAttribute(FbxNodeAttribute* pAttribute)
+Matrix4x4 FbxAMatrixToMatrix4x4(fbxsdk::FbxAMatrix const & fmatrix)
 {
-	if (!pAttribute) return;
-
-	FbxString typeName = GetAttributeTypeName(pAttribute->GetAttributeType());
-	FbxString attrName = pAttribute->GetName();
-	PrintTabs();
-	// Note: to retrieve the character array of a FbxString, use its Buffer() method.
-	printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
+	float f44[4][4];
+	auto d44 = fmatrix.Double44();
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			f44[i][j] = static_cast<float>(d44[j][i]);
+		}
+	}
+	return Matrix4x4(f44);
 }
 
-//void ConvertMapping(FbxGeometryElementUV *pUVs, FbxMesh *pMesh)
-//{
-//	if (pUVs->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-//	{
-//		if (pUVs->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
-//		{
-//			FbxSet<<#typename Type#>>
-//		}
-//	}
-//}
-
 // skinned data
-void FishEditor::FBXImporter::GetLinkData(FbxMesh* pGeometry, MeshPtr mesh)
+void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map<uint32_t, uint32_t> vertexIndexRemapping)
 {
-	int lSkinCount = pGeometry->GetDeformerCount(FbxDeformer::eSkin);
+	int lSkinCount = pMesh->GetDeformerCount(FbxDeformer::eSkin);
 	if (lSkinCount <= 0)
 	{
 		mesh->m_skinned = false;
+		return;
 	}
 	mesh->m_skinned = true;
 	
 	int n_vertices = mesh->vertexCount();
 	mesh->m_boneWeights.resize(n_vertices);
-//	mesh->m_boneIndexBuffer.resize(n_vertices);
-//	mesh->m_boneWeightBuffer.resize(n_vertices);
+
+	FbxCluster::ELinkMode lClusterMode = ((FbxSkin*)pMesh->GetDeformer(0, FbxDeformer::eSkin))->GetCluster(0)->GetLinkMode();
 	
-	for ( int i = 0; i < lSkinCount; ++i )
+	for ( int lSkinIndex = 0; lSkinIndex < lSkinCount; ++lSkinIndex )
 	{
-		int lClusterCount = ((FbxSkin *) pGeometry->GetDeformer(i, FbxDeformer::eSkin))->GetClusterCount();
+		FbxSkin * lSkinDeformer = (FbxSkin *)pMesh->GetDeformer(0, FbxDeformer::eSkin);
+		FbxSkin::EType lSkinningType = lSkinDeformer->GetSkinningType();
+
+		int lClusterCount = lSkinDeformer->GetClusterCount();
 		
-		for (int j = 0; j != lClusterCount; ++j)
+		for (int lClusterIndex = 0; lClusterIndex != lClusterCount; ++lClusterIndex)
 		{
-			FbxCluster* lCluster=((FbxSkin *) pGeometry->GetDeformer(i, FbxDeformer::eSkin))->GetCluster(j);
+			FbxCluster* lCluster= lSkinDeformer->GetCluster(lClusterIndex);
 			int lIndexCount = lCluster->GetControlPointIndicesCount();
 			int* lIndices = lCluster->GetControlPointIndices();
 			double* lWeights = lCluster->GetControlPointWeights();
@@ -117,25 +98,64 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pGeometry, MeshPtr mesh)
 			}
 			else
 			{
-				int boneId = m_boneCount;
+				boneId = m_boneCount;
 				m_model.m_avatar->m_boneToIndex[boneName] = boneId;
 				m_model.m_avatar->m_indexToBone[boneId] = boneName;
+				//fbxsdk::FbxAMatrix transformMatrix;
+				//lCluster->GetTransformMatrix(transformMatrix);
+				//auto t = transformMatrix.GetT();
+				//auto r = transformMatrix.GetR();
+				fbxsdk::FbxAMatrix bindPoseMatrix;
+				lCluster->GetTransformLinkMatrix(bindPoseMatrix);
+				auto tt = bindPoseMatrix.GetT();
+				auto rr = bindPoseMatrix.GetR();
+				m_bindPoses.push_back(FbxAMatrixToMatrix4x4(bindPoseMatrix));
 				m_boneCount++;
 			}
 			
 			for ( int k = 0; k < lIndexCount; k++ )
 			{
-				mesh->m_boneWeights[lIndices[k]].AddBoneData(boneId, lWeights[k]);
+				int id = lIndices[k];
+				float weight = static_cast<float>(lWeights[k]);
+				mesh->m_boneWeights[id].AddBoneData(boneId, weight);
+				auto it = vertexIndexRemapping.find(id);
+				while (it != vertexIndexRemapping.end())
+				{
+					id = it->second;
+					mesh->m_boneWeights[id].AddBoneData(boneId, weight);
+					it = vertexIndexRemapping.find(id);
+				}
 			}
 		}
 	}
-	
-//	for (uint32_t i = 0; i < n_vertices; ++i)
-//	{
-//		auto& b = mesh->m_boneWeights[i];
-//		mesh->m_boneIndexBuffer[i] = Int4{b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]};
-//		mesh->m_boneWeightBuffer[i] = Vector4{b.weight[0], b.weight[1], b.weight[2], b.weight[3]};
-//	}
+}
+
+void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
+{
+	auto boneName = node->gameObject()->name();
+	auto & boneToIndex = m_model.m_avatar->m_boneToIndex;
+	auto it = boneToIndex.find(boneName);
+	if (it != boneToIndex.end())
+	{
+		int id = it->second;
+		m_bones[id] = node;
+		if (node->parent() == nullptr)
+		{
+			node->setLocalToWorldMatrix(m_bindPoses[id]);
+		}
+		else
+		{
+			auto l2w = node->parent()->worldToLocalMatrix() * m_bindPoses[id];
+			//bindPoses[id] = l2w.inverse();
+			node->setLocalToWorldMatrix(l2w);
+			m_bindPoses[id] = node->worldToLocalMatrix();
+		}
+	}
+
+	for (auto & child : node->children())
+	{
+		UpdateBones(child.lock());
+	}
 }
 
 MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
@@ -163,6 +183,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 
 	// https://forums.autodesk.com/t5/fbx-forum/split-uv-per-control-point/td-p/4239606?nobounce
 
+#if 0
 	if (leUV0->GetMappingMode() == FbxGeometryElement::eByControlPoint &&
 		leNormal0->GetMappingMode() == FbxGeometryElement::eByControlPoint &&
 		leTangent0->GetMappingMode() == FbxGeometryElement::eByControlPoint)
@@ -254,6 +275,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 		GetLinkData(fbxMesh, mesh);
 		return mesh;
 	}
+#endif
 	
 	// use RawMesh to construct Mesh
 	
@@ -268,14 +290,14 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 	{
 		// Position
 		auto & p = controlPoints[controlPointIndex];
-		rawMesh.VertexPositions.emplace_back(p[0], p[1], p[2]);
+		rawMesh.m_vertexPositions.emplace_back((float)p[0], (float)p[1], (float)p[2]);
 	}
 	
 	for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
 	{
-		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 0) );
-		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 1) );
-		rawMesh.WedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 2) );
+		rawMesh.m_wedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 0) );
+		rawMesh.m_wedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 1) );
+		rawMesh.m_wedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 2) );
 	}
 
 	int vertexId = 0;
@@ -379,7 +401,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 					if (mode == FbxGeometryElement::eDirect || mode == FbxGeometryElement::eIndexToDirect)
 					{
 						auto uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
-						rawMesh.WedgeTexCoords.emplace_back(uv[0], uv[1]);
+						rawMesh.m_wedgeTexCoords.emplace_back((float)uv[0], (float)uv[1]);
 					}
 					else
 					{
@@ -404,14 +426,14 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 					{
 						//Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
 						auto n = leNormal->GetDirectArray().GetAt(vertexId);
-						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leNormal->GetIndexArray().GetAt(vertexId);
 						//Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
 						auto n = leNormal->GetDirectArray().GetAt(id);
-						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
 					}
 					else
 					{
@@ -424,13 +446,13 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 					if (mode == FbxGeometryElement::eDirect)
 					{
 						auto n = leNormal0->GetDirectArray().GetAt(lControlPointIndex);
-						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leNormal0->GetIndexArray().GetAt(lControlPointIndex);
 						auto n = leNormal0->GetDirectArray().GetAt(id);
-						rawMesh.WedgeNormals.emplace_back(n[0], n[1], n[2]);
+						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
 					}
 					else
 					{
@@ -455,14 +477,14 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 					{
 						//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
 						auto t = leTangent->GetDirectArray().GetAt(vertexId);
-						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leTangent->GetIndexArray().GetAt(vertexId);
 						//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
 						auto t = leTangent->GetDirectArray().GetAt(id);
-						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
 					}
 					else
 					{
@@ -475,13 +497,13 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 					if (mode == FbxGeometryElement::eDirect)
 					{
 						auto t = leTangent0->GetDirectArray().GetAt(lControlPointIndex);
-						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leTangent0->GetIndexArray().GetAt(lControlPointIndex);
 						auto t = leTangent0->GetDirectArray().GetAt(id);
-						rawMesh.WedgeTangents.emplace_back(t[0], t[1], t[2]);
+						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
 					}
 					else
 					{
@@ -529,7 +551,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 	
 	auto mesh = rawMesh.ToMesh();
 	
-	GetLinkData(fbxMesh, mesh);
+	GetLinkData(fbxMesh, mesh, rawMesh.m_vertexIndexRemapping);
 	
 	return mesh;
 }
@@ -540,7 +562,6 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 */
 GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 {
-	PrintTabs();
 	const char* nodeName = pNode->GetName();
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
@@ -552,15 +573,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	go->transform()->setLocalEulerAngles(r[0], r[1], r[2]);
 	go->transform()->setLocalScale(s[0], s[1], s[2]);
 	FishEditor::AssetDatabase::s_allAssetObjects.insert(go);
-
-//	// Print the contents of the node.
-//	printf("<node name='%s' translation='(%f, %f, %f)' rotation='(%f, %f, %f)' scaling='(%f, %f, %f)'>\n",
-//		nodeName,
-//		t[0], t[1], t[2],
-//		r[0], r[1], r[2],
-//		s[0], s[1], s[2]
-//	);
-//	numTabs++;
 
 	auto nodeAttribute = pNode->GetNodeAttribute();
 	if (nodeAttribute != nullptr)
@@ -574,14 +586,18 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 			if (mesh->name().empty())
 				mesh->setName(nodeName);
 			go->AddComponent<MeshFilter>()->SetMesh(mesh);
-//			if (mesh->m_skinned)
-//			{
-//				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
-//				srenderer->SetMaterial(Material::defaultMaterial());
-//				srenderer->setSharedMesh(mesh);
-//			}
-//			else
+			if (mesh->m_skinned)
+			{
+				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
+				srenderer->SetMaterial(Material::defaultMaterial());
+				srenderer->setSharedMesh(mesh);
+				srenderer->setAvatar(m_model.m_avatar);
+				srenderer->setRootBone(m_model.m_rootNode->transform());
+			}
+			else
+			{
 				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
+			}
 		}
 //		else if (type == FbxNodeAttribute::eSkeleton)
 //		{
@@ -593,16 +609,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 //		}
 	}
 
-	// Print the node's attributes.
-	//for (int i = 0; i < pNode->GetNodeAttributeCount(); i++)
-	//{
-	//	PrintAttribute(pNode->GetNodeAttributeByIndex(i));
-	//	if (pNode->GetNodeAttributeByIndex(i)->GetAttributeType() == FbxNodeAttribute::eMesh)
-	//	{
-	//		go->AddComponent<MeshFilter>();
-	//		go->AddComponent<MeshRenderer>();
-	//	}
-	//}
 
 	// Recursively print the children.
 	for (int j = 0; j < pNode->GetChildCount(); j++)
@@ -611,10 +617,16 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 		child->transform()->SetParent(go->transform(), false);
 	}
 
-//	numTabs--;
-//	PrintTabs();
-//	printf("</node>\n");
 	return go;
+}
+
+
+void PrintMatrix(Matrix4x4 const & m)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		Debug::Log("%lf %lf %lf %lf", m.m[i][0], m.m[i][1], m.m[i][2], m.m[i][3]);
+	}
 }
 
 
@@ -662,7 +674,8 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	// Note that we are not printing the root node because it should
 	// not contain any attributes.
 	FbxNode* lRootNode = lScene->GetRootNode();
-	auto root = FishEngine::GameObject::Create();
+	auto & root = m_model.m_rootNode;
+	root = FishEngine::GameObject::Create();
 	root->setName(name);
 	AssetDatabase::s_allAssetObjects.insert(root);
 	if (lRootNode)
@@ -675,8 +688,47 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	}
 	// Destroy the SDK manager and all the other objects it was handling.
 	lSdkManager->Destroy();
-	
-	m_model.m_rootNode = root;
 
+	m_bones.resize(m_boneCount);
+	UpdateBones(root->transform());
+
+	uint32_t boneCount = static_cast<uint32_t>( m_model.m_avatar->m_boneToIndex.size() );
+	for (auto & mesh : m_model.m_meshes)
+	{
+		if (mesh->m_skinned)
+		{
+			//mesh->m_bindposes.reserve(boneCount);
+			mesh->m_bindposes = m_bindPoses;
+
+			// make sure all the weights sum to 1.
+			for (auto & bw : mesh->m_boneWeights)
+			{
+				if (bw.weight[0] > 0)
+				{
+					float boneWeightScale = 0.0f;
+					for (float w : bw.weight)
+					{
+						boneWeightScale += w;
+					}
+					if ( Mathf::Abs(boneWeightScale - 1.0f) > 1E-5f)
+					{
+						boneWeightScale = 1.0f / boneWeightScale;
+						for (float & w : bw.weight)
+						{
+							w *= boneWeightScale;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//for (int i = 0; i < m_boneCount; ++i)
+	//{
+	//	Debug::LogWarning("%s", m_model.m_avatar->m_indexToBone[i].c_str());
+	//	PrintMatrix(m_bindPoses[i]);
+	//}
+	
+	//m_model.m_rootNode = root;
 	return root;
 }

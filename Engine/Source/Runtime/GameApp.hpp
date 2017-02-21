@@ -1,10 +1,12 @@
 #pragma once
 
+#include "ReflectClass.hpp"
+
 struct GLFWwindow;
 
 namespace FishEngine
 {
-    class GameApp
+    class Meta(NonSerializable) GameApp
     {
 
     public:

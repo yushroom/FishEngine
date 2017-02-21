@@ -13,14 +13,14 @@
 
 //#include "generate/EditorClassSerialization.hpp"
 
-namespace FishEngine
-{
-	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, FishEditor::TextureImporterPtr importer)
-	{
-		Load(archive, *importer);
-		return archive;
-	}
-}
+//namespace FishEngine
+//{
+//	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, FishEditor::TextureImporterPtr importer)
+//	{
+//		Load(archive, *importer);
+//		return archive;
+//	}
+//}
 
 using namespace FishEngine;
 

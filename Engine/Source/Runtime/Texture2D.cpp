@@ -51,7 +51,7 @@ namespace FishEngine
 		glBindTexture(GL_TEXTURE_2D, m_GLNativeTexture);
 		glCheckError();
 #if 1
-		GLsizei max_mipmap_level_count = Mathf::FloorToInt(std::log2f(Mathf::Max(m_width, m_height))) + 1;
+		GLsizei max_mipmap_level_count = Mathf::FloorToInt(std::log2f((float)std::max(m_width, m_height))) + 1;
 		glCheckError();
 		glTexStorage2D(GL_TEXTURE_2D, max_mipmap_level_count, internal_format, m_width, m_height);
 		glCheckError();

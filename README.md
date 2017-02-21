@@ -79,6 +79,7 @@ cmake --build . --target FishEditor --config Release
 
 - [boost](http://www.boost.org/) (filesystem)
 - [assimp](https://github.com/assimp/assimp) (3D model importer)
+- [Autodesk FBX SDK](http://www.autodesk.com/products/fbx/overview) (.fbx model importer)
 - [Qt](https://www.qt.io) (Editor only,  GUI / image loader)
 - [gli](https://github.com/g-truc/gli) (dds texture loader) and [glm](https://github.com/g-truc/glm) (required by gli)
 - [stb](https://github.com/nothings/stb) (font/image)

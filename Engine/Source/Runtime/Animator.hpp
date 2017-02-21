@@ -37,7 +37,7 @@ namespace FishEngine
         //std::vector<TransformationKey> transformationKeys;
     };
     
-    struct Animation
+    struct AnimationChannel
     {
         std::string name;
         float duration;
@@ -45,7 +45,7 @@ namespace FishEngine
         std::map<std::string, AnimationNode> channels;
     };
 
-    typedef std::shared_ptr<Animation> AnimationPtr;
+    typedef std::shared_ptr<AnimationChannel> AnimationChannelPtr;
     
     class Avatar : public Object
     {
@@ -67,7 +67,7 @@ namespace FishEngine
         int m_currentFrame = 0;
 
 		Meta(NonSerializable)
-        AnimationPtr m_animation;
+		AnimationChannelPtr m_animation;
         
         //virtual void OnInspectorGUI() override;
         

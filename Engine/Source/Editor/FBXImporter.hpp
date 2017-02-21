@@ -2,7 +2,7 @@
 
 #include "FishEditor.hpp"
 #include "ModelImporter.hpp"
-#include <boost/filesystem.hpp>
+#include <Path.hpp>
 
 namespace fbxsdk
 {
@@ -12,15 +12,16 @@ namespace fbxsdk
 
 namespace FishEditor
 {
-	struct ModelCollection
+	struct Meta(NonSerializable) ModelCollection
 	{
 		FishEngine::GameObjectPtr			m_rootNode;
 		FishEngine::AvatarPtr				m_avatar;
 		std::vector<FishEngine::MeshPtr>	m_meshes;
 	};
 	
-	class FBXImporter : public ModelImporter
+	class Meta(NonSerializable) FBXImporter : public ModelImporter
 	{
+		//InjectClassName(FBXImporter)
 	public:
 		FBXImporter() = default;
 		
@@ -31,13 +32,14 @@ namespace FishEditor
 
 		FishEngine::MeshPtr MeshFromFbxMesh(fbxsdk::FbxMesh* fbxMesh);
 
-		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh);
+		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> vertexIndexRemapping);
 
+		void UpdateBones(FishEngine::TransformPtr const & node);
 		
 		int m_boneCount = 0;
-		//std::map<std::string, int> m_boneToIndex;
-		//std::map<int, std::string> m_indexToBone;
+		std::vector<FishEngine::TransformPtr> m_bones;
 		
 		ModelCollection m_model;
+		std::vector<FishEngine::Matrix4x4> m_bindPoses;
 	};
 }

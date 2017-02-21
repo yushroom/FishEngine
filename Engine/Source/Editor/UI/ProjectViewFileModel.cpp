@@ -18,7 +18,7 @@ int ProjectViewFileModel::rowCount(const QModelIndex &) const
 {
 	if (m_rootNode == nullptr)
 		return 0;
-	return m_rootNode->childCount();
+	return static_cast<int>( m_rootNode->childCount() );
 }
 
 
@@ -116,7 +116,7 @@ int ProjectViewDirModel::rowCount(const QModelIndex &parent) const
         return 1;
     }
     auto parentNode = static_cast<FileInfo*>(parent.internalPointer());
-    return parentNode->subDirCount();
+    return static_cast<int>( parentNode->subDirCount() );
 }
 
 

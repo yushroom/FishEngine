@@ -2,6 +2,7 @@
 
 #include "FishEngine.hpp"
 #include <boost/filesystem/path.hpp>
+#include "ReflectClass.hpp"
 
 class OpenProjectDialog;
 
@@ -9,7 +10,7 @@ namespace FishEngine
 {
     // Access to application run-time data.
     // This class contains static methods for looking up information about and controlling the run-time data.
-    class Applicaiton
+    class Meta(NonSerializable) Applicaiton
     {
     public:
 		Applicaiton() = delete;

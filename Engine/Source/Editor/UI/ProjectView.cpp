@@ -25,10 +25,11 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui->listView->setDragEnabled(true);
 	ui->listView->viewport()->setAcceptDrops(true);
 	ui->listView->setDropIndicatorShown(true);
+	
 
-    dirModel = new ProjectViewDirModel(this);
+    m_dirModel = new ProjectViewDirModel(this);
     //dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-    ui->dirTreeView->setModel(dirModel);
+    ui->dirTreeView->setModel(m_dirModel);
 
 //    for (int i = 1; i < tree->header()->count(); ++i)
 //    {
@@ -36,27 +37,43 @@ ProjectView::ProjectView(QWidget *parent) :
 //    }
 //    tree->header()->hide();
 
-    fileModel = new ProjectViewFileModel(this);
-    ui->listView->setModel(fileModel);
+    m_fileModel = new ProjectViewFileModel(this);
+	ui->listView->setFileModel(m_fileModel);
+    ui->listView->setModel(m_fileModel);
     ui->iconSizeSlider->setMinimum(0);
     ui->iconSizeSlider->setMaximum(32);
     ui->iconSizeSlider->setValue(m_listViewIconSize);
     OnIconSizeChanged(m_listViewIconSize);
 
-//    QDir cwd = QCoreApplication::applicationDirPath();
-//    cwd.cdUp();
-//    cwd.cdUp();
-
-    //SetRootPath(cwd.absolutePath());
-    //const char * rootPath = "/Users/yushroom/program/graphics/FishEngine/Example/Sponza";
     auto const & rootPath = FishEngine::Applicaiton::dataPath();
     SetRootPath(QString::fromStdString(rootPath.string()));
 
-    connect(ui->dirTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnDirTreeViewSelectionChanged);
-    connect(ui->listView, &QListView::doubleClicked, this, &ProjectView::OnListTreeViewDoubleClicked);
+    connect(
+		ui->dirTreeView->selectionModel(), 
+		&QItemSelectionModel::currentChanged, 
+		this, 
+		&ProjectView::OnDirTreeViewSelectionChanged);
+
+    connect(
+		ui->listView, 
+		&QListView::doubleClicked, 
+		this,
+		&ProjectView::OnListViewDoubleClicked);
+
 	//connect(ui->listView, &QListView::clicked, this, &ProjectView::OnListTreeViewClicked);
-    connect(ui->listView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ProjectView::OnListTreeViewSelectionChanged);
-    connect(ui->iconSizeSlider, &QSlider::valueChanged, this, &ProjectView::OnIconSizeChanged);
+    connect(
+		ui->listView->selectionModel(),
+		&QItemSelectionModel::currentChanged, 
+		this, 
+		&ProjectView::OnListViewSelectionChanged);
+
+    connect(
+		ui->iconSizeSlider, 
+		&QSlider::valueChanged, 
+		this, 
+		&ProjectView::OnIconSizeChanged);
+
+	//connect(m_fileModel, &ProjectViewFileModel::rowsRemoved, m_dirModel, &ProjectViewDirModel::)
 }
 
 ProjectView::~ProjectView()
@@ -78,30 +95,34 @@ void ProjectView::SetRootPath(const QString &path)
 {
 	if (path.isEmpty() || path.isNull())
 		return;
-    ui->listView->setRootIndex(fileModel->setRootPath(path));
+    ui->listView->setRootIndex(m_fileModel->setRootPath(path));
 	ui->listView->selectionModel()->clearSelection();
     //ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(path));
 }
 
 void ProjectView::OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
-    auto path = QString::fromStdString(dirModel->fileInfo(current)->absoluteFilePath().string());
+	if (!current.isValid())
+	{
+		return;
+	}
+    auto path = QString::fromStdString(m_dirModel->fileInfo(current)->absoluteFilePath().string());
 	if (path.isEmpty() || path.isNull())
 		return;
-    ui->listView->setRootIndex(fileModel->setRootPath(path));
+    ui->listView->setRootIndex(m_fileModel->setRootPath(path));
 	ui->listView->selectionModel()->clearSelection();
 }
 
 
-void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
+void ProjectView::OnListViewDoubleClicked(const QModelIndex &index)
 {
-    auto info = fileModel->fileInfo(index);
+    auto info = m_fileModel->fileInfo(index);
     if (info->isDir())
     {
         auto path = QString::fromStdString(info->absoluteFilePath().string());
-        ui->listView->setRootIndex(fileModel->setRootPath(path));
+        ui->listView->setRootIndex(m_fileModel->setRootPath(path));
 		ui->listView->selectionModel()->clearSelection();
-		ui->dirTreeView->setCurrentIndex(dirModel->setRootPath(info->path()));
+		ui->dirTreeView->setCurrentIndex(m_dirModel->setRootPath(info->path()));
     }
 }
 
@@ -122,9 +143,9 @@ void ProjectView::OnListTreeViewDoubleClicked(const QModelIndex &index)
 //	Selection::setActiveObject(importer);
 //}
 
-void ProjectView::OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
+void ProjectView::OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &)
 {
-    auto info = fileModel->fileInfo(current);
+    auto info = m_fileModel->fileInfo(current);
     ui->fileNameLabel->setText(QString::fromStdString(info->fileName()));
 	auto path = boost::filesystem::absolute(info->path());
 	auto importer = AssetImporter::GetAtPath(path);

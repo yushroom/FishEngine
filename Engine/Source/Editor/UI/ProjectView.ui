@@ -113,11 +113,7 @@
         </layout>
        </item>
        <item>
-        <widget class="ProjectListView" name="listView">
-         <property name="editTriggers">
-          <set>QAbstractItemView::EditKeyPressed</set>
-         </property>
-        </widget>
+        <widget class="ProjectListView" name="listView"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="rightBottomLayout">

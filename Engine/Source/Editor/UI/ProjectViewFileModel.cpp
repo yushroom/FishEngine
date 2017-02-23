@@ -50,9 +50,60 @@ QVariant ProjectViewFileModel::data(const QModelIndex &index, int role) const
 }
 
 
+Qt::ItemFlags ProjectViewFileModel::flags(const QModelIndex &index) const
+{
+	return QAbstractListModel::flags(index) | Qt::ItemIsEditable;
+}
+
+
+bool ProjectViewFileModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+{
+	Debug::LogWarning("ProjectViewFileModel::setData");
+	//return true;
+	if (!index.isValid())
+	{
+		return false;
+	}
+
+	if (role == Qt::EditRole)
+	{
+		auto fi = this->fileInfo(index);
+		fi->Rename(value.toString().toStdString());
+		return true;
+	}
+	
+	return false;
+}
+
+
+//bool ProjectViewFileModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+//{
+//	beginRemoveRows(parent, row, row + count - 1); // note "-1"
+//	for (int i = 0; i < count; ++i)
+//	{
+//		m_rootNode->m_dirChildren[i]->m_fileExists = false;
+//		boost::system::error_code error;
+//		boost::filesystem::remove(m_rootNode->m_dirChildren[i]->m_path, error);
+//		if (error)
+//		{
+//			abort();
+//		}
+//	}
+//	auto begin = m_rootNode->m_dirChildren.begin() + row;
+//	m_rootNode->m_dirChildren.erase(begin, begin + count);
+//	endRemoveRows();
+//	return true;
+//}
+
+QString ProjectViewFileModel::rootPath() const
+{
+	return QString::fromStdString( m_rootNode->path().string() );
+}
+
+
 QModelIndex ProjectViewFileModel::setRootPath(const QString &path)
 {
-    auto p = boost::filesystem::absolute(path.toStdString()).string();
+    auto p = boost::filesystem::absolute(path.toStdString()).make_preferred().string();
     m_rootNode = FileInfo::fileInfo(p);
 
     //FishEngine::Debug::LogError("ProjectViewFileModel::setRootPath: %s", path.toStdString().c_str());
@@ -60,12 +111,50 @@ QModelIndex ProjectViewFileModel::setRootPath(const QString &path)
 }
 
 
-FileInfo *ProjectViewFileModel::fileInfo(const QModelIndex &index) const
+QModelIndex ProjectViewFileModel::AddItem(QString const & name, bool isDir)
 {
-    return m_rootNode->childAt(index.row());
+	int row = static_cast<int>(m_rootNode->subDirCount());
+	beginInsertRows(QModelIndex(), row, row);
+	if (!isDir)
+	{
+		// not implemented
+		abort();
+	}
+	auto fileInfo = m_rootNode->CreateNewSubDir(name.toStdString());
+	fileInfo->m_isDirectory = true;
+	endInsertRows();
+	return createIndex(row, 0, fileInfo);
 }
 
 
+void ProjectViewFileModel::RemoveItem(int row)
+{
+	beginRemoveRows(QModelIndex(), row, row);
+	auto node = m_rootNode->childAt(row);
+	node->DeleteFile();
+
+	if (node->isDir())
+	{
+		auto iter = m_rootNode->m_dirChildren.begin() + row;
+		m_rootNode->m_dirChildren.erase(iter);
+	}
+	else
+	{
+		auto iter = m_rootNode->m_fileChildren.begin() + (row - m_rootNode->subDirCount());
+		m_rootNode->m_fileChildren.erase(iter);
+	}
+
+	endRemoveRows();
+}
+
+FileInfo *ProjectViewFileModel::fileInfo(const QModelIndex &index) const
+{
+	if (!index.isValid())
+	{
+		return m_rootNode;
+	}
+    return m_rootNode->childAt(index.row());
+}
 
 
 ProjectViewDirModel::ProjectViewDirModel(QObject *parent)
@@ -100,8 +189,7 @@ QModelIndex ProjectViewDirModel::parent(const QModelIndex &child) const
 	int row = 0;
 	if (parentNode->parent() != nullptr)
 	{
-        auto const & children = parentNode->parent()->subDirs();
-		row = std::distance(std::find(children.begin(), children.end(), parentNode), children.begin());
+		row = parentNode->parent()->GetChildIndex(parentNode);
 	}
 	
 	return createIndex(row, 0, parentNode);
@@ -151,6 +239,7 @@ QVariant ProjectViewDirModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+
 QModelIndex ProjectViewDirModel::setRootPath(const Path &path)
 {
     //FishEngine::Debug::LogError("ProjectViewDirModel::setRootPath: %s", path.string().c_str());
@@ -161,12 +250,12 @@ QModelIndex ProjectViewDirModel::setRootPath(const Path &path)
 
     if (node->parent() != nullptr)
     {
-        auto const & children = node->parent()->subDirs();
-        row = std::distance(std::find(children.begin(), children.end(), node), children.begin());
+		row = node->parent()->GetChildIndex(node);
     }
 
     return createIndex(row, 0, node);
 }
+
 
 FileInfo *ProjectViewDirModel::fileInfo(const QModelIndex &index) const
 {

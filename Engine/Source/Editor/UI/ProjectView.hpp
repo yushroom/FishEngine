@@ -25,16 +25,16 @@ public:
 
 private:
     void OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-    void OnListTreeViewDoubleClicked(const QModelIndex &index);
+    void OnListViewDoubleClicked(const QModelIndex &index);
 	//void OnListTreeViewClicked(const QModelIndex &index);
-    void OnListTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+    void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void OnIconSizeChanged(int size);
 
 private:
     Ui::ProjectView         * ui;
 
-    ProjectViewDirModel     * dirModel;
-    ProjectViewFileModel    * fileModel;
+    ProjectViewDirModel     * m_dirModel;
+    ProjectViewFileModel    * m_fileModel;
 
     int m_listViewIconSize = 16;
 };

@@ -10,12 +10,23 @@ class ProjectViewFileModel : public QAbstractListModel
 public:
     explicit ProjectViewFileModel(QObject *parent = nullptr);
 
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+    virtual int				rowCount(const QModelIndex & parent = QModelIndex()) const override;
+    virtual QVariant		data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags	flags(const QModelIndex &index) const override;
+	virtual bool			setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+	//virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
+	QString rootPath() const;
     QModelIndex setRootPath(const QString &path);
 
+	QModelIndex AddItem(QString const & name, bool isDir);
+	void RemoveItem(int row);
+
     FishEditor::FileInfo * fileInfo(const QModelIndex &index) const;
+
+Q_SIGNALS:
+	void DirRemoved();
+	void DirAdded();
 
 private:
     FishEditor::FileInfo * m_rootNode = nullptr;

@@ -3,19 +3,132 @@
 #include "AssetImporter.hpp"
 #include "TextureImporter.hpp"
 #include "AssetDataBase.hpp"
+
 #include <Application.hpp>
+#include <Debug.hpp>
 
 #include <QImage>
 #include <QIcon>
+//#include <QDir>
+
+#include <boost/lexical_cast.hpp>
 
 using namespace FishEngine;
 
 namespace FishEditor
 {
     std::map<std::string, FileInfo*> FileInfo::s_nameToNode;
-    FileInfo * FileInfo::s_assetRoot = nullptr;
 
-    void FileInfo::SetAssetRootPath(const Path &path)
+	bool FileInfo::Create()
+	{
+		if (m_fileExists || !m_isDirectory)
+		{
+			abort();
+		}
+
+		if (m_isDirectory)
+		{
+			//boost::system::error_code error;
+			s_nameToNode[boost::filesystem::absolute(m_path).make_preferred().string()] = this;
+			return boost::filesystem::create_directory(m_path);
+		}
+		return false;
+	}
+
+	void FileInfo::RemoveChild(FileInfo* fileInfo)
+	{
+		if (fileInfo->isDir())
+		{
+			std::remove(m_dirChildren.begin(), m_dirChildren.end(), fileInfo);
+		}
+		else
+		{
+			std::remove(m_fileChildren.begin(), m_fileChildren.end(), fileInfo);
+		}
+	}
+
+	FileInfo * FileInfo::s_assetRoot = nullptr;
+
+	FileInfo * FileInfo::CreateNewSubDir(const std::string & folderName)
+	{
+		std::string name = folderName;
+		int sufix = 1;
+		bool ok = false;
+		while (!ok)
+		{
+			ok = true;
+			for (auto const & d : m_dirChildren)
+			{
+				if (d->m_path.filename() == name)
+				{
+					name = folderName + " " + boost::lexical_cast<std::string>(sufix);
+					sufix++;
+					ok = false;
+					break;
+				}
+			}
+		}
+
+		// TODO: delete
+		auto fileInfo = new FileInfo;
+		m_dirChildren.push_back(fileInfo);
+		fileInfo->m_path = m_path / name;
+		fileInfo->m_fileExists = false;
+
+		return fileInfo;
+	}
+
+	int FileInfo::GetChildIndex(FileInfo * child) const
+	{
+		int idx = -1;
+		if (child->m_isDirectory)
+		{
+			idx = std::distance(m_dirChildren.begin(), std::find(m_dirChildren.begin(), m_dirChildren.end(), child));
+		}
+		else
+		{
+			idx = m_dirChildren.size() + std::distance(m_fileChildren.begin(), std::find(m_fileChildren.begin(), m_fileChildren.end(), child));
+		}
+		if (idx < 0)
+		{
+			abort();
+		}
+		return static_cast<int>(idx);
+	}
+
+	void FileInfo::Rename(const std::string& newName)
+	{
+		auto newPath = m_path.parent_path() / (newName + m_path.extension().string());
+		if (!m_fileExists)
+		{
+			auto old_path = m_path;
+			m_path = newPath;
+			bool ok = Create();
+			if (!ok)
+			{
+				m_path = old_path;
+				ok = Create();
+				if (!ok)
+				{
+					abort();
+				}
+			}
+			return;
+		}
+		boost::system::error_code error;
+		boost::filesystem::rename(m_path, newPath, error);
+		if (error)
+		{
+			//Debug::LogWarning("FileInfo::Rename error");
+			abort();
+		}
+		else
+		{
+			m_path = newPath;
+		}
+	}
+
+	void FileInfo::SetAssetRootPath(const Path &path)
     {
         assert(boost::filesystem::is_directory(path));
         s_assetRoot = new FileInfo();
@@ -27,8 +140,9 @@ namespace FishEditor
     }
 
     FileInfo* FileInfo::fileInfo(const std::string &path)
-    {
-        auto const & it = s_nameToNode.find(path);
+	{
+		FishEngine::Path p = path;
+        auto const & it = s_nameToNode.find(p.make_preferred().string());
         if (it == FileInfo::s_nameToNode.end())
         {
             abort();
@@ -61,10 +175,30 @@ namespace FishEditor
     }
 
 
-    // path must be a dir
+	bool FileInfo::DeleteFile()
+	{
+		m_fileExists = false;
+
+		// remove from parent
+		if (m_parent != nullptr)
+		{
+			m_parent->RemoveChild(this);
+		}
+
+		boost::system::error_code error;
+		boost::filesystem::remove(m_path, error);
+		if (error)
+		{
+			abort();
+			return false;
+		}
+		return true;
+	}
+
+	// path must be a dir
     void FileInfo::BuildNodeTree(const Path &path)
     {
-        s_nameToNode[boost::filesystem::absolute(path).string()] = this;
+        s_nameToNode[boost::filesystem::absolute(path).make_preferred().string()] = this;
         for (auto& it : boost::filesystem::directory_iterator(path))
         {
             const Path & p = it.path();

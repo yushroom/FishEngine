@@ -201,12 +201,12 @@ void DefaultScene()
 	transform->setLocalEulerAngles(30, -90, 0);
 #else
 	//GameObject::CreatePrimitive(PrimitiveType::Cube);
-	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
-	Scene::AddGameObject(model);
-	
-	model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/unitychan.fbx");
-	Scene::AddGameObject(model);
-	model->transform()->setLocalScale(0.1f);
+	//GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
+	//Scene::AddGameObject(model);
+	//
+	//model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/unitychan.fbx");
+	//Scene::AddGameObject(model);
+	//model->transform()->setLocalScale(0.1f);
 //	auto sphere = model->transform()->children().front().lock()->gameObject();
 //	sphere->GetComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 #endif

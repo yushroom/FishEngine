@@ -7,6 +7,7 @@
 #include "Quaternion.hpp"
 #include "Matrix4x4.hpp"
 #include "ReflectClass.hpp"
+#include "Avatar.hpp"
 
 namespace FishEngine
 {
@@ -47,13 +48,7 @@ namespace FishEngine
 
     typedef std::shared_ptr<AnimationChannel> AnimationChannelPtr;
     
-    class Avatar : public Object
-    {
-	public:
-		InjectClassName(Avatar);
-        std::map<std::string, int> m_boneToIndex;
-        std::map<int, std::string> m_indexToBone;
-    };
+
 
     class FE_EXPORT Meta(DisallowMultipleComponent) Animator : public Component
     {

@@ -14,9 +14,13 @@ namespace FishEditor
 {
 	struct Meta(NonSerializable) ModelCollection
 	{
-		FishEngine::GameObjectPtr			m_rootNode;
-		FishEngine::AvatarPtr				m_avatar;
-		std::vector<FishEngine::MeshPtr>	m_meshes;
+		FishEngine::GameObjectPtr				m_rootNode;
+		FishEngine::AvatarPtr					m_avatar;
+		std::vector<FishEngine::MeshPtr>		m_meshes;
+		std::map<FishEngine::MeshPtr, std::vector<uint32_t>>
+												m_boneIndicesForEachMesh;
+		std::vector<FishEngine::TransformPtr>	m_bones;
+		std::vector<FishEngine::Matrix4x4>		m_bindPoses;
 	};
 	
 	class Meta(NonSerializable) FBXImporter : public ModelImporter
@@ -37,9 +41,9 @@ namespace FishEditor
 		void UpdateBones(FishEngine::TransformPtr const & node);
 		
 		int m_boneCount = 0;
-		std::vector<FishEngine::TransformPtr> m_bones;
+		//std::vector<FishEngine::TransformPtr> m_bones;
 		
 		ModelCollection m_model;
-		std::vector<FishEngine::Matrix4x4> m_bindPoses;
+		//std::vector<FishEngine::Matrix4x4> m_bindPoses;
 	};
 }

@@ -2,7 +2,6 @@
 #define UITEXTURE_HPP
 
 #include <QWidget>
-#include <boost/uuid/uuid.hpp>
 
 namespace Ui {
 class UITexture;
@@ -23,7 +22,7 @@ public:
     explicit UITexture(std::string const & label, QWidget *parent = 0);
     ~UITexture();
 
-    UITextureState CheckUpdate(std::string const & label, boost::uuids::uuid const & textureGUID);
+    UITextureState CheckUpdate(std::string const & label, const int textureInstanceID);
 
 private:
     void OnTextureClicked()         { m_textureClicked = true; }
@@ -36,7 +35,7 @@ private:
     bool m_textureClicked        = false;
     bool m_selectButtonClicked   = false;
     std::string         m_label;
-    boost::uuids::uuid  m_textureGUID;
+    int  m_textureInstanceID;
 };
 
 #endif // UITEXTURE_HPP

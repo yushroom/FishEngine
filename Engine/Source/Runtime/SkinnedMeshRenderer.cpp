@@ -29,6 +29,7 @@ namespace FishEngine
         return m_sharedMesh->bounds();
     }
 
+#if 0
 
     void RecursivelyGetTransformation(
         const TransformPtr&                   transform,
@@ -37,30 +38,36 @@ namespace FishEngine
     {
         const auto& name = transform->name();
         const auto& it = nameToIndex.find(name);
-        if (it != nameToIndex.end()) {
+        if (it != nameToIndex.end())
+		{
             const auto boneIndex = it->second;
-            outMatrixPalette[boneIndex] = transform->localToWorldMatrixFast();
+            //outMatrixPalette[boneIndex] = transform->localToWorldMatrixFast();
             outMatrixPalette[boneIndex] = transform->localToWorldMatrix();
         }
-        for (auto& child : transform->children()) {
+        for (auto& child : transform->children())
+		{
             RecursivelyGetTransformation(child.lock(), nameToIndex, outMatrixPalette);
         }
     }
 
+#endif
+
     void SkinnedMeshRenderer::UpdateMatrixPalette() const
     {
-        m_matrixPalette.resize(m_avatar->m_boneToIndex.size());
-        RecursivelyGetTransformation(m_rootBone.lock(), m_avatar->m_boneToIndex, m_matrixPalette);
-        const auto& invGlobalTransform = gameObject()->transform()->worldToLocalMatrix();
+        m_matrixPalette.resize(m_sharedMesh->m_bones.size());
+        //RecursivelyGetTransformation(m_rootBone.lock(), m_avatar->m_boneToIndex, m_matrixPalette);
+		const auto& worldToLocal = gameObject()->transform()->worldToLocalMatrix();
         const auto& bindposes = m_sharedMesh->bindposes();
         for (uint32_t i = 0; i < m_matrixPalette.size(); ++i)
         {
-            auto& m = m_matrixPalette[i];
-            m = invGlobalTransform * m * bindposes[i];
+			auto bone = m_sharedMesh->m_bones[i].lock();
+            auto& mat = m_matrixPalette[i];
+			// we multiply worldToLocal because we assume that the mesh is in local space in shader.
+            mat = worldToLocal * bone->localToWorldMatrix() * bindposes[i];
+
             // macOS bug
-            m = m.transpose();
-#if FISHENGINE_PLATFORM_APPLE
-#endif
+			// see the definition of Bones in ShaderVariables.inc
+            mat = mat.transpose();
         }
     }
     
@@ -75,44 +82,15 @@ namespace FishEngine
         auto model = transform()->localToWorldMatrix();
         Pipeline::UpdatePerDrawUniforms(model);
 
-        //std::map<std::string, TexturePtr> textures;
-        //auto& lights = Light::lights();
-        //if (lights.size() > 0)
-        //{
-        //    auto& l = lights.front();
-        //    if (l->transform() != nullptr)
-        //    {
-        //        textures["ShadowMap"] = l->m_shadowMap;
-        //    }
-        //}
-
-        // hack
-        // TODO: remove this block
-        //bool skinned = m_avatar != nullptr;
-        //if (skinned && m_matrixPalette.size() == 0)
-        //{
-            UpdateMatrixPalette();
-        //}
+        UpdateMatrixPalette();
         
         Pipeline::UpdateBonesUniforms(m_matrixPalette);
 
-        for (auto& m : m_materials)
+        for (auto& material : m_materials)
         {
-            m->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-#if 0
-            auto shader = m->shader();
-            assert(shader != nullptr);
-            shader->Use();
-            shader->PreRender();
-            m->BindTextures(textures);
-            m->BindProperties();
-            shader->CheckStatus();
-            m_sharedMesh->Render();
-            shader->PostRender();
-#else
-            Graphics::DrawMesh(m_sharedMesh, m);
-#endif
-            m->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+            material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+            Graphics::DrawMesh(m_sharedMesh, material);
+            material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
         }
     }
 

@@ -234,8 +234,6 @@ namespace FishEngine
 			v.z = vz;
 		}
 		mesh->m_bounds.SetMinMax(vmin, vmax);
-		//for (auto & f : mesh->m_vertices)
-		//	is >> f;
 		for (auto & f : mesh->m_normals)
 			is >> f.x >> f.y >> f.z;
 		for (auto & f : mesh->m_uv)
@@ -294,7 +292,7 @@ namespace FishEngine
 		assert(m_VAO == 0);
         glGenVertexArrays(1, &m_VAO);
 
-        // index vbo
+        // index VBO
         glGenBuffers(1, &m_indexVBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_triangles.size() * 4, m_triangles.data(), GL_STATIC_DRAW);
@@ -303,35 +301,20 @@ namespace FishEngine
         glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
         glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, m_vertices.data(), GL_STATIC_DRAW);
 
-        //if (vertexUsage & (int)VertexUsage::Normal) {
-            glGenBuffers(1, &m_normalVBO);
-            glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_normals.size() * 3 * 4, m_normals.data(), GL_STATIC_DRAW);
-        //}
+		glGenBuffers(1, &m_normalVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_normals.size() * 3 * 4, m_normals.data(), GL_STATIC_DRAW);
 
-        //if (vertexUsage & (int)VertexUsage::UV) {
-            glGenBuffers(1, &m_uvVBO);
-            glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
-        //}
+		glGenBuffers(1, &m_uvVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
 
-        //if (vertexUsage & (int)VertexUsage::Tangent) {
-            glGenBuffers(1, &m_tangentVBO);
-            glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
-            glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);
-        //}
+		glGenBuffers(1, &m_tangentVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);
 
-        if (m_skinned) {
-            //glGenTransformFeedbacks(1, &m_TFBO);
-
-            //glGenVertexArrays(1, &m_animationOutputVAO);
-
-            ////glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
-            //glGenBuffers(1, &m_animationOutputVBO);
-            //glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputVBO);
-            //glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 4, NULL, GL_DYNAMIC_COPY);
-            ////glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputVAO); //bind as TF output
-
+        if (m_skinned)
+		{
 			std::vector<Int4> boneIndexBuffer;
 			boneIndexBuffer.reserve(m_boneWeights.size());
 			std::vector<Vector4> boneWeightBuffer;
@@ -352,7 +335,8 @@ namespace FishEngine
         }
     }
 
-    void Mesh::BindBuffer() {
+    void Mesh::BindBuffer()
+	{
         glBindVertexArray(m_VAO);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
@@ -361,25 +345,20 @@ namespace FishEngine
         glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(PositionIndex);
 
-        //if (vertexUsage & (int)VertexUsage::Normal) {
-            glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
-            glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-            glEnableVertexAttribArray(NormalIndex);
-        //}
+		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(NormalIndex);
 
-        //if (vertexUsage & (int)VertexUsage::UV) {
-            glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
-            glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-            glEnableVertexAttribArray(UVIndex);
-        //}
+		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
+		glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(UVIndex);
 
-        //if (vertexUsage & (int)VertexUsage::Tangent) {
-            glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
-            glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-            glEnableVertexAttribArray(TangentIndex);
-        //}
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(TangentIndex);
 
-        if (m_skinned) {
+        if (m_skinned)
+		{
             glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
             glVertexAttribIPointer(BoneIndexIndex, 4, GL_INT, 4 * sizeof(GLint), (GLvoid*)0);
             glEnableVertexAttribArray(BoneIndexIndex);
@@ -394,27 +373,7 @@ namespace FishEngine
         glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
     }
 
-    //Mesh::PMesh Mesh::builtinMesh(const std::string& name)
-    //{
-    //    auto it = m_meshes.find(name);
-    //    if (it != m_meshes.end()) {
-    //        return it->second;
-    //    }
-    //    Debug::LogWarning("No built-in mesh called %d", name.c_str());
-    //    return nullptr;
-    //}
-    //
-    //void Mesh::Init()
-    //{
-    //#if FISHENGINE_PLATFORM_WINDOWS
-    //    const std::string root_dir = "../../assets/models/";
-    //#else
-    //    const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/assets/models/";
-    //#endif
-    //    for (auto& n : std::vector<std::string>{"cone", "cube", "plane", "quad", "sphere"}) {
-    //        m_meshes[n] = Mesh::CreateFromObjFile(root_dir+n+".obj");
-    //    }
-    //}
+
 
     SimpleMesh::SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode)
         : m_positionBuffer(positionBuffer, positionBuffer + vertexCount * 3),

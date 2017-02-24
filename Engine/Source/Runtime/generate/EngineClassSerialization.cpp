@@ -177,14 +177,12 @@ namespace FishEngine
 	{
 		archive << FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive << FishEngine::make_nvp("m_name", m_name); // std::string
-		archive << FishEngine::make_nvp("m_uuid", m_uuid); // UUID
 	}
 
 	void FishEngine::Object::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		archive >> FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive >> FishEngine::make_nvp("m_name", m_name); // std::string
-		archive >> FishEngine::make_nvp("m_uuid", m_uuid); // UUID
 	}
 
 

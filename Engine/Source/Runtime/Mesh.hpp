@@ -112,7 +112,7 @@ namespace FishEngine
         bool   m_skinned = false; // temp
 
         // The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
-        std::vector<Matrix4x4>& bindposes()
+        std::vector<Matrix4x4> const & bindposes()
         {
             return m_bindposes;
         }
@@ -137,8 +137,16 @@ namespace FishEngine
 		
 		//std::map<std::string, int> m_boneNameToIndex;
 		
+		// The bind poses. The bind pose at each index refers to the bone with the same index.
+		// The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
 		std::vector<Matrix4x4>  m_bindposes;
+
+		std::vector<std::string> m_boneNames;	// same size with m_binposes;
+		std::vector<std::weak_ptr<Transform>> m_bones;
 		
+		// The bone weights of each vertex.
+		// The size of the array is either the same as vertexCount or empty.
+		// Each vertex can be affected by up to 4 different bones.All 4 bone weights should sum up to 1.
 		Meta(NonSerializable)
 		std::vector<BoneWeight> m_boneWeights;
 		

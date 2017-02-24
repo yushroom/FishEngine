@@ -179,7 +179,7 @@ namespace FishEditor
             mesh->m_boneWeights.resize(n_vertices);
             //mesh->m_boneIndexBuffer.resize(n_vertices);
             //mesh->m_boneWeightBuffer.resize(n_vertices);
-            mesh->bindposes().resize(assimp_mesh->mNumBones);
+            mesh->m_bindposes.resize(assimp_mesh->mNumBones);
             //Debug::Log("Bone count: %d", assimp_mesh->mNumBones);
             for (uint32_t boneIndex = 0; boneIndex < assimp_mesh->mNumBones; ++boneIndex)
             {
@@ -192,7 +192,7 @@ namespace FishEditor
                 offsetMat.m[0][3] *= m_fileScale;
                 offsetMat.m[1][3] *= m_fileScale;
                 offsetMat.m[2][3] *= m_fileScale;
-                mesh->bindposes()[boneIndex] = offsetMat;
+                mesh->m_bindposes[boneIndex] = offsetMat;
                 for (uint32_t k = 0; k < bone->mNumWeights; ++k)
                 {
                     uint32_t vextexID = bone->mWeights[k].mVertexId;

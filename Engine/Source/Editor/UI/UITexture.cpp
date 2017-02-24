@@ -24,7 +24,7 @@ UITexture::~UITexture()
     delete ui;
 }
 
-UITextureState UITexture::CheckUpdate(const std::string &label, const boost::uuids::uuid &textureGUID)
+UITextureState UITexture::CheckUpdate(const std::string &label, const int textureInstanceID)
 {
     if (m_label != label)
     {
@@ -34,10 +34,10 @@ UITextureState UITexture::CheckUpdate(const std::string &label, const boost::uui
         ui->label->setText(m_label.c_str());
     }
 
-    if (textureGUID != m_textureGUID)
+    if (textureInstanceID != m_textureInstanceID)
     {
-        m_textureGUID = textureGUID;
-        auto path = FishEditor::AssetDatabase::GUIDToAssetPath(textureGUID);
+        m_textureInstanceID = textureInstanceID;
+        auto path = FishEditor::AssetDatabase::GetAssetPath(textureInstanceID);
         auto const & icon = FishEditor::AssetDatabase::GetCacheIcon(path);
         ui->iconLabel->setPixmap(icon.pixmap(64, 64));
     }

@@ -632,7 +632,7 @@ namespace FishEngine
 	
 	private:
 		YAML::Emitter m_emitter;
-		std::map<UUID, bool> m_serialized;
+		std::map<int, bool> m_serialized;	// instanceID
 		std::vector<std::shared_ptr<Object>> m_objectsToBeSerialized;
 		bool m_isInsideDoc = false;
 	};
@@ -727,10 +727,11 @@ namespace FishEngine
 	/************************************************************************/
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, boost::uuids::uuid const & t)
 	{
-		archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
-		archive << make_nvp("fileID", boost::uuids::to_string(t));
-		archive.SetManipulator(YAML::EndMap);
+		//archive.SetManipulator(YAML::Flow);
+		//archive.SetManipulator(YAML::BeginMap);
+		//archive << make_nvp("fileID", boost::uuids::to_string(t));
+		//archive.SetManipulator(YAML::EndMap);
+		archive << boost::uuids::to_string(t);
 		return archive;
 	}
 

@@ -20,7 +20,7 @@ namespace FishEditor
 		std::map<FishEngine::MeshPtr, std::vector<uint32_t>>
 												m_boneIndicesForEachMesh;
 		std::vector<FishEngine::TransformPtr>	m_bones;
-		std::vector<FishEngine::Matrix4x4>		m_bindPoses;
+		std::vector<FishEngine::Matrix4x4>		m_bindposes;
 	};
 	
 	class Meta(NonSerializable) FBXImporter : public ModelImporter
@@ -36,7 +36,7 @@ namespace FishEditor
 
 		FishEngine::MeshPtr MeshFromFbxMesh(fbxsdk::FbxMesh* fbxMesh);
 
-		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> vertexIndexRemapping);
+		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping);
 
 		void UpdateBones(FishEngine::TransformPtr const & node);
 		

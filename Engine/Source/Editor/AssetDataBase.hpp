@@ -39,7 +39,7 @@ namespace FishEditor
         AssetDatabase() = delete;
 		
 		static FishEngine::Path AssetPathToGUID(FishEngine::Path const & path);
-        static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);
+        //static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);
 		
 		static bool CopyAsset(FishEngine::Path const & path, FishEngine::Path const & newPath);
 		static void CreateAsset(FishEngine::ObjectPtr asset, FishEngine::Path const & path);
@@ -48,7 +48,7 @@ namespace FishEditor
 		
 		//Returns the path name relative to the project folder where the asset is stored.
 		//All paths are relative to the project folder, for example: "Assets/MyTextures/hello.png".
-		static std::string GetAssetPath(int instanceID);
+		static FishEngine::Path GetAssetPath(int instanceID);
 		static std::string GetAssetPath(FishEngine::ObjectPtr assetObject);
 		
         //static TexturePtr GetCacheIcon(std::string const & path);

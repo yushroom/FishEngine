@@ -11,6 +11,8 @@
 #include <Serialization/archives/yaml.hpp>
 #include <Serialization/archives/YAMLInputArchive.hpp>
 
+#include <boost/uuid/uuid_generators.hpp>
+
 //#include "generate/EditorClassSerialization.hpp"
 
 //namespace FishEngine
@@ -26,6 +28,12 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
+	AssetImporter::AssetImporter()
+		: m_guid(boost::uuids::random_generator()())
+	{
+
+	}
+
 	//void AssetImporter::SaveAndReimport()
 	//{
 	//	AssetDatabase::ImportAsset(m_assetPath);
@@ -62,6 +70,7 @@ namespace FishEditor
 		YAMLOutputArchive archive(fout);
 		archive.SetManipulator(YAML::BeginMap);
 		archive << make_nvp("timeCreated", time_created);
+		archive << make_nvp("guid", importer->GetGUID());
 		archive.SetManipulator(YAML::EndMap);
 		archive << importer;
 		return importer;
@@ -88,8 +97,8 @@ namespace FishEditor
 			//Timer t(path.string());
 			auto texture = importer->Import(path);
 			texture->setName(path.stem().string());
-			s_objectGUIDToPath[texture->GetGUID()] = path;
-			s_importerGuidToTexture[importer->GetGUID()] = texture;
+			s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
+			s_importerGUIDToTexture[importer->GetGUID()] = texture;
 			//t.StopAndPrint();
 			return importer;
 		}
@@ -100,19 +109,20 @@ namespace FishEditor
 			s_pathToImpoter[path] = importer;
 			auto model = importer->Load(path);
 			model->setName(path.stem().string());
-			s_objectGUIDToPath[model->GetGUID()] = path;
-			s_importerGuidToModel[importer->GetGUID()] = model;
+			s_objectInstanceIDToPath[model->GetInstanceID()] = path;
+			s_importerGUIDToModel[importer->GetGUID()] = model;
 			return importer;
 		}
 
 		return nullptr;
 	}
 
-	std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> AssetImporter::s_importerGuidToModel;
 
-	std::map<boost::uuids::uuid, boost::filesystem::path> AssetImporter::s_objectGUIDToPath;
+	std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> AssetImporter::s_importerGUIDToModel;
 
-	std::map<boost::uuids::uuid, TexturePtr> AssetImporter::s_importerGuidToTexture;
+	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
+
+	std::map<boost::uuids::uuid, TexturePtr> AssetImporter::s_importerGUIDToTexture;
 
 	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
 

@@ -67,6 +67,24 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     });
 
+	this->ui->actionLocalOrGlobal->setText("Global");
+	//FishEditor::MainEditor::m_mainSceneViewEditor->setTransformSpace(FishEditor::TransformSpace::Global);
+
+	connect(ui->actionLocalOrGlobal, &QAction::triggered, [this]() {
+		auto space = FishEditor::MainEditor::m_mainSceneViewEditor->transformSpace();
+
+		if (space == FishEditor::TransformSpace::Local)
+		{
+			this->ui->actionLocalOrGlobal->setText("Global");
+			FishEditor::MainEditor::m_mainSceneViewEditor->setTransformSpace(FishEditor::TransformSpace::Global);
+		}
+		if (space == FishEditor::TransformSpace::Global)
+		{
+			this->ui->actionLocalOrGlobal->setText("Local");
+			FishEditor::MainEditor::m_mainSceneViewEditor->setTransformSpace(FishEditor::TransformSpace::Local);
+		}
+	});
+
     connect(ui->actionHand, &QAction::triggered, [](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::None);
     });

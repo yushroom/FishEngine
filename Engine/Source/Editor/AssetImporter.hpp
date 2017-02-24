@@ -5,15 +5,18 @@
 #include <Object.hpp>
 #include <Resources.hpp>
 #include <ReflectClass.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace FishEditor
 {
+	using GUID = boost::uuids::uuid;
+
 	class AssetImporter : public FishEngine::Object
 	{
 	public:
 		InjectClassName(AssetImporter);
 
-		AssetImporter() = default;
+		AssetImporter();
 		virtual ~AssetImporter() = default;
 
 		// noncopyable
@@ -27,6 +30,11 @@ namespace FishEditor
 		
 		// Retrieves the asset importer for the asset at path.
 		static AssetImporterPtr GetAtPath(FishEngine::Path path);
+
+		GUID GetGUID() const
+		{
+			return m_guid;
+		}
 		
 	protected:
 
@@ -52,11 +60,14 @@ namespace FishEditor
 		Meta(NonSerializable)
 		std::string		m_userData;
 
+		Meta(NonSerializable)
+		GUID m_guid;
+
 	public:
-		static std::map<boost::uuids::uuid, FishEngine::TexturePtr> s_importerGuidToTexture;
-		static std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> s_importerGuidToModel;
+		static std::map<boost::uuids::uuid, FishEngine::TexturePtr> s_importerGUIDToTexture;
+		static std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> s_importerGUIDToModel;
 		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
-		static std::map<boost::uuids::uuid, boost::filesystem::path> s_objectGUIDToPath;
+		static std::map<int, boost::filesystem::path> s_objectInstanceIDToPath;
 	};
 }
 

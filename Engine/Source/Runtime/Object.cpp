@@ -1,20 +1,12 @@
 #include "Object.hpp"
 #include "Scene.hpp"
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+//#include <boost/uuid/uuid.hpp>
+//#include <boost/uuid/uuid_generators.hpp>
 
 namespace FishEngine
 {
-
-    Object::Object()
-        : m_uuid(boost::uuids::random_generator()())
-    {
-        
-    }
-    
-    Object::~Object() = default;
-
-    void Object::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/) {
+    void Object::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/)
+	{
         
         Scene::Destroy(obj, t);
     }
@@ -33,5 +25,4 @@ namespace FishEngine
     {
         Scene::DestroyImmediate(obj);
     }
-
 }

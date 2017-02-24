@@ -42,6 +42,7 @@ namespace FishEngine
         void setSharedMesh(MeshPtr sharedMesh)
         {
             m_sharedMesh = sharedMesh;
+			//m_bones.resize(m_sharedMesh->m_bindposes.size());
         }
 
         virtual void OnDrawGizmosSelected() override;
@@ -59,6 +60,7 @@ namespace FishEngine
         std::weak_ptr<Transform> m_rootBone;
         
         // The bones used to skin the mesh.
+		// same size with sharedMesh.bindposes
         std::vector<std::weak_ptr<Transform>> m_bones;  // to be done
         
         mutable std::vector<Matrix4x4> m_matrixPalette;

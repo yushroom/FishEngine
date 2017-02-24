@@ -66,6 +66,16 @@ namespace FishEditor
 //            return m_colorBuffer;
 //        }
 
+		TransformSpace transformSpace()
+		{
+			return m_transformSpace;
+		}
+
+		void setTransformSpace(TransformSpace space)
+		{
+			m_transformSpace = space;
+		}
+
         TransformToolType transformToolType()
         {
             return m_transformToolType;

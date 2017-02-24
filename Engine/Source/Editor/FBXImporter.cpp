@@ -14,35 +14,6 @@
 
 using namespace FishEngine;
 
-/**
-* Return a string-based representation based on the attribute type.
-*/
-FbxString GetAttributeTypeName(FbxNodeAttribute::EType type)
-{
-	switch (type) {
-	case FbxNodeAttribute::eUnknown: return "unidentified";
-	case FbxNodeAttribute::eNull: return "null";
-	case FbxNodeAttribute::eMarker: return "marker";
-	case FbxNodeAttribute::eSkeleton: return "skeleton";
-	case FbxNodeAttribute::eMesh: return "mesh";
-	case FbxNodeAttribute::eNurbs: return "nurbs";
-	case FbxNodeAttribute::ePatch: return "patch";
-	case FbxNodeAttribute::eCamera: return "camera";
-	case FbxNodeAttribute::eCameraStereo: return "stereo";
-	case FbxNodeAttribute::eCameraSwitcher: return "camera switcher";
-	case FbxNodeAttribute::eLight: return "light";
-	case FbxNodeAttribute::eOpticalReference: return "optical reference";
-	case FbxNodeAttribute::eOpticalMarker: return "marker";
-	case FbxNodeAttribute::eNurbsCurve: return "nurbs curve";
-	case FbxNodeAttribute::eTrimNurbsSurface: return "trim nurbs surface";
-	case FbxNodeAttribute::eBoundary: return "boundary";
-	case FbxNodeAttribute::eNurbsSurface: return "nurbs surface";
-	case FbxNodeAttribute::eShape: return "shape";
-	case FbxNodeAttribute::eLODGroup: return "lodgroup";
-	case FbxNodeAttribute::eSubDiv: return "subdiv";
-	default: return "unknown";
-	}
-}
 
 Matrix4x4 FbxAMatrixToMatrix4x4(fbxsdk::FbxAMatrix const & fmatrix)
 {
@@ -59,7 +30,7 @@ Matrix4x4 FbxAMatrixToMatrix4x4(fbxsdk::FbxAMatrix const & fmatrix)
 }
 
 // skinned data
-void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map<uint32_t, uint32_t> vertexIndexRemapping)
+void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping)
 {
 	int lSkinCount = pMesh->GetDeformerCount(FbxDeformer::eSkin);
 	if (lSkinCount <= 0)
@@ -87,6 +58,9 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 	// cluser == bone
 	int lClusterCount = lSkinDeformer->GetClusterCount();
 	std::vector<uint32_t> boneIndices(lClusterCount);
+
+	//mesh->m_bindposes.resize(lClusterCount);
+	mesh->m_boneNames.resize(lClusterCount);
 	
 	for (int lClusterIndex = 0; lClusterIndex != lClusterCount; ++lClusterIndex)
 	{
@@ -97,6 +71,12 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 		
 		auto & boneToIndex = m_model.m_avatar->m_boneToIndex;
 		std::string boneName = (char *) lCluster->GetLink()->GetName();
+		mesh->m_boneNames[lClusterIndex] = boneName;
+
+		//fbxsdk::FbxAMatrix bindPoseMatrix;
+		//lCluster->GetTransformLinkMatrix(bindPoseMatrix);	// this bind pose is in world(global) space
+		////m_model.m_bindposes.push_back(FbxAMatrixToMatrix4x4(bindPoseMatrix));
+
 		int boneId;
 		auto it = boneToIndex.find(boneName);
 		if ( it != boneToIndex.end() )
@@ -110,13 +90,9 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 			m_model.m_avatar->m_indexToBone[boneId] = boneName;
 			//fbxsdk::FbxAMatrix transformMatrix;
 			//lCluster->GetTransformMatrix(transformMatrix);
-			//auto t = transformMatrix.GetT();
-			//auto r = transformMatrix.GetR();
 			fbxsdk::FbxAMatrix bindPoseMatrix;
-			lCluster->GetTransformLinkMatrix(bindPoseMatrix);
-//			auto tt = bindPoseMatrix.GetT();
-//			auto rr = bindPoseMatrix.GetR();
-			m_model.m_bindPoses.push_back(FbxAMatrixToMatrix4x4(bindPoseMatrix));
+			lCluster->GetTransformLinkMatrix(bindPoseMatrix);	// this bind pose is in world(global) space
+			m_model.m_bindposes.push_back(FbxAMatrixToMatrix4x4(bindPoseMatrix));
 			m_boneCount++;
 		}
 		
@@ -124,15 +100,15 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 		
 		for ( int k = 0; k < lIndexCount; k++ )
 		{
-			int id = lIndices[k];
+			int vertexId = lIndices[k];
 			float weight = static_cast<float>(lWeights[k]);
-			mesh->m_boneWeights[id].AddBoneData(boneId, weight);
-			auto it = vertexIndexRemapping.find(id);
+			mesh->m_boneWeights[vertexId].AddBoneData(lClusterIndex, weight);
+			auto it = vertexIndexRemapping.find(vertexId);
 			while (it != vertexIndexRemapping.end())
 			{
-				id = it->second;
-				mesh->m_boneWeights[id].AddBoneData(boneId, weight);
-				it = vertexIndexRemapping.find(id);
+				vertexId = it->second;
+				mesh->m_boneWeights[vertexId].AddBoneData(lClusterIndex, weight);
+				it = vertexIndexRemapping.find(vertexId);
 			}
 		}
 	}
@@ -149,16 +125,18 @@ void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
 	{
 		int id = it->second;
 		m_model.m_bones[id] = node;
+
+		// world(global) space -> parent's local space
 		if (node->parent() == nullptr)
 		{
-			node->setLocalToWorldMatrix(m_model.m_bindPoses[id]);
+			node->setLocalToWorldMatrix(m_model.m_bindposes[id]);
 		}
 		else
 		{
-			auto l2w = node->parent()->worldToLocalMatrix() * m_model.m_bindPoses[id];
+			auto l2w = node->parent()->worldToLocalMatrix() * m_model.m_bindposes[id];
 			//bindPoses[id] = l2w.inverse();
 			node->setLocalToWorldMatrix(l2w);
-			m_model.m_bindPoses[id] = node->worldToLocalMatrix();
+			m_model.m_bindposes[id] = node->worldToLocalMatrix();
 		}
 	}
 
@@ -650,21 +628,15 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				mesh->setName(nodeName);
 			}
 			
-			Debug::LogWarning("%s", nodeName);
-			auto eulers = go->transform()->eulerAngles();
-			Debug::Log("%lf %lf %lf", eulers.x, eulers.y, eulers.z);
-			eulers = go->transform()->localEulerAngles();
-			Debug::Log("%lf %lf %lf", eulers.x, eulers.y, eulers.z);
-			
-//			if (mesh->m_skinned)
-//			{
-//				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
-//				srenderer->SetMaterial(Material::defaultMaterial());
-//				srenderer->setSharedMesh(mesh);
-//				srenderer->setAvatar(m_model.m_avatar);
-//				srenderer->setRootBone(m_model.m_rootNode->transform());
-//			}
-//			else
+			if (mesh->m_skinned)
+			{
+				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
+				srenderer->SetMaterial(Material::defaultMaterial());
+				srenderer->setSharedMesh(mesh);
+				srenderer->setAvatar(m_model.m_avatar);
+				srenderer->setRootBone(m_model.m_rootNode->transform());
+			}
+			else
 			{
 				go->AddComponent<MeshFilter>()->SetMesh(mesh);
 				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
@@ -770,8 +742,15 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	{
 		if (mesh->m_skinned)
 		{
-			//mesh->m_bindposes.reserve(boneCount);
-			mesh->m_bindposes = m_model.m_bindPoses;
+			mesh->m_bindposes.reserve(mesh->m_boneNames.size());
+			mesh->m_bones.reserve(mesh->m_boneNames.size());
+			//mesh->m_bindposes = m_model.m_bindposes;
+			for (auto & boneName : mesh->m_boneNames)
+			{
+				int boneId = m_model.m_avatar->m_boneToIndex[boneName];
+				mesh->m_bindposes.push_back(m_model.m_bindposes[boneId]);
+				mesh->m_bones.push_back(m_model.m_bones[boneId]);
+			}
 
 			// make sure all the weights sum to 1.
 			for (auto & bw : mesh->m_boneWeights)
@@ -795,6 +774,24 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 			}
 		}
 	}
+
+	//std::deque<TransformPtr> transforms;
+	//transforms.push_back(m_model.m_rootNode->transform());
+	//while (!transforms.empty())
+	//{
+	//	auto current = transforms.front();
+	//	transforms.pop_front();
+	//	for (auto & child : current->children())
+	//	{
+	//		transforms.push_back(child.lock());
+	//	}
+	//	
+	//	auto srenderer = current->gameObject()->GetComponent<SkinnedMeshRenderer>();
+	//	if (srenderer != nullptr)
+	//	{
+	//		srenderer.
+	//	}
+	//}
 
 	//for (int i = 0; i < m_boneCount; ++i)
 	//{

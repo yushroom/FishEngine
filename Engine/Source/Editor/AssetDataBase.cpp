@@ -12,12 +12,17 @@ namespace FishEditor
 
 	std::set<std::shared_ptr<FishEngine::Object>> AssetDatabase::s_allAssetObjects;
 
-	Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
-    {
-        return AssetImporter::s_objectGUIDToPath[guid];
-    }
+	//Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
+ //   {
+ //       return AssetImporter::s_objectInstanceIDToPath[guid];
+ //   }
 
-    const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
+	FishEngine::Path AssetDatabase::GetAssetPath(int instanceID)
+	{
+		return AssetImporter::s_objectInstanceIDToPath[instanceID];
+	}
+
+	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
         static QIcon unknown_icon(":/Resources/unknown_file.png");
 
@@ -45,7 +50,7 @@ namespace FishEditor
 			return nullptr;
 		}
 		auto importer = AssetImporter::GetAtPath(p);
-		return AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
+		return AssetImporter::s_importerGUIDToTexture[importer->GetGUID()];
 	}
 
 	template <>
@@ -58,7 +63,7 @@ namespace FishEditor
 			return nullptr;
 		}
 		auto importer = AssetImporter::GetAtPath(p);
-		return AssetImporter::s_importerGuidToModel[importer->GetGUID()];
+		return AssetImporter::s_importerGUIDToModel[importer->GetGUID()];
 	}
 
 }

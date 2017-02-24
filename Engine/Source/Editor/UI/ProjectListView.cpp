@@ -121,6 +121,8 @@ void ProjectListView::MakeDir()
 
 void ProjectListView::ShowInExplorer()
 {
+	// TODO show file in explorer
+	// see http://blog.csdn.net/icatchyou/article/details/40682107
 	auto rootPath = m_fileModel->rootPath();
 	QDesktopServices::openUrl(QUrl::fromLocalFile(rootPath));
 }

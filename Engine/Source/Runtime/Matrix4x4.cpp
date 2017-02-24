@@ -200,7 +200,7 @@ namespace FishEngine {
         // TODO: remove later
         //auto test = outWorldToLocal * outLocalToWorld;
         //if (!test.isIdentity()) {
-        //    Assert(false);
+        //    abort();
         //}
     }
 

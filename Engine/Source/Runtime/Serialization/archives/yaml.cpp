@@ -11,12 +11,17 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 
 	//std::cout << "SerializeObject: " << obj->ClassName() << std::endl;
 
-	auto guid = obj->GetGUID();
-	auto find_result = m_serialized.find(guid);
+	auto instanceID = obj->GetInstanceID();
+	auto find_result = m_serialized.find(instanceID);
 	if (find_result != m_serialized.end() && find_result->second)
 	{
 		if (m_isInsideDoc)
-			(*this) << guid;
+		{
+			SetManipulator(YAML::Flow);
+			SetManipulator(YAML::BeginMap);
+			(*this) << make_nvp("fileID", instanceID);
+			SetManipulator(YAML::EndMap);
+		}
 		return;
 	}
 
@@ -24,11 +29,11 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 	{
 		m_objectsToBeSerialized.push_back(obj);
 		//std::cout << "SerializeObject: push, size=" << m_objectsToBeSerialized.size() << std::endl;
-		(*this) << guid;
+		(*this) << instanceID;
 	}
 	else
 	{
-		m_serialized[guid] = true;
+		m_serialized[instanceID] = true;
 		SetManipulator(YAML::BeginDoc);
 		//m_emitter << " !u! " << guid;
 		//m_emitter << YAML::LocalTag("u", boost::uuids::to_string(guid));

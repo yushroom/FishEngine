@@ -76,6 +76,13 @@ void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
     {
         t->MakeDirty();
     }
+
+	//auto worldPostion = t->position();
+	//auto worldEulers = t->eulerAngles();
+	//auto worldScale = t->lossyScale();
+	//EditorGUI::Vector3Field("World Position", &worldPostion);
+	//EditorGUI::Vector3Field("World Eulers", &worldEulers);
+	//EditorGUI::Vector3Field("World Scale", &worldScale);
 }
 
 template<>

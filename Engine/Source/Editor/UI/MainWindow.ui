@@ -225,6 +225,7 @@
    <addaction name="actionTranslate"/>
    <addaction name="actionRotation"/>
    <addaction name="actionScale"/>
+   <addaction name="actionLocalOrGlobal"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
    <addaction name="actionPause"/>
@@ -616,6 +617,19 @@
   <action name="actionProject_Settings">
    <property name="text">
     <string>Project Settings</string>
+   </property>
+  </action>
+  <action name="actionCenterOrPivot">
+   <property name="text">
+    <string>Center</string>
+   </property>
+   <property name="toolTip">
+    <string>The tool handle...</string>
+   </property>
+  </action>
+  <action name="actionLocalOrGlobal">
+   <property name="text">
+    <string>Local</string>
    </property>
   </action>
  </widget>

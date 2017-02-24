@@ -17,7 +17,7 @@ ObjectListModel::ObjectListModel(QObject *parent)
 
 std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 {
-    auto it = AssetImporter::s_importerGuidToTexture.begin();
+    auto it = AssetImporter::s_importerGUIDToTexture.begin();
     for (int i = 0; i < index.row(); ++i)
         it++;
     return it->second;
@@ -25,7 +25,7 @@ std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 
 int ObjectListModel::rowCount(const QModelIndex &) const
 {
-    return static_cast<int>( AssetImporter::s_importerGuidToTexture.size() );
+    return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const
@@ -37,7 +37,7 @@ QVariant ObjectListModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 
     auto tex = this->object(index);
-	auto path = AssetDatabase::GUIDToAssetPath(tex->GetGUID());
+	auto path = AssetDatabase::GetAssetPath(tex->GetInstanceID());
 
 	switch (role)
 	{

@@ -3,13 +3,14 @@
 
 #include "FishEngine.hpp"
 #include <string>
-#include <boost/uuid/uuid.hpp>
+//#include <boost/uuid/uuid.hpp>
 #include "Macro.hpp"
 #include "HideFlags.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    using UUID = boost::uuids::uuid;
+    //using UUID = boost::uuids::uuid;
 	
 	class InputArchive;
 	class OutputArchive;
@@ -17,8 +18,13 @@ namespace FishEngine
     class FE_EXPORT Object
     {
     public:
-        Object();
-        virtual ~Object() = 0;
+		Object::Object()
+		{
+			static int sInstanceID = 0;
+			m_instanceID = (++sInstanceID);
+		}
+
+		virtual Object::~Object() = default;
 
         static const std::string StaticClassName()
         {
@@ -32,10 +38,10 @@ namespace FishEngine
 		
 		virtual int ClassID() const = 0;
         
-        inline UUID const & GetGUID() const
-        {
-            return m_uuid;
-        }
+        //inline UUID const & GetGUID() const
+        //{
+        //    return m_uuid;
+        //}
         
         //InjectSerializationFunctions(Object);
 		virtual void Serialize(OutputArchive & archive) const;
@@ -44,6 +50,11 @@ namespace FishEngine
         // The name of the object.
         virtual std::string name() const { return m_name; }
         void setName(const std::string& name) { m_name = name; }
+
+		inline int GetInstanceID() const
+		{
+			return m_instanceID;
+		}
 
         //virtual std::string ToString() const;
 
@@ -60,21 +71,24 @@ namespace FishEngine
 
 	protected:
 		// Should the object be hidden, saved with the scene or modifiable by the user?
-		HideFlags	m_hideFlags;
+		HideFlags	m_hideFlags = HideFlags::None;
         std::string m_name;
-        UUID        m_uuid;
+        //UUID        m_uuid;
+
+		Meta(NonSerializable)
+		int			m_instanceID;
 
     };
 
 
 	inline bool operator== (Object const & lhs, Object const & rhs)
 	{ 
-		return lhs.GetGUID() == rhs.GetGUID();
+		return lhs.GetInstanceID() == rhs.GetInstanceID();
 	}
 
 	inline bool operator< (Object const & lhs, Object const & rhs)
 	{
-		return lhs.GetGUID() < rhs.GetGUID();
+		return lhs.GetInstanceID() < rhs.GetInstanceID();
 	}
 }
 

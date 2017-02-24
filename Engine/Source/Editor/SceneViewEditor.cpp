@@ -275,7 +275,7 @@ namespace FishEditor
                     {
                         mesh = skinnedMeshRenderer->sharedMesh();
                         //bool useSkinnedVersion = FishEditorWindow::InPlayMode();
-                        bool useSkinnedVersion = false;
+                        bool useSkinnedVersion = true;
                         if (useSkinnedVersion)
                         {
                             material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
@@ -283,11 +283,11 @@ namespace FishEditor
                         }
                     }
                 }
-                if (mesh != nullptr)
-                {
-                    auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-                    Graphics::DrawMesh(mesh, model, material);
-                }
+				if (mesh != nullptr)
+				{
+					auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
+					Graphics::DrawMesh(mesh, model, material);
+				}
             }
 
             Pipeline::PopRenderTarget();

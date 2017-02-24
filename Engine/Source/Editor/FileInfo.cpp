@@ -9,7 +9,7 @@
 
 #include <QImage>
 #include <QIcon>
-//#include <QDir>
+#include <QDir>
 
 #include <boost/lexical_cast.hpp>
 
@@ -30,7 +30,8 @@ namespace FishEditor
 		{
 			//boost::system::error_code error;
 			s_nameToNode[boost::filesystem::absolute(m_path).make_preferred().string()] = this;
-			return boost::filesystem::create_directory(m_path);
+			//return boost::filesystem::create_directory(m_path);
+			return QDir().mkpath(QString::fromStdString(m_path.string()));
 		}
 		return false;
 	}
@@ -74,6 +75,7 @@ namespace FishEditor
 		m_dirChildren.push_back(fileInfo);
 		fileInfo->m_path = m_path / name;
 		fileInfo->m_fileExists = false;
+		fileInfo->m_parent = this;
 
 		return fileInfo;
 	}
@@ -179,19 +181,28 @@ namespace FishEditor
 	{
 		m_fileExists = false;
 
-		// remove from parent
-		if (m_parent != nullptr)
+		//boost::system::error_code error;
+		//boost::filesystem::remove(m_path, error);
+		//if (error)
+		//{
+		//	abort();
+		//	return false;
+		//}
+		QString path = QString::fromStdString(m_path.string());
+		const bool success = m_isDirectory ?  QDir(path).removeRecursively() : QFile::remove(path);
+		if (success)
 		{
-			m_parent->RemoveChild(this);
+			// remove from parent
+			if (m_parent != nullptr)
+			{
+				m_parent->RemoveChild(this);
+			}
 		}
-
-		boost::system::error_code error;
-		boost::filesystem::remove(m_path, error);
-		if (error)
+		else
 		{
 			abort();
-			return false;
 		}
+
 		return true;
 	}
 

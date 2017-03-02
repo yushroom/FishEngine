@@ -66,15 +66,15 @@ namespace FishEngine {
         return result;
     }
 
-    FishEngine::Quaternion Quaternion::operator*(const Quaternion & rhs) const
-    {
-        // [p.w*q.v + q.w*p.v + corss(p.v, q.v), p.w*q.w-dot(p.v, q.v)]
-        return Quaternion(
-            w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
-            w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
-            w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
-            w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
-    }
+//    FishEngine::Quaternion Quaternion::operator*(const Quaternion & rhs) const
+//    {
+//        // [p.w*q.v + q.w*p.v + corss(p.v, q.v), p.w*q.w-dot(p.v, q.v)]
+//        return Quaternion(
+//            w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+//            w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+//            w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
+//            w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
+//    }
 
     FishEngine::Quaternion Quaternion::AngleAxis(const float angle, const Vector3& axis)
     {

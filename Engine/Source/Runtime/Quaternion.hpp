@@ -125,9 +125,24 @@ namespace FishEngine
 		static Quaternion Euler(const Vector3& euler);
 
 
-		Quaternion operator *(const Quaternion & rhs) const;
+		Quaternion operator *(const Quaternion & rhs) const
+		{
+			// [p.w*q.v + q.w*p.v + corss(p.v, q.v), p.w*q.w-dot(p.v, q.v)]
+			return Quaternion(
+							  w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+							  w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+							  w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
+							  w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
+		}
 
+		Quaternion operator *=(const Quaternion & rhs)
+		{
+			(*this) = (*this) * rhs;
+			return *this;
+		}
+		
 		Vector3 operator *(const Vector3 & point) const;
+		
 
 		friend bool operator==(const Quaternion& lhs, const Quaternion& rhs)
 		{

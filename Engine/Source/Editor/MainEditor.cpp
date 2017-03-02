@@ -201,6 +201,9 @@ void DefaultScene()
 	transform->setLocalEulerAngles(30, -90, 0);
 #else
 	GameObject::CreatePrimitive(PrimitiveType::Cube);
+	auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+	plane->transform()->setLocalScale(10);
+	plane->transform()->setLocalPosition(0, -5, 0);
 	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
 	Scene::AddGameObject(model);
 	

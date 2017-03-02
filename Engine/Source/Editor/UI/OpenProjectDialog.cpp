@@ -35,12 +35,14 @@ OpenProjectDialog::~OpenProjectDialog()
 
 void OpenProjectDialog::OnCreateButtonClicked()
 {
+#if 0
 #if FISHENGINE_PLATFORM_WINDOWS
 	FishEngine::Applicaiton::s_dataPath = "D:/FishEngine/Projects/Sponza/Assets";
 #else
 	FishEngine::Applicaiton::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
 #endif
 	accept();
+#endif
 
 	auto projectName = ui->projectNameLineEdit->text();
 	auto location = ui->locationLineEdit->text();

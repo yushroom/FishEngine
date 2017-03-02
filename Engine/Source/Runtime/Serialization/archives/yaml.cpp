@@ -13,23 +13,27 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 
 	auto instanceID = obj->GetInstanceID();
 	auto find_result = m_serialized.find(instanceID);
+	
+	if (m_isInsideDoc)
+	{
+		SetManipulator(YAML::Flow);
+		SetManipulator(YAML::BeginMap);
+		(*this) << make_nvp("fileID", instanceID);
+		if (obj->ClassID() == ClassID<Mesh>())
+		{
+			(*this) << "GUID" << "xxxxxxxx";
+		}
+		SetManipulator(YAML::EndMap);
+	}
+	
 	if (find_result != m_serialized.end() && find_result->second)
 	{
-		if (m_isInsideDoc)
-		{
-			SetManipulator(YAML::Flow);
-			SetManipulator(YAML::BeginMap);
-			(*this) << make_nvp("fileID", instanceID);
-			SetManipulator(YAML::EndMap);
-		}
 		return;
 	}
-
+	
 	if (m_isInsideDoc)
 	{
 		m_objectsToBeSerialized.push_back(obj);
-		//std::cout << "SerializeObject: push, size=" << m_objectsToBeSerialized.size() << std::endl;
-		(*this) << instanceID;
 	}
 	else
 	{
@@ -39,6 +43,7 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 		//m_emitter << YAML::LocalTag("u", boost::uuids::to_string(guid));
 		//assert(m_emitter.good());
 		SetManipulator(YAML::BeginMap);
+		m_emitter << "fileID" << obj->GetInstanceID();
 		m_emitter << obj->ClassName();
 		//this->operator<<(*obj);
 		//DynamicSerializeObject(*this, obj);

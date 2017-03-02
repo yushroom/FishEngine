@@ -128,7 +128,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -441,6 +441,9 @@
    </property>
   </action>
   <action name="actionPlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Play_black.png</normaloff>:/Resources/Play_black.png</iconset>
@@ -453,6 +456,9 @@
    </property>
   </action>
   <action name="actionPause">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Pause_black.png</normaloff>:/Resources/Pause_black.png</iconset>
@@ -465,6 +471,9 @@
    </property>
   </action>
   <action name="actionStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/End_black.png</normaloff>:/Resources/End_black.png</iconset>
@@ -477,6 +486,9 @@
    </property>
   </action>
   <action name="actionHand">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Whole Hand_000000_100.png</normaloff>:/Resources/Whole Hand_000000_100.png</iconset>
@@ -489,6 +501,9 @@
    </property>
   </action>
   <action name="actionTranslate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Resize Four Directions_000000_100 2.png</normaloff>:/Resources/Resize Four Directions_000000_100 2.png</iconset>
@@ -501,6 +516,9 @@
    </property>
   </action>
   <action name="actionRotation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Rotate_000000_100.png</normaloff>:/Resources/Rotate_000000_100.png</iconset>
@@ -513,6 +531,9 @@
    </property>
   </action>
   <action name="actionScale">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/Resources/Expand_000000_100 2.png</normaloff>:/Resources/Expand_000000_100 2.png</iconset>

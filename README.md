@@ -21,10 +21,6 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with so
 
 
 
-## Release
-
-
-
 ## How to Build
 
 Before yout build, you will need to have some additional software installed:
@@ -35,22 +31,19 @@ Before yout build, you will need to have some additional software installed:
 - [Visual Studio 2015](https://www.visualstudio.com/downloads), Update 3 (Windows only)
 
 
-
-And some other 3rd-party libs is required (Or you can download from here[TBA])
+---
 
 **for all platforms:**
 
-​	Download and install Qt5 SDK from https://www.qt.io. My choice is version [5.8.0](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-mac-x64-clang-5.8.0.dmg).
-
-​	Download and install PhysX SDK from https://developer.nvidia.com/physx-sdk. You may get source on GitHub and compile by yourself. Current version is 3.3.4.
-
-​	Download and install Autodesk FBX SDK from http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26012646. Current version is 2017.1.
+- Download and install Qt5 SDK from https://www.qt.io. My choice is version [5.8.0](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-mac-x64-clang-5.8.0.dmg).
+- Download and install PhysX SDK from https://developer.nvidia.com/physx-sdk. You may get source on GitHub and compile by yourself. Current version is 3.3.4.
+- Download and install Autodesk FBX SDK from http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26012646. Current version is 2017.1.
 
 **for windows:**
 
-​	download and install [Clang](http://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe)
+- download and install [Clang](http://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe), clang is required if you want to automatically generate reflection code.
 
-
+---
 
 Clone the sources and create a build directory.
 
@@ -59,7 +52,7 @@ git clone https://github.com/yushroom/FishEngine.git
 cd FishEngine/Engine
 mkdir build && cd build
 ```
-Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html).Replace **Qt5_DIR**, **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing.
+Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html).Replace **Qt5_DIR**, **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing(recommended).
 
 ```shell
 cmake -G "Visual Studio 14 Win64" -DQt5_DIR=D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\lib\cmake\Qt5 -DPhysX_ROOT_DIR=D:\program\PhysX-3.3\PhysXSDK -DFBXSDK_DIR="D:\Library\FBX SDK\2017.1" ..

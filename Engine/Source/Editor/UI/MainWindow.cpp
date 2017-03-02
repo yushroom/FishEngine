@@ -54,15 +54,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionPlay, &QAction::triggered, [this](){
         if (Applicaiton::isPlaying())
         {
-            //this->ui->actionPlay->setText("Play");
             this->ui->actionPlay->setIcon(QIcon(":/Resources/Play_black.png"));
-            //this->ui->actionPlay->set
+			this->ui->actionPlay->setChecked(true);
             FishEditor::MainEditor::Stop();
         }
         else
         {
-            //this->ui->actionPlay->setText("Stop");
             this->ui->actionPlay->setIcon(QIcon(":/Resources/Stop_100.png"));
+			this->ui->actionPlay->setChecked(false);
             FishEditor::MainEditor::Play();
         }
     });
@@ -85,20 +84,40 @@ MainWindow::MainWindow(QWidget *parent) :
 		}
 	});
 
-    connect(ui->actionHand, &QAction::triggered, [](){
+    connect(ui->actionHand, &QAction::triggered, [this](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::None);
+		//this->ui->actionHand->setChecked(false);
+		this->ui->actionTranslate->setChecked(false);
+		this->ui->actionRotation->setChecked(false);
+		this->ui->actionScale->setChecked(false);
+		this->ui->actionHand->setChecked(true);
     });
 
-    connect(ui->actionTranslate, &QAction::triggered, [](){
+    connect(ui->actionTranslate, &QAction::triggered, [this](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Translate);
+		this->ui->actionHand->setChecked(false);
+		//this->ui->actionTranslate->setChecked(false);
+		this->ui->actionRotation->setChecked(false);
+		this->ui->actionScale->setChecked(false);
+		this->ui->actionTranslate->setChecked(true);
     });
 
-    connect(ui->actionRotation, &QAction::triggered, [](){
+    connect(ui->actionRotation, &QAction::triggered, [this](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Rotate);
+		this->ui->actionHand->setChecked(false);
+		this->ui->actionTranslate->setChecked(false);
+		//this->ui->actionRotation->setChecked(false);
+		this->ui->actionScale->setChecked(false);
+		this->ui->actionRotation->setChecked(true);
     });
 
-    connect(ui->actionScale, &QAction::triggered, [](){
+    connect(ui->actionScale, &QAction::triggered, [this](){
         FishEditor::MainEditor::m_mainSceneViewEditor->setTransformToolType(FishEditor::TransformToolType::Scale);
+		this->ui->actionHand->setChecked(false);
+		this->ui->actionTranslate->setChecked(false);
+		this->ui->actionRotation->setChecked(false);
+		//this->ui->actionScale->setChecked(false);
+		this->ui->actionScale->setChecked(true);
     });
 
     connect(ui->actionFrameSelected, &QAction::triggered, [](){

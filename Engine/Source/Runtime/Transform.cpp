@@ -41,19 +41,19 @@ namespace FishEngine
         m_isDirty = false;
     }
 
-    void Transform::UpdateFast() const
-    {
-        //m_localEulerAngles = m_localRotation.eulerAngles();
-        //m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
-        Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale, m_localToWorldMatrix, m_worldToLocalMatrix);
-        if (!m_parent.expired()) {
-            m_localToWorldMatrix = m_parent.lock()->m_localToWorldMatrix * m_localToWorldMatrix;
-            m_worldToLocalMatrix = m_worldToLocalMatrix * m_parent.lock()->m_worldToLocalMatrix;
-        }
-        //m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
-        //m_rotation = m_localToWorldMatrix.ToRotation();
-        //m_isDirty = false;
-    }
+//    void Transform::UpdateFast() const
+//    {
+//        //m_localEulerAngles = m_localRotation.eulerAngles();
+//        //m_localToWorldMatrix.SetTRS(m_localPosition, m_localRotation, m_localScale);
+//        Matrix4x4::TRS(m_localPosition, m_localRotation, m_localScale, m_localToWorldMatrix, m_worldToLocalMatrix);
+//        if (!m_parent.expired()) {
+//            m_localToWorldMatrix = m_parent.lock()->m_localToWorldMatrix * m_localToWorldMatrix;
+//            m_worldToLocalMatrix = m_worldToLocalMatrix * m_parent.lock()->m_worldToLocalMatrix;
+//        }
+//        //m_worldToLocalMatrix = m_localToWorldMatrix.inverse();
+//        //m_rotation = m_localToWorldMatrix.ToRotation();
+//        //m_isDirty = false;
+//    }
 
     void Transform::LookAt(const Vector3& target, const Vector3& worldUp /*= Vector3(0, 1, 0)*/)
     {
@@ -124,20 +124,20 @@ namespace FishEngine
         MakeDirty();
     }
 
-    //void Transform::Rotate(Vector3 eulerAngles, Space relativeTo /*= Space::Self*/)
-    //{
-    //    Quaternion lhs(glm::radians(eulerAngles));
-    //    if (Space::Self == relativeTo) {
-    //        //auto r = this->rotation();
-    //        //m_localRotation = glm::inverse(r) * lhs * r * m_localRotation;
-    //        m_localRotation = lhs * m_localRotation;
-    //    }
-    //    else {
-    //        //m_localRotation = lhs * m_localRotation;
-    //        lhs * rotation();
-    //        // TODO
-    //    }
-    //}
+	// TODO
+//    void Transform::Rotate(const Vector3 & eulerAngles, Space relativeTo /*= Space::Self*/)
+//    {
+//		Quaternion rhs = Quaternion::Euler(eulerAngles);
+//        if (Space::Self == relativeTo)
+//		{
+//            m_localRotation *= rhs;
+//        }
+//        else
+//		{
+//			auto rot = rotation();
+//			setRotation(rot * rot.inverse() * rhs * rot);
+//        }
+//    }
 
     void Transform::RotateAround(const Vector3& point, const Vector3& axis, float angle)
     {

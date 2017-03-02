@@ -5,6 +5,7 @@
 #include "TextureSampler.hpp"
 #include "TextureProperty.hpp"
 #include "ReflectClass.hpp"
+#include <cstdlib>
 
 namespace FishEngine
 {

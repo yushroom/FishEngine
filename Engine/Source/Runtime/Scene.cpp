@@ -188,11 +188,70 @@ namespace FishEngine
 
         glEnable(GL_DEPTH_CLAMP);
 
-#if 1
         auto shader = shadow_map_material->shader();
         shader->Use();
         //shader->BindUniformMat4("TestMat", Matrix4x4::identity);
-        
+
+#if 1
+		auto gameObjects = m_gameObjects;
+		
+		while (!gameObjects.empty())
+		{
+			auto go = gameObjects.front();
+			gameObjects.pop_front();
+			
+			if (!go->activeInHierarchy())
+				continue;
+			
+			for (auto & child : go->transform()->children())
+			{
+				gameObjects.push_back(child.lock()->gameObject());
+			}
+
+			bool is_skinned = false;
+
+			MeshPtr mesh;
+			auto mesh_renderer = go->GetComponent<MeshRenderer>();
+			if (mesh_renderer != nullptr)
+			{
+				if (mesh_renderer->shadowCastingMode() != ShadowCastingMode::Off)
+				{
+					auto meshFilter = go->GetComponent<MeshFilter>();
+					if (meshFilter != nullptr)
+					{
+						mesh = meshFilter->mesh();
+					}
+				}
+			}
+			else
+			{
+				auto renderer = go->GetComponent<SkinnedMeshRenderer>();
+				if (renderer != nullptr)
+				{
+					mesh = renderer->sharedMesh();
+					if (renderer->m_avatar != nullptr)
+					{
+						shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+						is_skinned = true;
+						Pipeline::UpdateBonesUniforms(renderer->m_matrixPalette);
+					}
+				}
+			}
+			
+			if (mesh != nullptr)
+			{
+				shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
+				shader->CheckStatus();
+				mesh->Render();
+				if (!is_skinned)
+				{
+					shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+				}
+			}
+
+		}
+		
+#else
         for (auto& go : m_gameObjects)
         {
             bool is_skinned = false;
@@ -239,8 +298,8 @@ namespace FishEngine
                 }
             }
         }
-        glDisable(GL_DEPTH_CLAMP);
 #endif
+        glDisable(GL_DEPTH_CLAMP);
         Pipeline::PopRenderTarget();
 #undef DEBUG_SHADOW
     }

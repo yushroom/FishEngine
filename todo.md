@@ -28,6 +28,8 @@ Hierarchy中drag&drop在debug模式下会挂掉
 
 
 
+渲染第一帧的时候，shadow是最先开始的，而SkinnedMeshRenderer.matrixPalette还没有生成，drawElements的时候会挂掉。解决方法：SkinnedMeshRenderer.setSharedMesh的时候resize matrixPalette
+
 
 
 ## Engine
@@ -48,9 +50,9 @@ Hierarchy中drag&drop在debug模式下会挂掉
 
 - [x] 高分屏的处理（尤其是高分屏移动到普通屏）
 
-- [ ] **cmake将qt项目移到xcode/VS**
+- [x] **cmake将qt项目移到xcode/VS**
 
-- [ ] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
+- [x] 动态添加/删除Component（删除搞定，script和component分开；添加要用到反射？）
 
 - [x] 将资源loader和Shader、Mesh、Texture之类的具体类分离（Model已经分离，动画导入WIP）
 
@@ -70,7 +72,7 @@ Hierarchy中drag&drop在debug模式下会挂掉
 
 - [x] assimp导入的fbx动画有冗余的（骨骼？）结点（~~done，导入时加参数~~），解析每个节点的local transformation。
 
-- [ ] basic model用NEF代替：http://assimp.sourceforge.net/howtoBasicShapes.html
+- [x] ~~basic model用NEF代替~~：http://assimp.sourceforge.net/howtoBasicShapes.html。从Unity导出
 
 - [x] eulerangles数值不自然（暂时解决）
 

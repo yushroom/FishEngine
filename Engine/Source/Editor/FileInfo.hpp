@@ -86,7 +86,7 @@ namespace FishEditor
 		bool DeleteFile();
 
     private:
-		friend class ProjectViewFileModel;
+		friend class ::ProjectViewFileModel;
         void BuildNodeTree(const Path & m_path);
 
         Path                    m_path;

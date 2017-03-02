@@ -39,11 +39,7 @@ namespace FishEngine
             return m_sharedMesh;
         }
         
-        void setSharedMesh(MeshPtr sharedMesh)
-        {
-            m_sharedMesh = sharedMesh;
-			//m_bones.resize(m_sharedMesh->m_bindposes.size());
-        }
+		void setSharedMesh(MeshPtr sharedMesh);
 
         virtual void OnDrawGizmosSelected() override;
 

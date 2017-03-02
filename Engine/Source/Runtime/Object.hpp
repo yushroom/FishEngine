@@ -18,13 +18,14 @@ namespace FishEngine
     class FE_EXPORT Object
     {
     public:
-		Object::Object()
+		
+		Object()
 		{
 			static int sInstanceID = 0;
 			m_instanceID = (++sInstanceID);
 		}
 
-		virtual Object::~Object() = default;
+		virtual ~Object() = default;
 
         static const std::string StaticClassName()
         {

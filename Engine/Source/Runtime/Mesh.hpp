@@ -112,10 +112,15 @@ namespace FishEngine
         bool   m_skinned = false; // temp
 
         // The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
-        std::vector<Matrix4x4> const & bindposes()
+        std::vector<Matrix4x4> const & bindposes() const
         {
             return m_bindposes;
         }
+		
+		int boneCount() const
+		{
+			return m_boneNames.size();
+		}
 
 		// temp
         void ToBinaryFile(std::ostream & os);

@@ -51,10 +51,16 @@ namespace FishEngine
     }
 
 #endif
+	
+	void SkinnedMeshRenderer::setSharedMesh(MeshPtr sharedMesh)
+	{
+		m_sharedMesh = sharedMesh;
+		m_matrixPalette.resize(m_sharedMesh->boneCount());
+	}
 
     void SkinnedMeshRenderer::UpdateMatrixPalette() const
     {
-        m_matrixPalette.resize(m_sharedMesh->m_bones.size());
+        m_matrixPalette.resize(m_sharedMesh->boneCount());
         //RecursivelyGetTransformation(m_rootBone.lock(), m_avatar->m_boneToIndex, m_matrixPalette);
 		const auto& worldToLocal = gameObject()->transform()->worldToLocalMatrix();
         const auto& bindposes = m_sharedMesh->bindposes();

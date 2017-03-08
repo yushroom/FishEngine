@@ -89,7 +89,7 @@ namespace FishEditor
 		}
 		else
 		{
-			idx = m_dirChildren.size() + std::distance(m_fileChildren.begin(), std::find(m_fileChildren.begin(), m_fileChildren.end(), child));
+			idx = static_cast<int>( m_dirChildren.size() ) + std::distance(m_fileChildren.begin(), std::find(m_fileChildren.begin(), m_fileChildren.end(), child));
 		}
 		if (idx < 0)
 		{

@@ -33,4 +33,6 @@ protected:
 	QAction * m_actionDelete;
 	QAction * m_actionOpen;
 	QAction * m_actionShowInExplorer;
+
+	QAction * m_actionMoveToScene;
 };

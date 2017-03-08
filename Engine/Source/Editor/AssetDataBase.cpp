@@ -57,7 +57,16 @@ namespace FishEditor
 	std::shared_ptr<FishEngine::GameObject> 
 		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
 	{
-		auto p = FishEngine::Applicaiton::dataPath().parent_path() / path;
+		Path p;
+		if (path.is_absolute())
+		{
+			Debug::LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
+			p = path;
+		}
+		else
+		{
+			p = FishEngine::Applicaiton::dataPath().parent_path() / path;
+		}
 		if (!boost::filesystem::exists(p))
 		{
 			return nullptr;

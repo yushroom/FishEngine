@@ -119,7 +119,7 @@ namespace FishEngine
 		
 		int boneCount() const
 		{
-			return m_boneNames.size();
+			return static_cast<int>( m_boneNames.size() );
 		}
 
 		// temp

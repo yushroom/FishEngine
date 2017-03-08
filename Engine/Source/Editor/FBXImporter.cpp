@@ -546,6 +546,95 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 }
 
 
+void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex) {
+
+	if (pProperty.IsValid())
+	{
+		int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
+
+		for (int j = 0; j < lTextureCount; ++j)
+		{
+			//Here we have to check if it's layeredtextures, or just textures:
+			FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
+			if (lLayeredTexture)
+			{
+				Debug::Log("    Layered Texture: %d", j);
+				int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
+				for (int k = 0; k < lNbTextures; ++k)
+				{
+					FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
+					if (lTexture)
+					{
+
+						if (pDisplayHeader) {
+							//DisplayInt("    Textures connected to Material ", pMaterialIndex);
+							pDisplayHeader = false;
+						}
+
+						//NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
+						//Why is that?  because one texture can be shared on different layered textures and might
+						//have different blend modes.
+
+						FbxLayeredTexture::EBlendMode lBlendMode;
+						lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
+						Debug::Log("    Textures for ", pProperty.GetName());
+						Debug::Log("        Texture ", k);
+						//DisplayTextureInfo(lTexture, (int)lBlendMode);
+					}
+
+				}
+			}
+			else
+			{
+				//no layered texture simply get on the property
+				FbxTexture* lTexture = pProperty.GetSrcObject<FbxTexture>(j);
+				if (lTexture)
+				{
+					//display connected Material header only at the first time
+					if (pDisplayHeader) {
+						//DisplayInt("    Textures connected to Material ", pMaterialIndex);
+						pDisplayHeader = false;
+					}
+
+					//DisplayString("    Textures for ", pProperty.GetName());
+					//DisplayInt("        Texture ", j);
+					//DisplayTextureInfo(lTexture, -1);
+				}
+			}
+		}
+	}//end if pProperty
+}
+
+
+FishEngine::TexturePtr FishEditor::FBXImporter::GetTextureInfo(fbxsdk::FbxGeometry* pGeometry)
+{
+	int lMaterialIndex;
+	FbxProperty lProperty;
+	if (pGeometry->GetNode() == nullptr)
+	{
+		return nullptr;
+	}
+	int lNbMat = pGeometry->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
+	for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++) {
+		FbxSurfaceMaterial *lMaterial = pGeometry->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
+		bool lDisplayHeader = true;
+
+		//go through all the possible textures
+		if (lMaterial) {
+
+			int lTextureIndex;
+			FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
+			{
+				lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
+				FindAndDisplayTextureInfoByProperty(lProperty, lDisplayHeader, lMaterialIndex);
+			}
+
+		}//end if(lMaterial)
+
+	}// end for lMaterialIndex
+	return nullptr;
+}
+
 /**
 * Print a node, its attributes, and all its children recursively.
 */
@@ -641,6 +730,8 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				go->AddComponent<MeshFilter>()->SetMesh(mesh);
 				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 			}
+
+			auto texture = GetTextureInfo(lMesh);
 		}
 //		else if (type == FbxNodeAttribute::eSkeleton)
 //		{

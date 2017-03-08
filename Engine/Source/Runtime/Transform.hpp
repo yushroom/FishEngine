@@ -10,20 +10,20 @@
 
 namespace FishEngine
 {
-    enum class Space
-    {
-        World,
-        Self
-    };
+	enum class Space
+	{
+		World,
+		Self
+	};
 
-    class FE_EXPORT Transform : public Component
-    {
-    public:
-        InjectClassName(Transform);
+	class FE_EXPORT Transform : public Component
+	{
+	public:
+		InjectClassName(Transform);
 
-        Transform();
+		Transform();
 
-        ~Transform();
+		~Transform();
 		
 		// The position of the transform in world space.
 		Vector3 position() const
@@ -219,20 +219,20 @@ namespace FishEngine
 		}
 
 
-        uint32_t childCount() const
-        {
-            return (uint32_t)m_children.size();
-        }
+		uint32_t childCount() const
+		{
+			return (uint32_t)m_children.size();
+		}
 
 
-        // The global scale of the object(Read Only).
-        Vector3 lossyScale() const
-        {
-            auto p = parent();
-            if (p != nullptr)
-                return m_localScale * p->lossyScale();
-            return m_localScale;
-        }
+		// The global scale of the object(Read Only).
+		Vector3 lossyScale() const
+		{
+			auto p = parent();
+			if (p != nullptr)
+				return m_localScale * p->lossyScale();
+			return m_localScale;
+		}
 
 
 		bool hasChanged();
@@ -284,48 +284,48 @@ namespace FishEngine
 		}
 
 
-        // Transforms direction from local space to world space.
-        Vector3 TransformDirection(const Vector3& direction) const;
+		// Transforms direction from local space to world space.
+		Vector3 TransformDirection(const Vector3& direction) const;
 
-        // Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
-        Vector3 InverseTransformDirection(const Vector3& direction) const;
+		// Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
+		Vector3 InverseTransformDirection(const Vector3& direction) const;
 
-        // Transforms bounds(AABB) from local space to world space.
-        Bounds TransformBounds(const Bounds& bounds) const;
-        
-        // Transforms bounds(AABB) from world space to local space. The opposite of TransformBounds.
-        Bounds InverseTransformBounds(const Bounds& bounds) const;
+		// Transforms bounds(AABB) from local space to world space.
+		Bounds TransformBounds(const Bounds& bounds) const;
+		
+		// Transforms bounds(AABB) from world space to local space. The opposite of TransformBounds.
+		Bounds InverseTransformBounds(const Bounds& bounds) const;
 
 
 		// parent: The parent Transform to use.
 		// worldPositionStays: If true, the parent-relative position, scale and rotation are modified such that the object keeps the same world space position, rotation and scale as before.
-        void SetParent(TransformPtr const & parent, bool worldPositionStays = true);
+		void SetParent(TransformPtr const & parent, bool worldPositionStays = true);
 
-        //========== Public Functions ==========//
+		//========== Public Functions ==========//
 
-        // Unparents all children.
-        void DetachChildren();
+		// Unparents all children.
+		void DetachChildren();
 
-        // Finds a child by name and returns it.
-        TransformPtr Find(const std::string& name) const;
+		// Finds a child by name and returns it.
+		TransformPtr Find(const std::string& name) const;
 
-        /* Returns a transform child by index.
-         * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
-         * @return: Transform Transform child by index.
-         */
-        TransformPtr GetChild(const size_t index);
+		/* Returns a transform child by index.
+		 * @param index	Index of the child transform to return. Must be smaller than Transform.childCount.
+		 * @return: Transform Transform child by index.
+		 */
+		TransformPtr GetChild(const size_t index);
 
 
-        const std::list<std::weak_ptr<Transform>>& children() const
-        {
-            return m_children;
-        }
+		const std::list<std::weak_ptr<Transform>>& children() const
+		{
+			return m_children;
+		}
 
-        // Returns the component of Type type if the game object has one attached, null if it doesn't.
-    //    template<typename T>
-    //    std::shared_ptr<T> GetComponent() const {
-    //        return gameObject()->GetComponent<T>();
-    //    }
+		// Returns the component of Type type if the game object has one attached, null if it doesn't.
+	//    template<typename T>
+	//    std::shared_ptr<T> GetComponent() const {
+	//        return gameObject()->GetComponent<T>();
+	//    }
 		
 		
 		
@@ -338,33 +338,35 @@ namespace FishEngine
 		void UpdateMatrix() const;
 		//void UpdateFast() const;
 		
+
+		void CopyValueTo(TransformPtr target) const;
 		
-    private:
-        friend class FishEditor::Inspector;
-        friend class Scene;
+	private:
+		friend class FishEditor::Inspector;
+		friend class Scene;
 
-        Vector3                             m_localPosition;
-        Vector3                             m_localScale;
-        Quaternion                          m_localRotation;
+		Vector3                             m_localPosition;
+		Vector3                             m_localScale;
+		Quaternion                          m_localRotation;
 
-        Meta(HideInInspector)
-        std::weak_ptr<Transform>            m_parent;
-        
-        Meta(HideInInspector)
-        std::list<std::weak_ptr<Transform>> m_children;
+		Meta(HideInInspector)
+		std::weak_ptr<Transform>            m_parent;
+		
+		Meta(HideInInspector)
+		std::list<std::weak_ptr<Transform>> m_children;
 
-        Meta(NonSerializable)
-        mutable bool                        m_isDirty;
+		Meta(NonSerializable)
+		mutable bool                        m_isDirty;
 
-        Meta(NonSerializable)
-        mutable Matrix4x4                   m_localToWorldMatrix; // localToWorld
+		Meta(NonSerializable)
+		mutable Matrix4x4                   m_localToWorldMatrix; // localToWorld
 
-        Meta(NonSerializable)
-        mutable Matrix4x4                   m_worldToLocalMatrix; // worldToLocal
+		Meta(NonSerializable)
+		mutable Matrix4x4                   m_worldToLocalMatrix; // worldToLocal
 
-        //bool dirtyInHierarchy() const;
-        void MakeDirty() const;
-    };
+		//bool dirtyInHierarchy() const;
+		void MakeDirty() const;
+	};
 
 	/************************************************************************/
 	/* Transform Serialization                                              */

@@ -15,27 +15,27 @@
 
 namespace FishEngine
 {
-    //GameObject::PGameObject GameObject::m_root = std::make_shared<GameObject>("Root");
+	//GameObject::PGameObject GameObject::m_root = std::make_shared<GameObject>("Root");
 
-    bool GameObject::activeInHierarchy() const
-    {
-        if (m_activeSelf && m_transform->parent() != nullptr)
-        {
-            return m_transform->parent()->gameObject()->activeInHierarchy();
-        }
-        return m_activeSelf;
-    }
+	bool GameObject::activeInHierarchy() const
+	{
+		if (m_activeSelf && m_transform->parent() != nullptr)
+		{
+			return m_transform->parent()->gameObject()->activeInHierarchy();
+		}
+		return m_activeSelf;
+	}
 	
 	GameObject::GameObject() : GameObject("")
 	{
 		
 	}
 
-    GameObject::GameObject(const std::string& name)
+	GameObject::GameObject(const std::string& name)
 		: m_transform(std::make_shared<Transform>())
-    {
+	{
 		m_name = name;
-    }
+	}
 	
 	GameObjectPtr GameObject::Create()
 	{
@@ -54,11 +54,11 @@ namespace FishEngine
 		m_tagIndex = TagManager::TagToIndex(tag);
 	}
 
-    FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
-    {
-        auto mesh = Mesh::builtinMesh(type);
-        auto go = Scene::CreateGameObject(EnumToString(type));
-        go->AddComponent<MeshFilter>()->SetMesh(mesh);
+	FishEngine::GameObjectPtr GameObject::CreatePrimitive(PrimitiveType type)
+	{
+		auto mesh = Mesh::builtinMesh(type);
+		auto go = Scene::CreateGameObject(EnumToString(type));
+		go->AddComponent<MeshFilter>()->SetMesh(mesh);
 		switch (type)
 		{
 		case PrimitiveType::Cube:
@@ -74,69 +74,83 @@ namespace FishEngine
 			break;
 		}
 		go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
-        return go;
-    }
+		return go;
+	}
 
-    GameObjectPtr GameObject::Find(const std::string& name)
-    {
-        return Scene::Find(name);
-    }
+	GameObjectPtr GameObject::Find(const std::string& name)
+	{
+		return Scene::Find(name);
+	}
 
-    void GameObject::Update()
-    {
-        m_transform->Update();
+	//ObjectPtr GameObject::Clone() const
+	//{
+	//	auto ret = std::make_shared<GameObject>(m_name);
+	//	GameObject::CopyValueTo(ret);
+	//	return ret;
+	//}
 
-        for (auto& c : m_components)
-        {
-            if (!c->m_isStartFunctionCalled)
-            {
-                if (IsScript(c->ClassID()))
-                {
-                    auto s = std::static_pointer_cast<Script>(c);
-                    // TODO
-                    s->Awake();
-                    s->OnEnable();
-                }
-                c->Start();
-                c->m_isStartFunctionCalled = true;
-            }
-            c->Update();
-        }
-    }
+	void GameObject::CopyValueTo(ObjectPtr target) const
+	{
+		Object::CopyValueTo(target);
+		auto go = std::dynamic_pointer_cast<GameObject>(target);
+		m_transform->CopyValueTo(go->m_transform);
+	}
 
-    void GameObject::OnDrawGizmos()
-    {
-        for (auto& c : m_components)
-        {
-            c->OnDrawGizmos();
-            Gizmos::setColor(Color::green);
-            Gizmos::setMatrix(Matrix4x4::identity);
-        }
-    }
+	void GameObject::Update()
+	{
+		m_transform->Update();
 
-    void GameObject::OnDrawGizmosSelected()
-    {
-        for (auto& c : m_components)
-        {
-            c->OnDrawGizmosSelected();
-            Gizmos::setColor(Color::green);
-            Gizmos::setMatrix(Matrix4x4::identity);
-        }
-    }
+		for (auto& c : m_components)
+		{
+			if (!c->m_isStartFunctionCalled)
+			{
+				if (IsScript(c->ClassID()))
+				{
+					auto s = std::static_pointer_cast<Script>(c);
+					// TODO
+					s->Awake();
+					s->OnEnable();
+				}
+				c->Start();
+				c->m_isStartFunctionCalled = true;
+			}
+			c->Update();
+		}
+	}
 
-    void GameObject::Start()
-    {
-        for (auto& c : m_components)
-        {
-            if (IsScript(c->ClassID()))
-            {
-                // // TODO:
-                auto s = std::static_pointer_cast<Script>(c);
-                s->Awake();
-                s->OnEnable();
-            }
-            c->Start();
-            c->m_isStartFunctionCalled = true;
+	void GameObject::OnDrawGizmos()
+	{
+		for (auto& c : m_components)
+		{
+			c->OnDrawGizmos();
+			Gizmos::setColor(Color::green);
+			Gizmos::setMatrix(Matrix4x4::identity);
+		}
+	}
+
+	void GameObject::OnDrawGizmosSelected()
+	{
+		for (auto& c : m_components)
+		{
+			c->OnDrawGizmosSelected();
+			Gizmos::setColor(Color::green);
+			Gizmos::setMatrix(Matrix4x4::identity);
+		}
+	}
+
+	void GameObject::Start()
+	{
+		for (auto& c : m_components)
+		{
+			if (IsScript(c->ClassID()))
+			{
+				// // TODO:
+				auto s = std::static_pointer_cast<Script>(c);
+				s->Awake();
+				s->OnEnable();
+			}
+			c->Start();
+			c->m_isStartFunctionCalled = true;
 		}
 	}
 

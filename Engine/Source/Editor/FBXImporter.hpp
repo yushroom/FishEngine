@@ -8,6 +8,7 @@ namespace fbxsdk
 {
 	class FbxNode;
 	class FbxMesh;
+	class FbxGeometry;
 }
 
 namespace FishEditor
@@ -35,6 +36,8 @@ namespace FishEditor
 		FishEngine::GameObjectPtr ParseNodeRecursively(fbxsdk::FbxNode* pNode);
 
 		FishEngine::MeshPtr MeshFromFbxMesh(fbxsdk::FbxMesh* fbxMesh);
+
+		FishEngine::TexturePtr GetTextureInfo(fbxsdk::FbxGeometry* pGeometry);
 
 		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping);
 

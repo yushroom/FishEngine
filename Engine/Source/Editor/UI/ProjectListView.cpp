@@ -1,5 +1,7 @@
 #include "ProjectListView.hpp"
 
+#include <sstream>
+
 #include <QDropEvent>
 #include <QMimeData>
 #include <QMenu>
@@ -7,8 +9,14 @@
 #include <QDir>
 
 #include "ProjectViewFileModel.hpp"
+//#include "Serialization.hpp"
+//#include "GameObject.hpp"
 
 #include <Debug.hpp>
+#include <Scene.hpp>
+//#include <Serialization/archives/BinaryOutputArchive.hpp>
+
+#include "AssetDataBase.hpp"
 
 ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	: QListView(parent)
@@ -62,7 +70,9 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	//connect(action, &QAction::triggered, []() { CreatePrimitive(PrimitiveType::Cube); });
 	m_actionOpen = m_menu->addAction("Open");
 	m_actionDelete = m_menu->addAction("Delete");
-	action->setEnabled(false);
+	m_actionMoveToScene = m_menu->addAction("Instance in scene");
+	m_actionMoveToScene->setEnabled(false);
+	//action->setEnabled(false);
 
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, &QWidget::customContextMenuRequested, this, &ProjectListView::ShowContexMenu);
@@ -76,6 +86,7 @@ ProjectListView::~ProjectListView()
 void ProjectListView::ShowContexMenu(const QPoint& pos)
 {
 	auto item = indexAt(pos);
+	auto fileInfo = m_fileModel->fileInfo(item);
 	if (item.isValid())
 	{
 		m_actionDelete->setEnabled(true);
@@ -87,6 +98,11 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 		m_actionOpen->setEnabled(false);
 		//this->selectionModel()->clearSelection();
 	}
+
+	auto path = fileInfo->path();
+	bool isModel = path.extension() == ".fbx";
+	m_actionMoveToScene->setEnabled(isModel);
+
 	auto action = m_menu->exec(QCursor::pos());
 	if (action == nullptr)
 	{
@@ -104,12 +120,20 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 			selected.push_back(row.row());
 		}
 		std::sort(selected.begin(), selected.end(), std::greater<int>());
-		// started from the end and iterate back to the beginnin
+		// started from the end and iterate back to the beginning
 		// see http://stackoverflow.com/questions/3325115/remove-a-list-of-selected-items-in-the-qlistview
 		for (int row : selected)
 		{
 			m_fileModel->RemoveItem(row);
 		}
+	}
+	else if (action == m_actionMoveToScene)
+	{
+		//auto model = FishEditor::AssetDatabase::LoadAssetAtPath<FishEngine::GameObject>(path);
+		//std::stringstream sstream;
+		//FishEngine::BinaryOutputArchive archive(sstream);
+		//archive << model;
+		//FishEngine::Scene::AddGameObject(model);
 	}
 }
 

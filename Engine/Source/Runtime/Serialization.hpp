@@ -11,6 +11,7 @@
 
 #include "Archive.hpp"
 #include "Serialization/archives/yaml.hpp"
+#include "Serialization/archives/BinaryOutputArchive.hpp"
 
 #include "Serialization/helper.hpp"
 #include "Serialization/types/map.hpp"
@@ -27,13 +28,13 @@
 
 namespace FishEngine
 {
-    class Meta(NonSerializable) Serialization
-    {
-    public:
-        Serialization() = delete;
-        
-        //void SerializeScene(BinaryOutputArchive& archive);
-    };
+	class Meta(NonSerializable) Serialization
+	{
+	public:
+		Serialization() = delete;
+		
+		//void SerializeScene(BinaryOutputArchive& archive);
+	};
 
 	template <class Archive, class T>
 	inline void Prologue(Archive& archive, T const & t)
@@ -52,6 +53,11 @@ namespace FishEngine
 			auto & ar = dynamic_cast<YAMLOutputArchive&>(archive);
 			Prologue(ar, t);
 		}
+		//else if (archive.ArchiveID() == ArchiveID<BinaryOutputArchive>())
+		//{
+		//	auto & ar = dynamic_cast<BinaryOutputArchive&>(archive);
+		//	Prologue(ar, t);
+		//}
 		else
 		{
 			abort();
@@ -66,62 +72,77 @@ namespace FishEngine
 			auto & ar = dynamic_cast<YAMLOutputArchive&>(archive);
 			Epilogue(ar, t);
 		}
+		//else if (archive.ArchiveID() == ArchiveID<BinaryOutputArchive>())
+		//{
+		//	auto & ar = dynamic_cast<BinaryOutputArchive&>(archive);
+		//	Epilogue(ar, t);
+		//}
 		else
 		{
 			abort();
 		}
 	}
-	
 
-    template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-    InputArchive& operator>>( InputArchive& archive, T& value )
-    {
-        return archive;
-    }
-    
-    template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-    OutputArchive& operator<<( OutputArchive& archive, T& value )
-    {
-        return archive;
-    }
-    
-    template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
-    InputArchive& operator>>( InputArchive& archive, T& value )
-    {
-        archive << static_cast<std::underlying_type_t<T> > ( value );
-        return archive;
-    }
-    
-    template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
-    OutputArchive& operator<<( OutputArchive& archive, T& value )
-    {
-        archive >> static_cast<std::underlying_type_t<T> > ( value );
-        return archive;
-    }
-    
-    
-    template <class T>
-    InputArchive& operator>>( InputArchive& archive, NameValuePair<T> && nvp)
-    {
-        return archive;
-    }
-    
-    template <class T>
-    OutputArchive& operator<<( OutputArchive& archive, NameValuePair<T> const & nvp)
-    {
+	template <class T>
+	InputArchive& operator >> (InputArchive& archive, NameValuePair<T> && nvp)
+	{
+		return archive;
+	}
+
+	template <class T>
+	OutputArchive& operator<<(OutputArchive& archive, NameValuePair<T> const & nvp)
+	{
 		if (archive.ArchiveID() == ArchiveID<YAMLOutputArchive>())
 		{
 			auto & ar = dynamic_cast<YAMLOutputArchive&>(archive);
 			ar << nvp;
 		}
+		//else if (archive.ArchiveID() == ArchiveID<BinaryOutputArchive>())
+		//{
+		//	auto & ar = dynamic_cast<BinaryOutputArchive&>(archive);
+		//	ar << nvp;
+		//}
 		else
 		{
 			abort();
 		}
-        return archive;
-    }
-    
-    
+		return archive;
+	}
+	
+#if 0
+
+	template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
+	InputArchive& operator>>( InputArchive& archive, T& value )
+	{
+		return archive;
+	}
+	
+	template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
+	OutputArchive& operator<<( OutputArchive& archive, T& value )
+	{
+		return archive;
+	}
+	
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	InputArchive& operator>>( InputArchive& archive, T& value )
+	{
+		archive << static_cast<std::underlying_type_t<T> > ( value );
+		return archive;
+	}
+	
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	OutputArchive& operator<<( OutputArchive& archive, T& value )
+	{
+		archive >> static_cast<std::underlying_type_t<T> > ( value );
+		return archive;
+	}
+	
+	
+
+	
+
+	
+	
   //  template <class T>
   //  InputArchive& operator>>( InputArchive& archive, BaseClassWrapper<T> && nvp)
   //  {
@@ -143,13 +164,13 @@ namespace FishEngine
   //      return archive;
   //  }
 
-    
+	
 	// template<class Archive, class T>
 	// void Serialize (Archive & archive, NameValuePair<T> const & nvp)
 	// {
 	// 	archive << nvp.name << nvp.value;
 	// }
-    
+	
  //    template<class Archive, typename T>
  //    static void Serialize ( Archive& archive, BaseClassWrapper<T> const & t )
  //    {
@@ -157,28 +178,28 @@ namespace FishEngine
  //        //archive << t.base_ref;
  //    }
 
-    /************************************************************************/
-    /* std::shared_ptr                                                      */
-    /************************************************************************/
+	/************************************************************************/
+	/* std::shared_ptr                                                      */
+	/************************************************************************/
 	template<class Archive, typename T>
-    static void operator << ( Archive& archive, std::shared_ptr<T> const & t )
-    {
+	static void operator << ( Archive& archive, std::shared_ptr<T> const & t )
+	{
 		if (t != nullptr)
 		{
-			archive << t->GetGUID();
+			archive << t->GetInstanceID();
 		}
 		else
 		{
 			archive << nullptr;
 		}
-    }
-    
-    /************************************************************************/
-    /* std::weak_ptr                                                        */
-    /************************************************************************/
-    template<class Archive, typename T>
-    inline void Serialize ( Archive& archive, const std::weak_ptr<T> & v )
-    {
+	}
+	
+	/************************************************************************/
+	/* std::weak_ptr                                                        */
+	/************************************************************************/
+	template<class Archive, typename T>
+	inline void Serialize ( Archive& archive, const std::weak_ptr<T> & v )
+	{
 		auto t = v.lock();
 		if (t != nullptr)
 		{
@@ -188,13 +209,13 @@ namespace FishEngine
 		{
 			archive << nullptr;
 		}
-    }
-    
-    template<class Archive, typename T>
-    static Archive & operator >> ( Archive & archive, std::weak_ptr<T> & v )
-    {
-        return archive;
-    }
+	}
+	
+	template<class Archive, typename T>
+	static Archive & operator >> ( Archive & archive, std::weak_ptr<T> & v )
+	{
+		return archive;
+	}
 
 	/************************************************************************/
 	/* boost::filesystem::path                                              */
@@ -204,7 +225,7 @@ namespace FishEngine
 	{
 		archive << v.c_str();
 	}
-
+#endif
 }
 
 //#ifndef __REFLECTION_PARSER__

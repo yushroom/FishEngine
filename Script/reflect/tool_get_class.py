@@ -315,18 +315,21 @@ def ExtractClasses(path):
     internal_find_typerefs(tu.cursor)
 
     for e in ('x', 'y'):
-        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        member = {'name': e, 'pretty_name': e, 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['FishEngine::Vector2']['members'].append(member)
     for e in ('x', 'y', 'z'):
-        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        member = {'name': e, 'pretty_name': e, 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['FishEngine::Vector3']['members'].append(member)
     for e in ('r', 'g', 'b'):
-        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        member = {'name': e, 'pretty_name': e, 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['FishEngine::Color']['members'].append(member)
     for e in ('x', 'y', 'z', 'w'):
-        member = {'name': e, 'pretty_name': CamelCaseToReadable(e), 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
+        member = {'name': e, 'pretty_name': e, 'type': 'float', 'NonSerializable': False, 'HideInInspector': False}
         classes['FishEngine::Vector4']['members'].append(member)
         classes['FishEngine::Quaternion']['members'].append(member)
+    for e in ('rows[0]', 'rows[1]', 'rows[2]', 'rows[3]'):
+        member = {'name': e, 'pretty_name': e, 'type': 'FishEngine::Vector4', 'NonSerializable': False, 'HideInInspector': False}
+        classes['FishEngine::Matrix4x4']['members'].append(member)
 
     return classes
 

@@ -15,6 +15,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with so
 - Unity-like Editor
 - Nearly same API with Unity
 - Physically Based Rendering (PBR)
+- Deferred Rendering
 - Asset management (WIP)
 - Physics system (WIP)
 
@@ -23,7 +24,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with so
 
 ## How to Build
 
-Before yout build, you will need to have some additional software installed:
+Before your build, you will need to have some additional software installed:
 
 - [Git](http://git-scm.com/downloads).
 - [CMake](https://cmake.org/download/). Version 3.0.0 or later is required.
@@ -45,20 +46,20 @@ Before yout build, you will need to have some additional software installed:
 
 ---
 
-Clone the sources and create a build directory.
+**Step 1.** Clone the sources and create a build directory.
 
 ```shell
 git clone https://github.com/yushroom/FishEngine.git
 cd FishEngine/Engine
 mkdir build && cd build
 ```
-Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html).Replace **Qt5_DIR**, **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing(recommended).
+**Step 2.** Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html). Replace **Qt5_DIR**, **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing(recommended).
 
 ```shell
 cmake -G "Visual Studio 14 Win64" -DQt5_DIR=D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\lib\cmake\Qt5 -DPhysX_ROOT_DIR=D:\program\PhysX-3.3\PhysXSDK -DFBXSDK_DIR="D:\Library\FBX SDK\2017.1" ..
 ```
 
-Finally, you can use any IDE according to you selected generator, but you can also just build straight from CMake. Build results can be found in Engine/Binary.
+**Step 3.** Finally, you can use any IDE according to you selected generator, but you can also just build straight from CMake. Build results can be found in Engine/Binary.
 
 ```shell
 cmake --build . --target FishEditor --config Release

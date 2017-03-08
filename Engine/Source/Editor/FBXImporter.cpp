@@ -577,8 +577,8 @@ void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHe
 
 						FbxLayeredTexture::EBlendMode lBlendMode;
 						lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
-						Debug::Log("    Textures for ", pProperty.GetName());
-						Debug::Log("        Texture ", k);
+						//Debug::Log("    Textures for ", pProperty.GetName());
+						//Debug::Log("        Texture ", k);
 						//DisplayTextureInfo(lTexture, (int)lBlendMode);
 					}
 

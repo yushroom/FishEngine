@@ -44,7 +44,7 @@
 #include "../ShaderProperty.hpp"
 #include "../Color.hpp"
 #include "../Light.hpp"
-#include "../Animator.hpp"
+#include "../Avatar.hpp"
 #include "../Animator.hpp"
 #include "../IntVector.hpp"
 #include "../Frustum.hpp"
@@ -396,7 +396,10 @@ namespace FishEngine
     FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Matrix4x4 const & value )
     {
         Prologue(archive, value);
-        
+        archive << FishEngine::make_nvp("rows[0]", value.rows[0]); // FishEngine::Vector4
+		archive << FishEngine::make_nvp("rows[1]", value.rows[1]); // FishEngine::Vector4
+		archive << FishEngine::make_nvp("rows[2]", value.rows[2]); // FishEngine::Vector4
+		archive << FishEngine::make_nvp("rows[3]", value.rows[3]); // FishEngine::Vector4
         Epilogue(archive, value);
         return archive;
     }
@@ -404,7 +407,10 @@ namespace FishEngine
     FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::Matrix4x4 & value )
     {
         Prologue(archive, value);
-        
+        archive >> FishEngine::make_nvp("rows[0]", value.rows[0]); // FishEngine::Vector4
+		archive >> FishEngine::make_nvp("rows[1]", value.rows[1]); // FishEngine::Vector4
+		archive >> FishEngine::make_nvp("rows[2]", value.rows[2]); // FishEngine::Vector4
+		archive >> FishEngine::make_nvp("rows[3]", value.rows[3]); // FishEngine::Vector4
         Epilogue(archive, value);
         return archive;
     }
@@ -553,6 +559,8 @@ namespace FishEngine
 		archive << FishEngine::make_nvp("m_tangents", m_tangents); // std::vector<Vector3>
 		archive << FishEngine::make_nvp("m_triangles", m_triangles); // std::vector<uint32_t>
 		archive << FishEngine::make_nvp("m_bindposes", m_bindposes); // std::vector<Matrix4x4>
+		archive << FishEngine::make_nvp("m_boneNames", m_boneNames); // std::vector<std::string>
+		archive << FishEngine::make_nvp("m_bones", m_bones); // std::vector<std::weak_ptr<Transform> >
 		archive << FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
 		archive << FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
 		archive << FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
@@ -570,6 +578,8 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("m_tangents", m_tangents); // std::vector<Vector3>
 		archive >> FishEngine::make_nvp("m_triangles", m_triangles); // std::vector<uint32_t>
 		archive >> FishEngine::make_nvp("m_bindposes", m_bindposes); // std::vector<Matrix4x4>
+		archive >> FishEngine::make_nvp("m_boneNames", m_boneNames); // std::vector<std::string>
+		archive >> FishEngine::make_nvp("m_bones", m_bones); // std::vector<std::weak_ptr<Transform> >
 		archive >> FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
 		archive >> FishEngine::make_nvp("m_uploaded", m_uploaded); // bool
 		archive >> FishEngine::make_nvp("m_vertexCount", m_vertexCount); // uint32_t
@@ -868,6 +878,7 @@ namespace FishEngine
 		FishEngine::Object::Serialize(archive);
 		archive << FishEngine::make_nvp("m_boneToIndex", m_boneToIndex); // std::map<std::string, int>
 		archive << FishEngine::make_nvp("m_indexToBone", m_indexToBone); // std::map<int, std::string>
+		archive << FishEngine::make_nvp("m_matrixPalette", m_matrixPalette); // std::vector<Matrix4x4>
 	}
 
 	void FishEngine::Avatar::Deserialize ( FishEngine::InputArchive & archive )
@@ -875,6 +886,7 @@ namespace FishEngine
 		FishEngine::Object::Deserialize(archive);
 		archive >> FishEngine::make_nvp("m_boneToIndex", m_boneToIndex); // std::map<std::string, int>
 		archive >> FishEngine::make_nvp("m_indexToBone", m_indexToBone); // std::map<int, std::string>
+		archive >> FishEngine::make_nvp("m_matrixPalette", m_matrixPalette); // std::vector<Matrix4x4>
 	}
 
 

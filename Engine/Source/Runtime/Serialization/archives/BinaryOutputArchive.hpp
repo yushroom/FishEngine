@@ -73,7 +73,7 @@ namespace FishEngine
 			(*this) << v.size();
 			for (auto && x : v)
 			{
-				archive << x;
+				(*this) << x;
 			}
 			return *this;
 		}

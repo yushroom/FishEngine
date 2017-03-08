@@ -26,8 +26,6 @@
 
 ## 2.BRDF
 
-​	
-
 ​	两个理论基石：辐射度学和微表面理论。辐射度学几个名词中我们最关心的是辐射率（Radiance），用符号L表示，定义为$$L={\rm d\Phi \over \rm d\omega A}$$。
 
 ​	BRDF定义为辐射率（radiance）与入射辐照度（irradiance）的比值：
@@ -56,7 +54,7 @@ $$
 $$
 f(\mathbf l, \mathbf v)={\mathbf {c_{diff}} \over \pi}
 $$
-其中$\mathbf{c_{diff}}$是材质的diffuse albedo。物理解释就是对于任何方向的入射光，都会在半球上均匀地反射出去，Lambert虽然不是物理真实的，但胜在足够简单。要除以PI是因为要在半球上积分的结果等于一（能量守恒）。注意Lambert是没有$\mathbf n \cdot \mathbf l$的，它是反射方程的一部分。
+其中$\mathbf{c_{diff}}$是材质的diffuse albedo。物理解释就是对于任何方向的入射光，都会在半球上均匀地反射出去，Lambert虽然不是物理真实的，但胜在足够简单。要除以$\pi$是因为要在半球上积分的结果等于一（能量守恒）。注意Lambert是没有$\mathbf n \cdot \mathbf l$的，这是反射方程的一部分。
 
 
 
@@ -84,7 +82,7 @@ $$
 D(\mathbf h)=\frac{\alpha^2}
 {\pi ((\mathbf n \cdot \mathbf h)^2(\alpha^2-1)+1)^2}
 $$
-其中$\alpha=Roughness^2$,Roughness就是上面提到的标准材质参数。
+其中$\alpha=\text{Roughness}^2$, Roughness就是下面会提到的标准材质参数。
 
 ​	Unreal4中的shader代码：
 
@@ -104,7 +102,7 @@ float D_GGX( float Roughness, float NoH )
 
 #### Specular G
 
-​	几何项，微面之间存在遮挡，体现为shadowing和masking，所以就算某微面的法向对了，也不一定能反射进入视点。G就是用来描述shadowing和masking*不*发生的概率，G=1就是不发生任何遮挡。
+​	几何项，微面之间存在遮挡，体现为shadowing和masking，所以就算某微面的法向对了，也不一定能反射进入视点。G就是用来描述shadowing和masking**不**发生的概率，G=1就是不发生任何遮挡。
 
 目前UE4默认用的是一种称为joint Smith的近似形式
 $$
@@ -208,7 +206,7 @@ UE4的标准材质中的几个参数：
 
 ​	float，[0,1]，缺省为0
 
-​	控制材质的金属性，即有多么像金属（metal-like），说简单点就是一个插值系数0，表示非金属，1表示金属。对于单一材质，直接设为0或者1就好了，对于混合材质（分层）材质才需要设成0-1之间的值。
+​	控制材质的金属性，即有多么像金属（metal-like），说简单点就是一个插值系数，0表示非金属，1表示金属。对于单一材质，直接设为0或者1就好了，对于混合材质（分层）材质才需要设成0-1之间的值。
 
 ### Roughness:
 
@@ -222,12 +220,12 @@ UE4的标准材质中的几个参数：
 
 ​	float，[0,1]，缺省为0.5
 
-​	Specular决定物体镜面反射强度的大小，其实就是Fresnel项中的$F_0$(垂直入射时镜面反射的强度)的一个线性映射。Specular的范围为[0,1]，对应的$F_0$的范围为[0,0.08]，而$F_0$又对应于ior（index of refraction，折射率）,相应的ior范围为[1.0,1.8]。Specular的值一般为0.5，对应的$f_0$为0.04，对应的Ior为1.5。
+​	Specular决定物体镜面反射强度的大小，其实就是Fresnel项中的$F_0$(垂直入射时镜面反射的强度)的一个线性映射。Specular的范围为[0,1]，对应的$F_0$的范围为[0,0.08]，而$F_0$又对应于ior（index of refraction，折射率）, 相应的ior范围为[1.0,1.8]。Specular的值一般为0.5，对应的$f_0$为0.04，对应的Ior为1.5。
 $$
-F_0 = 0.08*Specular \\
-F_0=(\frac {ior-1} {ior+1})^2
+F_0 = 0.08 * \text{Specular} \\
+F_0=(\frac {\text{ior}-1} {\text{ior}+1})^2
 $$
-​	即使是完全的diffuse材质，也不要将Specular设为0，，因为[Everthing is Shiny](http://filmicgames.com/archives/547)。对于大多数情况，Specular使用缺省值0.5即可。Unreal自己不太喜欢这个参数，首先Specular这个名字具有误导性，往往应该去调整Roughness；其次是这个参数很少需要调整，因为ior对于非金属意义不大，可以认为非金属的$F_0$为常数0.04。在13年的SIGGRAPH Presentation上，主讲人将Specular用别的参数（Cavity）替换掉，但是后来还是使用Specular这一参数，具体见[这篇blog](https://www.unrealengine.com/blog/physically-based-shading-on-mobile)。
+​	即使是完全的diffuse材质，也不要将Specular设为0，，因为[Everthing is Shiny](http://filmicgames.com/archives/547)。对于大多数情况，Specular使用缺省值0.5即可。Unreal自己不太喜欢这个参数，首先Specular这个名字具有误导性，往往应该去调整Roughness；其次是这个参数很少需要调整，因为ior对于非金属意义不大，可以认为非金属的$F_0$为常数0.04。在13年的SIGGRAPH Presentation上，主讲人将Specular用别的参数（Cavity）替换掉，但是后来还是将Specular带回来了，具体见[这篇blog](https://www.unrealengine.com/blog/physically-based-shading-on-mobile)。
 
 
 
@@ -243,12 +241,10 @@ $$
 
 ​	总结成如下公式:
 
+```c++
 diffuse = albedo * (1 - metalness)
 specular = lerp(0.04, albedo, metalness)
-
-这样，寸土寸金的GBuffer中只要存3通道的albedo和一个通道的metalness就可以了，视觉上可以摆脱以前常见的塑料感。
-
-
+```
 
 
 

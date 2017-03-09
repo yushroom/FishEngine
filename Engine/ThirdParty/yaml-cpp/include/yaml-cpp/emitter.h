@@ -77,6 +77,10 @@ class YAML_CPP_API Emitter : private noncopyable {
   template <typename T>
   Emitter& WriteStreamable(T value);
 
+  void EmitHeader_FishEngine();
+  void EmitBeginDoc_FishEngine(int classID, int fileID);
+  void EmitEndDoc_FishEngine();
+
  private:
   template <typename T>
   void SetStreamablePrecision(std::stringstream&) {}

@@ -141,6 +141,11 @@ Emitter& Emitter::SetLocalPrecision(const _Precision& precision) {
   return *this;
 }
 
+void Emitter::EmitHeader_FishEngine()
+{
+	m_stream << "%YAML 1.1\n%TAG !u!tag:FishEngine,2017:\n";
+}
+
 // EmitBeginDoc
 void Emitter::EmitBeginDoc() {
   if (!good())
@@ -163,6 +168,29 @@ void Emitter::EmitBeginDoc() {
   m_pState->StartedDoc();
 }
 
+void Emitter::EmitBeginDoc_FishEngine(int classID, int fileID)
+{
+	if (!good())
+		return;
+
+	if (m_pState->CurGroupType() != GroupType::NoType) {
+		m_pState->SetError("Unexpected begin document");
+		return;
+	}
+
+	if (m_pState->HasAnchor() || m_pState->HasTag()) {
+		m_pState->SetError("Unexpected begin document");
+		return;
+	}
+
+	if (m_stream.col() > 0)
+		m_stream << "\n";
+	//m_stream << "---\n";
+	m_stream << "--- !u!" << classID << '&' << fileID << '\n';
+
+	m_pState->StartedDoc();
+}
+
 // EmitEndDoc
 void Emitter::EmitEndDoc() {
   if (!good())
@@ -181,6 +209,26 @@ void Emitter::EmitEndDoc() {
   if (m_stream.col() > 0)
     m_stream << "\n";
   m_stream << "...\n";
+}
+
+void Emitter::EmitEndDoc_FishEngine()
+{
+	if (!good())
+		return;
+
+	if (m_pState->CurGroupType() != GroupType::NoType) {
+		m_pState->SetError("Unexpected begin document");
+		return;
+	}
+
+	if (m_pState->HasAnchor() || m_pState->HasTag()) {
+		m_pState->SetError("Unexpected begin document");
+		return;
+	}
+
+	if (m_stream.col() > 0)
+		m_stream << "\n";
+	//m_stream << "...\n";
 }
 
 // EmitBeginSeq

@@ -57,4 +57,9 @@ namespace FishEngine
 	{
 		return IsSubClassOf<Component>(derivedClassID);
 	}
+
+	inline bool IsGameObject(int classid)
+	{
+		return classid == ClassID<GameObject>();
+	}
 }

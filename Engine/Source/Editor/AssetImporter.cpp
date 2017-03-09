@@ -1,19 +1,20 @@
 #include "AssetImporter.hpp"
 
-#include <GameObject.hpp>
+//#include <iostream>
 
-//#include "AssetDataBase.hpp"
-#include "TextureImporter.hpp"
-#include "FBXImporter.hpp"
+#include <GameObject.hpp>
 #include <Timer.hpp>
 
+#include "TextureImporter.hpp"
+#include "FBXImporter.hpp"
+
 #include <Serialization.hpp>
-#include <Serialization/archives/yaml.hpp>
-#include <Serialization/archives/YAMLInputArchive.hpp>
+//#include <Serialization/archives/yaml.hpp>
+//#include <Serialization/archives/YAMLInputArchive.hpp>
+#include "AssetArchive.hpp"
 
 #include <boost/uuid/uuid_generators.hpp>
 
-//#include "generate/EditorClassSerialization.hpp"
 
 //namespace FishEngine
 //{
@@ -45,6 +46,7 @@ namespace FishEditor
 		//bool need_generate = true;
 		auto meta_path = assetPath.string() + ".meta";
 		auto name = assetPath.stem().string();
+
 #if 0
 		if (boost::filesystem::exists(meta_path))
 		{
@@ -65,19 +67,12 @@ namespace FishEditor
 		Debug::Log("Generate .meta file: %s", meta_path.c_str());
 		auto importer = std::make_shared<AssetImporterType>();
 		importer->setName(name);
-		std::ofstream fout(meta_path);
-		uint32_t time_created = static_cast<uint32_t>(time(NULL));
-		YAMLOutputArchive archive(fout);
-		archive.SetManipulator(YAML::BeginMap);
-		archive << make_nvp("timeCreated", time_created);
-		archive << make_nvp("guid", importer->GetGUID());
-		archive.SetManipulator(YAML::EndMap);
-		archive << importer;
 		return importer;
 	}
 
 	std::shared_ptr<AssetImporter> AssetImporter::GetAtPath(Path path)
 	{
+		AssetImporterPtr ret = nullptr;
 		path.make_preferred();
 		auto const & it = s_pathToImpoter.find(path);
 		if (it != s_pathToImpoter.end())
@@ -100,7 +95,8 @@ namespace FishEditor
 			s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
 			s_importerGUIDToTexture[importer->GetGUID()] = texture;
 			//t.StopAndPrint();
-			return importer;
+			//return importer;
+			ret = importer;
 		}
 		else if (ext == ".fbx" || ext == ".FBX")
 		{
@@ -111,10 +107,27 @@ namespace FishEditor
 			model->setName(path.stem().string());
 			s_objectInstanceIDToPath[model->GetInstanceID()] = path;
 			s_importerGUIDToModel[importer->GetGUID()] = model;
-			return importer;
+			//return importer;
+			ret = importer;
 		}
 
-		return nullptr;
+		if (ret != nullptr)
+		{
+			auto meta_path = path.string() + ".meta";
+			std::ofstream fout(meta_path);
+			uint32_t time_created = static_cast<uint32_t>(time(NULL));
+			AssetOutputArchive archive(fout);
+			//YAMLOutputArchive archive(fout);
+			//archive.SetManipulator(YAML::BeginMap);
+			archive.BeginMap();
+			archive << make_nvp("timeCreated", time_created);
+			archive << make_nvp("guid", ret->GetGUID());
+			//archive.SetManipulator(YAML::EndMap);
+			archive.EndMap();
+			archive << ret;
+		}
+
+		return ret;
 	}
 
 

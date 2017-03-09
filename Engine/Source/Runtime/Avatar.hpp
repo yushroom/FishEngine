@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Object.hpp"
 #include "ReflectClass.hpp"
 
 namespace FishEngine
@@ -13,7 +14,7 @@ namespace FishEngine
         std::vector<Matrix4x4> m_matrixPalette;
     };
 
-    class Meta(NonSerializable) MatrixiPalette
+    class Meta(NonSerializable) MatrixPalette
     {
     public:
         mutable std::vector<Matrix4x4> m_matrixPalette;

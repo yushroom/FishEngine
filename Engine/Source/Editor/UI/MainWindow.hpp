@@ -10,26 +10,27 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = 0);
+	~MainWindow();
 
 protected:
-    //virtual void keyPressEvent(QKeyEvent * event) override;
-    //virtual void keyReleaseEvent(QKeyEvent * event) override;
+	//virtual void keyPressEvent(QKeyEvent * event) override;
+	//virtual void keyReleaseEvent(QKeyEvent * event) override;
 
 private:
-    //bool eventFilter(QObject *watched, QEvent *event);
-    void Init();
+	//bool eventFilter(QObject *watched, QEvent *event);
+	void Init();
 	
 	bool CloseCurrentScene();
 
 	void NewScene();
-    void SaveSceneAs();
+	void OpenScene();
+	void SaveSceneAs();
 
-    Ui::MainWindow *ui;
+	Ui::MainWindow *ui;
 };
 
 #endif // MAINWINDOW_H

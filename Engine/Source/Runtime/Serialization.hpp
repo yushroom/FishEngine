@@ -10,8 +10,8 @@
 #include "Object.hpp"
 
 #include "Archive.hpp"
-#include "Serialization/archives/yaml.hpp"
-#include "Serialization/archives/BinaryOutputArchive.hpp"
+//#include "Serialization/archives/yaml.hpp"
+//#include "Serialization/archives/BinaryOutputArchive.hpp"
 
 #include "Serialization/helper.hpp"
 #include "Serialization/types/map.hpp"
@@ -35,16 +35,9 @@ namespace FishEngine
 		
 		//void SerializeScene(BinaryOutputArchive& archive);
 	};
+	
 
-	template <class Archive, class T>
-	inline void Prologue(Archive& archive, T const & t)
-	{ }
-	
-	template <class Archive, class T>
-	inline void Epilogue(Archive& archive, T const & t)
-	{ }
-	
-	
+#if 0	
 	template <class T>
 	inline void Prologue(OutputArchive& archive, T const & t)
 	{
@@ -108,8 +101,7 @@ namespace FishEngine
 		}
 		return archive;
 	}
-	
-#if 0
+
 
 	template <class T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
 	InputArchive& operator>>( InputArchive& archive, T& value )

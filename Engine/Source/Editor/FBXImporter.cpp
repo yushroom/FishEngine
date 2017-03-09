@@ -643,6 +643,9 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	const char* nodeName = pNode->GetName();
 	auto go = GameObject::Create();
 	go->setName(nodeName);
+	m_fileIDToRecycleName[m_nextNodeFileID] = nodeName;
+	m_recycleNameToFileID[nodeName] = m_nextNodeFileID;
+	m_nextNodeFileID++;
 #if 0
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
@@ -716,6 +719,10 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 			{
 				mesh->setName(nodeName);
 			}
+			
+			m_recycleNameToFileID[mesh->name()] = m_nextMeshFileID;
+			m_fileIDToRecycleName[m_nextMeshFileID] = mesh->name();
+			m_nextMeshFileID++;
 			
 			if (mesh->m_skinned)
 			{
@@ -831,6 +838,7 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 
 	for (auto & mesh : m_model.m_meshes)
 	{
+		AssetImporter::s_objectInstanceIDToPath[mesh->GetInstanceID()] = path;
 		if (mesh->m_skinned)
 		{
 			mesh->m_bindposes.reserve(mesh->m_boneNames.size());

@@ -487,21 +487,21 @@ namespace FishEngine
 	{
 	public:
 		
-		virtual int ArchiveID()
-		{
-			return FishEngine::ArchiveID<YAMLOutputArchive>();
-		}
+		//virtual int ArchiveID()
+		//{
+		//	return FishEngine::ArchiveID<YAMLOutputArchive>();
+		//}
 		
-        YAMLOutputArchive(std::ostream & emitter) : m_emitter(emitter)
+		YAMLOutputArchive(std::ostream & emitter) : OutputArchive(emitter), m_emitter(emitter)
 		{
 			
 		}
-        
-        YAMLOutputArchive(YAMLOutputArchive const &) = delete;
+		
+		YAMLOutputArchive(YAMLOutputArchive const &) = delete;
 		YAMLOutputArchive& operator = (YAMLOutputArchive const &) = delete;
 
 		~YAMLOutputArchive() = default;
-        
+		
 //		template<typename T, std::enable_if_t<!emittable<T>::value, int> = 0>
 //		YAMLOutputArchive & operator << (T const & t)
 //		{
@@ -609,9 +609,9 @@ namespace FishEngine
 
 		void SetManipulator(YAML::EMITTER_MANIP value)
 		{
-            //m_emitter.SetManipulator(value);
+			//m_emitter.SetManipulator(value);
 			m_emitter << value;
-            
+			
 			if (value == YAML::BeginDoc)
 			{
 				assert(!m_isInsideDoc);
@@ -619,7 +619,7 @@ namespace FishEngine
 			}
 			else if (value == YAML::EndDoc)
 			{
-                //std::cout << "EndDoc size=" << m_objectsToBeSerialized.size() << std::endl;
+				//std::cout << "EndDoc size=" << m_objectsToBeSerialized.size() << std::endl;
 				m_isInsideDoc = false;
 				if (!m_objectsToBeSerialized.empty())
 				{
@@ -652,10 +652,10 @@ namespace FishEngine
 	
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::nullptr_t const &)
 	{
-		archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
+		archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginMap);
 		archive << make_nvp("fileID", 0);
-		archive.SetManipulator(YAML::EndMap);
+		archive.SetManipulator(::YAML::EndMap);
 		return archive;
 	}
 
@@ -664,11 +664,11 @@ namespace FishEngine
 	static void SaveSequence(YAMLOutputArchive& archive, T const & v)
 	{
 		if (v.empty())
-			archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginSeq);
+			archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginSeq);
 		for (auto & x : v)
 			archive << x;
-		archive.SetManipulator(YAML::EndSeq);
+		archive.SetManipulator(::YAML::EndSeq);
 	}
 
 	template <class T>
@@ -689,13 +689,13 @@ namespace FishEngine
 	inline YAMLOutputArchive & operator << (YAMLOutputArchive & archive, std::map<T, B> const & t)
 	{
 		if (t.empty())
-			archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
+			archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginMap);
 		for (auto & p : t)
 		{
 			archive << p.first << p.second;
 		}
-		archive.SetManipulator(YAML::EndMap);
+		archive.SetManipulator(::YAML::EndMap);
 		return archive;
 	}
 
@@ -768,19 +768,19 @@ namespace FishEngine
 
 	inline void Prologue(YAMLOutputArchive& archive, Vector3 const & t)
 	{
-		archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
+		archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginMap);
 	}
 
 	inline void Prologue(YAMLOutputArchive& archive, Vector4 const & t)
 	{
-		archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
+		archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginMap);
 	}
 
 	inline void Prologue(YAMLOutputArchive& archive, Quaternion const & t)
 	{
-		archive.SetManipulator(YAML::Flow);
-		archive.SetManipulator(YAML::BeginMap);
+		archive.SetManipulator(::YAML::Flow);
+		archive.SetManipulator(::YAML::BeginMap);
 	}
 }

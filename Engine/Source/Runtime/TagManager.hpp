@@ -6,10 +6,11 @@
 
 #include "FishEngine.hpp"
 #include "Debug.hpp"
+#include "ReflectClass.hpp"
 
 namespace FishEngine
 {
-    class TagManager
+    class Meta(NonSerializable) TagManager
     {
     public:
         TagManager() = delete;

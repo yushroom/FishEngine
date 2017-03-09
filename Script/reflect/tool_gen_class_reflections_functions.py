@@ -1,6 +1,7 @@
 from mako.template import Template
 import json
 from tool_helper import UpdateFile
+from collections import OrderedDict
 
 serialization_template_str = '''
 /**************************************************
@@ -197,6 +198,7 @@ def GenSerialization_Editor(class_info):
 if __name__ == "__main__":
     with open('temp/class.json') as f:
         class_info = json.loads(f.read())
+        class_info = OrderedDict(sorted(class_info.items()))
     #GenComponentInheritance(class_info)
     UpdateFile('../../Engine/Source/Runtime/generate/EngineClassSerialization.cpp', GenSerialization_Engine(class_info))
     UpdateFile('../../Engine/Source/Editor/generate/EditorClassSerialization.cpp', GenSerialization_Editor(class_info))

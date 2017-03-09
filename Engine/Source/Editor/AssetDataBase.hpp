@@ -33,13 +33,16 @@ namespace FishEditor
 		ForceUncompressedImport,
 	};
 	
-    class Meta(NonSerializable) AssetDatabase
-    {
-    public:
-        AssetDatabase() = delete;
+	class Meta(NonSerializable) AssetDatabase
+	{
+	public:
+		AssetDatabase() = delete;
 		
-		static FishEngine::Path AssetPathToGUID(FishEngine::Path const & path);
-        //static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);
+		// Get the GUID for the asset at path.
+		static boost::uuids::uuid AssetPathToGUID(FishEngine::Path const & path);
+
+		// Translate a GUID to its current asset path.
+		//static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);
 		
 		static bool CopyAsset(FishEngine::Path const & path, FishEngine::Path const & newPath);
 		static void CreateAsset(FishEngine::ObjectPtr asset, FishEngine::Path const & path);
@@ -49,9 +52,9 @@ namespace FishEditor
 		//Returns the path name relative to the project folder where the asset is stored.
 		//All paths are relative to the project folder, for example: "Assets/MyTextures/hello.png".
 		static FishEngine::Path GetAssetPath(int instanceID);
-		static std::string GetAssetPath(FishEngine::ObjectPtr assetObject);
+		static FishEngine::Path GetAssetPath(FishEngine::ObjectPtr assetObject);
 		
-        //static TexturePtr GetCacheIcon(std::string const & path);
+		//static TexturePtr GetCacheIcon(std::string const & path);
 		static QIcon const & GetCacheIcon(FishEngine::Path path);
 		
 		static void ImportAsset(FishEngine::Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
@@ -61,10 +64,10 @@ namespace FishEditor
 		template <class T>
 		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path);
 
-        static std::map<FishEngine::Path, QIcon> s_cacheIcons;
+		static std::map<FishEngine::Path, QIcon> s_cacheIcons;
 
 		static std::set<std::shared_ptr<FishEngine::Object>> s_allAssetObjects;
-    };
+	};
 
 	// texture
 	template <>

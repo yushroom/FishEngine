@@ -45,8 +45,10 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 		action = subMenu->addAction("Prefab");
 		action->setEnabled(false);
 		subMenu->addSeparator();
-		action = subMenu->addAction("Material");
-		action->setEnabled(false);
+		m_actionCreateMaterial = subMenu->addAction("Material");
+		//action->setEnabled(false);
+		connect(m_actionCreateMaterial, &QAction::triggered, this, &ProjectListView::CreateMaterial);
+		m_actionCreateMaterial->setEnabled(false);
 		subMenu->addSeparator();
 		action = subMenu->addAction("Animator Controller");
 		action->setEnabled(false);
@@ -140,6 +142,12 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 void ProjectListView::MakeDir()
 {
 	auto index = m_fileModel->AddItem("New Folder", true);
+	this->edit(index);
+}
+
+void ProjectListView::CreateMaterial()
+{
+	auto index = m_fileModel->AddItem("New Material.mat", false);
 	this->edit(index);
 }
 

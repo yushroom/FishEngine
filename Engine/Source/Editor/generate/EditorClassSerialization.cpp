@@ -19,11 +19,13 @@ namespace FishEditor
 	void FishEditor::AssetImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Object::Serialize(archive);
+		archive << FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 	}
 
 	void FishEditor::AssetImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Object::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 	}
 
 
@@ -55,6 +57,7 @@ namespace FishEditor
 	void FishEditor::ModelImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEditor::AssetImporter::Serialize(archive);
+		archive << FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 		archive << FishEngine::make_nvp("m_fileScale", m_fileScale); // float
 		archive << FishEngine::make_nvp("m_importNormals", m_importNormals); // FishEditor::ModelImporterNormals
 		archive << FishEngine::make_nvp("m_importTangents", m_importTangents); // FishEditor::ModelImporterTangents
@@ -64,6 +67,7 @@ namespace FishEditor
 	void FishEditor::ModelImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEditor::AssetImporter::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 		archive >> FishEngine::make_nvp("m_fileScale", m_fileScale); // float
 		archive >> FishEngine::make_nvp("m_importNormals", m_importNormals); // FishEditor::ModelImporterNormals
 		archive >> FishEngine::make_nvp("m_importTangents", m_importTangents); // FishEditor::ModelImporterTangents

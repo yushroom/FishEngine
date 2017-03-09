@@ -22,30 +22,34 @@ namespace FishEditor
 	class ModelImporter;
 	typedef std::shared_ptr<ModelImporter> ModelImporterPtr;
 
+	class AssetOutputArchive;
+	class AssetInputArchive;
+	class SceneOutputArchive;
 
-    //typedef std::list<Actor> Action;
 
-    class Meta(NonSerializable) Action
-    {
-    public:
-        typedef std::function<void()> Actor;
+	//typedef std::list<Actor> Action;
 
-        void operator += (Actor const& actor)
-        {
-            m_actors.push_back(actor);
-        }
+	class Meta(NonSerializable) Action
+	{
+	public:
+		typedef std::function<void()> Actor;
 
-        void operator()() const
-        {
-            for (auto const & a : m_actors)
-            {
-                a();
-            }
-        }
+		void operator += (Actor const& actor)
+		{
+			m_actors.push_back(actor);
+		}
 
-    private:
-        std::list<Actor> m_actors;
-    };
+		void operator()() const
+		{
+			for (auto const & a : m_actors)
+			{
+				a();
+			}
+		}
+
+	private:
+		std::list<Actor> m_actors;
+	};
 }
 
 class HierarchyView;

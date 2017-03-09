@@ -8,9 +8,14 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-    std::map<FishEngine::Path, QIcon> AssetDatabase::s_cacheIcons;
+	std::map<FishEngine::Path, QIcon> AssetDatabase::s_cacheIcons;
 
 	std::set<std::shared_ptr<FishEngine::Object>> AssetDatabase::s_allAssetObjects;
+
+	boost::uuids::uuid AssetDatabase::AssetPathToGUID(FishEngine::Path const & path)
+	{
+		return AssetImporter::s_pathToImpoter[path]->GetGUID();
+	}
 
 	//Path AssetDatabase::GUIDToAssetPath(const boost::uuids::uuid &guid)
  //   {
@@ -22,15 +27,20 @@ namespace FishEditor
 		return AssetImporter::s_objectInstanceIDToPath[instanceID];
 	}
 
+	FishEngine::Path AssetDatabase::GetAssetPath(FishEngine::ObjectPtr assetObject)
+	{
+		return GetAssetPath(assetObject->GetInstanceID());
+	}
+
 	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
-        static QIcon unknown_icon(":/Resources/unknown_file.png");
+		static QIcon unknown_icon(":/Resources/unknown_file.png");
 
-        auto type = FishEngine::Resources::GetAssetType(path.extension());
-        if (type != FishEngine::AssetType::Texture)
-        {
-            return unknown_icon;
-        }
+		auto type = FishEngine::Resources::GetAssetType(path.extension());
+		if (type != FishEngine::AssetType::Texture)
+		{
+			return unknown_icon;
+		}
 		auto it = s_cacheIcons.find(path);
 		if (it != s_cacheIcons.end())
 		{

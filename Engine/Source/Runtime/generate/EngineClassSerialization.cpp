@@ -5,17 +5,16 @@
 
 #include <Serialization.hpp>
 #include <Archive.hpp>
-#include "../ShaderCompiler.hpp"
 #include "../Ray.hpp"
 #include "../Animator.hpp"
 #include "../Animator.hpp"
 #include "../Quaternion.hpp"
 #include "../Object.hpp"
 #include "../Collider.hpp"
-#include "../Script.hpp"
+#include "../Animator.hpp"
 #include "../CameraController.hpp"
 #include "../Material.hpp"
-#include "../MeshRenderer.hpp"
+#include "../ShaderCompiler.hpp"
 #include "../MeshFilter.hpp"
 #include "../BoxCollider.hpp"
 #include "../Animator.hpp"
@@ -23,15 +22,15 @@
 #include "../Shader.hpp"
 #include "../Texture.hpp"
 #include "../Matrix4x4.hpp"
-#include "../Behaviour.hpp"
+#include "../Rigidbody.hpp"
 #include "../Animator.hpp"
 #include "../Component.hpp"
-#include "../Rigidbody.hpp"
+#include "../Behaviour.hpp"
 #include "../Skybox.hpp"
 #include "../ShaderProperty.hpp"
 #include "../CapsuleCollider.hpp"
 #include "../Mesh.hpp"
-#include "../Transform.hpp"
+#include "../Renderer.hpp"
 #include "../Animator.hpp"
 #include "../Material.hpp"
 #include "../SkinnedMeshRenderer.hpp"
@@ -44,50 +43,22 @@
 #include "../ShaderProperty.hpp"
 #include "../Color.hpp"
 #include "../Light.hpp"
+#include "../Texture2D.hpp"
 #include "../Avatar.hpp"
-#include "../Animator.hpp"
+#include "../Script.hpp"
 #include "../IntVector.hpp"
 #include "../Frustum.hpp"
 #include "../IntVector.hpp"
 #include "../IntVector.hpp"
 #include "../Camera.hpp"
 #include "../Scene.hpp"
-#include "../Texture2D.hpp"
-#include "../Renderer.hpp"
+#include "../MeshRenderer.hpp"
+#include "../Transform.hpp"
 #include "../GameObject.hpp"
-#include "../TagManager.hpp"
 
 namespace FishEngine
 {
 	
-    // FishEngine::ShaderCompiler
-    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::ShaderCompiler const & value )
-    {
-        Prologue(archive, value);
-        archive << FishEngine::make_nvp("m_hasGeometryShader", value.m_hasGeometryShader); // bool
-		archive << FishEngine::make_nvp("m_settings", value.m_settings); // std::map<std::string, std::string>
-		archive << FishEngine::make_nvp("m_error", value.m_error); // FishEngine::ShaderCompilerErrorCode
-		archive << FishEngine::make_nvp("m_errorString", value.m_errorString); // std::string
-		archive << FishEngine::make_nvp("m_path", value.m_path); // Path
-		archive << FishEngine::make_nvp("m_includeDepth", value.m_includeDepth); // uint32_t
-        Epilogue(archive, value);
-        return archive;
-    }
-
-    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::ShaderCompiler & value )
-    {
-        Prologue(archive, value);
-        archive >> FishEngine::make_nvp("m_hasGeometryShader", value.m_hasGeometryShader); // bool
-		archive >> FishEngine::make_nvp("m_settings", value.m_settings); // std::map<std::string, std::string>
-		archive >> FishEngine::make_nvp("m_error", value.m_error); // FishEngine::ShaderCompilerErrorCode
-		archive >> FishEngine::make_nvp("m_errorString", value.m_errorString); // std::string
-		archive >> FishEngine::make_nvp("m_path", value.m_path); // Path
-		archive >> FishEngine::make_nvp("m_includeDepth", value.m_includeDepth); // uint32_t
-        Epilogue(archive, value);
-        return archive;
-    }
-
-
     // FishEngine::Ray
     FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Ray const & value )
     {
@@ -204,15 +175,29 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::Script
-	void FishEngine::Script::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Animator
+	void FishEngine::Animator::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
-		FishEngine::Behaviour::Serialize(archive);
+		FishEngine::Component::Serialize(archive);
+		archive << FishEngine::make_nvp("m_time", m_time); // float
+		archive << FishEngine::make_nvp("m_playing", m_playing); // bool
+		archive << FishEngine::make_nvp("m_playingOnce", m_playingOnce); // bool
+		archive << FishEngine::make_nvp("m_playOneFrame", m_playOneFrame); // bool
+		archive << FishEngine::make_nvp("m_currentFrame", m_currentFrame); // int
+		archive << FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
+		archive << FishEngine::make_nvp("m_nameToGameObject", m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
 	}
 
-	void FishEngine::Script::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Animator::Deserialize ( FishEngine::InputArchive & archive )
 	{
-		FishEngine::Behaviour::Deserialize(archive);
+		FishEngine::Component::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_time", m_time); // float
+		archive >> FishEngine::make_nvp("m_playing", m_playing); // bool
+		archive >> FishEngine::make_nvp("m_playingOnce", m_playingOnce); // bool
+		archive >> FishEngine::make_nvp("m_playOneFrame", m_playOneFrame); // bool
+		archive >> FishEngine::make_nvp("m_currentFrame", m_currentFrame); // int
+		archive >> FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
+		archive >> FishEngine::make_nvp("m_nameToGameObject", m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
 	}
 
 
@@ -262,16 +247,32 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::MeshRenderer
-	void FishEngine::MeshRenderer::Serialize ( FishEngine::OutputArchive & archive ) const
-	{
-		FishEngine::Renderer::Serialize(archive);
-	}
+    // FishEngine::ShaderCompiler
+    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::ShaderCompiler const & value )
+    {
+        Prologue(archive, value);
+        archive << FishEngine::make_nvp("m_hasGeometryShader", value.m_hasGeometryShader); // bool
+		archive << FishEngine::make_nvp("m_settings", value.m_settings); // std::map<std::string, std::string>
+		archive << FishEngine::make_nvp("m_error", value.m_error); // FishEngine::ShaderCompilerErrorCode
+		archive << FishEngine::make_nvp("m_errorString", value.m_errorString); // std::string
+		archive << FishEngine::make_nvp("m_path", value.m_path); // Path
+		archive << FishEngine::make_nvp("m_includeDepth", value.m_includeDepth); // uint32_t
+        Epilogue(archive, value);
+        return archive;
+    }
 
-	void FishEngine::MeshRenderer::Deserialize ( FishEngine::InputArchive & archive )
-	{
-		FishEngine::Renderer::Deserialize(archive);
-	}
+    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::ShaderCompiler & value )
+    {
+        Prologue(archive, value);
+        archive >> FishEngine::make_nvp("m_hasGeometryShader", value.m_hasGeometryShader); // bool
+		archive >> FishEngine::make_nvp("m_settings", value.m_settings); // std::map<std::string, std::string>
+		archive >> FishEngine::make_nvp("m_error", value.m_error); // FishEngine::ShaderCompilerErrorCode
+		archive >> FishEngine::make_nvp("m_errorString", value.m_errorString); // std::string
+		archive >> FishEngine::make_nvp("m_path", value.m_path); // Path
+		archive >> FishEngine::make_nvp("m_includeDepth", value.m_includeDepth); // uint32_t
+        Epilogue(archive, value);
+        return archive;
+    }
 
 
 	// FishEngine::MeshFilter
@@ -416,17 +417,27 @@ namespace FishEngine
     }
 
 
-	// FishEngine::Behaviour
-	void FishEngine::Behaviour::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Rigidbody
+	void FishEngine::Rigidbody::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive << FishEngine::make_nvp("m_mass", m_mass); // float
+		archive << FishEngine::make_nvp("m_drag", m_drag); // float
+		archive << FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
+		archive << FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
+		archive << FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
+		archive << FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
 	}
 
-	void FishEngine::Behaviour::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Rigidbody::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive >> FishEngine::make_nvp("m_mass", m_mass); // float
+		archive >> FishEngine::make_nvp("m_drag", m_drag); // float
+		archive >> FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
+		archive >> FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
+		archive >> FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
+		archive >> FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
 	}
 
 
@@ -464,27 +475,17 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::Rigidbody
-	void FishEngine::Rigidbody::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Behaviour
+	void FishEngine::Behaviour::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_mass", m_mass); // float
-		archive << FishEngine::make_nvp("m_drag", m_drag); // float
-		archive << FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
-		archive << FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
-		archive << FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
-		archive << FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
+		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
 	}
 
-	void FishEngine::Rigidbody::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Behaviour::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_mass", m_mass); // float
-		archive >> FishEngine::make_nvp("m_drag", m_drag); // float
-		archive >> FishEngine::make_nvp("m_angularDrag", m_angularDrag); // float
-		archive >> FishEngine::make_nvp("m_useGravity", m_useGravity); // bool
-		archive >> FishEngine::make_nvp("m_isKinematic", m_isKinematic); // bool
-		archive >> FishEngine::make_nvp("m_velocity", m_velocity); // FishEngine::Vector3
+		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
 	}
 
 
@@ -588,25 +589,23 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::Transform
-	void FishEngine::Transform::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Renderer
+	void FishEngine::Renderer::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_localPosition", m_localPosition); // FishEngine::Vector3
-		archive << FishEngine::make_nvp("m_localScale", m_localScale); // FishEngine::Vector3
-		archive << FishEngine::make_nvp("m_localRotation", m_localRotation); // FishEngine::Quaternion
-		archive << FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
-		archive << FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
+		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive << FishEngine::make_nvp("m_materials", m_materials); // std::vector<MaterialPtr>
+		archive << FishEngine::make_nvp("m_shadowCastingMode", m_shadowCastingMode); // FishEngine::ShadowCastingMode
+		archive << FishEngine::make_nvp("m_receiveShadows", m_receiveShadows); // bool
 	}
 
-	void FishEngine::Transform::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Renderer::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_localPosition", m_localPosition); // FishEngine::Vector3
-		archive >> FishEngine::make_nvp("m_localScale", m_localScale); // FishEngine::Vector3
-		archive >> FishEngine::make_nvp("m_localRotation", m_localRotation); // FishEngine::Quaternion
-		archive >> FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
-		archive >> FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
+		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
+		archive >> FishEngine::make_nvp("m_materials", m_materials); // std::vector<MaterialPtr>
+		archive >> FishEngine::make_nvp("m_shadowCastingMode", m_shadowCastingMode); // FishEngine::ShadowCastingMode
+		archive >> FishEngine::make_nvp("m_receiveShadows", m_receiveShadows); // bool
 	}
 
 
@@ -662,7 +661,6 @@ namespace FishEngine
 		archive << FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
 		archive << FishEngine::make_nvp("m_rootBone", m_rootBone); // std::weak_ptr<Transform>
 		archive << FishEngine::make_nvp("m_bones", m_bones); // std::vector<std::weak_ptr<Transform> >
-		archive << FishEngine::make_nvp("m_matrixPalette", m_matrixPalette); // std::vector<Matrix4x4>
 	}
 
 	void FishEngine::SkinnedMeshRenderer::Deserialize ( FishEngine::InputArchive & archive )
@@ -672,7 +670,6 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
 		archive >> FishEngine::make_nvp("m_rootBone", m_rootBone); // std::weak_ptr<Transform>
 		archive >> FishEngine::make_nvp("m_bones", m_bones); // std::vector<std::weak_ptr<Transform> >
-		archive >> FishEngine::make_nvp("m_matrixPalette", m_matrixPalette); // std::vector<Matrix4x4>
 	}
 
 
@@ -872,6 +869,22 @@ namespace FishEngine
 	}
 
 
+	// FishEngine::Texture2D
+	void FishEngine::Texture2D::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		FishEngine::Texture::Serialize(archive);
+		archive << FishEngine::make_nvp("m_format", m_format); // FishEngine::TextureFormat
+		archive << FishEngine::make_nvp("m_mipmapCount", m_mipmapCount); // uint32_t
+	}
+
+	void FishEngine::Texture2D::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		FishEngine::Texture::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_format", m_format); // FishEngine::TextureFormat
+		archive >> FishEngine::make_nvp("m_mipmapCount", m_mipmapCount); // uint32_t
+	}
+
+
 	// FishEngine::Avatar
 	void FishEngine::Avatar::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
@@ -890,29 +903,15 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::Animator
-	void FishEngine::Animator::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Script
+	void FishEngine::Script::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
-		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_time", m_time); // float
-		archive << FishEngine::make_nvp("m_playing", m_playing); // bool
-		archive << FishEngine::make_nvp("m_playingOnce", m_playingOnce); // bool
-		archive << FishEngine::make_nvp("m_playOneFrame", m_playOneFrame); // bool
-		archive << FishEngine::make_nvp("m_currentFrame", m_currentFrame); // int
-		archive << FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
-		archive << FishEngine::make_nvp("m_nameToGameObject", m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
+		FishEngine::Behaviour::Serialize(archive);
 	}
 
-	void FishEngine::Animator::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Script::Deserialize ( FishEngine::InputArchive & archive )
 	{
-		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_time", m_time); // float
-		archive >> FishEngine::make_nvp("m_playing", m_playing); // bool
-		archive >> FishEngine::make_nvp("m_playingOnce", m_playingOnce); // bool
-		archive >> FishEngine::make_nvp("m_playOneFrame", m_playOneFrame); // bool
-		archive >> FishEngine::make_nvp("m_currentFrame", m_currentFrame); // int
-		archive >> FishEngine::make_nvp("m_avatar", m_avatar); // AvatarPtr
-		archive >> FishEngine::make_nvp("m_nameToGameObject", m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
+		FishEngine::Behaviour::Deserialize(archive);
 	}
 
 
@@ -1056,39 +1055,37 @@ namespace FishEngine
     }
 
 
-	// FishEngine::Texture2D
-	void FishEngine::Texture2D::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::MeshRenderer
+	void FishEngine::MeshRenderer::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
-		FishEngine::Texture::Serialize(archive);
-		archive << FishEngine::make_nvp("m_format", m_format); // FishEngine::TextureFormat
-		archive << FishEngine::make_nvp("m_mipmapCount", m_mipmapCount); // uint32_t
+		FishEngine::Renderer::Serialize(archive);
 	}
 
-	void FishEngine::Texture2D::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::MeshRenderer::Deserialize ( FishEngine::InputArchive & archive )
 	{
-		FishEngine::Texture::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_format", m_format); // FishEngine::TextureFormat
-		archive >> FishEngine::make_nvp("m_mipmapCount", m_mipmapCount); // uint32_t
+		FishEngine::Renderer::Deserialize(archive);
 	}
 
 
-	// FishEngine::Renderer
-	void FishEngine::Renderer::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::Transform
+	void FishEngine::Transform::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		FishEngine::Component::Serialize(archive);
-		archive << FishEngine::make_nvp("m_enabled", m_enabled); // bool
-		archive << FishEngine::make_nvp("m_materials", m_materials); // std::vector<MaterialPtr>
-		archive << FishEngine::make_nvp("m_shadowCastingMode", m_shadowCastingMode); // FishEngine::ShadowCastingMode
-		archive << FishEngine::make_nvp("m_receiveShadows", m_receiveShadows); // bool
+		archive << FishEngine::make_nvp("m_localPosition", m_localPosition); // FishEngine::Vector3
+		archive << FishEngine::make_nvp("m_localScale", m_localScale); // FishEngine::Vector3
+		archive << FishEngine::make_nvp("m_localRotation", m_localRotation); // FishEngine::Quaternion
+		archive << FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
+		archive << FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
 	}
 
-	void FishEngine::Renderer::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::Transform::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		FishEngine::Component::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_enabled", m_enabled); // bool
-		archive >> FishEngine::make_nvp("m_materials", m_materials); // std::vector<MaterialPtr>
-		archive >> FishEngine::make_nvp("m_shadowCastingMode", m_shadowCastingMode); // FishEngine::ShadowCastingMode
-		archive >> FishEngine::make_nvp("m_receiveShadows", m_receiveShadows); // bool
+		archive >> FishEngine::make_nvp("m_localPosition", m_localPosition); // FishEngine::Vector3
+		archive >> FishEngine::make_nvp("m_localScale", m_localScale); // FishEngine::Vector3
+		archive >> FishEngine::make_nvp("m_localRotation", m_localRotation); // FishEngine::Quaternion
+		archive >> FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
+		archive >> FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
 	}
 
 
@@ -1112,23 +1109,5 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("m_tagIndex", m_tagIndex); // int
 		archive >> FishEngine::make_nvp("m_transform", m_transform); // TransformPtr
 	}
-
-
-    // FishEngine::TagManager
-    FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::TagManager const & value )
-    {
-        Prologue(archive, value);
-        
-        Epilogue(archive, value);
-        return archive;
-    }
-
-    FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::TagManager & value )
-    {
-        Prologue(archive, value);
-        
-        Epilogue(archive, value);
-        return archive;
-    }
 
 } // namespace FishEngine

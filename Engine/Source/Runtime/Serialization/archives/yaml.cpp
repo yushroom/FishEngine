@@ -1,5 +1,7 @@
 #include "yaml.hpp"
 #include "Serialization.hpp"
+//#include <fstream>
+//#include "AssetDataBase.hpp"
 
 void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> const & obj)
 {
@@ -21,6 +23,8 @@ void FishEngine::YAMLOutputArchive::SerializeObject(std::shared_ptr<Object> cons
 		(*this) << make_nvp("fileID", instanceID);
 		if (obj->ClassID() == ClassID<Mesh>())
 		{
+			//auto instanceID = obj->GetInstanceID();
+			//AssetDatabase::GetAssetPath(instanceID);
 			(*this) << "GUID" << "xxxxxxxx";
 		}
 		SetManipulator(YAML::EndMap);

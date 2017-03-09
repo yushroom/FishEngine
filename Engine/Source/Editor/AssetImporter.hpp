@@ -39,29 +39,38 @@ namespace FishEditor
 	protected:
 
 		friend class FishEditor::AssetDatabase;
+		friend class FishEditor::SceneOutputArchive;
 
 		// dirty flag for SaveAndReimport()
 		Meta(NonSerializable)
-		bool			m_isDirty = false;
+		bool							m_isDirty = false;
 
 		//Get or set the AssetBundle name.
 		Meta(NonSerializable)
-		std::string		m_assetBundleName;
+		std::string						m_assetBundleName;
 		
 		// Get or set the AssetBundle variant.
 		Meta(NonSerializable)
-		std::string		m_assetBundelVariant;
+		std::string						m_assetBundelVariant;
 		
 		// The path name of the asset for this importer. (Read Only)
 		Meta(NonSerializable)
-		FishEngine::Path			m_assetPath;
+		FishEngine::Path				m_assetPath;
 		
 		// Get or set any user data.
 		Meta(NonSerializable)
-		std::string		m_userData;
+		std::string						m_userData;
 
 		Meta(NonSerializable)
 		GUID m_guid;
+
+		std::map<int, std::string>		m_fileIDToRecycleName;
+
+		Meta(NonSerializable)
+		std::map<std::string, int>		m_recycleNameToFileID;
+
+		Meta(NonSerializable)
+		int								m_nextNodeFileID = 100000;
 
 	public:
 		static std::map<boost::uuids::uuid, FishEngine::TexturePtr> s_importerGUIDToTexture;

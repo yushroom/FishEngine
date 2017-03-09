@@ -25,6 +25,7 @@ protected:
 	//virtual void dropEvent(QDropEvent *e) override;
 
 	void MakeDir();
+	void CreateMaterial();
 	void ShowInExplorer();
 
 	ProjectViewFileModel    * m_fileModel;
@@ -33,6 +34,8 @@ protected:
 	QAction * m_actionDelete;
 	QAction * m_actionOpen;
 	QAction * m_actionShowInExplorer;
+
+	QAction * m_actionCreateMaterial;
 
 	QAction * m_actionMoveToScene;
 };

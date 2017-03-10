@@ -84,7 +84,7 @@ namespace FishEditor
 		virtual void Serialize(std::string t) override { m_emitter << t; }
 		virtual void Serialize(const char* t) override { m_emitter << t; }
 
-		virtual void Serialize(std::nullptr_t const & t)
+		virtual void Serialize(std::nullptr_t const & t) override
 		{
 			BeginFlow();
 			BeginMap();

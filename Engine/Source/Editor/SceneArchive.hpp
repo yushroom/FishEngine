@@ -3,6 +3,7 @@
 #include <deque>
 #include <set>
 #include <vector>
+#include <cassert>
 
 #include "AssetArchive.hpp"
 
@@ -33,11 +34,8 @@ namespace FishEditor
 
 		virtual void BeginDoc() override
 		{
-			// should call m_emitter.EmitBeginDoc_FishEngine directly
+			// call BeginDoc(int classID, int fileID) instead
 			abort();
-			//assert(!m_isInsideDoc);
-			//m_isInsideDoc = true;
-			//m_emitter << YAML::BeginDoc;
 		}
 
 		void BeginDoc(int classID, int fileID)
@@ -45,7 +43,7 @@ namespace FishEditor
 			assert(!m_isInsideDoc);
 			m_isInsideDoc = true;
 			//m_emitter << YAML::BeginDoc;
-			m_emitter.EmitBeginDoc_FishEngine(classID, m_nextFileID);
+			m_emitter.EmitBeginDoc_FishEngine(classID, fileID);
 		}
 
 		virtual void EndDoc() override
@@ -59,10 +57,10 @@ namespace FishEditor
 				m_objectsToBeSerialized.pop_front();
 				int fileID = item.first;
 				auto obj = item.second;
-				int oldFileId = m_nextFileID;
+				//int oldFileId = m_nextFileID;
 				m_nextFileID = fileID;
 				SerializeObject(obj);
-				m_nextFileID = oldFileId;
+				//m_nextFileID = m_totalCount+1;
 			}
 		}
 
@@ -70,10 +68,11 @@ namespace FishEditor
 		virtual void SerializeObject(FishEngine::ObjectPtr const & obj) override;
 
 		int m_nextFileID = 1;
+		int m_totalCount = 0;
 
 	private:
 
-		std::set<int> m_serialized;	// instanceID
+		std::map<int, int> m_serialized;	// instanceID to fileID
 		std::deque<std::pair<int, std::shared_ptr<FishEngine::Object>>> m_objectsToBeSerialized; // fileID
 		bool m_isInsideDoc = false;
 	};

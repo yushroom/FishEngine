@@ -553,22 +553,34 @@ namespace FishEditor
 	void ModelImporter::Init()
 	{
 		auto importer = std::make_shared<ModelImporter>();
-		for (auto & item : FishEngine::Mesh::s_builtinMeshes)
+		auto nameAndIDs = std::vector<std::pair<PrimitiveType, int>>{
+			{PrimitiveType::Cube,     10202},
+			{PrimitiveType::Cylinder, 10206},
+			{PrimitiveType::Sphere,   10207},
+			{PrimitiveType::Capsule,  10208},
+			{PrimitiveType::Plane,    10209},
+			{PrimitiveType::Quad,     10210},
+			{PrimitiveType::Cone,     10211},
+			{PrimitiveType::ScreenAlignedQuad, 10212}
+		};
+		
+		for (auto & item : nameAndIDs)
 		{
-			auto & mesh = item.second;
+			int fileID = item.second;
+			auto & mesh = FishEngine::Mesh::s_builtinMeshes[item.first];
 			std::string guid = "00000000-0000-0000-e000-000000000000";
 			std::istringstream sin(guid);
 			//using namespace boost::uuids;
 			sin >> importer->m_guid;
 			std::cout << importer->m_guid;
 			auto meshName = mesh->name();
-			importer->m_fileIDToRecycleName[importer->m_nextMeshFileID] = meshName;
-			importer->m_recycleNameToFileID[meshName] = importer->m_nextMeshFileID;
-			importer->m_nextMeshFileID++;
+			importer->m_fileIDToRecycleName[fileID] = meshName;
+			importer->m_recycleNameToFileID[meshName] = fileID;
 			auto path = "InternalModel";
 			AssetImporter::s_objectInstanceIDToPath[mesh->GetInstanceID()] = path;
 			AssetImporter::s_pathToImpoter[path] = importer;
 		}
+		importer->m_nextMeshFileID = 10213;
 	}
 
 	GameObjectPtr Model::

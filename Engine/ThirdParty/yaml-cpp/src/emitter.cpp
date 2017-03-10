@@ -143,7 +143,7 @@ Emitter& Emitter::SetLocalPrecision(const _Precision& precision) {
 
 void Emitter::EmitHeader_FishEngine()
 {
-	m_stream << "%YAML 1.1\n%TAG !u!tag:FishEngine,2017:\n";
+	m_stream << "%YAML 1.1\n%TAG !u! tag:FishEngine,2017:\n";
 }
 
 // EmitBeginDoc
@@ -186,7 +186,10 @@ void Emitter::EmitBeginDoc_FishEngine(int classID, int fileID)
 	if (m_stream.col() > 0)
 		m_stream << "\n";
 	//m_stream << "---\n";
-	m_stream << "--- !u!" << classID << '&' << fileID << '\n';
+	//m_stream << "--- !u!" << classID << " &" << fileID << '\n';
+	std::ostringstream sstream;
+	sstream << "--- !u!" << classID << " &" << fileID << '\n';
+	m_stream << sstream.str();
 
 	m_pState->StartedDoc();
 }

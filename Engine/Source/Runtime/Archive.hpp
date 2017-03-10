@@ -27,10 +27,12 @@ namespace FishEngine
 			return *this;
 		}
 
-		//template<class T>
-		//InputArchive & operator >> (NameValuePair<T> const & t)
-		//{
-		//}
+		template<class T>
+		InputArchive & operator >> (NameValuePair<T> && t)
+		{
+			return *this;
+		}
+		
 	protected:
 		std::istream & m_istream;
 	};

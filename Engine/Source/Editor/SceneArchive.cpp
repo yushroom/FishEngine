@@ -14,6 +14,22 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 
 	auto instanceID = obj->GetInstanceID();
 	auto classID = obj->ClassID();
+	
+	auto find_result = m_serialized.find(instanceID);
+	bool serialized = false;
+	int fileID = -1;
+	if (find_result != m_serialized.end()) // has already serialized
+	{
+		fileID = find_result->second;
+		serialized = true;
+	}
+	else
+	{
+		fileID = m_nextFileID;
+		m_totalCount++;
+		m_nextFileID = m_totalCount+1;
+		//m_serialized[instanceID] = fileID;
+	}
 
 	if (m_isInsideDoc)
 	{
@@ -36,10 +52,15 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 		//}
 		else
 		{
-			(*this) << FishEngine::make_nvp("fileID", m_nextFileID);
+			(*this) << FishEngine::make_nvp("fileID", fileID);
 		}
 
 		EndMap();
+	}
+	
+	if (serialized)
+	{
+		return;
 	}
 
 	bool isComponent = FishEngine::IsComponent(classID);
@@ -49,25 +70,16 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 		return;
 	}
 
-	auto find_result = m_serialized.find(instanceID);
-	if (find_result != m_serialized.end())
-	{
-		return;
-	}
-
 	if (m_isInsideDoc)
 	{
-		m_objectsToBeSerialized.push_back({ m_nextFileID, obj });
-		m_nextFileID++;
+		m_objectsToBeSerialized.push_back({ fileID, obj });
 	}
 	else
 	{
-		m_serialized.insert(instanceID);
+		m_serialized[instanceID] = fileID;
 		//AssetOutputArchive::SerializeObject(obj);
-		BeginDoc(classID, m_nextFileID);
+		BeginDoc(classID, fileID);
 		BeginMap();
-		//m_emitter << "ClassID" << classID;
-		//m_emitter << "fileID" << m_nextFileID;
 		m_emitter << obj->ClassName();
 		BeginMap();
 		obj->Serialize(*this);

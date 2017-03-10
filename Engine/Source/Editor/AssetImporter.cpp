@@ -8,9 +8,6 @@
 #include "TextureImporter.hpp"
 #include "FBXImporter.hpp"
 
-#include <Serialization.hpp>
-//#include <Serialization/archives/yaml.hpp>
-//#include <Serialization/archives/YAMLInputArchive.hpp>
 #include "AssetArchive.hpp"
 
 #include <boost/uuid/uuid_generators.hpp>
@@ -47,11 +44,12 @@ namespace FishEditor
 		auto meta_path = assetPath.string() + ".meta";
 		auto name = assetPath.stem().string();
 
-#if 0
+#if 1
 		if (boost::filesystem::exists(meta_path))
 		{
 			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
-			YAMLInputArchive archive{ meta_path };
+			std::ifstream fin(meta_path);
+			AssetInputArchive archive(fin);
 			uint32_t meta_created_time;
 			archive >> make_nvp("timeCreated", meta_created_time);
 			if (asset_modified_time <= meta_created_time)
@@ -117,25 +115,18 @@ namespace FishEditor
 			std::ofstream fout(meta_path);
 			uint32_t time_created = static_cast<uint32_t>(time(NULL));
 			AssetOutputArchive archive(fout);
-			//YAMLOutputArchive archive(fout);
-			//archive.SetManipulator(YAML::BeginMap);
-			archive.BeginMap();
-			archive << make_nvp("timeCreated", time_created);
-			archive << make_nvp("guid", ret->GetGUID());
-			//archive.SetManipulator(YAML::EndMap);
-			archive.EndMap();
-			archive << ret;
+			archive.SerializeAssetImporter(ret);
 		}
 
 		return ret;
 	}
 
 
-	std::map<boost::uuids::uuid, FishEngine::GameObjectPtr> AssetImporter::s_importerGUIDToModel;
+	std::map<GUID, FishEngine::GameObjectPtr> AssetImporter::s_importerGUIDToModel;
 
 	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
 
-	std::map<boost::uuids::uuid, TexturePtr> AssetImporter::s_importerGUIDToTexture;
+	std::map<GUID, TexturePtr> AssetImporter::s_importerGUIDToTexture;
 
 	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
 

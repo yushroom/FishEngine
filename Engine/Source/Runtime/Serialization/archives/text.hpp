@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "../../ReflectClass.hpp"
+#include "../../GUID.hpp"
 
 namespace FishEngine
 {
@@ -113,9 +114,9 @@ namespace FishEngine
 	/************************************************************************/
 	/* UUID                                                                 */
 	/************************************************************************/
-	static TextOutputArchive & operator << (TextOutputArchive & archive, FishEngine::UUID const & t)
+	static TextOutputArchive & operator << (TextOutputArchive & archive, GUID const & t)
 	{
-		archive << boost::uuids::to_string(t);
+		archive << ToString(t);
 		return archive;
 	}
 }

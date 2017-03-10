@@ -19,9 +19,6 @@
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
 #include <Application.hpp>
-//#include <Serialization/archives/binary.hpp>
-#include <Serialization.hpp>
-#include <Serialization/archives/yaml.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"

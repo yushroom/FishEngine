@@ -5,27 +5,27 @@
 #include <vector>
 #include <cassert>
 
-#include "AssetArchive.hpp"
+#include <Serialization/archives/YAMLArchive.hpp>
 
 namespace FishEditor
 {
-	class SceneInputArchive : public AssetInputArchive
+	class SceneInputArchive : public FishEngine::YAMLInputArchive
 	{
 	public:
 		SceneInputArchive(std::istream & is) 
-			: AssetInputArchive(is), m_nodes(YAML::LoadAll(is))
+			: FishEngine::YAMLInputArchive(is)
 		{
 		}
 
+		void LoadAll();
+
 	protected:
-		std::vector<YAML::Node> m_nodes;
-		//uint32_t m_nodeIndex = 0;
 	};
 
-	class SceneOutputArchive : public AssetOutputArchive
+	class SceneOutputArchive : public FishEngine::YAMLOutputArchive
 	{
 	public:
-		SceneOutputArchive(std::ostream & os) : AssetOutputArchive(os)
+		SceneOutputArchive(std::ostream & os) : FishEngine::YAMLOutputArchive(os)
 		{
 			m_emitter.EmitHeader_FishEngine();
 		}
@@ -51,26 +51,17 @@ namespace FishEditor
 			m_isInsideDoc = false;
 			//m_emitter << YAML::EndDoc;
 			m_emitter.EmitEndDoc_FishEngine();
-			if (!m_objectsToBeSerialized.empty())
-			{
-				auto item = m_objectsToBeSerialized.front();
-				m_objectsToBeSerialized.pop_front();
-				int fileID = item.first;
-				auto obj = item.second;
-				//int oldFileId = m_nextFileID;
-				m_nextFileID = fileID;
-				SerializeObject(obj);
-				//m_nextFileID = m_totalCount+1;
-			}
 		}
 
 	protected:
-		virtual void SerializeObject(FishEngine::ObjectPtr const & obj) override;
+		virtual void SerializeObject(FishEngine::ObjectPtr const & object) override;
 
 		int m_nextFileID = 1;
 		int m_totalCount = 0;
 
 	private:
+
+		void SerializeObject_impl(FishEngine::ObjectPtr const & obj);
 
 		std::map<int, int> m_serialized;	// instanceID to fileID
 		std::deque<std::pair<int, std::shared_ptr<FishEngine::Object>>> m_objectsToBeSerialized; // fileID

@@ -2,9 +2,11 @@
 #include "AssetImporter.hpp"
 #include "AssetDataBase.hpp"
 
+#include <Debug.hpp>
+
 using namespace FishEngine;
 
-void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const & obj)
+void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr const & obj)
 {
 	if (obj == nullptr)
 	{
@@ -34,7 +36,7 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 	if (m_isInsideDoc)
 	{
 		BeginFlow();
-		BeginMap();
+		BeginMap(1);	// do not know map size
 
 		if (classID == ClassID<Mesh>())
 		{
@@ -79,12 +81,36 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 		m_serialized[instanceID] = fileID;
 		//AssetOutputArchive::SerializeObject(obj);
 		BeginDoc(classID, fileID);
-		BeginMap();
+		BeginMap(2);
 		m_emitter << obj->ClassName();
-		BeginMap();
+		BeginMap(1);	// do not know map size
 		obj->Serialize(*this);
 		EndMap();
 		EndMap();
 		EndDoc();
 	}
+}
+
+void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
+{
+	SerializeObject_impl(object);
+	while (!m_objectsToBeSerialized.empty() && !m_isInsideDoc)
+	{
+		auto item = m_objectsToBeSerialized.front();
+		m_objectsToBeSerialized.pop_front();
+		int fileID = item.first;
+		auto obj = item.second;
+		m_nextFileID = fileID;
+		SerializeObject_impl(obj);
+	}
+	FishEngine::Debug::LogWarning("here");
+}
+
+void FishEditor::SceneInputArchive::LoadAll()
+{
+	std::list<GameObjectPtr> gameObjects;
+	//for (auto & node : m_nodes)
+	//{
+	//	//Debug::Log(node->)
+	//}
 }

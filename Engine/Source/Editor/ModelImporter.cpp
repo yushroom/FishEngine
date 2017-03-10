@@ -15,7 +15,7 @@
 #include <MeshRenderer.hpp>
 #include <SkinnedMeshRenderer.hpp>
 
-#include <boost/uuid/uuid_io.hpp>
+//#include <boost/uuid/uuid_io.hpp>
 #include <iostream>
 
 #define REMOVE_FBX_PIVOT
@@ -568,7 +568,7 @@ namespace FishEditor
 		{
 			int fileID = item.second;
 			auto & mesh = FishEngine::Mesh::s_builtinMeshes[item.first];
-			std::string guid = "00000000-0000-0000-e000-000000000000";
+			std::string guid = "0000000000000000e000000000000000";
 			std::istringstream sin(guid);
 			//using namespace boost::uuids;
 			sin >> importer->m_guid;

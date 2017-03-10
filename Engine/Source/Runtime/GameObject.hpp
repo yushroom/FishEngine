@@ -63,6 +63,7 @@ namespace FishEngine
 		// The Transform attached to this GameObject.
 		TransformPtr transform() const
 		{
+
 			return m_transform;
 		}
 

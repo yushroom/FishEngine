@@ -4,14 +4,12 @@
 #include <Object.hpp>
 #include "ReflectClass.hpp"
 #include "Serialization/NameValuePair.hpp"
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
+//#include <boost/uuid/uuid.hpp>
+//#include <boost/uuid/uuid_io.hpp>
+#include "GUID.hpp"
 
 namespace FishEngine
 {	
-	template <class T>
-	constexpr int ArchiveID();
-	
 	class Meta(NonSerializable) InputArchive
 	{
 	public:
@@ -27,14 +25,188 @@ namespace FishEngine
 			return *this;
 		}
 
-		template<class T>
-		InputArchive & operator >> (NameValuePair<T> && t)
+		InputArchive & operator >> (short & t)
 		{
+			this->Deserialize(t);
 			return *this;
 		}
+
+		InputArchive & operator >> (unsigned short & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (int & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (unsigned int & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (long & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (unsigned long & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (long long & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (unsigned long long & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (float & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (double & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		InputArchive & operator >> (bool & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
+
+		//InputArchive & operator >> (std::nullptr_t const & t)
+		//{
+		//	this->Serialize(t);
+		//	return *this;
+		//}
+
+		InputArchive & operator >> (GUID & t)
+		{
+			//(*this) >> ToString(t);
+			abort();
+			return *this;
+		}
+
+		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
+		InputArchive & operator << (std::shared_ptr<T> & obj)
+		{
+			DeserializeObject(obj);
+			return *this;
+		}
+
+		//OutputArchive & operator << (ObjectPtr const & obj)
+		//{
+		//	SerializeObject(obj);
+		//	return *this;
+		//}
+
+		InputArchive & operator >> (std::weak_ptr<Object> & obj)
+		{
+			DeserializeWeakObject(obj);
+			return *this;
+		}
+
+		template<class T>
+		InputArchive & operator >> (NameValuePair<T> && nvp)
+		{
+			NameOfNVP(nvp.name);
+			MiddleOfNVP();
+			(*this) >> nvp.value;
+			EndNVP();
+			return *this;
+		}
+
+		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
+		InputArchive & operator >> (NameValuePair<const std::shared_ptr<T> &> && nvp)
+		{ 
+			NameOfNVP(nvp.name);
+			MiddleOfNVP();
+			DeserializeObject(nvp.value);
+			EndNVP();
+			return *this;
+		}
+
+		template<class T>
+		InputArchive & operator >> (std::vector<T> & t)
+		{
+			//for (auto & item : t)
+			//{
+			//	(*this) << item;
+			//}
+			abort();
+			return *this;
+		}
+
+		template<class T>
+		InputArchive & operator >> (std::list<T> & t)
+		{
+			//BeginSequence(t.size());
+			//for (auto & item : t)
+			//{
+			//	(*this) << item;
+			//}
+			//EndSequence();
+			abort();
+			return *this;
+		}
+
+		template<class T, class B>
+		InputArchive & operator >> (std::map<T, B> & t)
+		{
+			//BeginMap(t.size());
+			//for (auto & item : t)
+			//{
+			//	(*this) << item.first << item.second;
+			//}
+			//EndMap();
+			abort();
+			return *this;
+		}
+
+		virtual void BeginClass() {}
+		virtual void EndClass() {}
 		
 	protected:
 		std::istream & m_istream;
+
+		virtual void Deserialize(short & t) { m_istream >> t; }
+		virtual void Deserialize(unsigned short & t) { m_istream >> t; }
+		virtual void Deserialize(int & t) { m_istream >> t; }
+		virtual void Deserialize(unsigned int & t) { m_istream >> t; }
+		virtual void Deserialize(long & t) { m_istream >> t; }
+		virtual void Deserialize(unsigned long & t) { m_istream >> t; }
+		virtual void Deserialize(long long & t) { m_istream >> t; }
+		virtual void Deserialize(unsigned long long & t) { m_istream >> t; }
+		virtual void Deserialize(float & t) { m_istream >> t; }
+		virtual void Deserialize(double & t) { m_istream >> t; }
+		virtual void Deserialize(bool & t) { m_istream >> t; }
+		virtual void Deserialize(std::string & t) { m_istream >> t; }
+		//virtual void Serialize(const char* t) { m_istream >> t; }
+		//virtual void Serialize(std::nullptr_t const & t) { }
+
+		virtual void DeserializeObject(ObjectPtr const & obj) = 0;
+		virtual void DeserializeWeakObject(std::weak_ptr<Object> const & obj) = 0;
+
+		virtual void EndNVP() = 0;
+		virtual void NameOfNVP(const char* name) = 0;
+		virtual void MiddleOfNVP() = 0;
 	};
 	
 	
@@ -141,9 +313,9 @@ namespace FishEngine
 			return *this;
 		}
 
-		OutputArchive & operator << (boost::uuids::uuid const & t)
+		OutputArchive & operator << (GUID const & t)
 		{
-			(*this) << boost::uuids::to_string(t);
+			(*this) << ToString(t);
 			return *this;
 		}
 
@@ -214,7 +386,7 @@ namespace FishEngine
 		template<class T, class B>
 		OutputArchive & operator << (std::map<T, B> const & t)
 		{
-			BeginMap();
+			BeginMap(t.size());
 			for (auto & item : t)
 			{
 				(*this) << item.first << item.second;
@@ -226,7 +398,7 @@ namespace FishEngine
 		virtual void BeginClass() {}
 		virtual void EndClass() {}
 
-		virtual void BeginMap() {}
+		virtual void BeginMap(std::size_t mapSize) {}
 		virtual void EndMap() {}
 
 		virtual void BeginSequence(std::size_t sequenceSize) {}
@@ -250,30 +422,29 @@ namespace FishEngine
 
 		virtual void SerializeObject(ObjectPtr const & obj) = 0;
 		virtual void SerializeWeakObject(std::weak_ptr<Object> const & obj) = 0;
+
+		//template<class T>
+		//void SerializeNVP (NameValuePair<T> const & nvp)
+		//{
+		//	SerializeNameOfNVP(nvp.name);
+		//	MiddleOfNVP();
+		//	(*this) << nvp.value;
+		//	EndNVP();
+		//}
+
+		//template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
+		//void SerializeNVP (NameValuePair<const std::shared_ptr<T> &> const & nvp)
+		//{
+		//	SerializeNameOfNVP(nvp.name);
+		//	MiddleOfNVP();
+		//	SerializeObject(nvp.value);
+		//	EndNVP();
+		//}
+
 		virtual void EndNVP() = 0;
 		virtual void SerializeNameOfNVP(const char* name) = 0;
 		virtual void MiddleOfNVP() = 0;
 
 		std::ostream & m_ostream;
 	};
-
-	template <class T>
-	inline void Prologue(InputArchive& archive, T const & t)
-	{ }
-
-	template <class T>
-	inline void Epilogue(InputArchive& archive, T const & t)
-	{ }
-
-	template <class T>
-	inline void Prologue(OutputArchive& archive, T const & t)
-	{
-		archive.BeginClass();
-	}
-
-	template <class T>
-	inline void Epilogue(OutputArchive& archive, T const & t)
-	{
-		archive.EndClass();
-	}
 }

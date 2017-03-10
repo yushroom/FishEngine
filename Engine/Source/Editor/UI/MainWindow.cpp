@@ -25,12 +25,11 @@
 #include "Selection.hpp"
 
 #include <fstream>
-#include <Serialization.hpp>
 #include <GameObject.hpp>
-//#include <Serialization/archives/yaml.hpp>
 #include <Timer.hpp>
 
 #include "SceneArchive.hpp"
+#include "AssetArchive.hpp"
 
 using namespace FishEngine;
 
@@ -214,9 +213,9 @@ void MainWindow::SaveSceneAs()
 		std::ofstream fout(metaPath);
 		uint32_t time_created = static_cast<uint32_t>(time(NULL));
 		FishEditor::AssetOutputArchive archive(fout);
-		archive.BeginMap();
-		archive << make_nvp("fileFormatVersion", 2);
-		archive << make_nvp("guid", "xxxxxxxx");
+		archive.BeginMap(3);
+		archive << "fileFormatVersion" << 2;
+		archive << "guid" << "xxxxxxxx";
 		archive << make_nvp("timeCreated", time_created);
 		archive.EndMap();
 	}

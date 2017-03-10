@@ -1,136 +1,53 @@
 #include <Archive.hpp>
+#include <Serialization/archives/YAMLArchive.hpp>
 
-#include <yaml-cpp/yaml.h>
+#include "AssetImporter.hpp"
 
 namespace FishEditor
 {
-	class AssetInputArchive : public ::FishEngine::InputArchive
+	class AssetInputArchive : public ::FishEngine::YAMLInputArchive
 	{
 	public:
-		AssetInputArchive(std::istream & is) : FishEngine::InputArchive(is) { }
+		AssetInputArchive(std::istream & is) : YAMLInputArchive(is) { }
 
 		virtual ~AssetInputArchive() = default;
+
+	protected:
 	};
 
 
-	class AssetOutputArchive : public ::FishEngine::OutputArchive
+	class AssetOutputArchive : public ::FishEngine::YAMLOutputArchive
 	{
 	public:
-		AssetOutputArchive(std::ostream & os) : OutputArchive(os), m_emitter(os)
+		AssetOutputArchive(std::ostream & os) : YAMLOutputArchive(os)
 		{
 
 		}
 
 		virtual ~AssetOutputArchive() = default;
 
-		virtual void BeginDoc()
+		void SerializeAssetImporter (AssetImporterPtr const & importer)
 		{
-			m_emitter << YAML::BeginDoc;
-		}
-
-		virtual void EndDoc()
-		{
-			m_emitter << YAML::EndDoc;
-		}
-
-		virtual void BeginClass() override
-		{
-			BeginMap();
-		}
-
-		virtual void EndClass() override
-		{
+			uint32_t time_created = static_cast<uint32_t>(time(NULL));
+			BeginMap(3);
+			//SerializeNVP(FishEngine::make_nvp("timeCreated", time_created));
+			//SerializeNVP(FishEngine::make_nvp("guid", importer->GetGUID()));
+			(*this) << FishEngine::make_nvp("timeCreated", time_created);
+			(*this) << FishEngine::make_nvp("guid", importer->GetGUID());
+			//archive.SetManipulator(YAML::EndMap);
+			m_emitter << importer->ClassName();
+			BeginMap(1);	// do not known map size
+			importer->Serialize(*this);
 			EndMap();
-		}
-
-		void BeginFlow()
-		{
-			m_emitter << YAML::Flow;
-		}
-
-		virtual void BeginSequence(std::size_t sequenceSize) override
-		{
-			if (sequenceSize <= 0)
-				BeginFlow();
-			m_emitter << YAML::BeginSeq;
-		}
-		virtual void EndSequence() override
-		{
-			m_emitter << YAML::EndSeq;
-		}
-
-		virtual void BeginMap() override
-		{
-			m_emitter << YAML::BeginMap;
-		}
-
-		virtual void EndMap() override
-		{
-			m_emitter << YAML::EndMap;
+			EndMap();
 		}
 
 	protected:
-		virtual void Serialize(short t) override { m_emitter << t; }
-		virtual void Serialize(unsigned short t) override { m_emitter << t; }
-		virtual void Serialize(int t) override { m_emitter << t; }
-		virtual void Serialize(unsigned int t) override { m_emitter << t; }
-		virtual void Serialize(long t) override { m_emitter << t; }
-		virtual void Serialize(unsigned long t) override { m_emitter << t; }
-		virtual void Serialize(long long t) override { m_emitter << t; }
-		virtual void Serialize(unsigned long long t) override { m_emitter << t; }
-		virtual void Serialize(float t) override { m_emitter << t; }
-		virtual void Serialize(double t) override { m_emitter << t; }
-		virtual void Serialize(bool t) override { m_emitter << t; }
-		virtual void Serialize(std::string t) override { m_emitter << t; }
-		virtual void Serialize(const char* t) override { m_emitter << t; }
-
-		virtual void Serialize(std::nullptr_t const & t) override
-		{
-			BeginFlow();
-			BeginMap();
-			(*this) << FishEngine::make_nvp("fileID", 0);
-			EndMap();
-		}
 
 		virtual void SerializeObject(FishEngine::ObjectPtr const & obj) override
 		{
-			if (obj == nullptr)
-			{
-				(*this) << nullptr;
-				return;
-			}
-
-			BeginDoc();
-			BeginMap();
-			m_emitter << obj->ClassName();
-			BeginMap();
-			obj->Serialize(*this);
-			EndMap();
-			EndMap();
-			EndDoc();
+			// use SerializeAssetImporter
+			abort();
 		}
-
-		virtual void SerializeWeakObject(std::weak_ptr<FishEngine::Object> const & obj) override
-		{
-			auto t = obj.lock();
-			this->SerializeObject(t);
-		}
-
-		virtual void SerializeNameOfNVP(const char* name) override
-		{
-			m_emitter << name;
-		}
-
-		virtual void MiddleOfNVP() override
-		{
-		}
-
-		virtual void EndNVP() override
-		{
-			//m_emitter << ::YAML::EndMap;
-		}
-
-	protected:
-		YAML::Emitter m_emitter;
 	};
 }

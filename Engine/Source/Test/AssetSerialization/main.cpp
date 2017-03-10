@@ -2,7 +2,6 @@
 
 #include <FishEngine.hpp>
 #include <iostream>
-#include <Serialization.hpp>
 #include <Serialization/archives/yaml.hpp>
 
 #include <GameApp.hpp>

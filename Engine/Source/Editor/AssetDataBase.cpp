@@ -12,7 +12,7 @@ namespace FishEditor
 
 	std::set<std::shared_ptr<FishEngine::Object>> AssetDatabase::s_allAssetObjects;
 
-	boost::uuids::uuid AssetDatabase::AssetPathToGUID(FishEngine::Path const & path)
+	FishEngine::GUID AssetDatabase::AssetPathToGUID(FishEngine::Path const & path)
 	{
 		return AssetImporter::s_pathToImpoter[path]->GetGUID();
 	}

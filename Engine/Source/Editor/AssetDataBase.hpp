@@ -4,6 +4,7 @@
 #include <Resources.hpp>
 #include <QIcon>
 #include <ReflectClass.hpp>
+#include <GUID.hpp>
 
 namespace FishEngine
 {
@@ -39,7 +40,7 @@ namespace FishEditor
 		AssetDatabase() = delete;
 		
 		// Get the GUID for the asset at path.
-		static boost::uuids::uuid AssetPathToGUID(FishEngine::Path const & path);
+		static FishEngine::GUID AssetPathToGUID(FishEngine::Path const & path);
 
 		// Translate a GUID to its current asset path.
 		//static FishEngine::Path GUIDToAssetPath(boost::uuids::uuid const & guid);

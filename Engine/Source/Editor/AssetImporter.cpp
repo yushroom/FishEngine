@@ -13,15 +13,6 @@
 #include <boost/uuid/uuid_generators.hpp>
 
 
-//namespace FishEngine
-//{
-//	inline YAMLInputArchive& operator >> (YAMLInputArchive& archive, FishEditor::TextureImporterPtr importer)
-//	{
-//		Load(archive, *importer);
-//		return archive;
-//	}
-//}
-
 using namespace FishEngine;
 
 namespace FishEditor
@@ -32,13 +23,20 @@ namespace FishEditor
 
 	}
 
-	//void AssetImporter::SaveAndReimport()
-	//{
-	//	AssetDatabase::ImportAsset(m_assetPath);
-	//}
+	void AssetImporter::SaveAndReimport()
+	{
+		//AssetDatabase::ImportAsset(m_assetPath);
+		uint32_t time_created = static_cast<uint32_t>(time(NULL));
+		m_assetTimeStamp = time_created;
+		auto meta_path = m_assetPath.string() + ".meta";
+		std::ofstream fout(meta_path);
+		AssetOutputArchive archive(fout);
+		archive.SerializeAssetImporter(*this);
+		Reimport();
+	}
 
 	template<class AssetImporterType>
-	std::shared_ptr<AssetImporterType> GetAssetImporter(Path const & assetPath)
+	std::shared_ptr<AssetImporterType> AssetImporter::GetAssetImporter(Path const & assetPath)
 	{
 		//bool need_generate = true;
 		auto meta_path = assetPath.string() + ".meta";
@@ -52,12 +50,17 @@ namespace FishEditor
 			AssetInputArchive archive(fin);
 			uint32_t meta_created_time;
 			archive >> make_nvp("timeCreated", meta_created_time);
+			GUID guid;
+			archive >> make_nvp("guid", guid);
 			if (asset_modified_time <= meta_created_time)
 			{
 				Debug::Log("Load .meta file: %s", meta_path.c_str());
 				archive.ToNextNode();
 				auto importer = archive.DeserializeObject<AssetImporterType>();
 				importer->setName(name);
+				importer->m_guid = guid;
+				importer->m_assetTimeStamp = meta_created_time;
+				importer->m_assetPath = assetPath;
 				return importer;
 			}
 		}
@@ -65,6 +68,8 @@ namespace FishEditor
 		Debug::Log("Generate .meta file: %s", meta_path.c_str());
 		auto importer = std::make_shared<AssetImporterType>();
 		importer->setName(name);
+		// do not set assetTimeStamp here
+		importer->m_assetPath = assetPath;
 		return importer;
 	}
 
@@ -109,11 +114,12 @@ namespace FishEditor
 			ret = importer;
 		}
 
-		if (ret != nullptr)
+		if (ret != nullptr && ret->m_assetTimeStamp == 0)	// if the .meta file is newly created
 		{
+			uint32_t time_created = static_cast<uint32_t>(time(NULL));
+			ret->m_assetTimeStamp = time_created;
 			auto meta_path = path.string() + ".meta";
 			std::ofstream fout(meta_path);
-			uint32_t time_created = static_cast<uint32_t>(time(NULL));
 			AssetOutputArchive archive(fout);
 			archive.SerializeAssetImporter(ret);
 		}

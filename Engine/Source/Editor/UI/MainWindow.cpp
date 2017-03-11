@@ -127,6 +127,8 @@ MainWindow::MainWindow(QWidget *parent) :
 		//FishEngine::Camera::main()->FrameSelected(FishEditor::Selection::activeGameObject());
 		FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected(FishEditor::Selection::activeGameObject());
 	});
+	
+	connect(ui->actionDelete, &QAction::triggered, ui->hierarchyTreeView->m_deleteAction, &QAction::trigger);
 
 //    FishEditor::MainEditor::OnInitialized += [this](){
 //        ui->projectView->SetRootPath(FishEngine::Applicaiton::dataPath());

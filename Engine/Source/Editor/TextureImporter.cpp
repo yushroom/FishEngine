@@ -217,11 +217,11 @@ namespace FishEditor
         free(data);
         return t;
     }
-
-	FishEngine::TexturePtr TextureImporter::Import(Path const & path)
+	
+	void TextureImporter::ImportTo(FishEngine::Texture2DPtr & texture)
 	{
 		//std::shared_ptr<Texture> texture;
-		auto ext = path.extension();
+		auto ext = m_assetPath.extension();
 		if (ext == ".dds")
 		{
 			abort();
@@ -229,8 +229,8 @@ namespace FishEditor
 		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
 		{
 #if 1
-			QImage image(QString::fromStdString(path.string()));
-			auto texture = std::make_shared<Texture2D>();
+			QImage image(QString::fromStdString(m_assetPath.string()));
+			//auto texture = std::make_shared<Texture2D>();
 			int width = image.width();
 			int height = image.height();
 			texture->m_width = width;
@@ -246,41 +246,41 @@ namespace FishEditor
 				height = Mathf::NextPowerOfTwo(height);
 				needResize = true;
 			}
-
+			
 			if (needResize)
 			{
 				Debug::LogWarning("resize image");
 				image = image.scaled(width, height);
 			}
-
+			
 			//int bytesPerLine = image.bytesPerLine();
 			//int bytes = image.byteCount();
 			int expectedBytes = 0;
-
+			
 			auto format = image.format();
 			
 			// QImage is 32-bit aligned
 			switch (format)
 			{
-			case QImage::Format_RGB32:
-				//image.convertToFormat(QImage::Format_RGB888);
-				//texture->m_format = TextureFormat::RGB24;
-				//expectedBytes = width * height * 3;
-				//break;
-			case QImage::Format_ARGB32:
-				image = image.convertToFormat(QImage::Format_RGBA8888);
-				texture->m_format = TextureFormat::RGBA32;
-				expectedBytes = width * height * 4;
-				break;
-			case QImage::Format_Mono:
-				image = image.convertToFormat(QImage::Format_Grayscale8);
-				//break;
-			case QImage::Format_Grayscale8:
-				texture->m_format = TextureFormat::R8;
-				expectedBytes = width * height;
-				break;
-			default:
-				abort();
+				case QImage::Format_RGB32:
+					//image.convertToFormat(QImage::Format_RGB888);
+					//texture->m_format = TextureFormat::RGB24;
+					//expectedBytes = width * height * 3;
+					//break;
+				case QImage::Format_ARGB32:
+					image = image.convertToFormat(QImage::Format_RGBA8888);
+					texture->m_format = TextureFormat::RGBA32;
+					expectedBytes = width * height * 4;
+					break;
+				case QImage::Format_Mono:
+					image = image.convertToFormat(QImage::Format_Grayscale8);
+					//break;
+				case QImage::Format_Grayscale8:
+					texture->m_format = TextureFormat::R8;
+					expectedBytes = width * height;
+					break;
+				default:
+					abort();
 			}
 			
 			int length = image.byteCount();
@@ -292,9 +292,9 @@ namespace FishEditor
 			texture->m_data.resize(length);
 			std::copy(data, data + length, texture->m_data.begin());
 			
-			AssetDatabase::s_cacheIcons[path] = QIcon(QPixmap::fromImage(std::move(image)));
+			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(QPixmap::fromImage(std::move(image)));
 			//AssetDatabase::m_cacheIcons.emplace({ path, QIcon(QPixmap::fromImage(std::move(image))) });
-			return texture;
+			return;
 #else
 			int width, height, components;
 			uint8_t *data = stbi_load(path.string().c_str(), &width, &height, &components, 0);
@@ -304,7 +304,7 @@ namespace FishEditor
 				abort();
 			}
 			//TextureImporter::FromRawData(data, width, height, TextureFormat::RGBA32);
-
+			
 			auto texture = std::make_shared<Texture2D>();
 			int length = width * height * components;
 			texture->m_data.resize(length);
@@ -312,32 +312,46 @@ namespace FishEditor
 			free(data);
 			texture->m_width = width;
 			texture->m_height = height;
-
+			
 			switch (components)
 			{
-			case 1:
-				texture->m_format = TextureFormat::R8;
-				break;
-			case 2:
-				texture->m_format = TextureFormat::RG16;
-				break;
-			case 3:
-				texture->m_format = TextureFormat::RGB24;
-				break;
-			case 4:
-				texture->m_format = TextureFormat::RGBA32;
-				break;
-			default:
-				abort();
+				case 1:
+					texture->m_format = TextureFormat::R8;
+					break;
+				case 2:
+					texture->m_format = TextureFormat::RG16;
+					break;
+				case 3:
+					texture->m_format = TextureFormat::RGB24;
+					break;
+				case 4:
+					texture->m_format = TextureFormat::RGBA32;
+					break;
+				default:
+					abort();
 			}
-			return texture;
+			return;
 #endif
 		}
 		else
 		{
 			abort();
 		}
-		return nullptr;
+	}
+
+	FishEngine::TexturePtr TextureImporter::Import(Path const & path)
+	{
+		m_assetPath = path;
+		auto texture = std::make_shared<Texture2D>();
+		this->ImportTo(texture);
+		return texture;
+	}
+	
+	void TextureImporter::Reimport()
+	{
+		auto texture = AssetImporter::s_importerGUIDToTexture[this->m_guid];
+		auto texture2d = std::dynamic_pointer_cast<Texture2D>(texture);
+		ImportTo(texture2d);
 	}
 
 #if 0

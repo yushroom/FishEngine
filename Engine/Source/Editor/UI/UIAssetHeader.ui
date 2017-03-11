@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="icon">
      <property name="maximumSize">
       <size>
        <width>40</width>
@@ -54,11 +54,6 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="name">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>TextLabel</string>
          </property>

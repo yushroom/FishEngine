@@ -2,6 +2,7 @@
 #include <Archive.hpp>
 #include <yaml-cpp/yaml.h>
 #include <cassert>
+#include <stack>
 
 namespace FishEngine
 {
@@ -16,11 +17,29 @@ namespace FishEngine
 
 		virtual ~YAMLInputArchive() = default;
 
-		YAML::Node CurrentNode()
+		const YAML::Node & CurrentNode()
 		{
-			if (m_node == nullptr)
-				return m_nodes[m_nodeIndex];
-			return *m_node;
+			if (m_workingNodes.empty())
+			{
+				m_workingNodes.push(m_nodes[m_nodeIndex]);
+			}
+			
+			if (m_expectedNextType == Type::MapKey)
+			{
+				m_expectedNextType = Type::MapValue;
+				m_workingNodes.pop();	// pop value node
+				auto key = m_mapOrSequenceiterator->first;
+				m_workingNodes.push(key);
+			}
+			else if (m_expectedNextType == Type::MapValue)
+			{
+				m_expectedNextType = Type::MapKey;
+				m_workingNodes.pop();	// pop key node
+				auto value = m_mapOrSequenceiterator->second;
+				++m_mapOrSequenceiterator;
+				m_workingNodes.push(value);
+			}
+			return m_workingNodes.top();
 		}
 
 		void ToNextNode()
@@ -31,29 +50,52 @@ namespace FishEngine
 		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
 		std::shared_ptr<T> DeserializeObject()
 		{
+			auto currentNode = CurrentNode();
 			assert(CurrentNode().IsMap());
-			auto node = CurrentNode()[T::StaticClassName()];
-			m_node = &node;
+			m_workingNodes.push(currentNode[T::StaticClassName()]);
 			auto p = std::make_shared<T>();
-			(*this) >> *p;
-			m_node = nullptr;
+			p->Deserialize(*this);
+			m_workingNodes.pop();
 			return p;
+		}
+		
+		virtual void BeginClass() override
+		{
+			//m_workingNodes.push()
+		}
+		
+		virtual void EndClass() override
+		{
+		}
+		
+		virtual void BeginMap() override
+		{
+			m_mapOrSequenceiterator = CurrentNode().begin();
+			m_expectedNextType = Type::MapKey;
+		}
+		
+		//virtual void GetMapItem() {}
+		virtual void EndMap() override
+		{
+			// the top node of m_workingNodes if map node itself (if this map is empty) or the last MapValue node of this map
+			//m_workingNodes.pop();
+			m_expectedNextType = Type::None;
 		}
 
 	protected:
 
-		virtual void Deserialize(short & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(unsigned short & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(int & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(unsigned int & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(long & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(unsigned long & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(long long & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(unsigned long long & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(float & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(double & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(bool & t) { Convert(CurrentNode(), t); }
-		virtual void Deserialize(std::string & t) { Convert(CurrentNode(), t); }
+		virtual void Deserialize(short & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(unsigned short & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(int & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(unsigned int & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(long & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(unsigned long & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(long long & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(unsigned long long & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(float & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(double & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(bool & t) override { Convert(CurrentNode(), t); }
+		virtual void Deserialize(std::string & t) override { Convert(CurrentNode(), t); }
 
 		virtual void DeserializeObject(FishEngine::ObjectPtr const & obj) override
 		{
@@ -68,25 +110,30 @@ namespace FishEngine
 
 		virtual void EndNVP() override
 		{
-
+			m_workingNodes.pop();
 		}
 
 		virtual void NameOfNVP(const char* name) override
 		{
-			assert(CurrentNode().IsMap());
-			m_node = &CurrentNode()[name];
+			auto currentNode = CurrentNode();
+			assert(currentNode.IsMap());
+			//assert(currentNode.front());
+			m_workingNodes.push(currentNode[name]);
 		}
 
 		virtual void MiddleOfNVP() override
 		{
 
 		}
+		
+		virtual std::size_t GetSizeTag() override
+		{
+			auto currentNode = CurrentNode();
+			assert(currentNode.IsMap() || currentNode.IsSequence());
+			return currentNode.size();
+		}
 
 	private:
-		std::vector<YAML::Node> m_nodes;
-		uint32_t m_nodeIndex = 0;
-		YAML::Node * m_node = nullptr;
-		 
 
 		static void Convert(YAML::Node const & node, std::string & t)
 		{
@@ -115,6 +162,20 @@ namespace FishEngine
 			//std::cout << node.Scalar() << std::endl;
 			t = static_cast<T>(node.as<std::underlying_type_t<T>>());
 		}
+		
+		std::vector<YAML::Node> m_nodes;
+		uint32_t m_nodeIndex = 0;
+		std::stack<YAML::Node> m_workingNodes;
+		
+		enum class Type
+		{
+			None,
+			MapKey,
+			MapValue,
+		};
+		
+		Type					m_expectedNextType = Type::None;
+		YAML::const_iterator	m_mapOrSequenceiterator;
 	};
 
 

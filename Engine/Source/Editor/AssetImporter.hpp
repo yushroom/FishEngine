@@ -22,6 +22,17 @@ namespace FishEditor
 		AssetImporter(AssetImporter const &) = delete;
 		AssetImporter& operator=(AssetImporter const &) = delete;
 		
+		FishEngine::Path assetPath() const
+		{
+			return m_assetPath;
+		}
+		
+		uint32_t assetTimeStamp() const
+		{
+			return m_assetTimeStamp;
+		}
+		
+		
 		void SaveAndReimport();
 		
 		// Set the AssetBundle name and variant.
@@ -39,6 +50,16 @@ namespace FishEditor
 
 		friend class FishEditor::AssetDatabase;
 		friend class FishEditor::SceneOutputArchive;
+		
+		virtual void Reimport() { abort(); }
+		
+		bool IsNewlyCreated() const
+		{
+			return m_assetTimeStamp == 0;
+		}
+		
+		template<class AssetImporterType>
+		static std::shared_ptr<AssetImporterType> GetAssetImporter(FishEngine::Path const & assetPath);
 
 		// dirty flag for SaveAndReimport()
 		Meta(NonSerializable)
@@ -56,6 +77,9 @@ namespace FishEditor
 		Meta(NonSerializable)
 		FishEngine::Path				m_assetPath;
 		
+		Meta(NonSerializable)
+		uint32_t						m_assetTimeStamp = 0;
+		
 		// Get or set any user data.
 		Meta(NonSerializable)
 		std::string						m_userData;
@@ -70,6 +94,7 @@ namespace FishEditor
 
 		Meta(NonSerializable)
 		int								m_nextNodeFileID = 100000;
+		
 
 	public:
 		static std::map<FishEngine::GUID, FishEngine::TexturePtr> s_importerGUIDToTexture;

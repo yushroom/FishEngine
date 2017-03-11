@@ -61,6 +61,8 @@ namespace FishEditor
         static bool ObjectField(const std::string &label, const FishEngine::ObjectPtr &obj);
 
 		static bool TextureField(std::string const & label, FishEngine::TexturePtr * texture);
+		
+		static void RevertApplyButtons(bool enabled);
 
     private:
         friend class Inspector;

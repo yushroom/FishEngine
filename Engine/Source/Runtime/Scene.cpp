@@ -83,16 +83,21 @@ namespace FishEngine
 		//UpdateBounds();
 	}
 
-	void Scene::RenderShadow(LightPtr& light)
+	void Scene::RenderShadow(LightPtr const & light)
 	{
+		if (light == nullptr)
+		{
+			return;
+		}
+		
 #define DEBUG_SHADOW 1
 		auto    camera = Camera::main();
 		auto    camera_to_world = camera->transform()->localToWorldMatrix();
 		float   near = camera->nearClipPlane();
 		//float   far = camera->farClipPlane();
 		float far = QualitySettings::shadowDistance();
-		Vector3 light_dir = light->transform()->forward();
 
+		Vector3 light_dir = light->transform()->forward();
 		Frustum total_frustum = camera->frustum();
 
 		constexpr float splits[] = { 0, 1.0f / 15.0f, 3.0f / 15.0f, 7.0f / 15.0f, 1 };

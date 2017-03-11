@@ -25,3 +25,18 @@ void UIAssetHeader::CheckUpdate(const std::string &name)
         ui->name->setText(QString::fromStdString(name));
     }
 }
+
+void UIAssetHeader::SetName(std::string const & name)
+{
+	if (m_name != name)
+	{
+		m_name = name;
+		LOG;
+		ui->name->setText(QString::fromStdString(name));
+	}
+}
+
+void UIAssetHeader::SetIcon(QIcon const & icon)
+{
+	ui->icon->setPixmap(icon.pixmap(ui->icon->width(), ui->icon->height()));
+}

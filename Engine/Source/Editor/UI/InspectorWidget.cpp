@@ -9,6 +9,7 @@
 #include "UI/UIGameObjectHeader.hpp"
 #include "UI/UIMaterialHeader.hpp"
 #include "UI/UIAssetHeader.hpp"
+#include "UI/TextureImporterInspector.hpp"
 
 #include "TextureImporter.hpp"
 #include "ModelImporter.hpp"
@@ -33,15 +34,19 @@ InspectorWidget::InspectorWidget(QWidget *parent)
 
     m_gameObjectHeader = new UIGameObjectHeader();
     m_materialHeader = new UIMaterialHeader();
-    m_assetHeader = new UIAssetHeader();
+    //m_assetHeader = new UIAssetHeader();
     rootLayout->addWidget(m_gameObjectHeader);
     rootLayout->addWidget(m_materialHeader);
-    rootLayout->addWidget(m_assetHeader);
+    //rootLayout->addWidget(m_assetHeader);
     m_gameObjectHeader->setHidden(true);
     m_materialHeader->setHidden(true);
-    m_assetHeader->setHidden(true);
-    rootLayout->addWidget(m_treeWidget);
+    //m_assetHeader->setHidden(true);
+	m_textureImporterInspector = new TextureImporterInspector();
+	rootLayout->addWidget(m_textureImporterInspector);
+	m_textureImporterInspector->setHidden(true);
 
+	rootLayout->addWidget(m_treeWidget);
+	
 	auto timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &InspectorWidget::Update);
 	timer->start(1000 / 15.0f); // 15 fps
@@ -53,8 +58,13 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::Object> obj)
         m_gameObjectHeader->setHidden(true);
     if ( ! m_materialHeader->isHidden() )
         m_materialHeader->setHidden(true);
-    if ( m_assetHeader->isHidden() )
-        m_assetHeader->setHidden(false);
+	
+    m_textureImporterInspector->Unbind();
+	
+	if (m_treeWidget->isHidden())
+	{
+		m_treeWidget->setHidden(false);
+	}
 }
 
 void InspectorWidget::Bind(std::shared_ptr<FishEngine::GameObject> go)
@@ -63,8 +73,13 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::GameObject> go)
         m_gameObjectHeader->setHidden(false);
     if ( ! m_materialHeader->isHidden() )
         m_materialHeader->setHidden(true);
-    if ( ! m_assetHeader->isHidden() )
-        m_assetHeader->setHidden(true);
+    if ( ! m_textureImporterInspector->isHidden() )
+        m_textureImporterInspector->setHidden(true);
+	
+	if (m_treeWidget->isHidden())
+	{
+		m_treeWidget->setHidden(false);
+	}
 
     m_gameObjectHeader->Bind(go);
 }
@@ -75,10 +90,17 @@ void InspectorWidget::Bind(std::shared_ptr<FishEditor::TextureImporter> importer
 		m_gameObjectHeader->setHidden(true);
 	if (!m_materialHeader->isHidden())
 		m_materialHeader->setHidden(true);
-	if (m_assetHeader->isHidden())
-		m_assetHeader->setHidden(false);
+	if (m_textureImporterInspector->isHidden())
+		m_textureImporterInspector->setHidden(false);
+	
+	if (! m_treeWidget->isHidden())
+	{
+		m_treeWidget->setHidden(true);
+	}
+	
+	m_textureImporterInspector->Bind(importer);
 
-	m_assetHeader->CheckUpdate(importer->name());
+	//m_assetHeader->CheckUpdate(importer->name());
 }
 
 void InspectorWidget::Bind(std::shared_ptr<FishEditor::ModelImporter> importer)
@@ -87,10 +109,10 @@ void InspectorWidget::Bind(std::shared_ptr<FishEditor::ModelImporter> importer)
 		m_gameObjectHeader->setHidden(true);
 	if (!m_materialHeader->isHidden())
 		m_materialHeader->setHidden(true);
-	if (m_assetHeader->isHidden())
-		m_assetHeader->setHidden(false);
 
-	m_assetHeader->CheckUpdate(importer->name());
+	m_textureImporterInspector->Unbind();
+
+	//m_assetHeader->CheckUpdate(importer->name());
 }
 
 void InspectorWidget::Update()
@@ -98,6 +120,7 @@ void InspectorWidget::Update()
 	auto go = FishEditor::Selection::activeGameObject();
 	if (go != nullptr)
 	{
+		m_textureImporterInspector->Unbind();
 		FishEditor::Inspector::Bind(go);
 	}
 	else
@@ -107,6 +130,15 @@ void InspectorWidget::Update()
 			FishEditor::Inspector::Bind(object);
 		else
 			FishEditor::Inspector::HideAll();
+	}
+}
+
+void InspectorWidget::HideAll()
+{
+	m_textureImporterInspector->Unbind();
+	if (!isHidden())
+	{
+		setHidden(true);
 	}
 }
 

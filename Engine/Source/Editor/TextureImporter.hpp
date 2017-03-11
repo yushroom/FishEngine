@@ -116,8 +116,14 @@ namespace FishEditor
 			m_isDirty = true;
 		}
 		
+	protected:
+		void ImportTo(FishEngine::Texture2DPtr & texture);
+		
+		virtual void Reimport() override;
+		
 	private:
 		friend class Inspector;
+		friend class TextureImporterInspector;
 
 		// Allows alpha splitting on relevant platforms for this texture.
 		bool m_allowAlphaSplitting;

@@ -643,9 +643,12 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	const char* nodeName = pNode->GetName();
 	auto go = GameObject::Create();
 	go->setName(nodeName);
-	m_fileIDToRecycleName[m_nextNodeFileID] = nodeName;
-	m_recycleNameToFileID[nodeName] = m_nextNodeFileID;
-	m_nextNodeFileID++;
+	if (IsNewlyCreated())
+	{
+		m_fileIDToRecycleName[m_nextNodeFileID] = nodeName;
+		m_recycleNameToFileID[nodeName] = m_nextNodeFileID;
+		m_nextNodeFileID++;
+	}
 #if 0
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
@@ -720,9 +723,12 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				mesh->setName(nodeName);
 			}
 			
-			m_recycleNameToFileID[mesh->name()] = m_nextMeshFileID;
-			m_fileIDToRecycleName[m_nextMeshFileID] = mesh->name();
-			m_nextMeshFileID++;
+			if (IsNewlyCreated())
+			{
+				m_recycleNameToFileID[mesh->name()] = m_nextMeshFileID;
+				m_fileIDToRecycleName[m_nextMeshFileID] = mesh->name();
+				m_nextMeshFileID++;
+			}
 			
 			if (mesh->m_skinned)
 			{

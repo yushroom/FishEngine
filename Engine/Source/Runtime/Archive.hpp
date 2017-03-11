@@ -1,11 +1,14 @@
 #pragma once
 
 #include <type_traits>
+#include <sstream>
+
+#include <boost/filesystem/path.hpp>
+
 #include <Object.hpp>
+
 #include "ReflectClass.hpp"
 #include "Serialization/NameValuePair.hpp"
-//#include <boost/uuid/uuid.hpp>
-//#include <boost/uuid/uuid_io.hpp>
 #include "GUID.hpp"
 
 namespace FishEngine
@@ -18,12 +21,6 @@ namespace FishEngine
 
 		virtual ~InputArchive() = default;
 		//virtual int ArchiveID() = 0;
-
-		template<class T>
-		InputArchive & operator >> (T & t)
-		{
-			return *this;
-		}
 
 		InputArchive & operator >> (short & t)
 		{
@@ -96,16 +93,41 @@ namespace FishEngine
 		//	this->Serialize(t);
 		//	return *this;
 		//}
+		
+		template<typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+		InputArchive & operator >> (T & t)
+		{
+			std::underlying_type_t<T> temp;
+			(*this) >> temp;
+			t = static_cast<T>(temp);
+			return *this;
+		}
+		
+		InputArchive & operator >> (std::string & t)
+		{
+			this->Deserialize(t);
+			return *this;
+		}
 
 		InputArchive & operator >> (GUID & t)
 		{
-			//(*this) >> ToString(t);
-			abort();
+			std::string guidStr;
+			(*this) >> guidStr;
+			std::istringstream sin(guidStr);
+			sin >> t;
+			return *this;
+		}
+		
+		InputArchive & operator >> (boost::filesystem::path & path)
+		{
+			std::string pathStr;
+			(*this) >> pathStr;
+			path = pathStr;
 			return *this;
 		}
 
 		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
-		InputArchive & operator << (std::shared_ptr<T> & obj)
+		InputArchive & operator >> (std::shared_ptr<T> & obj)
 		{
 			DeserializeObject(obj);
 			return *this;
@@ -117,7 +139,8 @@ namespace FishEngine
 		//	return *this;
 		//}
 
-		InputArchive & operator >> (std::weak_ptr<Object> & obj)
+		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
+		InputArchive & operator >> (std::weak_ptr<T> & obj)
 		{
 			DeserializeWeakObject(obj);
 			return *this;
@@ -170,18 +193,27 @@ namespace FishEngine
 		template<class T, class B>
 		InputArchive & operator >> (std::map<T, B> & t)
 		{
-			//BeginMap(t.size());
-			//for (auto & item : t)
-			//{
-			//	(*this) << item.first << item.second;
-			//}
-			//EndMap();
-			abort();
+			t.clear();
+			auto size = GetSizeTag();
+			BeginMap();
+			auto hint = t.begin();
+			for (size_t i = 0; i < size; ++i)
+			{
+				T key;
+				B value;
+				(*this) >> key >> value;
+				hint = t.emplace_hint(hint, std::move(key), std::move(value));
+			}
+			EndMap();
 			return *this;
 		}
 
 		virtual void BeginClass() {}
 		virtual void EndClass() {}
+		
+		virtual void BeginMap() {}
+		//virtual void GetMapItem() {}
+		virtual void EndMap() {}
 		
 	protected:
 		std::istream & m_istream;
@@ -203,6 +235,8 @@ namespace FishEngine
 
 		virtual void DeserializeObject(ObjectPtr const & obj) = 0;
 		virtual void DeserializeWeakObject(std::weak_ptr<Object> const & obj) = 0;
+		
+		virtual std::size_t GetSizeTag() = 0;
 
 		virtual void EndNVP() = 0;
 		virtual void NameOfNVP(const char* name) = 0;

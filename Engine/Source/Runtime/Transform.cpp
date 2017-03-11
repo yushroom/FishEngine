@@ -41,14 +41,6 @@ namespace FishEngine
 		m_isDirty = false;
 	}
 
-	void Transform::CopyValueTo(TransformPtr target) const
-	{
-		target->m_localPosition = m_localPosition;
-		target->m_localRotation = m_localRotation;
-		target->m_localScale = m_localScale;
-		target->MakeDirty();
-	}
-
 	//    void Transform::UpdateFast() const
 //    {
 //        //m_localEulerAngles = m_localRotation.eulerAngles();

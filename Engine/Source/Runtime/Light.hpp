@@ -33,10 +33,28 @@ namespace FishEngine
 
         static LightPtr Create();
 
-        static std::list<LightPtr>& lights()
-        {
-            return m_lights;
-        }
+//        static std::list<std::weak_ptr<Light>>& lights()
+//        {
+//            return m_lights;
+//        }
+		
+		static LightPtr mainLight()
+		{
+			LightPtr ret = nullptr;
+			while (!m_lights.empty())
+			{
+				if (m_lights.front().expired())
+				{
+					m_lights.pop_front();
+				}
+				else
+				{
+					ret = m_lights.front().lock();
+					break;
+				}
+			}
+			return ret;
+		}
 
         float shadowNearPlane() const
         {
@@ -101,7 +119,7 @@ namespace FishEngine
 		Meta(NonSerializable)
         Vector4 m_cascadesSplitPlaneFar;
 
-        static std::list<LightPtr> m_lights;
+		static std::list<std::weak_ptr<Light>> m_lights;
     };
 }
 

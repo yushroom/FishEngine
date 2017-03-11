@@ -380,9 +380,9 @@ void Inspector::Bind(TextureImporterPtr const & importer)
 	EditorGUI::s_treeWidget = s_inspectorWidget->m_treeWidget;
 	s_inspectorWidget->Bind(importer);
 
-	EditorGUI::Begin();
-	OnInspectorGUI<TextureImporter>(importer);
-	EditorGUI::End();
+//	EditorGUI::Begin();
+//	OnInspectorGUI<TextureImporter>(importer);
+//	EditorGUI::End();
 }
 
 
@@ -409,8 +409,9 @@ void FishEditor::Inspector::Bind(ModelImporterPtr const & importer)
 
 void Inspector::HideAll()
 {
-	if (!s_inspectorWidget->isHidden())
-		s_inspectorWidget->setHidden(true);
+//	if (!s_inspectorWidget->isHidden())
+//		s_inspectorWidget->setHidden(true);
+	s_inspectorWidget->HideAll();
 }
 
 std::string Inspector::ShowAddComponentMenu()

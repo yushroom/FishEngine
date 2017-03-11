@@ -6,8 +6,6 @@ SET(
     Serialization_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/Archive.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Archive.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/helper.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/NameValuePair.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/types/list.hpp
@@ -15,10 +13,9 @@ SET(
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/types/vector.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/binary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/text.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/yaml.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/yaml.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLInputArchive.hpp
     ${CMAKE_CURRENT_LIST_DIR}/generate/EngineClassSerialization.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLArchive.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLArchive.hpp
 )
 foreach (x ${Serialization_SRCS})
     IF(NOT EXISTS ${x})

@@ -101,11 +101,13 @@ namespace FishEngine
         /************************************************************************/
         /* Shadow                                                               */
         /************************************************************************/
-        auto& lights = Light::lights();
-        for (auto& l : lights)
-        {
-            Scene::RenderShadow(l); // note: RenderShadow will change viewport
-        }
+//        auto& lights = Light::lights();
+//        for (auto& l : lights)
+//        {
+//            Scene::RenderShadow(l.lock()); // note: RenderShadow will change viewport
+//        }
+		
+		Scene::RenderShadow(Light::mainLight());
 
         auto v = Camera::main()->viewport();
         const int w = Screen::width();
@@ -228,15 +230,24 @@ namespace FishEngine
         {
             glDepthFunc(GL_ALWAYS);
             glDepthMask(GL_FALSE);
-            auto light = Light::lights().front();
-            glClearBufferfv(GL_COLOR, 0, white);
-            auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
-            auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
-            mtl->SetTexture("CascadedShadowMap", light->m_shadowMap);
-            mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
-            Graphics::DrawMesh(quad, mtl);
-            glDepthMask(GL_TRUE);
-            glDepthFunc(GL_LESS);
+			auto light = Light::mainLight();
+			LayeredDepthBufferPtr shadowMap;
+			if (light != nullptr)
+			{
+				shadowMap = light->m_shadowMap;
+			}
+			else
+			{
+				shadowMap = RenderSettings::defaultShadowMap();
+			}
+			glClearBufferfv(GL_COLOR, 0, white);
+			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
+			auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
+			mtl->SetTexture("CascadedShadowMap", shadowMap);
+			mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
+			Graphics::DrawMesh(quad, mtl);
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
         }
         Pipeline::PopRenderTarget();
 

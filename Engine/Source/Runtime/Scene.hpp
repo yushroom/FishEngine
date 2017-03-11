@@ -131,7 +131,7 @@ namespace FishEngine
         static void Update();
 		static void Clean();
 		
-        static void RenderShadow(LightPtr& light);
+        static void RenderShadow(LightPtr const& light);
         static void OnDrawGizmos();
 
         static GameObjectPtr Find(const std::string& name);

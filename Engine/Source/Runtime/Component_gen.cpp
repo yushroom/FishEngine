@@ -30,7 +30,12 @@ AddComponentToGameObject(
     CASE(CapsuleCollider)
     //CASE(MeshCollider)
     CASE(SphereCollider)
-	CASE(Light)
+	if (componentClassName == "Light")
+	{
+		auto light = Light::Create();
+		gameObject->AddComponent(light);
+		return light;
+	}
 	CASE(CameraController)
 #undef CASE
     Debug::LogError("UNKNOWN component type name: %s", componentClassName.c_str());

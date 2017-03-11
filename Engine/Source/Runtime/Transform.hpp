@@ -339,8 +339,6 @@ namespace FishEngine
 		//void UpdateFast() const;
 		
 
-		void CopyValueTo(TransformPtr target) const;
-		
 	private:
 		friend class FishEditor::Inspector;
 		friend class Scene;

@@ -21,7 +21,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-foreach (x AssetImporter TextureImporter ModelImporter FBXImporter)
+foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})

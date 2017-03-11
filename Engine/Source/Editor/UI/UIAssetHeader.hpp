@@ -16,6 +16,10 @@ public:
     ~UIAssetHeader();
 
     void CheckUpdate(std::string const & name);
+	
+	void SetName(std::string const & name);
+	
+	void SetIcon(QIcon const & icon);
 
 private:
     Ui::UIAssetHeader *ui;

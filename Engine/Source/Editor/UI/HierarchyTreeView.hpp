@@ -20,6 +20,8 @@ public:
     explicit HierarchyTreeView(QWidget *parent = 0);
 
     virtual QSize sizeHint() const override;
+	
+	QAction * m_deleteAction;
 
 private slots:
     //void UpdateHierarchyView();
@@ -34,7 +36,7 @@ private:
     bool m_inDragDropMode = false;
 
     QMenu * m_menu;
-    QAction * m_deleteAction;
+	
     //QAction * m_createEmptyAction;
     //QAction * m_createCubeAction;
     //QAction * m_createSphereAction;

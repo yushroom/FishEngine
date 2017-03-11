@@ -74,6 +74,16 @@ ProjectView::ProjectView(QWidget *parent) :
 		&ProjectView::OnIconSizeChanged);
 
 	//connect(m_fileModel, &ProjectViewFileModel::rowsRemoved, m_dirModel, &ProjectViewDirModel::)
+	
+	Selection::selectionChanged += [this]() {
+		if (Selection::activeTransform() != nullptr)
+		{
+			Debug::LogWarning("ERROR");
+			ui->listView->selectionModel()->blockSignals(true);
+			ui->listView->selectionModel()->clear();
+			ui->listView->selectionModel()->blockSignals(false);
+		}
+	};
 }
 
 ProjectView::~ProjectView()

@@ -30,7 +30,20 @@ namespace FishEngine
         {
             m_ambientCubemap = ambientCubemap;
         }
-        
+		
+		static LayeredDepthBufferPtr defaultShadowMap()
+		{
+			static LayeredDepthBufferPtr m_shadowMap = nullptr;
+			if (m_shadowMap == nullptr)
+			{
+				m_shadowMap = LayeredDepthBuffer::Create(32, 32, 4, false);
+				//m_tempColorBuffer = LayeredColorBuffer::Create(shadow_map_size, shadow_map_size, 4, TextureFormat::R32);
+				m_shadowMap->setFilterMode(FilterMode::Bilinear);
+				m_shadowMap->setWrapMode(TextureWrapMode::Clamp);
+			}
+			return m_shadowMap;
+		}
+		
         static TexturePtr preintegratedGF();
 
     private:
@@ -38,6 +51,8 @@ namespace FishEngine
         // The global skybox to use.
         static MaterialPtr m_skybox;
         static TexturePtr m_ambientCubemap;
+		
+		
     };
 }
 

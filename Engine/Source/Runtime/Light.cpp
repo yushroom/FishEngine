@@ -10,7 +10,7 @@
 
 namespace FishEngine
 {
-    std::list<LightPtr> Light::m_lights;
+    std::list<std::weak_ptr<Light>> Light::m_lights;
 
     void Light::OnDrawGizmos()
     {

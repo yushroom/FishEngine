@@ -1,5 +1,6 @@
 #include "Object.hpp"
 #include "Scene.hpp"
+#include "GameObject.hpp"
 
 namespace FishEngine
 {
@@ -23,4 +24,11 @@ namespace FishEngine
 	{
 		Scene::DestroyImmediate(obj);
 	}
+
+	template<>
+	std::shared_ptr<GameObject> MakeShared()
+	{
+		return GameObject::Create();
+	}
+
 }

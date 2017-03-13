@@ -123,19 +123,6 @@ namespace FishEditor
 //        {
 //            Camera::main()->FrameSelected(Selection::activeGameObject());
 //        }
-
-//        if (Input::GetKeyDown(KeyCode::W))
-//        {
-//            m_transformToolType = TransformToolType::Translate;
-//        }
-//        else if (Input::GetKeyDown(KeyCode::E))
-//        {
-//            m_transformToolType = TransformToolType::Rotate;
-//        }
-//        else if (Input::GetKeyDown(KeyCode::R))
-//        {
-//            m_transformToolType = TransformToolType::Scale;
-//        }
 	}
 
 	void SceneViewEditor::Render()
@@ -280,6 +267,7 @@ namespace FishEditor
 						{
 							material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
 							Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->m_matrixPalette);
+							material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 						}
 					}
 				}

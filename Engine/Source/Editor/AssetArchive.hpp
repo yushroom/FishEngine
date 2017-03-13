@@ -28,18 +28,6 @@ namespace FishEditor
 
 		void SerializeAssetImporter (AssetImporterPtr const & importer)
 		{
-//			uint32_t time_created = static_cast<uint32_t>(time(NULL));
-//			BeginMap(3);
-//			//SerializeNVP(FishEngine::make_nvp("timeCreated", time_created));
-//			//SerializeNVP(FishEngine::make_nvp("guid", importer->GetGUID()));
-//			(*this) << FishEngine::make_nvp("timeCreated", time_created);
-//			(*this) << FishEngine::make_nvp("guid", importer->GetGUID());
-//			//archive.SetManipulator(YAML::EndMap);
-//			m_emitter << importer->ClassName();
-//			BeginMap(1);	// do not known map size
-//			importer->Serialize(*this);
-//			EndMap();
-//			EndMap();
 			SerializeAssetImporter(*importer);
 		}
 		
@@ -51,9 +39,8 @@ namespace FishEditor
 			//SerializeNVP(FishEngine::make_nvp("guid", importer->GetGUID()));
 			(*this) << FishEngine::make_nvp("timeCreated", time_created);
 			(*this) << FishEngine::make_nvp("guid", importer.GetGUID());
-			//archive.SetManipulator(YAML::EndMap);
 			m_emitter << importer.ClassName();
-			BeginMap(1);	// do not known map size
+			BeginMap(1);	// do not know map size
 			importer.Serialize(*this);
 			EndMap();
 			EndMap();

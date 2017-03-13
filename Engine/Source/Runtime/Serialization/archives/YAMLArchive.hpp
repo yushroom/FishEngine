@@ -133,7 +133,7 @@ namespace FishEngine
 			return currentNode.size();
 		}
 
-	private:
+	protected:
 
 		static void Convert(YAML::Node const & node, std::string & t)
 		{

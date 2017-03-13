@@ -40,6 +40,9 @@ namespace FishEngine
 		//InjectSerializationFunctions(Object);
 		virtual void Serialize(OutputArchive & archive) const;
 		virtual void Deserialize(InputArchive & archive);
+
+		virtual ObjectPtr Clone() const;
+		virtual void CopyValueTo(ObjectPtr & target) const;
 		
 		// The name of the object.
 		virtual inline std::string name() const { return m_name; }
@@ -69,12 +72,6 @@ namespace FishEngine
 
 		template<class T>
 		static std::shared_ptr<T> Instantiate(std::shared_ptr<T> const & original);
-//		{
-//			//abort();
-//			auto ret = std::make_shared<T>();
-//			//original->CopyValueTo(ret);
-//			return ret;
-//		}
 		
 		// TODO: make it protected
 		PrefabPtr prefabInternal() const
@@ -101,6 +98,23 @@ namespace FishEngine
 
 	};	// end of Class Object
 
+	template<class T>
+	static std::shared_ptr<T> MakeShared()
+	{
+		return std::make_shared<T>();
+	}
+
+	template<>
+	static std::shared_ptr<GameObject> MakeShared();
+
+	template<class T>
+	static std::shared_ptr<T>
+	FishEngine::Object::Instantiate(std::shared_ptr<T> const & original)
+	{
+		auto ret = MakeShared<T>();
+		original->CopyValueTo(ret);
+		return ret;
+	}
 
 	inline bool operator== (Object const & lhs, Object const & rhs)
 	{ 

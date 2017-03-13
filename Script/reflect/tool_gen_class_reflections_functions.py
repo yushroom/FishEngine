@@ -9,6 +9,7 @@ serialization_template_str = '''
 **************************************************/
 
 #include <Archive.hpp>
+#include <private/CloneUtility.hpp>
 % for h in headers:
 #include "../${h}" 
 % endfor
@@ -16,8 +17,8 @@ serialization_template_str = '''
 namespace ${scope}
 {
 % for c in ClassInfo:
-  <% T = c['ClassName'] %>
-  % if c['isPolymorphic']:
+<% T = c['ClassName'] %>
+% if c['isPolymorphic']:
 	// ${T}
 	void ${T}::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
@@ -43,7 +44,31 @@ namespace ${scope}
 		//archive.EndClass();
 	}
 
-  % else:
+	FishEngine::ObjectPtr ${T}::Clone() const
+	{
+		auto ret = FishEngine::MakeShared<${T}>();
+		FishEngine::ObjectPtr obj = ret;
+	% if 'parent' in c:
+		${c['parent']}::CopyValueTo(obj);
+	% endif
+	% for member in c['members']:
+		FishEngine::CloneUtility::Clone(this->${member['name']}, ret->${member['name']}); // ${member['type']}
+	% endfor
+		return ret;
+	}
+
+	void ${T}::CopyValueTo(ObjectPtr & target) const
+	{
+	% if 'parent' in c:
+		${c['parent']}::CopyValueTo(target);
+	% endif
+		auto ptr = std::dynamic_pointer_cast<${T}>(target);
+	% for member in c['members']:
+		FishEngine::CloneUtility::Clone(this->${member['name']}, ptr->${member['name']}); // ${member['type']}
+	% endfor
+	}
+
+% else:
 	// ${T}
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, ${T} const & value )
 	{
@@ -64,8 +89,7 @@ namespace ${scope}
 		archive.EndClass();
 		return archive;
 	}
-
-  % endif
+% endif
 % endfor
 
 } // namespace ${scope}

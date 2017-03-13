@@ -1,13 +1,14 @@
-#include "SceneArchive.hpp"
-#include "AssetImporter.hpp"
-#include "AssetDataBase.hpp"
-#include <Prefab.hpp>
+#include "ObjectArchive.hpp"
 
-#include <Debug.hpp>
+#include "GameObject.hpp"
+#include "Transform.hpp"
+
 
 using namespace FishEngine;
 
-void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr const & obj)
+#if 0
+
+void FishEngine::ObjectOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr const & obj)
 {
 	if (obj == nullptr)
 	{
@@ -17,7 +18,7 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 
 	auto instanceID = obj->GetInstanceID();
 	auto classID = obj->ClassID();
-	
+
 	auto find_result = m_serialized.find(instanceID);
 	bool serialized = false;
 	int fileID = -1;
@@ -30,7 +31,7 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 	{
 		fileID = m_nextFileID;
 		m_totalCount++;
-		m_nextFileID = m_totalCount+1;
+		m_nextFileID = m_totalCount + 1;
 		//m_serialized[instanceID] = fileID;
 	}
 
@@ -60,7 +61,7 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 
 		EndMap();
 	}
-	
+
 	if (serialized)
 	{
 		return;
@@ -93,31 +94,24 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 	}
 }
 
-void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
+void FishEngine::ObjectOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
 {
-	if (object == nullptr)
+	int classID = object->ClassID();
+	bool isComponent = FishEngine::IsComponent(classID);
+	bool isTransform = object->ClassID() == ClassID<Transform>();
+	bool isGameobject = FishEngine::IsGameObject(classID);
+	//bool isPrefab = object->ClassID() == FishEngine::ClassID<FishEngine::Prefab>();
+	if (isGameobject)
 	{
-		SerializeObject_impl(object);
+		//auto go = GameObject::Create();
+		//auto go = object->Clone();
 	}
-	else
+	if (isTransform)
 	{
-		auto prefab = object->prefabInternal();
-		if (prefab == nullptr)
-		{
-			SerializeObject_impl(object);
-		}
-		else
-		{
-			if (m_serializePrefab)
-			{
-				SerializeObject_impl(object);
-			}
-			else
-			{
-				SerializeObject_impl(prefab);
-			}
-		}
+		// auto transform = object->Clone();
 	}
+
+	SerializeObject_impl(object);
 	while (!m_objectsToBeSerialized.empty() && !m_isInsideDoc)
 	{
 		auto item = m_objectsToBeSerialized.front();
@@ -129,34 +123,4 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 	}
 }
 
-void PrintNode(YAML::Node const & node)
-{
-	if (node.IsScalar())
-	{
-		Debug::Log("%s", node.as<std::string>().c_str());
-	}
-	else if (node.IsSequence())
-	{
-		for (auto it = node.begin(); it != node.end(); ++it)
-		{
-			PrintNode(*it);
-		}
-	}
-	else if (node.IsMap())
-	{
-		for (auto it = node.begin(); it != node.end(); ++it)
-		{
-			PrintNode(it->first);
-			PrintNode(it->second);
-		}
-	}
-}
-
-void FishEditor::SceneInputArchive::LoadAll()
-{
-	std::list<GameObjectPtr> gameObjects;
-	for (auto & node : m_nodes)
-	{
-		PrintNode(node);
-	}
-}
+#endif

@@ -1,3 +1,6 @@
+@zwrite off
+@Cull Off
+
 struct V2F
 {
 	vec2 UV;

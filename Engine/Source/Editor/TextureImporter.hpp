@@ -7,6 +7,8 @@
 #include <Texture.hpp>
 #include <Resources.hpp>
 
+class TextureImporterInspector;
+
 namespace FishEditor
 {
 	struct TextureSettings
@@ -25,6 +27,8 @@ namespace FishEditor
 		InjectClassName(TextureImporter)
 
 		TextureImporter() = default;
+		
+		TextureImporter& operator=(TextureImporter const & rhs);
 
 		FishEngine::TexturePtr Import(FishEngine::Path const & path);
 
@@ -123,7 +127,7 @@ namespace FishEditor
 		
 	private:
 		friend class Inspector;
-		friend class TextureImporterInspector;
+		friend class ::TextureImporterInspector;
 
 		// Allows alpha splitting on relevant platforms for this texture.
 		bool m_allowAlphaSplitting;

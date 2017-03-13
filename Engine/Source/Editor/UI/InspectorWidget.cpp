@@ -10,6 +10,7 @@
 #include "UI/UIMaterialHeader.hpp"
 #include "UI/UIAssetHeader.hpp"
 #include "UI/TextureImporterInspector.hpp"
+#include "UI/ModelImporterInspector.hpp"
 
 #include "TextureImporter.hpp"
 #include "ModelImporter.hpp"
@@ -44,6 +45,10 @@ InspectorWidget::InspectorWidget(QWidget *parent)
 	m_textureImporterInspector = new TextureImporterInspector();
 	rootLayout->addWidget(m_textureImporterInspector);
 	m_textureImporterInspector->setHidden(true);
+	
+	m_modelImporterInspector = new ModelImporterInspector();
+	rootLayout->addWidget(m_modelImporterInspector);
+	m_modelImporterInspector->setHidden(true);
 
 	rootLayout->addWidget(m_treeWidget);
 	
@@ -60,6 +65,7 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::Object> obj)
         m_materialHeader->setHidden(true);
 	
     m_textureImporterInspector->Unbind();
+	m_modelImporterInspector->Unbind();
 	
 	if (m_treeWidget->isHidden())
 	{
@@ -73,8 +79,9 @@ void InspectorWidget::Bind(std::shared_ptr<FishEngine::GameObject> go)
         m_gameObjectHeader->setHidden(false);
     if ( ! m_materialHeader->isHidden() )
         m_materialHeader->setHidden(true);
-    if ( ! m_textureImporterInspector->isHidden() )
-        m_textureImporterInspector->setHidden(true);
+	
+	m_textureImporterInspector->Unbind();
+	m_modelImporterInspector->Unbind();
 	
 	if (m_treeWidget->isHidden())
 	{
@@ -90,8 +97,8 @@ void InspectorWidget::Bind(std::shared_ptr<FishEditor::TextureImporter> importer
 		m_gameObjectHeader->setHidden(true);
 	if (!m_materialHeader->isHidden())
 		m_materialHeader->setHidden(true);
-	if (m_textureImporterInspector->isHidden())
-		m_textureImporterInspector->setHidden(false);
+	
+	m_modelImporterInspector->Unbind();
 	
 	if (! m_treeWidget->isHidden())
 	{
@@ -111,6 +118,13 @@ void InspectorWidget::Bind(std::shared_ptr<FishEditor::ModelImporter> importer)
 		m_materialHeader->setHidden(true);
 
 	m_textureImporterInspector->Unbind();
+	
+	if (! m_treeWidget->isHidden())
+	{
+		m_treeWidget->setHidden(true);
+	}
+	
+	m_modelImporterInspector->Bind(importer);
 
 	//m_assetHeader->CheckUpdate(importer->name());
 }
@@ -121,6 +135,7 @@ void InspectorWidget::Update()
 	if (go != nullptr)
 	{
 		m_textureImporterInspector->Unbind();
+		m_modelImporterInspector->Unbind();
 		FishEditor::Inspector::Bind(go);
 	}
 	else
@@ -136,6 +151,7 @@ void InspectorWidget::Update()
 void InspectorWidget::HideAll()
 {
 	m_textureImporterInspector->Unbind();
+	m_modelImporterInspector->Unbind();
 	if (!isHidden())
 	{
 		setHidden(true);

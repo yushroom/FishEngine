@@ -64,7 +64,7 @@ namespace FishEditor
 	}
 
 	template <>
-	std::shared_ptr<FishEngine::GameObject> 
+	std::shared_ptr<FishEngine::Prefab>
 		AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
 	{
 		Path p;

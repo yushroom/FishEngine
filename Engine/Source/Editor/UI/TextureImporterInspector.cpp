@@ -24,7 +24,7 @@ template<class T>
 inline UIComboBox * CreateCombox(const char* name)
 {
 	static_assert(std::is_enum<T>(), "T must be enum type!");
-	return new UIComboBox(name, 0, EnumToCStringArray<TextureImporterType>(), EnumCount<TextureImporterType>());
+	return new UIComboBox(name, 0, EnumToCStringArray<T>(), EnumCount<T>());
 };
 
 TextureImporterInspector::TextureImporterInspector(QWidget *parent) :
@@ -58,23 +58,49 @@ TextureImporterInspector::TextureImporterInspector(QWidget *parent) :
 	auto verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_verticalLayout->addItem(verticalSpacer);
 	
+	m_cachedImporter = std::make_unique<TextureImporter>();
 	
 	connect(m_readWriteToggle,
 			&UIBool::OnValueChanged,
 			[this](bool value) {
-				//this->m_importer->setIsReadable(value);
-				m_isDirty = true;
-				m_isReadable = value;
-				this->m_revertApplyButtons->SetEnabled(true);
+				m_cachedImporter->m_isReadable = value;
+				this->SetDirty(true);
 			});
 	
 	connect(m_mipmapToggle,
 			&UIBool::OnValueChanged,
 			[this](bool value) {
-				//this->m_importer->setMipmapEnabled(value);
-				m_isDirty = true;
-				m_mipmapEnabled = value;
-				this->m_revertApplyButtons->SetEnabled(true);
+				m_cachedImporter->m_mipmapEnabled = value;
+				this->SetDirty(true);
+			});
+	
+	
+	connect(m_typeCombox,
+			&UIComboBox::OnValueChanged,
+			[this](int index) {
+				m_cachedImporter->m_textureType = FishEngine::ToEnum<decltype(m_cachedImporter->m_textureType)>(index);
+				this->SetDirty(true);
+			});
+	
+	connect(m_shapeCombox,
+			&UIComboBox::OnValueChanged,
+			[this](int index) {
+				m_cachedImporter->m_textureShape = FishEngine::ToEnum<decltype(m_cachedImporter->m_textureShape)>(index);
+				this->SetDirty(true);
+			});
+	
+	connect(m_filterModeCombox,
+			&UIComboBox::OnValueChanged,
+			[this](int index) {
+				m_cachedImporter->m_textureSettings.m_filterMode = FishEngine::ToEnum<decltype(m_cachedImporter->m_textureSettings.m_filterMode)>(index);
+				this->SetDirty(true);
+			});
+	
+	connect(m_wrapModeCombox,
+			&UIComboBox::OnValueChanged,
+			[this](int index) {
+				m_cachedImporter->m_textureSettings.m_wrapMode = FishEngine::ToEnum<decltype(m_cachedImporter->m_textureSettings.m_wrapMode)>(index);
+				this->SetDirty(true);
 			});
 	
 	connect(m_revertApplyButtons, &UIRevertApplyButtons::OnRevert, this, &TextureImporterInspector::Revert);
@@ -86,24 +112,25 @@ TextureImporterInspector::~TextureImporterInspector()
 {
 }
 
+void TextureImporterInspector::SetDirty(bool dirty)
+{
+	m_isDirty = dirty;
+	this->m_revertApplyButtons->SetEnabled(m_isDirty);
+}
+
 void TextureImporterInspector::Apply()
 {
-	m_isDirty = false;
-	m_revertApplyButtons->SetEnabled(false);
-	m_importer->setIsReadable(m_isReadable);
-	m_importer->setMipmapEnabled(m_mipmapEnabled);
+	SetDirty(false);
+	*m_importer = *m_cachedImporter;
 	m_importer->SaveAndReimport();
 }
 
 void TextureImporterInspector::Revert()
 {
-	m_isDirty = false;
+	//SetDirty(false);
 	auto importer = m_importer;
 	m_importer = nullptr;
 	Bind(importer);
-	//m_revertApplyButtons->SetEnabled(false);
-	//m_isReadable = m_importer->isReadable();
-	//m_mipmapEnabled = m_importer->mipmapEnabled();
 }
 
 void TextureImporterInspector::Bind(std::shared_ptr<FishEditor::TextureImporter> const & importer)
@@ -115,16 +142,23 @@ void TextureImporterInspector::Bind(std::shared_ptr<FishEditor::TextureImporter>
 	
 	if (m_importer != importer)
 	{
-		m_isDirty = false;
+		SetDirty(false);
 		m_importer = importer;
 		m_assetHeader->SetName(m_importer->name());
 		auto const & icon = AssetDatabase::GetCacheIcon(importer->assetPath());
 		m_assetHeader->SetIcon(icon);
-		m_isReadable = m_importer->isReadable();
-		m_mipmapEnabled = m_importer->mipmapEnabled();
-		m_readWriteToggle->SetValue(m_isReadable);
-		m_mipmapToggle->SetValue(m_mipmapEnabled);
-		m_revertApplyButtons->SetEnabled(false);
+		
+		*m_cachedImporter = *m_importer;
+		m_readWriteToggle->SetValue(m_cachedImporter->m_isReadable);
+		m_mipmapToggle->SetValue(m_cachedImporter->m_mipmapEnabled);
+		int index = FishEngine::EnumToIndex(m_cachedImporter->m_textureType);
+		m_typeCombox->SetValue(index);
+		index = FishEngine::EnumToIndex(m_cachedImporter->m_textureShape);
+		m_shapeCombox->SetValue(index);
+		index = FishEngine::EnumToIndex(m_cachedImporter->filterMode());
+		m_filterModeCombox->SetValue(index);
+		index = FishEngine::EnumToIndex(m_cachedImporter->wrapMode());
+		m_wrapModeCombox->SetValue(index);
 	}
 }
 

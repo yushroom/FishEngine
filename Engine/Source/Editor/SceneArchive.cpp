@@ -1,6 +1,7 @@
 #include "SceneArchive.hpp"
 #include "AssetImporter.hpp"
 #include "AssetDataBase.hpp"
+#include <Prefab.hpp>
 
 #include <Debug.hpp>
 
@@ -67,7 +68,8 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 
 	bool isComponent = FishEngine::IsComponent(classID);
 	bool isGameobject = FishEngine::IsGameObject(classID);
-	if (!(isComponent || isGameobject))
+	bool isPrefab = obj->ClassID() == FishEngine::ClassID<FishEngine::Prefab>();
+	if (!(isComponent || isGameobject || isPrefab))
 	{
 		return;
 	}
@@ -93,7 +95,29 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 
 void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
 {
-	SerializeObject_impl(object);
+	if (object == nullptr)
+	{
+		SerializeObject_impl(object);
+	}
+	else
+	{
+		auto prefab = object->prefabInternal();
+		if (prefab == nullptr)
+		{
+			SerializeObject_impl(object);
+		}
+		else
+		{
+			if (m_serializePrefab)
+			{
+				SerializeObject_impl(object);
+			}
+			else
+			{
+				SerializeObject_impl(prefab);
+			}
+		}
+	}
 	while (!m_objectsToBeSerialized.empty() && !m_isInsideDoc)
 	{
 		auto item = m_objectsToBeSerialized.front();
@@ -103,7 +127,6 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 		m_nextFileID = fileID;
 		SerializeObject_impl(obj);
 	}
-	FishEngine::Debug::LogWarning("here");
 }
 
 void FishEditor::SceneInputArchive::LoadAll()

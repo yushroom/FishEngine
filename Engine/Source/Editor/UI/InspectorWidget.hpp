@@ -10,6 +10,7 @@ class UIMaterialHeader;
 class UIAssetHeader;
 class QMenu;
 class TextureImporterInspector;
+class ModelImporterInspector;
 
 namespace FishEditor
 {
@@ -55,6 +56,7 @@ private:
     UIMaterialHeader    * m_materialHeader;
     //UIAssetHeader       * m_assetHeader;
 	TextureImporterInspector * m_textureImporterInspector;
+	ModelImporterInspector * m_modelImporterInspector;
 
     //QMenu               * m_menu;
 };

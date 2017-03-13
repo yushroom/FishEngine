@@ -675,4 +675,17 @@ namespace FishEditor
 		
 		return go;
 	}
+	
+	ModelImporter& ModelImporter::operator=(ModelImporter const & rhs)
+	{
+		m_importNormals = rhs.m_importNormals;
+		m_importTangents = rhs.m_importTangents;
+		m_materialSearch = rhs.m_materialSearch;
+		return *this;
+	}
+	
+	void ModelImporter::Reimport()
+	{
+		abort();
+	}
 }

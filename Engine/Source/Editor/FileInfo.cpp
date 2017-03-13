@@ -6,6 +6,7 @@
 
 #include <Application.hpp>
 #include <Debug.hpp>
+#include <Prefab.hpp>
 
 #include <QImage>
 #include <QIcon>
@@ -245,7 +246,7 @@ namespace FishEditor
 				}
 				else if (ext == ".fbx" || ext == ".FBX")
 				{
-					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(relative_path);
+					auto model = AssetDatabase::LoadAssetAtPath<Prefab>(relative_path)->rootGameObject();
 				}
 #endif
             }

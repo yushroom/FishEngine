@@ -12,6 +12,12 @@ aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/UI UI_SRCS)
 FILE(GLOB UI_Heasers ${CMAKE_CURRENT_LIST_DIR}/UI/*.hpp)
 FILE(GLOB FORMS ${CMAKE_CURRENT_LIST_DIR}/UI/*.ui)
 SOURCE_GROUP(Forms FILES ${FORMS})
+FILE(GLOB InspectorFiles
+    ${CMAKE_CURRENT_LIST_DIR}/Inspector.*
+    ${CMAKE_CURRENT_LIST_DIR}/UI/InspectorWidget.*
+    ${CMAKE_CURRENT_LIST_DIR}/UI/TextureImporterInspector.*
+    ${CMAKE_CURRENT_LIST_DIR}/UI/ModelImporterInspector.*
+    )
 
 
 # Widgets finds its own dependencies (QtGui and QtCore).
@@ -46,8 +52,9 @@ SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
 SOURCE_GROUP( UI    FILES ${UI_SRCS} ${UI_Heasers} )
 SOURCE_GROUP( MOC   FILES ${MOC_SRCS} )
 SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
+SOURCE_GROUP( Inspector FILES ${InspectorFiles} )
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${ReflectFilesSources} resources.qrc ${RESOURCE_FILES})
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} resources.qrc ${RESOURCE_FILES} )
 
 SET( INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
 MESSAGE("hhhh" ${INFO_PLIST})

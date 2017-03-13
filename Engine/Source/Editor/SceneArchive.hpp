@@ -52,6 +52,11 @@ namespace FishEditor
 			//m_emitter << YAML::EndDoc;
 			m_emitter.EmitEndDoc_FishEngine();
 		}
+		
+		void setSerializePrefab(bool value)
+		{
+			m_serializePrefab = value;
+		}
 
 	protected:
 		virtual void SerializeObject(FishEngine::ObjectPtr const & object) override;
@@ -66,5 +71,8 @@ namespace FishEditor
 		std::map<int, int> m_serialized;	// instanceID to fileID
 		std::deque<std::pair<int, std::shared_ptr<FishEngine::Object>>> m_objectsToBeSerialized; // fileID
 		bool m_isInsideDoc = false;
+		
+		// TODO: delete it
+		bool m_serializePrefab = false;
 	};
 }

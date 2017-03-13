@@ -128,7 +128,7 @@ namespace FishEditor
 	}
 
 
-	std::map<GUID, FishEngine::GameObjectPtr> AssetImporter::s_importerGUIDToModel;
+	std::map<GUID, FishEngine::PrefabPtr> AssetImporter::s_importerGUIDToModel;
 
 	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
 

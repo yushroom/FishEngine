@@ -8,6 +8,12 @@ namespace FishEditor
 	class TextureImporter;
 }
 
+namespace FishEngine
+{
+	enum class FilterMode;
+	enum class TextureWrapMode;
+}
+
 class QVBoxLayout;
 class UIAssetHeader;
 class UIComboBox;
@@ -33,6 +39,8 @@ private:
 	void Apply();
 	void Revert();
 	
+	void SetDirty(bool dirty);
+	
 	QVBoxLayout		* m_verticalLayout;
 	UIAssetHeader	* m_assetHeader;
 	
@@ -45,9 +53,7 @@ private:
 	
 	bool m_isDirty = false;
 	
-	// cached values
-	bool m_isReadable;
-	bool m_mipmapEnabled;
+	std::unique_ptr<FishEditor::TextureImporter> m_cachedImporter;
 	
 	UIRevertApplyButtons * m_revertApplyButtons;
 	

@@ -15,8 +15,16 @@ public:
     explicit UIComboBox(std::string const & label, int index, const char* const* enumStringArray, int arraySize, QWidget *parent = 0);
     ~UIComboBox();
 
+	// IMGUI
     bool CheckUpdate(std::string const & label, int &index, const char* const* enumStringArray, int arraySize);
+	
+	// this method do not emit signal
+	void SetValue(int index);
 
+Q_SIGNALS:
+	// RMGUI
+	void OnValueChanged(int value);
+	
 private slots:
     void OnComboBoxChanged(int index);
 

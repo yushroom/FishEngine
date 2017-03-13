@@ -49,6 +49,7 @@
 #include "../Frustum.hpp" 
 #include "../IntVector.hpp" 
 #include "../IntVector.hpp" 
+#include "../Prefab.hpp" 
 #include "../Camera.hpp" 
 #include "../Scene.hpp" 
 #include "../MeshRenderer.hpp" 
@@ -148,6 +149,8 @@ namespace FishEngine
 		//archive.BeginClass();
 		archive << FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive << FishEngine::make_nvp("m_name", m_name); // std::string
+		archive << FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
+		archive << FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
 		//archive.EndClass();
 	}
 
@@ -156,6 +159,8 @@ namespace FishEngine
 		//archive.BeginClass(2);
 		archive >> FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive >> FishEngine::make_nvp("m_name", m_name); // std::string
+		archive >> FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
+		archive >> FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
 		//archive.EndClass();
 	}
 
@@ -1091,6 +1096,28 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("y", value.y); // int
 		archive.EndClass();
 		return archive;
+	}
+
+  
+	// FishEngine::Prefab
+	void FishEngine::Prefab::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Object::Serialize(archive);
+		archive << FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
+		archive << FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		archive << FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
+		//archive.EndClass();
+	}
+
+	void FishEngine::Prefab::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Object::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
+		archive >> FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		archive >> FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
+		//archive.EndClass();
 	}
 
   

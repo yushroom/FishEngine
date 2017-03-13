@@ -316,7 +316,12 @@ namespace FishEngine
 		TransformPtr GetChild(const size_t index);
 
 
-		const std::list<std::weak_ptr<Transform>>& children() const
+		std::list<std::weak_ptr<Transform>> const & children() const
+		{
+			return m_children;
+		}
+		
+		std::list<std::weak_ptr<Transform>> & children()
 		{
 			return m_children;
 		}

@@ -58,6 +58,8 @@ namespace FishEditor
 			return m_assetTimeStamp == 0;
 		}
 		
+		virtual void BuildFileIDToRecycleName() { };
+		
 		template<class AssetImporterType>
 		static std::shared_ptr<AssetImporterType> GetAssetImporter(FishEngine::Path const & assetPath);
 
@@ -87,7 +89,11 @@ namespace FishEditor
 		Meta(NonSerializable)
 		FishEngine::GUID				m_guid;
 
+		// fileID starts with ClassID
 		std::map<int, std::string>		m_fileIDToRecycleName;
+		
+		Meta(NonSerializable)
+		std::map<int, int>				m_classIDCount;	// count for each ClassID
 
 		Meta(NonSerializable)
 		std::map<std::string, int>		m_recycleNameToFileID;
@@ -98,7 +104,7 @@ namespace FishEditor
 
 	public:
 		static std::map<FishEngine::GUID, FishEngine::TexturePtr> s_importerGUIDToTexture;
-		static std::map<FishEngine::GUID, FishEngine::GameObjectPtr> s_importerGUIDToModel;
+		static std::map<FishEngine::GUID, FishEngine::PrefabPtr> s_importerGUIDToModel;
 		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
 		static std::map<int, boost::filesystem::path> s_objectInstanceIDToPath;
 	};

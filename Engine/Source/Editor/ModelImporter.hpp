@@ -13,6 +13,8 @@ struct aiNode;
 struct aiMesh;
 struct aiAnimation;
 
+class ModelImporterInspector;
+
 namespace FishEditor
 {
 	struct ModelNode
@@ -156,6 +158,8 @@ namespace FishEditor
 
 		ModelImporter() = default;
 		
+		ModelImporter& operator=(ModelImporter const & rhs);
+		
 		void setFileScale( const float fileScale )
 		{
 			m_fileScale = fileScale;
@@ -176,12 +180,15 @@ namespace FishEditor
 	protected:
 
 		Meta(NonSerializable)
-		int m_nextMeshFileID = 13700000;
+		int m_nextMeshFileID = FishEngine::ClassID<FishEngine::Mesh>() * 100000;
+		
+		virtual void Reimport() override;
 
 	private:
 		
 		friend class Inspector;
 		friend class MainEditor;
+		friend class ::ModelImporterInspector;
 
 		static void Init();
 

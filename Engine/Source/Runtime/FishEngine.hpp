@@ -30,6 +30,7 @@
 namespace FishEngine
 {
     class Object;
+	class Prefab;
     class GameObject;
     class Transform;
     class Component;
@@ -41,7 +42,6 @@ namespace FishEngine
     class SkinnedMeshRenderer;
     class Script;
     class Debug;
-    class GameObject;
     class GameLoop;
     class Input;
     class Material;
@@ -86,6 +86,7 @@ namespace FishEngine
 	class OutputArchive;
 
     typedef std::shared_ptr<Object> ObjectPtr;
+	typedef std::shared_ptr<Prefab> PrefabPtr;
     typedef std::shared_ptr<GameObject> GameObjectPtr;
     typedef std::shared_ptr<Transform> TransformPtr;
     typedef std::shared_ptr<Component> ComponentPtr;

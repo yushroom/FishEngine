@@ -61,6 +61,7 @@ ComponentPtr componentToBeDestroyed;
 template<>
 void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
 {
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
     if (EditorGUI::Vector3Field("Position", &t->m_localPosition))
     {
         t->MakeDirty();
@@ -88,6 +89,7 @@ void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
 template<>
 void Inspector::OnInspectorGUI(std::shared_ptr<Camera> const & camera)
 {
+	EditorGUI::FloatField("Instance ID", camera->GetInstanceID());
     // note: must be *static* array
     static const char* listbox_items[] = {
         "Perspective", "Orthographic"
@@ -127,6 +129,7 @@ void Inspector::OnInspectorGUI(std::shared_ptr<Camera> const & camera)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::LightPtr& light)
 {
+	EditorGUI::FloatField("Instance ID", light->GetInstanceID());
 	EditorGUI::EnumPopup<LightType>("Type", &light->m_type);
 	if (light->m_type != LightType::Directional)
 	{
@@ -148,6 +151,7 @@ void Inspector::OnInspectorGUI(const FishEngine::LightPtr& light)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 {
+	EditorGUI::FloatField("Instance ID", meshFilter->GetInstanceID());
     EditorGUI::ObjectField("Mesh", meshFilter->m_mesh);
 	EditorGUI::FloatField("mesh verts", meshFilter->m_mesh->vertexCount());
 	EditorGUI::FloatField("mesh tris", meshFilter->m_mesh->triangles());
@@ -157,6 +161,7 @@ void Inspector::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::MaterialPtr& material)
 {
+	EditorGUI::FloatField("Instance ID", material->GetInstanceID());
     auto& uniforms = material->m_shader->uniforms();
     for (auto& u : uniforms)
     {
@@ -190,6 +195,7 @@ void Inspector::OnInspectorGUI(const FishEngine::MaterialPtr& material)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
 {
+	EditorGUI::FloatField("Instance ID", renderer->GetInstanceID());
     EditorGUI::EnumPopup("Cast Shadows", &renderer->m_shadowCastingMode);
     EditorGUI::Toggle("Receive Shadows", &renderer->m_receiveShadows);
     for (auto const & material : renderer->m_materials)
@@ -201,6 +207,7 @@ void Inspector::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 {
+	EditorGUI::FloatField("Instance ID", renderer->GetInstanceID());
     OnInspectorGUI<Renderer>(renderer);
 }
 
@@ -213,13 +220,15 @@ void Inspector::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& rendere
 }
 
 template<>
-void Inspector::OnInspectorGUI(const std::shared_ptr<CameraController>&)
+void Inspector::OnInspectorGUI(const std::shared_ptr<CameraController>& t)
 {
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
 }
 
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::RigidbodyPtr& rigidBody)
 {
+	EditorGUI::FloatField("Instance ID", rigidBody->GetInstanceID());
     EditorGUI::FloatField("Mass", &rigidBody->m_mass);
     EditorGUI::FloatField("Drag", &rigidBody->m_drag);
     EditorGUI::FloatField("Angular", &rigidBody->m_angularDrag);
@@ -230,6 +239,7 @@ void Inspector::OnInspectorGUI(const FishEngine::RigidbodyPtr& rigidBody)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::ColliderPtr& collider)
 {
+	EditorGUI::FloatField("Instance ID", collider->GetInstanceID());
     EditorGUI::Toggle("Is Trigger", &collider->m_isTrigger);
 }
 
@@ -260,6 +270,8 @@ void Inspector::OnInspectorGUI(const FishEngine::CapsuleColliderPtr& collider)
 	EditorGUI::EnumPopup("Direction", &collider->m_direction, direction_enum, 3);
 }
 
+#if 0
+
 template<>
 void Inspector::OnInspectorGUI(TextureImporterPtr const & importer)
 {
@@ -284,6 +296,7 @@ void Inspector::OnInspectorGUI(ModelImporterPtr const & importer)
 	//EditorGUI::EnumPopup("Wrap Mode", &importer->m_textureSettings.m_wrapMode);
 }
 
+#endif
 
 void Inspector::Bind(const GameObjectPtr & go)
 {
@@ -402,9 +415,9 @@ void FishEditor::Inspector::Bind(ModelImporterPtr const & importer)
 	EditorGUI::s_treeWidget = s_inspectorWidget->m_treeWidget;
 	s_inspectorWidget->Bind(importer);
 
-	EditorGUI::Begin();
-	OnInspectorGUI<ModelImporter>(importer);
-	EditorGUI::End();
+//	EditorGUI::Begin();
+//	OnInspectorGUI<ModelImporter>(importer);
+//	EditorGUI::End();
 }
 
 void Inspector::HideAll()

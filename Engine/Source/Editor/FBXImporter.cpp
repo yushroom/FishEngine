@@ -2,6 +2,7 @@
 
 #include <fbxsdk.h>
 #include <fbxsdk/utils/fbxgeometryconverter.h>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <Debug.hpp>
 #include <GameObject.hpp>
@@ -11,6 +12,8 @@
 
 #include "AssetDataBase.hpp"
 #include "private/RawMesh.hpp"
+
+#include "SceneArchive.hpp"
 
 using namespace FishEngine;
 
@@ -643,12 +646,14 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	const char* nodeName = pNode->GetName();
 	auto go = GameObject::Create();
 	go->setName(nodeName);
-	if (IsNewlyCreated())
-	{
-		m_fileIDToRecycleName[m_nextNodeFileID] = nodeName;
-		m_recycleNameToFileID[nodeName] = m_nextNodeFileID;
-		m_nextNodeFileID++;
-	}
+	go->setPrefabInternal(m_model.m_modelPrefab);
+	go->transform()->setPrefabInternal(m_model.m_modelPrefab);
+//	if (IsNewlyCreated())
+//	{
+//		m_fileIDToRecycleName[m_nextNodeFileID] = nodeName;
+//		m_recycleNameToFileID[nodeName] = m_nextNodeFileID;
+//		m_nextNodeFileID++;
+//	}
 #if 0
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
@@ -727,7 +732,7 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 			{
 				m_recycleNameToFileID[mesh->name()] = m_nextMeshFileID;
 				m_fileIDToRecycleName[m_nextMeshFileID] = mesh->name();
-				m_nextMeshFileID++;
+				m_nextMeshFileID += 2;
 			}
 			
 			if (mesh->m_skinned)
@@ -763,7 +768,13 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 		auto child = ParseNodeRecursively(pNode->GetChild(j));
 		child->transform()->SetParent(go->transform(), false);
 	}
+	
+	//boost::algorithm::is_iless compare;
 
+	go->transform()->children().sort([](std::weak_ptr<Transform> const & lhs, std::weak_ptr<Transform> const & rhs) {
+		return boost::algorithm::to_lower_copy(lhs.lock()->name()) < boost::algorithm::to_lower_copy(rhs.lock()->name());
+	});
+	
 	return go;
 }
 
@@ -776,9 +787,19 @@ void PrintMatrix(Matrix4x4 const & m)
 	}
 }
 
-
-GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
+void FishEditor::FBXImporter::ImportTo(FishEngine::GameObjectPtr & model)
 {
+	abort();
+}
+
+
+PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
+{
+	if (m_model.m_modelPrefab == nullptr)
+	{
+		m_model.m_modelPrefab = std::make_shared<Prefab>();
+		m_model.m_modelPrefab->setIsPrefabParent(true);
+	}
 	if (m_model.m_avatar == nullptr)
 		m_model.m_avatar = std::make_shared<Avatar>();
 	
@@ -827,6 +848,8 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	auto & root = m_model.m_rootNode;
 	root = FishEngine::GameObject::Create();
 	root->setName(name);
+	root->setPrefabInternal(m_model.m_modelPrefab);
+	root->transform()->setPrefabInternal(m_model.m_modelPrefab);
 	AssetDatabase::s_allAssetObjects.insert(root);
 	if (lRootNode)
 	{
@@ -905,5 +928,69 @@ GameObjectPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path
 	//}
 	
 	//m_model.m_rootNode = root;
-	return root;
+	
+	m_model.m_modelPrefab->setRootGameObject(root);
+	
+	if (IsNewlyCreated())
+	{
+		BuildFileIDToRecycleName();
+	}
+	
+	std::ofstream fout(path.string() + ".prefab");
+	FishEditor::SceneOutputArchive archive(fout);
+	archive.setSerializePrefab(true);
+	archive << m_model.m_modelPrefab;
+	
+	return m_model.m_modelPrefab;
+}
+
+
+int IncreaseMapValue(std::map<int, int> & dict, int key)
+{
+	auto it = dict.find(key);
+	if (it == dict.end())
+	{
+		dict[key] = 1;
+		return 0;
+	}
+	int ret = it->second;
+	it->second++;
+	return ret;
+}
+
+void FishEditor::FBXImporter::RecursivelyBuildFileIDToRecycleName(FishEngine::TransformPtr const & transform)
+{
+	auto gameObject = transform->gameObject();
+	{
+		constexpr int classID = FishEngine::ClassID<GameObject>();
+		int id = IncreaseMapValue(m_classIDCount, classID);
+		id = classID * 100000 + id*2;
+		m_fileIDToRecycleName[id] = gameObject->name();
+	}
+	{
+		constexpr int classID = FishEngine::ClassID<Transform>();
+		int id = IncreaseMapValue(m_classIDCount, classID);
+		id = classID * 100000 + id*2;
+		m_fileIDToRecycleName[id] = gameObject->name();
+	}
+	
+	
+	for (auto & component : gameObject->Components())
+	{
+		int classID = component->ClassID();
+		int id = IncreaseMapValue(m_classIDCount, classID);
+		id = classID * 100000 + id*2;
+		m_fileIDToRecycleName[id] = component->name();
+	}
+	
+	for (auto & child : transform->children())
+	{
+		RecursivelyBuildFileIDToRecycleName(child.lock());
+	}
+}
+
+
+void FishEditor::FBXImporter::BuildFileIDToRecycleName()
+{
+	RecursivelyBuildFileIDToRecycleName(m_model.m_modelPrefab->rootGameObject()->transform());
 }

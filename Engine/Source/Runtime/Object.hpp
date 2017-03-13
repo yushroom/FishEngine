@@ -67,23 +67,37 @@ namespace FishEngine
 		static void DestroyImmediate(ComponentPtr component);
 		static void DestroyImmediate(ScriptPtr script);
 
-		virtual void CopyValueTo(ObjectPtr target) const;
-
 		template<class T>
-		static std::shared_ptr<T> Instantiate(std::shared_ptr<T> const & original)
+		static std::shared_ptr<T> Instantiate(std::shared_ptr<T> const & original);
+//		{
+//			//abort();
+//			auto ret = std::make_shared<T>();
+//			//original->CopyValueTo(ret);
+//			return ret;
+//		}
+		
+		// TODO: make it protected
+		PrefabPtr prefabInternal() const
 		{
-			auto ret = std::make_shared<T>();
-			original->CopyValueTo(ret);
-			return ret;
+			return m_prefabInternal;
+		}
+		
+		// TODO: make it protected
+		void setPrefabInternal(PrefabPtr prefab)
+		{
+			m_prefabInternal = prefab;
 		}
 
 	protected:
 		// Should the object be hidden, saved with the scene or modifiable by the user?
 		HideFlags	m_hideFlags = HideFlags::None;
 		std::string m_name;
+		
+		PrefabPtr	m_prefabParentObject;
+		PrefabPtr	m_prefabInternal;
 
 		Meta(NonSerializable)
-		int			m_instanceID;
+		int			m_instanceID = 0;
 
 	};	// end of Class Object
 

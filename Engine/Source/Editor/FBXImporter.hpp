@@ -3,6 +3,7 @@
 #include "FishEditor.hpp"
 #include "ModelImporter.hpp"
 #include <Path.hpp>
+#include <Prefab.hpp>
 
 namespace fbxsdk
 {
@@ -15,6 +16,7 @@ namespace FishEditor
 {
 	struct Meta(NonSerializable) ModelCollection
 	{
+		FishEngine::PrefabPtr					m_modelPrefab;
 		FishEngine::GameObjectPtr				m_rootNode;
 		FishEngine::AvatarPtr					m_avatar;
 		std::vector<FishEngine::MeshPtr>		m_meshes;
@@ -30,7 +32,14 @@ namespace FishEditor
 	public:
 		FBXImporter() = default;
 		
-		FishEngine::GameObjectPtr Load(boost::filesystem::path const & path);
+		FishEngine::PrefabPtr Load(boost::filesystem::path const & path);
+		
+	protected:
+		void ImportTo(FishEngine::GameObjectPtr & model);
+		//virtual void Reimport() override;
+		
+		void RecursivelyBuildFileIDToRecycleName(FishEngine::TransformPtr const & transform);
+		virtual void BuildFileIDToRecycleName() override;
 		
 	private:
 		FishEngine::GameObjectPtr ParseNodeRecursively(fbxsdk::FbxNode* pNode);

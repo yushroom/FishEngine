@@ -64,15 +64,7 @@ bool UIComboBox::CheckUpdate(const std::string &label, int & index, const char *
         return false;
     }
 
-    if (m_index != index)
-    {
-        FishEngine::Debug::Log("[Enum] new index");
-        m_index = index;
-        LOG;
-        ui->comboBox->blockSignals(true);
-        ui->comboBox->setCurrentIndex(index);
-        ui->comboBox->blockSignals(false);
-    }
+	this->SetValue(index);
     return false;
 }
 
@@ -80,4 +72,18 @@ void UIComboBox::OnComboBoxChanged(int index)
 {
     m_index = index;
     m_changed = true;
+	emit OnValueChanged(index);
+}
+
+void UIComboBox::SetValue(int index)
+{
+	if (m_index != index)
+	{
+		FishEngine::Debug::Log("[Enum] new index");
+		m_index = index;
+		LOG;
+		ui->comboBox->blockSignals(true);
+		ui->comboBox->setCurrentIndex(index);
+		ui->comboBox->blockSignals(false);
+	}
 }

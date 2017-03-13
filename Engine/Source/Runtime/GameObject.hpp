@@ -147,7 +147,12 @@ namespace FishEngine
 
 		// make a new copy of this gameobject (deep copy)
 		//virtual ObjectPtr Clone() const override;
-		virtual void CopyValueTo(ObjectPtr target) const override;
+		//virtual void CopyValueTo(ObjectPtr target) const override;
+		
+		std::list<ComponentPtr> const & Components() const
+		{
+			return m_components;
+		}
 
 	protected:
 		friend class Scene;

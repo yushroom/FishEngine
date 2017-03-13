@@ -19,6 +19,7 @@
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
 #include <Application.hpp>
+#include <Prefab.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -201,10 +202,10 @@ void DefaultScene()
 	auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 	plane->transform()->setLocalScale(10);
 	plane->transform()->setLocalPosition(0, -5, 0);
-	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
+	GameObjectPtr model = AssetDatabase::LoadAssetAtPath<Prefab>("Assets/testFBX.fbx")->rootGameObject();
 	Scene::AddGameObject(model);
 	
-	model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/unitychan.fbx");
+	model = AssetDatabase::LoadAssetAtPath<Prefab>("Assets/unitychan.fbx")->rootGameObject();
 	Scene::AddGameObject(model);
 	model->transform()->setLocalScale(0.1f);
 //	auto sphere = model->transform()->children().front().lock()->gameObject();

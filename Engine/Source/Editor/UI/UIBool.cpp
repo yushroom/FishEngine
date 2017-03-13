@@ -40,15 +40,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
         ui->label->setText(m_label.c_str());
     }
 
-    if (m_value != value)
-    {
-        m_value = value;
-        Debug::Log("[UIBool] new value");
-        LOG;
-        ui->checkBox->blockSignals(true);
-        ui->checkBox->setChecked(value);
-        ui->checkBox->blockSignals(false);
-    }
+	this->SetValue(value);
 	return false;
 }
 

@@ -21,6 +21,27 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
+	TextureImporter& TextureImporter::operator=(TextureImporter const & rhs)
+	{
+		m_allowAlphaSplitting = rhs.m_allowAlphaSplitting;
+		m_alphaIsTransparency = rhs.m_alphaIsTransparency;
+		m_anisoLevel = rhs.m_anisoLevel;
+		m_borderMipmap = rhs.m_borderMipmap;
+		m_compressionQuality = rhs.m_compressionQuality;
+		m_convertToNormalmap = rhs.m_convertToNormalmap;
+		m_crunchedCompression = rhs.m_crunchedCompression;
+		m_fadeout = rhs.m_fadeout;
+		m_heightmapScale = rhs.m_heightmapScale;
+		m_generateCubemap = rhs.m_generateCubemap;
+		m_textureType = rhs.m_textureType;
+		m_textureShape = rhs.m_textureShape;
+		m_textureSettings = rhs.m_textureSettings;
+		m_sRGBTexture = rhs.m_sRGBTexture;
+		m_isReadable = rhs.m_isReadable;
+		m_mipmapEnabled = rhs.m_mipmapEnabled;
+		return *this;
+	}
+	
     // https://github.com/g-truc/gli/blob/master/manual.md
     // http://gli.g-truc.net/0.8.1/api/a00006.html
     // bug fixed

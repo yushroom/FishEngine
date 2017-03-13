@@ -23,11 +23,4 @@ namespace FishEngine
 	{
 		Scene::DestroyImmediate(obj);
 	}
-
-	void Object::CopyValueTo(ObjectPtr target) const
-	{
-		target->m_name = m_name;
-		target->m_hideFlags = m_hideFlags;
-	}
-
 }

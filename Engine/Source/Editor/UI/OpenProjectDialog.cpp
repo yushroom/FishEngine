@@ -22,6 +22,7 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 	ui->locationErrorLabel->hide();
 
 	connect(ui->createButton, &QPushButton::clicked, this, &OpenProjectDialog::OnCreateButtonClicked);
+	connect(ui->cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 	connect(ui->projectNameLineEdit, &QLineEdit::textChanged, ui->projectNameErrorLabel, &QLabel::hide);
 	connect(ui->toolButton, &QToolButton::clicked, this, &OpenProjectDialog::OnLocationToolButtonClicked);
 	connect(ui->locationLineEdit, &QLineEdit::textChanged, ui->locationErrorLabel, &QLabel::hide);

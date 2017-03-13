@@ -18,7 +18,7 @@ namespace FishEditor
 	void FishEditor::AssetImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		//archive.BeginClass();
-		FishEngine::Object::Serialize(archive);
+		//FishEngine::Object::Serialize(archive);
 		archive << FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 		//archive.EndClass();
 	}
@@ -26,7 +26,7 @@ namespace FishEditor
 	void FishEditor::AssetImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		//archive.BeginClass(2);
-		FishEngine::Object::Deserialize(archive);
+		//FishEngine::Object::Deserialize(archive);
 		archive >> FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 		//archive.EndClass();
 	}

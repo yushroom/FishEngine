@@ -89,12 +89,12 @@ namespace FishEngine
 	//	return ret;
 	//}
 
-	void GameObject::CopyValueTo(ObjectPtr target) const
-	{
-		Object::CopyValueTo(target);
-		auto go = std::dynamic_pointer_cast<GameObject>(target);
-		m_transform->CopyValueTo(go->m_transform);
-	}
+//	void GameObject::CopyValueTo(ObjectPtr target) const
+//	{
+//		Object::CopyValueTo(target);
+//		auto go = std::dynamic_pointer_cast<GameObject>(target);
+//		m_transform->CopyValueTo(go->m_transform);
+//	}
 
 	void GameObject::Update()
 	{

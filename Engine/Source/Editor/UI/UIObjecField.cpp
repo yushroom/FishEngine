@@ -7,22 +7,22 @@
 #include "UIDebug.hpp"
 
 UIObjecField::UIObjecField(std::string const & label, std::string const & objectName, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::UIObjecField),
-    m_label(label),
-    m_objectName(objectName)
+	QWidget(parent),
+	ui(new Ui::UIObjecField),
+	m_label(label),
+	m_objectName(objectName)
 {
-    ui->setupUi(this);
-    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
+	ui->setupUi(this);
+	ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
-    ui->label->setText(m_label.c_str());
-    ui->lineEdit->setText(objectName.c_str());
-    connect(ui->picker, &QPushButton::clicked, this, &UIObjecField::OnPickerClicked);
+	ui->label->setText(m_label.c_str());
+	ui->lineEdit->setText(objectName.c_str());
+	connect(ui->picker, &QPushButton::clicked, this, &UIObjecField::OnPickerClicked);
 }
 
 UIObjecField::~UIObjecField()
 {
-    delete ui;
+	delete ui;
 }
 
 bool UIObjecField::CheckUpdate(const std::string &label, const std::string &objectName)
@@ -35,25 +35,25 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
 //        return true;
 //    }
 
-    if (m_label != label)
-    {
-        Debug::Log("[UIObjecField] new label: %s", m_label.c_str());
-        m_label = label;
-        LOG;
-        ui->label->setText(m_label.c_str());
-    }
+	if (m_label != label)
+	{
+		Debug::Log("[UIObjecField] new label: %s", m_label.c_str());
+		m_label = label;
+		LOG;
+		ui->label->setText(m_label.c_str());
+	}
 
-    if (m_objectName != objectName)
-    {
-        m_objectName = objectName;
-        LOG;
-        ui->lineEdit->setText(objectName.c_str());
-    }
-    return false;
+	if (m_objectName != objectName)
+	{
+		m_objectName = objectName;
+		LOG;
+		ui->lineEdit->setText(objectName.c_str());
+	}
+	return false;
 }
 
 void UIObjecField::OnPickerClicked()
 {
-    SelectObjectDialog dialog;
-    dialog.exec();
+	SelectObjectDialog dialog;
+	dialog.exec();
 }

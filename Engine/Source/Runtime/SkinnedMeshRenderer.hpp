@@ -16,7 +16,7 @@ namespace FishEngine
 		SkinnedMeshRenderer(MaterialPtr material);
 
 		virtual void Update() override;
-		
+
 		//protected:
 		virtual void Render() const override;
 
@@ -29,16 +29,16 @@ namespace FishEngine
 		{
 			m_rootBone = rootBone;
 		}
-		
+
 		// AABB of this Skinned Mesh in its local space.
 		virtual Bounds localBounds() const override;
-		
+
 		// The mesh used for skinning.
 		MeshPtr sharedMesh()
 		{
 			return m_sharedMesh;
 		}
-		
+
 		void setSharedMesh(MeshPtr sharedMesh);
 
 		virtual void OnDrawGizmosSelected() override;
@@ -48,19 +48,19 @@ namespace FishEngine
 		//friend class FishEditor::EditorRenderSystem;
 		friend class FishEditor::SceneViewEditor;
 		friend class Scene;
-		
+
 		// The mesh used for skinning.
 		MeshPtr m_sharedMesh = nullptr;
-		
+
 		AvatarPtr m_avatar = nullptr;
 		std::weak_ptr<Transform> m_rootBone;
-		
+
 		// The bones used to skin the mesh.
 		// same size with sharedMesh.bindposes
 		std::vector<std::weak_ptr<Transform>> m_bones;  // to be done
-		
+
 		Meta(NonSerializable)
-		mutable std::vector<Matrix4x4> m_matrixPalette;
+			mutable std::vector<Matrix4x4> m_matrixPalette;
 		void UpdateMatrixPalette() const;
 	};
 

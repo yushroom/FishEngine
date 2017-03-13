@@ -6,17 +6,17 @@
 
 namespace FishEngine
 {
-    class Meta(NonSerializable) LayerMask
-    {
-    public:
-        explicit LayerMask(int layer);
+	class Meta(NonSerializable) LayerMask
+	{
+	public:
+		explicit LayerMask(int layer);
 
-        int value() const
-        {
-            return m_value;
-        }
+		int value() const
+		{
+			return m_value;
+		}
 
-        static int GetMask(std::vector<std::string> const & layerNames)
+		static int GetMask(std::vector<std::string> const & layerNames)
 		{
 			int result = 0;
 			for (auto const & name : layerNames)
@@ -33,14 +33,14 @@ namespace FishEngine
 			return result;
 		}
 
-        static std::string LayerToName(int layer)
+		static std::string LayerToName(int layer)
 		{
 			if (layer < 0 || layer > 31)
 				return "";
 			return s_layerNames[layer];
 		}
 
-        static int NameToLayer(std::string layerName)
+		static int NameToLayer(std::string layerName)
 		{
 			for (int i = 0; i < 32; ++i)
 			{
@@ -55,8 +55,8 @@ namespace FishEngine
 			return s_layerNames;
 		}
 
-    private:
-        int m_value = -1;
+	private:
+		int m_value = -1;
 
 		static std::array<std::string, 32> s_layerNames;
 		
@@ -66,5 +66,5 @@ namespace FishEngine
 		static void SetLayer(int index, std::string const & name);
 		
 		static int s_editorFlag;	// special flag for Editor use only;
-    };
+	};
 }

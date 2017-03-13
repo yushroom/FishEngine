@@ -18,63 +18,63 @@
 
 namespace FishEngine
 {
-    MeshRenderer::MeshRenderer(MaterialPtr material) : Renderer(material)
-    {
-        
-    }
-    
-    Bounds MeshRenderer::localBounds() const
-    {
-        auto mf = gameObject()->GetComponent<MeshFilter>();
-        if (mf == nullptr || mf->mesh() == nullptr)
-            return Bounds();
-        return mf->mesh()->bounds();
-    }
-    
-    void MeshRenderer::Render() const
-    {
-        auto meshFilter = gameObject()->GetComponent<MeshFilter>();
-        if (meshFilter == nullptr) {
-            Debug::LogWarning("This GameObject has no MeshFilter");
-            return;
-        }
-        
-        auto model = transform()->localToWorldMatrix();
-        Pipeline::UpdatePerDrawUniforms(model);
-        
-        //std::map<std::string, TexturePtr> textures;
-        //auto& lights = Light::lights();
-        //if (lights.size() > 0) {
-        //    auto& l = lights.front();
-        //    if (l->transform() != nullptr) {
-        //        textures["ShadowMap"] = l->m_shadowMap;
-        //    }
-        //}
-        
-        const auto& mesh = meshFilter->mesh();
-        
-        for (auto& m : m_materials)
-        {
+	MeshRenderer::MeshRenderer(MaterialPtr material) : Renderer(material)
+	{
+
+	}
+
+	Bounds MeshRenderer::localBounds() const
+	{
+		auto mf = gameObject()->GetComponent<MeshFilter>();
+		if (mf == nullptr || mf->mesh() == nullptr)
+			return Bounds();
+		return mf->mesh()->bounds();
+	}
+
+	void MeshRenderer::Render() const
+	{
+		auto meshFilter = gameObject()->GetComponent<MeshFilter>();
+		if (meshFilter == nullptr) {
+			Debug::LogWarning("This GameObject has no MeshFilter");
+			return;
+		}
+
+		auto model = transform()->localToWorldMatrix();
+		Pipeline::UpdatePerDrawUniforms(model);
+
+		//std::map<std::string, TexturePtr> textures;
+		//auto& lights = Light::lights();
+		//if (lights.size() > 0) {
+		//    auto& l = lights.front();
+		//    if (l->transform() != nullptr) {
+		//        textures["ShadowMap"] = l->m_shadowMap;
+		//    }
+		//}
+
+		const auto& mesh = meshFilter->mesh();
+
+		for (auto& m : m_materials)
+		{
 #if 0
-            auto shader = m->shader();
-            assert(shader != nullptr);
-            shader->Use();
-            shader->PreRender();
-            m->BindTextures(textures);
-            m->BindProperties();
-            shader->CheckStatus();
-            mesh->Render();
-            shader->PostRender();
+			auto shader = m->shader();
+			assert(shader != nullptr);
+			shader->Use();
+			shader->PreRender();
+			m->BindTextures(textures);
+			m->BindProperties();
+			shader->CheckStatus();
+			mesh->Render();
+			shader->PostRender();
 #else
-            Graphics::DrawMesh(mesh, m);
+			Graphics::DrawMesh(mesh, m);
 #endif
-        }
-    }
-    
-    void MeshRenderer::OnDrawGizmosSelected()
-    {
-        //Gizmos::setColor(Color::blue);
-        //auto b = bounds();
-        //Gizmos::DrawWireCube(b.center(), b.size());
-    }
+		}
+	}
+
+	void MeshRenderer::OnDrawGizmosSelected()
+	{
+		//Gizmos::setColor(Color::blue);
+		//auto b = bounds();
+		//Gizmos::DrawWireCube(b.center(), b.size());
+	}
 }

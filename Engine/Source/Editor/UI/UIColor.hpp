@@ -9,23 +9,23 @@ class UIColor;
 
 class UIColor : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit UIColor(std::string const & label, QColor const & value, QWidget *parent = 0);
-    ~UIColor();
+	explicit UIColor(std::string const & label, QColor const & value, QWidget *parent = 0);
+	~UIColor();
 
-    bool CheckUpdate(std::string const & label, QColor & value);
+	bool CheckUpdate(std::string const & label, QColor & value);
 
 private slots:
-    void ShowColorDialog();
+	void ShowColorDialog();
 
 private:
-    Ui::UIColor *ui;
+	Ui::UIColor *ui;
 
-    bool        m_changed = false;
-    std::string m_label;
-    QColor      m_value;
+	bool        m_changed = false;
+	std::string m_label;
+	QColor      m_value;
 };
 
 #endif // UICOLOR_HPP

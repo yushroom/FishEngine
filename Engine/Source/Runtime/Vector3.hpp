@@ -146,7 +146,7 @@ namespace FishEngine
 		Vector3     operator*(const Vector3& v) const;
 		void        operator+=(const Vector3& v);
 		void        operator-=(const Vector3& v);
-    
+	
 		Vector3     operator+(const float f) const;
 		Vector3     operator-(const float f) const;
 		Vector3     operator*(const float f) const;

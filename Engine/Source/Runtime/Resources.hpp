@@ -20,24 +20,24 @@ namespace FishEngine
 		Script,
 	};
 
-    enum class SystemDirectoryType
-    {
-        RootDir,
-        ShaderDir,
-        TextureDir,
-        FontDir,
-    };
+	enum class SystemDirectoryType
+	{
+		RootDir,
+		ShaderDir,
+		TextureDir,
+		FontDir,
+	};
 
-    class FE_EXPORT Meta(NonSerializable) Resources
-    {
-    public:
-        Resources() = delete;
+	class FE_EXPORT Meta(NonSerializable) Resources
+	{
+	public:
+		Resources() = delete;
 
-        //static Object Load(const std::string path);
+		//static Object Load(const std::string path);
 
 		static AssetType GetAssetType(Path const & ext);
 
-    };
+	};
 }
 
 #endif // Resources_hpp

@@ -48,7 +48,7 @@ bool				EditorGUI::s_expectNewGroup;
 template<class T, class... Args>
 T* EditorGUI::CheckNextWidget(Args&&... args )
 {
-    static_assert(std::is_base_of<QWidget, T>::value, "T must be a QWidget");
+	static_assert(std::is_base_of<QWidget, T>::value, "T must be a QWidget");
 
 	if (s_expectNewGroup)
 	{
@@ -56,46 +56,46 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 		s_expectNewGroup = false;
 	}
 
-    // get the item
-    QTreeWidgetItem * item;
-    if (s_currentGroupHeaderItem == nullptr) // is top item
-    {
-        if (s_currentGroupHeaderItemChildIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
-        {
-            item = s_treeWidget->topLevelItem(s_currentGroupHeaderItemChildIndex);
-            if (item->isHidden())
-            {
-                LOG;
-                item->setHidden(false);
-            }
-        }
-        else
-        {
-            LOG;
-            Debug::Log("[CheckNextWidget] add new QTreeWidgetItem");
-            item = new QTreeWidgetItem;
-            s_treeWidget->addTopLevelItem(item);
-            item->setExpanded(true);
-        }
-    }
-    else
-    {
-        if (s_currentGroupHeaderItemChildIndex < s_currentGroupHeaderItem->childCount())  // exists, reuse it
-        {
-            item = s_currentGroupHeaderItem->child(s_currentGroupHeaderItemChildIndex);
-            if (item->isHidden())
-            {
-                LOG;
-                item->setHidden(false);
-            }
-        }
-        else
-        {
-            LOG;
-            item = new QTreeWidgetItem;
+	// get the item
+	QTreeWidgetItem * item;
+	if (s_currentGroupHeaderItem == nullptr) // is top item
+	{
+		if (s_currentGroupHeaderItemChildIndex < s_treeWidget->topLevelItemCount()) // exists, reuse it
+		{
+			item = s_treeWidget->topLevelItem(s_currentGroupHeaderItemChildIndex);
+			if (item->isHidden())
+			{
+				LOG;
+				item->setHidden(false);
+			}
+		}
+		else
+		{
+			LOG;
+			Debug::Log("[CheckNextWidget] add new QTreeWidgetItem");
+			item = new QTreeWidgetItem;
+			s_treeWidget->addTopLevelItem(item);
+			item->setExpanded(true);
+		}
+	}
+	else
+	{
+		if (s_currentGroupHeaderItemChildIndex < s_currentGroupHeaderItem->childCount())  // exists, reuse it
+		{
+			item = s_currentGroupHeaderItem->child(s_currentGroupHeaderItemChildIndex);
+			if (item->isHidden())
+			{
+				LOG;
+				item->setHidden(false);
+			}
+		}
+		else
+		{
+			LOG;
+			item = new QTreeWidgetItem;
 			s_currentGroupHeaderItem->addChild(item);
-        }
-    }
+		}
+	}
 
 	s_currentGroupHeaderItemChildIndex++;
 	s_currentItem = item;
@@ -103,16 +103,16 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 
 	if (item == nullptr) abort();
 
-    auto widget = qobject_cast<T*>(s_treeWidget->itemWidget(item, 0));
+	auto widget = qobject_cast<T*>(s_treeWidget->itemWidget(item, 0));
 
-    if (widget == nullptr)
-    {
-        LOG;
-        Debug::Log("[CheckNextWidget] new widget");
-        widget = new T(args...);
-        s_treeWidget->setItemWidget(item, 0, widget);
-    }
-    return widget;
+	if (widget == nullptr)
+	{
+		LOG;
+		Debug::Log("[CheckNextWidget] new widget");
+		widget = new T(args...);
+		s_treeWidget->setItemWidget(item, 0, widget);
+	}
+	return widget;
 }
 
 
@@ -136,18 +136,18 @@ void EditorGUI::End()
 		s_expectNewGroup = false;
 	}
 
-    int rowCount = s_treeWidget->topLevelItemCount();
-    int componentCount = s_currentGroupHeaderItemChildIndex;
-    // hide redundant top item
-    for (int i = componentCount; i < rowCount; i++)
-    {
-        auto item = s_treeWidget->topLevelItem(i);
-        if (item->isHidden())
-            break;  // do not check the rest of rows
-        item->setHidden(true);
-        LOG;
-        Debug::Log("[EditorGUI::End]hide %d", i);
-    }
+	int rowCount = s_treeWidget->topLevelItemCount();
+	int componentCount = s_currentGroupHeaderItemChildIndex;
+	// hide redundant top item
+	for (int i = componentCount; i < rowCount; i++)
+	{
+		auto item = s_treeWidget->topLevelItem(i);
+		if (item->isHidden())
+			break;  // do not check the rest of rows
+		item->setHidden(true);
+		LOG;
+		Debug::Log("[EditorGUI::End]hide %d", i);
+	}
 }
 
 bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName, UIHeaderState * outState)
@@ -310,22 +310,22 @@ void EditorGUI::PopGroup()
 bool EditorGUI::ObjectField(const std::string &label, const ObjectPtr &obj)
 {
 	auto name = obj == nullptr ? "none" : obj->name();
-    UIObjecField * objField = CheckNextWidget<UIObjecField>(label, name);
-    return objField->CheckUpdate(label, name);
+	UIObjecField * objField = CheckNextWidget<UIObjecField>(label, name);
+	return objField->CheckUpdate(label, name);
 }
 
 
 std::string EditorGUI::ShowAddComponentMenu()
 {
-    static QMenu* menu = nullptr;
-    if (menu == nullptr)
-    {
-        menu = new QMenu(s_treeWidget);
-        menu->addAction("Rigidbody");
-    }
+	static QMenu* menu = nullptr;
+	if (menu == nullptr)
+	{
+		menu = new QMenu(s_treeWidget);
+		menu->addAction("Rigidbody");
+	}
 
-    auto action = menu->exec(QCursor::pos());
-    return action->text().toStdString();
+	auto action = menu->exec(QCursor::pos());
+	return action->text().toStdString();
 }
 
 

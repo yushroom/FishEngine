@@ -9,10 +9,10 @@
 #include <Application.hpp>
 
 OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::OpenProjectDialog)
+	QDialog(parent),
+	ui(new Ui::OpenProjectDialog)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 #if FISHENGINE_PLATFORM_WINDOWS
 	ui->locationLineEdit->setText("D:/FishEngine/Projects");
 #else
@@ -31,7 +31,7 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 
 OpenProjectDialog::~OpenProjectDialog()
 {
-    delete ui;
+	delete ui;
 }
 
 void OpenProjectDialog::OnCreateButtonClicked()

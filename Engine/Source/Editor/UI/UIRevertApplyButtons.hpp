@@ -9,11 +9,11 @@ class UIRevertApplyButtons;
 
 class UIRevertApplyButtons : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit UIRevertApplyButtons(QWidget *parent = 0);
-    ~UIRevertApplyButtons();
+	explicit UIRevertApplyButtons(QWidget *parent = 0);
+	~UIRevertApplyButtons();
 	
 Q_SIGNALS:
 	void OnRevert();
@@ -23,7 +23,7 @@ public:
 	void SetEnabled(bool enabled);
 
 private:
-    Ui::UIRevertApplyButtons *ui;
+	Ui::UIRevertApplyButtons *ui;
 };
 
 #endif // UIREVERTAPPLYBUTTONS_H

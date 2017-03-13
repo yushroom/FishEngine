@@ -2,5 +2,5 @@
 
 namespace FishEditor
 {
-    App::~App() = default;
+	App::~App() = default;
 }

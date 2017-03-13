@@ -7,30 +7,30 @@
 
 namespace FishEngine
 {
-    class FE_EXPORT Meta(NonSerializable) RenderSettings : public Object
-    {
-    public:
-        //InjectClassName(RenderSettings);
+	class FE_EXPORT Meta(NonSerializable) RenderSettings : public Object
+	{
+	public:
+		//InjectClassName(RenderSettings);
 
-        RenderSettings() = delete;
+		RenderSettings() = delete;
 
-        static MaterialPtr skybox()
-        {
-            return m_skybox;
-        }
+		static MaterialPtr skybox()
+		{
+			return m_skybox;
+		}
 
-        static void setSkybox(MaterialPtr& skybox);
+		static void setSkybox(MaterialPtr& skybox);
 
-        static TexturePtr ambientCubemap()
-        {
-            return m_ambientCubemap;
-        }
+		static TexturePtr ambientCubemap()
+		{
+			return m_ambientCubemap;
+		}
 
-        static void setAmbientCubemap(TexturePtr ambientCubemap)
-        {
-            m_ambientCubemap = ambientCubemap;
-        }
-		
+		static void setAmbientCubemap(TexturePtr ambientCubemap)
+		{
+			m_ambientCubemap = ambientCubemap;
+		}
+
 		static LayeredDepthBufferPtr defaultShadowMap()
 		{
 			static LayeredDepthBufferPtr m_shadowMap = nullptr;
@@ -43,17 +43,17 @@ namespace FishEngine
 			}
 			return m_shadowMap;
 		}
-		
-        static TexturePtr preintegratedGF();
 
-    private:
+		static TexturePtr preintegratedGF();
 
-        // The global skybox to use.
-        static MaterialPtr m_skybox;
-        static TexturePtr m_ambientCubemap;
-		
-		
-    };
+	private:
+
+		// The global skybox to use.
+		static MaterialPtr m_skybox;
+		static TexturePtr m_ambientCubemap;
+
+
+	};
 }
 
 #endif // RenderSettings_hpp

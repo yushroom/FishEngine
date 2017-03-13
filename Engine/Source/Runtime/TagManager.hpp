@@ -10,16 +10,16 @@
 
 namespace FishEngine
 {
-    class Meta(NonSerializable) TagManager
-    {
-    public:
-        TagManager() = delete;
+	class Meta(NonSerializable) TagManager
+	{
+	public:
+		TagManager() = delete;
 
-        static bool Exists(std::string const & tag)
-        {
+		static bool Exists(std::string const & tag)
+		{
 			auto it = std::find(s_tags.begin(), s_tags.end(), tag);
 			return it != s_tags.end();
-        }
+		}
 		
 //		static bool Exists(int index)
 //		{
@@ -73,13 +73,13 @@ namespace FishEngine
 			}
 		}
 
-    private:
+	private:
 		friend class ::UIGameObjectHeader;
 		
 		static constexpr int InternalTagCount = 7;
 		
-        static std::vector<std::string> s_tags;
+		static std::vector<std::string> s_tags;
 		
 		static int s_editorFlag;	// special flag for Editor use only;
-    };
+	};
 }

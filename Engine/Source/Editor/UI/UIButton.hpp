@@ -4,16 +4,16 @@
 
 class UIButton : public QPushButton
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit UIButton(QWidget* parent = nullptr);
-    explicit UIButton(const QString &text, QWidget* parent = nullptr);
+	explicit UIButton(QWidget* parent = nullptr);
+	explicit UIButton(const QString &text, QWidget* parent = nullptr);
 
-    bool CheckClicked();
+	bool CheckClicked();
 
 private slots:
-    void OnClicked();
+	void OnClicked();
 
 private:
-    bool m_clicked = false;
+	bool m_clicked = false;
 };

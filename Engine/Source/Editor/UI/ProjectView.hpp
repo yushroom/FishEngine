@@ -12,31 +12,31 @@ class ProjectViewDirModel;
 
 class ProjectView : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit ProjectView(QWidget *parent = 0);
-    ~ProjectView();
+	explicit ProjectView(QWidget *parent = 0);
+	~ProjectView();
 
-    virtual QSize sizeHint() const override;
+	virtual QSize sizeHint() const override;
 
-    void SetRootPath(std::string const & path);
-    void SetRootPath(QString const & path);
+	void SetRootPath(std::string const & path);
+	void SetRootPath(QString const & path);
 
 private:
-    void OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-    void OnListViewDoubleClicked(const QModelIndex &index);
+	void OnDirTreeViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+	void OnListViewDoubleClicked(const QModelIndex &index);
 	//void OnListTreeViewClicked(const QModelIndex &index);
-    void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-    void OnIconSizeChanged(int size);
+	void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+	void OnIconSizeChanged(int size);
 
 private:
-    Ui::ProjectView         * ui;
+	Ui::ProjectView         * ui;
 
-    ProjectViewDirModel     * m_dirModel;
-    ProjectViewFileModel    * m_fileModel;
+	ProjectViewDirModel     * m_dirModel;
+	ProjectViewFileModel    * m_fileModel;
 
-    int m_listViewIconSize = 16;
+	int m_listViewIconSize = 16;
 };
 
 #endif // PROJECTVIEW_HPP

@@ -2,10 +2,10 @@
 
 namespace FishEditor
 {
-    enum class UIHeaderState
-    {
-        none,
-        enabledChanged,
-        menuButtonClicked,
-    };
+	enum class UIHeaderState
+	{
+		none,
+		enabledChanged,
+		menuButtonClicked,
+	};
 }

@@ -11,35 +11,35 @@ class SelectObjectDialog;
 
 namespace FishEngine
 {
-    class Object;
+	class Object;
 }
 
 class ObjectListModel;
 
 class SelectObjectDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit SelectObjectDialog(QWidget *parent = 0);
-    ~SelectObjectDialog();
+	explicit SelectObjectDialog(QWidget *parent = 0);
+	~SelectObjectDialog();
 
-    typedef std::function<void(std::shared_ptr<FishEngine::Object>)> Callback;
+	typedef std::function<void(std::shared_ptr<FishEngine::Object>)> Callback;
 
-    //template <class T>
-    void ShowWithCallback( Callback const & callback );
-
-private:
-    void OnIconSizeChanged(int size);
-    void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+	//template <class T>
+	void ShowWithCallback( Callback const & callback );
 
 private:
-    Ui::SelectObjectDialog *ui;
+	void OnIconSizeChanged(int size);
+	void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
-    int m_listViewIconSize = 16;
-    ObjectListModel * m_model;
+private:
+	Ui::SelectObjectDialog *ui;
 
-    Callback m_callback;
+	int m_listViewIconSize = 16;
+	ObjectListModel * m_model;
+
+	Callback m_callback;
 };
 
 #endif // SELECTOBJECTDIALOG_HPP

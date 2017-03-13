@@ -11,75 +11,75 @@ namespace FishEditor
 
 namespace FishEngine
 {
-    enum class ShaderType
-    {
-        VertexShader,
-        FragmentShader,
-        GeometryShader,
-    };
+	enum class ShaderType
+	{
+		VertexShader,
+		FragmentShader,
+		GeometryShader,
+	};
 
-    enum class ShaderCompilerErrorCode
-    {
-        None,
-        EarlyEOF,
-        GrammarError,
-        FileNotExist,
-    };
+	enum class ShaderCompilerErrorCode
+	{
+		None,
+		EarlyEOF,
+		GrammarError,
+		FileNotExist,
+	};
 
-    class ShaderCompiler
-    {
-    public:
+	class ShaderCompiler
+	{
+	public:
 		InjectSerializationFunctionsNonPolymorphic(ShaderCompiler);
-		
-        bool                                m_hasGeometryShader = false;
-        std::map<std::string, std::string>  m_settings;
-        ShaderCompilerErrorCode             m_error = ShaderCompilerErrorCode::None;
-        std::string                         m_errorString;
 
-    public:
-        Path m_path;
-        uint32_t m_includeDepth = 0;
-        // absolute path to preprocessed text
-        static std::map<std::string, std::string> s_cachedHeaders;
+		bool                                m_hasGeometryShader = false;
+		std::map<std::string, std::string>  m_settings;
+		ShaderCompilerErrorCode             m_error = ShaderCompilerErrorCode::None;
+		std::string                         m_errorString;
 
-        ShaderCompiler(const Path& shaderFilePath)
-            : m_path(shaderFilePath)
-        {
-        }
+	public:
+		Path m_path;
+		uint32_t m_includeDepth = 0;
+		// absolute path to preprocessed text
+		static std::map<std::string, std::string> s_cachedHeaders;
 
-        std::string Preprocess()
-        {
-            return PreprocessShaderFile(m_path);
-        }
+		ShaderCompiler(const Path& shaderFilePath)
+			: m_path(shaderFilePath)
+		{
+		}
 
-    private:
+		std::string Preprocess()
+		{
+			return PreprocessShaderFile(m_path);
+		}
 
-        std::string PreprocessShaderFile(const Path& path);
+	private:
 
-        std::string PreprocessImpl(
-            const std::string&  shaderText, 
-            const Path&         localDir);
+		std::string PreprocessShaderFile(const Path& path);
 
-        std::string parseSubShader(
-            const std::string&  shaderText,
-            size_t&             cursor,
-            const std::string&  str,
-            const Path&         localDir);
+		std::string PreprocessImpl(
+			const std::string&  shaderText,
+			const Path&         localDir);
 
-        static std::string nextTok(const std::string &shaderText, size_t& cursor);
+		std::string parseSubShader(
+			const std::string&  shaderText,
+			size_t&             cursor,
+			const std::string&  str,
+			const Path&         localDir);
 
-        static void readToNewline(const std::string& shaderText, size_t& cursor);
+		static std::string nextTok(const std::string &shaderText, size_t& cursor);
 
-        static void ignoreSpace(const std::string& text, size_t& cursor);
+		static void readToNewline(const std::string& shaderText, size_t& cursor);
 
-        static bool expect(
-            const std::string&  text,
-            size_t&             cursor,
-            const std::string&  target);
+		static void ignoreSpace(const std::string& text, size_t& cursor);
 
-        static size_t findPair(const std::string& text, const size_t cursor);
+		static bool expect(
+			const std::string&  text,
+			size_t&             cursor,
+			const std::string&  target);
+
+		static size_t findPair(const std::string& text, const size_t cursor);
 
 		friend class FishEditor::EditorResources;
 		static Path s_shaderIncludeDir;
-    };
+	};
 }

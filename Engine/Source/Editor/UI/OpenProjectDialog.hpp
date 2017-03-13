@@ -9,11 +9,11 @@ class OpenProjectDialog;
 
 class OpenProjectDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit OpenProjectDialog(QWidget *parent = 0);
-    ~OpenProjectDialog();
+	explicit OpenProjectDialog(QWidget *parent = 0);
+	~OpenProjectDialog();
 
 private:
 
@@ -25,7 +25,7 @@ private:
 
 	void CreateNewProject(QString const & projectPath);
 
-    Ui::OpenProjectDialog *ui;
+	Ui::OpenProjectDialog *ui;
 };
 
 #endif // OPENPROJECTDIALOG_HPP

@@ -2,6 +2,7 @@
 #define TEXTUREIMPORTERINSPECTOR_HPP
 
 #include <QWidget>
+#include <memory>
 
 namespace FishEditor
 {
@@ -22,11 +23,11 @@ class UIRevertApplyButtons;
 
 class TextureImporterInspector : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit TextureImporterInspector(QWidget *parent = 0);
-    ~TextureImporterInspector();
+	explicit TextureImporterInspector(QWidget *parent = 0);
+	~TextureImporterInspector();
 	
 	void Bind(std::shared_ptr<FishEditor::TextureImporter> const & importer);
 	

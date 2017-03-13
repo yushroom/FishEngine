@@ -2,10 +2,10 @@
 
 namespace FishEngine::Rendering
 {
-    class CommandBuffer
-    {
-    public:
-        CommandBuffer();
+	class CommandBuffer
+	{
+	public:
+		CommandBuffer();
 
-    };
+	};
 }

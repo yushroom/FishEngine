@@ -9,14 +9,14 @@ class AssetProgressDialog;
 
 class AssetProgressDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit AssetProgressDialog(QWidget *parent = 0);
-    ~AssetProgressDialog();
+	explicit AssetProgressDialog(QWidget *parent = 0);
+	~AssetProgressDialog();
 
 private:
-    Ui::AssetProgressDialog *ui;
+	Ui::AssetProgressDialog *ui;
 };
 
 #endif // ASSETPROGRESSDIALOG_HPP

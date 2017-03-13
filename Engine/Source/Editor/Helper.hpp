@@ -7,7 +7,7 @@
 // std::to_sting(float) do not satisfy because it simply calls sprintf without format controlls
 inline std::string floatToStdString(const float f)
 {
-    std::ostringstream ss;
-    ss << f;
-    return ss.str();
+	std::ostringstream ss;
+	ss << f;
+	return ss.str();
 }

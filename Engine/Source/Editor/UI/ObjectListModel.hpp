@@ -5,18 +5,18 @@
 
 namespace FishEngine
 {
-    class Object;
+	class Object;
 }
 
 class ObjectListModel : public QAbstractListModel
 {
 public:
-    explicit ObjectListModel(QObject *parent = nullptr);
+	explicit ObjectListModel(QObject *parent = nullptr);
 
 	void SetModelType();
 
-    std::shared_ptr<FishEngine::Object> object(const QModelIndex &index) const;
+	std::shared_ptr<FishEngine::Object> object(const QModelIndex &index) const;
 
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 };

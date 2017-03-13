@@ -2,16 +2,16 @@
 
 namespace FishEngine
 {
-    enum class PrimitiveType
-    {
-        Sphere,
-        Capsule,
-        Cylinder,
-        Cube,
-        Plane,
-        Quad,
+	enum class PrimitiveType
+	{
+		Sphere,
+		Capsule,
+		Cylinder,
+		Cube,
+		Plane,
+		Quad,
 
-        Cone,
+		Cone,
 		ScreenAlignedQuad,
-    };
+	};
 }

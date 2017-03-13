@@ -5,31 +5,31 @@
 
 namespace FishEngine
 {
-    class FE_EXPORT MeshFilter : public Component
-    {
-    public:
-        InjectClassName(MeshFilter)
+	class FE_EXPORT MeshFilter : public Component
+	{
+	public:
+		InjectClassName(MeshFilter)
 
-        MeshFilter() = default;
+			MeshFilter() = default;
 
-        MeshFilter(MeshPtr mesh) : m_mesh(mesh) {
+		MeshFilter(MeshPtr mesh) : m_mesh(mesh) {
 
-        }
+		}
 
-        MeshPtr mesh() const {
-            return m_mesh;
-        }
+		MeshPtr mesh() const {
+			return m_mesh;
+		}
 
-        void SetMesh(MeshPtr mesh) {
-            m_mesh = mesh;
-        }
+		void SetMesh(MeshPtr mesh) {
+			m_mesh = mesh;
+		}
 
-        //virtual void OnInspectorGUI() override;
+		//virtual void OnInspectorGUI() override;
 
-    private:
-        friend class FishEditor::Inspector;
-        MeshPtr m_mesh = nullptr;
-    };
+	private:
+		friend class FishEditor::Inspector;
+		MeshPtr m_mesh = nullptr;
+	};
 }
 
 #endif /* MeshFilter_hpp */

@@ -10,25 +10,25 @@
 
 namespace FishEngine
 {
-    template<typename T>
-    inline T ToEnum(const std::string& s);
+	template<typename T>
+	inline T ToEnum(const std::string& s);
 
-    template<typename T>
-    inline T ToEnum(const int index);
+	template<typename T>
+	inline T ToEnum(const int index);
 
-    template<typename T>
-    inline int EnumToIndex(T e);
+	template<typename T>
+	inline int EnumToIndex(T e);
 
-    template<typename T>
-    inline constexpr const char** EnumToCStringArray();
+	template<typename T>
+	inline constexpr const char** EnumToCStringArray();
 
-    template<typename T>
-    inline const char* EnumToString(T e)
-    {
-        return EnumToCStringArray<T>()[EnumToIndex<T>(e)];
-    }
+	template<typename T>
+	inline const char* EnumToString(T e)
+	{
+		return EnumToCStringArray<T>()[EnumToIndex<T>(e)];
+	}
 
-    template<typename T>
-    constexpr int EnumCount();
+	template<typename T>
+	constexpr int EnumCount();
 
 }

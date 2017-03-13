@@ -5,61 +5,61 @@
 #include "../Helper.hpp"
 
 UIFloat::UIFloat(const std::string &label, float value, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::UIFloat),
-    m_label(label),
-    m_value(value)
+	QWidget(parent),
+	ui(new Ui::UIFloat),
+	m_label(label),
+	m_value(value)
 {
-    ui->setupUi(this);
-    ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
+	ui->setupUi(this);
+	ui->horizontalLayout->setContentsMargins(0, 2, 2, 2);
 
-    ui->label->setText(m_label.c_str());
+	ui->label->setText(m_label.c_str());
 
-    ui->value->setValue(m_value);
-    connect(ui->value, &FloatLineEdit::valueChanged, this, &UIFloat::OnValueChanged);
+	ui->value->setValue(m_value);
+	connect(ui->value, &FloatLineEdit::valueChanged, this, &UIFloat::OnValueChanged);
 }
 
 UIFloat::~UIFloat()
 {
-    delete ui;
+	delete ui;
 }
 
 bool UIFloat::CheckUpdate(const std::string &label, float &value)
 {
-    if (m_changed)
-    {
-        Debug::Log("[float] value changed");
-        value = m_value;
-        m_changed = false;
-        return true;
-    }
+	if (m_changed)
+	{
+		Debug::Log("[float] value changed");
+		value = m_value;
+		m_changed = false;
+		return true;
+	}
 
-    if (m_label != label)
-    {
-        Debug::Log("[float] new label: %s", m_label.c_str());
-        m_label = label;
-        LOG;
-        ui->label->setText(m_label.c_str());
-    }
+	if (m_label != label)
+	{
+		Debug::Log("[float] new label: %s", m_label.c_str());
+		m_label = label;
+		LOG;
+		ui->label->setText(m_label.c_str());
+	}
 
-    if (m_value != value)
-    {
-        if (!ui->value->hasFocus())
-        {
-            Debug::Log("[float] new value");
-            LOG;
-            m_value = value;
-            //ui->value->blockSignals(true);
-            ui->value->setValue(m_value);
-            //ui->value->blockSignals(false);
-        }
-    }
+	if (m_value != value)
+	{
+		if (!ui->value->hasFocus())
+		{
+			Debug::Log("[float] new value");
+			LOG;
+			m_value = value;
+			//ui->value->blockSignals(true);
+			ui->value->setValue(m_value);
+			//ui->value->blockSignals(false);
+		}
+	}
 
-    return false;
+	return false;
 }
 
 void UIFloat::OnValueChanged(float f)
 {
-    m_value = f;
-    m_changed = true;
+	m_value = f;
+	m_changed = true;
 }

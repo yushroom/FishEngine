@@ -8,31 +8,31 @@
 
 namespace FishEditor
 {
-    class SceneViewEditor;
+	class SceneViewEditor;
 
-    class Meta(NonSerializable) MainEditor
-    {
-    public:
-        MainEditor() = delete;
+	class Meta(NonSerializable) MainEditor
+	{
+	public:
+		MainEditor() = delete;
 
-        static void Init();
-        static void Run();
-        static void Clean();
+		static void Init();
+		static void Run();
+		static void Clean();
 
-        static void Play();
-        static void Stop();
+		static void Play();
+		static void Stop();
 
-        static void Resize(int width, int height);
+		static void Resize(int width, int height);
 
 		static void NewScene();
 
-        static Action OnInitialized;
+		static Action OnInitialized;
 
-    private:
+	private:
 
-    public:
-        static std::unique_ptr<SceneViewEditor>  m_mainSceneViewEditor;
-    };
+	public:
+		static std::unique_ptr<SceneViewEditor>  m_mainSceneViewEditor;
+	};
 }
 
 #endif // MAINEDITOR_HPP

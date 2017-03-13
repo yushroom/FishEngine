@@ -3,11 +3,11 @@
 
 namespace FishEngine
 {
-    void TextureFormat2GLFormat(
-	    TextureFormat format,
-	    GLenum& out_internalFormat,
-	    GLenum& out_externalFormat,
-	    GLenum& out_pixelType)
+	void TextureFormat2GLFormat(
+		TextureFormat format,
+		GLenum& out_internalFormat,
+		GLenum& out_externalFormat,
+		GLenum& out_pixelType)
 	{
 		switch (format)
 		{

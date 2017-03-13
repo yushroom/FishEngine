@@ -13,36 +13,36 @@ class UIComponentHeader;
 
 class UIComponentHeader : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    // show checkbox
-    explicit UIComponentHeader(std::string const & componentTypeName, bool enabled, QWidget *parent = 0);
+	// show checkbox
+	explicit UIComponentHeader(std::string const & componentTypeName, bool enabled, QWidget *parent = 0);
 
-    // hide checkbox
-    explicit UIComponentHeader(std::string const & componentTypeName, QWidget *parent = 0);
+	// hide checkbox
+	explicit UIComponentHeader(std::string const & componentTypeName, QWidget *parent = 0);
 
-    ~UIComponentHeader();
+	~UIComponentHeader();
 
-    // show checkBox
-    FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName, bool & enabled);
+	// show checkBox
+	FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName, bool & enabled);
 
-    // hide checkBox
-    FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName);
+	// hide checkBox
+	FishEditor::UIHeaderState CheckUpdate(std::string const & componentTypeName);
 
-
-private:
-    void OnCheckBoxChanged(bool value);
-    void OnRemoveActionTrigered() { m_menuButtonTrigered = true; }
 
 private:
-    Ui::UIComponentHeader *ui;
+	void OnCheckBoxChanged(bool value);
+	void OnRemoveActionTrigered() { m_menuButtonTrigered = true; }
 
-    //bool m_changed = false;
-    bool m_enabled = true;
+private:
+	Ui::UIComponentHeader *ui;
 
-    bool m_enabledChanged = false;
-    bool m_menuButtonTrigered = false;
+	//bool m_changed = false;
+	bool m_enabled = true;
+
+	bool m_enabledChanged = false;
+	bool m_menuButtonTrigered = false;
 
 //    void ResetState()
 //    {
@@ -50,7 +50,7 @@ private:
 //        m_removeActionTrigered = false;
 //    }
 
-    std::string m_componentTypeName;
+	std::string m_componentTypeName;
 };
 
 #endif // UIHEADER_HPP

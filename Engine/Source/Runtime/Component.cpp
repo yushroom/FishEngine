@@ -17,35 +17,35 @@
 namespace FishEngine
 {
 
-    //Component::~Component()
-    //{
-    //    Debug::Log("~Component");
-    //    //if (m_gameObject != nullptr) {
-    //    //    m_gameObject->
-    //    //}
-    //}
+	//Component::~Component()
+	//{
+	//    Debug::Log("~Component");
+	//    //if (m_gameObject != nullptr) {
+	//    //    m_gameObject->
+	//    //}
+	//}
 
-    std::string Component::name() const
-    {
-        const auto& go = gameObject();
-        if (go == nullptr)
-            return Object::name();
-        return gameObject()->name();
-    }
+	std::string Component::name() const
+	{
+		const auto& go = gameObject();
+		if (go == nullptr)
+			return Object::name();
+		return gameObject()->name();
+	}
 
-    std::string Component::tag() const
-    {
-        if (m_gameObject.expired())
-            return "";
-        return gameObject()->tag();
-    }
+	std::string Component::tag() const
+	{
+		if (m_gameObject.expired())
+			return "";
+		return gameObject()->tag();
+	}
 
-    TransformPtr Component::transform() const
-    {
-        if (m_gameObject.expired())
-            return nullptr;
-        return gameObject()->transform();
-    }
+	TransformPtr Component::transform() const
+	{
+		if (m_gameObject.expired())
+			return nullptr;
+		return gameObject()->transform();
+	}
 
 //    std::shared_ptr<Component> Component::CreateComponent(const std::string& componentClassName)
 //    {

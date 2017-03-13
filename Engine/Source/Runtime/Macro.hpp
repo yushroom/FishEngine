@@ -16,8 +16,8 @@
 	friend FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, T & t); \
 
 #define InjectClassName(T) \
-    static constexpr const char * StaticClassName() { return #T; }  \
-    virtual const std::string ClassName() const override { return StaticClassName(); } \
+	static constexpr const char * StaticClassName() { return #T; }  \
+	virtual const std::string ClassName() const override { return StaticClassName(); } \
 	virtual int ClassID() const override { return FishEngine::ClassID<T>(); } \
-    InjectSerializationFunctions(T)
+	InjectSerializationFunctions(T)
 

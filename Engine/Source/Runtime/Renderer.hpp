@@ -7,86 +7,86 @@
 
 namespace FishEngine
 {
-    enum class ShadowCastingMode
-    {
-        Off,
-        On,
-        TwoSided,
-        ShdowsOnly,
-    };
+	enum class ShadowCastingMode
+	{
+		Off,
+		On,
+		TwoSided,
+		ShdowsOnly,
+	};
 
-    class FE_EXPORT Renderer : public Component
-    {
-    public:
-        InjectClassName(Renderer);
+	class FE_EXPORT Renderer : public Component
+	{
+	public:
+		InjectClassName(Renderer);
 
-        Renderer() = default;
+		Renderer() = default;
 
-        Renderer(MaterialPtr material)
-        {
-            m_materials.push_back(material);
-        }
-
-        virtual void Render() const = 0;
-
-        void AddMaterial(MaterialPtr material)
+		Renderer(MaterialPtr material)
 		{
-            m_materials.push_back(material);
-        }
+			m_materials.push_back(material);
+		}
 
-        MaterialPtr material() const
+		virtual void Render() const = 0;
+
+		void AddMaterial(MaterialPtr material)
 		{
-            return m_materials.size() > 0 ? m_materials[0] : nullptr;
-        }
+			m_materials.push_back(material);
+		}
 
-        std::vector<MaterialPtr>& materials()
+		MaterialPtr material() const
 		{
-            return m_materials;
-        }
+			return m_materials.size() > 0 ? m_materials[0] : nullptr;
+		}
 
-        void SetMaterial(MaterialPtr material)
+		std::vector<MaterialPtr>& materials()
 		{
-            m_materials.clear();
-            m_materials.push_back(material);
-        }
+			return m_materials;
+		}
 
-        virtual Bounds localBounds() const = 0;
-        Bounds bounds() const;
-		
+		void SetMaterial(MaterialPtr material)
+		{
+			m_materials.clear();
+			m_materials.push_back(material);
+		}
+
+		virtual Bounds localBounds() const = 0;
+		Bounds bounds() const;
+
 		// Makes the rendered 3D object visible if enabled.
 		bool enabled() const
 		{
 			return m_enabled;
 		}
-		
+
 		// Makes the rendered 3D object visible if enabled.
 		void setEnabled(bool enabled)
 		{
 			m_enabled = enabled;
 		}
 
-        //virtual void OnInspectorGUI() override;
-        virtual void OnDrawGizmosSelected() override;
+		//virtual void OnInspectorGUI() override;
+		virtual void OnDrawGizmosSelected() override;
 
-        ShadowCastingMode shadowCastingMode() const
-        {
-            return m_shadowCastingMode;
-        }
+		ShadowCastingMode shadowCastingMode() const
+		{
+			return m_shadowCastingMode;
+		}
 
-        void setShadowCastingMode(ShadowCastingMode shadowCastingMode)
-        {
-            m_shadowCastingMode = shadowCastingMode;
-        }
+		void setShadowCastingMode(ShadowCastingMode shadowCastingMode)
+		{
+			m_shadowCastingMode = shadowCastingMode;
+		}
 
-    protected:
-        friend class FishEditor::Inspector;
+	protected:
+		friend class FishEditor::Inspector;
 		friend class FishEditor::EditorGUI;
 		bool m_enabled = true;	// Makes the rendered 3D object visible if enabled.
-        std::vector<MaterialPtr> m_materials;
+		std::vector<MaterialPtr> m_materials;
 
-        ShadowCastingMode	m_shadowCastingMode = ShadowCastingMode::On;
-		bool				m_receiveShadows	= true;
-    };
+		ShadowCastingMode	m_shadowCastingMode = ShadowCastingMode::On;
+		bool				m_receiveShadows = true;
+	};
 }
 
 #endif /* Renderer_hpp */

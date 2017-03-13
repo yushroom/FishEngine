@@ -6,33 +6,33 @@
 
 namespace FishEngine
 {
-    class Meta(NonSerializable) TextOutputArchive
-    {
-    public:
-        TextOutputArchive(std::ostream & stream) : m_stream(stream)
-        {
-        }
-        
-        TextOutputArchive& operator = (TextOutputArchive const &) = delete;
-        
-        ~TextOutputArchive() noexcept = default;
-        
-        template<typename T>
-        void Save ( T const & t)
-        {
-            m_stream << t << std::endl;
-        }
-        
+	class Meta(NonSerializable) TextOutputArchive
+	{
+	public:
+		TextOutputArchive(std::ostream & stream) : m_stream(stream)
+		{
+		}
+		
+		TextOutputArchive& operator = (TextOutputArchive const &) = delete;
+		
+		~TextOutputArchive() noexcept = default;
+		
+		template<typename T>
+		void Save ( T const & t)
+		{
+			m_stream << t << std::endl;
+		}
+		
 //        template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
 //        TextOutputArchive & operator << (T const & t)
 //        {
 //            this->Save(t);
 //            return *this;
 //        }
-        
-    private:
-        std::ostream & m_stream;
-    };
+		
+	private:
+		std::ostream & m_stream;
+	};
 
 
 	class Meta(NonSerializable) TextInputArchive
@@ -56,15 +56,15 @@ namespace FishEngine
 		std::istream & m_stream;
 	};
 
-    /************************************************************************/
-    /* arithmetic                                                           */
-    /************************************************************************/
+	/************************************************************************/
+	/* arithmetic                                                           */
+	/************************************************************************/
 	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-    TextOutputArchive & operator << ( TextOutputArchive & archive, T const & t)
-    {
-        archive.Save(t);
-        return archive;
-    }
+	TextOutputArchive & operator << ( TextOutputArchive & archive, T const & t)
+	{
+		archive.Save(t);
+		return archive;
+	}
 
 	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
 	TextInputArchive & operator >> ( TextInputArchive & archive, T & t )

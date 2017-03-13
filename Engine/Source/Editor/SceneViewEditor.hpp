@@ -9,57 +9,57 @@
 
 namespace FishEditor
 {
-    enum class TransformToolType
-    {
-        None,
-        Translate,
-        Rotate,
-        Scale,
-    };
+	enum class TransformToolType
+	{
+		None,
+		Translate,
+		Rotate,
+		Scale,
+	};
 
-    enum class TransformSpace
-    {
-        Global,
-        Local,
-    };
-    
-    enum class ShadingMode
-    {
-        Shaded,
-        Wireframe,
-        ShadedWireframe,
-    };
+	enum class TransformSpace
+	{
+		Global,
+		Local,
+	};
+	
+	enum class ShadingMode
+	{
+		Shaded,
+		Wireframe,
+		ShadedWireframe,
+	};
 
-    class Meta(NonSerializable) SceneViewEditor
-    {
-    public:
-        //FishEngine::Vector2             m_position;
-        FishEngine::Int2                m_size{128, 128};
+	class Meta(NonSerializable) SceneViewEditor
+	{
+	public:
+		//FishEngine::Vector2             m_position;
+		FishEngine::Int2                m_size{128, 128};
 
-        FishEngine::RenderTargetPtr     m_sceneViewRenderTarget;
-        FishEngine::ColorBufferPtr      m_colorBuffer;
-        FishEngine::DepthBufferPtr      m_depthBuffer;
-        //FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
+		FishEngine::RenderTargetPtr     m_sceneViewRenderTarget;
+		FishEngine::ColorBufferPtr      m_colorBuffer;
+		FishEngine::DepthBufferPtr      m_depthBuffer;
+		//FishEngine::RenderTexturePtr    m_sceneViewRenderTexture;
 
-        FishEngine::RenderTargetPtr     m_selectionOutlineRT;
-        FishEngine::DepthBufferPtr      m_selectionOutlineDepthBuffer;
-        FishEngine::RenderTargetPtr     m_selectionOutlineRT2;
-        FishEngine::ColorBufferPtr      m_selectionOutlineColorBuffer2;
+		FishEngine::RenderTargetPtr     m_selectionOutlineRT;
+		FishEngine::DepthBufferPtr      m_selectionOutlineDepthBuffer;
+		FishEngine::RenderTargetPtr     m_selectionOutlineRT2;
+		FishEngine::ColorBufferPtr      m_selectionOutlineColorBuffer2;
 
-        void Init();
+		void Init();
 
-        void Update();
+		void Update();
 
-        void Render();
+		void Render();
 
-        void Clean();
+		void Clean();
 
-        void Resize(int width, int height);
+		void Resize(int width, int height);
 
-        FishEngine::CameraPtr camera()
-        {
-            return m_camera;
-        }
+		FishEngine::CameraPtr camera()
+		{
+			return m_camera;
+		}
 
 //        auto ColorBuffer() const
 //        {
@@ -76,73 +76,73 @@ namespace FishEditor
 			m_transformSpace = space;
 		}
 
-        TransformToolType transformToolType()
-        {
-            return m_transformToolType;
-        }
+		TransformToolType transformToolType()
+		{
+			return m_transformToolType;
+		}
 
-        void setTransformToolType(TransformToolType type)
-        {
-            m_transformToolType = type;
-        }
+		void setTransformToolType(TransformToolType type)
+		{
+			m_transformToolType = type;
+		}
 
-        // this scene view is focused, so it may receive keyboard event.
-        bool focused() const
-        {
-            return m_focused;
-        }
+		// this scene view is focused, so it may receive keyboard event.
+		bool focused() const
+		{
+			return m_focused;
+		}
 
-        // mouse position is inside of this scene view, so it may receive mouse event.
-        bool isMouseHovered() const
-        {
-            return m_isMouseHovered;
-        }
-        
-        bool highlightSelections() const
-        {
-            return m_highlightSelections;
-        }
-        
-        void setHighlightSelections(bool value)
-        {
-            m_highlightSelections = value;
-        }
+		// mouse position is inside of this scene view, so it may receive mouse event.
+		bool isMouseHovered() const
+		{
+			return m_isMouseHovered;
+		}
+		
+		bool highlightSelections() const
+		{
+			return m_highlightSelections;
+		}
+		
+		void setHighlightSelections(bool value)
+		{
+			m_highlightSelections = value;
+		}
 
-        void FrameSelected(FishEngine::GameObjectPtr const & selected);
+		void FrameSelected(FishEngine::GameObjectPtr const & selected);
 
-    private:
-        friend class EditorGUI;
+	private:
+		friend class EditorGUI;
 
-        FishEngine::CameraPtr m_camera;
-        FishEngine::GameObjectPtr m_cameraGameObject;
+		FishEngine::CameraPtr m_camera;
+		FishEngine::GameObjectPtr m_cameraGameObject;
 
-        bool        m_isWireFrameMode;
-        bool        m_useGammaCorrection;
-        bool        m_showShadowMap;
-        bool        m_highlightSelections   = true;
+		bool        m_isWireFrameMode;
+		bool        m_useGammaCorrection;
+		bool        m_showShadowMap;
+		bool        m_highlightSelections   = true;
 
-        bool        m_mouseEventHandled     = false;
-        
-        ShadingMode m_shadingMode           = ShadingMode::Shaded;
-        bool        m_showGizmos            = true;
-        
+		bool        m_mouseEventHandled     = false;
+		
+		ShadingMode m_shadingMode           = ShadingMode::Shaded;
+		bool        m_showGizmos            = true;
+		
 
-        // this scene view is focused, so it may receive keyboard event.
-        bool        m_focused               = false;
+		// this scene view is focused, so it may receive keyboard event.
+		bool        m_focused               = false;
 
-        // mouse position is inside of this scene view, so it may receive mouse event.
-        bool        m_isMouseHovered        = false;
+		// mouse position is inside of this scene view, so it may receive mouse event.
+		bool        m_isMouseHovered        = false;
 
-        TransformToolType m_transformToolType = TransformToolType::Translate;
-        TransformSpace m_transformSpace     = TransformSpace::Global;
+		TransformToolType m_transformToolType = TransformToolType::Translate;
+		TransformSpace m_transformSpace     = TransformSpace::Global;
 
-        int         m_selectedAxis          = -1; // temp
-        std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
-        void DrawTranslateGizmo();
-        void DrawRotateGizmo();
-        void DrawScaleGizmo();
-        void DrawSceneGizmo();
-    };
+		int         m_selectedAxis          = -1; // temp
+		std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
+		void DrawTranslateGizmo();
+		void DrawRotateGizmo();
+		void DrawScaleGizmo();
+		void DrawSceneGizmo();
+	};
 
-    typedef std::shared_ptr<SceneViewEditor> SceneViewEditorPtr;
+	typedef std::shared_ptr<SceneViewEditor> SceneViewEditorPtr;
 }

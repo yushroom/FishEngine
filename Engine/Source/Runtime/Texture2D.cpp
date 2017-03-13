@@ -12,7 +12,7 @@ namespace FishEngine
 		m_height = height;
 		m_format = format;
 		m_data.resize(byteCount);
-		std::copy(data, data+byteCount, m_data.begin());
+		std::copy(data, data + byteCount, m_data.begin());
 	}
 
 	void Texture2D::UploadToGPU() const

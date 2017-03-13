@@ -18,7 +18,7 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-    std::map<std::string, FileInfo*> FileInfo::s_nameToNode;
+	std::map<std::string, FileInfo*> FileInfo::s_nameToNode;
 
 	bool FileInfo::Create()
 	{
@@ -132,50 +132,50 @@ namespace FishEditor
 	}
 
 	void FileInfo::SetAssetRootPath(const Path &path)
-    {
-        assert(boost::filesystem::is_directory(path));
-        s_assetRoot = new FileInfo();
-        s_assetRoot->m_isDirectory = true;
-        s_assetRoot->m_parent = nullptr;
-        s_assetRoot->m_path = path;
-        //s_nameToNode[boost::filesystem::absolute(path).string()] = this;
-        s_assetRoot->BuildNodeTree(path);
-    }
+	{
+		assert(boost::filesystem::is_directory(path));
+		s_assetRoot = new FileInfo();
+		s_assetRoot->m_isDirectory = true;
+		s_assetRoot->m_parent = nullptr;
+		s_assetRoot->m_path = path;
+		//s_nameToNode[boost::filesystem::absolute(path).string()] = this;
+		s_assetRoot->BuildNodeTree(path);
+	}
 
-    FileInfo* FileInfo::fileInfo(const std::string &path)
+	FileInfo* FileInfo::fileInfo(const std::string &path)
 	{
 		FishEngine::Path p = path;
-        auto const & it = s_nameToNode.find(p.make_preferred().string());
-        if (it == FileInfo::s_nameToNode.end())
-        {
-            abort();
-        }
-        return it->second;
-    }
+		auto const & it = s_nameToNode.find(p.make_preferred().string());
+		if (it == FileInfo::s_nameToNode.end())
+		{
+			abort();
+		}
+		return it->second;
+	}
 
-    void FileInfo::UpdateThumbnailImpl(FileInfo* node)
-    {
-        if (node->m_isDirectory)
-        {
-            for (auto const & child : node->m_dirChildren)
-                UpdateThumbnailImpl(child);
-            for (auto const & child : node->m_fileChildren)
-                UpdateThumbnailImpl(child);
-        }
-        else
-        {
-            auto type = Resources::GetAssetType(node->m_path.extension());
-            if (type == AssetType::Texture)
-            {
-                node->m_hasThumbnail = true;
-            }
-        }
-    }
+	void FileInfo::UpdateThumbnailImpl(FileInfo* node)
+	{
+		if (node->m_isDirectory)
+		{
+			for (auto const & child : node->m_dirChildren)
+				UpdateThumbnailImpl(child);
+			for (auto const & child : node->m_fileChildren)
+				UpdateThumbnailImpl(child);
+		}
+		else
+		{
+			auto type = Resources::GetAssetType(node->m_path.extension());
+			if (type == AssetType::Texture)
+			{
+				node->m_hasThumbnail = true;
+			}
+		}
+	}
 
-    void FileInfo::UpdateThumbnail()
-    {
-        UpdateThumbnailImpl(s_assetRoot);
-    }
+	void FileInfo::UpdateThumbnail()
+	{
+		UpdateThumbnailImpl(s_assetRoot);
+	}
 
 
 	bool FileInfo::DeleteFile()
@@ -208,31 +208,31 @@ namespace FishEditor
 	}
 
 	// path must be a dir
-    void FileInfo::BuildNodeTree(const Path &path)
-    {
-        s_nameToNode[boost::filesystem::absolute(path).make_preferred().string()] = this;
-        for (auto& it : boost::filesystem::directory_iterator(path))
-        {
-            const Path & p = it.path();
-            if (p.extension() == ".DS_Store" || p.extension() == ".meta")
-            {
-                continue;
-            }
+	void FileInfo::BuildNodeTree(const Path &path)
+	{
+		s_nameToNode[boost::filesystem::absolute(path).make_preferred().string()] = this;
+		for (auto& it : boost::filesystem::directory_iterator(path))
+		{
+			const Path & p = it.path();
+			if (p.extension() == ".DS_Store" || p.extension() == ".meta")
+			{
+				continue;
+			}
 
-            auto fileNode = new FileInfo();
-            fileNode->m_path = p;
-            fileNode->m_parent = this;
+			auto fileNode = new FileInfo();
+			fileNode->m_path = p;
+			fileNode->m_parent = this;
 
-            if (boost::filesystem::is_directory(p))
-            {
-                m_dirChildren.emplace_back(fileNode);
-                fileNode->m_isDirectory = true;
-                fileNode->BuildNodeTree(p);
-            }
-            else
-            {
-                m_fileChildren.emplace_back(fileNode);
-                fileNode->m_isDirectory = false;
+			if (boost::filesystem::is_directory(p))
+			{
+				m_dirChildren.emplace_back(fileNode);
+				fileNode->m_isDirectory = true;
+				fileNode->BuildNodeTree(p);
+			}
+			else
+			{
+				m_fileChildren.emplace_back(fileNode);
+				fileNode->m_isDirectory = false;
 				auto relative_path = boost::filesystem::relative(p, FishEngine::Applicaiton::dataPath().parent_path());
 #if 1
 				auto ext = p.extension();
@@ -249,9 +249,9 @@ namespace FishEditor
 					auto model = AssetDatabase::LoadAssetAtPath<Prefab>(relative_path)->rootGameObject();
 				}
 #endif
-            }
-        }
-    }
+			}
+		}
+	}
 }
 
 

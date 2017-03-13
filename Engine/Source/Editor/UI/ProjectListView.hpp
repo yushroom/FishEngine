@@ -20,8 +20,8 @@ public:
 protected:
 	void ShowContexMenu(const QPoint&);
 	//virtual void mousePressEvent(QMouseEvent *event) override;
-    //virtual void dragEnterEvent(QDragEnterEvent *e) override;
-    //virtual void dragMoveEvent(QDragMoveEvent *e) override;
+	//virtual void dragEnterEvent(QDragEnterEvent *e) override;
+	//virtual void dragMoveEvent(QDragMoveEvent *e) override;
 	//virtual void dropEvent(QDropEvent *e) override;
 
 	void MakeDir();

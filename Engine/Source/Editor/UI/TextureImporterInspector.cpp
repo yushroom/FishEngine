@@ -28,7 +28,7 @@ inline UIComboBox * CreateCombox(const char* name)
 };
 
 TextureImporterInspector::TextureImporterInspector(QWidget *parent) :
-    QWidget(parent)
+	QWidget(parent)
 {
 	m_verticalLayout = new QVBoxLayout(this);
 	m_verticalLayout->setSpacing(0);

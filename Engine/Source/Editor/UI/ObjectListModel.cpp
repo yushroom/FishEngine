@@ -10,22 +10,22 @@ using namespace FishEngine;
 using namespace FishEditor;
 
 ObjectListModel::ObjectListModel(QObject *parent)
-    : QAbstractListModel(parent)
+	: QAbstractListModel(parent)
 {
-    //Debug::LogError("ObjectListModel::ObjectListModel");
+	//Debug::LogError("ObjectListModel::ObjectListModel");
 }
 
 std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 {
-    auto it = AssetImporter::s_importerGUIDToTexture.begin();
-    for (int i = 0; i < index.row(); ++i)
-        it++;
-    return it->second;
+	auto it = AssetImporter::s_importerGUIDToTexture.begin();
+	for (int i = 0; i < index.row(); ++i)
+		it++;
+	return it->second;
 }
 
 int ObjectListModel::rowCount(const QModelIndex &) const
 {
-    return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
+	return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const
@@ -36,7 +36,7 @@ QVariant ObjectListModel::data(const QModelIndex &index, int role) const
 	if (row >= rowCount() || row < 0)
 		return QVariant();
 
-    auto tex = this->object(index);
+	auto tex = this->object(index);
 	auto path = AssetDatabase::GetAssetPath(tex->GetInstanceID());
 
 	switch (role)
@@ -50,5 +50,5 @@ QVariant ObjectListModel::data(const QModelIndex &index, int role) const
 		break;
 	}
 
-    return QVariant();
+	return QVariant();
 }

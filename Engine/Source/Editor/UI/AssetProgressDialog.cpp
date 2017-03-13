@@ -2,13 +2,13 @@
 #include "ui_AssetProgressDialog.h"
 
 AssetProgressDialog::AssetProgressDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AssetProgressDialog)
+	QDialog(parent),
+	ui(new Ui::AssetProgressDialog)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 }
 
 AssetProgressDialog::~AssetProgressDialog()
 {
-    delete ui;
+	delete ui;
 }

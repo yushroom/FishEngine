@@ -23,8 +23,8 @@
 	#include "glcorearb.h"
 #endif
 #else
-    #include <OpenGL/gl3.h>
-    #include <OpenGL/gl3ext.h>
+	#include <OpenGL/gl3.h>
+	#include <OpenGL/gl3ext.h>
 #endif
 
 //#ifdef _DEBUG

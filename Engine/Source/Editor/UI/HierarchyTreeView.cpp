@@ -87,8 +87,19 @@ HierarchyTreeView::HierarchyTreeView(QWidget *parent)
 	m_menu->addSeparator();
 	action = m_menu->addAction("Rename");
 	action->setEnabled(false);
-	action = m_menu->addAction("Duplicate");
-	action->setEnabled(false);
+	m_duplicateAction = m_menu->addAction("Duplicate");
+	connect(m_duplicateAction, &QAction::triggered, [](){
+		for (auto const & t : Selection::transforms())
+		{
+			//Object::DestroyImmediate(t.lock()->gameObject());
+			CloneUtility cu;
+			auto object = t.lock()->gameObject()->Clone(cu);
+			FishEngine::GameObjectPtr go = std::dynamic_pointer_cast<GameObject>(object);
+			Scene::AddGameObject(go);
+		}
+		//Selection::setTransforms({});
+	});
+	//action->setEnabled(false);
 	m_deleteAction = m_menu->addAction("Delete");
 	connect(m_deleteAction, &QAction::triggered, [](){
 		for (auto const & t : Selection::transforms())

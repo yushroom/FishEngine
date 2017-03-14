@@ -11,6 +11,9 @@ namespace FishEngine
 	public:
 		Prefab() = default;
 		
+		Prefab(Prefab const &) = delete;
+		Prefab & operator=(Prefab const &) = delete;
+		
 		GameObjectPtr rootGameObject() const
 		{
 			return m_rootGameObject;

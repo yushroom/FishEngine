@@ -7,11 +7,14 @@
 #include "Macro.hpp"
 #include "HideFlags.hpp"
 #include "ReflectClass.hpp"
+#include "private/CloneUtility.hpp"
 
 namespace FishEngine
 {
 	class InputArchive;
 	class OutputArchive;
+	
+	class CloneUtility;
 
 	class FE_EXPORT Object
 	{
@@ -22,6 +25,9 @@ namespace FishEngine
 			static int sInstanceID = 0;
 			m_instanceID = (++sInstanceID);
 		}
+		
+		Object(Object const &) = delete;
+		Object & operator=(Object const &) = delete;
 
 		virtual ~Object() = default;
 
@@ -41,8 +47,8 @@ namespace FishEngine
 		virtual void Serialize(OutputArchive & archive) const;
 		virtual void Deserialize(InputArchive & archive);
 
-		virtual ObjectPtr Clone() const;
-		virtual void CopyValueTo(ObjectPtr & target) const;
+		virtual ObjectPtr Clone(CloneUtility & cloneUtility) const;
+		virtual void CopyValueTo(ObjectPtr & target, CloneUtility & cloneUtility) const;
 		
 		// The name of the object.
 		virtual inline std::string name() const { return m_name; }
@@ -99,16 +105,16 @@ namespace FishEngine
 	};	// end of Class Object
 
 	template<class T>
-	static std::shared_ptr<T> MakeShared()
+	inline std::shared_ptr<T> MakeShared()
 	{
 		return std::make_shared<T>();
 	}
 
 	template<>
-	static std::shared_ptr<GameObject> MakeShared();
+	std::shared_ptr<GameObject> MakeShared();
 
 	template<class T>
-	static std::shared_ptr<T>
+	std::shared_ptr<T>
 	FishEngine::Object::Instantiate(std::shared_ptr<T> const & original)
 	{
 		auto ret = MakeShared<T>();

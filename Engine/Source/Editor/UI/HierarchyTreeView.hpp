@@ -22,6 +22,7 @@ public:
 	virtual QSize sizeHint() const override;
 	
 	QAction * m_deleteAction;
+	QAction * m_duplicateAction;
 
 private slots:
 	//void UpdateHierarchyView();

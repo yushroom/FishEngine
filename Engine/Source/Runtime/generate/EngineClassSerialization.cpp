@@ -50,6 +50,7 @@
 #include "../Frustum.hpp" 
 #include "../IntVector.hpp" 
 #include "../IntVector.hpp" 
+#include "../Prefab.hpp" 
 #include "../Camera.hpp" 
 #include "../Scene.hpp" 
 #include "../MeshRenderer.hpp" 
@@ -145,6 +146,8 @@ namespace FishEngine
 		//archive.BeginClass();
 		archive << FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive << FishEngine::make_nvp("m_name", m_name); // std::string
+		archive << FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
+		archive << FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
 		//archive.EndClass();
 	}
 
@@ -153,23 +156,24 @@ namespace FishEngine
 		//archive.BeginClass(2);
 		archive >> FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
 		archive >> FishEngine::make_nvp("m_name", m_name); // std::string
+		archive >> FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
+		archive >> FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Object::Clone() const
+	FishEngine::ObjectPtr FishEngine::Object::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
-		auto ret = FishEngine::MakeShared<FishEngine::Object>();
-		FishEngine::ObjectPtr obj = ret;
-		FishEngine::CloneUtility::Clone(this->m_hideFlags, ret->m_hideFlags); // FishEngine::HideFlags
-		FishEngine::CloneUtility::Clone(this->m_name, ret->m_name); // std::string
-		return ret;
+		abort();
+		return nullptr;
 	}
 
-	void FishEngine::Object::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Object::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Object>(target);
-		FishEngine::CloneUtility::Clone(this->m_hideFlags, ptr->m_hideFlags); // FishEngine::HideFlags
-		FishEngine::CloneUtility::Clone(this->m_name, ptr->m_name); // std::string
+		cloneUtility.Clone(this->m_hideFlags, ptr->m_hideFlags); // FishEngine::HideFlags
+		cloneUtility.Clone(this->m_name, ptr->m_name); // std::string
+		cloneUtility.Clone(this->m_prefabParentObject, ptr->m_prefabParentObject); // PrefabPtr
+		cloneUtility.Clone(this->m_prefabInternal, ptr->m_prefabInternal); // PrefabPtr
 	}
 
 
@@ -194,24 +198,19 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Collider::Clone() const
+	FishEngine::ObjectPtr FishEngine::Collider::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
-		auto ret = FishEngine::MakeShared<FishEngine::Collider>();
-		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_contactOffset, ret->m_contactOffset); // float
-		FishEngine::CloneUtility::Clone(this->m_enabled, ret->m_enabled); // bool
-		FishEngine::CloneUtility::Clone(this->m_isTrigger, ret->m_isTrigger); // bool
-		return ret;
+		abort();
+		return nullptr;
 	}
 
-	void FishEngine::Collider::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Collider::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Collider>(target);
-		FishEngine::CloneUtility::Clone(this->m_contactOffset, ptr->m_contactOffset); // float
-		FishEngine::CloneUtility::Clone(this->m_enabled, ptr->m_enabled); // bool
-		FishEngine::CloneUtility::Clone(this->m_isTrigger, ptr->m_isTrigger); // bool
+		cloneUtility.Clone(this->m_contactOffset, ptr->m_contactOffset); // float
+		cloneUtility.Clone(this->m_enabled, ptr->m_enabled); // bool
+		cloneUtility.Clone(this->m_isTrigger, ptr->m_isTrigger); // bool
 	}
 
 
@@ -244,32 +243,26 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Animator::Clone() const
+	FishEngine::ObjectPtr FishEngine::Animator::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Animator>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_time, ret->m_time); // float
-		FishEngine::CloneUtility::Clone(this->m_playing, ret->m_playing); // bool
-		FishEngine::CloneUtility::Clone(this->m_playingOnce, ret->m_playingOnce); // bool
-		FishEngine::CloneUtility::Clone(this->m_playOneFrame, ret->m_playOneFrame); // bool
-		FishEngine::CloneUtility::Clone(this->m_currentFrame, ret->m_currentFrame); // int
-		FishEngine::CloneUtility::Clone(this->m_avatar, ret->m_avatar); // AvatarPtr
-		FishEngine::CloneUtility::Clone(this->m_nameToGameObject, ret->m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Animator::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Animator::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Animator>(target);
-		FishEngine::CloneUtility::Clone(this->m_time, ptr->m_time); // float
-		FishEngine::CloneUtility::Clone(this->m_playing, ptr->m_playing); // bool
-		FishEngine::CloneUtility::Clone(this->m_playingOnce, ptr->m_playingOnce); // bool
-		FishEngine::CloneUtility::Clone(this->m_playOneFrame, ptr->m_playOneFrame); // bool
-		FishEngine::CloneUtility::Clone(this->m_currentFrame, ptr->m_currentFrame); // int
-		FishEngine::CloneUtility::Clone(this->m_avatar, ptr->m_avatar); // AvatarPtr
-		FishEngine::CloneUtility::Clone(this->m_nameToGameObject, ptr->m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
+		cloneUtility.Clone(this->m_time, ptr->m_time); // float
+		cloneUtility.Clone(this->m_playing, ptr->m_playing); // bool
+		cloneUtility.Clone(this->m_playingOnce, ptr->m_playingOnce); // bool
+		cloneUtility.Clone(this->m_playOneFrame, ptr->m_playOneFrame); // bool
+		cloneUtility.Clone(this->m_currentFrame, ptr->m_currentFrame); // int
+		cloneUtility.Clone(this->m_avatar, ptr->m_avatar); // AvatarPtr
+		cloneUtility.Clone(this->m_nameToGameObject, ptr->m_nameToGameObject); // std::map<std::string, std::weak_ptr<GameObject> >
 	}
 
 
@@ -302,32 +295,26 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::CameraController::Clone() const
+	FishEngine::ObjectPtr FishEngine::CameraController::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::CameraController>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Script::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_isRotating, ret->m_isRotating); // bool
-		FishEngine::CloneUtility::Clone(this->m_lookAtMode, ret->m_lookAtMode); // bool
-		FishEngine::CloneUtility::Clone(this->m_rotateSpeed, ret->m_rotateSpeed); // float
-		FishEngine::CloneUtility::Clone(this->m_dragSpeed, ret->m_dragSpeed); // float
-		FishEngine::CloneUtility::Clone(this->m_originalPosition, ret->m_originalPosition); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_originalRotation, ret->m_originalRotation); // FishEngine::Quaternion
-		FishEngine::CloneUtility::Clone(this->m_originalScale, ret->m_originalScale); // FishEngine::Vector3
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::CameraController::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::CameraController::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Script::CopyValueTo(target);
+		FishEngine::Script::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::CameraController>(target);
-		FishEngine::CloneUtility::Clone(this->m_isRotating, ptr->m_isRotating); // bool
-		FishEngine::CloneUtility::Clone(this->m_lookAtMode, ptr->m_lookAtMode); // bool
-		FishEngine::CloneUtility::Clone(this->m_rotateSpeed, ptr->m_rotateSpeed); // float
-		FishEngine::CloneUtility::Clone(this->m_dragSpeed, ptr->m_dragSpeed); // float
-		FishEngine::CloneUtility::Clone(this->m_originalPosition, ptr->m_originalPosition); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_originalRotation, ptr->m_originalRotation); // FishEngine::Quaternion
-		FishEngine::CloneUtility::Clone(this->m_originalScale, ptr->m_originalScale); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_isRotating, ptr->m_isRotating); // bool
+		cloneUtility.Clone(this->m_lookAtMode, ptr->m_lookAtMode); // bool
+		cloneUtility.Clone(this->m_rotateSpeed, ptr->m_rotateSpeed); // float
+		cloneUtility.Clone(this->m_dragSpeed, ptr->m_dragSpeed); // float
+		cloneUtility.Clone(this->m_originalPosition, ptr->m_originalPosition); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_originalRotation, ptr->m_originalRotation); // FishEngine::Quaternion
+		cloneUtility.Clone(this->m_originalScale, ptr->m_originalScale); // FishEngine::Vector3
 	}
 
 
@@ -354,26 +341,23 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Material::Clone() const
+	FishEngine::ObjectPtr FishEngine::Material::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Material>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_shader, ret->m_shader); // ShaderPtr
-		FishEngine::CloneUtility::Clone(this->m_textures, ret->m_textures); // std::map<std::string, TexturePtr>
-		FishEngine::CloneUtility::Clone(this->m_uniforms, ret->m_uniforms); // FishEngine::ShaderUniforms
-		FishEngine::CloneUtility::Clone(this->m_properties, ret->m_properties); // std::vector<MaterialProperty>
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Material::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Material::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Material>(target);
-		FishEngine::CloneUtility::Clone(this->m_shader, ptr->m_shader); // ShaderPtr
-		FishEngine::CloneUtility::Clone(this->m_textures, ptr->m_textures); // std::map<std::string, TexturePtr>
-		FishEngine::CloneUtility::Clone(this->m_uniforms, ptr->m_uniforms); // FishEngine::ShaderUniforms
-		FishEngine::CloneUtility::Clone(this->m_properties, ptr->m_properties); // std::vector<MaterialProperty>
+		cloneUtility.Clone(this->m_shader, ptr->m_shader); // ShaderPtr
+		cloneUtility.Clone(this->m_textures, ptr->m_textures); // std::map<std::string, TexturePtr>
+		cloneUtility.Clone(this->m_uniforms, ptr->m_uniforms); // FishEngine::ShaderUniforms
+		cloneUtility.Clone(this->m_properties, ptr->m_properties); // std::vector<MaterialProperty>
 	}
 
 
@@ -421,20 +405,20 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::MeshFilter::Clone() const
+	FishEngine::ObjectPtr FishEngine::MeshFilter::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::MeshFilter>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_mesh, ret->m_mesh); // MeshPtr
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::MeshFilter::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::MeshFilter::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::MeshFilter>(target);
-		FishEngine::CloneUtility::Clone(this->m_mesh, ptr->m_mesh); // MeshPtr
+		cloneUtility.Clone(this->m_mesh, ptr->m_mesh); // MeshPtr
 	}
 
 
@@ -457,22 +441,21 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::BoxCollider::Clone() const
+	FishEngine::ObjectPtr FishEngine::BoxCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::BoxCollider>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Collider::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_center, ret->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_size, ret->m_size); // FishEngine::Vector3
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::BoxCollider::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::BoxCollider::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Collider::CopyValueTo(target);
+		FishEngine::Collider::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::BoxCollider>(target);
-		FishEngine::CloneUtility::Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_size, ptr->m_size); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_size, ptr->m_size); // FishEngine::Vector3
 	}
 
 
@@ -518,22 +501,21 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Cubemap::Clone() const
+	FishEngine::ObjectPtr FishEngine::Cubemap::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Cubemap>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Texture::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_format, ret->m_format); // FishEngine::TextureFormat
-		FishEngine::CloneUtility::Clone(this->m_mipmapCount, ret->m_mipmapCount); // uint32_t
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Cubemap::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Cubemap::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Texture::CopyValueTo(target);
+		FishEngine::Texture::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Cubemap>(target);
-		FishEngine::CloneUtility::Clone(this->m_format, ptr->m_format); // FishEngine::TextureFormat
-		FishEngine::CloneUtility::Clone(this->m_mipmapCount, ptr->m_mipmapCount); // uint32_t
+		cloneUtility.Clone(this->m_format, ptr->m_format); // FishEngine::TextureFormat
+		cloneUtility.Clone(this->m_mipmapCount, ptr->m_mipmapCount); // uint32_t
 	}
 
 
@@ -564,30 +546,25 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Shader::Clone() const
+	FishEngine::ObjectPtr FishEngine::Shader::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Shader>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_uniforms, ret->m_uniforms); // std::vector<UniformInfo>
-		FishEngine::CloneUtility::Clone(this->m_cullface, ret->m_cullface); // FishEngine::Cullface
-		FishEngine::CloneUtility::Clone(this->m_ZWrite, ret->m_ZWrite); // bool
-		FishEngine::CloneUtility::Clone(this->m_blend, ret->m_blend); // bool
-		FishEngine::CloneUtility::Clone(this->m_deferred, ret->m_deferred); // bool
-		FishEngine::CloneUtility::Clone(this->m_keywords, ret->m_keywords); // ShaderKeywords
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Shader::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Shader::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Shader>(target);
-		FishEngine::CloneUtility::Clone(this->m_uniforms, ptr->m_uniforms); // std::vector<UniformInfo>
-		FishEngine::CloneUtility::Clone(this->m_cullface, ptr->m_cullface); // FishEngine::Cullface
-		FishEngine::CloneUtility::Clone(this->m_ZWrite, ptr->m_ZWrite); // bool
-		FishEngine::CloneUtility::Clone(this->m_blend, ptr->m_blend); // bool
-		FishEngine::CloneUtility::Clone(this->m_deferred, ptr->m_deferred); // bool
-		FishEngine::CloneUtility::Clone(this->m_keywords, ptr->m_keywords); // ShaderKeywords
+		cloneUtility.Clone(this->m_uniforms, ptr->m_uniforms); // std::vector<UniformInfo>
+		cloneUtility.Clone(this->m_cullface, ptr->m_cullface); // FishEngine::Cullface
+		cloneUtility.Clone(this->m_ZWrite, ptr->m_ZWrite); // bool
+		cloneUtility.Clone(this->m_blend, ptr->m_blend); // bool
+		cloneUtility.Clone(this->m_deferred, ptr->m_deferred); // bool
+		cloneUtility.Clone(this->m_keywords, ptr->m_keywords); // ShaderKeywords
 	}
 
 
@@ -618,30 +595,25 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Texture::Clone() const
+	FishEngine::ObjectPtr FishEngine::Texture::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Texture>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_height, ret->m_height); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_width, ret->m_width); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_anisoLevel, ret->m_anisoLevel); // int
-		FishEngine::CloneUtility::Clone(this->m_dimension, ret->m_dimension); // FishEngine::TextureDimension
-		FishEngine::CloneUtility::Clone(this->m_filterMode, ret->m_filterMode); // FishEngine::FilterMode
-		FishEngine::CloneUtility::Clone(this->m_wrapMode, ret->m_wrapMode); // FishEngine::TextureWrapMode
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Texture::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Texture::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Texture>(target);
-		FishEngine::CloneUtility::Clone(this->m_height, ptr->m_height); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_width, ptr->m_width); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_anisoLevel, ptr->m_anisoLevel); // int
-		FishEngine::CloneUtility::Clone(this->m_dimension, ptr->m_dimension); // FishEngine::TextureDimension
-		FishEngine::CloneUtility::Clone(this->m_filterMode, ptr->m_filterMode); // FishEngine::FilterMode
-		FishEngine::CloneUtility::Clone(this->m_wrapMode, ptr->m_wrapMode); // FishEngine::TextureWrapMode
+		cloneUtility.Clone(this->m_height, ptr->m_height); // uint32_t
+		cloneUtility.Clone(this->m_width, ptr->m_width); // uint32_t
+		cloneUtility.Clone(this->m_anisoLevel, ptr->m_anisoLevel); // int
+		cloneUtility.Clone(this->m_dimension, ptr->m_dimension); // FishEngine::TextureDimension
+		cloneUtility.Clone(this->m_filterMode, ptr->m_filterMode); // FishEngine::FilterMode
+		cloneUtility.Clone(this->m_wrapMode, ptr->m_wrapMode); // FishEngine::TextureWrapMode
 	}
 
 
@@ -695,30 +667,25 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Rigidbody::Clone() const
+	FishEngine::ObjectPtr FishEngine::Rigidbody::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Rigidbody>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_mass, ret->m_mass); // float
-		FishEngine::CloneUtility::Clone(this->m_drag, ret->m_drag); // float
-		FishEngine::CloneUtility::Clone(this->m_angularDrag, ret->m_angularDrag); // float
-		FishEngine::CloneUtility::Clone(this->m_useGravity, ret->m_useGravity); // bool
-		FishEngine::CloneUtility::Clone(this->m_isKinematic, ret->m_isKinematic); // bool
-		FishEngine::CloneUtility::Clone(this->m_velocity, ret->m_velocity); // FishEngine::Vector3
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Rigidbody::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Rigidbody::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Rigidbody>(target);
-		FishEngine::CloneUtility::Clone(this->m_mass, ptr->m_mass); // float
-		FishEngine::CloneUtility::Clone(this->m_drag, ptr->m_drag); // float
-		FishEngine::CloneUtility::Clone(this->m_angularDrag, ptr->m_angularDrag); // float
-		FishEngine::CloneUtility::Clone(this->m_useGravity, ptr->m_useGravity); // bool
-		FishEngine::CloneUtility::Clone(this->m_isKinematic, ptr->m_isKinematic); // bool
-		FishEngine::CloneUtility::Clone(this->m_velocity, ptr->m_velocity); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_mass, ptr->m_mass); // float
+		cloneUtility.Clone(this->m_drag, ptr->m_drag); // float
+		cloneUtility.Clone(this->m_angularDrag, ptr->m_angularDrag); // float
+		cloneUtility.Clone(this->m_useGravity, ptr->m_useGravity); // bool
+		cloneUtility.Clone(this->m_isKinematic, ptr->m_isKinematic); // bool
+		cloneUtility.Clone(this->m_velocity, ptr->m_velocity); // FishEngine::Vector3
 	}
 
 
@@ -758,20 +725,20 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Component::Clone() const
+	FishEngine::ObjectPtr FishEngine::Component::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Component>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_gameObject, ret->m_gameObject); // std::weak_ptr<GameObject>
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Component::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Component::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Component>(target);
-		FishEngine::CloneUtility::Clone(this->m_gameObject, ptr->m_gameObject); // std::weak_ptr<GameObject>
+		cloneUtility.Clone(this->m_gameObject, ptr->m_gameObject); // std::weak_ptr<GameObject>
 	}
 
 
@@ -792,20 +759,20 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Behaviour::Clone() const
+	FishEngine::ObjectPtr FishEngine::Behaviour::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Behaviour>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_enabled, ret->m_enabled); // bool
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Behaviour::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Behaviour::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Behaviour>(target);
-		FishEngine::CloneUtility::Clone(this->m_enabled, ptr->m_enabled); // bool
+		cloneUtility.Clone(this->m_enabled, ptr->m_enabled); // bool
 	}
 
 
@@ -826,20 +793,20 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Skybox::Clone() const
+	FishEngine::ObjectPtr FishEngine::Skybox::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Skybox>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Behaviour::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_material, ret->m_material); // MaterialPtr
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Skybox::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Skybox::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Behaviour::CopyValueTo(target);
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Skybox>(target);
-		FishEngine::CloneUtility::Clone(this->m_material, ptr->m_material); // MaterialPtr
+		cloneUtility.Clone(this->m_material, ptr->m_material); // MaterialPtr
 	}
 
 
@@ -891,26 +858,23 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::CapsuleCollider::Clone() const
+	FishEngine::ObjectPtr FishEngine::CapsuleCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::CapsuleCollider>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Collider::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_center, ret->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_direction, ret->m_direction); // int
-		FishEngine::CloneUtility::Clone(this->m_height, ret->m_height); // float
-		FishEngine::CloneUtility::Clone(this->m_radius, ret->m_radius); // float
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::CapsuleCollider::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::CapsuleCollider::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Collider::CopyValueTo(target);
+		FishEngine::Collider::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::CapsuleCollider>(target);
-		FishEngine::CloneUtility::Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_direction, ptr->m_direction); // int
-		FishEngine::CloneUtility::Clone(this->m_height, ptr->m_height); // float
-		FishEngine::CloneUtility::Clone(this->m_radius, ptr->m_radius); // float
+		cloneUtility.Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_direction, ptr->m_direction); // int
+		cloneUtility.Clone(this->m_height, ptr->m_height); // float
+		cloneUtility.Clone(this->m_radius, ptr->m_radius); // float
 	}
 
 
@@ -957,46 +921,33 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Mesh::Clone() const
+	FishEngine::ObjectPtr FishEngine::Mesh::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Mesh>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_skinned, ret->m_skinned); // bool
-		FishEngine::CloneUtility::Clone(this->m_vertices, ret->m_vertices); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_normals, ret->m_normals); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_uv, ret->m_uv); // std::vector<Vector2>
-		FishEngine::CloneUtility::Clone(this->m_tangents, ret->m_tangents); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_triangles, ret->m_triangles); // std::vector<uint32_t>
-		FishEngine::CloneUtility::Clone(this->m_bindposes, ret->m_bindposes); // std::vector<Matrix4x4>
-		FishEngine::CloneUtility::Clone(this->m_boneNames, ret->m_boneNames); // std::vector<std::string>
-		FishEngine::CloneUtility::Clone(this->m_bones, ret->m_bones); // std::vector<std::weak_ptr<Transform> >
-		FishEngine::CloneUtility::Clone(this->m_isReadable, ret->m_isReadable); // bool
-		FishEngine::CloneUtility::Clone(this->m_uploaded, ret->m_uploaded); // bool
-		FishEngine::CloneUtility::Clone(this->m_vertexCount, ret->m_vertexCount); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_triangleCount, ret->m_triangleCount); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_bounds, ret->m_bounds); // FishEngine::Bounds
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Mesh::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Mesh::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Mesh>(target);
-		FishEngine::CloneUtility::Clone(this->m_skinned, ptr->m_skinned); // bool
-		FishEngine::CloneUtility::Clone(this->m_vertices, ptr->m_vertices); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_normals, ptr->m_normals); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_uv, ptr->m_uv); // std::vector<Vector2>
-		FishEngine::CloneUtility::Clone(this->m_tangents, ptr->m_tangents); // std::vector<Vector3>
-		FishEngine::CloneUtility::Clone(this->m_triangles, ptr->m_triangles); // std::vector<uint32_t>
-		FishEngine::CloneUtility::Clone(this->m_bindposes, ptr->m_bindposes); // std::vector<Matrix4x4>
-		FishEngine::CloneUtility::Clone(this->m_boneNames, ptr->m_boneNames); // std::vector<std::string>
-		FishEngine::CloneUtility::Clone(this->m_bones, ptr->m_bones); // std::vector<std::weak_ptr<Transform> >
-		FishEngine::CloneUtility::Clone(this->m_isReadable, ptr->m_isReadable); // bool
-		FishEngine::CloneUtility::Clone(this->m_uploaded, ptr->m_uploaded); // bool
-		FishEngine::CloneUtility::Clone(this->m_vertexCount, ptr->m_vertexCount); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_triangleCount, ptr->m_triangleCount); // uint32_t
-		FishEngine::CloneUtility::Clone(this->m_bounds, ptr->m_bounds); // FishEngine::Bounds
+		cloneUtility.Clone(this->m_skinned, ptr->m_skinned); // bool
+		cloneUtility.Clone(this->m_vertices, ptr->m_vertices); // std::vector<Vector3>
+		cloneUtility.Clone(this->m_normals, ptr->m_normals); // std::vector<Vector3>
+		cloneUtility.Clone(this->m_uv, ptr->m_uv); // std::vector<Vector2>
+		cloneUtility.Clone(this->m_tangents, ptr->m_tangents); // std::vector<Vector3>
+		cloneUtility.Clone(this->m_triangles, ptr->m_triangles); // std::vector<uint32_t>
+		cloneUtility.Clone(this->m_bindposes, ptr->m_bindposes); // std::vector<Matrix4x4>
+		cloneUtility.Clone(this->m_boneNames, ptr->m_boneNames); // std::vector<std::string>
+		cloneUtility.Clone(this->m_bones, ptr->m_bones); // std::vector<std::weak_ptr<Transform> >
+		cloneUtility.Clone(this->m_isReadable, ptr->m_isReadable); // bool
+		cloneUtility.Clone(this->m_uploaded, ptr->m_uploaded); // bool
+		cloneUtility.Clone(this->m_vertexCount, ptr->m_vertexCount); // uint32_t
+		cloneUtility.Clone(this->m_triangleCount, ptr->m_triangleCount); // uint32_t
+		cloneUtility.Clone(this->m_bounds, ptr->m_bounds); // FishEngine::Bounds
 	}
 
 
@@ -1023,26 +974,20 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Renderer::Clone() const
+	FishEngine::ObjectPtr FishEngine::Renderer::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
-		auto ret = FishEngine::MakeShared<FishEngine::Renderer>();
-		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_enabled, ret->m_enabled); // bool
-		FishEngine::CloneUtility::Clone(this->m_materials, ret->m_materials); // std::vector<MaterialPtr>
-		FishEngine::CloneUtility::Clone(this->m_shadowCastingMode, ret->m_shadowCastingMode); // FishEngine::ShadowCastingMode
-		FishEngine::CloneUtility::Clone(this->m_receiveShadows, ret->m_receiveShadows); // bool
-		return ret;
+		abort();
+		return nullptr;
 	}
 
-	void FishEngine::Renderer::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Renderer::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Renderer>(target);
-		FishEngine::CloneUtility::Clone(this->m_enabled, ptr->m_enabled); // bool
-		FishEngine::CloneUtility::Clone(this->m_materials, ptr->m_materials); // std::vector<MaterialPtr>
-		FishEngine::CloneUtility::Clone(this->m_shadowCastingMode, ptr->m_shadowCastingMode); // FishEngine::ShadowCastingMode
-		FishEngine::CloneUtility::Clone(this->m_receiveShadows, ptr->m_receiveShadows); // bool
+		cloneUtility.Clone(this->m_enabled, ptr->m_enabled); // bool
+		cloneUtility.Clone(this->m_materials, ptr->m_materials); // std::vector<MaterialPtr>
+		cloneUtility.Clone(this->m_shadowCastingMode, ptr->m_shadowCastingMode); // FishEngine::ShadowCastingMode
+		cloneUtility.Clone(this->m_receiveShadows, ptr->m_receiveShadows); // bool
 	}
 
 
@@ -1111,26 +1056,23 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::SkinnedMeshRenderer::Clone() const
+	FishEngine::ObjectPtr FishEngine::SkinnedMeshRenderer::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::SkinnedMeshRenderer>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Renderer::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_sharedMesh, ret->m_sharedMesh); // MeshPtr
-		FishEngine::CloneUtility::Clone(this->m_avatar, ret->m_avatar); // AvatarPtr
-		FishEngine::CloneUtility::Clone(this->m_rootBone, ret->m_rootBone); // std::weak_ptr<Transform>
-		FishEngine::CloneUtility::Clone(this->m_bones, ret->m_bones); // std::vector<std::weak_ptr<Transform> >
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::SkinnedMeshRenderer::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::SkinnedMeshRenderer::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Renderer::CopyValueTo(target);
+		FishEngine::Renderer::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::SkinnedMeshRenderer>(target);
-		FishEngine::CloneUtility::Clone(this->m_sharedMesh, ptr->m_sharedMesh); // MeshPtr
-		FishEngine::CloneUtility::Clone(this->m_avatar, ptr->m_avatar); // AvatarPtr
-		FishEngine::CloneUtility::Clone(this->m_rootBone, ptr->m_rootBone); // std::weak_ptr<Transform>
-		FishEngine::CloneUtility::Clone(this->m_bones, ptr->m_bones); // std::vector<std::weak_ptr<Transform> >
+		cloneUtility.Clone(this->m_sharedMesh, ptr->m_sharedMesh); // MeshPtr
+		cloneUtility.Clone(this->m_avatar, ptr->m_avatar); // AvatarPtr
+		cloneUtility.Clone(this->m_rootBone, ptr->m_rootBone); // std::weak_ptr<Transform>
+		cloneUtility.Clone(this->m_bones, ptr->m_bones); // std::vector<std::weak_ptr<Transform> >
 	}
 
 
@@ -1153,22 +1095,21 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::SphereCollider::Clone() const
+	FishEngine::ObjectPtr FishEngine::SphereCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::SphereCollider>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Collider::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_center, ret->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_radius, ret->m_radius); // float
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::SphereCollider::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::SphereCollider::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Collider::CopyValueTo(target);
+		FishEngine::Collider::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::SphereCollider>(target);
-		FishEngine::CloneUtility::Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_radius, ptr->m_radius); // float
+		cloneUtility.Clone(this->m_center, ptr->m_center); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_radius, ptr->m_radius); // float
 	}
 
 
@@ -1346,34 +1287,27 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Light::Clone() const
+	FishEngine::ObjectPtr FishEngine::Light::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Light>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Behaviour::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_type, ret->m_type); // FishEngine::LightType
-		FishEngine::CloneUtility::Clone(this->m_range, ret->m_range); // float
-		FishEngine::CloneUtility::Clone(this->m_spotAngle, ret->m_spotAngle); // float
-		FishEngine::CloneUtility::Clone(this->m_color, ret->m_color); // FishEngine::Color
-		FishEngine::CloneUtility::Clone(this->m_intensity, ret->m_intensity); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowBias, ret->m_shadowBias); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowNormalBias, ret->m_shadowNormalBias); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowNearPlane, ret->m_shadowNearPlane); // float
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Light::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Light::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Behaviour::CopyValueTo(target);
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Light>(target);
-		FishEngine::CloneUtility::Clone(this->m_type, ptr->m_type); // FishEngine::LightType
-		FishEngine::CloneUtility::Clone(this->m_range, ptr->m_range); // float
-		FishEngine::CloneUtility::Clone(this->m_spotAngle, ptr->m_spotAngle); // float
-		FishEngine::CloneUtility::Clone(this->m_color, ptr->m_color); // FishEngine::Color
-		FishEngine::CloneUtility::Clone(this->m_intensity, ptr->m_intensity); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowBias, ptr->m_shadowBias); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowNormalBias, ptr->m_shadowNormalBias); // float
-		FishEngine::CloneUtility::Clone(this->m_shadowNearPlane, ptr->m_shadowNearPlane); // float
+		cloneUtility.Clone(this->m_type, ptr->m_type); // FishEngine::LightType
+		cloneUtility.Clone(this->m_range, ptr->m_range); // float
+		cloneUtility.Clone(this->m_spotAngle, ptr->m_spotAngle); // float
+		cloneUtility.Clone(this->m_color, ptr->m_color); // FishEngine::Color
+		cloneUtility.Clone(this->m_intensity, ptr->m_intensity); // float
+		cloneUtility.Clone(this->m_shadowBias, ptr->m_shadowBias); // float
+		cloneUtility.Clone(this->m_shadowNormalBias, ptr->m_shadowNormalBias); // float
+		cloneUtility.Clone(this->m_shadowNearPlane, ptr->m_shadowNearPlane); // float
 	}
 
 
@@ -1396,22 +1330,21 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Texture2D::Clone() const
+	FishEngine::ObjectPtr FishEngine::Texture2D::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Texture2D>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Texture::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_format, ret->m_format); // FishEngine::TextureFormat
-		FishEngine::CloneUtility::Clone(this->m_mipmapCount, ret->m_mipmapCount); // uint32_t
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Texture2D::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Texture2D::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Texture::CopyValueTo(target);
+		FishEngine::Texture::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Texture2D>(target);
-		FishEngine::CloneUtility::Clone(this->m_format, ptr->m_format); // FishEngine::TextureFormat
-		FishEngine::CloneUtility::Clone(this->m_mipmapCount, ptr->m_mipmapCount); // uint32_t
+		cloneUtility.Clone(this->m_format, ptr->m_format); // FishEngine::TextureFormat
+		cloneUtility.Clone(this->m_mipmapCount, ptr->m_mipmapCount); // uint32_t
 	}
 
 
@@ -1436,24 +1369,22 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Avatar::Clone() const
+	FishEngine::ObjectPtr FishEngine::Avatar::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Avatar>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_boneToIndex, ret->m_boneToIndex); // std::map<std::string, int>
-		FishEngine::CloneUtility::Clone(this->m_indexToBone, ret->m_indexToBone); // std::map<int, std::string>
-		FishEngine::CloneUtility::Clone(this->m_matrixPalette, ret->m_matrixPalette); // std::vector<Matrix4x4>
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Avatar::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Avatar::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Avatar>(target);
-		FishEngine::CloneUtility::Clone(this->m_boneToIndex, ptr->m_boneToIndex); // std::map<std::string, int>
-		FishEngine::CloneUtility::Clone(this->m_indexToBone, ptr->m_indexToBone); // std::map<int, std::string>
-		FishEngine::CloneUtility::Clone(this->m_matrixPalette, ptr->m_matrixPalette); // std::vector<Matrix4x4>
+		cloneUtility.Clone(this->m_boneToIndex, ptr->m_boneToIndex); // std::map<std::string, int>
+		cloneUtility.Clone(this->m_indexToBone, ptr->m_indexToBone); // std::map<int, std::string>
+		cloneUtility.Clone(this->m_matrixPalette, ptr->m_matrixPalette); // std::vector<Matrix4x4>
 	}
 
 
@@ -1472,17 +1403,18 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Script::Clone() const
+	FishEngine::ObjectPtr FishEngine::Script::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Script>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Behaviour::CopyValueTo(obj);
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Script::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Script::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Behaviour::CopyValueTo(target);
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Script>(target);
 	}
 
@@ -1573,6 +1505,46 @@ namespace FishEngine
 		return archive;
 	}
 
+	// FishEngine::Prefab
+	void FishEngine::Prefab::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Object::Serialize(archive);
+		archive << FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
+		archive << FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		archive << FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
+		//archive.EndClass();
+	}
+
+	void FishEngine::Prefab::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Object::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
+		archive >> FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		archive >> FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
+		//archive.EndClass();
+	}
+
+	FishEngine::ObjectPtr FishEngine::Prefab::Clone(FishEngine::CloneUtility & cloneUtility) const
+	{
+		auto ret = FishEngine::MakeShared<FishEngine::Prefab>();
+		FishEngine::ObjectPtr obj = ret;
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
+		return ret;
+	}
+
+	void FishEngine::Prefab::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
+	{
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
+		auto ptr = std::dynamic_pointer_cast<FishEngine::Prefab>(target);
+		cloneUtility.Clone(this->m_parentPrefab, ptr->m_parentPrefab); // PrefabPtr
+		cloneUtility.Clone(this->m_rootGameObject, ptr->m_rootGameObject); // GameObjectPtr
+		cloneUtility.Clone(this->m_isPrefabParent, ptr->m_isPrefabParent); // bool
+	}
+
+
 	// FishEngine::Camera
 	void FishEngine::Camera::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
@@ -1608,38 +1580,29 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Camera::Clone() const
+	FishEngine::ObjectPtr FishEngine::Camera::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Camera>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Behaviour::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_fieldOfView, ret->m_fieldOfView); // float
-		FishEngine::CloneUtility::Clone(this->m_orthographicSize, ret->m_orthographicSize); // float
-		FishEngine::CloneUtility::Clone(this->m_aspect, ret->m_aspect); // float
-		FishEngine::CloneUtility::Clone(this->m_isAspectSet, ret->m_isAspectSet); // bool
-		FishEngine::CloneUtility::Clone(this->m_farClipPlane, ret->m_farClipPlane); // float
-		FishEngine::CloneUtility::Clone(this->m_nearClipPlane, ret->m_nearClipPlane); // float
-		FishEngine::CloneUtility::Clone(this->m_viewport, ret->m_viewport); // FishEngine::Vector4
-		FishEngine::CloneUtility::Clone(this->m_isDirty, ret->m_isDirty); // bool
-		FishEngine::CloneUtility::Clone(this->m_cameraType, ret->m_cameraType); // FishEngine::CameraType
-		FishEngine::CloneUtility::Clone(this->m_orthographic, ret->m_orthographic); // bool
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Camera::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Camera::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Behaviour::CopyValueTo(target);
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Camera>(target);
-		FishEngine::CloneUtility::Clone(this->m_fieldOfView, ptr->m_fieldOfView); // float
-		FishEngine::CloneUtility::Clone(this->m_orthographicSize, ptr->m_orthographicSize); // float
-		FishEngine::CloneUtility::Clone(this->m_aspect, ptr->m_aspect); // float
-		FishEngine::CloneUtility::Clone(this->m_isAspectSet, ptr->m_isAspectSet); // bool
-		FishEngine::CloneUtility::Clone(this->m_farClipPlane, ptr->m_farClipPlane); // float
-		FishEngine::CloneUtility::Clone(this->m_nearClipPlane, ptr->m_nearClipPlane); // float
-		FishEngine::CloneUtility::Clone(this->m_viewport, ptr->m_viewport); // FishEngine::Vector4
-		FishEngine::CloneUtility::Clone(this->m_isDirty, ptr->m_isDirty); // bool
-		FishEngine::CloneUtility::Clone(this->m_cameraType, ptr->m_cameraType); // FishEngine::CameraType
-		FishEngine::CloneUtility::Clone(this->m_orthographic, ptr->m_orthographic); // bool
+		cloneUtility.Clone(this->m_fieldOfView, ptr->m_fieldOfView); // float
+		cloneUtility.Clone(this->m_orthographicSize, ptr->m_orthographicSize); // float
+		cloneUtility.Clone(this->m_aspect, ptr->m_aspect); // float
+		cloneUtility.Clone(this->m_isAspectSet, ptr->m_isAspectSet); // bool
+		cloneUtility.Clone(this->m_farClipPlane, ptr->m_farClipPlane); // float
+		cloneUtility.Clone(this->m_nearClipPlane, ptr->m_nearClipPlane); // float
+		cloneUtility.Clone(this->m_viewport, ptr->m_viewport); // FishEngine::Vector4
+		cloneUtility.Clone(this->m_isDirty, ptr->m_isDirty); // bool
+		cloneUtility.Clone(this->m_cameraType, ptr->m_cameraType); // FishEngine::CameraType
+		cloneUtility.Clone(this->m_orthographic, ptr->m_orthographic); // bool
 	}
 
 
@@ -1673,17 +1636,18 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::MeshRenderer::Clone() const
+	FishEngine::ObjectPtr FishEngine::MeshRenderer::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::MeshRenderer>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Renderer::CopyValueTo(obj);
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::MeshRenderer::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::MeshRenderer::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Renderer::CopyValueTo(target);
+		FishEngine::Renderer::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::MeshRenderer>(target);
 	}
 
@@ -1710,31 +1674,29 @@ namespace FishEngine
 		archive >> FishEngine::make_nvp("m_localRotation", m_localRotation); // FishEngine::Quaternion
 		archive >> FishEngine::make_nvp("m_parent", m_parent); // std::weak_ptr<Transform>
 		archive >> FishEngine::make_nvp("m_children", m_children); // std::list<std::weak_ptr<Transform> >
+		MakeDirty();
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::Transform::Clone() const
+	FishEngine::ObjectPtr FishEngine::Transform::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::Transform>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Component::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_localPosition, ret->m_localPosition); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_localScale, ret->m_localScale); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_localRotation, ret->m_localRotation); // FishEngine::Quaternion
-		FishEngine::CloneUtility::Clone(this->m_parent, ret->m_parent); // std::weak_ptr<Transform>
-		FishEngine::CloneUtility::Clone(this->m_children, ret->m_children); // std::list<std::weak_ptr<Transform> >
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::Transform::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::Transform::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Component::CopyValueTo(target);
+		FishEngine::Component::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::Transform>(target);
-		FishEngine::CloneUtility::Clone(this->m_localPosition, ptr->m_localPosition); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_localScale, ptr->m_localScale); // FishEngine::Vector3
-		FishEngine::CloneUtility::Clone(this->m_localRotation, ptr->m_localRotation); // FishEngine::Quaternion
-		FishEngine::CloneUtility::Clone(this->m_parent, ptr->m_parent); // std::weak_ptr<Transform>
-		FishEngine::CloneUtility::Clone(this->m_children, ptr->m_children); // std::list<std::weak_ptr<Transform> >
+		cloneUtility.Clone(this->m_localPosition, ptr->m_localPosition); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_localScale, ptr->m_localScale); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_localRotation, ptr->m_localRotation); // FishEngine::Quaternion
+		cloneUtility.Clone(this->m_parent, ptr->m_parent); // std::weak_ptr<Transform>
+		cloneUtility.Clone(this->m_children, ptr->m_children); // std::list<std::weak_ptr<Transform> >
+		ptr->MakeDirty();
 	}
 
 
@@ -1763,28 +1725,24 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEngine::GameObject::Clone() const
+	FishEngine::ObjectPtr FishEngine::GameObject::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
 		auto ret = FishEngine::MakeShared<FishEngine::GameObject>();
 		FishEngine::ObjectPtr obj = ret;
-		FishEngine::Object::CopyValueTo(obj);
-		FishEngine::CloneUtility::Clone(this->m_components, ret->m_components); // std::list<ComponentPtr>
-		FishEngine::CloneUtility::Clone(this->m_activeSelf, ret->m_activeSelf); // bool
-		FishEngine::CloneUtility::Clone(this->m_layer, ret->m_layer); // int
-		FishEngine::CloneUtility::Clone(this->m_tagIndex, ret->m_tagIndex); // int
-		FishEngine::CloneUtility::Clone(this->m_transform, ret->m_transform); // TransformPtr
+		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
+		this->CopyValueTo(obj, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::GameObject::CopyValueTo(ObjectPtr & target) const
+	void FishEngine::GameObject::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Object::CopyValueTo(target);
+		FishEngine::Object::CopyValueTo(target, cloneUtility);
 		auto ptr = std::dynamic_pointer_cast<FishEngine::GameObject>(target);
-		FishEngine::CloneUtility::Clone(this->m_components, ptr->m_components); // std::list<ComponentPtr>
-		FishEngine::CloneUtility::Clone(this->m_activeSelf, ptr->m_activeSelf); // bool
-		FishEngine::CloneUtility::Clone(this->m_layer, ptr->m_layer); // int
-		FishEngine::CloneUtility::Clone(this->m_tagIndex, ptr->m_tagIndex); // int
-		FishEngine::CloneUtility::Clone(this->m_transform, ptr->m_transform); // TransformPtr
+		cloneUtility.Clone(this->m_components, ptr->m_components); // std::list<ComponentPtr>
+		cloneUtility.Clone(this->m_activeSelf, ptr->m_activeSelf); // bool
+		cloneUtility.Clone(this->m_layer, ptr->m_layer); // int
+		cloneUtility.Clone(this->m_tagIndex, ptr->m_tagIndex); // int
+		cloneUtility.Clone(this->m_transform, ptr->m_transform); // TransformPtr
 	}
 
 

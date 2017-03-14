@@ -19,7 +19,7 @@
 	static constexpr const char * StaticClassName() { return #T; }  \
 	virtual const std::string ClassName() const override { return StaticClassName(); } \
 	virtual int ClassID() const override { return FishEngine::ClassID<T>(); } \
-	virtual ObjectPtr Clone() const override; \
-	virtual void CopyValueTo(FishEngine::ObjectPtr & target) const override; \
+	virtual FishEngine::ObjectPtr Clone(FishEngine::CloneUtility & cloneUtility) const override; \
+	virtual void CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const override; \
 	InjectSerializationFunctions(T)
 

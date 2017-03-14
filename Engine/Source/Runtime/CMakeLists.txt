@@ -24,6 +24,9 @@ foreach (x ${Serialization_SRCS})
 endforeach ()
 SOURCE_GROUP(Serialization FILES ${Serialization_SRCS})
 
+FILE(GLOB PrivateFiles ${CMAKE_CURRENT_LIST_DIR}/private/*.*)
+SOURCE_GROUP(Private FILES ${PrivateFiles})
+
 foreach (x AssetBundle Resources)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
@@ -68,4 +71,4 @@ endforeach()
 SOURCE_GROUP(Render FILES ${Render_SRCS})
 
 
-add_library (FishEngine STATIC ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS})
+add_library (FishEngine STATIC ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})

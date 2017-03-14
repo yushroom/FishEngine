@@ -53,7 +53,7 @@ namespace FishEngine
 	class FE_EXPORT Meta(DisallowMultipleComponent) Animator : public Component
 	{
 	public:
-		InjectClassName(Animator);
+		DefineComponent(Animator);
 		
 		float m_time;   // temp
 		bool m_playing = false;

@@ -8,7 +8,7 @@ namespace FishEngine
 	class FE_EXPORT BoxCollider : public Collider
 	{
 	public:
-		InjectClassName(BoxCollider);
+		DefineComponent(BoxCollider);
 
 		BoxCollider() = default;
 		BoxCollider(const Vector3& center,

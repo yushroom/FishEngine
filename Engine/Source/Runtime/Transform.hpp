@@ -19,7 +19,7 @@ namespace FishEngine
 	class FE_EXPORT Transform : public Component
 	{
 	public:
-		InjectClassName(Transform);
+		DefineComponent(Transform);
 
 		Transform();
 
@@ -316,12 +316,12 @@ namespace FishEngine
 		TransformPtr GetChild(const size_t index);
 
 
-		std::list<std::weak_ptr<Transform>> const & children() const
+		std::list<TransformPtr> const & children() const
 		{
 			return m_children;
 		}
 		
-		std::list<std::weak_ptr<Transform>> & children()
+		std::list<TransformPtr> & children()
 		{
 			return m_children;
 		}
@@ -346,26 +346,30 @@ namespace FishEngine
 
 	private:
 		friend class FishEditor::Inspector;
+		friend class GameObject;
 		friend class Scene;
 
-		Vector3                             m_localPosition;
-		Vector3                             m_localScale;
-		Quaternion                          m_localRotation;
+		Vector3						m_localPosition;
+		Vector3						m_localScale;
+		Quaternion					m_localRotation;
+
+		Meta(NonSerializable)
+		GameObjectPtr				m_gameObjectStrongRef;
 
 		Meta(HideInInspector)
-		std::weak_ptr<Transform>            m_parent;
+		std::weak_ptr<Transform>	m_parent;
 		
 		Meta(HideInInspector)
-		std::list<std::weak_ptr<Transform>> m_children;
+		std::list<TransformPtr>		m_children;
 
 		Meta(NonSerializable)
-		mutable bool                        m_isDirty;
+		mutable bool				m_isDirty = true;
 
 		Meta(NonSerializable)
-		mutable Matrix4x4                   m_localToWorldMatrix; // localToWorld
+		mutable Matrix4x4			m_localToWorldMatrix; // localToWorld
 
 		Meta(NonSerializable)
-		mutable Matrix4x4                   m_worldToLocalMatrix; // worldToLocal
+		mutable Matrix4x4			m_worldToLocalMatrix; // worldToLocal
 
 		//bool dirtyInHierarchy() const;
 		void MakeDirty() const;

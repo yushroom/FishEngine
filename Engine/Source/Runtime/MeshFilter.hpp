@@ -8,9 +8,9 @@ namespace FishEngine
 	class FE_EXPORT MeshFilter : public Component
 	{
 	public:
-		InjectClassName(MeshFilter)
+		DefineComponent(MeshFilter)
 
-			MeshFilter() = default;
+		MeshFilter() = default;
 
 		MeshFilter(MeshPtr mesh) : m_mesh(mesh) {
 

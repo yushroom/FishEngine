@@ -42,8 +42,7 @@ namespace FishEditor
 	GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 	{
 		auto& children = root->transform()->children();
-		for (auto& c : children) {
-			const auto& g = c.lock();
+		for (auto const & g : children) {
 			//Debug::Log("Name: %s", g->name().c_str());
 			if (g->name() == name) {
 				return g->gameObject();

@@ -121,8 +121,9 @@ void Animator::RecursivelyUpdate(const GameObjectPtr& go)
 		t->setLocalToWorldMatrix(m);
 #endif
 	}
-	for (auto child : t->children()) {
-		RecursivelyUpdate(child.lock()->gameObject());
+	for (auto child : t->children())
+	{
+		RecursivelyUpdate(child->gameObject());
 	}
 }
 

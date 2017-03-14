@@ -1,7 +1,6 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "Gizmos.hpp"
-//#include "ModelImporter.hpp"
 #include "Mesh.hpp"
 #include "MeshFilter.hpp"
 #include "BoxCollider.hpp"
@@ -15,8 +14,6 @@
 
 namespace FishEngine
 {
-	//GameObject::PGameObject GameObject::m_root = std::make_shared<GameObject>("Root");
-
 	bool GameObject::activeInHierarchy() const
 	{
 		if (m_activeSelf && m_transform->parent() != nullptr)
@@ -40,7 +37,8 @@ namespace FishEngine
 	GameObjectPtr GameObject::Create()
 	{
 		auto go = std::make_shared<GameObject>();
-		go->transform()->m_gameObject = go;
+		go->m_transform->m_gameObject = go;
+		go->m_transform->m_gameObjectStrongRef = go;
 		return go;
 	}
 	
@@ -82,20 +80,6 @@ namespace FishEngine
 		return Scene::Find(name);
 	}
 
-	//ObjectPtr GameObject::Clone() const
-	//{
-	//	auto ret = std::make_shared<GameObject>(m_name);
-	//	GameObject::CopyValueTo(ret);
-	//	return ret;
-	//}
-
-//	void GameObject::CopyValueTo(ObjectPtr target) const
-//	{
-//		Object::CopyValueTo(target);
-//		auto go = std::dynamic_pointer_cast<GameObject>(target);
-//		m_transform->CopyValueTo(go->m_transform);
-//	}
-
 	void GameObject::Update()
 	{
 		m_transform->Update();
@@ -136,6 +120,31 @@ namespace FishEngine
 			Gizmos::setColor(Color::green);
 			Gizmos::setMatrix(Matrix4x4::identity);
 		}
+	}
+
+	GameObjectPtr GameObject::Clone(CloneUtility & cloneUtility)
+	{
+		auto ret = MakeShared<GameObject>();
+		cloneUtility.m_clonedObject[GetInstanceID()] = ret;
+		cloneUtility.m_clonedObject[m_transform->GetInstanceID()] = m_transform;
+		this->CopyValueTo(ret, cloneUtility);
+		return ret;
+	}
+
+	void GameObject::CopyValueTo(GameObjectPtr target, CloneUtility & cloneUtility)
+	{
+		auto destGameObject = std::dynamic_pointer_cast<FishEngine::GameObject>(target);
+		//cloneUtility.Clone(this->m_components, ptr->m_components); // std::list<ComponentPtr>
+		for (auto & component : this->m_components)
+		{
+			auto clonedComponent = std::dynamic_pointer_cast<Component>(component->Clone(cloneUtility));
+			destGameObject->AddComponent(clonedComponent);
+		}
+		destGameObject->m_activeSelf = this->m_activeSelf; // bool
+		destGameObject->m_layer = this->m_layer; // int
+		destGameObject->m_tagIndex = this->m_tagIndex; // int
+		//cloneUtility.Clone(this->m_transform, ptr->m_transform); // TransformPtr
+		this->m_transform->CopyValueTo(destGameObject->transform(), cloneUtility);
 	}
 
 	void GameObject::Start()

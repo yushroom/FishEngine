@@ -30,21 +30,6 @@ namespace FishEditor
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEditor::AssetImporter::Clone(FishEngine::CloneUtility & cloneUtility) const
-	{
-		auto ret = FishEngine::MakeShared<FishEditor::AssetImporter>();
-		FishEngine::ObjectPtr obj = ret;
-		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
-		this->CopyValueTo(obj, cloneUtility);
-		return ret;
-	}
-
-	void FishEditor::AssetImporter::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
-	{
-		FishEngine::Object::CopyValueTo(target, cloneUtility);
-		auto ptr = std::dynamic_pointer_cast<FishEditor::AssetImporter>(target);
-		cloneUtility.Clone(this->m_fileIDToRecycleName, ptr->m_fileIDToRecycleName); // std::map<int, std::string>
-	}
 
 
 	// FishEditor::ModelNode
@@ -93,24 +78,6 @@ namespace FishEditor
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEditor::ModelImporter::Clone(FishEngine::CloneUtility & cloneUtility) const
-	{
-		auto ret = FishEngine::MakeShared<FishEditor::ModelImporter>();
-		FishEngine::ObjectPtr obj = ret;
-		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
-		this->CopyValueTo(obj, cloneUtility);
-		return ret;
-	}
-
-	void FishEditor::ModelImporter::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
-	{
-		FishEditor::AssetImporter::CopyValueTo(target, cloneUtility);
-		auto ptr = std::dynamic_pointer_cast<FishEditor::ModelImporter>(target);
-		cloneUtility.Clone(this->m_fileScale, ptr->m_fileScale); // float
-		cloneUtility.Clone(this->m_importNormals, ptr->m_importNormals); // FishEditor::ModelImporterNormals
-		cloneUtility.Clone(this->m_importTangents, ptr->m_importTangents); // FishEditor::ModelImporterTangents
-		cloneUtility.Clone(this->m_materialSearch, ptr->m_materialSearch); // FishEditor::ModelImporterMaterialSearch
-	}
 
 
 	// FishEditor::ProjectSettings
@@ -200,37 +167,6 @@ namespace FishEditor
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr FishEditor::TextureImporter::Clone(FishEngine::CloneUtility & cloneUtility) const
-	{
-		auto ret = FishEngine::MakeShared<FishEditor::TextureImporter>();
-		FishEngine::ObjectPtr obj = ret;
-		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
-		this->CopyValueTo(obj, cloneUtility);
-		return ret;
-	}
-
-	void FishEditor::TextureImporter::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
-	{
-		FishEditor::AssetImporter::CopyValueTo(target, cloneUtility);
-		auto ptr = std::dynamic_pointer_cast<FishEditor::TextureImporter>(target);
-		cloneUtility.Clone(this->m_allowAlphaSplitting, ptr->m_allowAlphaSplitting); // bool
-		cloneUtility.Clone(this->m_alphaIsTransparency, ptr->m_alphaIsTransparency); // bool
-		cloneUtility.Clone(this->m_alphaSource, ptr->m_alphaSource); // FishEditor::TextureImporterAlphaSource
-		cloneUtility.Clone(this->m_anisoLevel, ptr->m_anisoLevel); // int
-		cloneUtility.Clone(this->m_borderMipmap, ptr->m_borderMipmap); // bool
-		cloneUtility.Clone(this->m_compressionQuality, ptr->m_compressionQuality); // int
-		cloneUtility.Clone(this->m_convertToNormalmap, ptr->m_convertToNormalmap); // bool
-		cloneUtility.Clone(this->m_crunchedCompression, ptr->m_crunchedCompression); // bool
-		cloneUtility.Clone(this->m_fadeout, ptr->m_fadeout); // bool
-		cloneUtility.Clone(this->m_heightmapScale, ptr->m_heightmapScale); // float
-		cloneUtility.Clone(this->m_generateCubemap, ptr->m_generateCubemap); // FishEditor::TextureImporterGenerateCubemap
-		cloneUtility.Clone(this->m_textureType, ptr->m_textureType); // FishEditor::TextureImporterType
-		cloneUtility.Clone(this->m_textureShape, ptr->m_textureShape); // FishEditor::TextureImporterShape
-		cloneUtility.Clone(this->m_textureSettings, ptr->m_textureSettings); // FishEditor::TextureSettings
-		cloneUtility.Clone(this->m_sRGBTexture, ptr->m_sRGBTexture); // bool
-		cloneUtility.Clone(this->m_isReadable, ptr->m_isReadable); // bool
-		cloneUtility.Clone(this->m_mipmapEnabled, ptr->m_mipmapEnabled); // bool
-	}
 
 
 } // namespace FishEditor

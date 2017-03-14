@@ -7,28 +7,16 @@
 
 namespace FishEngine
 {
-	Meta(NonSerializable)
-	class CloneUtility
+	class Meta(NonSerializable) CloneUtility
 	{
 	public:
 
 		CloneUtility() = default;
 
-		template<class T, std::enable_if_t<std::is_copy_assignable<T>::value, int> = 0>
+		template<class T>
 		inline void Clone(T const & source, T & dest)
 		{
 			dest = source;
-		}
-
-		template<class T>
-		void Clone(std::list<std::shared_ptr<T>> const & source, std::list<std::shared_ptr<T>> & dest)
-		{
-			static_assert(std::is_base_of<Object, T>::value, "T must be Object");
-			for (auto & object : source)
-			{
-				std::shared_ptr<T> clonedObject = std::dynamic_pointer_cast<T>( object->Clone(*this) );
-				dest.push_back(clonedObject);
-			}
 		}
 		
 		template<class T>
@@ -38,6 +26,19 @@ namespace FishEngine
 			//*dest = *source;
 			source->CopyValueTo(dest, *this);
 		}
+
+		//std::vector<std::weak_ptr<Transform>> m_bones
+		template<class T>
+		void Clone(std::vector<T> const & source, std::vector<T> & dest)
+		{
+			dest.resize(source.size());
+			for (int i = 0; i < source.size(); ++i)
+			{
+				this->Clone(source[i], dest[i]);
+			}
+		}
+
+		void Clone(std::weak_ptr<Transform> const & source, std::weak_ptr<Transform> & dest);
 		
 		void Clone(FishEngine::TransformPtr const & source, FishEngine::TransformPtr & dest);
 		
@@ -63,6 +64,6 @@ namespace FishEngine
 	//private:
 
 		// instanceID of old object -> cloned object
-		std::map<int, ObjectPtr> m_serializedObject;
+		std::map<int, ObjectPtr> m_clonedObject;
 	};
 }

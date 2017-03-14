@@ -18,7 +18,7 @@ namespace FishEngine
 	class FE_EXPORT Renderer : public Component
 	{
 	public:
-		InjectClassName(Renderer);
+		DefineComponent(Renderer);
 
 		Renderer() = default;
 

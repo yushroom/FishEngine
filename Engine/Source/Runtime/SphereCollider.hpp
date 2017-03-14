@@ -8,7 +8,7 @@ namespace FishEngine
 	class FE_EXPORT SphereCollider : public Collider
 	{
 	public:
-		InjectClassName(SphereCollider);
+		DefineComponent(SphereCollider);
 		SphereCollider() = default;
 		SphereCollider(const Vector3& center,
 					   const float raduis);

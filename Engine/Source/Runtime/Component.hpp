@@ -39,7 +39,10 @@ namespace FishEngine
 
 		//static PComponent CreateComponent(const std::string& componentClassName);
 
-		//protected:
+	protected:
+		virtual ComponentPtr Clone(CloneUtility & cloneUtility) const;
+		void CopyValueTo(ComponentPtr target, CloneUtility & cloneUtility) const;
+
 	private:
 		friend class GameObject;
 		friend class Scene;

@@ -10,7 +10,7 @@ namespace FishEngine
 	class FE_EXPORT CameraController : public Script
 	{
 	public:
-		InjectClassName(CameraController)
+		DefineComponent(CameraController)
 
 		bool m_isRotating = false;
 		bool m_lookAtMode = true;

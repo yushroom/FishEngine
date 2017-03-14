@@ -53,30 +53,30 @@ namespace ${scope}
 		//archive.EndClass();
 	}
 
-	FishEngine::ObjectPtr ${T}::Clone(FishEngine::CloneUtility & cloneUtility) const
+	%if c['isComponent'] and T != 'FishEngine::Transform':
+	FishEngine::ComponentPtr ${T}::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
-	% if T in ( 'FishEngine::Object', 'FishEngine::Renderer', 'FishEngine::Collider'):
+		% if T in ( 'FishEngine::Renderer', 'FishEngine::Collider', 'FishEngine::Transform'):
 		abort();
 		return nullptr;
-	% else:
+		% else:
 		auto ret = FishEngine::MakeShared<${T}>();
-		FishEngine::ObjectPtr obj = ret;
-		cloneUtility.m_serializedObject[this->GetInstanceID()] = obj;
-		this->CopyValueTo(obj, cloneUtility);
+		cloneUtility.m_clonedObject[this->GetInstanceID()] = ret;
+		this->CopyValueTo(ret, cloneUtility);
 		return ret;
-	% endif
+		% endif
 	}
 
-	void ${T}::CopyValueTo(FishEngine::ObjectPtr & target, FishEngine::CloneUtility & cloneUtility) const
+	void ${T}::CopyValueTo(std::shared_ptr<${T}> target, FishEngine::CloneUtility & cloneUtility) const
 	{
-	% if 'parent' in c:
+		% if 'parent' in c:
 		${c['parent']}::CopyValueTo(target, cloneUtility);
-	% endif
-		auto ptr = std::dynamic_pointer_cast<${T}>(target);
-	% for member in c['members']:
-		cloneUtility.Clone(this->${member['name']}, ptr->${member['name']}); // ${member['type']}
-	% endfor
+		% endif
+		% for member in c['members']:
+		cloneUtility.Clone(this->${member['name']}, target->${member['name']}); // ${member['type']}
+		% endfor
 	}
+	%endif
 
 % else:
 	// ${T}
@@ -117,6 +117,13 @@ def GenSerializationFunctions(classinfo, scope):
 			return False
 		return IsObject(class_info[name]['parent'])
 
+	def IsComponent(name):
+		if name == "FishEngine::Component":
+			return True
+		if 'parent' not in class_info[name]:
+			return False
+		return IsComponent(class_info[name]['parent'])
+
 	headers = []
 	ClassInfo = []
 
@@ -135,6 +142,7 @@ def GenSerializationFunctions(classinfo, scope):
 		c['members'] = [m for m in item['members'] if not m['NonSerializable']]
 		if 'parent' in item:
 			c['parent'] = item['parent']
+		c['isComponent'] = IsComponent(key)
 		ClassInfo.append(c)
 
 	return serialization_template.render(headers = headers, scope = scope, ClassInfo=ClassInfo)
@@ -153,7 +161,6 @@ classname_template_str = '''
 
 def GenComponentInheritance(class_info):
 	def IsComponent(name):
-		#print(name)
 		if name == "Component":
 			return True
 		if 'parent' not in class_info[name]:

@@ -9,7 +9,7 @@ namespace FishEngine
 	class FE_EXPORT SkinnedMeshRenderer : public Renderer
 	{
 	public:
-		InjectClassName(SkinnedMeshRenderer)
+		DefineComponent(SkinnedMeshRenderer)
 
 		SkinnedMeshRenderer() = default;
 
@@ -39,6 +39,18 @@ namespace FishEngine
 			return m_sharedMesh;
 		}
 
+		// The bones used to skin the mesh.
+		std::vector<std::weak_ptr<Transform>> & bones()
+		{
+			return m_bones;
+		}
+
+		// The bones used to skin the mesh.
+		std::vector<std::weak_ptr<Transform>> const & bones() const
+		{
+			return m_bones;
+		}
+
 		void setSharedMesh(MeshPtr sharedMesh);
 
 		virtual void OnDrawGizmosSelected() override;
@@ -57,13 +69,12 @@ namespace FishEngine
 
 		// The bones used to skin the mesh.
 		// same size with sharedMesh.bindposes
-		std::vector<std::weak_ptr<Transform>> m_bones;  // to be done
+		std::vector<std::weak_ptr<Transform>> m_bones;
 
 		Meta(NonSerializable)
-			mutable std::vector<Matrix4x4> m_matrixPalette;
+		mutable std::vector<Matrix4x4> m_matrixPalette;
 		void UpdateMatrixPalette() const;
 	};
-
 }
 
 #endif /* SkinnedMeshRenderer_hpp */

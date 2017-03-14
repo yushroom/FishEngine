@@ -145,7 +145,7 @@ void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
 
 	for (auto & child : node->children())
 	{
-		UpdateBones(child.lock());
+		UpdateBones(child);
 	}
 }
 
@@ -738,6 +738,7 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 			if (mesh->m_skinned)
 			{
 				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
+				m_model.m_skinnedMeshRenderers.push_back(srenderer);
 				srenderer->SetMaterial(Material::defaultMaterial());
 				srenderer->setSharedMesh(mesh);
 				srenderer->setAvatar(m_model.m_avatar);
@@ -865,19 +866,31 @@ PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 	m_model.m_bones.resize(m_boneCount);
 	UpdateBones(root->transform());
 
+	for (auto & renderer : m_model.m_skinnedMeshRenderers)
+	{
+		auto mesh = renderer->sharedMesh();
+		renderer->bones().reserve(mesh->m_boneNames.size());
+		//mesh->m_bindposes = m_model.m_bindposes;
+		for (auto & boneName : mesh->m_boneNames)
+		{
+			int boneId = m_model.m_avatar->m_boneToIndex[boneName];
+			renderer->bones().push_back(m_model.m_bones[boneId]);
+		}
+	}
+
 	for (auto & mesh : m_model.m_meshes)
 	{
 		AssetImporter::s_objectInstanceIDToPath[mesh->GetInstanceID()] = path;
 		if (mesh->m_skinned)
 		{
 			mesh->m_bindposes.reserve(mesh->m_boneNames.size());
-			mesh->m_bones.reserve(mesh->m_boneNames.size());
+			//mesh->m_bones.reserve(mesh->m_boneNames.size());
 			//mesh->m_bindposes = m_model.m_bindposes;
 			for (auto & boneName : mesh->m_boneNames)
 			{
 				int boneId = m_model.m_avatar->m_boneToIndex[boneName];
 				mesh->m_bindposes.push_back(m_model.m_bindposes[boneId]);
-				mesh->m_bones.push_back(m_model.m_bones[boneId]);
+				//mesh->m_bones.push_back(m_model.m_bones[boneId]);
 			}
 
 			// make sure all the weights sum to 1.
@@ -985,7 +998,7 @@ void FishEditor::FBXImporter::RecursivelyBuildFileIDToRecycleName(FishEngine::Tr
 	
 	for (auto & child : transform->children())
 	{
-		RecursivelyBuildFileIDToRecycleName(child.lock());
+		RecursivelyBuildFileIDToRecycleName(child);
 	}
 }
 

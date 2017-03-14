@@ -27,7 +27,7 @@ namespace FishEngine
 	{
 	public:
 
-		InjectClassName(Light);
+		DefineComponent(Light);
 
 		Light();
 
@@ -93,31 +93,29 @@ namespace FishEngine
 		float m_shadowNormalBias = 0.4f;
 		float m_shadowNearPlane = 0.2f;
 
-		//LayeredColorBufferPtr m_shadowMap;
+		Meta(NonSerializable)
+		LayeredDepthBufferPtr m_shadowMap;
 
 		Meta(NonSerializable)
-			LayeredDepthBufferPtr m_shadowMap;
+		RenderTargetPtr m_renderTarget;
 
 		Meta(NonSerializable)
-			RenderTargetPtr m_renderTarget;
+		Matrix4x4 m_viewMatrixForShadowMap[4];
 
 		Meta(NonSerializable)
-			Matrix4x4 m_viewMatrixForShadowMap[4];
+		Matrix4x4 m_projectMatrixForShadowMap[4];
 
 		Meta(NonSerializable)
-			Matrix4x4 m_projectMatrixForShadowMap[4];
+		Vector4 m_cascadesNear;
 
 		Meta(NonSerializable)
-			Vector4 m_cascadesNear;
+		Vector4 m_cascadesFar;
 
 		Meta(NonSerializable)
-			Vector4 m_cascadesFar;
+		Vector4 m_cascadesSplitPlaneNear;
 
 		Meta(NonSerializable)
-			Vector4 m_cascadesSplitPlaneNear;
-
-		Meta(NonSerializable)
-			Vector4 m_cascadesSplitPlaneFar;
+		Vector4 m_cascadesSplitPlaneFar;
 
 		static std::list<std::weak_ptr<Light>> m_lights;
 	};

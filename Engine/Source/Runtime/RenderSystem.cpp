@@ -141,7 +141,7 @@ namespace FishEngine
 			gameObjects.pop_front();
 			for (auto && child : go->transform()->children())
 			{
-				gameObjects.push_back(child.lock()->gameObject());
+				gameObjects.push_back(child->gameObject());
 			}
 
 			if (!go->activeInHierarchy()) continue;

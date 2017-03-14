@@ -13,7 +13,7 @@ namespace FishEngine
 	{
 	public:
 
-		InjectClassName(Skybox)
+		DefineComponent(Skybox)
 
 		MaterialPtr material()
 		{

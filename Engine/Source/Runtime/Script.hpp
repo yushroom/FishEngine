@@ -13,7 +13,7 @@ namespace FishEngine
 	{
 	public:
 
-		InjectClassName(Script)
+		DefineComponent(Script)
 
 		virtual ~Script() = default;
 

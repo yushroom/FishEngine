@@ -66,7 +66,7 @@ namespace FishEngine
 		const auto& bindposes = m_sharedMesh->bindposes();
 		for (uint32_t i = 0; i < m_matrixPalette.size(); ++i)
 		{
-			auto bone = m_sharedMesh->m_bones[i].lock();
+			auto bone = m_bones[i].lock();
 			auto& mat = m_matrixPalette[i];
 			// we multiply worldToLocal because we assume that the mesh is in local space in shader.
 			mat = worldToLocal * bone->localToWorldMatrix() * bindposes[i];

@@ -247,7 +247,7 @@ namespace FishEditor
 				auto& children = go->transform()->children();
 				for (auto& c : children)
 				{
-					selections.push_back(c.lock()->gameObject());
+					selections.push_back(c->gameObject());
 				}
 				MeshPtr mesh;
 				auto meshFilter = go->GetComponent<MeshFilter>();

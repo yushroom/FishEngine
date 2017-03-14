@@ -88,16 +88,15 @@ HierarchyTreeView::HierarchyTreeView(QWidget *parent)
 	action = m_menu->addAction("Rename");
 	action->setEnabled(false);
 	m_duplicateAction = m_menu->addAction("Duplicate");
+	
 	connect(m_duplicateAction, &QAction::triggered, [](){
+		std::list<std::weak_ptr<Transform>> duplicatedTransforms;
 		for (auto const & t : Selection::transforms())
 		{
-			//Object::DestroyImmediate(t.lock()->gameObject());
-			CloneUtility cu;
-			auto object = t.lock()->gameObject()->Clone(cu);
-			FishEngine::GameObjectPtr go = std::dynamic_pointer_cast<GameObject>(object);
-			Scene::AddGameObject(go);
+			auto go = Object::Instantiate(t.lock()->gameObject());
+			duplicatedTransforms.push_back(go->transform());
 		}
-		//Selection::setTransforms({});
+		Selection::setTransforms(duplicatedTransforms);
 	});
 	//action->setEnabled(false);
 	m_deleteAction = m_menu->addAction("Delete");
@@ -267,11 +266,14 @@ QStandardItem* CreateHierarchyItem(TransformPtr const & transform)
 	item->setData(v);
 	for (auto const & child : transform->children())
 	{
-		auto c = child.lock();
-		if (c != nullptr)
-			item->appendRow( CreateHierarchyItem(c) );
+		if (child != nullptr)
+		{
+			item->appendRow(CreateHierarchyItem(child));
+		}
 		else
+		{
 			abort();
+		}
 	}
 	return item;
 }
@@ -303,9 +305,8 @@ QStandardItem* HierarchyTreeView::UpdateHierarchyItem(QStandardItem * item, Tran
 	}
 
 	int row = 0;
-	for (auto const & child : transform->children())
+	for (auto const & child_transform : transform->children())
 	{
-		auto child_transform = child.lock();
 		if (child_transform != nullptr)
 		{
 			auto child_item = item->child(row);

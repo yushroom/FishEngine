@@ -17,7 +17,7 @@ namespace FishEngine
 	class FE_EXPORT Meta(DisallowMultipleComponent) Rigidbody : public Component
 	{
 	public:
-		InjectClassName(Rigidbody);
+		DefineComponent(Rigidbody);
 		Rigidbody() = default;
 		
 		virtual void Start() override;

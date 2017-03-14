@@ -62,13 +62,15 @@ namespace FishEngine
 	void Scene::Update()
 	{
 		// Destroy components
-		for (auto & c : m_componentsToBeDestroyed) {
+		for (auto & c : m_componentsToBeDestroyed)
+		{
 			c->gameObject()->RemoveComponent(c);
 		}
 		m_componentsToBeDestroyed.clear();
 
 		// Destroy game objects
-		for (auto& g : m_gameObjectsToBeDestroyed) {
+		for (auto& g : m_gameObjectsToBeDestroyed)
+		{
 			DestroyImmediate(g);
 		}
 		m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, game objects should be destroyed automatically.
@@ -210,7 +212,7 @@ namespace FishEngine
 			
 			for (auto & child : go->transform()->children())
 			{
-				gameObjects.push_back(child.lock()->gameObject());
+				gameObjects.push_back(child->gameObject());
 			}
 
 			bool is_skinned = false;
@@ -334,9 +336,11 @@ namespace FishEngine
 		{
 			auto c = t->m_children.back();
 			t->m_children.pop_back();
-			DestroyImmediate(c.lock()->gameObject());
+			DestroyImmediate(c->gameObject());
 		}
 		t->SetParent(nullptr);  // remove from parent
+		t->m_gameObjectStrongRef = nullptr;
+		g->m_transform = nullptr;
 		m_gameObjects.remove(g);
 	}
 

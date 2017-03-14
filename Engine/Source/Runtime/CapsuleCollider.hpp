@@ -8,7 +8,7 @@ namespace FishEngine
 	class FE_EXPORT CapsuleCollider : public Collider
 	{
 	public:
-		InjectClassName(CapsuleCollider);
+		DefineComponent(CapsuleCollider);
 		
 		CapsuleCollider() = default;
 		

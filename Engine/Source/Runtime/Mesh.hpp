@@ -43,10 +43,10 @@ namespace FishEngine
 		//};
 
 		Meta(NonSerializable)
-			int boneIndex[MaxBoneForEachVertex];
+		int boneIndex[MaxBoneForEachVertex];
 
 		Meta(NonSerializable)
-			float weight[MaxBoneForEachVertex];
+		float weight[MaxBoneForEachVertex];
 
 		BoneWeight();
 
@@ -58,7 +58,7 @@ namespace FishEngine
 	public:
 		InjectClassName(Mesh)
 
-			Mesh() = default;
+		Mesh() = default;
 		//Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer);
 		//Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices);
 		//Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices);
@@ -140,20 +140,19 @@ namespace FishEngine
 		//		std::vector<Int4>       m_boneIndexBuffer;
 		//		std::vector<Vector4>    m_boneWeightBuffer;
 
-				//std::map<std::string, int> m_boneNameToIndex;
+		//std::map<std::string, int> m_boneNameToIndex;
 
-				// The bind poses. The bind pose at each index refers to the bone with the same index.
-				// The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
+		// The bind poses. The bind pose at each index refers to the bone with the same index.
+		// The bind pose is the inverse of the transformation matrix of the bone, when the bone is in the bind pose.
 		std::vector<Matrix4x4>  m_bindposes;
 
 		std::vector<std::string> m_boneNames;	// same size with m_binposes;
-		std::vector<std::weak_ptr<Transform>> m_bones;
 
 		// The bone weights of each vertex.
 		// The size of the array is either the same as vertexCount or empty.
 		// Each vertex can be affected by up to 4 different bones.All 4 bone weights should sum up to 1.
 		Meta(NonSerializable)
-			std::vector<BoneWeight> m_boneWeights;
+		std::vector<BoneWeight> m_boneWeights;
 
 	private:
 		friend class FishEditor::Inspector;
@@ -173,28 +172,28 @@ namespace FishEngine
 		Bounds m_bounds;
 
 		Meta(NonSerializable)
-			GLuint m_VAO = 0;
+		GLuint m_VAO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_indexVBO = 0;
+		GLuint m_indexVBO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_positionVBO = 0;
+		GLuint m_positionVBO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_normalVBO = 0;
+		GLuint m_normalVBO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_uvVBO = 0;
+		GLuint m_uvVBO = 0;
 
 		Meta(NonSerializable)
 			GLuint m_tangentVBO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_boneIndexVBO = 0;
+		GLuint m_boneIndexVBO = 0;
 
 		Meta(NonSerializable)
-			GLuint m_boneWeightVBO = 0;
+		GLuint m_boneWeightVBO = 0;
 
 		//GLuint m_TFBO;              // transform feedback buffer object, for Animation
 		//GLuint m_animationOutputVAO;

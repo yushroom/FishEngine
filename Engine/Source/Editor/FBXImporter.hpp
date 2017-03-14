@@ -24,6 +24,7 @@ namespace FishEditor
 												m_boneIndicesForEachMesh;
 		std::vector<FishEngine::TransformPtr>	m_bones;
 		std::vector<FishEngine::Matrix4x4>		m_bindposes;
+		std::vector<FishEngine::SkinnedMeshRendererPtr> m_skinnedMeshRenderers;
 	};
 	
 	class Meta(NonSerializable) FBXImporter : public ModelImporter

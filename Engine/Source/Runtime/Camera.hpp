@@ -19,7 +19,7 @@ namespace FishEngine
 	class FE_EXPORT Camera : public Behaviour
 	{
 	public:
-		InjectClassName(Camera)
+		DefineComponent(Camera)
 
 		//private:
 		Camera() = default;

@@ -8,7 +8,7 @@ namespace FishEngine
 	class FE_EXPORT MeshRenderer : public Renderer
 	{
 	public:
-		InjectClassName(MeshRenderer);
+		DefineComponent(MeshRenderer);
 
 		MeshRenderer() = default;
 

@@ -11,7 +11,7 @@ namespace FishEngine
 	{
 	public:
 
-		InjectClassName(Behaviour)
+		DefineComponent(Behaviour)
 
 		virtual ~Behaviour() = default;
 

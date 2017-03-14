@@ -150,7 +150,11 @@ namespace FishEngine
 
 			if (is)
 			{
-				std::copy(data, data + 16, u.begin());
+				//std::copy(data, data + 16, u.begin());
+				for (int i = 0; i < 16; ++i)
+				{
+					u.data[i] = data[i];
+				}
 			}
 		}
 		return is;

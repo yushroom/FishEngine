@@ -46,9 +46,6 @@ namespace FishEngine
 		//InjectSerializationFunctions(Object);
 		virtual void Serialize(OutputArchive & archive) const;
 		virtual void Deserialize(InputArchive & archive);
-
-		virtual ObjectPtr Clone(CloneUtility & cloneUtility) const;
-		virtual void CopyValueTo(ObjectPtr & target, CloneUtility & cloneUtility) const;
 		
 		// The name of the object.
 		virtual inline std::string name() const { return m_name; }
@@ -76,8 +73,8 @@ namespace FishEngine
 		static void DestroyImmediate(ComponentPtr component);
 		static void DestroyImmediate(ScriptPtr script);
 
-		template<class T>
-		static std::shared_ptr<T> Instantiate(std::shared_ptr<T> const & original);
+		static GameObjectPtr Instantiate(GameObjectPtr const & original);
+		static ComponentPtr Instantiate(ComponentPtr const & original);
 		
 		// TODO: make it protected
 		PrefabPtr prefabInternal() const
@@ -92,6 +89,8 @@ namespace FishEngine
 		}
 
 	protected:
+		void CopyValueTo(FishEngine::ObjectPtr target, CloneUtility & cloneUtility) const;
+
 		// Should the object be hidden, saved with the scene or modifiable by the user?
 		HideFlags	m_hideFlags = HideFlags::None;
 		std::string m_name;
@@ -113,14 +112,8 @@ namespace FishEngine
 	template<>
 	std::shared_ptr<GameObject> MakeShared();
 
-	template<class T>
-	std::shared_ptr<T>
-	FishEngine::Object::Instantiate(std::shared_ptr<T> const & original)
-	{
-		auto ret = MakeShared<T>();
-		original->CopyValueTo(ret);
-		return ret;
-	}
+	template<>
+	std::shared_ptr<Transform> MakeShared() = delete;
 
 	inline bool operator== (Object const & lhs, Object const & rhs)
 	{ 
@@ -132,9 +125,11 @@ namespace FishEngine
 		return lhs.GetInstanceID() < rhs.GetInstanceID();
 	}
 
-
-	//template<>
-	//GameObjectPtr Object::Instantiate(GameObjectPtr const & original);
+	template<class T>
+	inline std::shared_ptr<T> As(ObjectPtr const & object)
+	{
+		return std::dynamic_pointer_cast<T>(object);
+	}
 }
 
 #endif // Object_hpp

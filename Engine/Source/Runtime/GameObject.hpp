@@ -51,7 +51,7 @@ namespace FishEngine
 			return m_layer;
 		}
 
-		void setLayer(int layer)
+		void setLayer(int layer) 
 		{
 			m_layer = layer;
 		}
@@ -155,13 +155,19 @@ namespace FishEngine
 		}
 
 	protected:
-		friend class Scene;
 		void Start();
 		void Update();
 		void OnDrawGizmos();
 		void OnDrawGizmosSelected();
 
+		GameObjectPtr Clone(CloneUtility & cloneUtility);
+		void CopyValueTo(GameObjectPtr target, CloneUtility & cloneUtility);
+
 	private:
+		friend class Object;
+		friend class Scene;
+		friend class Transform;
+		friend class CloneUtility;
 		friend class ::UIGameObjectHeader;
 		friend class FishEditor::Inspector;
 		friend class FishEditor::EditorGUI;

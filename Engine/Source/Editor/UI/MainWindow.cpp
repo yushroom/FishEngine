@@ -128,7 +128,15 @@ MainWindow::MainWindow(QWidget *parent) :
 		FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected(FishEditor::Selection::activeGameObject());
 	});
 	
-	connect(ui->actionDelete, &QAction::triggered, ui->hierarchyTreeView->m_deleteAction, &QAction::trigger);
+	connect(ui->actionDelete,
+			&QAction::triggered,
+			ui->hierarchyTreeView->m_deleteAction,
+			&QAction::trigger);
+	
+	connect(ui->actionDuplicate,
+			&QAction::triggered,
+			ui->hierarchyTreeView->m_duplicateAction,
+			&QAction::trigger);
 
 //    FishEditor::MainEditor::OnInitialized += [this](){
 //        ui->projectView->SetRootPath(FishEngine::Applicaiton::dataPath());

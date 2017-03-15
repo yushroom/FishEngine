@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
-    <height>56</height>
+    <width>268</width>
+    <height>60</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="name">
+      <widget class="QLineEdit" name="nameEdit">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>

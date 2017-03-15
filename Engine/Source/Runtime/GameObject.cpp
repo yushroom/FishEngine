@@ -1,4 +1,7 @@
 #include "GameObject.hpp"
+
+#include <deque>
+
 #include "Scene.hpp"
 #include "Gizmos.hpp"
 #include "Mesh.hpp"
@@ -124,20 +127,43 @@ namespace FishEngine
 
 	GameObjectPtr GameObject::Clone(CloneUtility & cloneUtility)
 	{
-		auto ret = MakeShared<GameObject>();
-		cloneUtility.m_clonedObject[GetInstanceID()] = ret;
-		cloneUtility.m_clonedObject[m_transform->GetInstanceID()] = m_transform;
-		this->CopyValueTo(ret, cloneUtility);
-		return ret;
+		// step 1. clone all gameobjects and transforms in the hierarchy tree
+		std::deque<TransformPtr> workingQueue;
+		workingQueue.push_back(m_transform);
+		while (!workingQueue.empty())
+		{
+			auto current = workingQueue.front();
+			workingQueue.pop_front();
+			auto clonedGameObject = MakeShared<GameObject>();
+			auto clonedTransform = clonedGameObject->m_transform;
+			cloneUtility.m_clonedObject[current->gameObject()->GetInstanceID()] = clonedGameObject;
+			cloneUtility.m_clonedObject[current->GetInstanceID()] = clonedTransform;
+			auto parentOfCurrent = current->parent();
+			if (parentOfCurrent != nullptr)
+			{
+				auto parentOfCloned = As<Transform>(cloneUtility.m_clonedObject[parentOfCurrent->GetInstanceID()]);
+				clonedTransform->SetParent(parentOfCloned, false);
+			}
+			
+			for (auto const & child : current->children())
+			{
+				workingQueue.push_back(child);
+			}
+		}
+		
+		// step 2. copy serializable data
+		auto clonedGameObject = As<GameObject>(cloneUtility.m_clonedObject[GetInstanceID()]);
+		this->CopyValueTo(clonedGameObject, cloneUtility);
+		return clonedGameObject;
 	}
 
-	void GameObject::CopyValueTo(GameObjectPtr target, CloneUtility & cloneUtility)
+	void GameObject::CopyValueTo(GameObjectPtr destGameObject, CloneUtility & cloneUtility)
 	{
-		auto destGameObject = std::dynamic_pointer_cast<FishEngine::GameObject>(target);
+		Object::CopyValueTo(destGameObject, cloneUtility);
 		//cloneUtility.Clone(this->m_components, ptr->m_components); // std::list<ComponentPtr>
 		for (auto & component : this->m_components)
 		{
-			auto clonedComponent = std::dynamic_pointer_cast<Component>(component->Clone(cloneUtility));
+			auto clonedComponent = component->Clone(cloneUtility);
 			destGameObject->AddComponent(clonedComponent);
 		}
 		destGameObject->m_activeSelf = this->m_activeSelf; // bool

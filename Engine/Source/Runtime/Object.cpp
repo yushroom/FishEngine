@@ -1,4 +1,8 @@
 #include "Object.hpp"
+
+#include <set>
+#include <boost/lexical_cast.hpp>
+
 #include "Scene.hpp"
 #include "GameObject.hpp"
 
@@ -7,18 +11,60 @@ namespace FishEngine
 
 	GameObjectPtr Object::Instantiate(GameObjectPtr const & original)
 	{
+		std::set<std::string> siblingNames;
+		
 		CloneUtility cu;
 		auto cloned = original->Clone(cu);
-		cloned->setName(original->name() + "-copy");
 		auto parent = original->transform()->parent();
 		if (parent == nullptr)
 		{
+			for (auto & go : Scene::GameObjects())
+			{
+				siblingNames.insert(go->name());
+			}
 			Scene::AddGameObject(cloned);
 		}
 		else
 		{
+			for (auto & child : parent->children())
+			{
+				siblingNames.insert(child->name());
+			}
 			cloned->transform()->SetParent( parent, false );
 		}
+		
+		int id = 1;
+		std::string name = original->name();
+		std::string prefix = name;
+		if (name[name.size()-1] == ')')
+		{
+			auto pos = name.find_last_of("(");
+			if (pos != std::string::npos)
+			{
+				prefix = name.substr(0, pos);
+				std::string strID = name.substr(pos+1, name.size()-pos-2);
+				try
+				{
+					id = boost::lexical_cast<int>(strID) + 1;
+				}
+				catch(const boost::bad_lexical_cast &)
+				{
+					id = 1;
+				}
+			}
+		}
+
+		do {
+			name = prefix + "(" + boost::lexical_cast<std::string>(id) + ")";
+			auto it = siblingNames.find(name);
+			if (it == siblingNames.end())
+			{
+				break;
+			}
+			id++;
+		} while(true);
+		
+		cloned->setName(name);
 		return cloned;
 	}
 

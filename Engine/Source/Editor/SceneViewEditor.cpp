@@ -554,7 +554,13 @@ namespace FishEditor
 
 			// solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
 			float t = solve(camera_pos, new_view_dir, lastMousePosition, axis_selected);
-			selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
+			//selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
+			auto translation = lastCenter + t*axis_selected - selectedGO->transform()->position();
+			//selectedGO->transform()->Translate(translation, Space::World);
+			for (auto & t : Selection::transforms())
+			{
+				t.lock()->Translate(translation, Space::World);
+			}
 		}
 		else if (Input::GetMouseButtonUp(0))    // end
 		{

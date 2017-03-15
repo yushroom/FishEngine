@@ -280,12 +280,6 @@ namespace FishEngine
 	void Transform::CopyValueTo(std::shared_ptr<Transform> destTransform, CloneUtility & cloneUtility) const
 	{
 		Component::CopyValueTo(destTransform, cloneUtility);
-		//cloneUtility.Clone(this->m_localPosition, target->m_localPosition); // FishEngine::Vector3
-		//cloneUtility.Clone(this->m_localScale, target->m_localScale); // FishEngine::Vector3
-		//cloneUtility.Clone(this->m_localRotation, target->m_localRotation); // FishEngine::Quaternion
-		//cloneUtility.Clone(this->m_parent, target->m_parent); // std::weak_ptr<Transform>
-		//cloneUtility.Clone(this->m_children, target->m_children); // std::list<TransformPtr>
-
 		cloneUtility.Clone(this->m_localPosition, destTransform->m_localPosition); // FishEngine::Vector3
 		cloneUtility.Clone(this->m_localScale, destTransform->m_localScale); // FishEngine::Vector3
 		cloneUtility.Clone(this->m_localRotation, destTransform->m_localRotation); // FishEngine::Quaternion
@@ -293,9 +287,12 @@ namespace FishEngine
 		//cloneUtility.Clone(this->m_children, ptr->m_children); // std::list<std::weak_ptr<Transform> >
 		for (auto & child : this->m_children)
 		{
-			auto childGameObject = child->gameObject();
-			auto clonedGameObject = childGameObject->Clone(cloneUtility);
-			clonedGameObject->transform()->SetParent(destTransform, false);
+//			auto childGameObject = child->gameObject();
+//			auto clonedGameObject = childGameObject->Clone(cloneUtility);
+//			clonedGameObject->transform()->SetParent(destTransform, false);
+			auto clonedChildGameObject = As<GameObject>(cloneUtility.m_clonedObject[child->gameObject()->GetInstanceID()]);
+			child->gameObject()->CopyValueTo( clonedChildGameObject, cloneUtility );
+			
 			//FishEngine::ObjectPtr tobj = clonedGameObject->transform();
 			//CopyValueTo(tobj, cloneUtility);
 		}

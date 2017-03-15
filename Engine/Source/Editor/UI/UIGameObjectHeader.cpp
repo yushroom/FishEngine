@@ -13,12 +13,27 @@ UIGameObjectHeader::UIGameObjectHeader(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	connect(ui->name,  &QLineEdit::editingFinished,     this, &UIGameObjectHeader::OnNameChanged);
-	connect(ui->layer, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &UIGameObjectHeader::OnLayerChanged);
-	connect(ui->tag,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &UIGameObjectHeader::OnTagChanged);
-	connect(ui->activeCheckBox, &QCheckBox::toggled,    this, &UIGameObjectHeader::OnActiveCheckBoxChanged);
-	//connect(ui->addComponentButton, SIGNAL(clicked()),   this, SLOT(OnAddComponentButtonClicked()));
 
+	
+	connect(ui->layer,
+			static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+			this,
+			&UIGameObjectHeader::OnLayerChanged);
+	
+	connect(ui->tag,
+			static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+			this,
+			&UIGameObjectHeader::OnTagChanged);
+	
+	connect(ui->activeCheckBox,
+			&QCheckBox::toggled,
+			this,
+			&UIGameObjectHeader::OnActiveCheckBoxChanged);
+	
+	connect(ui->nameEdit,
+			&QLineEdit::editingFinished,
+			this,
+			&UIGameObjectHeader::OnNameChanged);
 }
 
 UIGameObjectHeader::~UIGameObjectHeader()
@@ -53,9 +68,9 @@ void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
 	{
 		m_name = go->name();
 		LOG;
-		ui->name->blockSignals(true);
-		ui->name->setText(m_name.c_str());
-		ui->name->blockSignals(true);
+		ui->nameEdit->blockSignals(true);
+		ui->nameEdit->setText(m_name.c_str());
+		ui->nameEdit->blockSignals(false);
 	}
 
 	// update Layer items
@@ -115,7 +130,7 @@ void UIGameObjectHeader::Bind(std::shared_ptr<FishEngine::GameObject> go)
 
 void UIGameObjectHeader::OnNameChanged()
 {
-	auto name = ui->name->text().toStdString();
+	auto name = ui->nameEdit->text().toStdString();
 	if (m_name != name)
 	{
 		m_name = name;

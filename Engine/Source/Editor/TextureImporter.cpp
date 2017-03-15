@@ -370,7 +370,7 @@ namespace FishEditor
 	
 	void TextureImporter::Reimport()
 	{
-		auto texture = AssetImporter::s_importerGUIDToTexture[this->m_guid];
+		auto texture = AssetImporter::s_importerGUIDToObject[this->m_guid];
 		auto texture2d = std::dynamic_pointer_cast<Texture2D>(texture);
 		ImportTo(texture2d);
 	}

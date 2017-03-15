@@ -7,12 +7,17 @@
 
 using namespace FishEngine;
 
-void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr const & obj)
+void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr obj)
 {
 	if (obj == nullptr)
 	{
 		(*this) << nullptr;
 		return;
+	}
+
+	if (obj->prefabInternal() != nullptr && obj->prefabInternal()->parentPrefab() != nullptr)
+	{
+		obj = obj->prefabInternal();
 	}
 
 	auto instanceID = obj->GetInstanceID();
@@ -45,6 +50,18 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 			(*this) << FishEngine::make_nvp("fileID", importer->m_recycleNameToFileID[obj->name()]);
 			(*this) << FishEngine::make_nvp("guid", importer->GetGUID());
 		}
+		else if (classID == ClassID<Prefab>())
+		{
+			auto prefab = As<Prefab>(obj);
+			if (prefab->parentPrefab() != nullptr)
+			{
+				prefab = prefab->parentPrefab();
+			}
+			auto path = AssetDatabase::GetAssetPath(prefab);
+			auto importer = AssetImporter::GetAtPath(path);
+			(*this) << FishEngine::make_nvp("fileID", "100100000");
+			(*this) << FishEngine::make_nvp("guid", importer->GetGUID());
+		}
 		//else if (classID == ClassID<Material>())
 		//{
 		//	(*this) << FishEngine::make_nvp("fileID", instanceID);
@@ -69,7 +86,12 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 	bool isComponent = FishEngine::IsComponent(classID);
 	bool isGameobject = FishEngine::IsGameObject(classID);
 	bool isPrefab = obj->ClassID() == FishEngine::ClassID<FishEngine::Prefab>();
-	if (!(isComponent || isGameobject || isPrefab))
+	bool isInternalPrefab = false;
+	if (isPrefab)
+	{
+		isInternalPrefab = ! FishEngine::As<FishEngine::Prefab>(obj)->isPrefabParent();
+	}
+	if (!(isComponent || isGameobject || isInternalPrefab))
 	{
 		return;
 	}
@@ -95,29 +117,30 @@ void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr 
 
 void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
 {
-	if (object == nullptr)
-	{
-		SerializeObject_impl(object);
-	}
-	else
-	{
-		auto prefab = object->prefabInternal();
-		if (prefab == nullptr)
-		{
-			SerializeObject_impl(object);
-		}
-		else
-		{
-			if (m_serializePrefab)
-			{
-				SerializeObject_impl(object);
-			}
-			else
-			{
-				SerializeObject_impl(prefab);
-			}
-		}
-	}
+	//if (object == nullptr)
+	//{
+	//	SerializeObject_impl(object);
+	//}
+	//else
+	//{
+	//	auto prefab = object->prefabInternal();
+	//	if (prefab == nullptr)
+	//	{
+	//		SerializeObject_impl(object);
+	//	}
+	//	else
+	//	{
+	//		if (m_serializePrefab)
+	//		{
+	//			SerializeObject_impl(object);
+	//		}
+	//		else
+	//		{
+	//			SerializeObject_impl(prefab);
+	//		}
+	//	}
+	//}
+	SerializeObject_impl(object);
 	while (!m_objectsToBeSerialized.empty() && !m_isInsideDoc)
 	{
 		auto item = m_objectsToBeSerialized.front();

@@ -4,6 +4,7 @@
 #include "UIBool.hpp"
 #include "UIComboBox.hpp"
 #include "UIRevertApplyButtons.hpp"
+#include "UIFloat.hpp"
 
 #include <QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
@@ -41,6 +42,8 @@ ModelImporterInspector::ModelImporterInspector(QWidget *parent) : QWidget(parent
 	
 	m_verticalLayout->addWidget(m_assetHeader);
 	
+	m_fileScaleEdit = new UIFloat("File Scale", 0.0f, this);
+	m_verticalLayout->addWidget(m_fileScaleEdit);
 	m_normalsCombox = CreateCombox<decltype(ModelImporter::m_importNormals)>("Normals");
 	m_verticalLayout->addWidget(m_normalsCombox);
 	m_tangentsCombox = CreateCombox<decltype(ModelImporter::m_importTangents)>("Tangents");
@@ -55,6 +58,13 @@ ModelImporterInspector::ModelImporterInspector(QWidget *parent) : QWidget(parent
 	m_verticalLayout->addItem(verticalSpacer);
 	
 	m_cachedImporter = std::make_unique<ModelImporter>();
+
+	connect(m_fileScaleEdit,
+			&UIFloat::ValueChanged,
+			[this](float value) {
+				m_cachedImporter->m_fileScale = value;
+				this->SetDirty(true);
+			});
 	
 	connect(m_normalsCombox,
 			&UIComboBox::OnValueChanged,
@@ -124,6 +134,7 @@ void ModelImporterInspector::Bind(std::shared_ptr<FishEditor::ModelImporter> con
 		m_assetHeader->SetIcon(icon);
 		
 		*m_cachedImporter = *m_importer;
+		m_fileScaleEdit->SetValue(m_cachedImporter->m_fileScale);
 		int index = FishEngine::EnumToIndex(m_cachedImporter->m_importNormals);
 		m_normalsCombox->SetValue(index);
 		index = FishEngine::EnumToIndex(m_cachedImporter->m_importTangents);

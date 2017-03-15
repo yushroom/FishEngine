@@ -58,8 +58,25 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 	return false;
 }
 
+void UIFloat::SetValue(float value)
+{
+	if (m_value != value)
+	{
+		//if (!ui->value->hasFocus())
+		//{
+			Debug::Log("[float] new value");
+			LOG;
+			m_value = value;
+			//ui->value->blockSignals(true);
+			ui->value->setValue(m_value);
+			//ui->value->blockSignals(false);
+		//}
+	}
+}
+
 void UIFloat::OnValueChanged(float f)
 {
 	m_value = f;
 	m_changed = true;
+	emit ValueChanged(f);
 }

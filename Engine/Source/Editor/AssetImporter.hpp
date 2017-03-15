@@ -5,7 +5,6 @@
 #include <Object.hpp>
 #include <Resources.hpp>
 #include <ReflectClass.hpp>
-//#include <boost/uuid/uuid.hpp>
 #include <GUID.hpp>
 
 namespace FishEditor
@@ -98,13 +97,14 @@ namespace FishEditor
 		Meta(NonSerializable)
 		std::map<std::string, int>		m_recycleNameToFileID;
 
-		Meta(NonSerializable)
-		int								m_nextNodeFileID = 100000;
+		//Meta(NonSerializable)
+		//int								m_nextNodeFileID = 100000;
 		
 
 	public:
-		static std::map<FishEngine::GUID, FishEngine::TexturePtr> s_importerGUIDToTexture;
-		static std::map<FishEngine::GUID, FishEngine::PrefabPtr> s_importerGUIDToModel;
+		//static std::map<FishEngine::GUID, FishEngine::TexturePtr> s_importerGUIDToTexture;
+		//static std::map<FishEngine::GUID, FishEngine::GameObjectPtr> s_importerGUIDToGameObject;
+		static std::map<FishEngine::GUID, FishEngine::ObjectPtr> s_importerGUIDToObject;
 		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
 		static std::map<int, boost::filesystem::path> s_objectInstanceIDToPath;
 	};

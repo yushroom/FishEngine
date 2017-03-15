@@ -36,6 +36,12 @@ namespace FishEngine
 	{
 		m_name = name;
 	}
+
+
+	GameObject::~GameObject()
+	{
+		//Debug::Log("GameObject::~GameObject: %s", m_name.c_str());
+	}
 	
 	GameObjectPtr GameObject::Create()
 	{
@@ -44,7 +50,7 @@ namespace FishEngine
 		go->m_transform->m_gameObjectStrongRef = go;
 		return go;
 	}
-	
+
 	std::string const & GameObject::tag() const
 	{
 		return TagManager::IndexToTag(m_tagIndex);

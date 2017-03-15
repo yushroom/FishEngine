@@ -12,8 +12,8 @@ namespace FishEngine
 
 	Transform::~Transform()
 	{
+		//Debug::Log("Transform::~Transform: %s", name().c_str());
 		m_children.clear();
-		//Debug::Log("~Transform");
 		SetParent(nullptr); // remove from parent
 		//for (auto child : m_children) {
 		//}

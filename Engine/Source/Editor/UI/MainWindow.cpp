@@ -43,7 +43,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 	
 	ui->setupUi(this);
-	//this->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
+#if FISHENGINE_PLATFORM_WINDOWS
+	ui->actionDelete->setShortcut(QApplication::translate("MainWindow", "Delete", Q_NULLPTR));
+#endif
 
 	ui->sceneView->setFocus();
 

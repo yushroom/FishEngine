@@ -19,6 +19,7 @@ class UIAssetHeader;
 class UIComboBox;
 class UIBool;
 class UIRevertApplyButtons;
+class UIFloat;
 
 class ModelImporterInspector : public QWidget
 {
@@ -44,6 +45,7 @@ private:
 	QVBoxLayout		* m_verticalLayout;
 	UIAssetHeader	* m_assetHeader;
 	
+	UIFloat			* m_fileScaleEdit;
 	UIComboBox		* m_normalsCombox;
 	UIComboBox		* m_tangentsCombox;
 	UIComboBox		* m_materialSearchCombox;

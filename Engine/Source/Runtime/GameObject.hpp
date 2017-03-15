@@ -30,7 +30,7 @@ namespace FishEngine
 		static GameObjectPtr Create();
 		
 	public:
-		~GameObject() = default;
+		~GameObject();
 
 		/************************************************************************/
 		/*                            Variables                                 */

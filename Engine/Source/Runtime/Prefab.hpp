@@ -23,13 +23,16 @@ namespace FishEngine
 		{
 			m_rootGameObject = root;
 		}
-		
-		void CreateInstance() const;
-		
+
 		// TODO: make it protected
-		bool prefabParent() const
+		bool isPrefabParent() const
 		{
 			return m_isPrefabParent;
+		}
+
+		PrefabPtr parentPrefab() const
+		{
+			return m_parentPrefab;
 		}
 		
 		// TODO: make it protected
@@ -39,6 +42,7 @@ namespace FishEngine
 		}
 	
 	private:
+		friend class Object;
 		PrefabPtr		m_parentPrefab;
 		GameObjectPtr	m_rootGameObject;
 		bool			m_isPrefabParent = false;

@@ -9,6 +9,7 @@
 #include "FBXImporter.hpp"
 
 #include "AssetArchive.hpp"
+#include "SceneArchive.hpp"
 
 #include <boost/uuid/uuid_generators.hpp>
 
@@ -17,6 +18,10 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
+	std::map<FishEngine::GUID, FishEngine::ObjectPtr> AssetImporter::s_importerGUIDToObject;
+	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
+	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
+
 	AssetImporter::AssetImporter()
 		: m_guid(boost::uuids::random_generator()())
 	{
@@ -87,31 +92,32 @@ namespace FishEditor
 		auto type = Resources::GetAssetType(ext);
 		if (type == AssetType::Texture)
 		{
-			//Timer t(path.string());
 			auto importer = GetAssetImporter<TextureImporter>(path);
-			//auto tex = importer->FromFile(path);
-			//t.StopAndPrint();
 			s_pathToImpoter[path] = importer;
 			//Timer t(path.string());
 			auto texture = importer->Import(path);
 			texture->setName(path.stem().string());
 			s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
-			s_importerGUIDToTexture[importer->GetGUID()] = texture;
+			s_importerGUIDToObject[importer->GetGUID()] = texture;
 			//t.StopAndPrint();
-			//return importer;
 			ret = importer;
 		}
 		else if (ext == ".fbx" || ext == ".FBX")
 		{
-			//auto importer = std::make_shared<FBXImporter>();
 			auto importer = GetAssetImporter<FBXImporter>(path);
 			s_pathToImpoter[path] = importer;
-			auto model = importer->Load(path);
-			model->setName(path.stem().string());
-			s_objectInstanceIDToPath[model->GetInstanceID()] = path;
-			s_importerGUIDToModel[importer->GetGUID()] = model;
-			//return importer;
+			auto modelPrefab = importer->Load(path);
+			modelPrefab->setName(path.stem().string());
+			modelPrefab->rootGameObject()->setName(path.stem().string());
+			s_objectInstanceIDToPath[modelPrefab->GetInstanceID()] = path;
+			s_objectInstanceIDToPath[modelPrefab->rootGameObject()->GetInstanceID()] = path;
+			s_importerGUIDToObject[importer->GetGUID()] = modelPrefab->rootGameObject();
 			ret = importer;
+
+			std::ofstream fout(path.string() + ".prefab");
+			FishEditor::SceneOutputArchive archive(fout);
+			archive.setSerializePrefab(true);
+			archive << modelPrefab;
 		}
 
 		if (ret != nullptr && ret->m_assetTimeStamp == 0)	// if the .meta file is newly created
@@ -126,15 +132,5 @@ namespace FishEditor
 
 		return ret;
 	}
-
-
-	std::map<GUID, FishEngine::PrefabPtr> AssetImporter::s_importerGUIDToModel;
-
-	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
-
-	std::map<GUID, TexturePtr> AssetImporter::s_importerGUIDToTexture;
-
-	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
-
 }
 

@@ -5,16 +5,25 @@
 
 #include "Scene.hpp"
 #include "GameObject.hpp"
+#include "Prefab.hpp"
 
 namespace FishEngine
 {
 
 	GameObjectPtr Object::Instantiate(GameObjectPtr const & original)
 	{
-		std::set<std::string> siblingNames;
-		
 		CloneUtility cu;
-		auto cloned = original->Clone(cu);
+		GameObjectPtr cloned;
+		if (original->m_prefabInternal != nullptr && original->m_prefabInternal->m_rootGameObject == original)
+		{
+			cloned = Instantiate(original->m_prefabInternal)->m_rootGameObject;
+		}
+		else
+		{
+			cloned = original->Clone(cu);
+		}
+
+		std::set<std::string> siblingNames;
 		auto parent = original->transform()->parent();
 		if (parent == nullptr)
 		{
@@ -54,29 +63,48 @@ namespace FishEngine
 			}
 		}
 
-		do {
-			name = prefix + "(" + boost::lexical_cast<std::string>(id) + ")";
-			auto it = siblingNames.find(name);
-			if (it == siblingNames.end())
-			{
-				break;
-			}
-			id++;
-		} while(true);
+		auto findResult = siblingNames.find(name);
+		if (findResult != siblingNames.end())
+		{
+			do {
+				name = prefix + "(" + boost::lexical_cast<std::string>(id) + ")";
+				auto it = siblingNames.find(name);
+				if (it == siblingNames.end())
+				{
+					break;
+				}
+				id++;
+			} while (true);
+		}
 		
 		cloned->setName(name);
 		return cloned;
 	}
 
-	ComponentPtr Object::Instantiate(ComponentPtr const & original)
+	//ComponentPtr Object::Instantiate(ComponentPtr const & original)
+	//{
+	//	abort();
+	//	return nullptr;
+	//}
+
+	FishEngine::PrefabPtr Object::Instantiate(PrefabPtr const & original)
 	{
-		abort();
-		return nullptr;
+		CloneUtility cloneUtility;
+		auto instance = std::make_shared<Prefab>();
+		instance->m_isPrefabParent = false;
+		instance->m_parentPrefab = original->m_rootGameObject->prefabInternal();
+		while (instance->m_parentPrefab->m_parentPrefab != nullptr)
+		{
+			instance->m_parentPrefab = instance->m_parentPrefab->m_parentPrefab;
+		}
+		cloneUtility.m_clonedObject[original->GetInstanceID()] = instance;
+		instance->m_rootGameObject = original->m_rootGameObject->Clone(cloneUtility);
+		return instance;
 	}
 
 	void Object::CopyValueTo(ObjectPtr target, CloneUtility & cloneUtility) const
 	{
-		cloneUtility.Clone(this->m_hideFlags, target->m_hideFlags); // FishEngine::HideFlags
+		cloneUtility.Clone(this->m_objectHideFlags, target->m_objectHideFlags); // FishEngine::HideFlags
 		cloneUtility.Clone(this->m_name, target->m_name); // std::string
 		cloneUtility.Clone(this->m_prefabParentObject, target->m_prefabParentObject); // PrefabPtr
 		cloneUtility.Clone(this->m_prefabInternal, target->m_prefabInternal); // PrefabPtr
@@ -84,7 +112,6 @@ namespace FishEngine
 
 	void Object::Destroy(GameObjectPtr obj, const float t /*= 0.0f*/)
 	{
-		
 		Scene::Destroy(obj, t);
 	}
 

@@ -52,8 +52,8 @@ namespace FishEngine
 		inline void setName(const std::string& name) { m_name = name; }
 
 		// Should the object be hidden, saved with the scene or modifiable by the user ?
-		inline HideFlags hideFlags() const { return m_hideFlags; }
-		inline void setHideFlags(HideFlags hideFlags) { m_hideFlags = hideFlags; }
+		inline HideFlags hideFlags() const { return m_objectHideFlags; }
+		inline void setHideFlags(HideFlags hideFlags) { m_objectHideFlags = hideFlags; }
 
 		inline int GetInstanceID() const
 		{
@@ -75,11 +75,17 @@ namespace FishEngine
 
 		static GameObjectPtr Instantiate(GameObjectPtr const & original);
 		static ComponentPtr Instantiate(ComponentPtr const & original);
+		static PrefabPtr Instantiate(PrefabPtr const & original);
 		
 		// TODO: make it protected
 		PrefabPtr prefabInternal() const
 		{
 			return m_prefabInternal;
+		}
+
+		PrefabPtr prefabParentObject() const
+		{
+			return m_prefabParentObject;
 		}
 		
 		// TODO: make it protected
@@ -92,7 +98,7 @@ namespace FishEngine
 		void CopyValueTo(FishEngine::ObjectPtr target, CloneUtility & cloneUtility) const;
 
 		// Should the object be hidden, saved with the scene or modifiable by the user?
-		HideFlags	m_hideFlags = HideFlags::None;
+		HideFlags	m_objectHideFlags = HideFlags::None;
 		std::string m_name;
 		
 		PrefabPtr	m_prefabParentObject;

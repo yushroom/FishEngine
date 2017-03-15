@@ -17,15 +17,17 @@ ObjectListModel::ObjectListModel(QObject *parent)
 
 std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 {
-	auto it = AssetImporter::s_importerGUIDToTexture.begin();
-	for (int i = 0; i < index.row(); ++i)
-		it++;
-	return it->second;
+	//auto it = AssetImporter::s_importerGUIDToTexture.begin();
+	//for (int i = 0; i < index.row(); ++i)
+	//	it++;
+	//return it->second;
+	return nullptr;
 }
 
 int ObjectListModel::rowCount(const QModelIndex &) const
 {
-	return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
+	//return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
+	return 0;
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const

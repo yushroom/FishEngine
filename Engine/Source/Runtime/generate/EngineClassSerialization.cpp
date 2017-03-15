@@ -144,7 +144,7 @@ namespace FishEngine
 	void FishEngine::Object::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		//archive.BeginClass();
-		archive << FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
+		archive << FishEngine::make_nvp("m_objectHideFlags", m_objectHideFlags); // FishEngine::HideFlags
 		archive << FishEngine::make_nvp("m_name", m_name); // std::string
 		archive << FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
 		archive << FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
@@ -154,7 +154,7 @@ namespace FishEngine
 	void FishEngine::Object::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		//archive.BeginClass(2);
-		archive >> FishEngine::make_nvp("m_hideFlags", m_hideFlags); // FishEngine::HideFlags
+		archive >> FishEngine::make_nvp("m_objectHideFlags", m_objectHideFlags); // FishEngine::HideFlags
 		archive >> FishEngine::make_nvp("m_name", m_name); // std::string
 		archive >> FishEngine::make_nvp("m_prefabParentObject", m_prefabParentObject); // PrefabPtr
 		archive >> FishEngine::make_nvp("m_prefabInternal", m_prefabInternal); // PrefabPtr
@@ -637,7 +637,7 @@ namespace FishEngine
 	void FishEngine::Component::CopyValueTo(std::shared_ptr<FishEngine::Component> target, FishEngine::CloneUtility & cloneUtility) const
 	{
 		FishEngine::Object::CopyValueTo(target, cloneUtility);
-		//cloneUtility.Clone(this->m_gameObject, target->m_gameObject); // std::weak_ptr<GameObject>
+		cloneUtility.Clone(this->m_gameObject, target->m_gameObject); // std::weak_ptr<GameObject>
 	}
 
 
@@ -1332,7 +1332,8 @@ namespace FishEngine
 		//archive.BeginClass();
 		FishEngine::Object::Serialize(archive);
 		archive << FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
-		archive << FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		if (m_isPrefabParent)
+			archive << FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
 		archive << FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
 		//archive.EndClass();
 	}
@@ -1342,7 +1343,8 @@ namespace FishEngine
 		//archive.BeginClass(2);
 		FishEngine::Object::Deserialize(archive);
 		archive >> FishEngine::make_nvp("m_parentPrefab", m_parentPrefab); // PrefabPtr
-		archive >> FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
+		if (m_isPrefabParent)
+			archive >> FishEngine::make_nvp("m_rootGameObject", m_rootGameObject); // GameObjectPtr
 		archive >> FishEngine::make_nvp("m_isPrefabParent", m_isPrefabParent); // bool
 		//archive.EndClass();
 	}

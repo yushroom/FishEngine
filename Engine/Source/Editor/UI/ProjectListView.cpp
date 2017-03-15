@@ -9,7 +9,6 @@
 #include <QDir>
 
 #include "ProjectViewFileModel.hpp"
-//#include "Serialization.hpp"
 //#include "GameObject.hpp"
 
 #include <Debug.hpp>
@@ -72,8 +71,13 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	//connect(action, &QAction::triggered, []() { CreatePrimitive(PrimitiveType::Cube); });
 	m_actionOpen = m_menu->addAction("Open");
 	m_actionDelete = m_menu->addAction("Delete");
-	m_actionMoveToScene = m_menu->addAction("Instance in scene");
-	m_actionMoveToScene->setEnabled(false);
+	m_actionMoveToScene = m_menu->addAction("Instantiate in scene");
+	//connect(
+	//	m_actionMoveToScene,
+	//	&QAction::triggered,
+	//	this,
+	//	);
+	//m_actionMoveToScene->setEnabled(false);
 	//action->setEnabled(false);
 
 	setContextMenuPolicy(Qt::CustomContextMenu);

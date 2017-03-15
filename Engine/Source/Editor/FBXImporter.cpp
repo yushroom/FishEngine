@@ -13,8 +13,6 @@
 #include "AssetDataBase.hpp"
 #include "private/RawMesh.hpp"
 
-#include "SceneArchive.hpp"
-
 using namespace FishEngine;
 
 
@@ -948,11 +946,6 @@ PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 	{
 		BuildFileIDToRecycleName();
 	}
-	
-	std::ofstream fout(path.string() + ".prefab");
-	FishEditor::SceneOutputArchive archive(fout);
-	archive.setSerializePrefab(true);
-	archive << m_model.m_modelPrefab;
 	
 	return m_model.m_modelPrefab;
 }

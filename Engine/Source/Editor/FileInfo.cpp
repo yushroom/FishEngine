@@ -3,6 +3,7 @@
 #include "AssetImporter.hpp"
 #include "TextureImporter.hpp"
 #include "AssetDataBase.hpp"
+#include "GameObject.hpp"
 
 #include <Application.hpp>
 #include <Debug.hpp>
@@ -246,7 +247,7 @@ namespace FishEditor
 				}
 				else if (ext == ".fbx" || ext == ".FBX")
 				{
-					auto model = AssetDatabase::LoadAssetAtPath<Prefab>(relative_path)->rootGameObject();
+					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(relative_path);
 				}
 #endif
 			}

@@ -66,7 +66,7 @@ namespace FishEditor
 
 	private:
 
-		void SerializeObject_impl(FishEngine::ObjectPtr const & obj);
+		void SerializeObject_impl(FishEngine::ObjectPtr obj);
 
 		std::map<int, int> m_serialized;	// instanceID to fileID
 		std::deque<std::pair<int, std::shared_ptr<FishEngine::Object>>> m_objectsToBeSerialized; // fileID

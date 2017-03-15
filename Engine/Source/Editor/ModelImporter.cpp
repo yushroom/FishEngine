@@ -572,7 +572,7 @@ namespace FishEditor
 			std::istringstream sin(guid);
 			//using namespace boost::uuids;
 			sin >> importer->m_guid;
-			std::cout << importer->m_guid;
+			//std::cout << importer->m_guid;
 			auto meshName = mesh->name();
 			importer->m_fileIDToRecycleName[fileID] = meshName;
 			importer->m_recycleNameToFileID[meshName] = fileID;
@@ -678,6 +678,7 @@ namespace FishEditor
 	
 	ModelImporter& ModelImporter::operator=(ModelImporter const & rhs)
 	{
+		m_fileScale = rhs.m_fileScale;
 		m_importNormals = rhs.m_importNormals;
 		m_importTangents = rhs.m_importTangents;
 		m_materialSearch = rhs.m_materialSearch;

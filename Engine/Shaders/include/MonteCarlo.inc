@@ -11,9 +11,9 @@ float3 TangentToWorld( float3 Vec, float3 TangentZ )
 
 float2 Hammersley( uint Index, uint NumSamples, uint2 Random )
 {
-    float E1 = frac( float(Index) / NumSamples + float( Random.x & uint(0xffff) ) / (1<<16) );
-    float E2 = float( ReverseBits32(Index) ^ Random.y ) * 2.3283064365386963e-10;
-    return float2( E1, E2 );
+	float E1 = frac( float(Index) / NumSamples + float( Random.x & uint(0xffff) ) / (1<<16) );
+	float E2 = float( ReverseBits32(Index) ^ Random.y ) * 2.3283064365386963e-10;
+	return float2( E1, E2 );
 }
 
 float4 CosineSampleHemisphere( float2 E )

@@ -9,15 +9,15 @@ uniform float Specular;
 
 vec4 ps_main(SurfaceData surfaceData)
 {
-    vec4 outColor = vec4(0, 0, 0, 1);
-    vec3 L = surfaceData.L;
-    vec3 V = surfaceData.V;
-    vec3 N = surfaceData.N;
-    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
-    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
-    uint2 seed = uint2(uint(abs(31010367 * surfaceData.uv.y)), uint(abs(10103671 * surfaceData.uv.x)));
-    seed = ScrambleTEA(seed);
-    outColor.rgb += SpecularIBL(seed, SpecularColor, Roughness, N, V);
-    outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
-    return outColor;
+	vec4 outColor = vec4(0, 0, 0, 1);
+	vec3 L = surfaceData.L;
+	vec3 V = surfaceData.V;
+	vec3 N = surfaceData.N;
+	vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
+	vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
+	uint2 seed = uint2(uint(abs(31010367 * surfaceData.uv.y)), uint(abs(10103671 * surfaceData.uv.x)));
+	seed = ScrambleTEA(seed);
+	outColor.rgb += SpecularIBL(seed, SpecularColor, Roughness, N, V);
+	outColor.rgb += DiffuseIBL(seed, DiffuseColor, Roughness, N, V);
+	return outColor;
 }

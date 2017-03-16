@@ -37,7 +37,7 @@ namespace FishEditor
 		
 	protected:
 		void ImportTo(FishEngine::GameObjectPtr & model);
-		//virtual void Reimport() override;
+		virtual void Reimport() override;
 		
 		void RecursivelyBuildFileIDToRecycleName(FishEngine::TransformPtr const & transform);
 		virtual void BuildFileIDToRecycleName() override;

@@ -8,9 +8,9 @@
 
 	void vs_main(AppData appdata)
 	{
-	    gl_Position = MATRIX_MVP * appdata.position;
-	    mat3 normalMatrix = mat3(MATRIX_IT_M);
-	    vs_out.normal = normalize(vec3(MATRIX_VP * vec4(normalMatrix*appdata.normal, 0.0)));
+		gl_Position = MATRIX_MVP * appdata.position;
+		mat3 normalMatrix = mat3(MATRIX_IT_M);
+		vs_out.normal = normalize(vec3(MATRIX_VP * vec4(normalMatrix*appdata.normal, 0.0)));
 	}
 }
 
@@ -26,18 +26,18 @@
 	const float MAGNITUDE = 0.01f;
 
 	void GenerateLine(int index) {
-	    gl_Position = gl_in[index].gl_Position;
-	    EmitVertex();
-	    gl_Position = gl_in[index].gl_Position + vec4(gs_in[index].normal, 0.f) * MAGNITUDE;
-	    EmitVertex();
-	    EndPrimitive();
+		gl_Position = gl_in[index].gl_Position;
+		EmitVertex();
+		gl_Position = gl_in[index].gl_Position + vec4(gs_in[index].normal, 0.f) * MAGNITUDE;
+		EmitVertex();
+		EndPrimitive();
 	}
 
 	void main()
 	{
-	    GenerateLine(0);
-	    GenerateLine(1);
-	    GenerateLine(2);
+		GenerateLine(0);
+		GenerateLine(1);
+		GenerateLine(2);
 	}
 }
 
@@ -46,6 +46,6 @@
 	out vec4 color;
 	void main()
 	{
-	    color = vec4(1.0, 0.5, 1.0, 1.0);
+		color = vec4(1.0, 0.5, 1.0, 1.0);
 	}
 }

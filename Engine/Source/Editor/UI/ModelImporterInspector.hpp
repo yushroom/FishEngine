@@ -45,6 +45,7 @@ private:
 	QVBoxLayout		* m_verticalLayout;
 	UIAssetHeader	* m_assetHeader;
 	
+	UIFloat			* m_globalScaleEdit;
 	UIFloat			* m_fileScaleEdit;
 	UIComboBox		* m_normalsCombox;
 	UIComboBox		* m_tangentsCombox;

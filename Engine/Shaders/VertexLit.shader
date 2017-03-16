@@ -15,10 +15,10 @@ struct VS_OUT
 
 	void vs_main(AppData appdata)
 	{
-	    gl_Position = MATRIX_MVP * appdata.position;
-	    float c = dot(normalize(mat3(MATRIX_IT_MV) * appdata.normal), normalize(LightPosition));
-	    c = clamp(c, 0, 1);
-	    vs_out.color = _Color * c;
+		gl_Position = MATRIX_MVP * appdata.position;
+		float c = dot(normalize(mat3(MATRIX_IT_MV) * appdata.normal), normalize(LightPosition));
+		c = clamp(c, 0, 1);
+		vs_out.color = _Color * c;
 	}
 }
 
@@ -30,6 +30,6 @@ struct VS_OUT
 
 	void main()
 	{
-	    color = vec4(vs_out.color, 1);
+		color = vec4(vs_out.color, 1);
 	}
 }

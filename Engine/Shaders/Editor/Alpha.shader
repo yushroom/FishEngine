@@ -10,8 +10,8 @@ uniform sampler2D _MainTex;
 	out vec2 uv;
 	void main()
 	{
-	    gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
-	    uv = InputUV;
+		gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
+		uv = InputUV;
 	}
 }
 

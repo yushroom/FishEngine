@@ -15,26 +15,26 @@ uniform sampler2D   _DownTex;
 
 @vertex
 {
-    layout(location = PositionIndex)	in vec3 InputPositon;
-    layout(location = UVIndex)			in vec2 InputUV;
+	layout(location = PositionIndex)	in vec3 InputPositon;
+	layout(location = UVIndex)			in vec2 InputUV;
 
-    out vec2 texcoord;
+	out vec2 texcoord;
 
-    float3 RotateAroundYInDegrees (float3 vertex, float degrees)
-    {
-    	float alpha = degrees * UNITY_PI / 180.0;
-    	float sina, cosa;
-    	sincos(alpha, sina, cosa);
-    	float2x2 m = float2x2(cosa, -sina, sina, cosa);
-    	return float3(mul(m, vertex.xz), vertex.y).xzy;
-    }
+	float3 RotateAroundYInDegrees (float3 vertex, float degrees)
+	{
+		float alpha = degrees * UNITY_PI / 180.0;
+		float sina, cosa;
+		sincos(alpha, sina, cosa);
+		float2x2 m = float2x2(cosa, -sina, sina, cosa);
+		return float3(mul(m, vertex.xz), vertex.y).xzy;
+	}
 
-    void main()
-    {
-    	float3 rotated = RotateAroundYInDegrees(InputPositon, _Rotation);
-    	gl_Position = UnityObjectToClipPos(rotated);
-    	texcoord = InputUV;
-    }
+	void main()
+	{
+		float3 rotated = RotateAroundYInDegrees(InputPositon, _Rotation);
+		gl_Position = UnityObjectToClipPos(rotated);
+		texcoord = InputUV;
+	}
 }
 
 @fragment

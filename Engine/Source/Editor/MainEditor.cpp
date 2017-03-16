@@ -197,18 +197,18 @@ namespace FishEditor
 		transform->setPosition(5, 8, 0);
 		transform->setLocalEulerAngles(30, -90, 0);
 	#else
-		GameObject::CreatePrimitive(PrimitiveType::Cube);
-		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
-		plane->transform()->setLocalScale(10);
-		plane->transform()->setLocalPosition(0, -5, 0);
-		auto model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/testFBX.fbx");
-		Object::Instantiate(model);
-	
-		model = AssetDatabase::LoadAssetAtPath<GameObject>("Assets/unitychan.fbx");
-		model = Object::Instantiate(model);
+//		GameObject::CreatePrimitive(PrimitiveType::Cube);
+//		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+//		plane->transform()->setLocalScale(10);
+//		//plane->transform()->setLocalPosition(0, -5, 0);
+//		
+//		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
+//		Object::Instantiate(model);
+//	
+//		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
+//		Scene::AddGameObject(model);
+		//model = Object::Instantiate(model);
 		//model->transform()->setLocalScale(0.1f);
-	//	auto sphere = model->transform()->children().front().lock()->gameObject();
-	//	sphere->GetComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 	#endif
 
 	#endif

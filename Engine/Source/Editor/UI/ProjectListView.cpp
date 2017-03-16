@@ -9,7 +9,9 @@
 #include <QDir>
 
 #include "ProjectViewFileModel.hpp"
-//#include "GameObject.hpp"
+
+#include <Object.hpp>
+#include <GameObject.cpp>
 
 #include <Debug.hpp>
 #include <Scene.hpp>
@@ -72,11 +74,6 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	m_actionOpen = m_menu->addAction("Open");
 	m_actionDelete = m_menu->addAction("Delete");
 	m_actionMoveToScene = m_menu->addAction("Instantiate in scene");
-	//connect(
-	//	m_actionMoveToScene,
-	//	&QAction::triggered,
-	//	this,
-	//	);
 	//m_actionMoveToScene->setEnabled(false);
 	//action->setEnabled(false);
 
@@ -106,7 +103,7 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 	}
 
 	auto path = fileInfo->path();
-	bool isModel = path.extension() == ".fbx";
+	bool isModel = path.extension() == ".fbx" || path.extension() == ".obj";
 	m_actionMoveToScene->setEnabled(isModel);
 
 	auto action = m_menu->exec(QCursor::pos());
@@ -140,6 +137,8 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 		//FishEngine::BinaryOutputArchive archive(sstream);
 		//archive << model;
 		//FishEngine::Scene::AddGameObject(model);
+		auto model = FishEngine::As<FishEngine::GameObject>( FishEditor::AssetDatabase::LoadAssetAtPath(path) );
+		FishEngine::Object::Instantiate(model);
 	}
 }
 
@@ -161,6 +160,11 @@ void ProjectListView::ShowInExplorer()
 	// see http://blog.csdn.net/icatchyou/article/details/40682107
 	auto rootPath = m_fileModel->rootPath();
 	QDesktopServices::openUrl(QUrl::fromLocalFile(rootPath));
+}
+
+void ProjectListView::InstantiateAsset()
+{
+	
 }
 
 //void ProjectListView::mousePressEvent(QMouseEvent *event)

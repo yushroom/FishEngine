@@ -83,7 +83,7 @@ layout(std140, row_major) uniform LightingUniforms
 // column_major: macOS bug
 layout(std140, column_major) uniform Bones
 {
-    mat4 BoneTransformations[MAX_BONE_SIZE];
+	mat4 BoneTransformations[MAX_BONE_SIZE];
 };
 
 

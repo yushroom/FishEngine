@@ -239,7 +239,7 @@ namespace FishEditor
 				auto ext = p.extension();
 				if (Resources::GetAssetType(ext) == AssetType::Texture)
 				{
-					auto texture = AssetDatabase::LoadAssetAtPath<Texture>(relative_path);
+					auto texture = As<Texture>( AssetDatabase::LoadAssetAtPath(relative_path) );
 					//auto importer = AssetImporter::GetAtPath(p);
 					//auto texture = AssetImporter::s_importerGuidToTexture[importer->GetGUID()];
 					//auto data = texture->rawdata().data();
@@ -247,7 +247,7 @@ namespace FishEditor
 				}
 				else if (ext == ".fbx" || ext == ".FBX")
 				{
-					auto model = AssetDatabase::LoadAssetAtPath<GameObject>(relative_path);
+					auto model = As<GameObject>(  AssetDatabase::LoadAssetAtPath(relative_path) );
 				}
 #endif
 			}

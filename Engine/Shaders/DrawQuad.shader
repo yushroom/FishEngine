@@ -19,8 +19,8 @@ struct V2F
 
 	void main()
 	{
-	    gl_Position = DrawRect(InputPosition.xy);
-	    v2f.UV = InputUV * vec2(1, -1);
+		gl_Position = DrawRect(InputPosition.xy);
+		v2f.UV = InputUV * vec2(1, -1);
 	}
 }
 
@@ -34,6 +34,6 @@ struct V2F
 
 	void main()
 	{
-	    color = texture(_MainTex, v2f.UV);
+		color = texture(_MainTex, v2f.UV);
 	}
 }

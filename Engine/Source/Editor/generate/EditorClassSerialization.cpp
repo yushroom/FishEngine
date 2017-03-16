@@ -60,7 +60,7 @@ namespace FishEditor
 	{
 		//archive.BeginClass();
 		FishEditor::AssetImporter::Serialize(archive);
-		archive << FishEngine::make_nvp("m_fileScale", m_fileScale); // float
+		archive << FishEngine::make_nvp("m_globalScale", m_globalScale); // float
 		archive << FishEngine::make_nvp("m_importNormals", m_importNormals); // FishEditor::ModelImporterNormals
 		archive << FishEngine::make_nvp("m_importTangents", m_importTangents); // FishEditor::ModelImporterTangents
 		archive << FishEngine::make_nvp("m_materialSearch", m_materialSearch); // FishEditor::ModelImporterMaterialSearch
@@ -71,7 +71,7 @@ namespace FishEditor
 	{
 		//archive.BeginClass(2);
 		FishEditor::AssetImporter::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_fileScale", m_fileScale); // float
+		archive >> FishEngine::make_nvp("m_globalScale", m_globalScale); // float
 		archive >> FishEngine::make_nvp("m_importNormals", m_importNormals); // FishEditor::ModelImporterNormals
 		archive >> FishEngine::make_nvp("m_importTangents", m_importTangents); // FishEditor::ModelImporterTangents
 		archive >> FishEngine::make_nvp("m_materialSearch", m_materialSearch); // FishEditor::ModelImporterMaterialSearch

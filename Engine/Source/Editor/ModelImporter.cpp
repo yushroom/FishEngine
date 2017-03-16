@@ -678,6 +678,7 @@ namespace FishEditor
 	
 	ModelImporter& ModelImporter::operator=(ModelImporter const & rhs)
 	{
+		m_globalScale = rhs.m_globalScale;
 		m_fileScale = rhs.m_fileScale;
 		m_importNormals = rhs.m_importNormals;
 		m_importTangents = rhs.m_importTangents;

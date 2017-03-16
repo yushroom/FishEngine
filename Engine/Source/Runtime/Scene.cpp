@@ -245,15 +245,17 @@ namespace FishEngine
 				}
 			}
 			
+			if (!is_skinned)
+			{
+				shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+			}
+
+			
 			if (mesh != nullptr)
 			{
 				shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
 				shader->CheckStatus();
 				mesh->Render();
-				if (!is_skinned)
-				{
-					shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
-				}
 			}
 
 		}

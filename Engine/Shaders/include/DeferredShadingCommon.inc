@@ -17,39 +17,39 @@ float3 DecodeNormal( float3 N )
 
 struct FGBufferData
 {
-    float3  BaseColor;
-    float3  WorldNormal;
-    float   Metallic;
-    float   Roughness;
-    float   Specular;
-    //float   AO;
-    //uint    MaterialID;
-    float   Depth;
+	float3  BaseColor;
+	float3  WorldNormal;
+	float   Metallic;
+	float   Roughness;
+	float   Specular;
+	//float   AO;
+	//uint    MaterialID;
+	float   Depth;
 };
 
 void EncodeGBuffer(
-    FGBufferData GBuffer,
-    out float4 RT0,
-    out float4 RT1,
-    out float4 RT2)
+	FGBufferData GBuffer,
+	out float4 RT0,
+	out float4 RT1,
+	out float4 RT2)
 {
-    RT0 = float4( GBuffer.BaseColor, 1 );
-    RT1 = float4( EncodeNormal( GBuffer.WorldNormal ), 1 );
-    RT2 = float4( GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1 );
+	RT0 = float4( GBuffer.BaseColor, 1 );
+	RT1 = float4( EncodeNormal( GBuffer.WorldNormal ), 1 );
+	RT2 = float4( GBuffer.Metallic, GBuffer.Roughness, GBuffer.Specular, 1 );
 }
 
 FGBufferData DecodeGBuffer(
-    float4 DBufferA,
-    float4 DBufferB,
-    float4 DBufferC)
+	float4 DBufferA,
+	float4 DBufferB,
+	float4 DBufferC)
 {
-    FGBufferData ret;
-    ret.BaseColor       = DBufferA.rgb;
-    ret.WorldNormal     = DecodeNormal( DBufferB.xyz );
-    ret.Metallic        = DBufferC.x;
-    ret.Roughness       = DBufferC.y;
-    ret.Specular        = DBufferC.z;
-    return ret;
+	FGBufferData ret;
+	ret.BaseColor       = DBufferA.rgb;
+	ret.WorldNormal     = DecodeNormal( DBufferB.xyz );
+	ret.Metallic        = DBufferC.x;
+	ret.Roughness       = DBufferC.y;
+	ret.Specular        = DBufferC.z;
+	return ret;
 }
 
 #endif

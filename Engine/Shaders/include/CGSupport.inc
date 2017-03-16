@@ -23,8 +23,8 @@
 // http://http.developer.nvidia.com/Cg/lit.html
 float4 lit(float NdotL, float NdotH, float m)
 {
-    float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m) : 0;
-    return float4(1.0, max(0.0, NdotL), specular, 1.0);
+	float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m) : 0;
+	return float4(1.0, max(0.0, NdotL), specular, 1.0);
 }
 
 void sincos(float a, out float s, out float c)

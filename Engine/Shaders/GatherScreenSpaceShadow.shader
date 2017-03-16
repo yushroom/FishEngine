@@ -18,11 +18,11 @@ struct V2F
 
 	void main()
 	{
-	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
-	    //gl_Position = ObjectToClipPos(InputPosition);
-	    // Screen to world
-	    v2f.UV = InputUV * vec2(1, -1);	// OpenGL
-	    
+		gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
+		//gl_Position = ObjectToClipPos(InputPosition);
+		// Screen to world
+		v2f.UV = InputUV * vec2(1, -1);	// OpenGL
+		
 		vec4 WorldPosition = inverse(MATRIX_VP) * vec4(InputPosition.x, InputPosition.y, 1.0f, 1.0f);
 		// in world space
 		v2f.ScreenVector = normalize(WorldPosition.xyz / WorldPosition.w - WorldSpaceCameraPos.xyz);

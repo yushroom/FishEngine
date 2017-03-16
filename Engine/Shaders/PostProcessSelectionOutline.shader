@@ -17,8 +17,8 @@ struct V2F
 
 	void main()
 	{
-	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
-	    v2f.UV = InputUV * vec2(1, -1);
+		gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
+		v2f.UV = InputUV * vec2(1, -1);
 	}
 }
 
@@ -47,28 +47,28 @@ struct V2F
 		float SceneDepth = texture(DepthTexture, v2f.UV).r;
 		vec3 SceneColor = texture(ColorTexture, v2f.UV).rgb;
 		FragColor = vec4(SceneColor, 1);
-	    float Stencil = texture(StencilTexture, v2f.UV).r;
-	    //float factor = 0;
+		float Stencil = texture(StencilTexture, v2f.UV).r;
+		//float factor = 0;
 
-	    if (Stencil == 1.0) // not in selection region
-	    {
-	    #if 1
-	    	for (int i = -Width; i <= Width; ++i)
-		    {
-		    	for (int j = -Width; j <= Width; ++j)
-		    	{
-		    		Stencil = texture(StencilTexture, v2f.UV + vec2(i, j)*InvSize).r;
-		    		if (Stencil != 1.0)
-		    		{
-		    			FragColor = OutlineColor;
-		    			if (Stencil > SceneDepth + 0.002f)
-		    			{
-		    				FragColor.rgb = mix(FragColor.rgb, SceneColor, OccludeWeight);
-		    			}
-		    			return;
-		    		}
-		    	}
-		    }
+		if (Stencil == 1.0) // not in selection region
+		{
+		#if 1
+			for (int i = -Width; i <= Width; ++i)
+			{
+				for (int j = -Width; j <= Width; ++j)
+				{
+					Stencil = texture(StencilTexture, v2f.UV + vec2(i, j)*InvSize).r;
+					if (Stencil != 1.0)
+					{
+						FragColor = OutlineColor;
+						if (Stencil > SceneDepth + 0.002f)
+						{
+							FragColor.rgb = mix(FragColor.rgb, SceneColor, OccludeWeight);
+						}
+						return;
+					}
+				}
+			}
 		#else
 			for (int i = 0; i < SampleCount; ++i)
 			{
@@ -77,15 +77,15 @@ struct V2F
 				if (Stencil != 1.0)
 				{
 					FragColor = OutlineColor;
-	    			if (Stencil > SceneDepth + 0.002f)
-	    			{
-	    				FragColor.rgb = mix(FragColor.rgb, SceneColor, OccludeWeight);
-	    			}
-	    			return;
+					if (Stencil > SceneDepth + 0.002f)
+					{
+						FragColor.rgb = mix(FragColor.rgb, SceneColor, OccludeWeight);
+					}
+					return;
 				}
 			}
 		#endif
-	    }
-	    //FragColor.rgb = mix(FragColor.rgb, SceneColor, factor);
+		}
+		//FragColor.rgb = mix(FragColor.rgb, SceneColor, factor);
 	}
 }

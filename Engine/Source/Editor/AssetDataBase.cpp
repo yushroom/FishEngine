@@ -50,39 +50,25 @@ namespace FishEditor
 		return s_cacheIcons[path];
 	}
 
-	//template <>
-	//std::shared_ptr<Texture>
-	//AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
-	//{
-	//	auto p = FishEngine::Applicaiton::dataPath().parent_path() / path;
-	//	if (!boost::filesystem::exists(p))
-	//	{
-	//		return nullptr;
-	//	}
-	//	auto importer = AssetImporter::GetAtPath(p);
-	//	return AssetImporter::s_importerGUIDToTexture[importer->GetGUID()];
-	//}
 
-	//template <>
-	//std::shared_ptr<FishEngine::GameObject>
-	//AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
-	//{
-	//	Path p;
-	//	if (path.is_absolute())
-	//	{
-	//		Debug::LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
-	//		p = path;
-	//	}
-	//	else
-	//	{
-	//		p = FishEngine::Applicaiton::dataPath().parent_path() / path;
-	//	}
-	//	if (!boost::filesystem::exists(p))
-	//	{
-	//		return nullptr;
-	//	}
-	//	auto importer = AssetImporter::GetAtPath(p);
-	//	return AssetImporter::s_importerGUIDToGameObject[importer->GetGUID()];
-	//}
-
+	FishEngine::ObjectPtr AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)
+	{
+		FishEngine::Path p;
+		if (path.is_absolute())
+		{
+			FishEngine::Debug::LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
+			p = path;
+		}
+		else
+		{
+			p = FishEngine::Applicaiton::dataPath().parent_path() / path;
+		}
+		if (!boost::filesystem::exists(p))
+		{
+			return nullptr;
+		}
+		auto importer = AssetImporter::GetAtPath(p);
+		//return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
+		return AssetImporter::s_importerGUIDToObject[importer->GetGUID()];
+	}
 }

@@ -11,64 +11,64 @@ uniform float Specular;
 
 struct PixelMaterialInputs
 {
-    vec3 BaseColor;
-    float Metallic;
-    float Roughness;
-    float Specular;
+	vec3 BaseColor;
+	float Metallic;
+	float Roughness;
+	float Specular;
 };
 
 #ifdef NO_DEFAULT_MATERIAL 
-    PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s);
+	PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s);
 #else
-    PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s)
-    {
-        PixelMaterialInputs inputs;
+	PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s)
+	{
+		PixelMaterialInputs inputs;
 
-        inputs.BaseColor = BaseColor;
-        inputs.Metallic = Metallic;
-        inputs.Roughness = Roughness;
-        inputs.Specular = Specular;
-        return inputs;
-    }
+		inputs.BaseColor = BaseColor;
+		inputs.Metallic = Metallic;
+		inputs.Roughness = Roughness;
+		inputs.Specular = Specular;
+		return inputs;
+	}
 #endif
 
 vec4 ps_main(SurfaceData surfaceData)
 {
-    vec4 outColor = vec4(0, 0, 0, 1);
-    vec3 L = surfaceData.L;
-    vec3 V = surfaceData.V;
-    vec3 N = surfaceData.N;
-    float3 R0 = 2 * dot( V, N ) * N - V;
+	vec4 outColor = vec4(0, 0, 0, 1);
+	vec3 L = surfaceData.L;
+	vec3 V = surfaceData.V;
+	vec3 N = surfaceData.N;
+	float3 R0 = 2 * dot( V, N ) * N - V;
 
-    vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
-    vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
-    float NoL = saturate( dot(N, L) );
-    //float NoV = max( dot(N, V), 1e-5 );
-    float NoV = saturate( dot(N, V) );
-    // Point lobe in off-specular peak direction
+	vec3 DiffuseColor = BaseColor - BaseColor * Metallic;
+	vec3 SpecularColor = mix( vec3(0.08 * Specular), BaseColor, Metallic);
+	float NoL = saturate( dot(N, L) );
+	//float NoV = max( dot(N, V), 1e-5 );
+	float NoV = saturate( dot(N, V) );
+	// Point lobe in off-specular peak direction
 
-    //outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness), vec3(1), L, V, N);
-    
+	//outColor.rgb = PI * LightColor0.rgb * NoL * StandardShading(DiffuseColor, SpecularColor, vec3(Roughness), vec3(1), L, V, N);
+	
 #ifdef _AMBIENT_IBL
-    float a = Square( Roughness );
-    float3 R = lerp( N, R0, (1 - a) * ( sqrt(1 - a) + a ) );
+	float a = Square( Roughness );
+	float3 R = lerp( N, R0, (1 - a) * ( sqrt(1 - a) + a ) );
 
-    float3 NonSpecularContribution = vec3(0);
-    float3 SpecularContribution = vec3(0);
+	float3 NonSpecularContribution = vec3(0);
+	float3 SpecularContribution = vec3(0);
 
-    float AbsoluteDiffuseMip = AmbientCubemapMipAdjust.z;
-    //float3 DiffuseLookup =  TextureCubeSampleLevel(AmbientCubemap, AmbientCubemapSampler, N, AbsoluteDiffuseMip).rgb;
-    float3 DiffuseLookup = textureLod(AmbientCubemap, N, AbsoluteDiffuseMip).rgb;
-    NonSpecularContribution += DiffuseColor * DiffuseLookup;
+	float AbsoluteDiffuseMip = AmbientCubemapMipAdjust.z;
+	//float3 DiffuseLookup =  TextureCubeSampleLevel(AmbientCubemap, AmbientCubemapSampler, N, AbsoluteDiffuseMip).rgb;
+	float3 DiffuseLookup = textureLod(AmbientCubemap, N, AbsoluteDiffuseMip).rgb;
+	NonSpecularContribution += DiffuseColor * DiffuseLookup;
 
-    float Mip = ComputeCubemapMipFromRoughness(Roughness, AmbientCubemapMipAdjust.w);
-    float3 SampleColor = textureLod(AmbientCubemap, R, Mip).rgb;
-    //SpecularContribution += SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
-    SpecularContribution += SampleColor * EnvBRDF(SpecularColor, Roughness, NoV);
+	float Mip = ComputeCubemapMipFromRoughness(Roughness, AmbientCubemapMipAdjust.w);
+	float3 SampleColor = textureLod(AmbientCubemap, R, Mip).rgb;
+	//SpecularContribution += SampleColor * EnvBRDFApprox(SpecularColor, Roughness, NoV);
+	SpecularContribution += SampleColor * EnvBRDF(SpecularColor, Roughness, NoV);
 
-    outColor.rgb += SpecularContribution + NonSpecularContribution;
-    //outColor.rgb += SpecularContribution;
-    //outColor.rgb += NonSpecularContribution;
+	outColor.rgb += SpecularContribution + NonSpecularContribution;
+	//outColor.rgb += SpecularContribution;
+	//outColor.rgb += NonSpecularContribution;
 #endif
-    return outColor;
+	return outColor;
 }

@@ -6,7 +6,7 @@ uniform vec4 _Color = vec4(1, 0, 0, 1);
 	layout(location = 0)	in vec3 InputPositon;
 	void main()
 	{
-	    gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
+		gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
 	}
 }
 

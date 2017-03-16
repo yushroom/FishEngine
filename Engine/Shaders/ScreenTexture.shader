@@ -14,10 +14,10 @@ struct V2F
 
 	void main()
 	{
-	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
-	    v2f.UV = InputUV * vec2(1, -1);
-	    //gl_Position = ObjectToClipPos(InputPosition);
-	    //v2f.UV = InputUV;
+		gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
+		v2f.UV = InputUV * vec2(1, -1);
+		//gl_Position = ObjectToClipPos(InputPosition);
+		//v2f.UV = InputUV;
 	}
 }
 
@@ -31,6 +31,6 @@ struct V2F
 
 	void main()
 	{
-	    color = texture(_MainTex, v2f.UV);
+		color = texture(_MainTex, v2f.UV);
 	}
 }

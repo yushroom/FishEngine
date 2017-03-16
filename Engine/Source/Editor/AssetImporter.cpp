@@ -102,7 +102,7 @@ namespace FishEditor
 			//t.StopAndPrint();
 			ret = importer;
 		}
-		else if (ext == ".fbx" || ext == ".FBX")
+		else if (ext == ".fbx" || ext == ".FBX" || ext == ".obj")
 		{
 			auto importer = GetAssetImporter<FBXImporter>(path);
 			s_pathToImpoter[path] = importer;

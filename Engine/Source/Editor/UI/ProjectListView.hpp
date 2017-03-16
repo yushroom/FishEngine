@@ -27,6 +27,8 @@ protected:
 	void MakeDir();
 	void CreateMaterial();
 	void ShowInExplorer();
+	
+	void InstantiateAsset();
 
 	ProjectViewFileModel    * m_fileModel;
 

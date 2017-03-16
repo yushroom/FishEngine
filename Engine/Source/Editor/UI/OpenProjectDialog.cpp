@@ -16,8 +16,9 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 #if FISHENGINE_PLATFORM_WINDOWS
 	ui->locationLineEdit->setText("D:/FishEngine/Projects");
 #else
-	ui->locationLineEdit->setText("~/FishEngine/Projects");
+	ui->locationLineEdit->setText("/Users/yushroom/FishEngine/Projects");
 #endif
+	ui->projectNameLineEdit->setText("CascadedShadowMapping");
 	ui->projectNameErrorLabel->hide();
 	ui->locationErrorLabel->hide();
 

@@ -8,11 +8,11 @@ vec3 DebugColor[4] = vec3[4](
 
 vec4 ps_main(SurfaceData surfaceData)
 {
-    float nDotL = dot(surfaceData.N, surfaceData.L);
-    nDotL = clamp(nDotL, 0.0f, 1.0f);
-    vec4 Weights = GetCascadeWeights(surfaceData.Depth);
-    float fSection = dot(Weights, vec4(0, 1, 2, 3));
-    int iSection = int(fSection);
-    vec3 diffuse = nDotL * DebugColor[iSection];
-    return vec4(diffuse, 1);
+	float nDotL = dot(surfaceData.N, surfaceData.L);
+	nDotL = clamp(nDotL, 0.0f, 1.0f);
+	vec4 Weights = GetCascadeWeights(surfaceData.Depth);
+	float fSection = dot(Weights, vec4(0, 1, 2, 3));
+	int iSection = int(fSection);
+	vec3 diffuse = nDotL * DebugColor[iSection];
+	return vec4(diffuse, 1);
 }

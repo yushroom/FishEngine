@@ -59,43 +59,21 @@ namespace FishEditor
 		static QIcon const & GetCacheIcon(FishEngine::Path path);
 		
 		static void ImportAsset(FishEngine::Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
-
+		
 		// Returns an array of all asset objects at assetPath.
 		// All paths are relative to the project folder, for example: "Assets/MyTextures/hello.png".
-		template <class T>
-		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path)
-		{
-			Path p;
-			if (path.is_absolute())
-			{
-				Debug::LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
-				p = path;
-			}
-			else
-			{
-				p = FishEngine::Applicaiton::dataPath().parent_path() / path;
-			}
-			if (!boost::filesystem::exists(p))
-			{
-				return nullptr;
-			}
-			auto importer = AssetImporter::GetAtPath(p);
-			return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
-		}
+		
+		// Returns the first asset object of type type at given path assetPath.
+		static FishEngine::ObjectPtr LoadAssetAtPath(FishEngine::Path const & path);
+		
+//		template <class T>
+//		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path)
+//		{
+//			return FishEngine::As<T>( LoadAssetAtPath(path) );
+//		}
 
 		static std::map<FishEngine::Path, QIcon> s_cacheIcons;
 
 		static std::set<std::shared_ptr<FishEngine::Object>> s_allAssetObjects;
 	};
-
-	// texture
-	//template <>
-	//std::shared_ptr<FishEngine::Texture> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
-
-	//// 3d model
-	//template <>
-	//std::shared_ptr<FishEngine::GameObject> AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path);
-
-	//template <>
-	//static std::shared_ptr<Texture> AssetDatabase::LoadAssetAtPath(Path const & path);
 }

@@ -11,8 +11,8 @@
 
 	void main()
 	{
-	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
-	    UV = InputUV * vec2(1, -1);
+		gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
+		UV = InputUV * vec2(1, -1);
 	}
 }
 
@@ -28,8 +28,8 @@
 	void main()
 	{
 		float Shadow = texture(ScreenShadow, UV).r;
-	    FragColor = texture(_MainTex, UV);
-	    FragColor.rgb *= Shadow;
-	    FragColor.a = 1.0;
+		FragColor = texture(_MainTex, UV);
+		FragColor.rgb *= Shadow;
+		FragColor.a = 1.0;
 	}
 }

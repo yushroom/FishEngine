@@ -18,10 +18,10 @@ struct V2F
 
 	void main()
 	{
-	    gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
-	    vec3 N_view = normalize(mat3(MATRIX_IT_MV) * InputNormal);
-	    float NoL = clamp(-N_view.z, 0, 1);
-	    v2f.color = _Color * NoL;
+		gl_Position = MATRIX_MVP * vec4(InputPositon, 1);
+		vec3 N_view = normalize(mat3(MATRIX_IT_MV) * InputNormal);
+		float NoL = clamp(-N_view.z, 0, 1);
+		v2f.color = _Color * NoL;
 	}
 }
 

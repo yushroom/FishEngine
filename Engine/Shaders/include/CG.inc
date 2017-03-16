@@ -40,7 +40,7 @@ vec3 WorldSpaceLightDir( in vec3 worldPos )
 
 vec3 WorldSpaceViewDir( in vec3 worldPos )
 {
-    return WorldSpaceCameraPos.xyz - worldPos;
+	return WorldSpaceCameraPos.xyz - worldPos;
 }
 
 #endif /* CG_inc */

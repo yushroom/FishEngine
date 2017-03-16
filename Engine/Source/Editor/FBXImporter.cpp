@@ -63,6 +63,8 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 	//mesh->m_bindposes.resize(lClusterCount);
 	mesh->m_boneNames.resize(lClusterCount);
 	
+	float scale = m_fileScale * m_globalScale;
+	
 	for (int lClusterIndex = 0; lClusterIndex != lClusterCount; ++lClusterIndex)
 	{
 		FbxCluster* lCluster= lSkinDeformer->GetCluster(lClusterIndex);
@@ -93,7 +95,11 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 			//lCluster->GetTransformMatrix(transformMatrix);
 			fbxsdk::FbxAMatrix bindPoseMatrix;
 			lCluster->GetTransformLinkMatrix(bindPoseMatrix);	// this bind pose is in world(global) space
-			m_model.m_bindposes.push_back(FbxAMatrixToMatrix4x4(bindPoseMatrix));
+			auto mat = FbxAMatrixToMatrix4x4(bindPoseMatrix);
+			mat.m[0][3] *= scale;
+			mat.m[1][3] *= scale;
+			mat.m[2][3] *= scale;
+			m_model.m_bindposes.push_back(mat);
 			m_boneCount++;
 		}
 		
@@ -280,7 +286,14 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 	{
 		// Position
 		auto & p = controlPoints[controlPointIndex];
-		rawMesh.m_vertexPositions.emplace_back((float)p[0], (float)p[1], (float)p[2]);
+		float scale = m_fileScale * m_globalScale;
+		float x = p[0] * scale;
+		float y = p[1] * scale;
+		float z = p[2] * scale;
+//		float x = p[0];
+//		float y = p[1];
+//		float z = p[2];
+		rawMesh.m_vertexPositions.emplace_back(x, y, z);
 	}
 	
 	for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
@@ -547,7 +560,8 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 }
 
 
-void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex) {
+void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex)
+{
 
 	if (pProperty.IsValid())
 	{
@@ -600,6 +614,8 @@ void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHe
 					//DisplayString("    Textures for ", pProperty.GetName());
 					//DisplayInt("        Texture ", j);
 					//DisplayTextureInfo(lTexture, -1);
+					FbxFileTexture *lFileTexture = FbxCast<FbxFileTexture>(lTexture);
+					FishEngine::Debug::Log("Texture: %s", (char *) lFileTexture->GetFileName());
 				}
 			}
 		}
@@ -674,7 +690,8 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	pNode->GetRotationOrder(FbxNode::eSourcePivot, order2);
 	//pNode->SetRotationOrder(FbxNode::eDestinationPivot, EFbxRotationOrder::eOrderZYX);
 	//r[0] = -r[0];
-	go->transform()->setLocalPosition(t[0], t[1], t[2]);
+	float scale = m_fileScale * m_globalScale;
+	go->transform()->setLocalPosition(t[0] * scale, t[1] * scale, t[2] * scale);
 	//go->transform()->setLocalEulerAngles(r[0], r[1], r[2]);
 	go->transform()->setLocalScale(s[0], s[1], s[2]);
 	
@@ -791,6 +808,11 @@ void FishEditor::FBXImporter::ImportTo(FishEngine::GameObjectPtr & model)
 	abort();
 }
 
+void FishEditor::FBXImporter::Reimport()
+{
+	Load(m_assetPath);
+}
+
 
 PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 {
@@ -800,7 +822,9 @@ PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 		m_model.m_modelPrefab->setIsPrefabParent(true);
 	}
 	if (m_model.m_avatar == nullptr)
+	{
 		m_model.m_avatar = std::make_shared<Avatar>();
+	}
 	
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_29C09995_47A9_4B49_9535_2F6BDC5C4107_htm
 	
@@ -837,8 +861,26 @@ PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
 	converter.Triangulate(lScene, true);
 	
 	FbxAxisSystem::MayaYUp.ConvertScene(lScene);
-	//FbxAxisSystem::DirectX.ConvertScene(lScene);
-
+	// FbxAxisSystem::DirectX.ConvertScene(lScene);
+	// FbxSystemUnit::m.ConvertScene(lScene);
+	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_CC93340E_C4A1_49EE_B048_E898F856CFBF_htm
+	// do NOT use FbxSystemUnit::ConvertScene(lScene), which just simply set transform.scale of root nodes.
+	if ( lScene->GetGlobalSettings().GetSystemUnit() == FbxSystemUnit::mm )
+	{
+		m_fileScale = 0.001f;
+	}
+	else if ( lScene->GetGlobalSettings().GetSystemUnit() == FbxSystemUnit::dm)
+	{
+		m_fileScale = 0.1f;
+	}
+	else if (lScene->GetGlobalSettings().GetSystemUnit() == FbxSystemUnit::m)
+	{
+		m_fileScale = 1.0f;
+	}
+	else
+	{
+		m_fileScale = 0.01f;
+	}
 
 	// Print the nodes of the scene and their attributes recursively.
 	// Note that we are not printing the root node because it should

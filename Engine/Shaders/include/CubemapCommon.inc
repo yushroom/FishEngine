@@ -17,9 +17,9 @@ const half4 AmbientCubemapMipAdjust = half4(0.5, 3.5, 4.0, 8.0);
 // @param MipCount e.g. 10 for x 512x512
 half ComputeCubemapMipFromRoughness( half Roughness, half MipCount )
 {
-    // Level starting from 1x1 mip
-    half Level = 3 - 1.15 * log2( Roughness );
-    return MipCount - 1 - Level;
+	// Level starting from 1x1 mip
+	half Level = 3 - 1.15 * log2( Roughness );
+	return MipCount - 1 - Level;
 }
 
 #endif

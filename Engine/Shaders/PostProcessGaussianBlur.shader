@@ -12,8 +12,8 @@
 
 	void main()
 	{
-	    gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
-	    UV = InputUV * vec2(1, -1);
+		gl_Position = vec4(InputPosition.x, InputPosition.y, 0.f, 1.f);
+		UV = InputUV * vec2(1, -1);
 	}
 }
 

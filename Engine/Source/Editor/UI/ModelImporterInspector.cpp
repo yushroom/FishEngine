@@ -42,7 +42,10 @@ ModelImporterInspector::ModelImporterInspector(QWidget *parent) : QWidget(parent
 	
 	m_verticalLayout->addWidget(m_assetHeader);
 	
+	m_globalScaleEdit = new UIFloat("Scale Factor", 0.0f, this);
+	m_verticalLayout->addWidget(m_globalScaleEdit);
 	m_fileScaleEdit = new UIFloat("File Scale", 0.0f, this);
+	m_fileScaleEdit->setEnabled(false);
 	m_verticalLayout->addWidget(m_fileScaleEdit);
 	m_normalsCombox = CreateCombox<decltype(ModelImporter::m_importNormals)>("Normals");
 	m_verticalLayout->addWidget(m_normalsCombox);
@@ -59,12 +62,19 @@ ModelImporterInspector::ModelImporterInspector(QWidget *parent) : QWidget(parent
 	
 	m_cachedImporter = std::make_unique<ModelImporter>();
 
-	connect(m_fileScaleEdit,
+	connect(m_globalScaleEdit,
 			&UIFloat::ValueChanged,
 			[this](float value) {
-				m_cachedImporter->m_fileScale = value;
+				m_cachedImporter->m_globalScale = value;
 				this->SetDirty(true);
 			});
+	
+//	connect(m_fileScaleEdit,
+//			&UIFloat::ValueChanged,
+//			[this](float value) {
+//				m_cachedImporter->m_fileScale = value;
+//				this->SetDirty(true);
+//			});
 	
 	connect(m_normalsCombox,
 			&UIComboBox::OnValueChanged,
@@ -134,6 +144,7 @@ void ModelImporterInspector::Bind(std::shared_ptr<FishEditor::ModelImporter> con
 		m_assetHeader->SetIcon(icon);
 		
 		*m_cachedImporter = *m_importer;
+		m_globalScaleEdit->SetValue(m_cachedImporter->m_globalScale);
 		m_fileScaleEdit->SetValue(m_cachedImporter->m_fileScale);
 		int index = FishEngine::EnumToIndex(m_cachedImporter->m_importNormals);
 		m_normalsCombox->SetValue(index);

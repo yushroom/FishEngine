@@ -184,7 +184,7 @@ namespace FishEditor
 		
 		virtual void Reimport() override;
 
-	private:
+	protected:
 		
 		friend class Inspector;
 		friend class MainEditor;
@@ -192,6 +192,9 @@ namespace FishEditor
 
 		static void Init();
 
+		float m_globalScale = 1.0f;
+		
+		Meta(NonSerializable)
 		float m_fileScale = 1.0f;
 		
 		ModelNodePtr

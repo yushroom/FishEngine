@@ -13,19 +13,19 @@ layout (location = UVIndex) in vec2 uv;
 
 #ifdef VERTEX_SHADER
 	out VS_OUT {
-	    vec2 uv;
+		vec2 uv;
 	} vs_out;
 
 	void main()
 	{
-	    gl_Position = vec4(position.x, position.y, 0.f, 1.f);
-	    vs_out.uv = uv;
+		gl_Position = vec4(position.x, position.y, 0.f, 1.f);
+		vs_out.uv = uv;
 	}
 #endif
 
 #ifdef FRAGMENT_SHADER
 	in VS_OUT {
-	    vec2 uv;
+		vec2 uv;
 	} vs_out;
 
 	out vec4 color;
@@ -36,11 +36,11 @@ layout (location = UVIndex) in vec2 uv;
 
 	void main()
 	{
-	    //color = texture(screenTexture, vs_out.uv);
-	    vec2 uv = vs_out.uv;
-	    uv.y = 1 - uv.y;
-	    uv *= iResolution;
-	    mainImage(color, uv);
+		//color = texture(screenTexture, vs_out.uv);
+		vec2 uv = vs_out.uv;
+		uv.y = 1 - uv.y;
+		uv *= iResolution;
+		mainImage(color, uv);
 	}
 #endif
 

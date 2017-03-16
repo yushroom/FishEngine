@@ -33,7 +33,7 @@ namespace FishEditor
 	public:
 		FBXImporter() = default;
 		
-		FishEngine::PrefabPtr Load(boost::filesystem::path const & path);
+		FishEngine::PrefabPtr Load(FishEngine::Path const & path);
 		
 	protected:
 		void ImportTo(FishEngine::GameObjectPtr & model);

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
 #include <map>
 #include <array>
 #include <Resources.hpp>
 #include <ReflectClass.hpp>
 
-//typedef boost::filesystem::path Path;
+#include <Path.hpp>
+
 using FishEngine::Path;
 class ProjectViewFileModel;
 

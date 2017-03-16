@@ -6,6 +6,7 @@ namespace FishEditor
 	class ModelImporter;
 	class TextureImporter;
 	class AssetDatabase;
+	class NativeFormatImporter;
 }
 
 namespace FishEngine
@@ -845,9 +846,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<SceneAsset>() { return 1032; }
 	
-	class NativeFormatImporter;
+	//class NativeFormatImporter;
 	template<>
-	constexpr int ClassID<NativeFormatImporter>() { return 1034; }
+	constexpr int ClassID<FishEditor::NativeFormatImporter>() { return 1034; }
 	
 	class MonoImporter;
 	template<>

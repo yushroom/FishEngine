@@ -49,7 +49,6 @@ namespace FishEditor
 		void setTextureType(const TextureImporterType textureType)
 		{
 			m_textureType = textureType;
-			m_isDirty = true;
 		}
 
 		TextureImporterShape textureShape() const
@@ -60,7 +59,6 @@ namespace FishEditor
 		void setTextureShape(const TextureImporterShape textureShape)
 		{
 			m_textureShape = textureShape;
-			m_isDirty = true;
 		}
 		
 		// Filtering mode of the texture.
@@ -72,7 +70,6 @@ namespace FishEditor
 		void setFilterMode(const FishEngine::FilterMode filterMode)
 		{
 			m_textureSettings.m_filterMode = filterMode;
-			m_isDirty = true;
 		}
 		
 		// Wrap mode (Repeat or Clamp) of the texture.
@@ -84,7 +81,6 @@ namespace FishEditor
 		void setWrapMode(const FishEngine::TextureWrapMode wrapMode)
 		{
 			m_textureSettings.m_wrapMode = wrapMode;
-			m_isDirty = true;
 		}
 
 		bool sRGBTexture() const
@@ -95,7 +91,6 @@ namespace FishEditor
 		void setSRGBTexture(const bool sRGBTexture)
 		{
 			m_sRGBTexture = sRGBTexture;
-			m_isDirty = true;
 		}
 
 		bool isReadable() const
@@ -106,7 +101,6 @@ namespace FishEditor
 		void setIsReadable(const bool isReadable)
 		{
 			m_isReadable = isReadable;
-			m_isDirty = true;
 		}
 
 		bool mipmapEnabled() const
@@ -117,7 +111,6 @@ namespace FishEditor
 		void setMipmapEnabled(const bool mipmapEnabled)
 		{
 			m_mipmapEnabled = mipmapEnabled;
-			m_isDirty = true;
 		}
 		
 	protected:

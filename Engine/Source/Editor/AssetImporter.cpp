@@ -7,6 +7,7 @@
 
 #include "TextureImporter.hpp"
 #include "FBXImporter.hpp"
+#include "NativeFormatImporter.hpp"
 
 #include "AssetArchive.hpp"
 #include "SceneArchive.hpp"
@@ -19,8 +20,8 @@ using namespace FishEngine;
 namespace FishEditor
 {
 	std::map<FishEngine::GUID, FishEngine::ObjectPtr> AssetImporter::s_importerGUIDToObject;
-	std::map<int, boost::filesystem::path> AssetImporter::s_objectInstanceIDToPath;
-	std::map<boost::filesystem::path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
+	std::map<int, FishEngine::Path> AssetImporter::s_objectInstanceIDToPath;
+	std::map<FishEngine::Path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
 
 	AssetImporter::AssetImporter()
 		: m_guid(boost::uuids::random_generator()())
@@ -47,7 +48,7 @@ namespace FishEditor
 		auto meta_path = assetPath.string() + ".meta";
 		auto name = assetPath.stem().string();
 
-#if 1
+#if 0
 		if (boost::filesystem::exists(meta_path))
 		{
 			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
@@ -67,6 +68,21 @@ namespace FishEditor
 				importer->m_assetTimeStamp = meta_created_time;
 				importer->m_assetPath = assetPath;
 				return importer;
+			}
+		}
+#else
+		if (boost::filesystem::exists(meta_path))
+		{
+			uint32_t asset_modified_time = static_cast<uint32_t>(boost::filesystem::last_write_time(assetPath));
+			std::ifstream fin(meta_path);
+			MetaInputArchive archive(fin);
+			uint32_t meta_created_time = archive.timeStamp();
+			if (asset_modified_time <= meta_created_time)
+			{
+				auto importer = archive.DeserializeAssetImporter();
+				importer->setName(name);
+				importer->m_assetPath = assetPath;
+				return FishEngine::As<AssetImporterType>( importer );
 			}
 		}
 #endif
@@ -104,6 +120,7 @@ namespace FishEditor
 		}
 		else if (ext == ".fbx" || ext == ".FBX" || ext == ".obj")
 		{
+			Timer t(path.string());
 			auto importer = GetAssetImporter<FBXImporter>(path);
 			s_pathToImpoter[path] = importer;
 			auto modelPrefab = importer->Load(path);
@@ -113,11 +130,18 @@ namespace FishEditor
 			s_objectInstanceIDToPath[modelPrefab->rootGameObject()->GetInstanceID()] = path;
 			s_importerGUIDToObject[importer->GetGUID()] = modelPrefab->rootGameObject();
 			ret = importer;
+			t.StopAndPrint();
 
-			std::ofstream fout(path.string() + ".prefab");
-			FishEditor::SceneOutputArchive archive(fout);
-			archive.setSerializePrefab(true);
-			archive << modelPrefab;
+			//std::ofstream fout(path.string() + ".prefab");
+			//FishEditor::SceneOutputArchive archive(fout);
+			//archive.setSerializePrefab(true);
+			//archive << modelPrefab;
+		}
+		else if (ext == ".mat")
+		{
+			auto importer = GetAssetImporter<NativeFormatImporter>(path);
+			importer->Load(path);
+			ret = importer;
 		}
 
 		if (ret != nullptr && ret->m_assetTimeStamp == 0)	// if the .meta file is newly created

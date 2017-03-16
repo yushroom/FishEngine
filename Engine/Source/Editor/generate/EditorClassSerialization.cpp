@@ -6,9 +6,11 @@
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
 #include "../AssetImporter.hpp" 
-#include "../ModelImporter.hpp" 
-#include "../ModelImporter.hpp" 
 #include "../ProjectSettings.hpp" 
+#include "../NativeFormatImporter.hpp" 
+#include "../ModelImporter.hpp" 
+#include "../ModelImporter.hpp" 
+#include "../PrefabUtility.hpp" 
 #include "../TextureImporter.hpp" 
 #include "../TextureImporter.hpp" 
 
@@ -19,6 +21,9 @@ namespace FishEditor
 	void FishEditor::AssetImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		//archive.BeginClass();
+		archive << FishEngine::make_nvp("m_assetBundleName", m_assetBundleName); // std::string
+		archive << FishEngine::make_nvp("m_assetBundelVariant", m_assetBundelVariant); // std::string
+		archive << FishEngine::make_nvp("m_userData", m_userData); // std::string
 		archive << FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
 		//archive.EndClass();
 	}
@@ -26,7 +31,42 @@ namespace FishEditor
 	void FishEditor::AssetImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		//archive.BeginClass(2);
+		archive >> FishEngine::make_nvp("m_assetBundleName", m_assetBundleName); // std::string
+		archive >> FishEngine::make_nvp("m_assetBundelVariant", m_assetBundelVariant); // std::string
+		archive >> FishEngine::make_nvp("m_userData", m_userData); // std::string
 		archive >> FishEngine::make_nvp("m_fileIDToRecycleName", m_fileIDToRecycleName); // std::map<int, std::string>
+		//archive.EndClass();
+	}
+
+
+
+	// FishEditor::ProjectSettings
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ProjectSettings const & value )
+	{
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
+	}
+
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::ProjectSettings & value )
+	{
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
+	}
+
+	// FishEditor::NativeFormatImporter
+	void FishEditor::NativeFormatImporter::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEditor::AssetImporter::Serialize(archive);
+		//archive.EndClass();
+	}
+
+	void FishEditor::NativeFormatImporter::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEditor::AssetImporter::Deserialize(archive);
 		//archive.EndClass();
 	}
 
@@ -80,15 +120,15 @@ namespace FishEditor
 
 
 
-	// FishEditor::ProjectSettings
-	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ProjectSettings const & value )
+	// FishEditor::PrefabUtility
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::PrefabUtility const & value )
 	{
 		archive.BeginClass();
 		archive.EndClass();
 		return archive;
 	}
 
-	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::ProjectSettings & value )
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::PrefabUtility & value )
 	{
 		archive.BeginClass();
 		archive.EndClass();

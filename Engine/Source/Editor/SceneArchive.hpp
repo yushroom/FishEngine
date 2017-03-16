@@ -22,6 +22,30 @@ namespace FishEditor
 	protected:
 	};
 
+	class SingleObjectOutputArchive : public FishEngine::YAMLOutputArchive
+	{
+	public:
+		SingleObjectOutputArchive(std::ostream & os) : FishEngine::YAMLOutputArchive(os)
+		{
+			m_emitter.EmitHeader_FishEngine();
+		}
+
+		virtual ~SingleObjectOutputArchive() = default;
+
+		void BeginDoc(int classID, int fileID)
+		{
+			assert(!m_isInsideDoc);
+			//m_isInsideDoc = true;
+			//m_emitter << YAML::BeginDoc;
+			m_emitter.EmitBeginDoc_FishEngine(classID, fileID);
+		}
+
+		virtual void SerializeObject(FishEngine::ObjectPtr const & object) override;
+
+	protected:
+		bool m_isInsideDoc = false;
+	};
+
 	class SceneOutputArchive : public FishEngine::YAMLOutputArchive
 	{
 	public:

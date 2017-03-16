@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 
 namespace Ui {
 class MainWindow;

@@ -26,19 +26,22 @@ namespace FishEditor
 			return m_assetPath;
 		}
 		
-		uint32_t assetTimeStamp() const
-		{
-			return m_assetTimeStamp;
-		}
+		uint32_t assetTimeStamp() const { return m_assetTimeStamp; }
 		
+		// Get or set any user data.
+		std::string userData() const { return m_userData; }
+
+		std::string assetBundleName() const { return m_assetBundleName; }
 		
-		void SaveAndReimport();
-		
+		std::string assetBundleVariant() const { return m_assetBundelVariant; }
+
 		// Set the AssetBundle name and variant.
 		void SetAssetBundleNameAndVariant(std::string const & assetBundleName, std::string const & assetBundleVariant);
-		
+
 		// Retrieves the asset importer for the asset at path.
 		static AssetImporterPtr GetAtPath(FishEngine::Path path);
+
+		void SaveAndReimport();
 
 		FishEngine::GUID GetGUID() const
 		{
@@ -46,9 +49,9 @@ namespace FishEditor
 		}
 		
 	protected:
-
 		friend class FishEditor::AssetDatabase;
 		friend class FishEditor::SceneOutputArchive;
+		friend class MetaInputArchive;
 		
 		virtual void Reimport() { abort(); }
 		
@@ -62,16 +65,10 @@ namespace FishEditor
 		template<class AssetImporterType>
 		static std::shared_ptr<AssetImporterType> GetAssetImporter(FishEngine::Path const & assetPath);
 
-		// dirty flag for SaveAndReimport()
-		Meta(NonSerializable)
-		bool							m_isDirty = false;
-
 		//Get or set the AssetBundle name.
-		Meta(NonSerializable)
 		std::string						m_assetBundleName;
 		
 		// Get or set the AssetBundle variant.
-		Meta(NonSerializable)
 		std::string						m_assetBundelVariant;
 		
 		// The path name of the asset for this importer. (Read Only)
@@ -82,7 +79,6 @@ namespace FishEditor
 		uint32_t						m_assetTimeStamp = 0;
 		
 		// Get or set any user data.
-		Meta(NonSerializable)
 		std::string						m_userData;
 
 		Meta(NonSerializable)
@@ -99,8 +95,8 @@ namespace FishEditor
 
 	public:
 		static std::map<FishEngine::GUID, FishEngine::ObjectPtr> s_importerGUIDToObject;
-		static std::map<boost::filesystem::path, AssetImporterPtr> s_pathToImpoter;
-		static std::map<int, boost::filesystem::path> s_objectInstanceIDToPath;
+		static std::map<FishEngine::Path, AssetImporterPtr> s_pathToImpoter;
+		static std::map<int, FishEngine::Path> s_objectInstanceIDToPath;
 	};
 }
 

@@ -18,6 +18,7 @@
 //#include <Serialization/archives/BinaryOutputArchive.hpp>
 
 #include "AssetDataBase.hpp"
+#include "SceneArchive.hpp"
 
 ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	: QListView(parent)
@@ -49,7 +50,7 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 		m_actionCreateMaterial = subMenu->addAction("Material");
 		//action->setEnabled(false);
 		connect(m_actionCreateMaterial, &QAction::triggered, this, &ProjectListView::CreateMaterial);
-		m_actionCreateMaterial->setEnabled(false);
+		//m_actionCreateMaterial->setEnabled(false);
 		subMenu->addSeparator();
 		action = subMenu->addAction("Animator Controller");
 		action->setEnabled(false);
@@ -150,8 +151,13 @@ void ProjectListView::MakeDir()
 
 void ProjectListView::CreateMaterial()
 {
-	auto index = m_fileModel->AddItem("New Material.mat", false);
-	this->edit(index);
+	//auto index = m_fileModel->AddItem("New Material.mat", false);
+	//this->edit(index);
+	auto mat = std::make_shared<FishEngine::Material>();
+	auto path = Path(m_fileModel->rootPath().toStdString()) / "New Material.mat";
+	std::ofstream fout(path.string());
+	FishEditor::SingleObjectOutputArchive archive(fout);
+	archive << mat;
 }
 
 void ProjectListView::ShowInExplorer()

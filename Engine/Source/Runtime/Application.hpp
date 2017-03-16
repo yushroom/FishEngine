@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FishEngine.hpp"
-#include <boost/filesystem/path.hpp>
 #include "ReflectClass.hpp"
+#include "Path.hpp"
 
 class OpenProjectDialog;
 
@@ -19,7 +19,7 @@ namespace FishEngine
 		// Unity Editor: <path to project folder>/Assets
 		// Mac player: <path to player app bundle>/Contents
 		// Win/Linux player: <path to executablename_Data folder> (note that most Linux installations will be case-sensitive!)
-		static const boost::filesystem::path & dataPath() { return s_dataPath; }
+		static const FishEngine::Path & dataPath() { return s_dataPath; }
 
 		// Are we running inside the Unity editor? (Read Only)
 		// Returns true if the game is being run from the Unity editor; false if run from any deployment target.
@@ -33,8 +33,8 @@ namespace FishEngine
 		friend class FishEditor::MainEditor;
 		friend class ::MainWindow;
 		friend class ::OpenProjectDialog;
-		static boost::filesystem::path  s_dataPath;
-		static bool         s_isEditor;
-		static bool         s_isPlaying;
+		static Path s_dataPath;
+		static bool s_isEditor;
+		static bool s_isPlaying;
 	};
 }

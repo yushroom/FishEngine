@@ -183,3 +183,35 @@ void FishEditor::SceneInputArchive::LoadAll()
 		PrintNode(node);
 	}
 }
+
+void FishEditor::SingleObjectOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
+{
+	if (!m_isInsideDoc)
+	{
+		m_isInsideDoc = true;
+		auto classID = object->ClassID();
+		int fileID = classID * 100000;
+		BeginDoc(classID, fileID);
+		BeginMap(2);
+		m_emitter << object->ClassName();
+		BeginMap(1);	// do not know map size
+		object->Serialize(*this);
+		EndMap();
+		EndMap();
+		EndDoc();
+	}
+	else
+	{
+		if (object == nullptr)
+		{
+			(*this) << nullptr;
+		}
+		else
+		{
+			BeginFlow();
+			BeginMap(1);
+			(*this) << FishEngine::make_nvp("fileID", 1111);
+			EndMap();
+		}
+	}
+}

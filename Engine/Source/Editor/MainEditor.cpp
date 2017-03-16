@@ -29,7 +29,7 @@
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
 
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 
 #include <iostream>
 
@@ -202,12 +202,12 @@ namespace FishEditor
 //		plane->transform()->setLocalScale(10);
 //		//plane->transform()->setLocalPosition(0, -5, 0);
 //		
-//		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
-//		Object::Instantiate(model);
-//	
-//		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
+		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
+		Object::Instantiate(model);
+	
+		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
 //		Scene::AddGameObject(model);
-		//model = Object::Instantiate(model);
+		model = Object::Instantiate(model);
 		//model->transform()->setLocalScale(0.1f);
 	#endif
 

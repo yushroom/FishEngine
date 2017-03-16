@@ -765,7 +765,7 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
 			}
 
-			auto texture = GetTextureInfo(lMesh);
+			//auto texture = GetTextureInfo(lMesh);
 		}
 //		else if (type == FbxNodeAttribute::eSkeleton)
 //		{
@@ -814,7 +814,7 @@ void FishEditor::FBXImporter::Reimport()
 }
 
 
-PrefabPtr FishEditor::FBXImporter::Load(boost::filesystem::path const & path)
+PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 {
 	if (m_model.m_modelPrefab == nullptr)
 	{

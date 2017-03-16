@@ -3,13 +3,11 @@
 #include <type_traits>
 #include <sstream>
 
-#include <boost/filesystem/path.hpp>
-
-#include <Object.hpp>
-
+#include "Object.hpp"
 #include "ReflectClass.hpp"
 #include "Serialization/NameValuePair.hpp"
 #include "GUID.hpp"
+#include "Path.hpp"
 
 namespace FishEngine
 {	
@@ -118,7 +116,7 @@ namespace FishEngine
 			return *this;
 		}
 		
-		InputArchive & operator >> (boost::filesystem::path & path)
+		InputArchive & operator >> (FishEngine::Path & path)
 		{
 			std::string pathStr;
 			(*this) >> pathStr;

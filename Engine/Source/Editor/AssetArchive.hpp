@@ -5,18 +5,43 @@
 
 namespace FishEditor
 {
-	class AssetInputArchive : public ::FishEngine::YAMLInputArchive
+	class MetaInputArchive : public FishEngine::YAMLInputArchive
+	{
+	public:
+		MetaInputArchive(std::istream & is) : YAMLInputArchive(is) { }
+
+		virtual ~MetaInputArchive() = default;
+
+		uint32_t timeStamp() const;
+
+		AssetImporterPtr DeserializeAssetImporter();
+	};
+
+	class MaterialArchive : public FishEngine::YAMLInputArchive
+	{
+	public:
+		MaterialArchive(std::istream & is) : YAMLInputArchive(is) { }
+
+		virtual ~MaterialArchive() = default;
+
+		FishEngine::MaterialPtr DeserializeMaterial();
+	};
+
+	class AssetInputArchive : public FishEngine::YAMLInputArchive
 	{
 	public:
 		AssetInputArchive(std::istream & is) : YAMLInputArchive(is) { }
 
 		virtual ~AssetInputArchive() = default;
 
+		std::vector<FishEngine::ObjectPtr> LoadAll();
+
 	protected:
+		bool m_isSingle = true;
 	};
 
 
-	class AssetOutputArchive : public ::FishEngine::YAMLOutputArchive
+	class AssetOutputArchive : public FishEngine::YAMLOutputArchive
 	{
 	public:
 		AssetOutputArchive(std::ostream & os) : YAMLOutputArchive(os)

@@ -12,7 +12,6 @@ namespace FishEngine
 		YAMLInputArchive(std::istream & is)
 			: InputArchive(is), m_nodes(YAML::LoadAll(is))
 		{
-
 		}
 
 		virtual ~YAMLInputArchive() = default;
@@ -138,7 +137,6 @@ namespace FishEngine
 		static void Convert(YAML::Node const & node, std::string & t)
 		{
 			t = node.as<std::string>();
-			//std::cout << "as string: " << t << std::endl;
 		}
 
 		static void Convert(YAML::Node const & node, boost::uuids::uuid & t)

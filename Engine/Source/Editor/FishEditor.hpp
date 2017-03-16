@@ -22,6 +22,9 @@ namespace FishEditor
 	class ModelImporter;
 	typedef std::shared_ptr<ModelImporter> ModelImporterPtr;
 
+	class NativeFormatImporter;
+	typedef std::shared_ptr<NativeFormatImporter> NativeFormatImporterPtr;
+
 	class AssetOutputArchive;
 	class AssetInputArchive;
 	class SceneOutputArchive;

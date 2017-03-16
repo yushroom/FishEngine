@@ -249,6 +249,10 @@ namespace FishEditor
 				{
 					auto model = As<GameObject>(  AssetDatabase::LoadAssetAtPath(relative_path) );
 				}
+				else if (ext == ".mat")
+				{
+					AssetDatabase::LoadAssetAtPath(relative_path);
+				}
 #endif
 			}
 		}

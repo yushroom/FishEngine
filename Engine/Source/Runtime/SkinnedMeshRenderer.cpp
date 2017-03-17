@@ -76,6 +76,15 @@ namespace FishEngine
 			mat = mat.transpose();
 		}
 	}
+	
+	std::vector<Matrix4x4> const & SkinnedMeshRenderer::matrixPalette() const
+	{
+		if (m_sharedMesh != nullptr && m_matrixPalette.size() != m_sharedMesh->boneCount())
+		{
+			UpdateMatrixPalette();
+		}
+		return m_matrixPalette;
+	}
 
 	void SkinnedMeshRenderer::Update()
 	{

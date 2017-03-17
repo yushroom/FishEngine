@@ -44,6 +44,29 @@ public:
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const override
+	{
+		auto defaultFlags = QAbstractItemModel::flags(index);
+		if (index.isValid())
+		{
+			return Qt::ItemIsDragEnabled | defaultFlags;
+		}
+		else
+		{
+			return defaultFlags;
+		}
+	}
+	
+	virtual Qt::DropActions supportedDropActions() const override
+	{
+		return Qt::CopyAction | Qt::MoveAction;
+	}
+	
+	virtual Qt::DropActions supportedDragActions() const override
+	{
+		return Qt::MoveAction;
+	}
 
 	QModelIndex setRootPath(const Path &path);
 	FishEditor::FileInfo * fileInfo(const QModelIndex &index) const;

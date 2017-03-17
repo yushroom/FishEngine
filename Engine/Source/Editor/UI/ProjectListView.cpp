@@ -25,8 +25,12 @@ ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 {
 	//setAcceptDrops(true);
 	//setDragEnabled(true);
+	setDragEnabled(true);
+	setAcceptDrops(true);
+	setDropIndicatorShown(true);
 	setDragDropMode(QAbstractItemView::DragDrop);
 	setSelectionMode(QAbstractItemView::ExtendedSelection);
+	//setSelectionMode(QAbstractItemView::SingleSelection);
 	setEditTriggers(QAbstractItemView::EditKeyPressed);
 
 	m_menu = new QMenu(this);

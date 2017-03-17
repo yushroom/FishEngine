@@ -80,6 +80,20 @@ namespace FishEngine
 			//m_workingNodes.pop();
 			m_expectedNextType = Type::None;
 		}
+		
+		virtual std::size_t BeginSequence() override
+		{
+			auto & current = CurrentNode();
+			assert(current.IsSequence());
+			m_mapOrSequenceiterator = CurrentNode().begin();
+			//m_expectedNextType = Type::S
+			return current.size();
+		}
+		
+		virtual void EndSequence() override
+		{
+			m_expectedNextType = Type::None;
+		}
 
 	protected:
 

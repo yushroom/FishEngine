@@ -240,7 +240,7 @@ namespace FishEngine
 					{
 						shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
 						is_skinned = true;
-						Pipeline::UpdateBonesUniforms(renderer->m_matrixPalette);
+						Pipeline::UpdateBonesUniforms(renderer->matrixPalette());
 					}
 				}
 			}

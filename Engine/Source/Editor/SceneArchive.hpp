@@ -32,10 +32,15 @@ namespace FishEditor
 
 		virtual ~SingleObjectOutputArchive() = default;
 
+		virtual void BeginDoc() override
+		{
+			abort();
+		}
+		
 		void BeginDoc(int classID, int fileID)
 		{
 			assert(!m_isInsideDoc);
-			//m_isInsideDoc = true;
+			m_isInsideDoc = true;
 			//m_emitter << YAML::BeginDoc;
 			m_emitter.EmitBeginDoc_FishEngine(classID, fileID);
 		}

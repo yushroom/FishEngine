@@ -20,11 +20,6 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui(new Ui::ProjectView)
 {
 	ui->setupUi(this);
-
-	ui->listView->setResizeMode(QListView::Adjust);
-	ui->listView->setDragEnabled(true);
-	ui->listView->viewport()->setAcceptDrops(true);
-	ui->listView->setDropIndicatorShown(true);
 	
 
 	m_dirModel = new ProjectViewDirModel(this);
@@ -40,6 +35,13 @@ ProjectView::ProjectView(QWidget *parent) :
 	m_fileModel = new ProjectViewFileModel(this);
 	ui->listView->setFileModel(m_fileModel);
 	ui->listView->setModel(m_fileModel);
+
+	ui->listView->setResizeMode(QListView::Adjust);
+	ui->listView->setDragEnabled(true);
+	//ui->listView->viewport()->setAcceptDrops(true);
+	ui->listView->setAcceptDrops(true);
+	ui->listView->setDropIndicatorShown(true);
+	
 	ui->iconSizeSlider->setMinimum(0);
 	ui->iconSizeSlider->setMaximum(32);
 	ui->iconSizeSlider->setValue(m_listViewIconSize);

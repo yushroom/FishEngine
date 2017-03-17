@@ -188,7 +188,6 @@ void FishEditor::SingleObjectOutputArchive::SerializeObject(FishEngine::ObjectPt
 {
 	if (!m_isInsideDoc)
 	{
-		m_isInsideDoc = true;
 		auto classID = object->ClassID();
 		int fileID = classID * 100000;
 		BeginDoc(classID, fileID);

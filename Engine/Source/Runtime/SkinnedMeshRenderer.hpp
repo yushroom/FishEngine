@@ -50,6 +50,8 @@ namespace FishEngine
 		{
 			return m_bones;
 		}
+		
+		std::vector<Matrix4x4> const & matrixPalette() const;
 
 		void setSharedMesh(MeshPtr sharedMesh);
 

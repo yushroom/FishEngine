@@ -171,7 +171,14 @@ namespace FishEngine
 			//{
 			//	(*this) << item;
 			//}
-			abort();
+			auto size = BeginSequence();
+			t.resize(size);
+			//abort();
+			for (auto & x : t)
+			{
+				(*this) >> x;
+			}
+			EndSequence();
 			return *this;
 		}
 
@@ -212,6 +219,9 @@ namespace FishEngine
 		virtual void BeginMap() {}
 		//virtual void GetMapItem() {}
 		virtual void EndMap() {}
+		
+		virtual std::size_t BeginSequence() = 0;
+		virtual void EndSequence() = 0;
 		
 	protected:
 		std::istream & m_istream;

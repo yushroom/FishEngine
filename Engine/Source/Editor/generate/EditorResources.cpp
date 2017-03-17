@@ -86,6 +86,6 @@ MaterialPtr EditorResources::InstantiateBuiltinMaterial(const std::string& name)
 	assert(shader != nullptr);
 	auto material = Material::CreateMaterial();
 	material->setName(name);
-	material->SetShader(shader);
+	material->setShader(shader);
 	return material;
 }

@@ -63,7 +63,7 @@ namespace FishEngine
 		return false;
 	}
 
-	void Material::SetShader(const ShaderPtr& shader)
+	void Material::setShader(const ShaderPtr& shader)
 	{
 		m_shader = shader;
 		m_uniforms.floats.clear();
@@ -230,7 +230,7 @@ namespace FishEngine
 		assert(shader != nullptr);
 		auto material = CreateMaterial();
 		material->setName(name);
-		material->SetShader(shader);
+		material->setShader(shader);
 		return material;
 	}
 
@@ -255,7 +255,7 @@ namespace FishEngine
 		//s_defaultMaterial = CreateMaterial();
 		auto s_defaultMaterial = defaultMaterial();
 		s_defaultMaterial->setName("DefaultMaterial");
-		s_defaultMaterial->SetShader(Shader::builtinShader("PBR"));
+		s_defaultMaterial->setShader(Shader::builtinShader("PBR"));
 		s_defaultMaterial->SetFloat("Metallic", 0);
 		s_defaultMaterial->SetFloat("Roughness", 0.5f);
 		s_defaultMaterial->SetFloat("Specular", 0.5f);

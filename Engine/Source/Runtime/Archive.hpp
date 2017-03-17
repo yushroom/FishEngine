@@ -206,7 +206,10 @@ namespace FishEngine
 			{
 				T key;
 				B value;
-				(*this) >> key >> value;
+				(*this) >> key;
+				AfterMapKey();
+				(*this) >> value;
+				AfterMapValue();
 				hint = t.emplace_hint(hint, std::move(key), std::move(value));
 			}
 			EndMap();
@@ -216,9 +219,10 @@ namespace FishEngine
 		virtual void BeginClass() {}
 		virtual void EndClass() {}
 		
-		virtual void BeginMap() {}
-		//virtual void GetMapItem() {}
-		virtual void EndMap() {}
+		virtual void BeginMap() = 0;
+		virtual void AfterMapKey() = 0;
+		virtual void AfterMapValue() = 0;
+		virtual void EndMap() = 0;
 		
 		virtual std::size_t BeginSequence() = 0;
 		virtual void EndSequence() = 0;

@@ -38,25 +38,48 @@ namespace FishEngine
 
 		Material(const ShaderPtr& shader)
 		{
-			SetShader(shader);
+			setShader(shader);
 		}
 
-		Color color() const;
+		/**
+		 * The main material's color.
+		 *
+		 * @return FishEngine::Color
+		 */
+		 Color color() const;
 
-		// The shader used by the material.
-		ShaderPtr shader() const
+		/**
+		 * The shader used by the material.
+		 *
+		 * @return FishEngine::ShaderPtr
+		 */
+		 ShaderPtr shader() const
 		{
 			return m_shader;
 		}
 
 		// The shader used by the material.
-		void SetShader(const ShaderPtr& shader);
+		void setShader(const ShaderPtr& shader);
 
+		/**
+		 * Unset a shader keyword.
+		 *
+		 * @param ShaderKeyword keyword
+		 * @return void
+		 */
 		void DisableKeyword(ShaderKeyword keyword)
 		{
 			DisableKeywords(static_cast<ShaderKeywords>(keyword));
 		}
-		void EnableKeyword(ShaderKeyword keyword)
+
+
+		/**
+		 * Set a shader keyword that is enabled by this material.
+		 *
+		 * @param ShaderKeyword keyword
+		 * @return void
+		 */
+		 void EnableKeyword(ShaderKeyword keyword)
 		{
 			EnableKeywords(static_cast<ShaderKeywords>(keyword));
 		}

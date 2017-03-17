@@ -22,22 +22,6 @@ namespace FishEngine
 			{
 				m_workingNodes.push(m_nodes[m_nodeIndex]);
 			}
-			
-			if (m_expectedNextType == Type::MapKey)
-			{
-				m_expectedNextType = Type::MapValue;
-				m_workingNodes.pop();	// pop value node
-				auto key = m_mapOrSequenceiterator->first;
-				m_workingNodes.push(key);
-			}
-			else if (m_expectedNextType == Type::MapValue)
-			{
-				m_expectedNextType = Type::MapKey;
-				m_workingNodes.pop();	// pop key node
-				auto value = m_mapOrSequenceiterator->second;
-				++m_mapOrSequenceiterator;
-				m_workingNodes.push(value);
-			}
 			return m_workingNodes.top();
 		}
 
@@ -50,7 +34,7 @@ namespace FishEngine
 		std::shared_ptr<T> DeserializeObject()
 		{
 			auto currentNode = CurrentNode();
-			assert(CurrentNode().IsMap());
+			assert(currentNode.IsMap());
 			m_workingNodes.push(currentNode[T::StaticClassName()]);
 			auto p = std::make_shared<T>();
 			p->Deserialize(*this);
@@ -61,6 +45,8 @@ namespace FishEngine
 		virtual void BeginClass() override
 		{
 			//m_workingNodes.push()
+			auto current = CurrentNode();
+			assert(current.IsMap());
 		}
 		
 		virtual void EndClass() override
@@ -70,6 +56,25 @@ namespace FishEngine
 		virtual void BeginMap() override
 		{
 			m_mapOrSequenceiterator = CurrentNode().begin();
+			m_expectedNextType = Type::MapKey;
+		}
+
+		virtual void AfterMapKey() override
+		{
+			m_workingNodes.pop();	// pop value node
+			auto key = m_mapOrSequenceiterator->first;
+			m_workingNodes.push(key);
+			m_expectedNextType = Type::MapValue;
+		}
+
+		virtual void AfterMapValue() override
+		{
+			//m_expectedNextType = Type::MapKey;
+			m_workingNodes.pop();	// pop key node
+			auto value = m_mapOrSequenceiterator->second;
+			//++m_mapOrSequenceiterator;
+			m_workingNodes.push(value);
+			m_mapOrSequenceiterator++;
 			m_expectedNextType = Type::MapKey;
 		}
 		

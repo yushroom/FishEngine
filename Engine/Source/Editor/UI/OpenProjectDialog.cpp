@@ -37,11 +37,11 @@ OpenProjectDialog::~OpenProjectDialog()
 
 void OpenProjectDialog::OnCreateButtonClicked()
 {
-#if 0
+#if 1
 #if FISHENGINE_PLATFORM_WINDOWS
-	FishEngine::Applicaiton::s_dataPath = "D:/FishEngine/Projects/Sponza/Assets";
+	FishEngine::Application::s_dataPath = "D:/FishEngine/Projects/Sponza/Assets";
 #else
-	FishEngine::Applicaiton::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
+	FishEngine::Application::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
 #endif
 	accept();
 #endif
@@ -95,7 +95,7 @@ void OpenProjectDialog::OnLocationToolButtonClicked()
 
 void OpenProjectDialog::SetProjectPath(QString const & projectPath)
 {
-	FishEngine::Applicaiton::s_dataPath = QDir(projectPath).filePath("Assets").toStdString();
+	FishEngine::Application::s_dataPath = QDir(projectPath).filePath("Assets").toStdString();
 }
 
 void OpenProjectDialog::CreateNewProject(QString const & projectPath)

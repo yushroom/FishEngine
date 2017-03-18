@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionSaveSceneAs, &QAction::triggered, this, &MainWindow::SaveSceneAs);
 
 	connect(ui->actionPlay, &QAction::triggered, [this](){
-		if (Applicaiton::isPlaying())
+		if (Application::isPlaying())
 		{
 			this->ui->actionPlay->setIcon(QIcon(":/Resources/Play_black.png"));
 			this->ui->actionPlay->setChecked(true);
@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent) :
 			&QAction::trigger);
 
 //    FishEditor::MainEditor::OnInitialized += [this](){
-//        ui->projectView->SetRootPath(FishEngine::Applicaiton::dataPath());
+//        ui->projectView->SetRootPath(FishEngine::Application::dataPath());
 //    };
 }
 
@@ -155,10 +155,10 @@ void MainWindow::Init()
 {
 	FishEngine::Debug::Init();
 
-	Applicaiton::s_isEditor = true;
+	Application::s_isEditor = true;
 
 	//FishEngine::Timer t("Load assets");
-	FishEditor::FileInfo::SetAssetRootPath(Applicaiton::s_dataPath);
+	FishEditor::FileInfo::SetAssetRootPath(Application::s_dataPath);
 	//t.StopAndPrint();
 
 	//// http://stackoverflow.com/questions/37987426/qt-non-blocking-overlay-dialog
@@ -192,7 +192,7 @@ void MainWindow::NewScene()
 
 void MainWindow::OpenScene()
 {
-	QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath().string());
+	QString path = QString::fromStdString(FishEngine::Application::dataPath().string());
 	path = QFileDialog::getOpenFileName(this, "Load Scene", path, "Scene (*.scene)");
 	if (path.isEmpty())
 	{
@@ -207,7 +207,7 @@ void MainWindow::OpenScene()
 void MainWindow::SaveSceneAs()
 {
 	//options |= QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
-	QString path = QString::fromStdString(FishEngine::Applicaiton::dataPath().string());
+	QString path = QString::fromStdString(FishEngine::Application::dataPath().string());
 	path = QFileDialog::getSaveFileName(this, "Save Scene", path, "Scene (*.scene)");
 	if (path.isEmpty())
 	{

@@ -10,10 +10,10 @@ namespace FishEngine
 {
 	// Access to application run-time data.
 	// This class contains static methods for looking up information about and controlling the run-time data.
-	class Meta(NonSerializable) Applicaiton
+	class Meta(NonSerializable) Application
 	{
 	public:
-		Applicaiton() = delete;
+		Application() = delete;
 
 		// Contains the path to the game data folder (Read Only).
 		// Unity Editor: <path to project folder>/Assets

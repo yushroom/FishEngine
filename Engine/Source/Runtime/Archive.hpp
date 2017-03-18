@@ -18,7 +18,6 @@ namespace FishEngine
 		InputArchive(std::istream & is) : m_istream(is) { }
 
 		virtual ~InputArchive() = default;
-		//virtual int ArchiveID() = 0;
 
 		InputArchive & operator >> (short & t)
 		{
@@ -85,12 +84,6 @@ namespace FishEngine
 			this->Deserialize(t);
 			return *this;
 		}
-
-		//InputArchive & operator >> (std::nullptr_t const & t)
-		//{
-		//	this->Serialize(t);
-		//	return *this;
-		//}
 		
 		template<typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
 		InputArchive & operator >> (T & t)
@@ -124,18 +117,14 @@ namespace FishEngine
 			return *this;
 		}
 
+		
 		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
 		InputArchive & operator >> (std::shared_ptr<T> & obj)
 		{
 			DeserializeObject(obj);
 			return *this;
 		}
-
-		//OutputArchive & operator << (ObjectPtr const & obj)
-		//{
-		//	SerializeObject(obj);
-		//	return *this;
-		//}
+		
 
 		template<class T, std::enable_if_t<std::is_base_of<Object, T>::value, int> = 0>
 		InputArchive & operator >> (std::weak_ptr<T> & obj)
@@ -167,16 +156,13 @@ namespace FishEngine
 		template<class T>
 		InputArchive & operator >> (std::vector<T> & t)
 		{
-			//for (auto & item : t)
-			//{
-			//	(*this) << item;
-			//}
 			auto size = BeginSequence();
 			t.resize(size);
-			//abort();
 			for (auto & x : t)
 			{
+				BeforeASequenceItem();
 				(*this) >> x;
+				AfterASequenceItem();
 			}
 			EndSequence();
 			return *this;
@@ -199,13 +185,14 @@ namespace FishEngine
 		InputArchive & operator >> (std::map<T, B> & t)
 		{
 			t.clear();
-			auto size = GetSizeTag();
-			BeginMap();
+			//auto size = GetSizeTag();
+			auto size = BeginMap();
 			auto hint = t.begin();
 			for (size_t i = 0; i < size; ++i)
 			{
 				T key;
 				B value;
+				BeforeMapKey();
 				(*this) >> key;
 				AfterMapKey();
 				(*this) >> value;
@@ -216,16 +203,8 @@ namespace FishEngine
 			return *this;
 		}
 
-		virtual void BeginClass() {}
-		virtual void EndClass() {}
-		
-		virtual void BeginMap() = 0;
-		virtual void AfterMapKey() = 0;
-		virtual void AfterMapValue() = 0;
-		virtual void EndMap() = 0;
-		
-		virtual std::size_t BeginSequence() = 0;
-		virtual void EndSequence() = 0;
+		virtual void BeginClass() = 0;
+		virtual void EndClass() = 0;
 		
 	protected:
 		std::istream & m_istream;
@@ -248,8 +227,19 @@ namespace FishEngine
 		virtual void DeserializeObject(ObjectPtr const & obj) = 0;
 		virtual void DeserializeWeakObject(std::weak_ptr<Object> const & obj) = 0;
 		
-		virtual std::size_t GetSizeTag() = 0;
+		//virtual std::size_t GetSizeTag() = 0;
 
+		virtual std::size_t BeginMap() = 0;
+		virtual void BeforeMapKey() = 0;
+		virtual void AfterMapKey() = 0;
+		virtual void AfterMapValue() = 0;
+		virtual void EndMap() = 0;
+		
+		virtual std::size_t BeginSequence() = 0;
+		virtual void BeforeASequenceItem() = 0;
+		virtual void AfterASequenceItem() = 0;
+		virtual void EndSequence() = 0;
+		
 		virtual void EndNVP() = 0;
 		virtual void NameOfNVP(const char* name) = 0;
 		virtual void MiddleOfNVP() = 0;
@@ -260,10 +250,7 @@ namespace FishEngine
 	{
 	public:
 
-		OutputArchive(std::ostream & os) : m_ostream(os)
-		{
-
-		}
+		OutputArchive() = default;
 
 		virtual ~OutputArchive() = default;
 		//virtual int ArchiveID() = 0;
@@ -451,20 +438,20 @@ namespace FishEngine
 		virtual void EndSequence() {}
 
 	protected:
-		virtual void Serialize(short t) { m_ostream << t; }
-		virtual void Serialize(unsigned short t) { m_ostream << t; }
-		virtual void Serialize(int t) { m_ostream << t; }
-		virtual void Serialize(unsigned int t) { m_ostream << t; }
-		virtual void Serialize(long t) { m_ostream << t; }
-		virtual void Serialize(unsigned long t) { m_ostream << t; }
-		virtual void Serialize(long long t) { m_ostream << t; }
-		virtual void Serialize(unsigned long long t) { m_ostream << t; }
-		virtual void Serialize(float t) { m_ostream << t; }
-		virtual void Serialize(double t) { m_ostream << t; }
-		virtual void Serialize(bool t) { m_ostream << t; }
-		virtual void Serialize(std::string t) { m_ostream << t; }
-		virtual void Serialize(const char* t) { m_ostream << t; }
-		virtual void Serialize(std::nullptr_t const & t) { }
+		virtual void Serialize(short t) = 0;
+		virtual void Serialize(unsigned short t) = 0;
+		virtual void Serialize(int t) = 0;
+		virtual void Serialize(unsigned int t) = 0;
+		virtual void Serialize(long t) = 0;
+		virtual void Serialize(unsigned long t) = 0;
+		virtual void Serialize(long long t) = 0;
+		virtual void Serialize(unsigned long long t) = 0;
+		virtual void Serialize(float t) = 0;
+		virtual void Serialize(double t) = 0;
+		virtual void Serialize(bool t) = 0;
+		virtual void Serialize(std::string const & t) = 0;
+		virtual void Serialize(const char* t) = 0;
+		virtual void Serialize(std::nullptr_t const & t) = 0;
 
 		virtual void SerializeObject(ObjectPtr const & obj) = 0;
 		virtual void SerializeWeakObject(std::weak_ptr<Object> const & obj) = 0;
@@ -491,6 +478,6 @@ namespace FishEngine
 		virtual void SerializeNameOfNVP(const char* name) = 0;
 		virtual void MiddleOfNVP() = 0;
 
-		std::ostream & m_ostream;
+		//std::ostream & m_ostream;
 	};
 }

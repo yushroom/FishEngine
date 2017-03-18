@@ -234,7 +234,7 @@ namespace FishEditor
 			{
 				m_fileChildren.emplace_back(fileNode);
 				fileNode->m_isDirectory = false;
-				auto relative_path = boost::filesystem::relative(p, FishEngine::Applicaiton::dataPath().parent_path());
+				auto relative_path = boost::filesystem::relative(p, FishEngine::Application::dataPath().parent_path());
 #if 1
 				auto ext = p.extension();
 				if (Resources::GetAssetType(ext) == AssetType::Texture)

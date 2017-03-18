@@ -28,6 +28,12 @@ namespace FishEditor
 	class AssetOutputArchive;
 	class AssetInputArchive;
 	class SceneOutputArchive;
+	
+	class SerializedProperty;
+	typedef std::shared_ptr<SerializedProperty> SerializedPropertyPtr;
+	
+	class SerializedObject;
+	typedef std::shared_ptr<SerializedObject> SerializedObjectPtr;
 
 
 	//typedef std::list<Actor> Action;

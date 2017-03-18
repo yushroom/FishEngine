@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <QDropEvent>
 #include <QMimeData>
 #include <QMenu>
@@ -12,6 +15,7 @@
 
 #include <Object.hpp>
 #include <GameObject.cpp>
+#include <Application.hpp>
 
 #include <Debug.hpp>
 #include <Scene.hpp>
@@ -180,41 +184,89 @@ void ProjectListView::InstantiateAsset()
 
 //void ProjectListView::mousePressEvent(QMouseEvent *event)
 //{
-//	if (event->button() == Qt::LeftButton)
-//	{
-//		auto item = indexAt(event->pos());
-//		if (!item.isValid())
-//		{
-//			this->selectionModel()->clearSelection();
-//		}
-//	}
-//	QListView::mousePressEvent(event);
+//	FishEngine::Debug::Log("%s", "ProjectListView::mousePressEvent");
 //}
 
-//void ProjectListView::dragEnterEvent(QDragEnterEvent *e)
-//{
-//    FishEngine::Debug::Log("%s", "ProjectListView::dragEnterEvent");
-//    e->acceptProposedAction();
-//}
-//
-//void ProjectListView::dragMoveEvent(QDragMoveEvent *e)
-//{
-//    FishEngine::Debug::Log("%s", "ProjectListView::dragMoveEvent");
-//    e->acceptProposedAction();
-//}
-//
-//void ProjectListView::dropEvent(QDropEvent *e)
-//{
-//	FishEngine::Debug::Log("%s", "ProjectListView::dropEvent");
-//	auto mimeData = e->mimeData();
-//
-//	if (mimeData->hasUrls())
-//	{
-//		QStringList pathList;
-//		for (auto const & url : mimeData->urls())
+void ProjectListView::dragEnterEvent(QDragEnterEvent *e)
+{
+    FishEngine::Debug::Log("%s", "ProjectListView::dragEnterEvent");
+	if (e->mimeData()->hasUrls())
+		e->acceptProposedAction();
+}
+
+void ProjectListView::dragMoveEvent(QDragMoveEvent *e)
+{
+    //FishEngine::Debug::Log("%s", "ProjectListView::dragMoveEvent");
+    e->acceptProposedAction();
+}
+
+Path getUniqueName(Path const & dir, Path const & filename)
+{
+	auto dest = dir / filename;
+	
+	if (!boost::filesystem::exists(dest))
+	{
+		return dest;
+	}
+	
+	auto stem = filename.stem().string();
+	auto ext = filename.extension().string();
+	
+	int id = 1;
+	do {
+		dest = dir / (stem + " " + boost::lexical_cast<std::string>(id) + ext);
+	} while (boost::filesystem::exists(dest));
+
+	return dest;
+}
+
+void ProjectListView::dropEvent(QDropEvent *e)
+{
+	FishEngine::Debug::Log("%s", "ProjectListView::dropEvent");
+	auto mimeData = e->mimeData();
+
+	auto currentDir = Path(m_fileModel->rootPath().toStdString()).remove_trailing_separator().make_preferred();
+	
+	if (mimeData->hasUrls())
+	{
+		auto projectRoot = FishEngine::Application::dataPath();
+		projectRoot = projectRoot.make_preferred();
+		for (auto const & url : mimeData->urls())
+		{
+			auto src = Path(url.toLocalFile().toStdString());
+			src = boost::filesystem::absolute(src).make_preferred();
+			bool insideProject = boost::starts_with(src.string(), projectRoot.string());
+			if (!insideProject)
+			{
+				auto dest = getUniqueName(currentDir, src.filename());
+				boost::filesystem::copy(src, dest);
+				FishEngine::Debug::Log("copy file from: [%s] --> [%s]", src.string().c_str(), dest.string().c_str());
+				// TODO: .meta
+			}
+			else
+			{
+				bool insideThisDir = (src.parent_path() == currentDir);
+				if (insideThisDir)
+				{
+					// do nothing
+				}
+				else
+				{
+					auto dest = getUniqueName(currentDir, src.filename());
+					boost::filesystem::rename(src, dest);
+					auto srcMeta = Path(src.string() + ".meta");
+					if (boost::filesystem::exists(srcMeta))
+					{
+						auto destMeta = Path(dest.string() + ".meta");
+						boost::filesystem::rename(srcMeta, destMeta);
+					}
+				}
+			}
+		}
+		
+//		if (!pathList.empty())
 //		{
-//			pathList.append(url.toLocalFile());
+//			e->acceptProposedAction();
 //		}
-//
-//	}
-//}
+	}
+}

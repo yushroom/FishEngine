@@ -9,6 +9,7 @@ class ProjectView;
 
 class ProjectViewFileModel;
 class ProjectViewDirModel;
+class QFileSystemWatcher;
 
 class ProjectView : public QWidget
 {
@@ -29,12 +30,17 @@ private:
 	//void OnListTreeViewClicked(const QModelIndex &index);
 	void OnListViewSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 	void OnIconSizeChanged(int size);
+	
+	void OnFileChanged(QString const & path);
+	void OnDirectoryChanged(QString const & path);
 
 private:
 	Ui::ProjectView         * ui;
 
 	ProjectViewDirModel     * m_dirModel;
 	ProjectViewFileModel    * m_fileModel;
+	
+	QFileSystemWatcher		* m_assetsDirWatcher;
 
 	int m_listViewIconSize = 16;
 };

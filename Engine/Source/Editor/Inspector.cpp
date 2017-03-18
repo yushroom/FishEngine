@@ -207,7 +207,6 @@ void Inspector::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
 template<>
 void Inspector::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 {
-	EditorGUI::FloatField("Instance ID", renderer->GetInstanceID());
 	OnInspectorGUI<Renderer>(renderer);
 }
 

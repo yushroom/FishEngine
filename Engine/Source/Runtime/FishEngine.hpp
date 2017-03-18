@@ -30,6 +30,7 @@
 namespace FishEngine
 {
 	class Object;
+	class ScriptableObject;
 	class Prefab;
 	class GameObject;
 	class Transform;
@@ -60,6 +61,7 @@ namespace FishEngine
 	class Quaternion;
 	class Matrix4x4;
 	class Bounds;
+	class Rect;
 	class Ray;
 	class Light;
 	class Color;
@@ -86,6 +88,7 @@ namespace FishEngine
 	class OutputArchive;
 
 	typedef std::shared_ptr<Object> ObjectPtr;
+	typedef std::shared_ptr<ScriptableObject> ScriptableObjectPtr;
 	typedef std::shared_ptr<Prefab> PrefabPtr;
 	typedef std::shared_ptr<GameObject> GameObjectPtr;
 	typedef std::shared_ptr<Transform> TransformPtr;

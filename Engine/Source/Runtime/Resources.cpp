@@ -25,6 +25,10 @@ namespace FishEngine
 		{
 			return AssetType::Script;
 		}
+		else if (ext == ".prefab")
+		{
+			return AssetType::Prefab;
+		}
 		return AssetType::Unknown;
 	}
 }

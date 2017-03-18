@@ -5,6 +5,7 @@
 #include "ProjectViewFileModel.hpp"
 //#include <QDirModel>
 #include <QDir>
+#include <QFileSystemWatcher>
 
 #include <Debug.hpp>
 #include <Application.hpp>
@@ -20,7 +21,6 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui(new Ui::ProjectView)
 {
 	ui->setupUi(this);
-	
 
 	m_dirModel = new ProjectViewDirModel(this);
 	//dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -47,9 +47,24 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui->iconSizeSlider->setValue(m_listViewIconSize);
 	OnIconSizeChanged(m_listViewIconSize);
 
-	auto const & rootPath = FishEngine::Applicaiton::dataPath();
+	auto const & rootPath = FishEngine::Application::dataPath();
 	SetRootPath(QString::fromStdString(rootPath.string()));
+	
+	m_assetsDirWatcher = new QFileSystemWatcher(this);
+	m_assetsDirWatcher->addPath(QString::fromStdString(rootPath.string()));
+	
+	
+	connect(m_assetsDirWatcher,
+			&QFileSystemWatcher::fileChanged,
+			this,
+			&ProjectView::OnFileChanged);
 
+	connect(m_assetsDirWatcher,
+			&QFileSystemWatcher::directoryChanged,
+			this,
+			&ProjectView::OnDirectoryChanged);
+
+	
 	connect(
 		ui->dirTreeView->selectionModel(), 
 		&QItemSelectionModel::currentChanged, 
@@ -182,4 +197,15 @@ void ProjectView::OnIconSizeChanged(int size)
 		ui->listView->setGridSize(QSize(s+12, s+24));
 		ui->listView->setIconSize(QSize(s, s));
 	}
+}
+
+void ProjectView::OnFileChanged(QString const & path)
+{
+	FishEngine::Debug::Log("ProjectView::OnFileChanged: %s", path.toStdString().c_str());
+}
+
+
+void ProjectView::OnDirectoryChanged(QString const & path)
+{
+	FishEngine::Debug::Log("ProjectView::OnDirectoryChanged: %s", path.toStdString().c_str());
 }

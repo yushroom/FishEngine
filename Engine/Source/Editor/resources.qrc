@@ -20,5 +20,8 @@
         <file>Resources/circled_dot.png</file>
         <file>Resources/M.png</file>
         <file>Resources/settings.png</file>
+        <file>Resources/MaterialIcon.png</file>
+        <file>Resources/MeshIcon.png</file>
+        <file>Resources/PrefabIcon.png</file>
     </qresource>
 </RCC>

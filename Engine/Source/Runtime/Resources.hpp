@@ -15,9 +15,11 @@ namespace FishEngine
 		Unknown,
 		Texture,
 		Model,
+		Mesh,
 		Shader,
 		Material,
 		Script,
+		Prefab,
 	};
 
 	enum class SystemDirectoryType

@@ -53,37 +53,35 @@ namespace FishEngine
 		{
 		}
 		
-		virtual void BeginMap() override
+		virtual std::size_t BeginMap() override
 		{
-			m_mapOrSequenceiterator = CurrentNode().begin();
-			m_expectedNextType = Type::MapKey;
+			auto const & current = CurrentNode();
+			assert(current.IsMap());
+			m_mapOrSequenceiterator = current.begin();
+			return current.size();
 		}
-
-		virtual void AfterMapKey() override
+		
+		virtual void BeforeMapKey() override
 		{
-			m_workingNodes.pop();	// pop value node
 			auto key = m_mapOrSequenceiterator->first;
 			m_workingNodes.push(key);
-			m_expectedNextType = Type::MapValue;
+		}
+		
+		virtual void AfterMapKey() override
+		{
+			m_workingNodes.pop();	// pop key node
+			auto value = m_mapOrSequenceiterator->second;
+			m_workingNodes.push(value);
+			m_mapOrSequenceiterator++;
 		}
 
 		virtual void AfterMapValue() override
 		{
-			//m_expectedNextType = Type::MapKey;
-			m_workingNodes.pop();	// pop key node
-			auto value = m_mapOrSequenceiterator->second;
-			//++m_mapOrSequenceiterator;
-			m_workingNodes.push(value);
-			m_mapOrSequenceiterator++;
-			m_expectedNextType = Type::MapKey;
+			m_workingNodes.pop();	// pop value node
 		}
 		
-		//virtual void GetMapItem() {}
 		virtual void EndMap() override
 		{
-			// the top node of m_workingNodes if map node itself (if this map is empty) or the last MapValue node of this map
-			//m_workingNodes.pop();
-			m_expectedNextType = Type::None;
 		}
 		
 		virtual std::size_t BeginSequence() override
@@ -91,13 +89,22 @@ namespace FishEngine
 			auto & current = CurrentNode();
 			assert(current.IsSequence());
 			m_mapOrSequenceiterator = CurrentNode().begin();
-			//m_expectedNextType = Type::S
 			return current.size();
+		}
+		
+		virtual void BeforeASequenceItem() override
+		{
+			m_workingNodes.push(*m_mapOrSequenceiterator);
+		}
+		
+		virtual void AfterASequenceItem() override
+		{
+			m_mapOrSequenceiterator++;
+			m_workingNodes.pop();
 		}
 		
 		virtual void EndSequence() override
 		{
-			m_expectedNextType = Type::None;
 		}
 
 	protected:
@@ -135,20 +142,13 @@ namespace FishEngine
 		{
 			auto currentNode = CurrentNode();
 			assert(currentNode.IsMap());
-			//assert(currentNode.front());
+			assert(currentNode[name]);
 			m_workingNodes.push(currentNode[name]);
 		}
 
 		virtual void MiddleOfNVP() override
 		{
 
-		}
-		
-		virtual std::size_t GetSizeTag() override
-		{
-			auto currentNode = CurrentNode();
-			assert(currentNode.IsMap() || currentNode.IsSequence());
-			return currentNode.size();
 		}
 
 	protected:
@@ -180,26 +180,17 @@ namespace FishEngine
 			t = static_cast<T>(node.as<std::underlying_type_t<T>>());
 		}
 		
-		std::vector<YAML::Node> m_nodes;
-		uint32_t m_nodeIndex = 0;
-		std::stack<YAML::Node> m_workingNodes;
-		
-		enum class Type
-		{
-			None,
-			MapKey,
-			MapValue,
-		};
-		
-		Type					m_expectedNextType = Type::None;
-		YAML::const_iterator	m_mapOrSequenceiterator;
+		std::vector<YAML::Node>		m_nodes;
+		uint32_t					m_nodeIndex = 0;
+		std::stack<YAML::Node>		m_workingNodes;
+		YAML::const_iterator		m_mapOrSequenceiterator;
 	};
 
 
 	class YAMLOutputArchive : public OutputArchive
 	{
 	public:
-		YAMLOutputArchive(std::ostream & os) : OutputArchive(os), m_emitter(os)
+		YAMLOutputArchive(std::ostream & os) : m_emitter(os)
 		{
 
 		}
@@ -267,7 +258,7 @@ namespace FishEngine
 		virtual void Serialize(float t) override { m_emitter << t; }
 		virtual void Serialize(double t) override { m_emitter << t; }
 		virtual void Serialize(bool t) override { m_emitter << t; }
-		virtual void Serialize(std::string t) override { m_emitter << t; }
+		virtual void Serialize(std::string const & t) override { m_emitter << t; }
 		virtual void Serialize(const char* t) override { m_emitter << t; }
 
 		virtual void Serialize(std::nullptr_t const & t) override

@@ -245,7 +245,7 @@ namespace FishEditor
 		//Input::Update();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if (Applicaiton::isPlaying())
+		if (Application::isPlaying())
 		{
 			Scene::Update();
 			PhysicsSystem::FixedUpdate();
@@ -277,7 +277,7 @@ namespace FishEditor
 //			archive << go;
 //		}
 		
-		Applicaiton::s_isPlaying = true;
+		Application::s_isPlaying = true;
 		PhysicsSystem::Init();
 		//m_inPlayMode = true;
 		Camera::setMainCamera(nullptr);
@@ -288,7 +288,7 @@ namespace FishEditor
 	void MainEditor::Stop()
 	{
 		//m_inPlayMode = false;
-		Applicaiton::s_isPlaying = false;
+		Application::s_isPlaying = false;
 		//Camera::m_mainCamera = EditorGUI::m_mainSceneViewEditor->camera();
 		Camera::setMainCamera(m_mainSceneViewEditor->camera());
 		PhysicsSystem::Clean();

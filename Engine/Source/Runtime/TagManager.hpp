@@ -10,7 +10,7 @@
 
 namespace FishEngine
 {
-	class Meta(NonSerializable) TagManager
+	class FE_EXPORT Meta(NonSerializable) TagManager
 	{
 	public:
 		TagManager() = delete;

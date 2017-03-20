@@ -37,7 +37,7 @@ namespace FishEditor
 	};
 
 
-	class FE_EXPORT Meta(NonSerializable) Model
+	class Meta(NonSerializable) Model
 	{
 	public:
 		//InjectClassName(Model)

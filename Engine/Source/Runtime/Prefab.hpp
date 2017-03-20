@@ -4,7 +4,7 @@
 
 namespace FishEngine
 {	
-	class Prefab : public Object
+	class FE_EXPORT Prefab : public Object
 	{
 		InjectClassName(Prefab);
 		

@@ -4,7 +4,7 @@
 
 namespace FishEngine
 {
-	class Texture2D : public Texture
+	class FE_EXPORT Texture2D : public Texture
 	{
 	public:
 

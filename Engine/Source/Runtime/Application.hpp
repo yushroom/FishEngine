@@ -10,7 +10,7 @@ namespace FishEngine
 {
 	// Access to application run-time data.
 	// This class contains static methods for looking up information about and controlling the run-time data.
-	class Meta(NonSerializable) Application
+	class FE_EXPORT Meta(NonSerializable) Application
 	{
 	public:
 		Application() = delete;

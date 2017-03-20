@@ -8,9 +8,11 @@ boost_headers = (
 	"boost/uuid/uuid_io.hpp",
 	"boost/algorithm/string.hpp",
 	"boost/filesystem.hpp",
+	"boost/any.hpp",
+	"boost/dll.hpp"
 	)
 
-output_dir = R"D:\program\FishEngine\Engine\ThirdParty\boost"
+output_dir = R"D:\program\github\FishEngine\Engine\ThirdParty\boost"
 
 if not os.path.exists(output_dir):
 	os.makedirs(output_dir)

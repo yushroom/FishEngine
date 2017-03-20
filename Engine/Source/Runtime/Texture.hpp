@@ -125,7 +125,7 @@ namespace FishEngine
 	};
 
 
-	class Meta(NonSerializable) ColorBuffer : public Texture
+	class FE_EXPORT Meta(NonSerializable) ColorBuffer : public Texture
 	{
 	public:
 		static std::shared_ptr<ColorBuffer> Create(const int width, const int height, TextureFormat format = TextureFormat::RGBA32);
@@ -144,7 +144,7 @@ namespace FishEngine
 	//};
 
 
-	class Meta(NonSerializable) DepthBuffer : public Texture
+	class FE_EXPORT Meta(NonSerializable) DepthBuffer : public Texture
 	{
 	public:
 		static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
@@ -153,7 +153,7 @@ namespace FishEngine
 	};
 
 
-	class LayeredDepthBuffer : public DepthBuffer
+	class FE_EXPORT LayeredDepthBuffer : public DepthBuffer
 	{
 	public:
 		static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int depth, bool useStencil = true);
@@ -163,7 +163,7 @@ namespace FishEngine
 	};
 
 
-	class Cubemap : public Texture
+	class FE_EXPORT Cubemap : public Texture
 	{
 	public:
 

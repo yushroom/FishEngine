@@ -14,7 +14,8 @@
 #include "ProjectViewFileModel.hpp"
 
 #include <Object.hpp>
-#include <GameObject.cpp>
+#include <GameObject.hpp>
+#include <Material.hpp>
 #include <Application.hpp>
 
 #include <Debug.hpp>

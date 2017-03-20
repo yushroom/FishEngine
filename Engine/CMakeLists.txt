@@ -24,21 +24,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #message("lib output directory: " ${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE})
 
+SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/)
+SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/lib64-msvc-14.0)
+
 #boost
-IF(WIN32)
-	ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
-	ADD_SUBDIRECTORY(./ThirdParty/boost/cmake)
-	include_directories(${Boost_INCLUDE_DIRS})
-	message("Boost root dir: " ${Boost_INCLUDE_DIRS})
-	link_directories(${Boost_LIBRARY_DIRS})
-	message("Boost lib dir: " ${Boost_LIBRARY_DIRS})
-ELSE()
-	set(Boost_USE_STATIC_LIBS       ON) # find static libs
-	set(Boost_USE_MULTITHREADED     ON)
-	set(Boost_USE_STATIC_RUNTIME    OFF)
-	find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
-	include_directories(${Boost_INCLUDE_DIRS})
-ENDIF()
+set(Boost_USE_STATIC_LIBS       ON)
+set(Boost_USE_MULTITHREADED     ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
+include_directories(${Boost_INCLUDE_DIRS})
 
 # Autodesk FBX sdk
 SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
@@ -196,6 +190,8 @@ if (MSVC)
 else()
     FILE(GLOB PhysXSDK_LIBRARIES ${PhysX_ROOT_DIR}/Lib/osx64/*.a)
 endif()
+
+add_definitions(-DFishEngine_SHARED_LIB=1)
 
 ADD_SUBDIRECTORY(./Source/Runtime)
 ADD_SUBDIRECTORY(./Source/Editor)

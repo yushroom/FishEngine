@@ -116,7 +116,7 @@ namespace FishEngine
 	}
 
 	template<>
-	std::shared_ptr<GameObject> MakeShared();
+	FE_EXPORT std::shared_ptr<GameObject> MakeShared();
 
 	template<>
 	std::shared_ptr<Transform> MakeShared() = delete;

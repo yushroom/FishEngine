@@ -38,6 +38,23 @@ namespace FishEngine
 	FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget2;
 
 
+	void RenderSystem::InitializeGL()
+	{
+#if FISHENGINE_PLATFORM_WINDOWS
+		glewExperimental = GL_TRUE;
+		// Initialize GLEW to setup the OpenGL Function pointers
+		auto err = glewInit();
+		if (err != GLEW_OK)
+		{
+			Debug::Log("%s", glewGetErrorString(err));
+		}
+		else
+		{
+			Debug::Log("GlEW initialized");
+		}
+#endif
+	}
+
 	void RenderSystem::Init()
 	{
 		TextureSampler::Init();

@@ -263,13 +263,13 @@ namespace FishEngine
 		
 		
 		// Applies a rotation of eulerAngles.z degrees around the z axis, eulerAngles.x degrees around the x axis, and eulerAngles.y degrees around the y axis (in that order).
-		void Rotate(const Vector3 & eulerAngles, Space relativeTo = Space::Self);
+		void Rotate(const Vector3 & eulerAngles, Space relativeTo = Space::Self)
+		{
+			this->Rotate(eulerAngles.x, eulerAngles.y, eulerAngles.z, relativeTo);
+		}
 		
 		// Applies a rotation of zAngle degrees around the z axis, xAngle degrees around the x axis, and yAngle degrees around the y axis (in that order)
-		void Rotate(float xAngle, float yAngle, float zAngle, Space relativeTo = Space::Self)
-		{
-			this->Rotate(Vector3(xAngle, yAngle, zAngle), relativeTo);
-		}
+		void Rotate(float xAngle, float yAngle, float zAngle, Space relativeTo = Space::Self);
 		
 		// Rotates the transform about axis passing through point in world coordinates by angle degrees.
 		void RotateAround(const Vector3& point, const Vector3& axis, float angle);

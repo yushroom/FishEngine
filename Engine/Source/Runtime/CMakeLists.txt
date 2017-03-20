@@ -71,4 +71,9 @@ endforeach()
 SOURCE_GROUP(Render FILES ${Render_SRCS})
 
 
-add_library (FishEngine STATIC ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
+add_library (FishEngine SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
+target_link_libraries(FishEngine opengl32.lib)
+target_link_libraries(FishEngine glew_s)
+target_link_libraries(FishEngine ${Boost_LIBRARIES})
+target_link_libraries(FishEngine ${PhysXSDK_LIBRARIES})
+target_link_libraries(FishEngine yaml-cpp)

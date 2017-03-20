@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-	class Meta(NonSerializable) LayerMask
+	class FE_EXPORT Meta(NonSerializable) LayerMask
 	{
 	public:
 		explicit LayerMask(int layer);

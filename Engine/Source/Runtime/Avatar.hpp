@@ -5,7 +5,7 @@
 
 namespace FishEngine
 {
-	class Avatar : public Object
+	class FE_EXPORT Avatar : public Object
 	{
 	public:
 		InjectClassName(Avatar);

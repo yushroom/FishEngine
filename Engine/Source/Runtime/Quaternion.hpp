@@ -78,7 +78,7 @@ namespace FishEngine
 		 * @param const Vector3 & upwards The vector that defines in which direction up is.
 		 * @return FishEngine::Quaternion 
 		 */
-		static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards = Vector3::up);
+		//static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards = Vector3::up);
 
 		/**
 		 * Creates a rotation with the specified forward and upwards directions.
@@ -87,10 +87,10 @@ namespace FishEngine
 		 * @param const Vector3 & up The vector that defines in which direction up is.
 		 * @return void
 		 */
-		void SetLookRotation(const Vector3& view, const Vector3& up = Vector3::up)
-		{
-			*this = Quaternion::LookRotation(view, up);
-		}
+		//void SetLookRotation(const Vector3& view, const Vector3& up = Vector3::up)
+		//{
+		//	*this = Quaternion::LookRotation(view, up);
+		//}
 
 
 		// Spherically interpolates between a and b by t. The parameter t is clamped to the range [0, 1].
@@ -100,10 +100,10 @@ namespace FishEngine
 		static Quaternion SlerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
 
 		// Interpolates between a and b by t and normalizes the result afterwards. The parameter t is clamped to the range [0, 1].
-		static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
+		//static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t);
 
 		// Interpolates between a and b by t and normalizes the result afterwards.The parameter t is not clamped.
-		static Quaternion LerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
+		//static Quaternion LerpUnclamped(const Quaternion& a, const Quaternion& b, float t);
 
 		// Rotates a rotation from towards to.
 		static Quaternion RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta);

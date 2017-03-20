@@ -11,7 +11,7 @@
 
 namespace FishEngine
 {	
-	class Meta(NonSerializable) InputArchive
+	class FE_EXPORT Meta(NonSerializable) InputArchive
 	{
 	public:
 		
@@ -247,7 +247,7 @@ namespace FishEngine
 
 	
 	
-	class Meta(NonSerializable) OutputArchive
+	class FE_EXPORT Meta(NonSerializable) OutputArchive
 	{
 	public:
 

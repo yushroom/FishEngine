@@ -124,6 +124,20 @@ namespace FishEngine
 		MakeDirty();
 	}
 
+	void Transform::Rotate(float xAngle, float yAngle, float zAngle, Space relativeTo /*= Space::Self*/)
+	{
+		// TODO, check this
+		Quaternion rot = Quaternion::AngleAxis(yAngle, Vector3(0, 1, 0)) * Quaternion::AngleAxis(xAngle, Vector3(1, 0, 0)) * Quaternion::AngleAxis(zAngle, Vector3(0, 0, 1));
+		if (relativeTo == Space::Self)
+		{
+			setLocalRotation(rot * localRotation());
+		}
+		else
+		{
+			setRotation(rot * rotation());
+		}
+	}
+
 	// TODO
 //    void Transform::Rotate(const Vector3 & eulerAngles, Space relativeTo /*= Space::Self*/)
 //    {

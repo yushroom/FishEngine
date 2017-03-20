@@ -8,6 +8,7 @@
 #include <Debug.hpp>
 #include <Screen.hpp>
 #include <Input.hpp>
+#include <RenderSystem.hpp>
 
 #include "MainEditor.hpp"
 
@@ -30,19 +31,7 @@ void GLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 
-#if FISHENGINE_PLATFORM_WINDOWS
-	glewExperimental = GL_TRUE;
-	// Initialize GLEW to setup the OpenGL Function pointers
-	auto err = glewInit();
-	if (err != GLEW_OK)
-	{
-		Debug::Log("%s", glewGetErrorString(err));
-	}
-	else
-	{
-		Debug::Log("GlEW initialized");
-	}
-#endif
+	RenderSystem::InitializeGL();
 
 	Screen::set(width(), height());
 	MainEditor::Init();

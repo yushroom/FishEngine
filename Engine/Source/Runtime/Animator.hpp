@@ -11,25 +11,25 @@
 
 namespace FishEngine
 {
-	struct Vector3Key
+	struct FE_EXPORT Vector3Key
 	{
 		float time;
 		Vector3 value;
 	};
 	
-	struct QuaternionKey
+	struct FE_EXPORT QuaternionKey
 	{
 		float time;
 		Quaternion value;
 	};
 
-	struct TransformationKey
+	struct FE_EXPORT TransformationKey
 	{
 		float time;
 		Matrix4x4 value;
 	};
 	
-	struct AnimationNode
+	struct FE_EXPORT AnimationNode
 	{
 		std::string name;
 		std::vector<Vector3Key> positionKeys;
@@ -38,7 +38,7 @@ namespace FishEngine
 		//std::vector<TransformationKey> transformationKeys;
 	};
 	
-	struct AnimationChannel
+	struct FE_EXPORT AnimationChannel
 	{
 		std::string name;
 		float duration;

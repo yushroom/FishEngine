@@ -21,7 +21,7 @@ namespace FishEditor
 
 	// Texture importer lets you modify Texture2D import settings from editor scripts.
 	// Settings of this class match the ones exposed in Texture Import Settings.
-	class FE_EXPORT TextureImporter final : public AssetImporter
+	class TextureImporter final : public AssetImporter
 	{
 	public:
 		InjectClassName(TextureImporter)

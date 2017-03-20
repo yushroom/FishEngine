@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-	class Meta(NonSerializable) Timer
+	class FE_EXPORT Meta(NonSerializable) Timer
 	{
 	public:
 		Timer(std::string label);

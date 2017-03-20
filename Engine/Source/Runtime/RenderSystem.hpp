@@ -10,6 +10,8 @@ namespace FishEngine
 	public:
 		RenderSystem() = delete;
 
+		static void InitializeGL();
+
 		static void Init();
 
 		static void Render();

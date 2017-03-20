@@ -11,9 +11,9 @@
 
 namespace FishEngine
 {
-	bool IsDerivedFrom(const std::string& derivedClassName, const std::string& baseClassName);
+	FE_EXPORT bool IsDerivedFrom(const std::string& derivedClassName, const std::string& baseClassName);
 	
-	bool IsDerivedFrom(int derivedClassID, int baseClassID);
+	FE_EXPORT bool IsDerivedFrom(int derivedClassID, int baseClassID);
 
 
 	template<typename BaseClass>

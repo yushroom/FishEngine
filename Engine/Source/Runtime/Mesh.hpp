@@ -21,7 +21,7 @@ namespace FishEngine
 {
 	static constexpr int MaxBoneForEachVertex = 4;
 
-	struct BoneWeight
+	struct FE_EXPORT BoneWeight
 	{
 		//union {
 		//    struct {

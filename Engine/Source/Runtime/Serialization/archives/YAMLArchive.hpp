@@ -6,7 +6,7 @@
 
 namespace FishEngine
 {
-	class YAMLInputArchive : public InputArchive
+	class FE_EXPORT YAMLInputArchive : public InputArchive
 	{
 	public:
 		YAMLInputArchive(std::istream & is)
@@ -187,7 +187,7 @@ namespace FishEngine
 	};
 
 
-	class YAMLOutputArchive : public OutputArchive
+	class FE_EXPORT YAMLOutputArchive : public OutputArchive
 	{
 	public:
 		YAMLOutputArchive(std::ostream & os) : m_emitter(os)

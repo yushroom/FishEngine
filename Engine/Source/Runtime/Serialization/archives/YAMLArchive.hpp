@@ -261,6 +261,30 @@ namespace FishEngine
 		virtual void Serialize(std::string const & t) override { m_emitter << t; }
 		virtual void Serialize(const char* t) override { m_emitter << t; }
 
+		virtual void Serialize(Vector2 const & t) override
+		{
+			BeginFlow();
+			OutputArchive::Serialize(t);
+		}
+				
+		virtual void Serialize(Vector3 const & t) override
+		{
+			BeginFlow();
+			OutputArchive::Serialize(t);
+		}
+				
+		virtual void Serialize(Vector4 const & t) override
+		{
+			BeginFlow();
+			OutputArchive::Serialize(t);
+		}
+				
+		virtual void Serialize(Quaternion const & t) override
+		{
+			BeginFlow();
+			OutputArchive::Serialize(t);
+		}
+				
 		virtual void Serialize(std::nullptr_t const & t) override
 		{
 			BeginFlow();

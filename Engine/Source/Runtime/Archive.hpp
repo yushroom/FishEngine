@@ -244,6 +244,7 @@ namespace FishEngine
 		virtual void NameOfNVP(const char* name) = 0;
 		virtual void MiddleOfNVP() = 0;
 	};
+
 	
 	
 	class Meta(NonSerializable) OutputArchive
@@ -253,7 +254,6 @@ namespace FishEngine
 		OutputArchive() = default;
 
 		virtual ~OutputArchive() = default;
-		//virtual int ArchiveID() = 0;
 
 		OutputArchive & operator << (short t)
 		{
@@ -349,6 +349,36 @@ namespace FishEngine
 		OutputArchive & operator << (GUID const & t)
 		{
 			(*this) << ToString(t);
+			return *this;
+		}
+		
+		OutputArchive & operator << (Vector2 const & t)
+		{
+			this->Serialize(t);
+			return *this;
+		}
+		
+		OutputArchive & operator << (Vector3 const & t)
+		{
+			this->Serialize(t);
+			return *this;
+		}
+		
+		OutputArchive & operator << (Vector4 const & t)
+		{
+			this->Serialize(t);
+			return *this;
+		}
+		
+		OutputArchive & operator << (Quaternion const & t)
+		{
+			this->Serialize(t);
+			return *this;
+		}
+		
+		OutputArchive & operator << (Matrix4x4 const & t)
+		{
+			this->Serialize(t);
 			return *this;
 		}
 
@@ -452,6 +482,11 @@ namespace FishEngine
 		virtual void Serialize(std::string const & t) = 0;
 		virtual void Serialize(const char* t) = 0;
 		virtual void Serialize(std::nullptr_t const & t) = 0;
+		virtual void Serialize(Vector2 const & t);
+		virtual void Serialize(Vector3 const & t);
+		virtual void Serialize(Vector4 const & t);
+		virtual void Serialize(Quaternion const & t);
+		virtual void Serialize(Matrix4x4 const & t);
 
 		virtual void SerializeObject(ObjectPtr const & obj) = 0;
 		virtual void SerializeWeakObject(std::weak_ptr<Object> const & obj) = 0;

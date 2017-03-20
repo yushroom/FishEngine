@@ -38,7 +38,18 @@ using namespace std;
 
 namespace FishEditor
 {
-
+//	class Rotator : public FishEngine::Script
+//	{
+//	public:
+//		virtual void Update() override
+//		{
+//			auto eulerAngles = transform()->localEulerAngles();
+//			eulerAngles.y += 2.0f;
+//			transform()->setLocalEulerAngles(eulerAngles);
+//		}
+//	};
+	
+	
 	GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 	{
 		auto& children = root->transform()->children();
@@ -208,6 +219,7 @@ namespace FishEditor
 		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
 //		Scene::AddGameObject(model);
 		model = Object::Instantiate(model);
+		//model->AddComponent<Rotator>();
 		//model->transform()->setLocalScale(0.1f);
 	#endif
 

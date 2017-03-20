@@ -38,7 +38,7 @@ namespace FishEditor
 		
 		bool isEditingMultipleObjects() const;
 		int maxArraySizeForMultiEditing() const;
-		void Update();
+		void Update() { };
 		void SetIsDifferentCacheDirty();
 		void UpdateIfDirtyOrScript();
 		void Dispose();
@@ -47,7 +47,7 @@ namespace FishEditor
 		
 		SerializedPropertyPtr FindProperty(std::string const & propertyPath);
 		
-		bool ApplyModifiedProperties();
+		bool ApplyModifiedProperties() { return true; };
 		bool ApplyModifiedPropertiesWithoutUndo();
 		void CopyFromSerializedProperty(SerializedPropertyPtr prop);
 

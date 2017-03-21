@@ -1,3 +1,4 @@
+
 #include "MainEditor.hpp"
 
 #include <QDir>
@@ -28,6 +29,7 @@
 //#include "Inspector.hpp"
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
+#include <boost/dll/import.hpp>
 
 //#include <boost/filesystem.hpp>
 
@@ -221,6 +223,14 @@ namespace FishEditor
 		model = Object::Instantiate(model);
 		//model->AddComponent<Rotator>();
 		//model->transform()->setLocalScale(0.1f);
+		
+		FishEngine::Path shared_lib_path("/Users/yushroom/FishEngine/Projects/Sponza/build");
+		shared_lib_path /= "libSponza.dylib";
+		static auto func = boost::dll::import<Script*(void)>(shared_lib_path, "CreateRotator");
+		
+		auto rotator = std::shared_ptr<Script>( func() );
+		model->AddComponent(rotator);
+		
 	#endif
 
 	#endif

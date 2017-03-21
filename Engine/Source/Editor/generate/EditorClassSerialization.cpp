@@ -71,30 +71,6 @@ namespace FishEditor
 	}
 
 
-
-	// FishEditor::ModelNode
-	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ModelNode const & value )
-	{
-		archive.BeginClass();
-		archive << FishEngine::make_nvp("index", value.index); // uint32_t
-		archive << FishEngine::make_nvp("name", value.name); // std::string
-		archive << FishEngine::make_nvp("meshesIndices", value.meshesIndices); // std::vector<uint32_t>
-		archive << FishEngine::make_nvp("isBone", value.isBone); // bool
-		archive.EndClass();
-		return archive;
-	}
-
-	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::ModelNode & value )
-	{
-		archive.BeginClass();
-		archive >> FishEngine::make_nvp("index", value.index); // uint32_t
-		archive >> FishEngine::make_nvp("name", value.name); // std::string
-		archive >> FishEngine::make_nvp("meshesIndices", value.meshesIndices); // std::vector<uint32_t>
-		archive >> FishEngine::make_nvp("isBone", value.isBone); // bool
-		archive.EndClass();
-		return archive;
-	}
-
 	// FishEditor::ModelImporter
 	void FishEditor::ModelImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{

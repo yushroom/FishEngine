@@ -9,14 +9,15 @@
 #include <Animator.hpp>
 #include <PrimitiveType.hpp>
 
-struct aiNode;
-struct aiMesh;
-struct aiAnimation;
+//struct aiNode;
+//struct aiMesh;
+//struct aiAnimation;
 
 class ModelImporterInspector;
 
 namespace FishEditor
 {
+#if 0
 	struct ModelNode
 	{
 		uint32_t                index;
@@ -93,7 +94,8 @@ namespace FishEditor
 		mutable std::weak_ptr<FishEngine::GameObject>   m_rootGameObject; // temp
 		//mutable std::vector<std::weak_ptr<SkinnedMeshRenderer>> m_skinnedMeshRenderersToFindLCA;
 	};
-
+#endif
+	
 	// Vertex normal generation options for ModelImporter.
 	enum class ModelImporterNormals
 	{
@@ -196,17 +198,6 @@ namespace FishEditor
 		
 		Meta(NonSerializable)
 		float m_fileScale = 1.0f;
-		
-		ModelNodePtr
-		buildModelTree(const aiNode*   assimp_node);
-		
-		FishEngine::MeshPtr
-		ParseMesh(const aiMesh* assimp_mesh, bool load_uv, bool load_tangent);
-
-		void RemoveDummyNodeFBX(FishEngine::AnimationChannelPtr animation );
-
-		Meta(NonSerializable)
-		ModelPtr      m_model;
 
 		// Vertex normal import options.
 		ModelImporterNormals m_importNormals    = ModelImporterNormals::Import;
@@ -220,6 +211,20 @@ namespace FishEditor
 		// remove dummy nodes
 		Meta(NonSerializable)
 		std::map<std::string, std::map<std::string, FishEngine::Matrix4x4>> m_nodeTransformations;
+		
+		
+#if 0
+		ModelNodePtr
+		buildModelTree(const aiNode*   assimp_node);
+		
+		FishEngine::MeshPtr
+		ParseMesh(const aiMesh* assimp_mesh, bool load_uv, bool load_tangent);
+		
+		void RemoveDummyNodeFBX(FishEngine::AnimationChannelPtr animation );
+		
+		Meta(NonSerializable)
+		ModelPtr      m_model;
+#endif
 
 	}; // end of class ModelImporter
 }

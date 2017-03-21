@@ -101,7 +101,7 @@ namespace FishEngine
 			//}
 			component->m_gameObject = m_transform->gameObject();
 			m_components.push_back(component);
-			if (IsScript(component->ClassName()))
+			if (IsScript(component->ClassID()))
 			{
 				auto script = std::static_pointer_cast<Script>(component);
 				script->Reset();

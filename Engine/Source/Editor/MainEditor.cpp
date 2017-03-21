@@ -224,11 +224,15 @@ namespace FishEditor
 		//model->AddComponent<Rotator>();
 		//model->transform()->setLocalScale(0.1f);
 		
-		FishEngine::Path shared_lib_path("/Users/yushroom/FishEngine/Projects/Sponza/build");
-		shared_lib_path /= "libSponza.dylib";
-		static auto func = boost::dll::import<Script*(void)>(shared_lib_path, "CreateRotator");
-		
-		auto rotator = std::shared_ptr<Script>( func() );
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
+		//FishEngine::Path shared_lib_path("/Users/yushroom/FishEngine/Projects/Sponza/build");
+		//shared_lib_path /= "Sponza.dll";
+		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
+		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
+		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
+			deleteFunc(s);
+		});
+
 		model->AddComponent(rotator);
 		
 	#endif

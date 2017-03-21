@@ -24,8 +24,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #message("lib output directory: " ${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE})
 
-SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/)
-SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/lib64-msvc-14.0)
+#SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/)
+#SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/boost_1_63/lib64-msvc-14.0)
 
 #boost
 set(Boost_USE_STATIC_LIBS       ON)
@@ -33,6 +33,7 @@ set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
+MESSAGE("Found Boost: " ${Boost_INCLUDE_DIRS})
 
 # Autodesk FBX sdk
 SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
@@ -65,7 +66,7 @@ include_directories(./ThirdParty/assimp/include)
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
     include_directories(./ThirdParty/glew/include)
-    set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
+    #set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
     ADD_SUBDIRECTORY(./ThirdParty/glew/build/cmake)
     #ADD_SUBDIRECTORY(./ThirdParty/glfw-3.2.1/)
     # include_directories(./ThirdParty/glfw-3.2.1/include)
@@ -158,8 +159,8 @@ include_directories( ${PhysX_ROOT_DIR}/Include )
 include_directories( ${PhysX_ROOT_DIR}/../ )
 
 if (MSVC)
-    SET_TARGET_PROPERTIES(zlibstatic PROPERTIES FOLDER "ThirdParty")
-    SET_TARGET_PROPERTIES(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ThirdParty")
+    #SET_TARGET_PROPERTIES(zlibstatic PROPERTIES FOLDER "ThirdParty")
+    #SET_TARGET_PROPERTIES(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ThirdParty")
     #target_link_libraries(FishEditor opengl32.lib)
     # PhysXSDK
     # set(PhysX_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/PhysXSDK)

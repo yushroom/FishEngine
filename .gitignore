@@ -1,7 +1,8 @@
 *.DS_Store
 *.pro.user
 
-# 3rd parth libs
+# 3rd party libs
+/Engine/ThirdParty/boost/lib64-msvc-14.0/
 
 # generated
 # /Engine/Source/Runtime/generate/
@@ -15,19 +16,15 @@
 *.pyc
 /Script/reflect/temp/
 
-# assets
-#/assets/models/
-#/assets/textures/
-#/example/Content
-#/Example/Sponza/crytek-sponza/
+# Example
+/Example/Sponza/build
 *.meta
 
 # cmake build
 /Engine/[Bb]uild
-[Bb]uild
-build-*
 CMakeLists.txt.user
 /Engine/ThirdParty/boost/lib
+/Engine/ThirdParty/boost_1_63
 
 # vscode
 /.vscode/

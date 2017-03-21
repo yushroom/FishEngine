@@ -14,11 +14,11 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 {
 	ui->setupUi(this);
 #if FISHENGINE_PLATFORM_WINDOWS
-	ui->locationLineEdit->setText("D:/FishEngine/Projects");
+	ui->locationLineEdit->setText(R"(D:\program\github\FishEngine\Example)");
 #else
 	ui->locationLineEdit->setText("/Users/yushroom/FishEngine/Projects");
 #endif
-	ui->projectNameLineEdit->setText("CascadedShadowMapping");
+	ui->projectNameLineEdit->setText("Sponza");
 	ui->projectNameErrorLabel->hide();
 	ui->locationErrorLabel->hide();
 
@@ -39,7 +39,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 {
 #if 1
 #if FISHENGINE_PLATFORM_WINDOWS
-	FishEngine::Application::s_dataPath = "D:/FishEngine/Projects/Sponza/Assets";
+	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\Sponza\Assets)";
 #else
 	FishEngine::Application::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
 #endif

@@ -70,7 +70,7 @@ namespace FishEditor
 
 	void DefaultScene()
 	{
-	#if 1
+#if 1
 		cout << "CWD: " << boost::filesystem::initial_path() << endl;
 
 	//    auto camera = Camera::Create();
@@ -101,7 +101,7 @@ namespace FishEditor
 		material->SetFloat("_Exposure", 1.3f);
 		RenderSettings::setSkybox(material);
 
-	#if 0
+#if 0
 
 		//auto go = GameObject::CreatePrimitive(PrimitiveType::Cube);
 		QualitySettings::setShadowDistance(20);
@@ -124,7 +124,7 @@ namespace FishEditor
 		terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
 		}
 	
-	#elif 0
+#elif 0
 	
 		QualitySettings::setShadowDistance(30);
 		Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
@@ -209,20 +209,12 @@ namespace FishEditor
 		transform = Camera::mainGameCamera()->gameObject()->transform();
 		transform->setPosition(5, 8, 0);
 		transform->setLocalEulerAngles(30, -90, 0);
-	#else
-//		GameObject::CreatePrimitive(PrimitiveType::Cube);
-//		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
-//		plane->transform()->setLocalScale(10);
-//		//plane->transform()->setLocalPosition(0, -5, 0);
-//		
+#elif 0
 		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
 		Object::Instantiate(model);
 	
 		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
-//		Scene::AddGameObject(model);
 		model = Object::Instantiate(model);
-		//model->AddComponent<Rotator>();
-		//model->transform()->setLocalScale(0.1f);
 		
 #if FISHENGINE_PLATFORM_WINDOWS
 		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
@@ -243,10 +235,15 @@ namespace FishEditor
 		});
 
 		model->AddComponent(rotator);
-		
-	#endif
+#else
+	light_go->transform()->setLocalEulerAngles(50, 150, 0);
+	auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 
-	#endif
+	auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
+	model = Object::Instantiate(model);
+#endif
+
+#endif
 
 	}
 

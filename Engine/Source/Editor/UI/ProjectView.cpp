@@ -176,7 +176,18 @@ void ProjectView::OnListViewSelectionChanged(const QModelIndex &current, const Q
 	auto path = boost::filesystem::absolute(info->path());
 	auto importer = AssetImporter::GetAtPath(path);
 	Selection::setTransforms({});
-	Selection::setActiveObject(importer);
+	if (importer == nullptr)
+	{
+		Selection::setActiveObject(nullptr);
+	}
+	else if (importer->ClassID() == ClassID<NativeFormatImporter>())
+	{
+		Selection::setActiveObject(importer->assetObject());
+	}
+	else
+	{
+		Selection::setActiveObject(importer);
+	}
 }
 
 void ProjectView::OnIconSizeChanged(int size)

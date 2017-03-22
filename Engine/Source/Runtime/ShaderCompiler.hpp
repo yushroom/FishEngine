@@ -52,6 +52,11 @@ namespace FishEngine
 			return PreprocessShaderFile(m_path);
 		}
 
+		static void setShaderIncludeDir(const std::string& path)
+		{
+			s_shaderIncludeDir = path;
+		}
+
 	private:
 
 		std::string PreprocessShaderFile(const Path& path);

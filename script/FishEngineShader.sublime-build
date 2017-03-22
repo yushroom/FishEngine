@@ -1,5 +1,5 @@
 {
-	"shell_cmd": "D:/program/FishEngine/Engine/Binary/Release/ShaderCompiler.exe \"$file\"",
+	"shell_cmd": "D:/program/github/FishEngine/Engine/Binary/RelWithDebInfo/ShaderCompiler.exe \"$file\"",
 	"selector": "source.vert",
 	"file_regex": "\\[ERROR\\] (.+)\\(([0-9]+)\\) : error",
 	"encoding": "UTF-8"

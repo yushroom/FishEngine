@@ -7,5 +7,7 @@ FishEngine::ObjectPtr FishEditor::NativeFormatImporter::Load(FishEngine::Path co
 {
 	std::ifstream fin(path.string());
 	MaterialArchive archive(fin);
-	return archive.DeserializeMaterial();
+	auto material = archive.DeserializeMaterial();
+	m_assetObject = material;
+	return material;
 }

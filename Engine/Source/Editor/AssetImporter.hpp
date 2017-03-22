@@ -47,6 +47,11 @@ namespace FishEditor
 		{
 			return m_guid;
 		}
+
+		FishEngine::ObjectPtr assetObject() const
+		{
+			return m_assetObject;
+		}
 		
 	protected:
 		friend class FishEditor::AssetDatabase;
@@ -92,6 +97,9 @@ namespace FishEditor
 
 		Meta(NonSerializable)
 		std::map<std::string, int>		m_recycleNameToFileID;
+
+		Meta(NonSerializable)
+		FishEngine::ObjectPtr			m_assetObject;
 
 	public:
 		static std::map<FishEngine::GUID, FishEngine::ObjectPtr> s_importerGUIDToObject;

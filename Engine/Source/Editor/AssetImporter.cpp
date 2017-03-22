@@ -140,7 +140,11 @@ namespace FishEditor
 		else if (ext == ".mat")
 		{
 			auto importer = GetAssetImporter<NativeFormatImporter>(path);
-			importer->Load(path);
+			auto material = importer->Load(path);
+			material->setName(path.stem().string());
+			s_pathToImpoter[path] = importer;
+			s_objectInstanceIDToPath[material->GetInstanceID()] = path;
+			s_importerGUIDToObject[importer->GetGUID()] = material;
 			ret = importer;
 		}
 

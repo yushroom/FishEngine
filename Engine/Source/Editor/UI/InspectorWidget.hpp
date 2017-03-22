@@ -23,6 +23,7 @@ namespace FishEngine
 {
 	class GameObject;
 	class Object;
+	class Material;
 }
 
 
@@ -36,6 +37,7 @@ public:
 	void Bind(std::shared_ptr<FishEngine::GameObject> go);
 	void Bind(std::shared_ptr<FishEditor::TextureImporter> importer);
 	void Bind(std::shared_ptr<FishEditor::ModelImporter> importer);
+	void Bind(std::shared_ptr<FishEngine::Material> material);
 
 	virtual QSize sizeHint() const override
 	{
@@ -57,6 +59,8 @@ private:
 	//UIAssetHeader       * m_assetHeader;
 	TextureImporterInspector * m_textureImporterInspector;
 	ModelImporterInspector * m_modelImporterInspector;
+
+	std::shared_ptr<FishEngine::Object> m_target;
 
 	//QMenu               * m_menu;
 };

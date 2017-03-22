@@ -1,4 +1,5 @@
 #include <Shader.hpp>
+#include <ShaderCompiler.hpp>
 #include <GLEnvironment.hpp>
 #include <glfw/glfw3.h>
 #include <Debug.hpp>
@@ -9,7 +10,7 @@ int main(int argc, char* argv[])
 {
     //Debug::Init();
     Debug::setColorMode(false);
-    Resources::Init();
+    //Resources::Init();
     Debug::Log("Compiling...");
     
     glfwInit();
@@ -32,20 +33,24 @@ int main(int argc, char* argv[])
     glewExperimental = GL_TRUE;
     // Initialize GLEW to setup the OpenGL Function pointers
     glewInit();
+	std::string path = R"(D:\program\github\FishEngine\Example\UnityChan\AlphaMask.surf)";
+	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
+#else
+	std::string path = R"(/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/Deferred.shader)";
 #endif
 
-    std::string path = R"(/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/Deferred.shader)";
+    
     if (argc == 2)
     {
         path = argv[1];
     }
-#ifdef _DEBUG
-    else
-    {
-        Debug::LogError("invalid command.");
-        return 1;
-    }
-#endif
+//#ifdef _DEBUG
+//    else
+//    {
+//        Debug::LogError("invalid command.");
+//        return 1;
+//    }
+//#endif
     
     auto shader = Shader::CreateFromFile(path);
     if (shader == nullptr)

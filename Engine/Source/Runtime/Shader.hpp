@@ -100,7 +100,7 @@ namespace FishEngine
 		friend class RenderSystem;
 
 		Meta(NonSerializable)
-			std::unique_ptr<ShaderImpl> m_impl;
+		std::unique_ptr<ShaderImpl> m_impl;
 
 		//void GetAllUniforms();
 		bool FromFile(const Path& path);

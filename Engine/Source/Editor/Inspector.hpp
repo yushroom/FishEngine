@@ -50,6 +50,8 @@ namespace FishEditor
 
 		static std::weak_ptr<FishEngine::Component> s_targetComponent;
 
+		
+
 	public:
 		static void BeginComponent(FishEngine::ComponentPtr const & component);
 

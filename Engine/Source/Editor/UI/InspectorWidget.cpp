@@ -129,6 +129,10 @@ void InspectorWidget::Bind(std::shared_ptr<FishEditor::ModelImporter> importer)
 	//m_assetHeader->CheckUpdate(importer->name());
 }
 
+void InspectorWidget::Bind(std::shared_ptr<FishEngine::Material> material)
+{
+}
+
 void InspectorWidget::Update()
 {
 	auto go = FishEditor::Selection::activeGameObject();

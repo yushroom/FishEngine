@@ -16,7 +16,7 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 #if FISHENGINE_PLATFORM_WINDOWS
 	ui->locationLineEdit->setText(R"(D:\program\github\FishEngine\Example)");
 #else
-	ui->locationLineEdit->setText("/Users/yushroom/FishEngine/Projects");
+	ui->locationLineEdit->setText("/Users/yushroom/program/FishEngine/Example");
 #endif
 	ui->projectNameLineEdit->setText("Sponza");
 	ui->projectNameErrorLabel->hide();
@@ -41,7 +41,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 #if FISHENGINE_PLATFORM_WINDOWS
 	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\Sponza\Assets)";
 #else
-	FishEngine::Application::s_dataPath = "/Users/yushroom/FishEngine/Projects/Sponza/Assets";
+	FishEngine::Application::s_dataPath = "/Users/yushroom/program/FishEngine/Example/Sponza/Assets";
 #endif
 	accept();
 #endif

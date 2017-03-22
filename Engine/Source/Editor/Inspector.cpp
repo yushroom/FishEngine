@@ -211,6 +211,12 @@ void Inspector::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 }
 
 template<>
+void Inspector::OnInspectorGUI(const std::shared_ptr<Script>& t)
+{
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
+}
+
+template<>
 void Inspector::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& renderer)
 {
 	OnInspectorGUI<Renderer>(renderer);
@@ -502,7 +508,7 @@ void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 	//bool changed = false;
 	UIHeaderState state;
 	//bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, state );
-	bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, &state );
+	bool expanded = EditorGUI::BeginComponent( component->ClassName(), enabled, &state );
 	if ( expanded )
 	{
 		OnInspectorGUI<T>(p);
@@ -565,6 +571,7 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 		CASE(BoxCollider)
 		CASE(SphereCollider)
 		CASE(CapsuleCollider)
+		CASE(Script)
 		default:
 			//Foldout( component->ClassName() );
 			BeginComponentImpl(component);

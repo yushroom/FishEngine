@@ -224,7 +224,16 @@ namespace FishEditor
 		//model->AddComponent<Rotator>();
 		//model->transform()->setLocalScale(0.1f);
 		
+#if FISHENGINE_PLATFORM_WINDOWS
 		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
+#else
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libSponza.dylib";
+#endif
+		if ( !boost::filesystem::exists(shared_lib_path) )
+		{
+			Debug::LogError("%s not found", shared_lib_path.string().c_str());
+			abort();
+		}
 		//FishEngine::Path shared_lib_path("/Users/yushroom/FishEngine/Projects/Sponza/build");
 		//shared_lib_path /= "Sponza.dll";
 		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");

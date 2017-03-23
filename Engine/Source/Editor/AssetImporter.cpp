@@ -4,10 +4,12 @@
 
 #include <GameObject.hpp>
 #include <Timer.hpp>
+#include <Shader.hpp>
 
 #include "TextureImporter.hpp"
 #include "FBXImporter.hpp"
 #include "NativeFormatImporter.hpp"
+#include "ShaderImporter.hpp"
 
 #include "AssetArchive.hpp"
 #include "SceneArchive.hpp"
@@ -116,6 +118,17 @@ namespace FishEditor
 			s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
 			s_importerGUIDToObject[importer->GetGUID()] = texture;
 			//t.StopAndPrint();
+			ret = importer;
+		}
+		else if (type == AssetType::Shader)
+		{
+			//auto shader = Shader::CreateFromFile(path);
+			auto importer = GetAssetImporter<ShaderImporter>(path);
+			s_pathToImpoter[path] = importer;
+			auto shader = importer->Load();
+			shader->setName(path.stem().string());
+			s_objectInstanceIDToPath[shader->GetInstanceID()] = path;
+			s_importerGUIDToObject[importer->GetGUID()] = shader;
 			ret = importer;
 		}
 		else if (ext == ".fbx" || ext == ".FBX" || ext == ".obj")

@@ -1,6 +1,7 @@
-
 #include "MainEditor.hpp"
 
+#include <iostream>
+#include <boost/dll/import.hpp>
 #include <QDir>
 #include <QCoreApplication>
 
@@ -28,32 +29,14 @@
 #include "Selection.hpp"
 #include "EditorGUI.hpp"
 #include "SceneViewEditor.hpp"
-//#include "Inspector.hpp"
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
-#include <boost/dll/import.hpp>
-
-//#include <boost/filesystem.hpp>
-
-#include <iostream>
 
 using namespace FishEngine;
 using namespace std;
 
 namespace FishEditor
 {
-//	class Rotator : public FishEngine::Script
-//	{
-//	public:
-//		virtual void Update() override
-//		{
-//			auto eulerAngles = transform()->localEulerAngles();
-//			eulerAngles.y += 2.0f;
-//			transform()->setLocalEulerAngles(eulerAngles);
-//		}
-//	};
-	
-	
 	GameObjectPtr FindNamedChild(const GameObjectPtr & root, const std::string& name)
 	{
 		auto& children = root->transform()->children();
@@ -83,9 +66,7 @@ namespace FishEditor
 		camera_go->setName("Main Camera");
 		auto camera = camera_go->GetComponent<Camera>();
 
-		camera_go->transform()->setLocalPosition(0, 0, 5);
 		camera_go->transform()->setLocalPosition(0, 1, -10);
-		//camera_go->transform()->LookAt(0, 0, 0);
 		camera_go->setTag("MainCamera");
 		//camera_go->AddComponent<TakeScreenShot>();
 
@@ -237,21 +218,28 @@ namespace FishEditor
 		});
 
 		model->AddComponent(rotator);
-#else
+#elif 0
+		QualitySettings::setShadowDistance(20);
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 
 		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
 		model = Object::Instantiate(model);
 		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uv_checker.jpg"));
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/ground.jpg"));
+			assert(tex != nullptr);
 			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 			material->setMainTexture(tex);
 			plane->GetComponent<MeshRenderer>()->SetMaterial(material);
 		}
+
+		auto albedo_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Albedo.surf"));
 		{
 			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/hvyweapon_red.tga"));
-			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			assert(tex != nullptr);
+			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			auto material = Material::CreateMaterial();
+			material->setShader(albedo_shader);
 			material->setMainTexture(tex);
 			auto renderers = model->GetComponentsInChildren<SkinnedMeshRenderer>();
 			for (auto & r : renderers)
@@ -261,10 +249,15 @@ namespace FishEditor
 		}
 		{
 			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/heavy_head.tga"));
-			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			assert(tex != nullptr);
+			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			auto material = Material::CreateMaterial();
+			material->setShader(albedo_shader);
 			material->setMainTexture(tex);
 			FindNamedChild(model, "head_mesh")->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
 		}
+#else
+	
 #endif
 
 #endif

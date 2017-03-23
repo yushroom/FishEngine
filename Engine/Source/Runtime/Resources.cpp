@@ -5,7 +5,7 @@ namespace FishEngine
 	AssetType Resources::GetAssetType(Path const & ext)
 	{
 		//auto ext = path.extension();
-		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga")
+		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga" || ext == ".dds")
 		{
 			return AssetType::Texture;
 		}
@@ -13,7 +13,7 @@ namespace FishEngine
 		{
 			return AssetType::Model;
 		}
-		else if (ext == ".shader")
+		else if (ext == ".shader" || ext == ".surf")
 		{
 			return AssetType::Shader;
 		}

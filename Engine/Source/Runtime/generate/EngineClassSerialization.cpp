@@ -5,6 +5,7 @@
 
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
+#include "../ScriptableObject.hpp" 
 #include "../Ray.hpp" 
 #include "../Animator.hpp" 
 #include "../Animator.hpp" 
@@ -31,6 +32,7 @@
 #include "../CapsuleCollider.hpp" 
 #include "../Mesh.hpp" 
 #include "../Renderer.hpp" 
+#include "../Rect.hpp" 
 #include "../Animator.hpp" 
 #include "../Material.hpp" 
 #include "../SkinnedMeshRenderer.hpp" 
@@ -55,10 +57,28 @@
 #include "../Scene.hpp" 
 #include "../MeshRenderer.hpp" 
 #include "../Transform.hpp" 
-#include "../GameObject.hpp" 
+#include "../GameObject.hpp"
+#include "../Cubemap.hpp"
 
 namespace FishEngine
 {
+
+	// FishEngine::ScriptableObject
+	void FishEngine::ScriptableObject::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Object::Serialize(archive);
+		//archive.EndClass();
+	}
+
+	void FishEngine::ScriptableObject::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Object::Deserialize(archive);
+		//archive.EndClass();
+	}
+
+
 
 	// FishEngine::Ray
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Ray const & value )
@@ -852,6 +872,29 @@ namespace FishEngine
 		cloneUtility.Clone(this->m_receiveShadows, target->m_receiveShadows); // bool
 	}
 
+
+	//// FishEngine::Rect
+	//FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Rect const & value )
+	//{
+	//	archive.BeginClass();
+	//	archive << FishEngine::make_nvp("m_XMin", value.m_XMin); // float
+	//	archive << FishEngine::make_nvp("m_YMin", value.m_YMin); // float
+	//	archive << FishEngine::make_nvp("m_Width", value.m_Width); // float
+	//	archive << FishEngine::make_nvp("m_Height", value.m_Height); // float
+	//	archive.EndClass();
+	//	return archive;
+	//}
+
+	//FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::Rect & value )
+	//{
+	//	archive.BeginClass();
+	//	archive >> FishEngine::make_nvp("m_XMin", value.m_XMin); // float
+	//	archive >> FishEngine::make_nvp("m_YMin", value.m_YMin); // float
+	//	archive >> FishEngine::make_nvp("m_Width", value.m_Width); // float
+	//	archive >> FishEngine::make_nvp("m_Height", value.m_Height); // float
+	//	archive.EndClass();
+	//	return archive;
+	//}
 
 	// FishEngine::AnimationChannel
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::AnimationChannel const & value )

@@ -376,18 +376,37 @@ namespace FishEngine
 		}
 		catch (const std::exception& e)
 		{
-			//std::cout << AddLineNumber(m_impl->shaderTextRaw()) 
-			//    << std::endl << m_impl->m_lineCount << std::endl;
-			std::string str = string(e.what());
+			PrintErrorMessage(e.what());
+			return false;
+		}
+		return true;
+	}
+
+	void Shader::PrintErrorMessage(std::string const & errorMessage) noexcept
+	{
+		Debug::LogError("%s", errorMessage.c_str());
+
+		std::vector<std::string> lines;
+		boost::split(lines, errorMessage, boost::is_any_of("\n"));
+		for (auto & line : lines)
+		{
 #if FISHENGINE_PLATFORM_WINDOWS
-			auto begin = str.find_first_of('(');
-			auto end = str.find_first_of(')');
+			auto begin = line.find_first_of('(');
+			auto end = line.find_first_of(')');
 #else
-			auto begin = str.find_first_of(':');
-			begin = str.find_first_of(':', begin + 1);
-			auto end = str.find_first_of(':', begin + 1);
+			auto begin = line.find_first_of(':');
+			begin = line.find_first_of(':', begin + 1);
+			auto end = line.find_first_of(':', begin + 1);
 #endif
-			uint32_t line_number = boost::lexical_cast<uint32_t>(str.substr(begin + 1, end - begin - 1));
+			uint32_t line_number = 0;
+			try
+			{
+				line_number = boost::lexical_cast<uint32_t>(line.substr(begin + 1, end - begin - 1));
+			}
+			catch(exception const &)
+			{
+				continue;
+			}
 			//cout << line_number << endl;
 			uint32_t start_line = m_impl->m_lineCount;
 			auto& text = m_impl->shaderTextRaw();
@@ -408,25 +427,30 @@ namespace FishEngine
 			if (last >= total)
 				last = total - 1;
 
+			std::ostringstream context_lines;
 			for (int i = first; i < last; ++i)
 			{
 				auto new_cursor = text.find_first_of('\n', cursor);
-				cout << '#' << i + start_line << '\t' << text.substr(cursor, new_cursor - cursor) << '\n';
+				context_lines << '#' << i + start_line << '\t' << text.substr(cursor, new_cursor - cursor) << '\n';
 				cursor = new_cursor + 1;
 			}
-
-			Debug::LogError("%s", e.what());
-			return false;
+			Debug::LogError("%s", line.c_str());
+			Debug::Log("%s", context_lines.str().c_str());
+			cout << endl;
 		}
-		return true;
 	}
 
 	Shader::~Shader()
 	{
 	}
 
-	void Shader::Use() const
+	void Shader::Use()
 	{
+		//if (m_GLNativeProgram == 0)
+		//{
+		//	m_impl->CompileAndLink(m_keywords);
+		//	m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+		//}
 		glUseProgram(m_GLNativeProgram);
 		for (auto& u : m_uniforms)
 		{

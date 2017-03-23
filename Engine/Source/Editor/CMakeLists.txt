@@ -2,8 +2,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-include_directories(${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage/include)
-link_directories(${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage/lib)
+SET(FreeImage_Root ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage)
+include_directories(${FreeImage_Root}/include)
+link_directories(${FreeImage_Root}/lib)
 
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
@@ -37,7 +38,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter)
+foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})
@@ -145,6 +146,9 @@ if( WIN32 )
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CommonCHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
     )
+
+    add_custom_command(TARGET FishEditor POST_BUILD
+    	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FreeImage_Root}/bin/FreeImage.dll $<TARGET_FILE_DIR:FishEditor>)
 
     add_custom_command(TARGET FishEditor POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:FishEditor>/Resources

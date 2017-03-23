@@ -46,7 +46,7 @@ namespace FishEditor
 		m_size.y = Screen::height();
 		Debug::Log("size: x = %d, y = %d", m_size.x, m_size.y);
 
-		m_camera = Camera::Create(60.0, 0.3f, 1000.f, CameraType::SceneView);
+		m_camera = Camera::Create(60.0, 0.1f, 1000.f, CameraType::SceneView);
 		m_cameraGameObject = std::make_shared<GameObject>("EditorCamera");
 		m_cameraGameObject->transform()->m_gameObject = m_cameraGameObject;
 		//auto camera_go = Scene::CreateGameObject("MainCamera");

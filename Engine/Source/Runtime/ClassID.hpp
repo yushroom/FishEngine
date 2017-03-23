@@ -7,6 +7,8 @@ namespace FishEditor
 	class TextureImporter;
 	class AssetDatabase;
 	class NativeFormatImporter;
+	class ShaderImporter;
+	class DDSImporter;
 }
 
 namespace FishEngine
@@ -802,9 +804,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<FishEditor::TextureImporter>() { return 1006; }
 	
-	class ShaderImporter;
+	//class ShaderImporter;
 	template<>
-	constexpr int ClassID<ShaderImporter>() { return 1007; }
+	constexpr int ClassID<FishEditor::ShaderImporter>() { return 1007; }
 	
 	class ComputeShaderImporter;
 	template<>
@@ -882,9 +884,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<EditorBuildSettings>() { return 1045; }
 	
-	class DDSImporter;
+	//class DDSImporter;
 	template<>
-	constexpr int ClassID<DDSImporter>() { return 1046; }
+	constexpr int ClassID<FishEditor::DDSImporter>() { return 1046; }
 	
 	class InspectorExpandedState;
 	template<>

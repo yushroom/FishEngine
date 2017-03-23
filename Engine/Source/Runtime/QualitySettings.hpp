@@ -2,6 +2,7 @@
 
 #include "FishEngine.hpp"
 #include "ReflectClass.hpp"
+#include "Object.hpp"
 
 namespace FishEngine
 {
@@ -13,19 +14,19 @@ namespace FishEngine
 		VeryHigh,   // Very high shadow map resolution.
 	};
 
-	class Meta(NonSerializable) QualitySettings
+	class Meta(NonSerializable) QualitySettings final : public FishEngine::Object
 	{
 	public:
 		QualitySettings() = delete;
 
-		static void setShadowDistance(float shadowDistance)
+		FE_EXPORT static void setShadowDistance(float shadowDistance)
 		{
-			m_shadowDistance = shadowDistance;
+			s_shadowDistance = shadowDistance;
 		}
 
-		static float shadowDistance()
+		FE_EXPORT static float shadowDistance()
 		{
-			return m_shadowDistance;
+			return s_shadowDistance;
 		}
 
 		static uint32_t CalculateShadowMapSize();
@@ -43,7 +44,7 @@ namespace FishEngine
 		static int m_shadowCascades;
 
 		// Shadow Distance	The maximum distance from camera at which shadows will be visible.Shadows that fall beyond this distance will not be rendered.
-		static float m_shadowDistance;
+		static float s_shadowDistance;
 
 		// Shadow Near Plane Offset	Offset shadow near plane to account for large triangles being distorted by shadow pancaking.
 		static float m_shadowNearPlaneOffset;

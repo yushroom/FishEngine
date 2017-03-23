@@ -83,6 +83,8 @@ namespace FishEditor
 			return nullptr;
 		}
 		auto importer = AssetImporter::GetAtPath(p);
+		if (importer == nullptr)
+			return nullptr;
 		//return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
 		return AssetImporter::s_importerGUIDToObject[importer->GetGUID()];
 	}

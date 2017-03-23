@@ -4,6 +4,7 @@
 #include "UIBool.hpp"
 #include "UIComboBox.hpp"
 #include "UIRevertApplyButtons.hpp"
+#include "UIFloat.hpp"
 
 #include <QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
@@ -39,6 +40,14 @@ TextureImporterInspector::TextureImporterInspector(QWidget *parent) :
 	
 	m_verticalLayout->addWidget(m_assetHeader);
 	
+	m_widthEdit = new UIFloat("Width", 0.0f, this);
+	m_widthEdit->setEnabled(false);
+	m_verticalLayout->addWidget(m_widthEdit);
+
+	m_heightEdit = new UIFloat("Height", 0.0f, this);
+	m_heightEdit->setEnabled(false);
+	m_verticalLayout->addWidget(m_heightEdit);
+
 	m_typeCombox = CreateCombox<TextureImporterType>("Texture Type");
 	m_verticalLayout->addWidget(m_typeCombox);
 	m_shapeCombox = CreateCombox<TextureImporterShape>("Texture Shape");
@@ -149,6 +158,9 @@ void TextureImporterInspector::Bind(std::shared_ptr<FishEditor::TextureImporter>
 		m_assetHeader->SetIcon(icon);
 		
 		*m_cachedImporter = *m_importer;
+		auto texture = As<Texture>(m_importer->m_assetObject);
+		m_widthEdit->SetValue(texture->width());
+		m_heightEdit->SetValue(texture->height());
 		m_readWriteToggle->SetValue(m_cachedImporter->m_isReadable);
 		m_mipmapToggle->SetValue(m_cachedImporter->m_mipmapEnabled);
 		int index = FishEngine::EnumToIndex(m_cachedImporter->m_textureType);

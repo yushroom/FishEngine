@@ -2,19 +2,11 @@
 
 #include <FreeImage.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-//#define STB_IMAGE_RESIZE_IMPLEMENTATION
-//#include <stb/stb_image_resize.h>
-
-#include <gli/gli.hpp>
-
 #include <GLEnvironment.hpp>
 #include <Debug.hpp>
 #include <Common.hpp>
 #include <Mathf.hpp>
 #include <Texture2D.hpp>
-#include <Debug.hpp>
 
 #include "AssetDataBase.hpp"
 
@@ -126,145 +118,7 @@ namespace FishEditor
 		return *this;
 	}
 	
-	// https://github.com/g-truc/gli/blob/master/manual.md
-	// http://gli.g-truc.net/0.8.1/api/a00006.html
-	// bug fixed
-	GLuint CreateTextureFromDDS(char const* path, FishEngine::TextureDimension* out_textureFormat)
-	{
-		glCheckError();
-		
-		gli::texture gli_texture = gli::load(path);
-		if (gli_texture.empty())
-		{
-			Debug::LogError("Texture %s not found", path);
-			abort();
-		}
-		
-		gli::gl GL(gli::gl::PROFILE_GL33);
-		gli::gl::format const gli_format = GL.translate(gli_texture.format(), gli_texture.swizzles());
-		GLenum target = GL.translate(gli_texture.target());
-		
-		GLuint gl_texture_name = 0;
-		glGenTextures(1, &gl_texture_name);
-		glBindTexture(target, gl_texture_name);
-		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(gli_texture.levels() - 1));
-		glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, gli_format.Swizzles[0]);
-		glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, gli_format.Swizzles[1]);
-		glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, gli_format.Swizzles[2]);
-		glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, gli_format.Swizzles[3]);
-		
-		glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
-		glm::tvec3<GLsizei> const extent(gli_texture.extent());
-		//GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
-		
-		auto t = gli_texture.target();
-		if (t == gli::TARGET_2D)
-			*out_textureFormat = TextureDimension::Tex2D;
-		else if (t == gli::TARGET_3D)
-			*out_textureFormat = TextureDimension::Tex3D;
-		else if (t == gli::TARGET_CUBE)
-			*out_textureFormat = TextureDimension::Cube;
-
-		switch (gli_texture.target())
-		{
-			case gli::TARGET_1D:
-				glTexStorage1D(target, static_cast<GLint>(gli_texture.levels()), gli_format.Internal, extent.x);
-				break;
-			case gli::TARGET_1D_ARRAY:
-			case gli::TARGET_2D:
-			case gli::TARGET_CUBE:
-				glTexStorage2D(target, static_cast<GLint>(gli_texture.levels()), gli_format.Internal, extent.x, extent.y);
-				break;
-			case gli::TARGET_2D_ARRAY:
-			case gli::TARGET_3D:
-			case gli::TARGET_CUBE_ARRAY:
-				glTexStorage3D(target, static_cast<GLint>(gli_texture.levels()), gli_format.Internal, extent.x, extent.y, extent.z);
-				break;
-			default:
-				assert(0);
-				break;
-		}
-		
-		for (std::size_t Layer = 0; Layer < gli_texture.layers(); ++Layer)
-		{
-			for (std::size_t Face = 0; Face < gli_texture.faces(); ++Face)
-			{
-				for (std::size_t Level = 0; Level < gli_texture.levels(); ++Level)
-				{
-					GLsizei const LayerGL = static_cast<GLsizei>(Layer);
-					glm::tvec3<GLsizei> Extent(gli_texture.extent(Level));
-					if (gli::is_target_cube(gli_texture.target()))
-						target = static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face);
-					
-					switch (gli_texture.target())
-					{
-						case gli::TARGET_1D:
-							if (gli::is_compressed(gli_texture.format()))
-								glCompressedTexSubImage1D(
-														  target, static_cast<GLint>(Level), 0, Extent.x,
-														  gli_format.Internal, static_cast<GLsizei>(gli_texture.size(Level)),
-														  gli_texture.data(Layer, Face, Level));
-							else
-								glTexSubImage1D(
-												target, static_cast<GLint>(Level), 0, Extent.x,
-												gli_format.External, gli_format.Type,
-												gli_texture.data(Layer, Face, Level));
-							break;
-						case gli::TARGET_1D_ARRAY:
-						case gli::TARGET_2D:
-						case gli::TARGET_CUBE:
-							if (gli::is_compressed(gli_texture.format()))
-								glCompressedTexSubImage2D(
-														  target, static_cast<GLint>(Level),
-														  0, 0,
-														  Extent.x,
-														  gli_texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
-														  gli_format.Internal, static_cast<GLsizei>(gli_texture.size(Level)),
-														  gli_texture.data(Layer, Face, Level));
-							else {
-								glTexSubImage2D(
-												target, static_cast<GLint>(Level),
-												0, 0,
-												Extent.x,
-												gli_texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
-												gli_format.External, gli_format.Type,
-												gli_texture.data(Layer, Face, Level));
-							}
-							break;
-						case gli::TARGET_2D_ARRAY:
-						case gli::TARGET_3D:
-						case gli::TARGET_CUBE_ARRAY:
-							if (gli::is_compressed(gli_texture.format()))
-								glCompressedTexSubImage3D(
-														  target, static_cast<GLint>(Level),
-														  0, 0, 0,
-														  Extent.x, Extent.y,
-														  gli_texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
-														  gli_format.Internal, static_cast<GLsizei>(gli_texture.size(Level)),
-														  gli_texture.data(Layer, Face, Level));
-							else
-								glTexSubImage3D(
-												target, static_cast<GLint>(Level),
-												0, 0, 0,
-												Extent.x, Extent.y,
-												gli_texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
-												gli_format.External, gli_format.Type,
-												gli_texture.data(Layer, Face, Level));
-							break;
-						default: assert(0); break;
-					}
-				}
-			}
-		}
-		glCheckError();
-		return gl_texture_name;
-	}
-	
+#if 0
 	GLuint CreateTexture(const Path& path)
 	{
 		int width, height, components;
@@ -322,6 +176,7 @@ namespace FishEditor
 		free(data);
 		return t;
 	}
+#endif
 	
 	void TextureImporter::ImportTo(FishEngine::Texture2DPtr & texture)
 	{
@@ -330,26 +185,28 @@ namespace FishEditor
 		auto ext = m_assetPath.extension();
 		if (ext == ".dds")
 		{
-			abort();
+			//abort();
+			return;
 		}
 		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
 		{
-#if 1
 			FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 			FIBITMAP *dib = nullptr;
 			uint8_t * bits = nullptr;
 			unsigned int width = 0, height = 0;
-			const char* filename = m_assetPath.c_str();
-			fif = FreeImage_GetFileType(filename);
+			auto filename = m_assetPath.wstring().c_str();
+			fif = FreeImage_GetFileTypeU(filename);
 			if (fif == FIF_UNKNOWN)
-				fif = FreeImage_GetFIFFromFilename(filename);
+			{
+				fif = FreeImage_GetFIFFromFilenameU(filename);
+			}
 			if (fif == FIF_UNKNOWN)
 			{
 				abort();
 			}
 			if (FreeImage_FIFSupportsReading(fif))
 			{
-				dib = FreeImage_Load(fif, filename);
+				dib = FreeImage_LoadU(fif, filename);
 			}
 			else
 			{
@@ -362,8 +219,28 @@ namespace FishEditor
 			width = FreeImage_GetWidth(dib);
 			height = FreeImage_GetHeight(dib);
 			//if this somehow one of these failed (they shouldn't), return failure
-			if((bits == 0) || (width == 0) || (height == 0))
+			if ((bits == 0) || (width == 0) || (height == 0))
+			{
 				abort();
+			}
+
+			bool needResize = false;
+			if ( ! Mathf::IsPowerOfTwo(width) )
+			{
+				width = Mathf::NextPowerOfTwo(width);
+				needResize = true;
+			}
+			if ( ! Mathf::IsPowerOfTwo(height) )
+			{
+				height = Mathf::NextPowerOfTwo(height);
+				needResize = true;
+			}
+			
+			if (needResize)
+			{
+				Debug::LogWarning("resize image");
+				FreeImage_Rescale(dib, width, height);
+			}
 			
 			auto imageType = FreeImage_GetImageType(dib);
 			auto colorType = FreeImage_GetColorType(dib);
@@ -378,7 +255,7 @@ namespace FishEditor
 					auto newBitmap = FreeImage_ConvertToGreyscale(dib);
 					FreeImage_Unload(dib);
 					dib = newBitmap;
-					bpp = FreeImage_GetColorType(dib);
+					bpp = FreeImage_GetBPP(dib);
 					colorType = FreeImage_GetColorType(dib);
 				}
 				else if (bpp < 8 || colorType == FIC_PALETTE || colorType == FIC_CMYK)
@@ -410,6 +287,7 @@ namespace FishEditor
 						break;
 					case 24:
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
+						// unity does not support BGR24
 						SwapRedBlue32(dib);
 #endif
 						format = TextureFormat::RGB24;
@@ -463,80 +341,40 @@ namespace FishEditor
 			texture->m_data.resize(length);
 			std::copy(data, data + length, texture->m_data.begin());
 			
-			//AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(QPixmap::fromImage(std::move(image)));
-			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon();
-			
-			FreeImage_Unload(dib);
-			return;
-			
-#else
-			QImage image(QString::fromStdString(m_assetPath.string()));
-			//auto texture = std::make_shared<Texture2D>();
-			int width = image.width();
-			int height = image.height();
-			texture->m_width = width;
-			texture->m_height = height;
-			bool needResize = false;
-			if ( ! Mathf::IsPowerOfTwo(width) )
+			// get icon
+			FreeImage_FlipVertical(dib);	// flip for Qt
+			QImage::Format qformat;
+			if (format == TextureFormat::RGBA32)
 			{
-				width = Mathf::NextPowerOfTwo(width);
-				needResize = true;
+				qformat = QImage::Format_RGBA8888;
 			}
-			if ( ! Mathf::IsPowerOfTwo(height) )
+			else if (format == TextureFormat::BGRA32)
 			{
-				height = Mathf::NextPowerOfTwo(height);
-				needResize = true;
+				// TODO
+				SwapRedBlue32(dib);
+				//data = FreeImage_GetBits(dib);
+				qformat = QImage::Format_RGBA8888;
 			}
-			
-			if (needResize)
+			else if (format == TextureFormat::RGB24)
 			{
-				Debug::LogWarning("resize image");
-				image = image.scaled(width, height);
+				qformat = QImage::Format_RGB888;
+				
 			}
-			
-			//int bytesPerLine = image.bytesPerLine();
-			//int bytes = image.byteCount();
-			int expectedBytes = 0;
-			
-			auto format = image.format();
-			
-			// QImage is 32-bit aligned
-			switch (format)
+			else if (format == TextureFormat::R8)
 			{
-				case QImage::Format_RGB32:
-					//image.convertToFormat(QImage::Format_RGB888);
-					//texture->m_format = TextureFormat::RGB24;
-					//expectedBytes = width * height * 3;
-					//break;
-				case QImage::Format_ARGB32:
-					image = image.convertToFormat(QImage::Format_RGBA8888);
-					texture->m_format = TextureFormat::RGBA32;
-					expectedBytes = width * height * 4;
-					break;
-				case QImage::Format_Mono:
-					image = image.convertToFormat(QImage::Format_Grayscale8);
-					//break;
-				case QImage::Format_Grayscale8:
-					texture->m_format = TextureFormat::R8;
-					expectedBytes = width * height;
-					break;
-				default:
-					abort();
+				qformat = QImage::Format_Grayscale8;
 			}
-			
-			int length = image.byteCount();
-			if (expectedBytes != length)
+			else
 			{
 				abort();
 			}
-			auto data = image.bits();
-			texture->m_data.resize(length);
-			std::copy(data, data + length, texture->m_data.begin());
-			
-			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(QPixmap::fromImage(std::move(image)));
-			//AssetDatabase::m_cacheIcons.emplace({ path, QIcon(QPixmap::fromImage(std::move(image))) });
+			auto qimage = QImage(width, height, qformat);
+			std::copy(data, data + length, qimage.bits());
+			auto qpixmap = QPixmap::fromImage(std::move(qimage));
+			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(qpixmap);
+
+			FreeImage_Unload(dib);
 			return;
-#endif
 		}
 		else
 		{
@@ -549,6 +387,7 @@ namespace FishEditor
 		m_assetPath = path;
 		auto texture = std::make_shared<Texture2D>();
 		this->ImportTo(texture);
+		m_assetObject = texture;
 		return texture;
 	}
 	
@@ -558,86 +397,4 @@ namespace FishEditor
 		auto texture2d = std::dynamic_pointer_cast<Texture2D>(texture);
 		ImportTo(texture2d);
 	}
-
-#if 0
-
-	TexturePtr TextureImporter::FromFile(const Path& path)
-	{
-		auto t = std::make_shared<Texture>();
-		GLuint texture;
-		auto ext = path.extension();
-		if (ext == ".dds")
-		{
-			//abort();
-			TextureDimension format;
-			texture = CreateTextureFromDDS(path.string().c_str(), &format);
-			t->m_dimension = format;
-		}
-		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
-		{
-			texture = CreateTexture(path);
-			t->m_dimension = TextureDimension::Tex2D;
-		}
-		else
-		{
-			Debug::LogError("texture type[%s] not supported\n", ext.string().c_str());
-			abort();
-		}
-
-		t->m_GLNativeTexture = texture;
-		auto name = path.stem().string();
-		t->setName(name);
-		Texture::s_textures.push_back(t);
-		return t;
-	}
-	
-	TexturePtr TextureImporter::FromRawData(const uint8_t* data, int width, int height, TextureFormat format)
-	{
-		GLenum internal_format, external_format, pixel_type;
-
-		TextureFormat2GLFormat(format, internal_format, external_format, pixel_type);
-
-		GLuint texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-			external_format, pixel_type, data);
-		glCheckError();
-
-		GLenum wrap_mode = (m_wrapMode == TextureWrapMode::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-		
-		GLenum min_filter_mode;
-		GLenum mag_filter_mode = GL_LINEAR;
-		if (m_filterMode == FilterMode::Point)
-		{
-			mag_filter_mode = min_filter_mode = GL_NEAREST;
-		}
-		else if (m_filterMode == FilterMode::Bilinear)
-		{
-			min_filter_mode = GL_LINEAR;
-		}
-		else    // Trilinear
-		{
-			min_filter_mode = GL_LINEAR_MIPMAP_LINEAR;
-		}
-		glCheckError();
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter_mode);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter_mode);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glCheckError();
-		
-		auto t = std::make_shared<Texture>();
-		t->m_GLNativeTexture = texture;
-		t->m_width = width;
-		t->m_height = height;
-		t->m_dimension = TextureDimension::Tex2D;
-		
-		Texture::s_textures.push_back(t);
-		return t;
-	}
-#endif
 }

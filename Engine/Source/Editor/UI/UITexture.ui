@@ -97,8 +97,8 @@
       <property name="frameShape">
        <enum>QFrame::Box</enum>
       </property>
-      <property name="scaledContents">
-       <bool>true</bool>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
      <widget class="QPushButton" name="selectButton">

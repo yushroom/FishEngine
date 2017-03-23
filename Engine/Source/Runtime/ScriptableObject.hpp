@@ -11,6 +11,8 @@ namespace FishEngine
 	class ScriptableObject : public Object
 	{
 	public:
+		InjectClassName(ScriptableObject);
+
 		ScriptableObject() = default;
 		virtual ~ScriptableObject() = default;
 		

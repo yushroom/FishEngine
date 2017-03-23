@@ -27,9 +27,11 @@
 #include <fstream>
 #include <GameObject.hpp>
 #include <Timer.hpp>
+#include <Path.hpp>
 
 #include "SceneArchive.hpp"
 #include "AssetArchive.hpp"
+#include "ShaderCompiler.hpp"
 
 using namespace FishEngine;
 
@@ -156,6 +158,14 @@ void MainWindow::Init()
 	FishEngine::Debug::Init();
 
 	Application::s_isEditor = true;
+
+	QDir cwd = QCoreApplication::applicationDirPath();
+#if FISHENGINE_PLATFORM_APPLE
+	cwd.cdUp();
+#endif
+	//s_rootSystemDirectory = cwd.absolutePath().toStdString();
+	auto p = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders" / "include";
+	ShaderCompiler::setShaderIncludeDir(p.string());
 
 	//FishEngine::Timer t("Load assets");
 	FishEditor::FileInfo::SetAssetRootPath(Application::s_dataPath);

@@ -20,6 +20,7 @@ class UIAssetHeader;
 class UIComboBox;
 class UIBool;
 class UIRevertApplyButtons;
+class UIFloat;
 
 class TextureImporterInspector : public QWidget
 {
@@ -45,6 +46,8 @@ private:
 	QVBoxLayout		* m_verticalLayout;
 	UIAssetHeader	* m_assetHeader;
 	
+	UIFloat			* m_widthEdit;
+	UIFloat			* m_heightEdit;
 	UIComboBox		* m_typeCombox;
 	UIComboBox		* m_shapeCombox;
 	UIBool			* m_readWriteToggle;

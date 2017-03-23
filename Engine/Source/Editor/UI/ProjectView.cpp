@@ -35,6 +35,8 @@ ProjectView::ProjectView(QWidget *parent) :
 	m_fileModel = new ProjectViewFileModel(this);
 	ui->listView->setFileModel(m_fileModel);
 	ui->listView->setModel(m_fileModel);
+	ui->listView->setUniformItemSizes(true);
+	//ui->listView->setLayoutMode(QListView::Batched);
 
 	ui->listView->setResizeMode(QListView::Adjust);
 	ui->listView->setDragEnabled(true);

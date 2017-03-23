@@ -17,9 +17,9 @@ namespace FishEngine
 	class FE_EXPORT Shader : public Object
 	{
 	public:
-		InjectClassName(Shader)
+		InjectClassName(Shader);
 
-			Shader();
+		Shader();
 		Shader(const Shader&) = delete;
 		Shader& operator=(const Shader&) = delete;
 		//Shader(Shader&&);
@@ -31,7 +31,7 @@ namespace FishEngine
 
 		static ShaderPtr CreateFromFile(const Path& path);
 
-		void Use() const;
+		void Use();
 
 		bool HasUniform(const std::string& name);
 
@@ -105,9 +105,11 @@ namespace FishEngine
 		//void GetAllUniforms();
 		bool FromFile(const Path& path);
 
+		void PrintErrorMessage(std::string const & errorMessage) noexcept;
+
 		// cache
 		Meta(NonSerializable)
-			unsigned int m_GLNativeProgram = 0;
+		unsigned int m_GLNativeProgram = 0;
 		std::vector<UniformInfo> m_uniforms;
 
 		Cullface    m_cullface = Cullface::Back;

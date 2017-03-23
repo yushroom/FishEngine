@@ -26,6 +26,12 @@ GameObjectInspector
 
 Hierarchy中drag&drop在debug模式下会挂掉
 
+asset cache里面path大小写的问题
+
+ProjectView中的icon垂直居中，label靠下。
+
+subclass QStyledItemDelegate之后发现icon不能居中。。。https://bugreports.qt.io/browse/QTBUG-13177 10年开始的bug一直没修过
+
 
 
 渲染第一帧的时候，shadow是最先开始的，而SkinnedMeshRenderer.matrixPalette还没有生成，drawElements的时候会挂掉。解决方法：SkinnedMeshRenderer.setSharedMesh的时候resize matrixPalette

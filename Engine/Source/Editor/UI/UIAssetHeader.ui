@@ -40,9 +40,6 @@
      <property name="pixmap">
       <pixmap resource="../resources.qrc">:/Resources/M.png</pixmap>
      </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>

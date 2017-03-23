@@ -9,9 +9,10 @@
 
 namespace FishEditor
 {
-	class Editor : public FishEngine::ScriptableObject, public IPreviewable
+	class Meta(NonSerializable) Editor : public FishEngine::ScriptableObject, public IPreviewable
 	{
 	public:
+		InjectClassName(Editor);
 		
 		// Draw the built-in inspector.
 		bool DrawDefaultInspector()

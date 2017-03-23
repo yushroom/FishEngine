@@ -23,7 +23,7 @@ namespace FishEngine
 
 	int QualitySettings::m_shadowCascades = 4;
 
-	float QualitySettings::m_shadowDistance = 150.0f;
+	float QualitySettings::s_shadowDistance = 150.0f;
 
 	float QualitySettings::m_shadowNearPlaneOffset = 2.0f;
 

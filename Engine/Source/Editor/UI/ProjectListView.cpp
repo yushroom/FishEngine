@@ -10,6 +10,8 @@
 #include <QMenu>
 #include <QDesktopServices>
 #include <QDir>
+#include <QStyledItemDelegate>
+#include <QApplication>
 
 #include "ProjectViewFileModel.hpp"
 
@@ -25,9 +27,44 @@
 #include "AssetDataBase.hpp"
 #include "SceneArchive.hpp"
 
+class ProjectListItem : public QStyledItemDelegate
+{
+public:
+	explicit ProjectListItem(QObject *parent = Q_NULLPTR) : QStyledItemDelegate(parent)
+	{
+	}
+
+	virtual ~ProjectListItem() = default;
+
+	// painting
+	virtual void paint(QPainter *painter,
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index) const override
+	{
+		auto opt = option;
+		
+		if (option.decorationPosition == QStyleOptionViewItem::Top)
+		{
+			auto size = opt.decorationSize;
+			opt.displayAlignment = Qt::AlignBottom | Qt::AlignHCenter;
+			opt.decorationAlignment = Qt::AlignCenter;
+		}
+		QStyledItemDelegate::paint(painter, opt, index);
+	}
+
+	//virtual QSize sizeHint(const QStyleOptionViewItem &option,
+	//	const QModelIndex &index) const override
+	//{
+	//	auto size = option.decorationSize;
+	//	auto ret = QStyledItemDelegate::sizeHint(option, index);
+	//	return ret;
+	//}
+};
+
 ProjectListView::ProjectListView(QWidget *parent /*= 0*/)
 	: QListView(parent)
 {
+	setItemDelegate(new ProjectListItem());
 	//setAcceptDrops(true);
 	//setDragEnabled(true);
 	setDragEnabled(true);

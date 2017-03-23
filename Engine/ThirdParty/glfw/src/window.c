@@ -1,8 +1,8 @@
 //========================================================================
-// GLFW 3.2 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 // Copyright (c) 2012 Torsten Walluhn <tw@mad-cad.net>
 //
 // This software is provided 'as-is', without any express or implied
@@ -86,6 +86,12 @@ void _glfwInputWindowIconify(_GLFWwindow* window, GLFWbool iconified)
         window->callbacks.iconify((GLFWwindow*) window, iconified);
 }
 
+void _glfwInputWindowMaximize(_GLFWwindow* window, GLFWbool maximized)
+{
+    if (window->callbacks.maximize)
+        window->callbacks.maximize((GLFWwindow*) window, maximized);
+}
+
 void _glfwInputFramebufferSize(_GLFWwindow* window, int width, int height)
 {
     if (window->callbacks.fbsize)
@@ -100,7 +106,7 @@ void _glfwInputWindowDamage(_GLFWwindow* window)
 
 void _glfwInputWindowCloseRequest(_GLFWwindow* window)
 {
-    window->closed = GLFW_TRUE;
+    window->shouldClose = GLFW_TRUE;
 
     if (window->callbacks.close)
         window->callbacks.close((GLFWwindow*) window);
@@ -260,6 +266,9 @@ void glfwDefaultWindowHints(void)
 
     // The default is to select the highest available refresh rate
     _glfw.hints.refreshRate = GLFW_DONT_CARE;
+
+    // The default is to use full Retina resolution framebuffers
+    _glfw.hints.window.ns.retina = GLFW_TRUE;
 }
 
 GLFWAPI void glfwWindowHint(int hint, int value)
@@ -333,6 +342,12 @@ GLFWAPI void glfwWindowHint(int hint, int value)
             break;
         case GLFW_VISIBLE:
             _glfw.hints.window.visible = value ? GLFW_TRUE : GLFW_FALSE;
+            break;
+        case GLFW_COCOA_RETINA_FRAMEBUFFER:
+            _glfw.hints.window.ns.retina = value ? GLFW_TRUE : GLFW_FALSE;
+            break;
+        case GLFW_COCOA_FRAME_AUTOSAVE:
+            _glfw.hints.window.ns.frame = value ? GLFW_TRUE : GLFW_FALSE;
             break;
         case GLFW_CLIENT_API:
             _glfw.hints.context.client = value;
@@ -412,7 +427,7 @@ GLFWAPI int glfwWindowShouldClose(GLFWwindow* handle)
     assert(window != NULL);
 
     _GLFW_REQUIRE_INIT_OR_RETURN(0);
-    return window->closed;
+    return window->shouldClose;
 }
 
 GLFWAPI void glfwSetWindowShouldClose(GLFWwindow* handle, int value)
@@ -421,7 +436,7 @@ GLFWAPI void glfwSetWindowShouldClose(GLFWwindow* handle, int value)
     assert(window != NULL);
 
     _GLFW_REQUIRE_INIT();
-    window->closed = value;
+    window->shouldClose = value;
 }
 
 GLFWAPI void glfwSetWindowTitle(GLFWwindow* handle, const char* title)
@@ -631,6 +646,10 @@ GLFWAPI void glfwMaximizeWindow(GLFWwindow* handle)
     assert(window != NULL);
 
     _GLFW_REQUIRE_INIT();
+
+    if (window->monitor)
+        return;
+
     _glfwPlatformMaximizeWindow(window);
 }
 
@@ -694,6 +713,8 @@ GLFWAPI int glfwGetWindowAttrib(GLFWwindow* handle, int attrib)
             return window->decorated;
         case GLFW_FLOATING:
             return window->floating;
+        case GLFW_AUTO_ICONIFY:
+            return window->autoIconify;
         case GLFW_CLIENT_API:
             return window->context.client;
         case GLFW_CONTEXT_CREATION_API:
@@ -720,6 +741,52 @@ GLFWAPI int glfwGetWindowAttrib(GLFWwindow* handle, int attrib)
 
     _glfwInputError(GLFW_INVALID_ENUM, "Invalid window attribute %i", attrib);
     return 0;
+}
+
+GLFWAPI void glfwSetWindowAttrib(GLFWwindow* handle, int attrib, int value)
+{
+    _GLFWwindow* window = (_GLFWwindow*) handle;
+    assert(window != NULL);
+
+    _GLFW_REQUIRE_INIT();
+
+    value = value ? GLFW_TRUE : GLFW_FALSE;
+
+    switch (attrib)
+    {
+        case GLFW_RESIZABLE:
+            if (window->resizable != value)
+            {
+                window->resizable = value;
+                if (!window->monitor)
+                    _glfwPlatformSetWindowResizable(window, value);
+            }
+            return;
+
+        case GLFW_DECORATED:
+            if (window->decorated != value)
+            {
+                window->decorated = value;
+                if (!window->monitor)
+                    _glfwPlatformSetWindowDecorated(window, value);
+            }
+            return;
+
+        case GLFW_FLOATING:
+            if (window->floating != value)
+            {
+                window->floating = value;
+                if (!window->monitor)
+                    _glfwPlatformSetWindowFloating(window, value);
+            }
+            return;
+
+        case GLFW_AUTO_ICONIFY:
+            window->autoIconify = value;
+            return;
+    }
+
+    _glfwInputError(GLFW_INVALID_ENUM, "Invalid window attribute %i", attrib);
 }
 
 GLFWAPI GLFWmonitor* glfwGetWindowMonitor(GLFWwindow* handle)
@@ -849,6 +916,17 @@ GLFWAPI GLFWwindowiconifyfun glfwSetWindowIconifyCallback(GLFWwindow* handle,
 
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
     _GLFW_SWAP_POINTERS(window->callbacks.iconify, cbfun);
+    return cbfun;
+}
+
+GLFWAPI GLFWwindowmaximizefun glfwSetWindowMaximizeCallback(GLFWwindow* handle,
+                                                            GLFWwindowmaximizefun cbfun)
+{
+    _GLFWwindow* window = (_GLFWwindow*) handle;
+    assert(window != NULL);
+
+    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    _GLFW_SWAP_POINTERS(window->callbacks.maximize, cbfun);
     return cbfun;
 }
 

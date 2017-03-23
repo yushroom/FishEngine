@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
 	std::string path = R"(D:\program\github\FishEngine\Example\UnityChan\AlphaMask.surf)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
-	std::string path = R"(/Users/yushroom/program/graphics/FishEngine/Engine/Shaders/Deferred.shader)";
+	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/Deferred.shader";
+	ShaderCompiler::setShaderIncludeDir("/Users/yushroom/program/FishEngine/Engine/Shaders/include");
 #endif
 
     

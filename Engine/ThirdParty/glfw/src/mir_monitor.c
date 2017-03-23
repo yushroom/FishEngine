@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.2 Mir - www.glfw.org
+// GLFW 3.3 Mir - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2014-2015 Brandon Schaefer <brandon.schaefer@canonical.com>
 //
@@ -30,17 +30,16 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
+//////                       GLFW internal API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-_GLFWmonitor** _glfwPlatformGetMonitors(int* count)
+// Poll for changes in the set of connected monitors
+//
+void _glfwPollMonitorsMir(void)
 {
-    int i, found = 0;
-    _GLFWmonitor** monitors = NULL;
+    int i;
     MirDisplayConfiguration* displayConfig =
         mir_connection_create_display_config(_glfw.mir.connection);
-
-    *count = 0;
 
     for (i = 0;  i < displayConfig->num_outputs;  i++)
     {
@@ -51,32 +50,27 @@ _GLFWmonitor** _glfwPlatformGetMonitors(int* count)
             out->num_modes &&
             out->current_mode < out->num_modes)
         {
-            found++;
-            monitors        = realloc(monitors, sizeof(_GLFWmonitor*) * found);
-            monitors[i]     = _glfwAllocMonitor("Unknown",
-                                                out->physical_width_mm,
-                                                out->physical_height_mm);
+            _GLFWmonitor* monitor = _glfwAllocMonitor("Unknown",
+                                                      out->physical_width_mm,
+                                                      out->physical_height_mm);
 
-            monitors[i]->mir.x         = out->position_x;
-            monitors[i]->mir.y         = out->position_y;
-            monitors[i]->mir.output_id = out->output_id;
-            monitors[i]->mir.cur_mode  = out->current_mode;
+            monitor->mir.x        = out->position_x;
+            monitor->mir.y        = out->position_y;
+            monitor->mir.outputId = out->output_id;
+            monitor->mir.curMode  = out->current_mode;
+            monitor->modes = _glfwPlatformGetVideoModes(monitor, &monitor->modeCount);
 
-            monitors[i]->modes = _glfwPlatformGetVideoModes(monitors[i],
-                                                            &monitors[i]->modeCount);
+            _glfwInputMonitor(monitor, GLFW_CONNECTED, _GLFW_INSERT_LAST);
         }
     }
 
     mir_display_config_destroy(displayConfig);
-
-    *count = found;
-    return monitors;
 }
 
-GLFWbool _glfwPlatformIsSameMonitor(_GLFWmonitor* first, _GLFWmonitor* second)
-{
-    return first->mir.output_id == second->mir.output_id;
-}
+
+//////////////////////////////////////////////////////////////////////////
+//////                       GLFW platform API                      //////
+//////////////////////////////////////////////////////////////////////////
 
 void _glfwPlatformGetMonitorPos(_GLFWmonitor* monitor, int* xpos, int* ypos)
 {
@@ -129,7 +123,7 @@ GLFWvidmode* _glfwPlatformGetVideoModes(_GLFWmonitor* monitor, int* found)
     for (i = 0;  i < displayConfig->num_outputs;  i++)
     {
         const MirDisplayOutput* out = displayConfig->outputs + i;
-        if (out->output_id != monitor->mir.output_id)
+        if (out->output_id != monitor->mir.outputId)
             continue;
 
         modes = calloc(out->num_modes, sizeof(GLFWvidmode));
@@ -153,7 +147,7 @@ GLFWvidmode* _glfwPlatformGetVideoModes(_GLFWmonitor* monitor, int* found)
 
 void _glfwPlatformGetVideoMode(_GLFWmonitor* monitor, GLFWvidmode* mode)
 {
-    *mode = monitor->modes[monitor->mir.cur_mode];
+    *mode = monitor->modes[monitor->mir.curMode];
 }
 
 void _glfwPlatformGetGammaRamp(_GLFWmonitor* monitor, GLFWgammaramp* ramp)
@@ -177,6 +171,6 @@ GLFWAPI int glfwGetMirMonitor(GLFWmonitor* handle)
 {
     _GLFWmonitor* monitor = (_GLFWmonitor*) handle;
     _GLFW_REQUIRE_INIT_OR_RETURN(0);
-    return monitor->mir.output_id;
+    return monitor->mir.outputId;
 }
 

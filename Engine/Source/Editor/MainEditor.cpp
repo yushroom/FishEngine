@@ -9,6 +9,7 @@
 #include <GameObject.hpp>
 #include <CameraController.hpp>
 #include <ModelImporter.hpp>
+#include <TextureImporter.hpp>
 #include <Shader.hpp>
 #include <Scene.hpp>
 #include <Screen.hpp>
@@ -17,6 +18,7 @@
 #include <RenderSettings.hpp>
 #include <QualitySettings.hpp>
 #include <MeshRenderer.hpp>
+#include <SkinnedMeshRenderer.hpp>
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
 #include <Application.hpp>
@@ -236,11 +238,33 @@ namespace FishEditor
 
 		model->AddComponent(rotator);
 #else
-	light_go->transform()->setLocalEulerAngles(50, 150, 0);
-	auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+		light_go->transform()->setLocalEulerAngles(50, 150, 0);
+		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 
-	auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
-	model = Object::Instantiate(model);
+		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
+		model = Object::Instantiate(model);
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uv_checker.jpg"));
+			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			material->setMainTexture(tex);
+			plane->GetComponent<MeshRenderer>()->SetMaterial(material);
+		}
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/hvyweapon_red.tga"));
+			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			material->setMainTexture(tex);
+			auto renderers = model->GetComponentsInChildren<SkinnedMeshRenderer>();
+			for (auto & r : renderers)
+			{
+				r->SetMaterial(material);
+			}
+		}
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/heavy_head.tga"));
+			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			material->setMainTexture(tex);
+			FindNamedChild(model, "head_mesh")->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
+		}
 #endif
 
 #endif

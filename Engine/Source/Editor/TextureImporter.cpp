@@ -1,5 +1,7 @@
 #include "TextureImporter.hpp"
 
+#include <FreeImage.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 //#define STB_IMAGE_RESIZE_IMPLEMENTATION
@@ -12,12 +14,94 @@
 #include <Common.hpp>
 #include <Mathf.hpp>
 #include <Texture2D.hpp>
+#include <Debug.hpp>
 
 #include "AssetDataBase.hpp"
 
 #include <QImage>
 
 using namespace FishEngine;
+
+// RAII for FreeImage
+class FreeImagePlugin
+{
+public:
+	static FreeImagePlugin * instance()
+	{
+		static FreeImagePlugin s_instance;
+		return & s_instance;
+	}
+	
+	~FreeImagePlugin()
+	{
+		FreeImage_DeInitialise();
+	}
+	
+private:
+	
+	FreeImagePlugin()
+	{
+		FreeImage_Initialise(false);
+		std::cout << "Supported texture formats: ";
+		for (int i = 0; i < FreeImage_GetFIFCount(); ++i)
+		{
+			std::string ext = FreeImage_GetFIFExtensionList(FREE_IMAGE_FORMAT(i));
+			std::cout << ext << ", ";
+		}
+		std::cout << std::endl;
+		
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
+	}
+
+	
+	static void FreeImageLoadErrorHandler(FREE_IMAGE_FORMAT fif, const char *message)
+	{
+		// Callback method as required by FreeImage to report problems
+		const char* typeName = FreeImage_GetFormatFromFIF(fif);
+		if (typeName)
+		{
+			Debug::LogError("FreeImage error: '%s' when loading format", message, typeName);
+		}
+		else
+		{
+			Debug::LogError("FreeImage error: '%s'", message);
+		}
+	}
+};
+
+/// INPLACESWAP adopted from codeguru.com
+template <class T> void INPLACESWAP(T& a, T& b) {
+	a ^= b; b ^= a; a ^= b;
+}
+
+// ==========================================================
+// Utility functions declared in Utilities.h
+
+BOOL SwapRedBlue32(FIBITMAP* dib) {
+	if(FreeImage_GetImageType(dib) != FIT_BITMAP) {
+		return FALSE;
+	}
+	
+	const unsigned bytesperpixel = FreeImage_GetBPP(dib) / 8;
+	if(bytesperpixel > 4 || bytesperpixel < 3) {
+		return FALSE;
+	}
+	
+	const unsigned height = FreeImage_GetHeight(dib);
+	const unsigned pitch = FreeImage_GetPitch(dib);
+	const unsigned lineSize = FreeImage_GetLine(dib);
+	
+	BYTE* line = FreeImage_GetBits(dib);
+	for(unsigned y = 0; y < height; ++y, line += pitch) {
+		for(BYTE* pixel = line; pixel < line + lineSize ; pixel += bytesperpixel) {
+			INPLACESWAP(pixel[0], pixel[2]);
+		}
+	}
+	
+	return TRUE;
+}
+
 
 namespace FishEditor
 {
@@ -241,6 +325,7 @@ namespace FishEditor
 	
 	void TextureImporter::ImportTo(FishEngine::Texture2DPtr & texture)
 	{
+		auto fm_instance = FreeImagePlugin::instance();
 		//std::shared_ptr<Texture> texture;
 		auto ext = m_assetPath.extension();
 		if (ext == ".dds")
@@ -250,6 +335,141 @@ namespace FishEditor
 		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
 		{
 #if 1
+			FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+			FIBITMAP *dib = nullptr;
+			uint8_t * bits = nullptr;
+			unsigned int width = 0, height = 0;
+			const char* filename = m_assetPath.c_str();
+			fif = FreeImage_GetFileType(filename);
+			if (fif == FIF_UNKNOWN)
+				fif = FreeImage_GetFIFFromFilename(filename);
+			if (fif == FIF_UNKNOWN)
+			{
+				abort();
+			}
+			if (FreeImage_FIFSupportsReading(fif))
+			{
+				dib = FreeImage_Load(fif, filename);
+			}
+			else
+			{
+				abort();
+			}
+			
+			//retrieve the image data
+			bits = FreeImage_GetBits(dib);
+			//get the image width and height
+			width = FreeImage_GetWidth(dib);
+			height = FreeImage_GetHeight(dib);
+			//if this somehow one of these failed (they shouldn't), return failure
+			if((bits == 0) || (width == 0) || (height == 0))
+				abort();
+			
+			auto imageType = FreeImage_GetImageType(dib);
+			auto colorType = FreeImage_GetColorType(dib);
+			auto bpp = FreeImage_GetBPP(dib);
+			
+			TextureFormat format;
+			
+			if (imageType == FIT_BITMAP)
+			{
+				if (colorType == FIC_MINISWHITE || colorType == FIC_MINISBLACK)
+				{
+					auto newBitmap = FreeImage_ConvertToGreyscale(dib);
+					FreeImage_Unload(dib);
+					dib = newBitmap;
+					bpp = FreeImage_GetColorType(dib);
+					colorType = FreeImage_GetColorType(dib);
+				}
+				else if (bpp < 8 || colorType == FIC_PALETTE || colorType == FIC_CMYK)
+				{
+					auto newBitmap = FreeImage_ConvertTo24Bits(dib);
+					FreeImage_Unload(dib);
+					dib = newBitmap;
+					bpp = FreeImage_GetBPP(dib);
+					colorType = FreeImage_GetColorType(dib);
+				}
+				
+				// by this stage, 8-bit is greyscale, 16/24/32 bit are RGB[A]
+				switch (bpp)
+				{
+					case 8:
+						format = TextureFormat::R8;
+						break;
+					case 16:
+						if (FreeImage_GetGreenMask(dib) == FI16_565_GREEN_MASK)
+						{
+							//"Format not supported by the engine. TODO."
+							abort();
+						}
+						else
+						{
+							//"Format not supported by the engine. TODO."
+							abort();
+						}
+						break;
+					case 24:
+#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
+						SwapRedBlue32(dib);
+#endif
+						format = TextureFormat::RGB24;
+						break;
+					case 32:
+#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+						format = TextureFormat::RGBA32;
+#else
+						format = TextureFormat::BGRA32;
+#endif
+						break;
+					default:
+						break;
+				}
+			}
+			else if (imageType == FIT_UINT16 || imageType == FIT_INT16)
+			{
+				// "No INT pixel formats supported currently. TODO."
+				abort();
+			}
+			else if (imageType == FIT_FLOAT)
+			{
+				format = TextureFormat::RFloat;
+			}
+			else if (imageType == FIT_RGB16)
+			{
+				// Format not supported by the engine. TODO.
+				abort();
+			}
+			else
+			{
+				abort();
+			}
+			
+			unsigned char* srcData = FreeImage_GetBits(dib);
+			unsigned srcPitch = FreeImage_GetPitch(dib);
+			if (srcPitch != width * (bpp / 8))
+			{
+				abort();
+			}
+			
+			int length = width * height * (bpp / 8);
+//			if (expectedBytes != length)
+//			{
+//				abort();
+//			}
+			auto data = srcData;
+			texture->m_width = width;
+			texture->m_height = height;
+			texture->m_format = format;
+			texture->m_data.resize(length);
+			std::copy(data, data + length, texture->m_data.begin());
+			
+			//AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(QPixmap::fromImage(std::move(image)));
+			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon();
+			
+			FreeImage_Unload(dib);
+			return;
+			
+#else
 			QImage image(QString::fromStdString(m_assetPath.string()));
 			//auto texture = std::make_shared<Texture2D>();
 			int width = image.width();
@@ -315,42 +535,6 @@ namespace FishEditor
 			
 			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(QPixmap::fromImage(std::move(image)));
 			//AssetDatabase::m_cacheIcons.emplace({ path, QIcon(QPixmap::fromImage(std::move(image))) });
-			return;
-#else
-			int width, height, components;
-			uint8_t *data = stbi_load(path.string().c_str(), &width, &height, &components, 0);
-			if (data == nullptr)
-			{
-				Debug::LogError("Texture not found, path: %s", path.c_str());
-				abort();
-			}
-			//TextureImporter::FromRawData(data, width, height, TextureFormat::RGBA32);
-			
-			auto texture = std::make_shared<Texture2D>();
-			int length = width * height * components;
-			texture->m_data.resize(length);
-			std::copy(data, data + length, texture->m_data.begin());
-			free(data);
-			texture->m_width = width;
-			texture->m_height = height;
-			
-			switch (components)
-			{
-				case 1:
-					texture->m_format = TextureFormat::R8;
-					break;
-				case 2:
-					texture->m_format = TextureFormat::RG16;
-					break;
-				case 3:
-					texture->m_format = TextureFormat::RGB24;
-					break;
-				case 4:
-					texture->m_format = TextureFormat::RGBA32;
-					break;
-				default:
-					abort();
-			}
 			return;
 #endif
 		}

@@ -80,12 +80,33 @@ namespace FishEngine
 			{
 				int id = comp->ClassID();
 				if ( IsSubClassOf<T>(id) )
-				//if (comp->ClassName() == T::StaticClassName())
 				{
 					return std::static_pointer_cast<T>(comp);
 				}
 			}
 			return nullptr;
+		}
+		
+		template<typename T>
+		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const
+		{
+			std::vector<std::shared_ptr<T>> result;
+			this->GetComponentsInChildren(result);
+			return result;
+		}
+		
+		template<typename T>
+		void GetComponentsInChildren(std::vector<std::shared_ptr<T>> & components) const
+		{
+			auto comp = this->GetComponent<T>();
+			if (comp != nullptr)
+			{
+				components.push_back(comp);
+			}
+			for (auto & child : m_transform->m_children)
+			{
+				child->m_gameObjectStrongRef->GetComponentsInChildren(components);
+			}
 		}
 
 		//bool AddComponent(std::string const & typeName);

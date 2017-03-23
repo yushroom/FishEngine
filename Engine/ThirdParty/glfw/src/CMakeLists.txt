@@ -7,10 +7,10 @@ set(common_SOURCES context.c init.c input.c monitor.c vulkan.c window.c)
 
 if (_GLFW_COCOA)
     set(glfw_HEADERS ${common_HEADERS} cocoa_platform.h cocoa_joystick.h
-                     posix_tls.h nsgl_context.h)
+                     posix_tls.h nsgl_context.h egl_context.h)
     set(glfw_SOURCES ${common_SOURCES} cocoa_init.m cocoa_joystick.m
                      cocoa_monitor.m cocoa_window.m cocoa_time.c posix_tls.c
-                     nsgl_context.m)
+                     nsgl_context.m egl_context.c)
 elseif (_GLFW_WIN32)
     set(glfw_HEADERS ${common_HEADERS} win32_platform.h win32_joystick.h
                      wgl_context.h egl_context.h)
@@ -45,6 +45,12 @@ elseif (_GLFW_MIR)
     set(glfw_SOURCES ${common_SOURCES} mir_init.c mir_monitor.c mir_window.c
                      linux_joystick.c posix_time.c posix_tls.c xkb_unicode.c
                      egl_context.c)
+elseif (_GLFW_OSMESA)
+    set(glfw_HEADERS ${common_HEADERS} osmesa_platform.h
+                     posix_time.h posix_tls.h osmesa_context.h)
+    set(glfw_SOURCES ${common_SOURCES} osmesa_init.c osmesa_monitor.c
+                     osmesa_window.c posix_time.c posix_tls.c
+                     osmesa_context.c)
 endif()
 
 if (APPLE)

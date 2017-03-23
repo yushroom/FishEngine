@@ -40,6 +40,10 @@ namespace FishEngine
 			internal_format = GL_RGBA8;
 			format = GL_RGBA;
 			break;
+		case TextureFormat::BGRA32:
+			internal_format = GL_RGBA8;
+			format = GL_BGRA;
+			break;
 		default:
 			abort();
 		}

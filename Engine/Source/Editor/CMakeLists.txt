@@ -2,6 +2,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+include_directories(${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage/include)
+link_directories(${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage/lib)
+
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -89,6 +92,7 @@ target_link_libraries(FishEditor FishEngine)
 #target_link_libraries(FishEditor ${PhysXSDK_LIBRARIES})
 #target_link_libraries(FishEditor ${Boost_LIBRARIES})
 target_link_libraries(FishEditor ${FBXSDK_LIB})
+target_link_libraries(FishEditor freeimage)
 
 if (MSVC)
     # target_link_libraries(FishEditor opengl32.lib)

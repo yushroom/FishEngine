@@ -1,8 +1,8 @@
 //========================================================================
-// GLFW 3.2 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -130,7 +130,6 @@ GLFWAPI int glfwInit(void)
         return GLFW_FALSE;
     }
 
-    _glfw.monitors = _glfwPlatformGetMonitors(&_glfw.monitorCount);
     _glfwInitialized = GLFW_TRUE;
 
     _glfw.timerOffset = _glfwPlatformGetTimerValue();
@@ -161,14 +160,14 @@ GLFWAPI void glfwTerminate(void)
         _GLFWmonitor* monitor = _glfw.monitors[i];
         if (monitor->originalRamp.size)
             _glfwPlatformSetGammaRamp(monitor, &monitor->originalRamp);
+        _glfwFreeMonitor(monitor);
     }
 
-    _glfwTerminateVulkan();
-
-    _glfwFreeMonitors(_glfw.monitors, _glfw.monitorCount);
+    free(_glfw.monitors);
     _glfw.monitors = NULL;
     _glfw.monitorCount = 0;
 
+    _glfwTerminateVulkan();
     _glfwPlatformTerminate();
 
     memset(&_glfw, 0, sizeof(_glfw));

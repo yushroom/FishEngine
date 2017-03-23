@@ -106,7 +106,7 @@ namespace FishEngine
 
 		// OpenGL
 		Meta(NonSerializable)
-			mutable unsigned int        m_GLNativeTexture = 0;
+		mutable unsigned int        m_GLNativeTexture = 0;
 
 		void BindSampler();
 
@@ -115,10 +115,10 @@ namespace FishEngine
 		virtual void UploadToGPU() const { m_uploaded = true; };
 
 		Meta(NonSerializable)
-			std::vector<std::uint8_t> m_data;
+		std::vector<std::uint8_t> m_data;
 
 		Meta(NonSerializable)
-			mutable bool m_uploaded = false;
+		mutable bool m_uploaded = false;
 
 	private:
 		friend class FishEditor::TextureImporter;

@@ -1,8 +1,8 @@
 //========================================================================
-// GLFW 3.2 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -37,6 +37,8 @@
     defined(GLFW_INCLUDE_ES1)       || \
     defined(GLFW_INCLUDE_ES2)       || \
     defined(GLFW_INCLUDE_ES3)       || \
+    defined(GLFW_INCLUDE_ES31)      || \
+    defined(GLFW_INCLUDE_ES32)      || \
     defined(GLFW_INCLUDE_NONE)      || \
     defined(GLFW_INCLUDE_GLEXT)     || \
     defined(GLFW_INCLUDE_GLU)       || \
@@ -47,6 +49,9 @@
 
 #define GLFW_INCLUDE_NONE
 #include "../include/GLFW/glfw3.h"
+
+#define _GLFW_INSERT_FIRST      0
+#define _GLFW_INSERT_LAST       1
 
 typedef int GLFWbool;
 
@@ -69,6 +74,7 @@ typedef void (* _GLFWdestroycontextfun)(_GLFWwindow*);
 #define GL_VERSION 0x1f02
 #define GL_NONE	0
 #define GL_COLOR_BUFFER_BIT	0x00004000
+#define GL_UNSIGNED_BYTE 0x1401
 #define GL_EXTENSIONS 0x1f03
 #define GL_NUM_EXTENSIONS 0x821d
 #define GL_CONTEXT_FLAGS 0x821e
@@ -110,6 +116,7 @@ typedef enum VkStructureType
     VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR = 1000006000,
     VK_STRUCTURE_TYPE_MIR_SURFACE_CREATE_INFO_KHR = 1000007000,
     VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR = 1000009000,
+    VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK = 1000053000,
     VK_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkStructureType;
 
@@ -171,6 +178,8 @@ typedef void (APIENTRY * PFN_vkVoidFunction)(void);
  #include "wl_platform.h"
 #elif defined(_GLFW_MIR)
  #include "mir_platform.h"
+#elif defined(_GLFW_OSMESA)
+ #include "osmesa_platform.h"
 #else
  #error "No supported window creation API selected"
 #endif
@@ -260,6 +269,10 @@ struct _GLFWwndconfig
     GLFWbool      autoIconify;
     GLFWbool      floating;
     GLFWbool      maximized;
+    struct {
+        GLFWbool  retina;
+        GLFWbool  frame;
+    } ns;
 };
 
 /*! @brief Context configuration.
@@ -351,7 +364,7 @@ struct _GLFWwindow
     GLFWbool            decorated;
     GLFWbool            autoIconify;
     GLFWbool            floating;
-    GLFWbool            closed;
+    GLFWbool            shouldClose;
     void*               userPointer;
     GLFWvidmode         videoMode;
     _GLFWmonitor*       monitor;
@@ -378,6 +391,7 @@ struct _GLFWwindow
         GLFWwindowrefreshfun    refresh;
         GLFWwindowfocusfun      focus;
         GLFWwindowiconifyfun    iconify;
+        GLFWwindowmaximizefun   maximize;
         GLFWframebuffersizefun  fbsize;
         GLFWmousebuttonfun      mouseButton;
         GLFWcursorposfun        cursorPos;
@@ -449,18 +463,24 @@ struct _GLFWlibrary
     struct {
         GLFWbool        available;
         void*           handle;
-        char**          extensions;
-        uint32_t        extensionCount;
+        char*           extensions[2];
 #if !defined(_GLFW_VULKAN_STATIC)
         PFN_vkEnumerateInstanceExtensionProperties EnumerateInstanceExtensionProperties;
         PFN_vkGetInstanceProcAddr GetInstanceProcAddr;
 #endif
         GLFWbool        KHR_surface;
+#if defined(_GLFW_WIN32)
         GLFWbool        KHR_win32_surface;
+#elif defined(_GLFW_COCOA)
+        GLFWbool        MVK_macos_surface;
+#elif defined(_GLFW_X11)
         GLFWbool        KHR_xlib_surface;
         GLFWbool        KHR_xcb_surface;
+#elif defined(_GLFW_WAYLAND)
         GLFWbool        KHR_wayland_surface;
+#elif defined(_GLFW_MIR)
         GLFWbool        KHR_mir_surface;
+#endif
     } vk;
 
     struct {
@@ -543,20 +563,10 @@ void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode);
  */
 const char* _glfwPlatformGetKeyName(int key, int scancode);
 
-/*! @copydoc glfwGetMonitors
+/*! @copydoc glfwGetKeyScancode
  *  @ingroup platform
  */
-_GLFWmonitor** _glfwPlatformGetMonitors(int* count);
-
-/*! @brief Checks whether two monitor objects represent the same monitor.
- *
- *  @param[in] first The first monitor.
- *  @param[in] second The second monitor.
- *  @return @c GLFW_TRUE if the monitor objects represent the same monitor, or
- *  @c GLFW_FALSE otherwise.
- *  @ingroup platform
- */
-GLFWbool _glfwPlatformIsSameMonitor(_GLFWmonitor* first, _GLFWmonitor* second);
+int _glfwPlatformGetKeyScancode(int key);
 
 /*! @copydoc glfwGetMonitorPos
  *  @ingroup platform
@@ -598,22 +608,22 @@ const char* _glfwPlatformGetClipboardString(_GLFWwindow* window);
 /*! @copydoc glfwJoystickPresent
  *  @ingroup platform
  */
-int _glfwPlatformJoystickPresent(int joy);
+int _glfwPlatformJoystickPresent(int jid);
 
 /*! @copydoc glfwGetJoystickAxes
  *  @ingroup platform
  */
-const float* _glfwPlatformGetJoystickAxes(int joy, int* count);
+const float* _glfwPlatformGetJoystickAxes(int jid, int* count);
 
 /*! @copydoc glfwGetJoystickButtons
  *  @ingroup platform
  */
-const unsigned char* _glfwPlatformGetJoystickButtons(int joy, int* count);
+const unsigned char* _glfwPlatformGetJoystickButtons(int jid, int* count);
 
 /*! @copydoc glfwGetJoystickName
  *  @ingroup platform
  */
-const char* _glfwPlatformGetJoystickName(int joy);
+const char* _glfwPlatformGetJoystickName(int jid);
 
 /*! @copydoc glfwGetTimerValue
  *  @ingroup platform
@@ -741,6 +751,21 @@ int _glfwPlatformWindowVisible(_GLFWwindow* window);
  */
 int _glfwPlatformWindowMaximized(_GLFWwindow* window);
 
+/*! @brief Sets whether the window is resizable by the user.
+ *  @ingroup platform
+ */
+void _glfwPlatformSetWindowResizable(_GLFWwindow* window, GLFWbool enabled);
+
+/*! @brief Sets whether the window is decorated.
+ *  @ingroup platform
+ */
+void _glfwPlatformSetWindowDecorated(_GLFWwindow* window, GLFWbool enabled);
+
+/*! @brief Sets whether the window is floating.
+ *  @ingroup platform
+ */
+void _glfwPlatformSetWindowFloating(_GLFWwindow* window, GLFWbool enabled);
+
 /*! @copydoc glfwPollEvents
  *  @ingroup platform
  */
@@ -792,7 +817,7 @@ void _glfwPlatformSetCursor(_GLFWwindow* window, _GLFWcursor* cursor);
 
 /*! @ingroup platform
  */
-char** _glfwPlatformGetRequiredInstanceExtensions(uint32_t* count);
+void _glfwPlatformGetRequiredInstanceExtensions(char** extensions);
 
 /*! @ingroup platform
  */
@@ -846,6 +871,14 @@ void _glfwInputFramebufferSize(_GLFWwindow* window, int width, int height);
  *  @ingroup event
  */
 void _glfwInputWindowIconify(_GLFWwindow* window, GLFWbool iconified);
+
+/*! @brief Notifies shared code of a window maximization event.
+ *  @param[in] window The window that received the event.
+ *  @param[in] maximized `GLFW_TRUE` if the window was maximized, or
+ *  `GLFW_FALSE` if it was restored.
+ *  @ingroup event
+ */
+void _glfwInputWindowMaximize(_GLFWwindow* window, GLFWbool maximized);
 
 /*! @brief Notifies shared code of a window damage event.
  *  @param[in] window The window that received the event.
@@ -916,11 +949,11 @@ void _glfwInputCursorEnter(_GLFWwindow* window, GLFWbool entered);
 
 /*! @ingroup event
  */
-void _glfwInputMonitorChange(void);
+void _glfwInputMonitor(_GLFWmonitor* monitor, int action, int placement);
 
 /*! @ingroup event
  */
-void _glfwInputMonitorWindowChange(_GLFWmonitor* monitor, _GLFWwindow* window);
+void _glfwInputMonitorWindow(_GLFWmonitor* monitor, _GLFWwindow* window);
 
 /*! @brief Notifies shared code of an error.
  *  @param[in] error The error code most suitable for the error.
@@ -943,11 +976,11 @@ void _glfwInputError(int error, const char* format, ...);
 void _glfwInputDrop(_GLFWwindow* window, int count, const char** names);
 
 /*! @brief Notifies shared code of a joystick connection/disconnection event.
- *  @param[in] joy The joystick that was connected or disconnected.
+ *  @param[in] jid The joystick that was connected or disconnected.
  *  @param[in] event One of `GLFW_CONNECTED` or `GLFW_DISCONNECTED`.
  *  @ingroup event
  */
-void _glfwInputJoystickChange(int joy, int event);
+void _glfwInputJoystickChange(int jid, int event);
 
 
 //========================================================================
@@ -1033,16 +1066,12 @@ _GLFWmonitor* _glfwAllocMonitor(const char* name, int widthMM, int heightMM);
 void _glfwFreeMonitor(_GLFWmonitor* monitor);
 
 /*! @ingroup utility
-  */
-void _glfwFreeMonitors(_GLFWmonitor** monitors, int count);
-
-/*! @ingroup utility
  */
 GLFWbool _glfwIsPrintable(int key);
 
 /*! @ingroup utility
  */
-GLFWbool _glfwInitVulkan(void);
+GLFWbool _glfwInitVulkan(int mode);
 
 /*! @ingroup utility
  */

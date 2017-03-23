@@ -2,7 +2,7 @@
 // GLFW 3.1 Win32 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -332,26 +332,26 @@ static BOOL CALLBACK deviceObjectCallback(const DIDEVICEOBJECTINSTANCEW* doi,
 //
 static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
 {
-    int joy = 0;
+    int jid = 0;
     DIDEVCAPS dc;
     DIPROPDWORD dipd;
     IDirectInputDevice8* device;
     _GLFWobjenumWin32 data;
     _GLFWjoystickWin32* js;
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
     {
-        if (memcmp(&_glfw.win32_js[joy].guid, &di->guidInstance, sizeof(GUID)) == 0)
+        if (memcmp(&_glfw.win32_js[jid].guid, &di->guidInstance, sizeof(GUID)) == 0)
             return DIENUM_CONTINUE;
     }
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
     {
-        if (!_glfw.win32_js[joy].present)
+        if (!_glfw.win32_js[jid].present)
             break;
     }
 
-    if (joy > GLFW_JOYSTICK_LAST)
+    if (jid > GLFW_JOYSTICK_LAST)
         return DIENUM_STOP;
 
     if (supportsXInput(&di->guidProduct))
@@ -362,14 +362,14 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
                                           &device,
                                           NULL)))
     {
-        _glfwInputError(GLFW_PLATFORM_ERROR, "DI: Failed to create device");
+        _glfwInputError(GLFW_PLATFORM_ERROR, "Win32: Failed to create device");
         return DIENUM_CONTINUE;
     }
 
     if (FAILED(IDirectInputDevice8_SetDataFormat(device, &_glfwDataFormat)))
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "DI: Failed to set device data format");
+                        "Win32: Failed to set device data format");
 
         IDirectInputDevice8_Release(device);
         return DIENUM_CONTINUE;
@@ -381,7 +381,7 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
     if (FAILED(IDirectInputDevice8_GetCapabilities(device, &dc)))
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "DI: Failed to query device capabilities");
+                        "Win32: Failed to query device capabilities");
 
         IDirectInputDevice8_Release(device);
         return DIENUM_CONTINUE;
@@ -398,7 +398,7 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
                                                &dipd.diph)))
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "DI: Failed to set device axis mode");
+                        "Win32: Failed to set device axis mode");
 
         IDirectInputDevice8_Release(device);
         return DIENUM_CONTINUE;
@@ -415,7 +415,7 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
                                                DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV)))
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "DI: Failed to enumerate device objects");
+                        "Win32: Failed to enumerate device objects");
 
         IDirectInputDevice8_Release(device);
         free(data.objects);
@@ -426,7 +426,7 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
           sizeof(_GLFWjoyobjectWin32),
           compareJoystickObjects);
 
-    js = _glfw.win32_js + joy;
+    js = _glfw.win32_js + jid;
     js->device = device;
     js->guid = di->guidInstance;
     js->axisCount = data.axisCount + data.sliderCount;
@@ -438,7 +438,7 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
     js->name = _glfwCreateUTF8FromWideStringWin32(di->tszInstanceName);
     js->present = GLFW_TRUE;
 
-    _glfwInputJoystickChange(joy, GLFW_CONNECTED);
+    _glfwInputJoystickChange(jid, GLFW_CONNECTED);
     return DIENUM_CONTINUE;
 }
 
@@ -447,33 +447,33 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
 //
 static GLFWbool openXinputDevice(DWORD index)
 {
-    int joy;
+    int jid;
     XINPUT_CAPABILITIES xic;
     _GLFWjoystickWin32* js;
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
     {
-        if (_glfw.win32_js[joy].present &&
-            _glfw.win32_js[joy].device == NULL &&
-            _glfw.win32_js[joy].index == index)
+        if (_glfw.win32_js[jid].present &&
+            _glfw.win32_js[jid].device == NULL &&
+            _glfw.win32_js[jid].index == index)
         {
             return GLFW_FALSE;
         }
     }
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
     {
-        if (!_glfw.win32_js[joy].present)
+        if (!_glfw.win32_js[jid].present)
             break;
     }
 
-    if (joy > GLFW_JOYSTICK_LAST)
+    if (jid > GLFW_JOYSTICK_LAST)
         return GLFW_FALSE;
 
     if (_glfw_XInputGetCapabilities(index, 0, &xic) != ERROR_SUCCESS)
         return GLFW_FALSE;
 
-    js = _glfw.win32_js + joy;
+    js = _glfw.win32_js + jid;
     js->axisCount = 6;
     js->axes = calloc(js->axisCount, sizeof(float));
     js->buttonCount = 14;
@@ -482,7 +482,7 @@ static GLFWbool openXinputDevice(DWORD index)
     js->name = strdup(getDeviceDescription(&xic));
     js->index = index;
 
-    _glfwInputJoystickChange(joy, GLFW_CONNECTED);
+    _glfwInputJoystickChange(jid, GLFW_CONNECTED);
 
     return GLFW_TRUE;
 }
@@ -603,9 +603,10 @@ static GLFWbool pollJoystickState(_GLFWjoystickWin32* js, int mode)
         if (mode == _GLFW_PRESENCE_ONLY)
             return GLFW_TRUE;
 
-        if (sqrt((double) (xis.Gamepad.sThumbLX * xis.Gamepad.sThumbLX +
-                           xis.Gamepad.sThumbLY * xis.Gamepad.sThumbLY)) >
-            (double) XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+        if ((float) xis.Gamepad.sThumbLX * xis.Gamepad.sThumbLX +
+            (float) xis.Gamepad.sThumbLY * xis.Gamepad.sThumbLY >
+            (float) XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE *
+                    XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
         {
             js->axes[0] = (xis.Gamepad.sThumbLX + 0.5f) / 32767.f;
             js->axes[1] = (xis.Gamepad.sThumbLY + 0.5f) / 32767.f;
@@ -616,9 +617,10 @@ static GLFWbool pollJoystickState(_GLFWjoystickWin32* js, int mode)
             js->axes[1] = 0.f;
         }
 
-        if (sqrt((double) (xis.Gamepad.sThumbRX * xis.Gamepad.sThumbRX +
-                           xis.Gamepad.sThumbRY * xis.Gamepad.sThumbRY)) >
-            (double) XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+        if ((float) xis.Gamepad.sThumbRX * xis.Gamepad.sThumbRX +
+            (float) xis.Gamepad.sThumbRY * xis.Gamepad.sThumbRY >
+            (float) XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE *
+                    XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
             js->axes[2] = (xis.Gamepad.sThumbRX + 0.5f) / 32767.f;
             js->axes[3] = (xis.Gamepad.sThumbRY + 0.5f) / 32767.f;
@@ -664,7 +666,7 @@ void _glfwInitJoysticksWin32(void)
                                             NULL)))
         {
             _glfwInputError(GLFW_PLATFORM_ERROR,
-                            "DI: Failed to create interface");
+                            "Win32: Failed to create interface");
         }
     }
 
@@ -675,10 +677,10 @@ void _glfwInitJoysticksWin32(void)
 //
 void _glfwTerminateJoysticksWin32(void)
 {
-    int joy;
+    int jid;
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
-        closeJoystick(_glfw.win32_js + joy);
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
+        closeJoystick(_glfw.win32_js + jid);
 
     if (_glfw.win32.dinput8.api)
         IDirectInput8_Release(_glfw.win32.dinput8.api);
@@ -715,10 +717,10 @@ void _glfwDetectJoystickConnectionWin32(void)
 //
 void _glfwDetectJoystickDisconnectionWin32(void)
 {
-    int joy;
+    int jid;
 
-    for (joy = GLFW_JOYSTICK_1;  joy <= GLFW_JOYSTICK_LAST;  joy++)
-        pollJoystickState(_glfw.win32_js + joy, _GLFW_PRESENCE_ONLY);
+    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
+        pollJoystickState(_glfw.win32_js + jid, _GLFW_PRESENCE_ONLY);
 }
 
 
@@ -726,15 +728,15 @@ void _glfwDetectJoystickDisconnectionWin32(void)
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-int _glfwPlatformJoystickPresent(int joy)
+int _glfwPlatformJoystickPresent(int jid)
 {
-    _GLFWjoystickWin32* js = _glfw.win32_js + joy;
+    _GLFWjoystickWin32* js = _glfw.win32_js + jid;
     return pollJoystickState(js, _GLFW_PRESENCE_ONLY);
 }
 
-const float* _glfwPlatformGetJoystickAxes(int joy, int* count)
+const float* _glfwPlatformGetJoystickAxes(int jid, int* count)
 {
-    _GLFWjoystickWin32* js = _glfw.win32_js + joy;
+    _GLFWjoystickWin32* js = _glfw.win32_js + jid;
     if (!pollJoystickState(js, _GLFW_UPDATE_STATE))
         return NULL;
 
@@ -742,9 +744,9 @@ const float* _glfwPlatformGetJoystickAxes(int joy, int* count)
     return js->axes;
 }
 
-const unsigned char* _glfwPlatformGetJoystickButtons(int joy, int* count)
+const unsigned char* _glfwPlatformGetJoystickButtons(int jid, int* count)
 {
-    _GLFWjoystickWin32* js = _glfw.win32_js + joy;
+    _GLFWjoystickWin32* js = _glfw.win32_js + jid;
     if (!pollJoystickState(js, _GLFW_UPDATE_STATE))
         return NULL;
 
@@ -752,9 +754,9 @@ const unsigned char* _glfwPlatformGetJoystickButtons(int joy, int* count)
     return js->buttons;
 }
 
-const char* _glfwPlatformGetJoystickName(int joy)
+const char* _glfwPlatformGetJoystickName(int jid)
 {
-    _GLFWjoystickWin32* js = _glfw.win32_js + joy;
+    _GLFWjoystickWin32* js = _glfw.win32_js + jid;
     if (!pollJoystickState(js, _GLFW_PRESENCE_ONLY))
         return NULL;
 

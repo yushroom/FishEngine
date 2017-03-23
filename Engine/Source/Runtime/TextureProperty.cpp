@@ -31,7 +31,7 @@ namespace FishEngine
 			out_externalFormat = GL_RG;
 			out_pixelType = GL_FLOAT;
 			break;
-		case TextureFormat::R32:
+		case TextureFormat::RFloat:
 			out_internalFormat = GL_R32F;
 			out_externalFormat = GL_RED;
 			out_pixelType = GL_FLOAT;

@@ -194,6 +194,7 @@ namespace FishEditor
 			FIBITMAP *dib = nullptr;
 			uint8_t * bits = nullptr;
 			unsigned int width = 0, height = 0;
+#if FISHENGINE_PLATFORM_WINDOWS
 			auto filename = m_assetPath.wstring().c_str();
 			fif = FreeImage_GetFileTypeU(filename);
 			if (fif == FIF_UNKNOWN)
@@ -212,6 +213,26 @@ namespace FishEditor
 			{
 				abort();
 			}
+#else
+			auto filename = m_assetPath.c_str();
+			fif = FreeImage_GetFileType(filename);
+			if (fif == FIF_UNKNOWN)
+			{
+				fif = FreeImage_GetFIFFromFilename(filename);
+			}
+			if (fif == FIF_UNKNOWN)
+			{
+				abort();
+			}
+			if (FreeImage_FIFSupportsReading(fif))
+			{
+				dib = FreeImage_Load(fif, filename);
+			}
+			else
+			{
+				abort();
+			}
+#endif
 			
 			//retrieve the image data
 			bits = FreeImage_GetBits(dib);

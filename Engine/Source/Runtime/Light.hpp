@@ -4,6 +4,7 @@
 #include "Behaviour.hpp"
 #include "Color.hpp"
 #include "RenderTexture.hpp"
+#include "RenderBuffer.hpp"
 #include "Common.hpp"
 #include "Matrix4x4.hpp"
 

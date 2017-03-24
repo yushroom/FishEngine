@@ -29,10 +29,14 @@ namespace FishEngine
 
 		virtual void UploadToGPU() const override;
 
-	private:
+	protected:
 
 		friend class FishEditor::TextureImporter;
+		friend class FishEditor::DDSImporter;
 
+		Meta(NonSerializable)
+		std::vector<std::uint8_t> m_data;
+		
 		// The format of the pixel data in the texture (Read Only).
 		TextureFormat m_format;
 

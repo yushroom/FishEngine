@@ -8,10 +8,10 @@ namespace FishEngine
 	// A class you can derive from if you want to create objects that don't need to be attached to game objects.
 	// This is most useful for assets which are only meant to store data.
 	// To make it easy to create ScriptableObject instances that are bound to assets in your project, see CreateAssetMenuAttribute.
-	class ScriptableObject : public Object
+	class Meta(NonSerializable) ScriptableObject : public Object
 	{
 	public:
-		InjectClassName(ScriptableObject);
+		//InjectClassName(ScriptableObject);
 
 		ScriptableObject() = default;
 		virtual ~ScriptableObject() = default;

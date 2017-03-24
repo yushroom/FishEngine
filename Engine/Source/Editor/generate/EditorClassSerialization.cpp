@@ -7,8 +7,8 @@
 #include <private/CloneUtility.hpp>
 #include "../AssetImporter.hpp" 
 #include "../ShaderImporter.hpp" 
+#include "../DDSImporter.hpp" 
 #include "../EditorUtility.hpp" 
-#include "../Editor.hpp" 
 #include "../ProjectSettings.hpp" 
 #include "../EditorGUILayout.hpp" 
 #include "../NativeFormatImporter.hpp" 
@@ -56,6 +56,23 @@ namespace FishEditor
 	}
 
 	void FishEditor::ShaderImporter::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEditor::AssetImporter::Deserialize(archive);
+		//archive.EndClass();
+	}
+
+
+
+	// FishEditor::DDSImporter
+	void FishEditor::DDSImporter::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEditor::AssetImporter::Serialize(archive);
+		//archive.EndClass();
+	}
+
+	void FishEditor::DDSImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		//archive.BeginClass(2);
 		FishEditor::AssetImporter::Deserialize(archive);

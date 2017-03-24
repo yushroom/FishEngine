@@ -10,6 +10,7 @@
 #include "FBXImporter.hpp"
 #include "NativeFormatImporter.hpp"
 #include "ShaderImporter.hpp"
+#include "DDSImporter.hpp"
 
 using namespace FishEngine;
 
@@ -127,6 +128,10 @@ FishEditor::AssetImporterPtr FishEditor::MetaInputArchive::DeserializeAssetImpor
 		else if (key == "ShaderImporter")
 		{
 			importer = std::make_shared<ShaderImporter>();
+		}
+		else if (key == "DDSImporter")
+		{
+			importer = std::make_shared<DDSImporter>();
 		}
 		else
 		{

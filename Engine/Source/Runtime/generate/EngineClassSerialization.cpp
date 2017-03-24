@@ -5,7 +5,6 @@
 
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
-#include "../ScriptableObject.hpp" 
 #include "../Ray.hpp" 
 #include "../Animator.hpp" 
 #include "../Animator.hpp" 
@@ -19,7 +18,7 @@
 #include "../MeshFilter.hpp" 
 #include "../BoxCollider.hpp" 
 #include "../Animator.hpp" 
-#include "../Texture.hpp" 
+#include "../Cubemap.hpp" 
 #include "../Shader.hpp" 
 #include "../Texture.hpp" 
 #include "../Matrix4x4.hpp" 
@@ -57,28 +56,10 @@
 #include "../Scene.hpp" 
 #include "../MeshRenderer.hpp" 
 #include "../Transform.hpp" 
-#include "../GameObject.hpp"
-#include "../Cubemap.hpp"
+#include "../GameObject.hpp" 
 
 namespace FishEngine
 {
-
-	// FishEngine::ScriptableObject
-	void FishEngine::ScriptableObject::Serialize ( FishEngine::OutputArchive & archive ) const
-	{
-		//archive.BeginClass();
-		FishEngine::Object::Serialize(archive);
-		//archive.EndClass();
-	}
-
-	void FishEngine::ScriptableObject::Deserialize ( FishEngine::InputArchive & archive )
-	{
-		//archive.BeginClass(2);
-		FishEngine::Object::Deserialize(archive);
-		//archive.EndClass();
-	}
-
-
 
 	// FishEngine::Ray
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::Ray const & value )

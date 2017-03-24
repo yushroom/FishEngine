@@ -60,6 +60,7 @@ ENDIF ()
 
 include_directories(./Source/Runtime)
 include_directories(./ThirdParty/)
+#include_directories(./ThirdParty/PVR/Framework)
 #include_directories(./ThirdParty/PhysXSDK/Include/)
 #include_directories(./ThirdParty/assimp/include)
 

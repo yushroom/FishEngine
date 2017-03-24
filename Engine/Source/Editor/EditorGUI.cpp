@@ -260,6 +260,10 @@ bool FishEditor::EditorGUI::TextureField(std::string const & label, FishEngine::
 {
 	//FishEngine::Debug::LogError("EditorGUI::TextureField");
 	UITexture * t = CheckNextWidget<UITexture>(label);
+	if (*texture == nullptr)
+	{
+		return false;
+	}
 	UITextureState state = t->CheckUpdate(label, (*texture)->GetInstanceID());
 	if (state == UITextureState::TextureClicked)
 	{

@@ -36,10 +36,24 @@ namespace FishEngine
 
 	enum class TextureFormat
 	{
+		// Alpha-only texture format.
 		Alpha8 = 1,
+		
+		// A 16 bits/pixel texture format. Texture stores color with an alpha channel.
 		ARGB4444,
+		
+		// Color texture format, 8-bits per channel.
+		// Each of RGB color channels is stored as an 8-bit value in [0..1] range. In memory, the channel data is ordered this way: R, G, B bytes one after another.
+		// Note that there are almost no GPUs that support this format natively, so at texture load time it is converted into an RGBA32 format. RGB24 is thus only useful for some game build size savings.
 		RGB24,
+		
+		// Color with alpha texture format, 8-bits per channel.
+		// Each of RGBA color channels is stored as an 8-bit value in [0..1] range. In memory, the channel data is ordered this way: R, G, B, A bytes one after another.
 		RGBA32,
+		
+		// Color with alpha texture format, 8-bits per channel.
+		// Each of RGBA color channels is stored as an 8-bit value in [0..1] range. In memory, the channel data is ordered this way: A, R, G, B bytes one after another.
+		// Note that RGBA32 format might be slightly more efficient on most platforms, as the data layout in memory more closely matches what the graphics APIs expect.
 		ARGB32,
 		RGB565 = 7,
 		R16 = 9,
@@ -88,24 +102,9 @@ namespace FishEngine
 		ASTC_RGBA_12x12,
 		ETC_RGB4_3DS,
 		ETC_RGBA8_3DS,
-//		//Alpha8,
-//		//ARGB4444,
-//		RGB24,	// Color texture format, 8-bits per channel.
-//		RGBA32, // Color with alpha texture format, 8-bits per channel.
-//		ARGB32, // Color with an alpha channel texture format.
-//		R16,    // A 16 bit color texture format that only has a red channel.
-//		DXT1,   // Compressed color texture format.
-//		DXT5,   // Compressed color with alpha channel texture format.
-//		//RGBA4444,
-//		BGRA32,
-		R8,
-//		R32,    // **New**, float * 1
-		RG16,    // **New**, uint8_t * 2
+		R8,		// **New**, uint8_t * 1
+		RG16,	// **New**, uint8_t * 2
 		RG32,   // **New**, uint16_t * 2
-//		RGHalf,	// Two color (RG) texture format, 16 bit floating point per channel.
-//		RGFloat, // Two color (RG) texture format, 32 bit floating point per channel.
-//		RFloat,
-//		RGBAFloat,
 	};
 
 	void TextureFormat2GLFormat(

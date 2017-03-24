@@ -579,7 +579,10 @@ namespace FishEngine
 
 	void Shader::BindTexture(const std::string& name, TexturePtr texture)
 	{
-		abort();
+		//abort();
+		std::map<std::string, TexturePtr> dict;
+		dict[name] = texture;
+		BindTextures(dict);
 	}
 
 	void Shader::BindTextures(const std::map<std::string, TexturePtr>& textures)

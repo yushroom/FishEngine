@@ -38,7 +38,7 @@ foreach (x AssetBundle Resources)
 endforeach()
 SOURCE_GROUP(Asset FILES ${Asset_SRCS})
 
-foreach (x Vector2 Vector3 Vector4 Matrix4x4 Quaternion Mathf Frustum IntVector Ray Bounds)
+foreach (x Vector2 Vector3 Vector4 Matrix4x4 Quaternion Mathf Frustum IntVector Ray Bounds Rect)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Math_SRCS ${Math_SRCS} ${f})
@@ -62,13 +62,21 @@ foreach (x Collider MeshCollider PhysicsSystem SphereCollider BoxCollider Capsul
 endforeach()
 SOURCE_GROUP(Physics FILES ${Physics_SRCS})
 
-foreach (x GL GLEnvironment Graphics Color Light Material Mesh MeshFilter MeshRenderer Pipeline QualitySettings RenderSettings RenderSystem RenderTarget RenderTexture Renderer Shader ShaderCompiler ShaderProperty ShaderVariables_gen SkinnedMeshRenderer Skybox Texture Texture2D TextureProperty Gizmos)
+foreach (x GL GLEnvironment Graphics Color Light Material Mesh MeshFilter MeshRenderer Pipeline QualitySettings RenderSettings RenderSystem RenderTarget RenderTexture Renderer Shader ShaderCompiler ShaderProperty ShaderVariables_gen SkinnedMeshRenderer Skybox Gizmos)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Render_SRCS ${Render_SRCS} ${f})
     endforeach ()
 endforeach()
 SOURCE_GROUP(Render FILES ${Render_SRCS})
+
+foreach (x Texture Texture2D TextureProperty RenderBuffer RenderTexture Cubemap TextureSampler)
+    foreach (ext hpp cpp)
+        set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
+        SET(Texture_SRCS ${Texture_SRCS} ${f})
+    endforeach ()
+endforeach()
+SOURCE_GROUP(Texture FILES ${Texture_SRCS})
 
 
 add_library (FishEngine SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})

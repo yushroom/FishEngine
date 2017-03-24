@@ -84,9 +84,7 @@ namespace FishEngine
 			abort();
 		}
 
-		std::vector<std::uint8_t> const & rawdata() { return m_data; };
-
-		//void UploadTextureData() { if (!m_uploaded) UploadToGPU(); }
+		//std::vector<std::uint8_t> const & rawdata() { return m_data; };
 
 	protected:
 		uint32_t            m_height;
@@ -115,51 +113,10 @@ namespace FishEngine
 		virtual void UploadToGPU() const { m_uploaded = true; };
 
 		Meta(NonSerializable)
-		std::vector<std::uint8_t> m_data;
-
-		Meta(NonSerializable)
 		mutable bool m_uploaded = false;
 
 	private:
 		friend class FishEditor::TextureImporter;
-	};
-
-
-	class FE_EXPORT Meta(NonSerializable) ColorBuffer : public Texture
-	{
-	public:
-		static std::shared_ptr<ColorBuffer> Create(const int width, const int height, TextureFormat format = TextureFormat::RGBA32);
-		virtual void Resize(const int newWidth, const int newHeight) override;
-	protected:
-		TextureFormat m_format;
-	};
-
-	//class LayeredColorBuffer : public ColorBuffer
-	//{
-	//public:
-	//    static std::shared_ptr<LayeredColorBuffer> Create(const int width, const int height, const int layers, TextureFormat format = TextureFormat::RGBA32);
-	//    //virtual void Resize(const int newWidth, const int newHeight) override;
-	//protected:
-	//    int m_layers;
-	//};
-
-
-	class FE_EXPORT Meta(NonSerializable) DepthBuffer : public Texture
-	{
-	public:
-		static std::shared_ptr<DepthBuffer> Create(const int width, const int height);
-		virtual void Resize(const int newWidth, const int newHeight) override;
-		bool m_useStencil = true;
-	};
-
-
-	class FE_EXPORT LayeredDepthBuffer : public DepthBuffer
-	{
-	public:
-		static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int depth, bool useStencil = true);
-		//virtual void Resize(const int newWidth, const int newHeight) override;
-	protected:
-		int m_depth;
 	};
 }
 

@@ -10,6 +10,7 @@
 #include "FBXImporter.hpp"
 #include "NativeFormatImporter.hpp"
 #include "ShaderImporter.hpp"
+#include "DDSImporter.hpp"
 
 #include "AssetArchive.hpp"
 #include "SceneArchive.hpp"
@@ -110,15 +111,33 @@ namespace FishEditor
 		auto type = Resources::GetAssetType(ext);
 		if (type == AssetType::Texture)
 		{
-			auto importer = GetAssetImporter<TextureImporter>(path);
-			s_pathToImpoter[path] = importer;
-			//Timer t(path.string());
-			auto texture = importer->Import(path);
-			texture->setName(path.stem().string());
-			s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
-			s_importerGUIDToObject[importer->GetGUID()] = texture;
-			//t.StopAndPrint();
-			ret = importer;
+			if (ext == ".dds")
+			{
+				auto importer = GetAssetImporter<DDSImporter>(path);
+				s_pathToImpoter[path] = importer;
+				//Timer t(path.string());
+				auto texture = importer->Load();
+				if (texture != nullptr)
+				{
+					texture->setName(path.stem().string());
+					s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
+					s_importerGUIDToObject[importer->GetGUID()] = texture;
+					ret = importer;
+				}
+				//t.StopAndPrint();
+			}
+			else
+			{
+				auto importer = GetAssetImporter<TextureImporter>(path);
+				s_pathToImpoter[path] = importer;
+				//Timer t(path.string());
+				auto texture = importer->Import(path);
+				texture->setName(path.stem().string());
+				s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
+				s_importerGUIDToObject[importer->GetGUID()] = texture;
+				//t.StopAndPrint();
+				ret = importer;
+			}
 		}
 		else if (type == AssetType::Shader)
 		{

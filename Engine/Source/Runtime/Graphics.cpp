@@ -27,11 +27,13 @@ namespace FishEngine
 		shader->Use();
 		if (shader->HasUniform("AmbientCubemap"))
 		{
-			shader->BindTexture("AmbientCubemap", RenderSettings::ambientCubemap());
+			//shader->BindTexture("AmbientCubemap", RenderSettings::ambientCubemap());
+			material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
 		}
 		if (shader->HasUniform("PreIntegratedGF"))
 		{
-			shader->BindTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
+			//shader->BindTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
+			material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
 		}
 		shader->PreRender();
 		material->BindProperties();

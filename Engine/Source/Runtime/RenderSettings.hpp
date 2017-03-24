@@ -4,6 +4,7 @@
 #include "Object.hpp"
 #include "RenderSystem.hpp"
 #include "ReflectClass.hpp"
+#include "RenderBuffer.hpp"
 
 namespace FishEngine
 {

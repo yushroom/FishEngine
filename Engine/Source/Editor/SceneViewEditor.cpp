@@ -21,6 +21,7 @@
 #include <Graphics.hpp>
 #include <RenderTarget.hpp>
 #include <Command.hpp>
+#include <RenderBuffer.hpp>
 
 #include "Selection.hpp"
 #include "EditorResources.hpp"

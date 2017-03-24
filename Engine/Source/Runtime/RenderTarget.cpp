@@ -2,6 +2,7 @@
 #include "GLEnvironment.hpp"
 #include "Texture.hpp"
 #include "Debug.hpp"
+#include "RenderBuffer.hpp"
 #include <cassert>
 
 namespace FishEngine

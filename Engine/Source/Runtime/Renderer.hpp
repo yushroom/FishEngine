@@ -77,6 +77,11 @@ namespace FishEngine
 		{
 			m_shadowCastingMode = shadowCastingMode;
 		}
+		
+		void setReceiveShadows(bool value)
+		{
+			m_receiveShadows = value;
+		}
 
 	protected:
 		friend class FishEditor::Inspector;

@@ -3,6 +3,7 @@
 #include "FishEngine.hpp"
 #include "Resources.hpp"
 #include "Macro.hpp"
+#include "Shader/ShaderBlendFactor.hpp"
 
 namespace FishEditor
 {
@@ -32,6 +33,9 @@ namespace FishEngine
 		InjectSerializationFunctionsNonPolymorphic(ShaderCompiler);
 
 		bool                                m_hasGeometryShader = false;
+		bool				m_blendEnabled = false;
+		int					m_blendFactorCount = 0;
+		ShaderBlendFactor	m_blendFactors[4];
 		std::map<std::string, std::string>  m_settings;
 		ShaderCompilerErrorCode             m_error = ShaderCompilerErrorCode::None;
 		std::string                         m_errorString;

@@ -28,6 +28,8 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 	connect(ui->toolButton, &QToolButton::clicked, this, &OpenProjectDialog::OnLocationToolButtonClicked);
 	connect(ui->locationLineEdit, &QLineEdit::textChanged, ui->locationErrorLabel, &QLabel::hide);
 	connect(ui->openButton, &QPushButton::clicked, this, &OpenProjectDialog::OnOpenButtonClicked);
+	
+	//OnOpenButtonClicked();
 }
 
 OpenProjectDialog::~OpenProjectDialog()
@@ -41,7 +43,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 #if FISHENGINE_PLATFORM_WINDOWS
 	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\PBR\Assets)";
 #else
-	FishEngine::Application::s_dataPath = "/Users/yushroom/program/FishEngine/Example/PBR/Assets";
+	FishEngine::Application::s_dataPath = "/Users/yushroom/program/FishEngine/Example/UnityChan/Assets";
 #endif
 	accept();
 #endif

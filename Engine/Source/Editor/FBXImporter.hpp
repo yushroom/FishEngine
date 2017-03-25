@@ -7,10 +7,15 @@
 
 namespace fbxsdk
 {
+	class FbxScene;
 	class FbxNode;
 	class FbxMesh;
 	class FbxGeometry;
+	class FbxAnimLayer;
 }
+
+class FBXAnimationClip;
+class FBXImportScene;
 
 namespace FishEditor
 {
@@ -52,6 +57,10 @@ namespace FishEditor
 		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping);
 
 		void UpdateBones(FishEngine::TransformPtr const & node);
+		
+		void ImportAnimations(fbxsdk::FbxScene* scene);
+		
+		void ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxsdk::FbxNode * node, FBXAnimationClip & clip);
 		
 		int m_boneCount = 0;
 		//std::vector<FishEngine::TransformPtr> m_bones;

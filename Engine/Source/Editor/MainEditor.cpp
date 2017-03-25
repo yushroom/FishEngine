@@ -257,7 +257,7 @@ namespace FishEditor
 			material->setMainTexture(tex);
 			FindNamedChild(model, "head_mesh")->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
 		}
-#else
+#elif 0
 		auto envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross.dds"));
 		assert(envmap != nullptr);
 		auto filtered_envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross_128_filtered.dds"));
@@ -337,6 +337,174 @@ namespace FishEditor
 				renderer->setShadowCastingMode(ShadowCastingMode::Off);
 			}
 		}
+#else
+		QualitySettings::setShadowDistance(20);
+		light_go->transform()->setLocalEulerAngles(50, 150, 0);
+		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+		
+//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
+//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
+//		auto chan_texture_dir = example_root / "textures";
+		As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tag"));
+		auto bodyTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tga"));
+		auto skinTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/skin_01.tga"));
+		auto hairTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/hair_01.tga"));
+		auto faceTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/face_00.tga"));
+		auto eyelineTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eyeline_00.tga"));
+		auto eyeirisLTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eye_iris_L_00.tga"));
+		auto eyeirisRTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eye_iris_R_00.tga"));
+		auto cheekTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/cheek_00.tga"));
+		
+		//auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
+		auto rolloffTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/FO_CLOTH1.tga"));
+		auto rimLightTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/FO_RIM1.tga"));
+		auto specularTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01_SPEC.tga"));
+		auto envTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/ENV2.tga"));
+		auto normalMapTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01_NRM.tga"));
+		
+		auto stageBaseTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/unitychan_tile3.png"));
+		auto stageMaskTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/AlphaMask.png"));
+		
+		material = Material::InstantiateBuiltinMaterial("Diffuse");
+		material->setMainTexture(stageBaseTexture);
+		plane->GetComponent<Renderer>()->SetMaterial(material);
+		
+		auto chanMainShader = As<Shader>(AssetDatabase::LoadAssetAtPath("CharaMain.shader"));
+		auto bodyMaterial = Material::CreateMaterial();
+		bodyMaterial->setName("body");
+		bodyMaterial->setShader(chanMainShader);
+		bodyMaterial->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		bodyMaterial->SetFloat("_SpecularPower", 20.f);
+		bodyMaterial->SetTexture("_MainTex", bodyTexture);
+		bodyMaterial->SetTexture("_FalloffSampler", rolloffTexture);
+		bodyMaterial->SetTexture("_RimLightSampler", rimLightTexture);
+		bodyMaterial->SetTexture("_SpecularReflectionSampler", specularTexture);
+		bodyMaterial->SetTexture("_EnvMapSampler", envTexture);
+		bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
+		
+		constexpr float edgeThickness = 0.5f;
+		auto texture2side = As<Shader>(AssetDatabase::LoadAssetAtPath("TextureDoubleSided.surf"));
+		material = Material::CreateMaterial();
+		material->setShader(texture2side);
+		//material = bodyMaterial;
+		//material = Material::builtinMaterial("SkinnedMesh");
+		material->SetTexture("_MainTex", bodyTexture);
+		auto outline_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Outline.shader"));
+		auto outline_material = Material::CreateMaterial();
+		outline_material->setShader(outline_shader);
+		outline_material->setName("Outline");
+		outline_material->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		outline_material->setMainTexture(bodyTexture);
+		outline_material->SetFloat("_EdgeThickness", edgeThickness);
+		
+		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
+		auto modelGO = Object::Instantiate(model);
+		
+		for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK", "hair_accce"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(bodyMaterial);
+			renderer->AddMaterial(outline_material);
+			//renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Texture");
+		material->SetTexture("_MainTex", skinTexture);
+		material->setName("skin");
+		for (auto name : {"skin"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->AddMaterial(outline_material);
+			//renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Texture");
+		material->setName("face");
+		material->SetTexture("_MainTex", faceTexture);
+		for (auto name : {"MTH_DEF", "EYE_DEF", "head_back"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->AddMaterial(outline_material);
+			//renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Texture");
+		material->setName("hair");
+		material->SetTexture("_MainTex", hairTexture);
+		for (auto name : {"hair_front", "hair_frontside", "tail", "tail_bottom"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			//renderer->AddMaterial(outline_material);
+			//renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Transparent");
+		material->setName("eye_L1");
+		material->SetTexture("_MainTex", eyeirisLTexture);
+		for (auto name : {"eye_L_old"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->setShadowCastingMode(ShadowCastingMode::Off);
+			renderer->setReceiveShadows(false);
+		}
+
+		
+		material = Material::InstantiateBuiltinMaterial("Transparent");
+		material->setName("eye_R1");
+		material->SetTexture("_MainTex", eyeirisRTexture);
+		for (auto name : {"eye_R_old"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->setShadowCastingMode(ShadowCastingMode::Off);
+			renderer->setReceiveShadows(false);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Transparent");
+		material->SetTexture("_MainTex", eyelineTexture);
+		for (auto name : {"BLW_DEF", "EL_DEF"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			//renderer->setShadowCastingMode(ShadowCastingMode::Off);
+			//renderer->setReceiveShadows(false);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Transparent");
+		material->setName("mat_cheek");
+		material->SetTexture("_MainTex", cheekTexture);
+		for (auto name : {"cheek"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		}
+		
+		material = Material::InstantiateBuiltinMaterial("Texture");
+		material->setName("eyeline");
+		material->SetTexture("_MainTex", eyelineTexture);
+		for (auto name : {"eye_base_old"}) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(material);
+			renderer->setShadowCastingMode(ShadowCastingMode::Off);
+			renderer->setReceiveShadows(false);
+		}
+		
+
 #endif
 
 #endif

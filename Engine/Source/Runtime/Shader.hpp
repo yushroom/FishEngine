@@ -9,6 +9,7 @@
 #include "Common.hpp"
 #include "ShaderProperty.hpp"
 #include "Resources.hpp"
+#include "Shader/ShaderBlendFactor.hpp"
 
 namespace FishEngine
 {
@@ -116,6 +117,8 @@ namespace FishEngine
 		bool        m_ZWrite = true;
 		bool        m_blend = false;
 		bool        m_deferred = false;
+		int					m_blendFactorCount = 0;
+		ShaderBlendFactor	m_blendFactors[4];
 
 		ShaderKeywords m_keywords = static_cast<ShaderKeywords>(ShaderKeyword::None);
 

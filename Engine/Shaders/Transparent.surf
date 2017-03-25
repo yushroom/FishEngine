@@ -1,4 +1,5 @@
-@Blend On
+@Blend SrcAlpha OneMinusSrcAlpha
+@Cull off
 uniform sampler2D _MainTex;
 
 vec4 ps_main(SurfaceData surfaceData)

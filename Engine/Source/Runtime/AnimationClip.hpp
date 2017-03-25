@@ -1,33 +1,43 @@
 #include "FishEngine.hpp"
 #include "Object.hpp"
+#include "Animation/WrapMode.hpp"
+#include "Animation/AnimationBlendMode.hpp"
 
 namespace FishEngine
 {
 	class Motion : public Object
 	{
-
+	public:
+		InjectClassName(Motion);
 	};
-
-	// Determines how time is treated outside of the keyframed range of an AnimationClip or AnimationCurve.
-	enum class WrapMode
+	
+	
+	// Stores keyframe based animations.
+	// AnimationClip is used by Animation to play back animations.
+	class AnimationClip final : public Motion
 	{
-		Once,           // When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
-		Loop,           // When time reaches the end of the animation clip, time will continue at the beginning.
-		PingPong,       // When time reaches the end of the animation clip, time will ping pong back between beginning and end.
-		Default,        // Reads the default repeat mode set higher up.
-		ClampForever,   // Plays back the animation. When it reaches the end, it will keep playing the last frame and never stop playing.
-	};
-
-	// Used by Animation.Play function.
-	enum class AnimationBlendMode
-	{
-		Blend,          // Animations will be blended.
-		Additive,       // Animations will be added.
+	public:
+		
+		InjectClassName(AnimationClip);
+		
+		// Animation Events for this animation clip.
+		std::vector<AnimationClip> events;
+		
+		// Frame rate at which keyframes are sampled. (Read Only)
+		// This is the frame rate that was used in the animation program you used to create the animation or model.
+		float frameRate;
+		
+		// Animation length in seconds. (Read Only)
+		float length;
+		
+		// Sets the default wrap mode used in the animation state.
+		WrapMode wrapMode;
 	};
 
 	// The AnimationState gives full control over animation blending.
 	class AnimationState
 	{
+	public:
 		// Which blend mode should be used?
 		AnimationBlendMode blendMode;
 
@@ -89,23 +99,4 @@ namespace FishEngine
 		AnimatorClipInfo animatorClipInfo;
 	};
 
-	// Stores keyframe based animations.
-	// AnimationClip is used by Animation to play back animations.
-	class AnimationClip : public Motion
-	{
-	public:
-
-		// Animation Events for this animation clip.
-		std::vector<AnimationClip> events;
-
-		// Frame rate at which keyframes are sampled. (Read Only)
-		// This is the frame rate that was used in the animation program you used to create the animation or model.
-		float frameRate;
-
-		// Animation length in seconds. (Read Only)
-		float length;
-
-		// Sets the default wrap mode used in the animation state.
-		WrapMode wrapMode;
-	};
 }

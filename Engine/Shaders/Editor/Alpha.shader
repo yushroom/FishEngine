@@ -1,4 +1,4 @@
-@Blend On
+//@Blend SrcAlpha OneMinusSrcAlpha
 layout(location = 0)	in vec3 InputPositon;
 layout(location = 2)	in vec2 InputUV;
 

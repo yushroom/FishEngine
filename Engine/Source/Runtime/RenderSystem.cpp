@@ -344,11 +344,12 @@ namespace FishEngine
 		/************************************************************************/
 		for (auto& go : transparentQueue)
 		{
-			RendererPtr renderer = go->GetComponent<MeshRenderer>();
-			if (renderer == nullptr)
-			{
-				renderer = go->GetComponent<SkinnedMeshRenderer>();
-			}
+//			RendererPtr renderer = go->GetComponent<MeshRenderer>();
+//			if (renderer == nullptr)
+//			{
+//				renderer = go->GetComponent<SkinnedMeshRenderer>();
+//			}
+			auto renderer = go->GetComponent<Renderer>();
 			renderer->Render();
 		}
 		transparentQueue.clear();

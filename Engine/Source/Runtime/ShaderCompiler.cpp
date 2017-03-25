@@ -54,6 +54,51 @@ namespace FishEngine
 
 		return PreprocessImpl(shaderText, m_path.parent_path());
 	}
+	
+	ShaderBlendFactor ParseShaderBlendFactor(std::string const & str)
+	{
+		if (str ==  "One")
+		{
+			return ShaderBlendFactor::One;
+		}
+		else if (str ==  "Zero")
+		{
+			return ShaderBlendFactor::Zero;
+		}
+		else if (str ==  "SrcColor")
+		{
+			return ShaderBlendFactor::SrcColor;
+		}
+		else if (str ==  "SrcAlpha")
+		{
+			return ShaderBlendFactor::SrcAlpha;
+		}
+		else if (str ==  "DstColor")
+		{
+			return ShaderBlendFactor::DstColor;
+		}
+		else if (str ==  "DstAlpha")
+		{
+			return ShaderBlendFactor::DstAlpha;
+		}
+		else if (str ==  "OneMinusSrcColor")
+		{
+			return ShaderBlendFactor::OneMinusDstColor;
+		}
+		else if (str ==  "OneMinusSrcAlpha")
+		{
+			return ShaderBlendFactor::OneMinusSrcAlpha;
+		}
+		else if (str ==  "OneMinusDstColor")
+		{
+			return ShaderBlendFactor::OneMinusDstColor;
+		}
+		else if (str ==  "OneMinusDstAlpha")
+		{
+			return ShaderBlendFactor::OneMinusDstAlpha;
+		}
+		abort();
+	}
 
 	std::string ShaderCompiler::PreprocessImpl(const std::string& shaderText, const Path& localDir)
 	{
@@ -135,6 +180,29 @@ namespace FishEngine
 					{
 						//cout << "Keyword " << name << endl;
 						m_settings[name] = "on";
+					}
+					else if (name == "blend")
+					{
+						m_blendEnabled = true;
+						//m_settings[nam]
+						//readToNewline(shaderText, cursor);
+						ignoreSpace(shaderText, cursor);
+						auto factor1 = nextTok(shaderText, cursor);
+						ignoreSpace(shaderText, cursor);
+						auto factor2 = nextTok(shaderText, cursor);
+						m_blendFactorCount = 2;
+						m_blendFactors[0] = ParseShaderBlendFactor(factor1);
+						m_blendFactors[1] = ParseShaderBlendFactor(factor2);
+						if (expect(shaderText, cursor, ","))
+						{
+							ignoreSpace(shaderText, cursor);
+							auto factor3 = nextTok(shaderText, cursor);
+							ignoreSpace(shaderText, cursor);
+							auto factor4 = nextTok(shaderText, cursor);
+							m_blendFactors[2] = ParseShaderBlendFactor(factor3);
+							m_blendFactors[3] = ParseShaderBlendFactor(factor4);
+							m_blendFactorCount = 4;
+						}
 					}
 					else
 					{

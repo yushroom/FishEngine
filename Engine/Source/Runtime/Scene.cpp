@@ -233,7 +233,7 @@ namespace FishEngine
 			else
 			{
 				auto renderer = go->GetComponent<SkinnedMeshRenderer>();
-				if (renderer != nullptr)
+				if (renderer != nullptr && renderer->shadowCastingMode() != ShadowCastingMode::Off)
 				{
 					mesh = renderer->sharedMesh();
 					if (renderer->m_avatar != nullptr)

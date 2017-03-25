@@ -367,8 +367,14 @@ namespace FishEngine
 			m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
 			m_cullface = ToEnum<Cullface>(Capitalize(GetValueOrDefault<string, string>(settings, "cull", "back")));
 			m_ZWrite = GetValueOrDefault<string, string>(settings, "zwrite", "on") == "on";
-			m_blend = GetValueOrDefault<string, string>(settings, "blend", "off") == "on";
+			//m_blend = GetValueOrDefault<string, string>(settings, "blend", "off") == "on";
 			m_deferred = GetValueOrDefault<string, string>(settings, "deferred", "off") == "on";
+			m_blend = compiler.m_blendEnabled;
+			m_blendFactorCount = compiler.m_blendFactorCount;
+			for (int i = 0; i < m_blendFactorCount; ++i)
+			{
+				m_blendFactors[i] = compiler.m_blendFactors[i];
+			}
 
 			m_impl->set(parsed_shader_text);
 			m_impl->CompileAndLink(m_keywords);
@@ -606,10 +612,39 @@ namespace FishEngine
 				u.binded = true;
 				glCheckError();
 			}
-			//            else
-			//            {
-			//                Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
-			//            }
+//            else
+//            {
+//                Debug::LogWarning("%s of type %s not found", u.name.c_str(), GLenumToString(u.type));
+//            }
+		}
+	}
+				
+				
+	static GLuint ShaderBlendFactorToGL(ShaderBlendFactor factor)
+	{
+		switch (factor)
+		{
+		case ShaderBlendFactor::One:
+			return GL_ONE;
+		case ShaderBlendFactor::Zero:
+			return GL_ZERO;
+		case ShaderBlendFactor::SrcColor:
+			return GL_SRC_COLOR;
+		case ShaderBlendFactor::SrcAlpha:
+			return GL_SRC_ALPHA;
+		case ShaderBlendFactor::DstColor:
+			return GL_DST_COLOR;
+		case ShaderBlendFactor::DstAlpha:
+			return GL_DST_ALPHA;
+		case ShaderBlendFactor::OneMinusSrcColor:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case ShaderBlendFactor::OneMinusSrcAlpha:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		case ShaderBlendFactor::OneMinusDstColor:
+			return GL_ONE_MINUS_DST_COLOR;
+		default:
+		case ShaderBlendFactor::OneMinusDstAlpha:
+			return GL_ONE_MINUS_DST_ALPHA;
 		}
 	}
 
@@ -627,7 +662,22 @@ namespace FishEngine
 		if (m_blend)
 		{
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//			if (m_blendFactorCount == 2)
+//			{
+				auto f1 = ShaderBlendFactorToGL(m_blendFactors[0]);
+				auto f2 = ShaderBlendFactorToGL(m_blendFactors[1]);
+				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFunc(f1, f2);
+//			}
+//			else
+//			{
+//				auto f1 = ShaderBlendFactorToGL(m_blendFactors[0]);
+//				auto f2 = ShaderBlendFactorToGL(m_blendFactors[1]);
+//				auto f3 = ShaderBlendFactorToGL(m_blendFactors[2]);
+//				auto f4 = ShaderBlendFactorToGL(m_blendFactors[3]);
+//				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//				glBlendFunc(f1, f2, );
+//			}
 		}
 	}
 
@@ -694,7 +744,7 @@ namespace FishEngine
 	void Shader::Init(std::string const & rootDir)
 	{
 		Path root_dir = rootDir;
-		for (auto& n : { "PBR", "PBR-Reference", "Diffuse", "DebugCSM" })
+		for (auto& n : { "PBR", "PBR-Reference", "Diffuse", "DebugCSM", "Texture", "Transparent" })
 		{
 			m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".surf"));
 			m_builtinShaders[n]->setName(n);

@@ -42,7 +42,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QToolButton" name="toolButton_2">
+       <widget class="QToolButton" name="sceneViewDrawModeButton">
         <property name="text">
          <string>Shaded</string>
         </property>

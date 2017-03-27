@@ -338,7 +338,7 @@ namespace FishEditor
 			}
 		}
 #else
-		QualitySettings::setShadowDistance(20);
+		//QualitySettings::setShadowDistance(20);
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 		

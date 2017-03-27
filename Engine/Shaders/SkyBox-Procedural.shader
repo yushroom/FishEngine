@@ -1,3 +1,4 @@
+@Name "Skybox/Procedural"
 @Cull Off
 @ZWrite Off
 

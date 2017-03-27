@@ -32,7 +32,8 @@ namespace FishEngine
 	public:
 		InjectSerializationFunctionsNonPolymorphic(ShaderCompiler);
 
-		bool                                m_hasGeometryShader = false;
+		std::string			m_name;
+		bool				m_hasGeometryShader = false;
 		bool				m_blendEnabled = false;
 		int					m_blendFactorCount = 0;
 		ShaderBlendFactor	m_blendFactors[4];
@@ -74,19 +75,6 @@ namespace FishEngine
 			size_t&             cursor,
 			const std::string&  str,
 			const Path&         localDir);
-
-		static std::string nextTok(const std::string &shaderText, size_t& cursor);
-
-		static void readToNewline(const std::string& shaderText, size_t& cursor);
-
-		static void ignoreSpace(const std::string& text, size_t& cursor);
-
-		static bool expect(
-			const std::string&  text,
-			size_t&             cursor,
-			const std::string&  target);
-
-		static size_t findPair(const std::string& text, const size_t cursor);
 
 		friend class FishEditor::EditorResources;
 		static Path s_shaderIncludeDir;

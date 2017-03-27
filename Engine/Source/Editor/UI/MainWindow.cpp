@@ -132,6 +132,8 @@ MainWindow::MainWindow(QWidget *parent) :
 		FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected(FishEditor::Selection::activeGameObject());
 	});
 	
+	connect(ui->sceneViewDrawModeButton, &QToolButton::clicked, this, &MainWindow::ShowSceneViewDrawModeMenu);
+	
 	connect(ui->actionDelete,
 			&QAction::triggered,
 			ui->hierarchyTreeView->m_deleteAction,
@@ -243,4 +245,71 @@ void MainWindow::SaveSceneAs()
 		archive << make_nvp("timeCreated", time_created);
 		archive.EndMap();
 	}
+}
+
+void MainWindow::ShowSceneViewDrawModeMenu()
+{
+	if (m_sceneViewDrawModeMenu == nullptr)
+	{
+		QAction * action;
+		QActionGroup* action_group = new QActionGroup( this );
+		m_sceneViewDrawModeMenu = new QMenu(this);
+		action = m_sceneViewDrawModeMenu->addAction("Shaded");
+		action->setChecked(true);
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action = m_sceneViewDrawModeMenu->addAction("Wireframe");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		//action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Shaded Wireframe");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		//action->setEnabled(false);
+		m_sceneViewDrawModeMenu->addSeparator();
+		action = m_sceneViewDrawModeMenu->addAction("Shadow Cascades");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		//action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Render Paths");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Alpha Channel");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Overdraw");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Mipmaps");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		m_sceneViewDrawModeMenu->addSeparator();
+		action = m_sceneViewDrawModeMenu->addAction("Albedo");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Specular");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Smoothness");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+		action = m_sceneViewDrawModeMenu->addAction("Normal");
+		action->setCheckable(true);
+		action->setActionGroup(action_group);
+		action->setEnabled(false);
+//		m_sceneViewDrawModeMenu->addSeparator();
+//		m_sceneViewDrawModeMenu->addAction("UV Charts");
+//		m_sceneViewDrawModeMenu->addAction("Wireframe");
+//		m_sceneViewDrawModeMenu->addAction("Shaded Wireframe");
+//		m_sceneViewDrawModeMenu->addSeparator();
+	}
+	
+	m_sceneViewDrawModeMenu->exec(QCursor::pos());
 }

@@ -5,6 +5,7 @@
 #include "RenderSystem.hpp"
 #include "ReflectClass.hpp"
 #include "RenderBuffer.hpp"
+#include "QualitySettings.hpp"
 
 namespace FishEngine
 {
@@ -37,7 +38,8 @@ namespace FishEngine
 			static LayeredDepthBufferPtr m_shadowMap = nullptr;
 			if (m_shadowMap == nullptr)
 			{
-				m_shadowMap = LayeredDepthBuffer::Create(32, 32, 4, false);
+				int shadowMapSize = QualitySettings::CalculateShadowMapSize();
+				m_shadowMap = LayeredDepthBuffer::Create(shadowMapSize, shadowMapSize, 4, false);
 				//m_tempColorBuffer = LayeredColorBuffer::Create(shadow_map_size, shadow_map_size, 4, TextureFormat::R32);
 				m_shadowMap->setFilterMode(FilterMode::Bilinear);
 				m_shadowMap->setWrapMode(TextureWrapMode::Clamp);

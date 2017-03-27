@@ -261,6 +261,9 @@ namespace FishEngine
 			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
 			auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
 			mtl->SetTexture("CascadedShadowMap", shadowMap);
+			float shadowMapSize = shadowMap->width();
+			float shadowMapTexelSize = 1.0f / shadowMapSize;
+			mtl->SetVector4("_ShadowMapTexture_TexelSize", Vector4(shadowMapTexelSize, shadowMapTexelSize, shadowMapSize, shadowMapSize));
 			mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);
 			Graphics::DrawMesh(quad, mtl);
 			glDepthMask(GL_TRUE);
@@ -268,6 +271,7 @@ namespace FishEngine
 		}
 		Pipeline::PopRenderTarget();
 
+#if 0
 		// blur shadow map, pass 1
 		m_screenShadowMap->setFilterMode(FilterMode::Bilinear);
 		Pipeline::PushRenderTarget(m_blurScreenShadowMapRenderTarget1);
@@ -303,7 +307,8 @@ namespace FishEngine
 			glDepthFunc(GL_LESS);
 		}
 		Pipeline::PopRenderTarget();
-
+#endif
+		
 		// add shadow
 		{
 			glDepthFunc(GL_ALWAYS);

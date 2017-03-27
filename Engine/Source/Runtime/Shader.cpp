@@ -128,7 +128,10 @@ const char* GLenumToString(GLenum e)
 		return "GL_SAMPLER_3D";
 	case GL_SAMPLER_CUBE:
 		return "GL_SAMPLER_CUBE";
+	case GL_SAMPLER_2D_ARRAY_SHADOW:
+		return "GL_SAMPLER_2D_ARRAY_SHADOW";
 	default:
+		abort();
 		return "UNKNOWN";
 		break;
 	}
@@ -136,7 +139,7 @@ const char* GLenumToString(GLenum e)
 
 bool UniformIsTexture(GLenum type)
 {
-	return (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_ARRAY || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE);
+	return (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_ARRAY || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_2D_ARRAY_SHADOW);
 }
 
 
@@ -595,7 +598,7 @@ namespace FishEngine
 	{
 		for (auto& u : m_uniforms)
 		{
-			if (!(u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY))
+			if (!(u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY || u.type == GL_SAMPLER_2D_ARRAY_SHADOW))
 				continue;
 			auto it = textures.find(u.name);
 			if (it != textures.end())
@@ -603,7 +606,7 @@ namespace FishEngine
 				GLenum type = GL_TEXTURE_2D;
 				if (u.type == GL_SAMPLER_CUBE)
 					type = GL_TEXTURE_CUBE_MAP;
-				else if (u.type == GL_SAMPLER_2D_ARRAY)
+				else if (u.type == GL_SAMPLER_2D_ARRAY || u.type == GL_SAMPLER_2D_ARRAY_SHADOW)
 					type = GL_TEXTURE_2D_ARRAY;
 				//BindUniformTexture(u.name.c_str(), it->second->GLTexuture(), texture_id, type);
 				glActiveTexture(GLenum(GL_TEXTURE0 + u.textureBindPoint));

@@ -21,6 +21,95 @@ static std::string ReadFile(const FishEngine::Path& path)
 }
 
 
+std::string nextTok(const std::string &shaderText, size_t& cursor)
+{
+	size_t start = cursor;
+	size_t end = shaderText.size();
+	
+	string test = shaderText.substr(start, 2);
+	if (test == "//" || test == "/*" || test == "*/")
+	{
+		return test;
+	}
+	
+	test = shaderText.substr(start, 8);
+	if (test == "#include")
+	{
+		cursor += 8;
+		return test;
+	}
+	bool first_is_space = (std::isspace(shaderText[start]) != 0);
+	while (cursor < end)
+	{
+		char c = shaderText[cursor];
+		bool is_space = (std::isspace(c) != 0);
+		if ((first_is_space && !is_space) ||
+			(!first_is_space && is_space))
+			break;
+		cursor++;
+	}
+	if (start == cursor)
+		cursor++;
+	return shaderText.substr(start, cursor - start);
+}
+
+void readToNewline(const std::string& shaderText, size_t& cursor)
+{
+	for (; cursor < shaderText.size(); cursor++)
+	{
+		if (shaderText[cursor] == '\n')
+			return;
+	}
+}
+
+void ignoreSpace(const std::string& text, size_t& cursor)
+{
+	if (std::isspace(text[cursor]))
+		nextTok(text, cursor);
+}
+
+bool expect(const std::string& text, size_t& cursor, char target)
+{
+	if (text[cursor] != target)
+		return false;
+	cursor++;
+	return true;
+}
+
+bool expect(const std::string& text, size_t& cursor, const std::string& target)
+{
+	for (int i = 0; i < target.size(); ++i)
+	{
+		if (text[cursor + i] != target[i])
+			return false;
+	}
+	cursor += target.size();
+	return true;
+}
+
+size_t findPair(const std::string& text, const size_t cursor)
+{
+	int left_count = 1;
+	size_t i = cursor;
+	for (; i < text.size(); ++i)
+	{
+		if (text[i] == '{')
+		{
+			left_count++;
+		}
+		else if (text[i] == '}')
+		{
+			left_count--;
+			if (left_count == 0)
+			{
+				return i;
+			}
+		}
+	}
+	return i;
+}
+
+
 namespace FishEngine
 {
 
@@ -181,6 +270,17 @@ namespace FishEngine
 						//cout << "Keyword " << name << endl;
 						m_settings[name] = "on";
 					}
+					else if (name == "name")
+					{
+						ignoreSpace(shaderText, cursor);
+						assert(expect(shaderText, cursor, "\""));
+						auto begin = cursor;
+						readToNewline(shaderText, cursor);
+						cursor--;
+						assert(shaderText[cursor] == '"');
+						auto end = cursor;
+						m_name = shaderText.substr(begin, end-begin);
+					}
 					else if (name == "blend")
 					{
 						m_blendEnabled = true;
@@ -244,84 +344,5 @@ namespace FishEngine
 		return out_parsedShaderText;
 	}
 
-	std::string ShaderCompiler::nextTok(const std::string &shaderText, size_t& cursor)
-	{
-		size_t start = cursor;
-		size_t end = shaderText.size();
-
-		string test = shaderText.substr(start, 2);
-		if (test == "//" || test == "/*" || test == "*/")
-		{
-			return test;
-		}
-
-		test = shaderText.substr(start, 8);
-		if (test == "#include")
-		{
-			cursor += 8;
-			return test;
-		}
-		bool first_is_space = (std::isspace(shaderText[start]) != 0);
-		while (cursor < end)
-		{
-			char c = shaderText[cursor];
-			bool is_space = (std::isspace(c) != 0);
-			if ((first_is_space && !is_space) ||
-				(!first_is_space && is_space))
-				break;
-			cursor++;
-		}
-		if (start == cursor)
-			cursor++;
-		return shaderText.substr(start, cursor - start);
-	}
-
-	void ShaderCompiler::readToNewline(const std::string& shaderText, size_t& cursor)
-	{
-		for (; cursor < shaderText.size(); cursor++)
-		{
-			if (shaderText[cursor] == '\n')
-				return;
-		}
-	}
-
-	void ShaderCompiler::ignoreSpace(const std::string& text, size_t& cursor)
-	{
-		if (std::isspace(text[cursor]))
-			nextTok(text, cursor);
-	}
-
-	bool ShaderCompiler::expect(const std::string& text, size_t& cursor, const std::string& target)
-	{
-		for (int i = 0; i < target.size(); ++i)
-		{
-			if (text[cursor + i] != target[i])
-				return false;
-		}
-		cursor += target.size();
-		return true;
-	}
-
-	size_t ShaderCompiler::findPair(const std::string& text, const size_t cursor)
-	{
-		int left_count = 1;
-		size_t i = cursor;
-		for (; i < text.size(); ++i)
-		{
-			if (text[i] == '{')
-			{
-				left_count++;
-			}
-			else if (text[i] == '}')
-			{
-				left_count--;
-				if (left_count == 0)
-				{
-					return i;
-				}
-			}
-		}
-		return i;
-	}
 
 }

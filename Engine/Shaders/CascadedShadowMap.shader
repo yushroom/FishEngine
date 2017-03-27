@@ -1,5 +1,6 @@
 #include <ShaderVariables.inc>
-#include <ShadowCommon.inc>
+//#include <ShadowCommon.inc>
+//#include <CascadedShadowMapCommon.inc>
 
 @vertex
 {

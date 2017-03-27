@@ -107,12 +107,17 @@ namespace FishEngine
 			{
 				m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Texture2DArray });
 			}
+			else if (u.type == GL_SAMPLER_2D_ARRAY_SHADOW)
+			{
+				m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::Texture2DArrayShadow });
+			}
 			else if (u.type == GL_SAMPLER_CUBE)
 			{
 				m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::TextureCube });
 			}
 			else {
 				Debug::LogError("Unknown shader property type");
+				abort();
 			}
 		}
 	}
@@ -191,7 +196,7 @@ namespace FishEngine
 	{
 		for (auto& u : m_shader->m_uniforms)
 		{
-			if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY))
+			if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY || u.type == GL_SAMPLER_2D_ARRAY_SHADOW))
 			{
 				m_textures[name] = texture;
 				return;

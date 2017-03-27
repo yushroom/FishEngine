@@ -8,6 +8,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class QMenu;
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -31,6 +33,9 @@ private:
 	void SaveSceneAs();
 
 	Ui::MainWindow *ui;
+	
+	QMenu * m_sceneViewDrawModeMenu = nullptr;
+	void ShowSceneViewDrawModeMenu();
 };
 
 #endif // MAINWINDOW_H

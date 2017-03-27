@@ -1,4 +1,16 @@
 #include <UnitySupport.inc>
+
+struct VS_OUT
+{
+    //LIGHTING_COORDS( 0, 1 )
+    float2 uv;
+    float3 eyeDir;
+    float3 normal;
+    float3 tangent;
+    float3 binormal;
+    float3 lightDir;
+};
+
 @vertex
 {
     #include <AppData.inc>
@@ -33,15 +45,7 @@
 
     //#ifdef ENABLE_CAST_SHADOWS
 
-    out VS_OUT {
-        //LIGHTING_COORDS( 0, 1 )
-        float2 uv;
-        float3 eyeDir;
-        float3 normal;
-        float3 tangent;
-        float3 binormal;
-        float3 lightDir;
-    } vs_out;
+    out VS_OUT vs_out;
 
     void vs_main(AppData appdata)
     {
@@ -83,15 +87,7 @@
 
     //#ifdef ENABLE_CAST_SHADOWS
 
-    in VS_OUT {
-        //LIGHTING_COORDS( 0, 1 )
-        float2 uv;
-        float3 eyeDir;
-        float3 normal;
-        float3 tangent;
-        float3 binormal;
-        float3 lightDir;
-    } vs_out;
+    in VS_OUT vs_out;
 
     out float4 color;
 
@@ -125,6 +121,8 @@
     void main()
     {
         float4_t diffSamplerColor = tex2D( _MainTex, vs_out.uv.xy );
+        //color = diffSamplerColor;
+        //return;
 
         //float3_t normalVec = vs_out.normal;
         float3_t normalVec = GetNormalFromMap();

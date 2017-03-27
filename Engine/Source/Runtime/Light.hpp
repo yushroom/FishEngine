@@ -65,6 +65,8 @@ namespace FishEngine
 		virtual void OnDrawGizmos() override;
 		virtual void OnDrawGizmosSelected() override;
 
+		static void ResizeShadowMaps();
+
 	private:
 		friend class Scene;
 		//friend class FishEditor::EditorRenderSystem;
@@ -90,7 +92,7 @@ namespace FishEngine
 		// Brightness of the light. The default value for a Point, Spot or Area light is 1 but for a Directional light, it is 0.5.
 		float m_intensity = 1.0f;
 
-		float m_shadowBias = 0.2f;
+		float m_shadowBias = 0.05f;
 		float m_shadowNormalBias = 0.4f;
 		float m_shadowNearPlane = 0.2f;
 

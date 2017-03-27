@@ -36,7 +36,7 @@ namespace FishEngine
 	{
 	public:
 		static std::shared_ptr<LayeredDepthBuffer> Create(const int width, const int height, const int depth, bool useStencil = true);
-		//virtual void Resize(const int newWidth, const int newHeight) override;
+		virtual void Resize(const int newWidth, const int newHeight) override;
 	protected:
 		int m_depth;
 	};

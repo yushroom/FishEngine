@@ -83,6 +83,10 @@ namespace FishEngine
 		s_lightingUniforms.CascadesFar = light->m_cascadesFar;
 		s_lightingUniforms.CascadesSplitPlaneNear = light->m_cascadesSplitPlaneNear;
 		s_lightingUniforms.CascadesSplitPlaneFar = light->m_cascadesSplitPlaneFar;
+		s_lightingUniforms.fish_LightShadowBias.x = light->m_shadowBias;
+		s_lightingUniforms.fish_LightShadowBias.y = 1;
+		s_lightingUniforms.fish_LightShadowBias.z = light->m_shadowNormalBias;
+		s_lightingUniforms.fish_LightShadowBias.w = 0;
 		for (int i = 0; i < 4; ++i)
 		{
 			s_lightingUniforms.LightMatrix[i] = light->m_projectMatrixForShadowMap[i] * light->m_viewMatrixForShadowMap[i];

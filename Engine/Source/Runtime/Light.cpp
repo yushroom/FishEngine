@@ -25,10 +25,23 @@ namespace FishEngine
 		Gizmos::DrawLight(center, dir);
 	}
 
+	void Light::ResizeShadowMaps()
+	{
+		auto shadow_map_size = QualitySettings::CalculateShadowMapSize();
+		for (auto & l : m_lights)
+		{
+			auto light = l.lock();
+			if (light != nullptr)
+			{
+				light->m_shadowMap->Resize(shadow_map_size, shadow_map_size);
+			}
+		}
+	}
+
 	Light::Light()
 	{
-		//auto shadow_map_size = QualitySettings::CalculateShadowMapSize();
-		constexpr uint32_t shadow_map_size = 2048;
+		auto shadow_map_size = QualitySettings::CalculateShadowMapSize();
+		//constexpr uint32_t shadow_map_size = 2048;
 
 		m_renderTarget = std::make_shared<RenderTarget>();
 		//m_renderTarget->Set(m_shadowMap, m_depthBuffer);

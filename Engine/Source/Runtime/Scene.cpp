@@ -161,6 +161,19 @@ namespace FishEngine
 				aabb.Encapsulate(view_corners[i]);
 			}
 
+#if 1
+			float sphereRadius = 0.0f;
+			for (auto& c : world_corners)
+			{
+				float dist = Vector3::Distance(c, split_centroid);
+				sphereRadius = std::max(sphereRadius, dist);
+			}
+
+			sphereRadius = std::ceil(sphereRadius * 16.0f) / 16.0f;
+			Vector3 maxExtents(sphereRadius, sphereRadius, sphereRadius);
+			Vector3 minExtents = -maxExtents;
+			Vector3 cascadeExtents = maxExtents - minExtents;
+#endif
 			constexpr float near_offset = 10.0f;
 			constexpr float far_offset = 20.0f;
 			auto min_p = aabb.min();
@@ -175,9 +188,48 @@ namespace FishEngine
 			float z_far = max_p.z;
 			light->m_cascadesNear[i] = z_near - near_offset;
 			light->m_cascadesFar[i] = z_far + far_offset;
+
+#if 0
 			light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, z_near, z_far);
-			//light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, light->shadowNearPlane(), light->shadowNearPlane());
 			light->m_viewMatrixForShadowMap[i] = world_to_light;
+#elif 0
+			float scaleX = 2.0f / (max_p.x - min_p.x);
+			float scaleY = 2.0f / (max_p.y - min_p.y);
+			constexpr float scaleQuantizer = 64.0f;
+
+			scaleX = 1.0f / std::ceil(1.0f / scaleX * scaleQuantizer) * scaleQuantizer;
+			scaleY = 1.0f / std::ceil(1.0f / scaleY * scaleQuantizer) * scaleQuantizer;
+			float offsetX = -0.5f * (max_p.x + min_p.x) * scaleX;
+			float offsetY = -0.5f * (max_p.y + min_p.y) * scaleY;
+			const float halfTextureSize = 0.5f * light->m_shadowMap->width();
+			offsetX = std::ceil(offsetX * halfTextureSize) / halfTextureSize;
+			offsetY = std::ceil(offsetY * halfTextureSize) / halfTextureSize;
+			eye_pos.x += offsetX;
+			eye_pos.y += offsetY;
+			//Gizmos::DrawWireSphere(eye_pos, 0.5f);
+			world_to_light = Matrix4x4::LookAt(eye_pos, split_centroid, Vector3::up);
+			light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, z_near, z_far);
+			light->m_viewMatrixForShadowMap[i] = world_to_light;
+#else
+			eye_pos = -light_dir * sphereRadius + split_centroid;
+			auto shadowView = Matrix4x4::LookAt(eye_pos, split_centroid, Vector3::up);
+			auto shadowProj = Matrix4x4::Ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, 0, cascadeExtents.z);
+
+			auto shadowMatrix = shadowProj * shadowView;
+			Vector3 shadowOrigin = shadowMatrix.MultiplyPoint(Vector3::zero);
+			const float sMapSize = light->m_shadowMap->width();
+			shadowOrigin *= sMapSize;
+			Vector3 roundedOrigin{ std::round(shadowOrigin.x), std::round(shadowOrigin.y), std::round(shadowOrigin.z) };
+			Vector3 roundOffset = roundedOrigin - shadowOrigin;
+			roundOffset /= sMapSize;
+			roundOffset.z = 0.0f;
+
+			shadowProj[0][3] += roundOffset.x;
+			shadowProj[1][3] += roundOffset.y;
+
+			light->m_projectMatrixForShadowMap[i] = shadowProj;
+			light->m_viewMatrixForShadowMap[i] = shadowView;
+#endif
 
 			light->m_cascadesSplitPlaneNear[i] = split_near;
 			light->m_cascadesSplitPlaneFar[i] = split_far;

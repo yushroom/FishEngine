@@ -25,6 +25,7 @@
 
 #include "Selection.hpp"
 #include "EditorResources.hpp"
+#include "Light.hpp"
 //#include "FishEditorWindow.hpp"
 //#include "EditorGUI.hpp"
 
@@ -1000,6 +1001,7 @@ namespace FishEditor
 		m_selectionOutlineColorBuffer2->Resize(width, height);
 		RenderSystem::ResizeBufferSize(width, height);
 		Camera::OnWindowSizeChanged(width, height);
+		Light::ResizeShadowMaps();
 	}
 
 	void SceneViewEditor::FrameSelected(const GameObjectPtr &selected)

@@ -155,3 +155,19 @@ std::shared_ptr<LayeredDepthBuffer> LayeredDepthBuffer::Create(const int width, 
 	t->m_uploaded = true;
 	return t;
 }
+
+void FishEngine::LayeredDepthBuffer::Resize(const int newWidth, const int newHeight)
+{
+	Debug::Log("LayeredDepthBuffer::Resize");
+	if (newWidth == m_width && newHeight == m_height)
+		return;
+	m_width = newWidth;
+	m_height = newHeight;
+	glBindTexture(GL_TEXTURE_2D_ARRAY, m_GLNativeTexture);
+	if (m_useStencil)
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH24_STENCIL8, m_width, m_height, m_depth, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+	else
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, m_width, m_height, m_depth, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	glCheckError();
+}

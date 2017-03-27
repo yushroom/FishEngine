@@ -3,8 +3,8 @@
 
 #include <CGSupport.inc>
 
-const float ExpC = 120.0;
-const float bias = 0.002;
+//const float ExpC = 120.0;
+//const float bias = 0.05;
 
 uniform sampler2DArrayShadow CascadedShadowMap;
 
@@ -49,7 +49,7 @@ float SampleCascadeShadowMap_PCF5x5( vec3 Coord, float Section )
 	half shadow;
 	half sum = 0.0f;
 
-	float z = Coord.z - bias;
+	float z = Coord.z - fish_LightShadowBias.x * 0.1;
 
 	half3 accum = uw * vw.x;
 	sum += accum.x * texture( CascadedShadowMap, vec4(base_uv+float2(u.x, v.x), Section, z ));

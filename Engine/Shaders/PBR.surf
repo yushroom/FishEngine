@@ -2,6 +2,14 @@
 #include <BRDF.inc>
 #include <Ambient.inc>
 
+@Properties
+{
+	BaseColor	("Base Color", Color) = (1,1,1,1)
+	Metallic	("Metallic", Range(0,1)) = 0
+	Roughness	("Roughness", Range(0,1)) = 0.5
+	Specular	("Specular", Range(0,1)) = 0.5
+}
+
 uniform vec3  BaseColor;
 uniform float Metallic;
 uniform float Roughness;

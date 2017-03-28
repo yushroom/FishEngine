@@ -10,6 +10,7 @@
 #include "ShaderProperty.hpp"
 #include "Resources.hpp"
 #include "Shader/ShaderBlendFactor.hpp"
+#include "Shader/ShaderLabProperties.hpp"
 
 namespace FishEngine
 {
@@ -119,6 +120,9 @@ namespace FishEngine
 		bool        m_deferred = false;
 		int					m_blendFactorCount = 0;
 		ShaderBlendFactor	m_blendFactors[4];
+
+		Meta(NonSerializable)
+		ShaderLabProperties m_savedProperties;	// save in material
 
 		ShaderKeywords m_keywords = static_cast<ShaderKeywords>(ShaderKeyword::None);
 

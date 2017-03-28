@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
 	glewInit();
-	std::string path = R"(D:\program\github\FishEngine\Example\PBR\PBR.surf)";
+	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\PBR.surf)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
 	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/Deferred.shader";

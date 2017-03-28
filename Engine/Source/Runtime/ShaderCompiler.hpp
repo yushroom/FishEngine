@@ -4,6 +4,7 @@
 #include "Resources.hpp"
 #include "Macro.hpp"
 #include "Shader/ShaderBlendFactor.hpp"
+#include "Shader/ShaderLabProperties.hpp"
 
 namespace FishEditor
 {
@@ -40,6 +41,8 @@ namespace FishEngine
 		std::map<std::string, std::string>  m_settings;
 		ShaderCompilerErrorCode             m_error = ShaderCompilerErrorCode::None;
 		std::string                         m_errorString;
+
+		ShaderLabProperties m_savedProperties;
 
 	public:
 		Path m_path;

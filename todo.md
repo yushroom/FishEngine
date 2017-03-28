@@ -38,6 +38,10 @@ subclass QStyledItemDelegate之后发现icon不能居中。。。https://bugrepo
 
 
 
+加载脚本的dll的时候，MD/MT不匹配会挂，GameObject清理的时候也会挂
+
+
+
 ## Engine
 
 - [x] 数学库换成左手系

@@ -312,37 +312,37 @@ namespace FishEditor
 		group->setName("Group");
 		Scene::AddGameObject(group);
 		
-		//		for (int x = -5; x < 5; ++x)
-		//		{
-		//			for (int y = -5; y <= 5; y++)
-		//			{
-		//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-		//				go->transform()->SetParent(group->transform());
-		//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
-		//				go->transform()->setLocalEulerAngles(0, 30, 0);
-		//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-		//				MaterialPtr material;
-		////				if (x == 0)
-		////				{
-		//					material = Material::InstantiateBuiltinMaterial("PBR");
-		//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
-		//				//}
-		////				else
-		////				{
-		////					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
-		////					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
-		////				}
-		//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
-		//				//material->DisableKeyword(ShaderKeyword::Shadow);
-		//				material->SetFloat("Metallic", 0.1f*(x+5));
-		//				material->SetFloat("Roughness", 0.1f*(y+5));
-		//				material->SetFloat("Specular", 0.5);
-		//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-		//				auto renderer = go->GetComponent<MeshRenderer>();
-		//				renderer->SetMaterial(material);
-		//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
-		//			}
-		//		}
+//		for (int x = -5; x < 5; ++x)
+//		{
+//			for (int y = -5; y <= 5; y++)
+//			{
+//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+//				go->transform()->SetParent(group->transform());
+//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
+//				go->transform()->setLocalEulerAngles(0, 30, 0);
+//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+//				MaterialPtr material;
+////				if (x == 0)
+////				{
+//					material = Material::InstantiateBuiltinMaterial("PBR");
+//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
+//				//}
+////				else
+////				{
+////					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
+////					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
+////				}
+//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
+//				//material->DisableKeyword(ShaderKeyword::Shadow);
+//				material->SetFloat("Metallic", 0.1f*(x+5));
+//				material->SetFloat("Roughness", 0.1f*(y+5));
+//				material->SetFloat("Specular", 0.5);
+//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
+//				auto renderer = go->GetComponent<MeshRenderer>();
+//				renderer->SetMaterial(material);
+//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
+//			}
+//		}
 		
 		for (int x = 0; x < 2; ++x)
 		{
@@ -391,7 +391,8 @@ namespace FishEditor
 		//TextureImporter texture_importer;
 		//auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
 		//material->setMainTexture(bakedAO);
-		terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+		//terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+		terrainGO->GetComponentInChildren<Renderer>()->SetMaterial(material);
 	}
 	
 	void InitializeScene_IllustrativeRendering()
@@ -437,18 +438,13 @@ namespace FishEditor
 	}
 	
 	
-	void InitializeScene_Script()
+	void InitializeScene_TestScript()
 	{
-		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
-		Object::Instantiate(model);
-		
-		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
-		model = Object::Instantiate(model);
-		
+		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
 #if FISHENGINE_PLATFORM_WINDOWS
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/TestScript.dll";
 #else
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libSponza.dylib";
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libTestScript.dylib";
 #endif
 		if ( !boost::filesystem::exists(shared_lib_path) )
 		{
@@ -458,10 +454,11 @@ namespace FishEditor
 		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
 		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
 		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
+			Debug::Log("Delete from dll");
 			deleteFunc(s);
 		});
 		
-		model->AddComponent(rotator);
+		cube->AddComponent(rotator);
 	}
 	
 
@@ -512,22 +509,30 @@ namespace FishEditor
 		m_mainSceneViewEditor->Init();
 		DefaultScene();
 		
-		auto exampleName = Application::dataPath().parent_path().stem().string();
-		if (exampleName == "UnityChan")
+		auto projectName = Application::dataPath().parent_path().stem().string();
+		if (projectName == "UnityChan")
 		{
 			InitializeScene_UnityChan();
 		}
-		else if (exampleName == "Sponza")
+		else if (projectName == "Sponza")
 		{
 			InitializeScene_Sponza();
 		}
-		else if (exampleName == "PBR")
+		else if (projectName == "PBR")
 		{
 			InitializeScene_PBR();
 		}
-		else if (exampleName == "Illustrative-Rendering")
+		else if (projectName == "Illustrative-Rendering")
 		{
 			InitializeScene_IllustrativeRendering();
+		}
+		else if (projectName == "TestShadow")
+		{
+			InitializeScene_TestShadow();
+		}
+		else if (projectName == "TestScript")
+		{
+			InitializeScene_TestScript();
 		}
 
 		glClearColor(1.0f, 0.0f, 0.0f, 1);

@@ -86,10 +86,31 @@ namespace FishEngine
 			}
 			return nullptr;
 		}
+
+		template<typename T>
+		std::shared_ptr<T> GetComponentInChildren() const
+		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
+			auto comp = this->GetComponent<T>();
+			if (comp != nullptr)
+			{
+				return comp;
+			}
+			for (auto & child : m_transform->m_children)
+			{
+				auto comp = child->m_gameObjectStrongRef->GetComponentInChildren<T>();
+				if (comp != nullptr)
+				{
+					return comp;
+				}
+			}
+			return nullptr;
+		}
 		
 		template<typename T>
 		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const
 		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
 			std::vector<std::shared_ptr<T>> result;
 			this->GetComponentsInChildren(result);
 			return result;
@@ -98,6 +119,7 @@ namespace FishEngine
 		template<typename T>
 		void GetComponentsInChildren(std::vector<std::shared_ptr<T>> & components) const
 		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
 			auto comp = this->GetComponent<T>();
 			if (comp != nullptr)
 			{

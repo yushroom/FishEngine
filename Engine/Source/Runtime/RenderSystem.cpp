@@ -261,7 +261,7 @@ namespace FishEngine
 			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
 			auto mtl = Material::builtinMaterial("GatherScreenSpaceShadow");
 			mtl->SetTexture("CascadedShadowMap", shadowMap);
-			float shadowMapSize = shadowMap->width();
+			float shadowMapSize = static_cast<float>( shadowMap->width() );
 			float shadowMapTexelSize = 1.0f / shadowMapSize;
 			mtl->SetVector4("_ShadowMapTexture_TexelSize", Vector4(shadowMapTexelSize, shadowMapTexelSize, shadowMapSize, shadowMapSize));
 			mtl->SetTexture("SceneDepthTexture", m_mainDepthBuffer);

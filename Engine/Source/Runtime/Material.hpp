@@ -5,6 +5,7 @@
 
 #include "Object.hpp"
 #include "ShaderProperty.hpp"
+#include "shader/ShaderLabProperties.hpp"
 
 namespace FishEngine
 {
@@ -148,6 +149,8 @@ namespace FishEngine
 		std::map<std::string, TexturePtr>   m_textures;
 		ShaderUniforms                      m_uniforms;
 		std::vector<MaterialProperty>       m_properties;
+
+		ShaderLabProperties m_savedProperties;
 
 		static std::map<std::string, MaterialPtr>   s_builtinMaterialInstance;
 		//static MaterialPtr                          s_defaultMaterial;

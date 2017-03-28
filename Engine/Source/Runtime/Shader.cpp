@@ -378,6 +378,7 @@ namespace FishEngine
 			{
 				m_blendFactors[i] = compiler.m_blendFactors[i];
 			}
+			m_savedProperties = compiler.m_savedProperties;
 
 			m_impl->set(parsed_shader_text);
 			m_impl->CompileAndLink(m_keywords);

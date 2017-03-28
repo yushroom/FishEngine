@@ -17,7 +17,7 @@
 /Script/reflect/temp/
 
 # Example
-/Example/Sponza/build
+/Example/*/build
 *.meta
 
 # cmake build

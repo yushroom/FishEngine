@@ -3,10 +3,14 @@
 #include <iostream>
 #include <cctype>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "Debug.hpp"
+#include "Color.hpp"
 
 using namespace std;
+
+constexpr size_t npos = std::numeric_limits<size_t>::max();
 
 static std::string ReadFile(const FishEngine::Path& path)
 {
@@ -87,6 +91,29 @@ bool expect(const std::string& text, size_t& cursor, const std::string& target)
 	return true;
 }
 
+size_t findRightPair(const std::string& text, const size_t cursor, char left, char right)
+{
+	int left_count = 1;
+	size_t i = cursor;
+	for (; i < text.size(); ++i)
+	{
+		if (text[i] == left)
+		{
+			left_count++;
+		}
+		else if (text[i] == right)
+		{
+			left_count--;
+			if (left_count == 0)
+			{
+				return i;
+			}
+		}
+	}
+	return npos;
+}
+
+
 size_t findPair(const std::string& text, const size_t cursor)
 {
 	int left_count = 1;
@@ -106,13 +133,103 @@ size_t findPair(const std::string& text, const size_t cursor)
 			}
 		}
 	}
-	return i;
+	return npos;
 }
+
+class Tokenizer
+{
+public:
+
+	std::string m_string;
+	std::size_t m_cursor = 0;
+
+	Tokenizer(std::string const & str) : m_string(str)
+	{
+
+	}
+
+	// ignore leading spaces
+	// until spaces
+	std::string NextToken()
+	{
+		RangeCheck();
+		ignoreSpace(m_string, m_cursor);
+		return nextTok(m_string, m_cursor);
+	}
+
+	// cursor will point the position right behind target
+	std::string NextTokenUntil(char target)
+	{
+		RangeCheck();
+		ignoreSpace(m_string, m_cursor);
+		auto end = m_string.find_first_of(target, m_cursor);
+		std::string ret = m_string.substr(m_cursor, end - m_cursor);
+		m_cursor = end+1;
+		return ret;
+	}
+
+	// ')'
+	std::string NextTokenUntilRightParenthesis()
+	{
+		auto pos = findRightPair(m_string, m_cursor, '(', ')');
+		assert(pos != npos); // unmatched parenthesis
+		auto begin = m_cursor;
+		m_cursor = pos + 1;
+		return m_string.substr(begin, pos - begin);
+	}
+
+	std::string RemainingString()
+	{
+		RangeCheck();
+		auto p = m_cursor;
+		m_cursor = m_string.size();
+		return m_string.substr(p);
+	}
+
+	void Expect(char target)
+	{
+		RangeCheck();
+		ignoreSpace(m_string, m_cursor);
+		bool result = expect(m_string, m_cursor, target);
+		assert(result);		// syntax error
+	}
+
+	void Expect(std::string const & target)
+	{
+		RangeCheck();
+		ignoreSpace(m_string, m_cursor);
+		bool result = expect(m_string, m_cursor, target);
+		assert(result);		// syntax error
+	}
+
+	// assert eof
+	void ExpectEndOfFile()
+	{
+		ignoreSpace(m_string, m_cursor);
+		assert(m_cursor == m_string.size());
+	}
+
+	void RangeCheck()
+	{
+		assert(m_cursor < m_string.size()); // early end of file
+	}
+};
+
+enum class ShaderLabPropertyType
+{
+	Float,
+	Range,
+	Color,
+	Vector,
+	Texture2D,
+	TextureCube,
+	Texture3D,
+	Texture2DArray,
+};
 
 
 namespace FishEngine
 {
-
 	std::map<std::string, std::string> ShaderCompiler::s_cachedHeaders;
 
 	Path ShaderCompiler::s_shaderIncludeDir;
@@ -247,7 +364,38 @@ namespace FishEngine
 			}
 			else if (tok.size() > 0 && tok[0] == '@')
 			{
-				if (tok == "@vertex")
+				if (tok == "@Properties")
+				{
+					//ShaderLabProperties m_properties;
+					ignoreSpace(shaderText, cursor);
+					expect(shaderText, cursor, "{");
+					auto begin = cursor;
+					auto end = findPair(shaderText, cursor);
+					if (end == npos) abort();
+					cursor = end + 1;
+					std::string properitesString = shaderText.substr(begin + 1, end - begin - 1);
+					//Debug::Log("properitesString %s", properitesString.c_str());
+					boost::trim(properitesString);
+					std::vector<std::string> lines;
+					boost::split(lines, properitesString, boost::is_any_of("\n"));
+					for (auto & line : lines)
+					{
+						Tokenizer tokenizer(line);
+						std::string name = tokenizer.NextTokenUntil('(');
+						boost::trim(name);
+						tokenizer.Expect('"');
+						std::string displayName = tokenizer.NextTokenUntil('"');
+						tokenizer.Expect(',');
+						std::string type = tokenizer.NextTokenUntilRightParenthesis();
+						boost::trim(type);
+						tokenizer.Expect('=');
+						std::string defaultValue = tokenizer.RemainingString();
+						boost::trim(defaultValue);
+						tokenizer.ExpectEndOfFile();
+						m_savedProperties.AddProperty(name, displayName, type, defaultValue);
+					}
+				}
+				else if (tok == "@vertex")
 				{
 					parsed += parseSubShader(shaderText, cursor, "VERTEX_SHADER", localDir);
 				}
@@ -344,5 +492,55 @@ namespace FishEngine
 		return out_parsedShaderText;
 	}
 
+
+	void ShaderLabProperties::AddProperty(std::string const & name, std::string const & displayName, std::string const & type, std::string const & defalutValueString)
+	{
+		if (type == "Float")
+		{
+			float value = boost::lexical_cast<float>(defalutValueString);
+			m_Floats[name] = value;
+		}
+		else if (boost::starts_with(type, "Range"))
+		{
+			Tokenizer t(type);
+			t.NextTokenUntil('(');
+			auto minStr = t.NextTokenUntil(',');
+			auto maxStr = t.NextTokenUntil(')');
+			float minFloat = boost::lexical_cast<float>(minStr);
+			float maxFloat = boost::lexical_cast<float>(maxStr);
+			float value = boost::lexical_cast<float>(defalutValueString);
+			m_Ranges[name] = ShaderLabRangeProperty(value, minFloat, maxFloat);
+			t.ExpectEndOfFile();
+		}
+		else if (type == "Color")
+		{
+			FishEngine::Color color;
+			Tokenizer t(defalutValueString);
+			t.NextTokenUntil('(');
+			auto str = t.NextTokenUntil(',');
+			float value = boost::lexical_cast<float>(str);
+			color.r = value;
+
+			str = t.NextTokenUntil(',');
+			value = boost::lexical_cast<float>(str);
+			color.g = value;
+
+			str = t.NextTokenUntil(',');
+			value = boost::lexical_cast<float>(str);
+			color.b = value;
+
+			str = t.NextTokenUntil(')');
+			value = boost::lexical_cast<float>(str);
+			color.a = value;
+
+			t.ExpectEndOfFile();
+			m_Colors[name] = color;
+		}
+		else
+		{
+			abort(); // unknown property type
+		}
+		m_names.emplace_back(std::make_pair(displayName, name));
+	}
 
 }

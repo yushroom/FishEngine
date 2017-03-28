@@ -71,6 +71,7 @@ namespace FishEngine
 		m_uniforms.vec3s.clear();
 		m_uniforms.vec4s.clear();
 		m_uniforms.mat4s.clear();
+		m_savedProperties = shader->m_savedProperties;
 		m_properties.clear();
 		for (auto& u : m_shader->uniforms())
 		{

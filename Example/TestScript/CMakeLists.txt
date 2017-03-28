@@ -22,5 +22,5 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/Assets)
 INCLUDE_DIRECTORIES(${FishEngineRootDir}/Source/Runtime)
 LINK_DIRECTORIES(${FishEngineRootDir}/Binary/lib/Debug)
 
-add_library (Sponza SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
-target_link_libraries(Sponza FishEngine)
+add_library (TestScript SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
+target_link_libraries(TestScript FishEngine)

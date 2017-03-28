@@ -53,117 +53,44 @@ namespace FishEditor
 		}
 		return nullptr;
 	}
-
-	void DefaultScene()
+	
+	
+	void InitializeScene_Sponza()
 	{
-#if 1
-		cout << "CWD: " << boost::filesystem::initial_path() << endl;
-
-	//    auto camera = Camera::Create();
-	//    auto camera_go = Scene::CreateGameObject("Main Camera");
-	//    camera_go->AddComponent(camera);
-	//    camera_go->AddComponent<CameraController>();
-		auto camera_go = Scene::CreateCamera();
-		camera_go->setName("Main Camera");
-		auto camera = camera_go->GetComponent<Camera>();
-
-		camera_go->transform()->setLocalPosition(0, 1, -10);
-		camera_go->setTag("MainCamera");
-		//camera_go->AddComponent<TakeScreenShot>();
-
-		auto light_go = Scene::CreateGameObject("Directional Light");
-		light_go->transform()->setPosition(0, 3, 0);
-		light_go->transform()->setLocalEulerAngles(50, -30, 0);
-		light_go->AddComponent(Light::Create());
-
-		auto material = Material::InstantiateBuiltinMaterial("SkyboxProcedural");
-		material->SetFloat("_AtmosphereThickness", 1.0);
-		//material->SetFloat("_SunDisk", 2);
-		material->SetFloat("_SunSize", 0.04f);
-		material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
-		material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
-		material->SetFloat("_Exposure", 1.3f);
-		RenderSettings::setSkybox(material);
-
-#if 0
-
-		//auto go = GameObject::CreatePrimitive(PrimitiveType::Cube);
-		QualitySettings::setShadowDistance(20);
-		{
-	#if FISHENGINE_PLATFORM_WINDOWS
-		const std::string root_dir = R"(D:\program\FishEngine\Example\CascadedShadowMapping\)";
-	#else
-		const std::string root_dir = "/Users/yushroom/program/graphics/FishEngine/Example/CascadedShadowMapping/";
-	#endif
-		ModelImporter importer;
-		auto model = importer.LoadFromFile(root_dir + "Terrain.obj");
-		auto terrainGO = model->CreateGameObject();
-		auto material = Material::InstantiateBuiltinMaterial("DebugCSM");
-		//auto material = Material::defaultMaterial();
-		//material->EnableKeyword(ShaderKeyword::Shadow);
-
-		//TextureImporter texture_importer;
-		//auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
-		//material->setMainTexture(bakedAO);
-		terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
-		}
-	
-#elif 0
-	
-		QualitySettings::setShadowDistance(30);
-		Path sponza_root = Resources::exampleRootDirectory() / "Sponza";
-		Path sponza_assets_root = sponza_root / "crytek-sponza";
-		Resources::SetAssetsDirectory(sponza_root);
-	
-		ModelImporter importer;
-		importer.setFileScale(0.01f);
-		//auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
-		//auto sponza_go = sponza_model->CreateGameObject();
-
-		//auto handle = std::async(std::launch::async,
-		//	[&importer, &sponza_assets_root]() {
-		//	return importer.LoadFromFile(sponza_assets_root / "sponza.obj");
-		//}
-		//);
-
-		//TextureImporter tex_importer;
-		Path textures_root = sponza_assets_root / "textures";
-		auto shader1 = Shader::CreateFromFile(sponza_root / "diffuse_mask_twosided.shader");
-
-		auto sponza_model = importer.LoadFromFile(sponza_assets_root / "sponza.obj");
+		//QualitySettings::setShadowDistance(30);
+		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
+		
+		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.obj"));
 		//auto sponza_model = handle.get();
-		auto sponza_go = sponza_model->CreateGameObject();
-
-		auto ApplyMateril1 = [&sponza_go, &shader1, &textures_root]
+		auto sponza_go = Object::Instantiate(sponza_model);
+		
+		auto ApplyMateril1 = [&sponza_go, &shader1]
 		(const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
 		{
 			auto mesh0 = FindNamedChild(sponza_go, go_name);
 			auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
-			mtl->SetShader(shader1);
-			auto diffuse = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (diffuse_tex + ".png"));
-			auto mask = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (mask_tex + ".png"));
-			//auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
-			//auto mask = tex_importer.FromFile(textures_root / (mask_tex + ".png"));
+			mtl->setShader(shader1);
+			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ diffuse_tex + ".png"));
+			auto mask = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ mask_tex + ".png"));
 			mtl->SetTexture("DiffuseTex", diffuse);
 			mtl->SetTexture("MaskTex", mask);
 		};
-
+		
 		ApplyMateril1("mesh0", "sponza_thorn_diff", "sponza_thorn_mask");
 		ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
 		ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
-
-		auto shader2 = Shader::CreateFromFile(sponza_root / "diffuse_bump.shader");
-		auto ApplyMateril2 = [&sponza_go, &shader2, &textures_root]
+		
+		auto shader2 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_bump.shader"));
+		auto ApplyMateril2 = [&sponza_go, &shader2]
 		(const char* go_name, const std::string& diffuse_tex)
 		{
 			auto mesh0 = FindNamedChild(sponza_go, go_name);
 			auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
-			mtl->SetShader(shader2);
-			auto diffuse = AssetDatabase::LoadAssetAtPath<Texture>(textures_root / (diffuse_tex + ".png"));
-			//auto diffuse = tex_importer.FromFile(textures_root / (diffuse_tex + ".png"));
+			mtl->setShader(shader2);
+			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ diffuse_tex + ".png"));
 			mtl->SetTexture("DiffuseTex", diffuse);
 		};
-
+		
 		ApplyMateril2("mesh2", "vase_round");
 		ApplyMateril2("mesh3", "background");
 		ApplyMateril2("mesh4", "spnza_bricks_a_diff");
@@ -185,166 +112,27 @@ namespace FishEditor
 		ApplyMateril2("mesh22", "vase_dif");
 		ApplyMateril2("mesh23", "lion");
 		ApplyMateril2("mesh24", "sponza_roof_diff");
-
+		
 		auto transform = Camera::main()->gameObject()->transform();
 		transform->setPosition(5, 8, 0);
 		transform->setLocalEulerAngles(30, -90, 0);
-
+		
 		transform = Camera::mainGameCamera()->gameObject()->transform();
 		transform->setPosition(5, 8, 0);
 		transform->setLocalEulerAngles(30, -90, 0);
-#elif 0
-		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
-		Object::Instantiate(model);
+	}
 	
-		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
-		model = Object::Instantiate(model);
-		
-#if FISHENGINE_PLATFORM_WINDOWS
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
-#else
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libSponza.dylib";
-#endif
-		if ( !boost::filesystem::exists(shared_lib_path) )
-		{
-			Debug::LogError("%s not found", shared_lib_path.string().c_str());
-			abort();
-		}
-		//FishEngine::Path shared_lib_path("/Users/yushroom/FishEngine/Projects/Sponza/build");
-		//shared_lib_path /= "Sponza.dll";
-		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
-		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
-		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
-			deleteFunc(s);
-		});
-
-		model->AddComponent(rotator);
-#elif 0
-		QualitySettings::setShadowDistance(20);
-		light_go->transform()->setLocalEulerAngles(50, 150, 0);
-		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
-
-		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
-		model = Object::Instantiate(model);
-		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/ground.jpg"));
-			assert(tex != nullptr);
-			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
-			material->setMainTexture(tex);
-			plane->GetComponent<MeshRenderer>()->SetMaterial(material);
-		}
-
-		auto albedo_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Albedo.surf"));
-		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/hvyweapon_red.tga"));
-			assert(tex != nullptr);
-			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
-			auto material = Material::CreateMaterial();
-			material->setShader(albedo_shader);
-			material->setMainTexture(tex);
-			auto renderers = model->GetComponentsInChildren<SkinnedMeshRenderer>();
-			for (auto & r : renderers)
-			{
-				r->SetMaterial(material);
-			}
-		}
-		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/heavy_head.tga"));
-			assert(tex != nullptr);
-			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
-			auto material = Material::CreateMaterial();
-			material->setShader(albedo_shader);
-			material->setMainTexture(tex);
-			FindNamedChild(model, "head_mesh")->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
-		}
-#elif 0
-		auto envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross.dds"));
-		assert(envmap != nullptr);
-		auto filtered_envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross_128_filtered.dds"));
-		assert(filtered_envmap != nullptr);
-		RenderSettings::setAmbientCubemap(filtered_envmap);
-		auto skybox = Material::InstantiateBuiltinMaterial("SkyboxCubed");
-		skybox->SetTexture("_Tex", envmap);
-		skybox->SetVector4("_Tint", Vector4::one);
-		skybox->SetFloat("_Exposure", 1);
-		skybox->SetFloat("_Rotation", 0);
-		RenderSettings::setSkybox(skybox);
-		
-		auto group = GameObject::Create();
-		group->setName("Group");
-		Scene::AddGameObject(group);
 	
-//		for (int x = -5; x < 5; ++x)
-//		{
-//			for (int y = -5; y <= 5; y++)
-//			{
-//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-//				go->transform()->SetParent(group->transform());
-//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
-//				go->transform()->setLocalEulerAngles(0, 30, 0);
-//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-//				MaterialPtr material;
-////				if (x == 0)
-////				{
-//					material = Material::InstantiateBuiltinMaterial("PBR");
-//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
-//				//}
-////				else
-////				{
-////					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
-////					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
-////				}
-//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
-//				//material->DisableKeyword(ShaderKeyword::Shadow);
-//				material->SetFloat("Metallic", 0.1f*(x+5));
-//				material->SetFloat("Roughness", 0.1f*(y+5));
-//				material->SetFloat("Specular", 0.5);
-//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-//				auto renderer = go->GetComponent<MeshRenderer>();
-//				renderer->SetMaterial(material);
-//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
-//			}
-//		}
-		
-		for (int x = 0; x < 2; ++x)
-		{
-			for (int y = -5; y <= 5; y++)
-			{
-				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-				go->transform()->SetParent(group->transform());
-				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
-				go->transform()->setLocalEulerAngles(0, 30, 0);
-				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-				MaterialPtr material;
-				if (x == 0)
-				{
-					material = Material::InstantiateBuiltinMaterial("PBR");
-					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
-				}
-				else
-				{
-					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
-					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
-				}
-				material->EnableKeyword(ShaderKeyword::AmbientIBL);
-				//material->DisableKeyword(ShaderKeyword::Shadow);
-				material->SetFloat("Metallic", 0.0f);
-				material->SetFloat("Roughness", 0.1f*(y+5));
-				material->SetFloat("Specular", 0.5);
-				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-				auto renderer = go->GetComponent<MeshRenderer>();
-				renderer->SetMaterial(material);
-				renderer->setShadowCastingMode(ShadowCastingMode::Off);
-			}
-		}
-#else
+	void InitializeScene_UnityChan()
+	{
+		auto light_go = Light::mainLight()->gameObject();
 		//QualitySettings::setShadowDistance(20);
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 		
-//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
-//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
-//		auto chan_texture_dir = example_root / "textures";
+		//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
+		//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
+		//		auto chan_texture_dir = example_root / "textures";
 		As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tag"));
 		auto bodyTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tga"));
 		auto skinTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/skin_01.tga"));
@@ -365,7 +153,7 @@ namespace FishEditor
 		auto stageBaseTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/unitychan_tile3.png"));
 		auto stageMaskTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/AlphaMask.png"));
 		
-		material = Material::InstantiateBuiltinMaterial("Diffuse");
+		auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 		material->setMainTexture(stageBaseTexture);
 		plane->GetComponent<Renderer>()->SetMaterial(material);
 		
@@ -456,7 +244,7 @@ namespace FishEditor
 			renderer->setShadowCastingMode(ShadowCastingMode::Off);
 			renderer->setReceiveShadows(false);
 		}
-
+		
 		
 		material = Material::InstantiateBuiltinMaterial("Transparent");
 		material->setName("eye_R1");
@@ -503,12 +291,207 @@ namespace FishEditor
 			renderer->setShadowCastingMode(ShadowCastingMode::Off);
 			renderer->setReceiveShadows(false);
 		}
+	}
+	
+	
+	void InitializeScene_PBR()
+	{
+		auto envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross.dds"));
+		assert(envmap != nullptr);
+		auto filtered_envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross_128_filtered.dds"));
+		assert(filtered_envmap != nullptr);
+		RenderSettings::setAmbientCubemap(filtered_envmap);
+		auto skybox = Material::InstantiateBuiltinMaterial("SkyboxCubed");
+		skybox->SetTexture("_Tex", envmap);
+		skybox->SetVector4("_Tint", Vector4::one);
+		skybox->SetFloat("_Exposure", 1);
+		skybox->SetFloat("_Rotation", 0);
+		RenderSettings::setSkybox(skybox);
 		
-
+		auto group = GameObject::Create();
+		group->setName("Group");
+		Scene::AddGameObject(group);
+		
+		//		for (int x = -5; x < 5; ++x)
+		//		{
+		//			for (int y = -5; y <= 5; y++)
+		//			{
+		//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+		//				go->transform()->SetParent(group->transform());
+		//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
+		//				go->transform()->setLocalEulerAngles(0, 30, 0);
+		//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+		//				MaterialPtr material;
+		////				if (x == 0)
+		////				{
+		//					material = Material::InstantiateBuiltinMaterial("PBR");
+		//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
+		//				//}
+		////				else
+		////				{
+		////					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
+		////					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
+		////				}
+		//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
+		//				//material->DisableKeyword(ShaderKeyword::Shadow);
+		//				material->SetFloat("Metallic", 0.1f*(x+5));
+		//				material->SetFloat("Roughness", 0.1f*(y+5));
+		//				material->SetFloat("Specular", 0.5);
+		//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
+		//				auto renderer = go->GetComponent<MeshRenderer>();
+		//				renderer->SetMaterial(material);
+		//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
+		//			}
+		//		}
+		
+		for (int x = 0; x < 2; ++x)
+		{
+			for (int y = -5; y <= 5; y++)
+			{
+				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+				go->transform()->SetParent(group->transform());
+				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
+				go->transform()->setLocalEulerAngles(0, 30, 0);
+				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+				MaterialPtr material;
+				if (x == 0)
+				{
+					material = Material::InstantiateBuiltinMaterial("PBR");
+					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
+				}
+				else
+				{
+					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
+					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
+				}
+				material->EnableKeyword(ShaderKeyword::AmbientIBL);
+				//material->DisableKeyword(ShaderKeyword::Shadow);
+				material->SetFloat("Metallic", 0.0f);
+				material->SetFloat("Roughness", 0.1f*(y+5));
+				material->SetFloat("Specular", 0.5);
+				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
+				auto renderer = go->GetComponent<MeshRenderer>();
+				renderer->SetMaterial(material);
+				renderer->setShadowCastingMode(ShadowCastingMode::Off);
+			}
+		}
+	}
+	
+	
+	void InitializeScene_TestShadow()
+	{
+		//QualitySettings::setShadowDistance(20);
+		ModelImporter importer;
+		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/Terrain.obj"));
+		auto terrainGO = Object::Instantiate(model);
+		auto material = Material::InstantiateBuiltinMaterial("DebugCSM");
+		//auto material = Material::defaultMaterial();
+		//material->EnableKeyword(ShaderKeyword::Shadow);
+		
+		//TextureImporter texture_importer;
+		//auto bakedAO = texture_importer.FromFile(root_dir + "bakedAO.jpg");
+		//material->setMainTexture(bakedAO);
+		terrainGO->GetComponent<MeshRenderer>()->SetMaterial(material);
+	}
+	
+	void InitializeScene_IllustrativeRendering()
+	{
+		auto light_go = Light::mainLight()->gameObject();
+		//QualitySettings::setShadowDistance(20);
+		light_go->transform()->setLocalEulerAngles(50, 150, 0);
+		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+		
+		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
+		model = Object::Instantiate(model);
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/ground.jpg"));
+			assert(tex != nullptr);
+			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			material->setMainTexture(tex);
+			plane->GetComponent<MeshRenderer>()->SetMaterial(material);
+		}
+		
+		auto albedo_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Albedo.surf"));
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/hvyweapon_red.tga"));
+			assert(tex != nullptr);
+			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			auto material = Material::CreateMaterial();
+			material->setShader(albedo_shader);
+			material->setMainTexture(tex);
+			auto renderers = model->GetComponentsInChildren<SkinnedMeshRenderer>();
+			for (auto & r : renderers)
+			{
+				r->SetMaterial(material);
+			}
+		}
+		{
+			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/heavy_head.tga"));
+			assert(tex != nullptr);
+			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
+			auto material = Material::CreateMaterial();
+			material->setShader(albedo_shader);
+			material->setMainTexture(tex);
+			FindNamedChild(model, "head_mesh")->GetComponent<SkinnedMeshRenderer>()->SetMaterial(material);
+		}
+	}
+	
+	
+	void InitializeScene_Script()
+	{
+		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/testFBX.fbx") );
+		Object::Instantiate(model);
+		
+		model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
+		model = Object::Instantiate(model);
+		
+#if FISHENGINE_PLATFORM_WINDOWS
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/Sponza.dll";
+#else
+		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libSponza.dylib";
 #endif
+		if ( !boost::filesystem::exists(shared_lib_path) )
+		{
+			Debug::LogError("%s not found", shared_lib_path.string().c_str());
+			abort();
+		}
+		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
+		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
+		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
+			deleteFunc(s);
+		});
+		
+		model->AddComponent(rotator);
+	}
+	
 
-#endif
+	void DefaultScene()
+	{
+//	    auto camera = Camera::Create();
+//	    auto camera_go = Scene::CreateGameObject("Main Camera");
+//	    camera_go->AddComponent(camera);
+//	    camera_go->AddComponent<CameraController>();
+		auto camera_go = Scene::CreateCamera();
+		camera_go->setName("Main Camera");
+		auto camera = camera_go->GetComponent<Camera>();
 
+		camera_go->transform()->setLocalPosition(0, 1, -10);
+		camera_go->setTag("MainCamera");
+		//camera_go->AddComponent<TakeScreenShot>();
+
+		auto light_go = Scene::CreateGameObject("Directional Light");
+		light_go->transform()->setPosition(0, 3, 0);
+		light_go->transform()->setLocalEulerAngles(50, -30, 0);
+		light_go->AddComponent(Light::Create());
+
+		auto material = Material::InstantiateBuiltinMaterial("SkyboxProcedural");
+		material->SetFloat("_AtmosphereThickness", 1.0);
+		//material->SetFloat("_SunDisk", 2);
+		material->SetFloat("_SunSize", 0.04f);
+		material->SetVector4("_SkyTint", Vector4(0.5f, 0.5f, 0.5f, 1));
+		material->SetVector4("_GroundColor", Vector4(.369f, .349f, .341f, 1));
+		material->SetFloat("_Exposure", 1.3f);
+		RenderSettings::setSkybox(material);
 	}
 
 	//bool MainEditor::m_inPlayMode = false;
@@ -528,6 +511,24 @@ namespace FishEditor
 
 		m_mainSceneViewEditor->Init();
 		DefaultScene();
+		
+		auto exampleName = Application::dataPath().parent_path().stem().string();
+		if (exampleName == "UnityChan")
+		{
+			InitializeScene_UnityChan();
+		}
+		else if (exampleName == "Sponza")
+		{
+			InitializeScene_Sponza();
+		}
+		else if (exampleName == "PBR")
+		{
+			InitializeScene_PBR();
+		}
+		else if (exampleName == "Illustrative-Rendering")
+		{
+			InitializeScene_IllustrativeRendering();
+		}
 
 		glClearColor(1.0f, 0.0f, 0.0f, 1);
 		OnInitialized();

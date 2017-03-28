@@ -161,7 +161,8 @@ namespace FishEngine
 				aabb.Encapsulate(view_corners[i]);
 			}
 
-#if 1
+#define CSM_SPLIT_SPHERE
+#ifdef CSM_SPLIT_SPHERE
 			float sphereRadius = 0.0f;
 			for (auto& c : world_corners)
 			{
@@ -196,32 +197,35 @@ namespace FishEngine
 			float scaleX = 2.0f / (max_p.x - min_p.x);
 			float scaleY = 2.0f / (max_p.y - min_p.y);
 			constexpr float scaleQuantizer = 64.0f;
-
-			scaleX = 1.0f / std::ceil(1.0f / scaleX * scaleQuantizer) * scaleQuantizer;
-			scaleY = 1.0f / std::ceil(1.0f / scaleY * scaleQuantizer) * scaleQuantizer;
+			scaleX = 1.0f / std::ceilf(1.0f / scaleX * scaleQuantizer) * scaleQuantizer;
+			scaleY = 1.0f / std::ceilf(1.0f / scaleY * scaleQuantizer) * scaleQuantizer;
 			float offsetX = -0.5f * (max_p.x + min_p.x) * scaleX;
 			float offsetY = -0.5f * (max_p.y + min_p.y) * scaleY;
 			const float halfTextureSize = 0.5f * light->m_shadowMap->width();
-			offsetX = std::ceil(offsetX * halfTextureSize) / halfTextureSize;
-			offsetY = std::ceil(offsetY * halfTextureSize) / halfTextureSize;
-			eye_pos.x += offsetX;
-			eye_pos.y += offsetY;
+			offsetX = std::ceilf(offsetX * halfTextureSize) / halfTextureSize;
+			offsetY = std::ceilf(offsetY * halfTextureSize) / halfTextureSize;
+			auto& forward = light_dir; // +z
+			auto right = Vector3::Cross(Vector3(0, 1, 0), forward); // +x
+			auto up = Vector3::Cross(forward, right); // +y
+			eye_pos += right * offsetX + up * offsetY;
+			split_centroid += right * offsetX + up * offsetY;
 			//Gizmos::DrawWireSphere(eye_pos, 0.5f);
 			world_to_light = Matrix4x4::LookAt(eye_pos, split_centroid, Vector3::up);
 			light->m_projectMatrixForShadowMap[i] = Matrix4x4::Ortho(min_p.x, max_p.x, min_p.y, max_p.y, z_near, z_far);
 			light->m_viewMatrixForShadowMap[i] = world_to_light;
 #else
-			eye_pos = -light_dir * sphereRadius + split_centroid;
-			auto shadowView = Matrix4x4::LookAt(eye_pos, split_centroid, Vector3::up);
+			//Debug::Log("sphereRadius: %lf", sphereRadius);
+			auto shadowCameraPos = -light_dir * sphereRadius + split_centroid;
+			auto shadowView = Matrix4x4::LookAt(shadowCameraPos, split_centroid, Vector3::up);
 			auto shadowProj = Matrix4x4::Ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, 0, cascadeExtents.z);
 
+			const float halfShadowMapSize = 0.5f * light->m_shadowMap->width();
 			auto shadowMatrix = shadowProj * shadowView;
-			Vector3 shadowOrigin = shadowMatrix.MultiplyPoint(Vector3::zero);
-			const float sMapSize = light->m_shadowMap->width();
-			shadowOrigin *= sMapSize;
+			Vector3 shadowOrigin = shadowMatrix.MultiplyPoint3x4(Vector3::zero);
+			shadowOrigin *= halfShadowMapSize;
 			Vector3 roundedOrigin{ std::round(shadowOrigin.x), std::round(shadowOrigin.y), std::round(shadowOrigin.z) };
 			Vector3 roundOffset = roundedOrigin - shadowOrigin;
-			roundOffset /= sMapSize;
+			roundOffset /= halfShadowMapSize;
 			roundOffset.z = 0.0f;
 
 			shadowProj[0][3] += roundOffset.x;

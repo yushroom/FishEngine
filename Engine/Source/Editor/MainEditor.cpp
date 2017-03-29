@@ -58,60 +58,213 @@ namespace FishEditor
 	void InitializeScene_Sponza()
 	{
 		//QualitySettings::setShadowDistance(30);
-		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
-		
-		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.obj"));
-		//auto sponza_model = handle.get();
+		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.fbx"));
 		auto sponza_go = Object::Instantiate(sponza_model);
 		
-		auto ApplyMateril1 = [&sponza_go, &shader1]
-		(const char* go_name, const std::string& diffuse_tex, const std::string& mask_tex)
+		
+		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
+		assert(shader1 != nullptr);
+		auto createMaterial1 = [&sponza_go, &shader1] (const std::string& diffuse_tex, const std::string& mask_tex) -> MaterialPtr
 		{
-			auto mesh0 = FindNamedChild(sponza_go, go_name);
-			auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+			auto mtl = Material::CreateMaterial();
+			mtl->setName(diffuse_tex);
 			mtl->setShader(shader1);
-			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ diffuse_tex + ".png"));
-			auto mask = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ mask_tex + ".png"));
+			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ diffuse_tex + ".png"));
+			assert(diffuse != nullptr);
+			auto mask = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ mask_tex + ".png"));
+			assert(mask != nullptr);
 			mtl->SetTexture("DiffuseTex", diffuse);
 			mtl->SetTexture("MaskTex", mask);
+			mtl->SetFloat("Roughness", 0.5f);
+			mtl->SetFloat("Specular", 0.5f);
+			return mtl;
 		};
-		
-		ApplyMateril1("mesh0", "sponza_thorn_diff", "sponza_thorn_mask");
-		ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
-		ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
+
 		
 		auto shader2 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_bump.shader"));
-		auto ApplyMateril2 = [&sponza_go, &shader2]
-		(const char* go_name, const std::string& diffuse_tex)
+		assert(shader2 != nullptr);
+		auto createMaterial2 = [&shader2] (const std::string& diffuse_tex) -> MaterialPtr
 		{
-			auto mesh0 = FindNamedChild(sponza_go, go_name);
-			auto mtl = mesh0->GetComponent<MeshRenderer>()->material();
+			auto mtl = Material::CreateMaterial();
+			mtl->setName(diffuse_tex);
 			mtl->setShader(shader2);
-			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/"+ diffuse_tex + ".png"));
+			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ diffuse_tex + ".png"));
+			assert(diffuse != nullptr);
+			mtl->SetFloat("Roughness", 0.5f);
+			mtl->SetFloat("Specular", 0.5f);
 			mtl->SetTexture("DiffuseTex", diffuse);
+			return mtl;
 		};
 		
-		ApplyMateril2("mesh2", "vase_round");
-		ApplyMateril2("mesh3", "background");
-		ApplyMateril2("mesh4", "spnza_bricks_a_diff");
-		ApplyMateril2("mesh5", "sponza_arch_diff");
-		ApplyMateril2("mesh6", "sponza_ceiling_a_diff");
-		ApplyMateril2("mesh7", "sponza_column_a_diff");
-		ApplyMateril2("mesh8", "sponza_floor_a_diff");
-		ApplyMateril2("mesh9", "sponza_column_c_diff");
-		ApplyMateril2("mesh10", "sponza_details_diff");
-		ApplyMateril2("mesh11", "sponza_column_b_diff");
-		ApplyMateril2("mesh13", "sponza_flagpole_diff");
-		ApplyMateril2("mesh14", "sponza_fabric_green_diff");
-		ApplyMateril2("mesh15", "sponza_fabric_blue_diff");
-		ApplyMateril2("mesh16", "sponza_fabric_diff");
-		ApplyMateril2("mesh17", "sponza_curtain_blue_diff");
-		ApplyMateril2("mesh18", "sponza_curtain_diff");
-		ApplyMateril2("mesh19", "sponza_curtain_green_diff");
-		ApplyMateril2("mesh21", "vase_hanging");
-		ApplyMateril2("mesh22", "vase_dif");
-		ApplyMateril2("mesh23", "lion");
-		ApplyMateril2("mesh24", "sponza_roof_diff");
+		
+		auto ApplyMaterial = [&sponza_go](std::string const & go_name, MaterialPtr mtl)
+		{
+			auto go = FindNamedChild(sponza_go, go_name);
+			assert(go != nullptr);
+			go->GetComponent<MeshRenderer>()->SetMaterial(mtl);
+		};
+		
+		
+		
+		std::string prefix = "sponza_";
+		
+		auto material = createMaterial2("background");
+		for (auto i : {"03", "377", "378"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("lion");
+		ApplyMaterial("sponza_377", material);
+		ApplyMaterial("sponza_378", material);
+		
+		material = createMaterial2("spnza_bricks_a_diff");
+		for (auto i : {"05", "06", "34", "36", "66", "68", "69", "71", "72", "75", "116", "258", "379", "382"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_arch_diff");
+		for (auto i : {"07", "17", "20", "21", "37", "39", "41", "43", "45", "47", "49", "51", "53", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "67", "122", "123", "124"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_ceiling_a_diff");
+		for (auto i : {"08", "19", "35", "38", "40", "42", "44", "46", "48", "50", "52", "54"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_column_a_diff");
+		for (auto i : {"09", "10", "11", "12", "13", "14", "15", "16", "118", "119", "120", "121"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		
+		material = createMaterial2("sponza_column_b_diff");
+		for (int i = 125; i <= 256; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		material = createMaterial2("sponza_column_c_diff");
+		for (int i = 22; i <= 33; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+
+		}
+		for (int i = 76; i <= 115; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		material = createMaterial2("sponza_curtain_blue_diff");
+		for (auto i : {"320", "326", "329"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_curtain_diff");
+		for (auto i : {"321", "323", "325", "328"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_curtain_green_diff");
+		for (auto i : {"322", "324", "327"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_details_diff");
+		for (auto i : {"70", "71", "72", "73", "74"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_fabric_blue_diff");
+		for (auto i : {"283", "286", "289"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_fabric_diff");
+		ApplyMaterial("sponza_284", material);
+		ApplyMaterial("sponza_288", material);
+		
+		material = createMaterial2("sponza_fabric_green_diff");
+		for (auto i : {"282", "285", "287"})
+		{
+			ApplyMaterial(prefix + i, material);
+		}
+		
+		material = createMaterial2("sponza_flagpole_diff");
+		for (int i = 259; i <= 274; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		for (int i = 290; i <= 319; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		material = createMaterial2("sponza_floor_a_diff");
+		ApplyMaterial("sponza_18", material);
+		ApplyMaterial("sponza_117", material);
+		
+		material = createMaterial2("sponza_roof_diff");
+		ApplyMaterial("sponza_380", material);
+		ApplyMaterial("sponza_381", material);
+		
+		
+		material = createMaterial2("vase_dif");
+		for (int i = 373; i <= 376; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		material = createMaterial2("vase_hanging");
+		for (int i = 334; i <= 338; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		for (int i = 343; i <= 347; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		for (int i = 52; i <= 56; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		for (int i = 62; i <= 65; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		
+		material = createMaterial1("sponza_thorn_diff", "sponza_thorn_mask");
+		ApplyMaterial("sponza_00", material);
+		for (int i = 275; i <= 281; ++i)
+		{
+			auto name = prefix + boost::lexical_cast<std::string>(i);
+			ApplyMaterial(name, material);
+		}
+		
+		
+//		ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
+//		ApplyMateril1("mesh20", "chain_texture", "chain_texture_mask");
 		
 		auto transform = Camera::main()->gameObject()->transform();
 		transform->setPosition(5, 8, 0);
@@ -563,6 +716,7 @@ namespace FishEditor
 		glViewport(0, 0, Screen::width(), Screen::height());
 		auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
 		auto mtl = Material::builtinMaterial("DrawQuad");
+		mtl->SetVector4("DrawRectParameters", Vector4(-1, -1, 1, 1));
 		mtl->setMainTexture(m_mainSceneViewEditor->m_colorBuffer);
 		Graphics::DrawMesh(quad, mtl);
 		//Debug::Log("paintGL");

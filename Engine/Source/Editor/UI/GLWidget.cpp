@@ -38,7 +38,7 @@ void GLWidget::initializeGL()
 
 	auto timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(1000 / 30.0f); // 30 fps
+	timer->start(1000 / 10.0f); // 10 fps
 }
 
 void GLWidget::paintGL()
@@ -61,7 +61,7 @@ void GLWidget::resizeGL(int width, int height)
 {
 	Debug::Log("resize w=%d h =%d", width, height);
 	int ratio = QApplication::desktop()->devicePixelRatio();
-	Debug::LogWarning("ratio: %d", ratio);
+	Debug::Log("[GLWidget::resizeGL] ratio = %d", ratio);
 	Screen::setPixelsPerPoint(ratio);
 	MainEditor::Resize(width, height);
 	//m_mainSceneViewEditor->Resize(width*ratio, height*ratio);

@@ -154,7 +154,7 @@ void Inspector::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 	EditorGUI::FloatField("Instance ID", meshFilter->GetInstanceID());
 	EditorGUI::ObjectField("Mesh", meshFilter->m_mesh);
 	EditorGUI::FloatField("mesh verts", meshFilter->m_mesh->vertexCount());
-	EditorGUI::FloatField("mesh tris", meshFilter->m_mesh->triangles());
+	//EditorGUI::FloatField("mesh tris", meshFilter->m_mesh->triangles());
 }
 
 

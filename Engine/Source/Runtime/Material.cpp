@@ -152,58 +152,64 @@ namespace FishEngine
 
 	void Material::SetFloat(const std::string& name, const float value)
 	{
-		if (FindUniformInShader<float>(m_shader->m_uniforms, name))
-		{
-			m_uniforms.floats[name] = value;
-			return;
-		}
-		Debug::LogWarning("Uniform %s[float] not found.", name.c_str());
+//		if (FindUniformInShader<float>(m_shader->m_uniforms, name))
+//		{
+//			m_uniforms.floats[name] = value;
+//			return;
+//		}
+//		Debug::LogWarning("Uniform %s[float] not found.", name.c_str());
+		
+		m_uniforms.floats[name] = value;
 	}
 
 
 	void Material::SetVector2(const std::string& name, const Vector2& value)
 	{
-		if (FindUniformInShader<Vector2>(m_shader->m_uniforms, name))
-		{
-			m_uniforms.vec2s[name] = value;
-			return;
-		}
-		Debug::LogWarning("Uniform %s[vec2] not found.", name.c_str());
+//		if (FindUniformInShader<Vector2>(m_shader->m_uniforms, name))
+//		{
+//			m_uniforms.vec2s[name] = value;
+//			return;
+//		}
+//		Debug::LogWarning("Uniform %s[vec2] not found.", name.c_str());
+		m_uniforms.vec2s[name] = value;
 	}
 
 	void Material::SetVector3(const std::string& name, const Vector3& value)
 	{
-		if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name))
-		{
-			m_uniforms.vec3s[name] = value;
-			return;
-		}
-		Debug::LogWarning("Uniform %s[vec3] not found.", name.c_str());
+//		if (FindUniformInShader<Vector3>(m_shader->m_uniforms, name))
+//		{
+//			m_uniforms.vec3s[name] = value;
+//			return;
+//		}
+//		Debug::LogWarning("Uniform %s[vec3] not found.", name.c_str());
+		m_uniforms.vec3s[name] = value;
 	}
 
 
 	void Material::SetVector4(const std::string& name, const Vector4& value)
 	{
-		if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name))
-		{
-			m_uniforms.vec4s[name] = value;
-			return;
-		}
-		Debug::LogWarning("Uniform %s[vec4] not found.", name.c_str());
+//		if (FindUniformInShader<Vector4>(m_shader->m_uniforms, name))
+//		{
+//			m_uniforms.vec4s[name] = value;
+//			return;
+//		}
+//		Debug::LogWarning("Uniform %s[vec4] not found.", name.c_str());
+		m_uniforms.vec4s[name] = value;
 	}
 
 
 	void Material::SetTexture(const std::string& name, TexturePtr texture)
 	{
-		for (auto& u : m_shader->m_uniforms)
-		{
-			if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY || u.type == GL_SAMPLER_2D_ARRAY_SHADOW))
-			{
-				m_textures[name] = texture;
-				return;
-			}
-		}
-		Debug::LogWarning("Uniform %s[texture] not found.", name.c_str());
+//		for (auto& u : m_shader->m_uniforms)
+//		{
+//			if (u.name == name && (u.type == GL_SAMPLER_2D || u.type == GL_SAMPLER_CUBE || u.type == GL_SAMPLER_2D_ARRAY || u.type == GL_SAMPLER_2D_ARRAY_SHADOW))
+//			{
+//				m_textures[name] = texture;
+//				return;
+//			}
+//		}
+//		Debug::LogWarning("Uniform %s[texture] not found.", name.c_str());
+		m_textures[name] = texture;
 	}
 
 

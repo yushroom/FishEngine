@@ -8,7 +8,10 @@
 #include "Debug.hpp"
 #include "Color.hpp"
 
+#include "Shader/ShaderCompileError.hpp"
+
 using namespace std;
+using namespace FishEngine;
 
 constexpr size_t npos = std::numeric_limits<size_t>::max();
 
@@ -17,7 +20,7 @@ static std::string ReadFile(const FishEngine::Path& path)
 	std::ifstream fin(path.string());
 	if (!fin.is_open()) {
 		FishEngine::Debug::LogError("Can not open shader file: %s", path.string().c_str());
-		throw exception();
+		throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::FileNotFound);
 	}
 	return std::string(
 		std::istreambuf_iterator<char>(fin.rdbuf()),
@@ -163,16 +166,25 @@ public:
 		RangeCheck();
 		ignoreSpace(m_string, m_cursor);
 		auto end = m_string.find_first_of(target, m_cursor);
+		if (end == std::string::npos)
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::InvalidSyntax);
+		}
 		std::string ret = m_string.substr(m_cursor, end - m_cursor);
 		m_cursor = end+1;
 		return ret;
 	}
 
 	// ')'
-	std::string NextTokenUntilRightParenthesis()
+	std::string NextTokenUntilRightParentheese()
 	{
 		auto pos = findRightPair(m_string, m_cursor, '(', ')');
-		assert(pos != npos); // unmatched parenthesis
+		//assert(pos != npos); // unmatched parenthesis
+		if (pos == npos)
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::UnMatchedParenthese);
+		}
+
 		auto begin = m_cursor;
 		m_cursor = pos + 1;
 		return m_string.substr(begin, pos - begin);
@@ -191,7 +203,11 @@ public:
 		RangeCheck();
 		ignoreSpace(m_string, m_cursor);
 		bool result = expect(m_string, m_cursor, target);
-		assert(result);		// syntax error
+		//assert(result);		// syntax error
+		if (!result)
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::InvalidSyntax);
+		}
 	}
 
 	void Expect(std::string const & target)
@@ -199,19 +215,31 @@ public:
 		RangeCheck();
 		ignoreSpace(m_string, m_cursor);
 		bool result = expect(m_string, m_cursor, target);
-		assert(result);		// syntax error
+		//assert(result);		// syntax error
+		if (!result)
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::InvalidSyntax);
+		}
 	}
 
 	// assert eof
 	void ExpectEndOfFile()
 	{
 		ignoreSpace(m_string, m_cursor);
-		assert(m_cursor == m_string.size());
+		//assert(m_cursor >= m_string.size());
+		if (m_cursor < m_string.size())
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::InvalidSyntax);
+		}
 	}
 
 	void RangeCheck()
 	{
-		assert(m_cursor < m_string.size()); // early end of file
+		assert(m_cursor < m_string.size());
+		if (m_cursor >= m_string.size()) // early end of file
+		{
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::EarlyEndOfFile);
+		}
 	}
 };
 
@@ -303,7 +331,8 @@ namespace FishEngine
 		{
 			return ShaderBlendFactor::OneMinusDstAlpha;
 		}
-		abort();
+		//abort();
+		throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::UnknownType);
 	}
 
 	std::string ShaderCompiler::PreprocessImpl(const std::string& shaderText, const Path& localDir)
@@ -371,7 +400,10 @@ namespace FishEngine
 					expect(shaderText, cursor, "{");
 					auto begin = cursor;
 					auto end = findPair(shaderText, cursor);
-					if (end == npos) abort();
+					if (end == npos)
+					{
+						throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::InvalidSyntax);
+					}
 					cursor = end + 1;
 					std::string properitesString = shaderText.substr(begin + 1, end - begin - 1);
 					//Debug::Log("properitesString %s", properitesString.c_str());
@@ -386,7 +418,7 @@ namespace FishEngine
 						tokenizer.Expect('"');
 						std::string displayName = tokenizer.NextTokenUntil('"');
 						tokenizer.Expect(',');
-						std::string type = tokenizer.NextTokenUntilRightParenthesis();
+						std::string type = tokenizer.NextTokenUntilRightParentheese();
 						boost::trim(type);
 						tokenizer.Expect('=');
 						std::string defaultValue = tokenizer.RemainingString();
@@ -538,7 +570,8 @@ namespace FishEngine
 		}
 		else
 		{
-			abort(); // unknown property type
+			//abort(); // unknown property type
+			throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::UnknownType);
 		}
 		m_names.emplace_back(std::make_pair(displayName, name));
 	}

@@ -164,6 +164,7 @@ void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
 MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 {
 	assert(fbxMesh->IsTriangleMesh());
+	fbxMesh->RemoveBadPolygons();
 	fbxMesh->GenerateNormals(false, true, false);
 	fbxMesh->GenerateTangentsDataForAllUVSets();
 	auto name1 = fbxMesh->GetName();

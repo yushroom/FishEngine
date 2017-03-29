@@ -381,8 +381,8 @@ namespace FishEngine
 			m_savedProperties = compiler.m_savedProperties;
 
 			m_impl->set(parsed_shader_text);
-			m_impl->CompileAndLink(m_keywords);
-			m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+			//m_impl->CompileAndLink(m_keywords);
+			//m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
 		}
 		catch (const std::exception& e)
 		{
@@ -456,11 +456,12 @@ namespace FishEngine
 
 	void Shader::Use()
 	{
-		//if (m_GLNativeProgram == 0)
-		//{
-		//	m_impl->CompileAndLink(m_keywords);
-		//	m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
-		//}
+		if (m_GLNativeProgram == 0)
+		{
+			m_impl->CompileAndLink(m_keywords);
+			m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+		}
+		assert(m_GLNativeProgram != 0);
 		glUseProgram(m_GLNativeProgram);
 		for (auto& u : m_uniforms)
 		{

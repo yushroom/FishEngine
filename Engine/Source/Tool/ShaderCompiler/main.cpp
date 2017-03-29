@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\PBR.surf)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
-	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/Deferred.shader";
+	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/PBR.surf";
 	ShaderCompiler::setShaderIncludeDir("/Users/yushroom/program/FishEngine/Engine/Shaders/include");
 #endif
 

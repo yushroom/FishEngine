@@ -38,7 +38,7 @@ namespace FishEngine
 			}
 		}
 		// more than MaxBoneForEachVertex
-		Debug::LogWarning("[BoneWeight::AddBoneData] more than %d bones", MaxBoneForEachVertex);
+		Debug::Log("[BoneWeight::AddBoneData] more than %d bones", MaxBoneForEachVertex);
 
 		int minId = 0;
 		float minWeight = this->weight[0];
@@ -98,6 +98,7 @@ namespace FishEngine
 	{
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
 		m_triangleCount = static_cast<uint32_t>(triangles.size() / 3);
+		m_subMeshFaceCount.push_back(m_triangleCount);
 	}
 
 	//Mesh::Mesh(Mesh&& m)

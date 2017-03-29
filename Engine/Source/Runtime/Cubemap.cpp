@@ -1,6 +1,6 @@
 #include "Cubemap.hpp"
 
-void FishEngine::Cubemap::UploadToGPU() const
+void FishEngine::Cubemap::UploadToGPU()
 {
 	if (m_uploaded)
 		return;

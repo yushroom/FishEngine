@@ -98,7 +98,7 @@ namespace FishEngine
 	{
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
 		m_triangleCount = static_cast<uint32_t>(triangles.size() / 3);
-		m_subMeshFaceCount.push_back(m_triangleCount);
+		m_subMeshIndexOffset.push_back(m_triangleCount);
 	}
 
 	//Mesh::Mesh(Mesh&& m)
@@ -160,13 +160,19 @@ namespace FishEngine
 	void Mesh::Clear()
 	{
 		m_vertices.clear();
+		m_vertices.shrink_to_fit();
 		m_normals.clear();
+		m_normals.shrink_to_fit();
 		m_uv.clear();
+		m_uv.shrink_to_fit();
 		m_tangents.clear();
+		m_tangents.shrink_to_fit();
 		m_triangles.clear();
+		m_triangles.shrink_to_fit();
 		//m_boneIndexBuffer.clear();
 		//m_boneWeightBuffer.clear();
 		m_boneWeights.clear();
+		m_boneWeights.shrink_to_fit();
 	}
 
 	void Mesh::Render()

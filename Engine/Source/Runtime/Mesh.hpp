@@ -103,9 +103,9 @@ namespace FishEngine
 		
 		// The number of sub-Meshes. Every Mesh has a separate triangle list.
 		// See Also: GetTriangles, SetTriangles.
-		int subMeshCount() const
+		uint32_t subMeshCount() const
 		{
-			return m_subMeshFaceCount.size();
+			return static_cast<uint32_t>(m_subMeshIndexOffset.size());
 		}
 		
 		
@@ -240,7 +240,7 @@ namespace FishEngine
 		std::vector<Vector2>    m_uv;
 		std::vector<Vector3>    m_tangents;
 		std::vector<uint32_t>   m_triangles;
-		std::vector<int>		m_subMeshFaceCount;	// face count for each submesh. .size() == subMeshCount
+		std::vector<uint32_t>	m_subMeshIndexOffset;	// index start position
 		//		std::vector<Int4>       m_boneIndexBuffer;
 		//		std::vector<Vector4>    m_boneWeightBuffer;
 

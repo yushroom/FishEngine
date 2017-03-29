@@ -45,7 +45,7 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui->listView->setDropIndicatorShown(true);
 	
 	ui->iconSizeSlider->setMinimum(0);
-	ui->iconSizeSlider->setMaximum(32);
+	ui->iconSizeSlider->setMaximum(16);
 	ui->iconSizeSlider->setValue(m_listViewIconSize);
 	OnIconSizeChanged(m_listViewIconSize);
 

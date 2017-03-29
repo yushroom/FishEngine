@@ -29,7 +29,7 @@
 	{
 		float Shadow = texture(ScreenShadow, UV).r;
 		FragColor = texture(_MainTex, UV);
-		FragColor.rgb *= Shadow;
+		FragColor.rgb *= Shadow * 0.7 + 0.3; // TODO
 		//FragColor.rgb = vec3(Shadow); //debug shadow
 		FragColor.a = 1.0;
 	}

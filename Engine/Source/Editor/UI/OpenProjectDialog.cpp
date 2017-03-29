@@ -41,7 +41,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 {
 #if 1
 #if FISHENGINE_PLATFORM_WINDOWS
-	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\UnityChan\Assets)";
+	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\Sponza\Assets)";
 #else
 	FishEngine::Application::s_dataPath = "/Users/yushroom/program/FishEngine/Example/Sponza/Assets";
 #endif

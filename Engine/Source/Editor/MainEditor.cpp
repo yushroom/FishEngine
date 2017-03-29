@@ -242,12 +242,12 @@ namespace FishEditor
 			auto name = prefix + boost::lexical_cast<std::string>(i);
 			ApplyMaterial(name, material);
 		}
-		for (int i = 52; i <= 56; ++i)
+		for (int i = 352; i <= 356; ++i)
 		{
 			auto name = prefix + boost::lexical_cast<std::string>(i);
 			ApplyMaterial(name, material);
 		}
-		for (int i = 62; i <= 65; ++i)
+		for (int i = 361; i <= 365; ++i)
 		{
 			auto name = prefix + boost::lexical_cast<std::string>(i);
 			ApplyMaterial(name, material);

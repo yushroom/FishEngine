@@ -260,7 +260,9 @@ namespace FishEditor
 			if (needResize)
 			{
 				Debug::LogWarning("resize image");
-				FreeImage_Rescale(dib, width, height);
+				auto newdib = FreeImage_Rescale(dib, width, height);
+				FreeImage_Unload(dib);
+				newdib = dib;
 			}
 			
 			auto imageType = FreeImage_GetImageType(dib);
@@ -363,7 +365,9 @@ namespace FishEditor
 			std::copy(data, data + length, texture->m_data.begin());
 			
 			// get icon
-			FreeImage_FlipVertical(dib);	// flip for Qt
+			//FreeImage_Rescale();
+			auto thumbnail = FreeImage_MakeThumbnail(dib, 64);
+			FreeImage_FlipVertical(thumbnail);	// flip for Qt
 			QImage::Format qformat;
 			if (format == TextureFormat::RGBA32)
 			{
@@ -372,7 +376,7 @@ namespace FishEditor
 			else if (format == TextureFormat::BGRA32)
 			{
 				// TODO
-				SwapRedBlue32(dib);
+				SwapRedBlue32(thumbnail);
 				//data = FreeImage_GetBits(dib);
 				qformat = QImage::Format_RGBA8888;
 			}
@@ -389,10 +393,15 @@ namespace FishEditor
 			{
 				abort();
 			}
+			data = FreeImage_GetBits(thumbnail);
+			width = FreeImage_GetWidth(thumbnail);
+			height = FreeImage_GetHeight(thumbnail);
+			length = width * height * (bpp / 8);
 			auto qimage = QImage(width, height, qformat);
 			std::copy(data, data + length, qimage.bits());
 			auto qpixmap = QPixmap::fromImage(std::move(qimage));
 			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(qpixmap);
+			FreeImage_Unload(thumbnail);
 
 			FreeImage_Unload(dib);
 			return;

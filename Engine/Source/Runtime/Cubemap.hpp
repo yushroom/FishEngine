@@ -46,7 +46,7 @@ namespace FishEngine
 		}
 		
 	protected:
-		virtual void UploadToGPU() const override;
+		virtual void UploadToGPU() override;
 
 	private:
 		// The format of the pixel data in the texture (Read Only).

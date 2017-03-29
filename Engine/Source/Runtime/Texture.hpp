@@ -32,7 +32,7 @@ namespace FishEngine
 			return m_height;
 		}
 
-		unsigned int GetNativeTexturePtr() const
+		unsigned int GetNativeTexturePtr()
 		{
 			if (!m_uploaded)
 				UploadToGPU();
@@ -110,7 +110,7 @@ namespace FishEngine
 
 		static std::vector<TexturePtr> s_textures;
 
-		virtual void UploadToGPU() const { m_uploaded = true; };
+		virtual void UploadToGPU() { m_uploaded = true; };
 
 		Meta(NonSerializable)
 		mutable bool m_uploaded = false;

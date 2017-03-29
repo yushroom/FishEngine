@@ -15,7 +15,7 @@ namespace FishEngine
 		std::copy(data, data + byteCount, m_data.begin());
 	}
 
-	void Texture2D::UploadToGPU() const
+	void Texture2D::UploadToGPU()
 	{
 		if (m_uploaded)
 			return;
@@ -86,6 +86,8 @@ namespace FishEngine
 		glCheckError();
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_uploaded = true;
+		m_data.clear();
+		m_data.shrink_to_fit();
 		glCheckError();
 	}
 }

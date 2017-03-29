@@ -15,6 +15,7 @@
 
 using namespace FishEngine;
 
+typedef std::uint32_t UINT32;
 
 Matrix4x4 FBXToNativeType(fbxsdk::FbxAMatrix const & fmatrix)
 {
@@ -30,11 +31,53 @@ Matrix4x4 FBXToNativeType(fbxsdk::FbxAMatrix const & fmatrix)
 	return Matrix4x4(f44);
 }
 
+
+
+Vector3 FBXToNativeType(const FbxVector4& value)
+{
+	Vector3 native;
+	native.x = (float)value[0];
+	native.y = (float)value[1];
+	native.z = (float)value[2];
+
+	return native;
+}
+
 Vector3 FBXToNativeType(const FbxDouble3& value)
 {
 	return Vector3(static_cast<float>(value[0]),
-				   static_cast<float>(value[1]),
-				   static_cast<float>(value[2]));
+		static_cast<float>(value[1]),
+		static_cast<float>(value[2]));
+}
+
+Vector2 FBXToNativeType(const FbxVector2& value)
+{
+	Vector2 native;
+	native.x = (float)value[0];
+	native.y = (float)value[1];
+
+	return native;
+}
+
+Color FBXToNativeType(const FbxColor& value)
+{
+	Color native;
+	native.r = (float)value[0];
+	native.g = (float)value[1];
+	native.b = (float)value[2];
+	native.a = (float)value[3];
+
+	return native;
+}
+
+FbxSurfaceMaterial* FBXToNativeType(FbxSurfaceMaterial* const& value)
+{
+	return value;
+}
+
+int FBXToNativeType(const int & value)
+{
+	return value;
 }
 
 
@@ -161,9 +204,18 @@ void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
 	}
 }
 
-MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
+
+MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 {
 	assert(fbxMesh->IsTriangleMesh());
+
+	auto it = m_model.m_fbxMeshLookup.find(fbxMesh);
+	if (it != m_model.m_fbxMeshLookup.end())
+	{
+		auto meshIndex = it->second;
+		return m_model.m_meshes[meshIndex];
+	}
+
 	fbxMesh->RemoveBadPolygons();
 	fbxMesh->GenerateNormals(false, true, false);
 	fbxMesh->GenerateTangentsDataForAllUVSets();
@@ -179,20 +231,111 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 	int vertexCount = fbxMesh->GetControlPointsCount();
 	FbxVector4* controlPoints = fbxMesh->GetControlPoints();
 
+	auto attributeCount = fbxMesh->GetNode()->GetNodeAttributeCount();
+	std::vector<FbxMesh*> submeshes;
+	for (int attributeIndex = 1; attributeIndex < attributeCount; ++attributeIndex)
+	{
+		auto nodeAttribute = fbxMesh->GetNode()->GetNodeAttributeByIndex(attributeIndex);
+		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+		{
+			FbxMesh* lMesh = (FbxMesh*)nodeAttribute;
+			submeshes.push_back(lMesh);
+			int submeshPolygonCount = lMesh->GetPolygonCount();
+			int submeshVertexCount = lMesh->GetControlPointsCount();
+		}
+	}
+
+
 	if (fbxMesh->GetElementUVCount() == 0)
 	{
 		abort();
 	}
-	
+
+	// get material info
+	int lMaterialCount = fbxMesh->GetNode()->GetMaterialCount();
+	if (lMaterialCount == 0)
+	{
+		// no material from fbx, set default material
+		abort();
+	}
+
 	// use RawMesh to construct Mesh
 	RawMesh rawMesh;
-	
+
 	rawMesh.SetFaceCount(polygonCount);
 	rawMesh.SetVertexCount(vertexCount);
+
+
+	int subMeshCount = lMaterialCount;
+	int hasSubMesh = subMeshCount > 1;
+
+
+	for (int i = 0; i < lMaterialCount; ++i)
+	{
+		auto lMaterial = fbxMesh->GetNode()->GetMaterial(i);
+		ParseMaterial(lMaterial);
+	}
+
+	// TODO:
+	// if this mesh only has one material, we assume this material applies to all polygons.
+	// Better choice is to apply default material to polygons without materials.
+
+	// use material info to split submeshes
 	
+	//std::vector<std::vector<int>> submeshPolygonIds;
+	if (hasSubMesh)
+	{
+		rawMesh.m_submeshMap.resize(polygonCount);
+		rawMesh.m_submeshPolygonIds.resize(subMeshCount);
+		//Debug::LogError("eByPolygon mapping material");
+		//auto lMaterialElement = fbxMesh->GetElementMaterial(l);
+		for (int l = 0; l < fbxMesh->GetElementMaterialCount(); l++)
+		{
+			auto lMaterialElement = fbxMesh->GetElementMaterial(l);
+			if (lMaterialElement->GetMappingMode() == FbxLayerElement::eByPolygon)
+			{
+				//int lMatId = lMaterialElement->GetIndexArray().GetAt(0);
+				//if (lMatId >= 0)
+				//{
+				//	auto lMaterial = fbxMesh->GetNode()->GetMaterial(lMatId);
+				//	ParseMaterial(lMaterial);
+				//}
+				//else
+				//{
+				//	abort();
+				//}
+
+				if (lMaterialElement->GetReferenceMode() == FbxLayerElement::eIndex ||
+					lMaterialElement->GetReferenceMode() == FbxLayerElement::eIndexToDirect)
+				{
+					int lIndexArrayCount = lMaterialElement->GetIndexArray().GetCount();
+					if (lIndexArrayCount != polygonCount)
+					{
+						abort();
+					}
+					for (int i = 0; i < polygonCount; i++)
+					{
+						int lMatId = lMaterialElement->GetIndexArray().GetAt(i);
+						rawMesh.m_submeshMap[i] = lMatId;
+						rawMesh.m_submeshPolygonIds[lMatId].push_back(i);
+					}
+				}
+				else
+				{
+					abort();
+				}
+			}
+			else
+			{
+				abort();
+			}
+		}
+	}
+
+	
+	// positions
 	for (int controlPointIndex = 0; controlPointIndex < vertexCount; ++controlPointIndex)
 	{
-		// Position
 		auto & p = controlPoints[controlPointIndex];
 		float scale = m_fileScale * m_globalScale;
 		float x = p[0] * scale;
@@ -201,6 +344,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 		rawMesh.m_vertexPositions.emplace_back(x, y, z);
 	}
 	
+	// indices(triangles)
 	for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
 	{
 		rawMesh.m_wedgeIndices.push_back( fbxMesh->GetPolygonVertex(polygonIndex, 0) );
@@ -211,8 +355,8 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 	int vertexId = 0;
 	for (int i = 0; i < polygonCount; i++)	// for each triangle
 	{
-		int lPolygonSize = fbxMesh->GetPolygonSize(i);
-
+		int lPolygonSize = fbxMesh->GetPolygonSize(i); // should be 3
+		assert(lPolygonSize == 3);
 		for (int j = 0; j < lPolygonSize; j++)
 		{
 			int lControlPointIndex = fbxMesh->GetPolygonVertex(i, j);
@@ -242,9 +386,9 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 //			}
 
 			// Normal
-			for (int l = 0; l < fbxMesh->GetElementNormalCount(); ++l)
-			{
-				FbxGeometryElementNormal* leNormal = fbxMesh->GetElementNormal(l);
+			//for (int l = 0; l < fbxMesh->GetElementNormalCount(); ++l)
+			//{
+				FbxGeometryElementNormal* leNormal = fbxMesh->GetElementNormal(0);
 				//FBXSDK_sprintf(header, 100, "            Normal: ");
 
 				if (leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
@@ -291,12 +435,12 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 				{
 					abort();
 				}
-			}
+			//}
 
 			// Tangent
-			for (int l = 0; l < fbxMesh->GetElementTangentCount(); ++l)
-			{
-				FbxGeometryElementTangent* leTangent = fbxMesh->GetElementTangent(l);
+			//for (int l = 0; l < fbxMesh->GetElementTangentCount(); ++l)
+			//{
+				FbxGeometryElementTangent* leTangent = fbxMesh->GetElementTangent(0);
 				//FBXSDK_sprintf(header, 100, "            Tangent: ");
 
 				if (leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
@@ -343,7 +487,7 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 				{
 					abort();
 				}
-			}
+			//}
 
 #if 0
 			// Binormal
@@ -372,20 +516,70 @@ MeshPtr FishEditor::FBXImporter::MeshFromFbxMesh(FbxMesh* fbxMesh)
 				}
 			}
 #endif
-			//rawMesh.WedgeIndices.push_back(vertexId);
-			//indexBuffer.push_back(vertexId * 3 + 1);
-			//indexBuffer.push_back(vertexId * 3 + 2);
 			vertexId++;
 		} // for polygonSize
 	} // for polygonCount
 	
+
+
 	auto mesh = rawMesh.ToMesh();
-	
 	GetLinkData(fbxMesh, mesh, rawMesh.m_vertexIndexRemapping);
 	
+	m_model.m_fbxMeshLookup[fbxMesh] = m_model.m_meshes.size();
+	m_model.m_meshes.push_back(mesh);
+
 	return mesh;
 }
 
+
+FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfaceMaterial * pMaterial)
+{
+	auto it = m_model.m_fbxMaterialLookup.find(pMaterial);
+	if (it != m_model.m_fbxMaterialLookup.end())
+	{
+		// already parsed
+		return m_model.m_materials[it->second];
+	}
+
+	auto ret_material = Material::CreateMaterial();
+	m_model.m_fbxMaterialLookup[pMaterial] = m_model.m_materials.size();
+	m_model.m_materials.push_back(ret_material);
+
+	FbxProperty lProperty;
+	//Diffuse Textures
+	lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
+	//DisplayTextureNames(lProperty, lConnectionString);
+	int lNbTextures = lProperty.GetSrcObjectCount<FbxTexture>();
+	if (lNbTextures > 0)
+	{
+		for (int j = 0; j < lNbTextures; ++j)
+		{
+			FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
+			if (lTexture)
+			{
+				std::string textureName = lTexture->GetName();
+				ret_material->setName(textureName);
+				auto * lFileTexture = FbxCast<FbxFileTexture>(lTexture);
+				if (lFileTexture == nullptr)
+				{
+					// do not support non-file texture
+					abort();
+				}
+				std::string texturePath = lFileTexture->GetFileName();
+				Debug::LogWarning("diffuse texture: %s", texturePath.c_str());
+			}
+			else
+			{
+				abort();
+			}
+		}
+	}
+	else
+	{
+		abort();
+	}
+	return ret_material;
+}
 
 void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex)
 {
@@ -556,14 +750,16 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 
 	FishEditor::AssetDatabase::s_allAssetObjects.insert(go);
 
+	auto nodeAttributeCount = pNode->GetNodeAttributeCount();
 	auto nodeAttribute = pNode->GetNodeAttribute();
+	
 	if (nodeAttribute != nullptr)
 	{
 		auto type = nodeAttribute->GetAttributeType();
 		if (type == FbxNodeAttribute::eMesh)
 		{
 			FbxMesh* lMesh = (FbxMesh*)nodeAttribute;
-			auto mesh = MeshFromFbxMesh(lMesh);
+			auto mesh = ParseMesh(lMesh);
 			m_model.m_meshes.push_back(mesh);
 			if (mesh->name().empty())
 			{
@@ -686,9 +882,10 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 
 	FbxGeometryConverter converter(lSdkManager);
 	converter.Triangulate(lScene, true);
+	//converter.SplitMeshesPerMaterial(lScene, true);
 	
 	FbxAxisSystem::MayaYUp.ConvertScene(lScene);
-	// FbxAxisSystem::DirectX.ConvertScene(lScene);
+	//FbxAxisSystem::DirectX.ConvertScene(lScene);
 	// FbxSystemUnit::m.ConvertScene(lScene);
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_CC93340E_C4A1_49EE_B048_E898F856CFBF_htm
 	// do NOT use FbxSystemUnit::ConvertScene(lScene), which just simply set transform.scale of root nodes.

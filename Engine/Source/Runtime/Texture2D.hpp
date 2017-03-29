@@ -27,7 +27,7 @@ namespace FishEngine
 		}
 	protected:
 
-		virtual void UploadToGPU() const override;
+		virtual void UploadToGPU() override;
 
 	protected:
 

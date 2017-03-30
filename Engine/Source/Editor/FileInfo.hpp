@@ -87,7 +87,8 @@ namespace FishEditor
 
 	private:
 		friend class ::ProjectViewFileModel;
-		void BuildNodeTree(const Path & m_path);
+		void BuildNodeTree(const Path & path, std::vector<Path> & modelPaths);
+		static void AddFileNode(const Path & path);
 
 		Path                    m_path;
 		FileInfo*               m_parent = nullptr;

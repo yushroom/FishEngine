@@ -7,11 +7,11 @@
 #include "Scene.hpp"
 #include "MeshFilter.hpp"
 #include "Mesh.hpp"
-#include "Light.hpp"
-#include "Animator.hpp"
+//#include "Light.hpp"
+//#include "Animator.hpp"
 #include "Pipeline.hpp"
 #include "Camera.hpp"
-#include "Gizmos.hpp"
+//#include "Gizmos.hpp"
 //#include "Shader.hpp"
 #include "Graphics.hpp"
 
@@ -42,32 +42,45 @@ namespace FishEngine
 		auto model = transform()->localToWorldMatrix();
 		Pipeline::UpdatePerDrawUniforms(model);
 
-		//std::map<std::string, TexturePtr> textures;
-		//auto& lights = Light::lights();
-		//if (lights.size() > 0) {
-		//    auto& l = lights.front();
-		//    if (l->transform() != nullptr) {
-		//        textures["ShadowMap"] = l->m_shadowMap;
-		//    }
-		//}
-
 		const auto& mesh = meshFilter->mesh();
-
-		for (auto& m : m_materials)
+//		for (auto& m : m_materials)
+//		{
+//			Graphics::DrawMesh(mesh, m);
+//		}
+		
+		auto materialCount = m_materials.size();
+		auto submeshCount = mesh->subMeshCount();
+		
+		if (materialCount == submeshCount)
 		{
-#if 0
-			auto shader = m->shader();
-			assert(shader != nullptr);
-			shader->Use();
-			shader->PreRender();
-			m->BindTextures(textures);
-			m->BindProperties();
-			shader->CheckStatus();
-			mesh->Render();
-			shader->PostRender();
-#else
-			Graphics::DrawMesh(mesh, m);
-#endif
+			for (int i = 0; i < materialCount; ++i)
+			{
+				auto & m = m_materials[i];
+				Graphics::DrawMesh(mesh, m, i);
+			}
+		}
+		else
+		{
+			Debug::LogWarning("[MeshRenderer::Render] Material size and submesh count not match");
+			if (materialCount < submeshCount)
+			{
+				int materialId = 0;
+				for (int i = 0; i < submeshCount; ++i)
+				{
+					auto & mat = m_materials[materialId];
+					materialId = (materialId + 1) % materialCount;
+					Graphics::DrawMesh(mesh, mat, i);
+				}
+			}
+			else // materialCount > mesh->subMeshCount()
+			{
+				int submeshId = 0;
+				for (auto & mat : m_materials)
+				{
+					Graphics::DrawMesh(mesh, mat, submeshId);
+					submeshId = (submeshId + 1) % submeshCount;
+				}
+			}
 		}
 	}
 

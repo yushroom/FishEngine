@@ -17,12 +17,11 @@ namespace FishEngine
 
 	void Graphics::DrawMesh(const MeshPtr& mesh, const MaterialPtr& material)
 	{
-		//if (material->IsKeywordEnabled(ShaderKeyword::AmbientIBL))
-		//{
-		//    material->SetTexture("AmbientCubemap", RenderSettings::ambientCubemap());
-		//    material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
-		//}
-
+		DrawMesh(mesh, material, -1);
+	}
+	
+	void Graphics::DrawMesh(const MeshPtr& mesh, const MaterialPtr& material, int subMeshIndex)
+	{
 		auto shader = material->shader();
 		shader->Use();
 		if (shader->HasUniform("AmbientCubemap"))
@@ -38,7 +37,7 @@ namespace FishEngine
 		shader->PreRender();
 		material->BindProperties();
 		shader->CheckStatus();
-		mesh->Render();
+		mesh->Render(subMeshIndex);
 		shader->PostRender();
 	}
 }

@@ -16,6 +16,7 @@ namespace FishEngine
 
 		static void DrawMesh(const MeshPtr& mesh, const Matrix4x4& matrix, const MaterialPtr& material);
 		static void DrawMesh(const MeshPtr& mesh, const MaterialPtr& material);
+		static void DrawMesh(const MeshPtr& mesh, const MaterialPtr& material, int subMeshIndex);
 		static void DrawTexture();
 
 		static void SetRenderTarget(RenderTexturePtr rt);

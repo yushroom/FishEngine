@@ -23,9 +23,8 @@ void EditorResources::Init()
 #endif
 	s_rootSystemDirectory = cwd.absolutePath().toStdString();
 
-	ShaderCompiler::s_shaderIncludeDir = shaderRootDirectory() / "include";
-
-	Shader::Init(shaderRootDirectory().string());
+//	ShaderCompiler::s_shaderIncludeDir = shaderRootDirectory() / "include";
+//	Shader::Init(shaderRootDirectory().string());
 	Mesh::Init(modelRootDirectory().string());
 
 	const auto& root_dir = shaderRootDirectory();

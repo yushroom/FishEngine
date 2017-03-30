@@ -175,13 +175,47 @@ namespace FishEngine
 		m_boneWeights.shrink_to_fit();
 	}
 
-	void Mesh::Render()
+	void Mesh::Render( int subMeshIndex /* = -1*/)
 	{
 		//assert(m_uploaded);
 		if (!m_uploaded)
+		{
 			UploadMeshData();
+		}
+		
 		glBindVertexArray(m_VAO);
-		glDrawElements(GL_TRIANGLES, m_triangleCount * 3, GL_UNSIGNED_INT, 0);
+			
+		if (subMeshIndex < 0 && subMeshIndex != -1)
+		{
+			Debug::LogWarning("invalid subMeshIndex %d", subMeshIndex);
+			subMeshIndex = -1;
+		}
+		else if (subMeshIndex >= m_subMeshCount)
+		{
+			Debug::LogWarning("invalid subMeshIndex %d", subMeshIndex);
+			subMeshIndex = m_subMeshCount;
+		}
+			
+		if (subMeshIndex == -1 || m_subMeshCount == 1)
+		{
+			glDrawElements(GL_TRIANGLES, m_triangleCount * 3, GL_UNSIGNED_INT, 0);
+		}
+		else
+		{
+			GLvoid * offset = (GLvoid *)( m_subMeshIndexOffset[subMeshIndex] * sizeof(GLuint) );
+			int index_count = 0;
+			if (subMeshIndex == m_subMeshCount-1) // the last one
+			{
+				index_count = m_triangleCount * 3 - m_subMeshIndexOffset[m_subMeshCount-1];
+				//index_count = 0;
+			}
+			else
+			{
+				index_count = m_subMeshIndexOffset[subMeshIndex+1] - m_subMeshIndexOffset[subMeshIndex];
+			}
+			glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, offset);
+		}
+		
 		glBindVertexArray(0);
 	}
 

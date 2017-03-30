@@ -140,7 +140,15 @@ namespace FishEditor
 		s_assetRoot->m_parent = nullptr;
 		s_assetRoot->m_path = path;
 		//s_nameToNode[boost::filesystem::absolute(path).string()] = this;
-		s_assetRoot->BuildNodeTree(path);
+		
+		std::vector<Path> modelPaths;
+		s_assetRoot->BuildNodeTree(path, modelPaths);
+		
+		
+		for (auto & p : modelPaths)
+		{
+			AddFileNode(p);
+		}
 	}
 
 	FileInfo* FileInfo::fileInfo(const std::string &path)
@@ -209,9 +217,13 @@ namespace FishEditor
 	}
 
 	// path must be a dir
-	void FileInfo::BuildNodeTree(const Path &path)
+	void FileInfo::BuildNodeTree(const Path & path, std::vector<Path> & modelPaths)
 	{
 		s_nameToNode[boost::filesystem::absolute(path).make_preferred().string()] = this;
+		
+		// models should be imported after all materials and texutures
+		//std::vector<Path> modelPaths;
+		
 		for (auto& it : boost::filesystem::directory_iterator(path))
 		{
 			const Path & p = it.path();
@@ -228,7 +240,7 @@ namespace FishEditor
 			{
 				m_dirChildren.emplace_back(fileNode);
 				fileNode->m_isDirectory = true;
-				fileNode->BuildNodeTree(p);
+				fileNode->BuildNodeTree(p, modelPaths);
 			}
 			else
 			{
@@ -237,9 +249,28 @@ namespace FishEditor
 				auto relative_path = boost::filesystem::relative(p, FishEngine::Application::dataPath().parent_path());
 				auto ext = p.extension();
 				auto assetType = Resources::GetAssetType(ext);
-				AssetDatabase::LoadAssetAtPath(relative_path);
+				if (assetType == AssetType::Model)
+				{
+					modelPaths.push_back(p);
+				}
+				else
+				{
+					AssetDatabase::LoadAssetAtPath(relative_path);
+				}
 			}
 		}
+
+	}
+	
+	void FileInfo::AddFileNode(const Path & path)
+	{
+		auto parentDir = path.parent_path();
+		auto parentNode = fileInfo(parentDir.string());
+		auto fileNode = new FileInfo();
+		fileNode->m_path = path;
+		fileNode->m_parent = parentNode;
+		auto relative_path = boost::filesystem::relative(path, FishEngine::Application::dataPath().parent_path());
+		AssetDatabase::LoadAssetAtPath(relative_path);
 	}
 }
 

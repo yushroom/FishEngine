@@ -43,8 +43,9 @@ namespace FishEngine
 		std::vector<Vector2> m_wedgeTexCoords;
 
 		// polygonId to sub mesh id
-		std::vector<int> m_submeshMap;
-		std::vector<std::vector<int>> m_submeshPolygonIds;
+		int					m_subMeshCount = 1;
+		std::vector<int>	m_submeshMap;
+		//std::vector<std::vector<int>> m_submeshPolygonIds;
 
 		// disjoint set
 		std::map<uint32_t, uint32_t> m_vertexIndexRemapping;
@@ -89,11 +90,11 @@ namespace FishEngine
 
 			std::vector<bool> vertexVisited(m_vertexCount, false);
 
-			bool hasSubMesh = m_submeshPolygonIds.size() > 0;
-			int subMeshCount = hasSubMesh ? m_submeshPolygonIds.size() : 1;
-			std::vector<uint32_t> subMeshOffset(subMeshCount);
+			bool hasSubMesh = m_subMeshCount > 1;
+			std::vector<uint32_t> subMeshOffset(m_subMeshCount);
+			subMeshOffset[0] = 0;
 
-			for (int subMeshId = 0; subMeshId < subMeshCount; ++subMeshId)
+			for (int subMeshId = 0; subMeshId < m_subMeshCount; ++subMeshId)
 			{
 				subMeshOffset[subMeshId] = indexBuffer.size();
 				for (uint32_t faceId = 0; faceId < m_faceCount; ++faceId)
@@ -110,6 +111,7 @@ namespace FishEngine
 							normalBuffer[vertexId] = m_wedgeNormals[wedgeId];
 							tangentBuffer[vertexId] = m_wedgeTangents[wedgeId];
 							vertexVisited[vertexId] = true;
+							indexBuffer.push_back(vertexId);
 						}
 						else
 						{
@@ -148,10 +150,12 @@ namespace FishEngine
 			}
 			
 			// now positionBuffer.size() == normalBuffer.size() == uvBuffer.size() == tangentBuffer.size()
-			//std::vector<uint32_t> indexBuffer(WedgeIndices);
 			auto ret = std::make_shared<Mesh>(std::move(positionBuffer), std::move(normalBuffer), std::move(uvBuffer), std::move(tangentBuffer), std::move(indexBuffer));
-			//for (int i = 0; i < subMeshCount; ++i)
-			ret->m_subMeshIndexOffset = subMeshOffset;
+			if (m_subMeshCount > 1)
+			{
+				ret->m_subMeshCount = m_subMeshCount;
+				ret->m_subMeshIndexOffset = subMeshOffset;
+			}
 			return ret;
 		}
 	};

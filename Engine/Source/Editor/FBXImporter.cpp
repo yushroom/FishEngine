@@ -9,6 +9,8 @@
 #include <MeshFilter.hpp>
 #include <MeshRenderer.hpp>
 #include <SkinnedMeshRenderer.hpp>
+#include <Texture.hpp>
+#include <Application.hpp>
 
 #include "AssetDataBase.hpp"
 #include "private/RawMesh.hpp"
@@ -231,19 +233,19 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 	int vertexCount = fbxMesh->GetControlPointsCount();
 	FbxVector4* controlPoints = fbxMesh->GetControlPoints();
 
-	auto attributeCount = fbxMesh->GetNode()->GetNodeAttributeCount();
-	std::vector<FbxMesh*> submeshes;
-	for (int attributeIndex = 1; attributeIndex < attributeCount; ++attributeIndex)
-	{
-		auto nodeAttribute = fbxMesh->GetNode()->GetNodeAttributeByIndex(attributeIndex);
-		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
-		{
-			FbxMesh* lMesh = (FbxMesh*)nodeAttribute;
-			submeshes.push_back(lMesh);
-			int submeshPolygonCount = lMesh->GetPolygonCount();
-			int submeshVertexCount = lMesh->GetControlPointsCount();
-		}
-	}
+//	auto attributeCount = fbxMesh->GetNode()->GetNodeAttributeCount();
+//	std::vector<FbxMesh*> submeshes;
+//	for (int attributeIndex = 1; attributeIndex < attributeCount; ++attributeIndex)
+//	{
+//		auto nodeAttribute = fbxMesh->GetNode()->GetNodeAttributeByIndex(attributeIndex);
+//		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+//		{
+//			FbxMesh* lMesh = (FbxMesh*)nodeAttribute;
+//			submeshes.push_back(lMesh);
+//			int submeshPolygonCount = lMesh->GetPolygonCount();
+//			int submeshVertexCount = lMesh->GetControlPointsCount();
+//		}
+//	}
 
 
 	if (fbxMesh->GetElementUVCount() == 0)
@@ -270,11 +272,11 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 	int hasSubMesh = subMeshCount > 1;
 
 
-	for (int i = 0; i < lMaterialCount; ++i)
-	{
-		auto lMaterial = fbxMesh->GetNode()->GetMaterial(i);
-		ParseMaterial(lMaterial);
-	}
+//	for (int i = 0; i < lMaterialCount; ++i)
+//	{
+//		auto lMaterial = fbxMesh->GetNode()->GetMaterial(i);
+//		ParseMaterial(lMaterial);
+//	}
 
 	// TODO:
 	// if this mesh only has one material, we assume this material applies to all polygons.
@@ -285,8 +287,9 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 	//std::vector<std::vector<int>> submeshPolygonIds;
 	if (hasSubMesh)
 	{
+		rawMesh.m_subMeshCount = subMeshCount;
 		rawMesh.m_submeshMap.resize(polygonCount);
-		rawMesh.m_submeshPolygonIds.resize(subMeshCount);
+		//rawMesh.m_submeshPolygonIds.resize(subMeshCount);
 		//Debug::LogError("eByPolygon mapping material");
 		//auto lMaterialElement = fbxMesh->GetElementMaterial(l);
 		for (int l = 0; l < fbxMesh->GetElementMaterialCount(); l++)
@@ -317,7 +320,7 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 					{
 						int lMatId = lMaterialElement->GetIndexArray().GetAt(i);
 						rawMesh.m_submeshMap[i] = lMatId;
-						rawMesh.m_submeshPolygonIds[lMatId].push_back(i);
+						//rawMesh.m_submeshPolygonIds[lMatId].push_back(i);
 					}
 				}
 				else
@@ -541,7 +544,7 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 		return m_model.m_materials[it->second];
 	}
 
-	auto ret_material = Material::CreateMaterial();
+	auto ret_material = Material::InstantiateBuiltinMaterial("Diffuse");
 	m_model.m_fbxMaterialLookup[pMaterial] = m_model.m_materials.size();
 	m_model.m_materials.push_back(ret_material);
 
@@ -549,6 +552,8 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	//Diffuse Textures
 	lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
 	//DisplayTextureNames(lProperty, lConnectionString);
+	
+	std::string diffuseTexturePath;
 	int lNbTextures = lProperty.GetSrcObjectCount<FbxTexture>();
 	if (lNbTextures > 0)
 	{
@@ -565,8 +570,9 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 					// do not support non-file texture
 					abort();
 				}
-				std::string texturePath = lFileTexture->GetFileName();
-				Debug::LogWarning("diffuse texture: %s", texturePath.c_str());
+				diffuseTexturePath = lFileTexture->GetFileName();
+				//Debug::LogWarning("diffuse texture: %s", texturePath.c_str());
+				break;
 			}
 			else
 			{
@@ -578,6 +584,13 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	{
 		abort();
 	}
+	
+	
+	auto texturePath = Application::dataPath() / "textures" / Path(diffuseTexturePath).filename();
+	auto diffuseTexture = As<Texture>( AssetDatabase::LoadAssetAtPath(texturePath) );
+	//assert(diffuseTexture != nullptr);
+	ret_material->setMainTexture(diffuseTexture);
+	
 	return ret_material;
 }
 
@@ -773,20 +786,43 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				m_nextMeshFileID += 2;
 			}
 			
+			int lMaterialCount = pNode->GetMaterialCount();
+			MaterialPtr material;
+			if (lMaterialCount == 0)
+			{
+				material = Material::defaultMaterial();
+			}
+			else
+			{
+				auto lMaterial = pNode->GetMaterial(0);
+				material = ParseMaterial(lMaterial);
+			}
+			
+			RendererPtr renderer;
 			if (mesh->m_skinned)
 			{
 				auto srenderer = go->AddComponent<SkinnedMeshRenderer>();
 				m_model.m_skinnedMeshRenderers.push_back(srenderer);
-				srenderer->SetMaterial(Material::defaultMaterial());
+				srenderer->SetMaterial(material);
 				srenderer->setSharedMesh(mesh);
 				srenderer->setAvatar(m_model.m_avatar);
 				srenderer->setRootBone(m_model.m_rootNode->transform());
+				renderer = srenderer;
 			}
 			else
 			{
 				go->AddComponent<MeshFilter>()->SetMesh(mesh);
-				go->AddComponent<MeshRenderer>()->SetMaterial(Material::defaultMaterial());
+				renderer = go->AddComponent<MeshRenderer>();
+				renderer->SetMaterial(material);
 			}
+			
+			for (int i = 1; i < lMaterialCount; ++i)
+			{
+				auto lMaterial = pNode->GetMaterial(i);
+				material = ParseMaterial(lMaterial);
+				renderer->AddMaterial(material);
+			}
+
 
 			//auto texture = GetTextureInfo(lMesh);
 		}

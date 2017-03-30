@@ -105,7 +105,7 @@ namespace FishEngine
 		// See Also: GetTriangles, SetTriangles.
 		uint32_t subMeshCount() const
 		{
-			return static_cast<uint32_t>(m_subMeshIndexOffset.size());
+			return m_subMeshCount;// static_cast<uint32_t>(m_subMeshIndexOffset.size());
 		}
 		
 		
@@ -205,7 +205,9 @@ namespace FishEngine
 		
 	public:
 		void Clear();
-		void Render();
+		
+		// -1: reander all submeshes
+		void Render(int subMeshIndex = -1);
 		//void renderPatch(const Shader& shader);
 		// Returns the number of vertices in the Mesh
 		
@@ -234,7 +236,7 @@ namespace FishEngine
 		
 
 	public:
-		//int						m_subMeshCount = 1;
+		int						m_subMeshCount = 1;
 		std::vector<Vector3>    m_vertices;
 		std::vector<Vector3>    m_normals;
 		std::vector<Vector2>    m_uv;

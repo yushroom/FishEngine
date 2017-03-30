@@ -28,6 +28,7 @@
 #include <GameObject.hpp>
 #include <Timer.hpp>
 #include <Path.hpp>
+#include <Shader.hpp>
 
 #include "SceneArchive.hpp"
 #include "AssetArchive.hpp"
@@ -166,8 +167,13 @@ void MainWindow::Init()
 	cwd.cdUp();
 #endif
 	//s_rootSystemDirectory = cwd.absolutePath().toStdString();
-	auto p = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders" / "include";
-	ShaderCompiler::setShaderIncludeDir(p.string());
+	auto shaderRoot = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders";
+	auto shaderIncludeDir = shaderRoot / "include";
+	//auto p = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders" / "include";
+	ShaderCompiler::setShaderIncludeDir(shaderIncludeDir.string());
+	//ShaderCompiler::s_shaderIncludeDir = shaderRootDirectory() / "include";
+	
+	Shader::Init(shaderRoot.string());
 
 	//FishEngine::Timer t("Load assets");
 	FishEditor::FileInfo::SetAssetRootPath(Application::s_dataPath);

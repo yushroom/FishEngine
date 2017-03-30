@@ -61,7 +61,7 @@ namespace FishEditor
 		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.fbx"));
 		auto sponza_go = Object::Instantiate(sponza_model);
 		
-		
+#if 0
 		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
 		assert(shader1 != nullptr);
 		auto createMaterial1 = [&sponza_go, &shader1] (const std::string& diffuse_tex, const std::string& mask_tex) -> MaterialPtr
@@ -95,172 +95,29 @@ namespace FishEditor
 			mtl->SetTexture("DiffuseTex", diffuse);
 			return mtl;
 		};
-		
-		
-		auto ApplyMaterial = [&sponza_go](std::string const & go_name, MaterialPtr mtl)
-		{
-			auto go = FindNamedChild(sponza_go, go_name);
-			assert(go != nullptr);
-			go->GetComponent<MeshRenderer>()->SetMaterial(mtl);
-		};
-		
-		
-		
-		std::string prefix = "sponza_";
-		
-		auto material = createMaterial2("background");
-		for (auto i : {"03", "377", "378"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
-		material = createMaterial2("lion");
-		ApplyMaterial("sponza_377", material);
-		ApplyMaterial("sponza_378", material);
-		
-		material = createMaterial2("spnza_bricks_a_diff");
-		for (auto i : {"05", "06", "34", "36", "66", "68", "69", "71", "72", "75", "116", "258", "379", "382"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
-		material = createMaterial2("sponza_arch_diff");
-		for (auto i : {"07", "17", "20", "21", "37", "39", "41", "43", "45", "47", "49", "51", "53", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "67", "122", "123", "124"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
-		material = createMaterial2("sponza_ceiling_a_diff");
-		for (auto i : {"08", "19", "35", "38", "40", "42", "44", "46", "48", "50", "52", "54"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
-		material = createMaterial2("sponza_column_a_diff");
-		for (auto i : {"09", "10", "11", "12", "13", "14", "15", "16", "118", "119", "120", "121"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
-		
-		material = createMaterial2("sponza_column_b_diff");
-		for (int i = 125; i <= 256; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		
-		material = createMaterial2("sponza_column_c_diff");
-		for (int i = 22; i <= 33; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
 
-		}
-		for (int i = 76; i <= 115; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		
+		auto material = createMaterial2("background");
+		material = createMaterial2("lion");
+		material = createMaterial2("spnza_bricks_a_diff");
+		material = createMaterial2("sponza_arch_diff");
+		material = createMaterial2("sponza_ceiling_a_diff");
+		material = createMaterial2("sponza_column_a_diff");
+		material = createMaterial2("sponza_column_b_diff");
+		material = createMaterial2("sponza_column_c_diff");
 		material = createMaterial2("sponza_curtain_blue_diff");
-		for (auto i : {"320", "326", "329"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_curtain_diff");
-		for (auto i : {"321", "323", "325", "328"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_curtain_green_diff");
-		for (auto i : {"322", "324", "327"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_details_diff");
-		for (auto i : {"70", "71", "72", "73", "74"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_fabric_blue_diff");
-		for (auto i : {"283", "286", "289"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_fabric_diff");
-		ApplyMaterial("sponza_284", material);
-		ApplyMaterial("sponza_288", material);
-		
 		material = createMaterial2("sponza_fabric_green_diff");
-		for (auto i : {"282", "285", "287"})
-		{
-			ApplyMaterial(prefix + i, material);
-		}
-		
 		material = createMaterial2("sponza_flagpole_diff");
-		for (int i = 259; i <= 274; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		for (int i = 290; i <= 319; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		
 		material = createMaterial2("sponza_floor_a_diff");
-		ApplyMaterial("sponza_18", material);
-		ApplyMaterial("sponza_117", material);
-		
 		material = createMaterial2("sponza_roof_diff");
-		ApplyMaterial("sponza_380", material);
-		ApplyMaterial("sponza_381", material);
-		
-		
 		material = createMaterial2("vase_dif");
-		for (int i = 373; i <= 376; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		
 		material = createMaterial2("vase_hanging");
-		for (int i = 334; i <= 338; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		for (int i = 343; i <= 347; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		for (int i = 352; i <= 356; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		for (int i = 361; i <= 365; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
-		
-		
 		material = createMaterial1("sponza_thorn_diff", "sponza_thorn_mask");
-		ApplyMaterial("sponza_00", material);
-		for (int i = 275; i <= 281; ++i)
-		{
-			auto name = prefix + boost::lexical_cast<std::string>(i);
-			ApplyMaterial(name, material);
-		}
+#endif
 		
 		
 //		ApplyMateril1("mesh1", "vase_plant", "vase_plant_mask");
@@ -273,6 +130,9 @@ namespace FishEditor
 		transform = Camera::mainGameCamera()->gameObject()->transform();
 		transform->setPosition(5, 8, 0);
 		transform->setLocalEulerAngles(30, -90, 0);
+		
+		transform = Light::mainLight()->gameObject()->transform();
+		transform->setLocalEulerAngles(50, -75, 0);
 	}
 	
 	

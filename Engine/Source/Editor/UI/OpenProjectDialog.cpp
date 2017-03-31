@@ -13,14 +13,25 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 	ui(new Ui::OpenProjectDialog)
 {
 	ui->setupUi(this);
+
 #if FISHENGINE_PLATFORM_WINDOWS
-	ui->locationLineEdit->setText(R"(D:\program\github\FishEngine\Example)");
+	QString projectRootDir = R"(D:\program\github\FishEngine\Example)";
 #else
-	ui->locationLineEdit->setText("/Users/yushroom/program/FishEngine/Example");
+	QString projectRootDir = "/Users/yushroom/program/FishEngine/Example";
 #endif
-	ui->projectNameLineEdit->setText("Sponza");
-	ui->projectNameErrorLabel->hide();
-	ui->locationErrorLabel->hide();
+	ui->locationLineEdit->setText(projectRootDir);
+
+	QDir dir(projectRootDir);
+	dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+	auto entryList = dir.entryList();
+	for (auto & entry : entryList)
+	{
+		ui->listWidget->addItem(entry);
+	}
+	ui->listWidget->setAlternatingRowColors(true);
+
+	ui->projectNameLineEdit->setText("New Project");
+	ClearErrorMessage();
 
 	connect(ui->createButton, &QPushButton::clicked, this, &OpenProjectDialog::OnCreateButtonClicked);
 	connect(ui->cancelButton, &QPushButton::clicked, this, &QDialog::reject);
@@ -28,8 +39,7 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 	connect(ui->toolButton, &QToolButton::clicked, this, &OpenProjectDialog::OnLocationToolButtonClicked);
 	connect(ui->locationLineEdit, &QLineEdit::textChanged, ui->locationErrorLabel, &QLabel::hide);
 	connect(ui->openButton, &QPushButton::clicked, this, &OpenProjectDialog::OnOpenButtonClicked);
-	
-	//OnOpenButtonClicked();
+	connect(ui->listWidget, &QListWidget::itemClicked, this, &OpenProjectDialog::OnProjectListWidgetItemClicked);
 }
 
 OpenProjectDialog::~OpenProjectDialog()
@@ -39,15 +49,6 @@ OpenProjectDialog::~OpenProjectDialog()
 
 void OpenProjectDialog::OnCreateButtonClicked()
 {
-#if 1
-#if FISHENGINE_PLATFORM_WINDOWS
-	FishEngine::Application::s_dataPath = R"(D:\program\github\FishEngine\Example\Sponza\Assets)";
-#else
-	FishEngine::Application::s_dataPath = "/Users/yushroom/program/FishEngine/Example/Sponza/Assets";
-#endif
-	accept();
-#endif
-
 	auto projectName = ui->projectNameLineEdit->text();
 	auto location = ui->locationLineEdit->text();
 	
@@ -57,6 +58,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 		auto fullpath = dir.filePath(projectName);
 		if (dir.exists(projectName))
 		{
+			ClearErrorMessage();
 			ui->projectNameErrorLabel->show();
 		}
 		else
@@ -71,6 +73,7 @@ void OpenProjectDialog::OnCreateButtonClicked()
 	}
 	else
 	{
+		ClearErrorMessage();
 		ui->locationErrorLabel->show();
 	}
 }
@@ -78,7 +81,11 @@ void OpenProjectDialog::OnCreateButtonClicked()
 void OpenProjectDialog::OnOpenButtonClicked()
 {
 	auto dir = QFileDialog::getExistingDirectory(this, "Open existing project", ui->locationLineEdit->text());
-	if ( ! QDir(dir).exists("Assets"))
+	if (dir.isNull())
+	{
+
+	}
+	else if ( ! QDir(dir).exists("Assets"))
 	{
 		QMessageBox::warning(this, "Waring", "Selected folder is not a FishEngine project.");
 	}
@@ -92,7 +99,26 @@ void OpenProjectDialog::OnOpenButtonClicked()
 void OpenProjectDialog::OnLocationToolButtonClicked()
 {
 	auto dir = QFileDialog::getExistingDirectory(this, "Choose location for project", ui->locationLineEdit->text());
-	ui->locationLineEdit->setText(dir);
+	if (!dir.isNull())
+	{
+		ui->locationLineEdit->setText(dir);
+	}
+}
+
+void OpenProjectDialog::OnProjectListWidgetItemClicked(QListWidgetItem * item)
+{
+	auto location = ui->locationLineEdit->text();
+	QDir dir = location;
+	dir = dir.filePath(item->text());
+	if (!QDir(dir).exists("Assets"))
+	{
+		QMessageBox::warning(this, "Waring", "Project not found.");
+	}
+	else
+	{
+		SetProjectPath(dir.absolutePath());
+		accept();
+	}
 }
 
 void OpenProjectDialog::SetProjectPath(QString const & projectPath)
@@ -103,4 +129,10 @@ void OpenProjectDialog::SetProjectPath(QString const & projectPath)
 void OpenProjectDialog::CreateNewProject(QString const & projectPath)
 {
 	QDir(projectPath).mkdir("Assets");
+}
+
+void OpenProjectDialog::ClearErrorMessage()
+{
+	ui->projectNameErrorLabel->hide();
+	ui->locationErrorLabel->hide();
 }

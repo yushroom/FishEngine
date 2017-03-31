@@ -17,6 +17,12 @@ namespace FishEditor
 		Scale,
 	};
 
+	enum class TransformPivot
+	{
+		Pivot,
+		Center,
+	};
+
 	enum class TransformSpace
 	{
 		Global,
@@ -60,13 +66,18 @@ namespace FishEditor
 		{
 			return m_camera;
 		}
+		
+		TransformPivot transformPivot() const
+		{
+			return m_transformPivot;
+		}
 
-//        auto ColorBuffer() const
-//        {
-//            return m_colorBuffer;
-//        }
+		void setTransformPivot(TransformPivot pivot)
+		{
+			m_transformPivot = pivot;
+		}
 
-		TransformSpace transformSpace()
+		TransformSpace transformSpace() const
 		{
 			return m_transformSpace;
 		}
@@ -108,7 +119,7 @@ namespace FishEditor
 			m_highlightSelections = value;
 		}
 
-		void FrameSelected(FishEngine::GameObjectPtr const & selected);
+		void FrameSelected();
 
 	private:
 		friend class EditorGUI;
@@ -134,6 +145,7 @@ namespace FishEditor
 		bool        m_isMouseHovered        = false;
 
 		TransformToolType m_transformToolType = TransformToolType::Translate;
+		TransformPivot m_transformPivot		= TransformPivot::Center;
 		TransformSpace m_transformSpace     = TransformSpace::Global;
 
 		int         m_selectedAxis          = -1; // temp

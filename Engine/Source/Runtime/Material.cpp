@@ -63,6 +63,11 @@ namespace FishEngine
 		return false;
 	}
 
+	int Material::renderQueue()
+	{
+		return m_shader->renderQueue();
+	}
+
 	void Material::setShader(const ShaderPtr& shader)
 	{
 		m_shader = shader;

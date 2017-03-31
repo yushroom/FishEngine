@@ -130,19 +130,4 @@ namespace FishEngine
 		}
 		return nullptr;
 	}
-
-
-	void Camera::
-	FrameSelected(GameObjectPtr const & selected)
-	{
-		if (selected == nullptr)
-			return;
-		auto camera = Camera::main()->transform();
-		float focus_distance = Vector3::Distance(camera->position(), m_focusPoint);
-		m_focusPoint = selected->transform()->position();
-		auto camera_dir = camera->forward().normalized();
-		auto target_camera_position = m_focusPoint - camera_dir * focus_distance;
-		auto translation = target_camera_position - camera->position();
-		camera->Translate(translation, Space::World);
-	}
 }

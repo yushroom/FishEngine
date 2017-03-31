@@ -27,6 +27,7 @@ namespace FishEngine
 			m_materials.push_back(material);
 		}
 
+		virtual void PreRender() const = 0;
 		virtual void Render() const = 0;
 
 		void AddMaterial(MaterialPtr material)

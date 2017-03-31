@@ -92,7 +92,7 @@ namespace FishEngine
 	}
 
 
-	void SkinnedMeshRenderer::Render() const
+	void SkinnedMeshRenderer::PreRender() const
 	{
 		auto model = transform()->localToWorldMatrix();
 		Pipeline::UpdatePerDrawUniforms(model);
@@ -100,6 +100,11 @@ namespace FishEngine
 		UpdateMatrixPalette();
 
 		Pipeline::UpdateBonesUniforms(m_matrixPalette);
+	}
+
+	void SkinnedMeshRenderer::Render() const
+	{
+		PreRender();
 
 		for (auto& material : m_materials)
 		{

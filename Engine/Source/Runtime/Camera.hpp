@@ -159,14 +159,6 @@ namespace FishEngine
 		Meta(NonSerializable)
 		mutable Matrix4x4 m_projectMatrix;
 
-		// temp
-		// https://docs.unity3d.com/Manual/SceneViewNavigation.html
-		Meta(NonSerializable)
-		mutable Vector3 m_focusPoint{ 0, 0, 0 };
-
-
-		void FrameSelected(GameObjectPtr const & selected);
-
 		static CameraPtr m_mainCamera;
 		static std::vector<CameraPtr> m_allCameras;
 	};

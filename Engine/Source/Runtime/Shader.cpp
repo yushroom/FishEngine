@@ -19,6 +19,8 @@
 //#include EnumHeader(CullFace)
 #include "generate/Enum_Cullface.hpp"
 
+#include "Rendering/RenderQueue.hpp"
+
 using namespace std;
 using namespace FishEngine;
 
@@ -206,12 +208,14 @@ namespace FishEngine
 		bool m_hasGeometryShader = false;
 		uint32_t m_lineCount;   // for error message
 
-	private:
+	//private:
 		//std::string                         m_filePath;
 		std::string                         m_shaderTextRaw;
 		std::map<ShaderKeywords, GLuint>    m_keywordToGLPrograms;
 		std::map<GLuint, std::vector<UniformInfo>>
 			m_GLProgramToUniforms;
+		int m_renderQueue = -1;
+
 
 		GLuint Compile(ShaderType type, ShaderKeywords keywords)
 		{
@@ -742,6 +746,20 @@ namespace FishEngine
 	{
 		m_keywords &= ~keyword;
 		m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+	}
+
+	int Shader::renderQueue()
+	{
+		if (m_impl->m_renderQueue < 0)
+		{
+			if (m_blend)
+				return static_cast<int>(Rendering::RenderQueue::Transparent);
+			return static_cast<int>(Rendering::RenderQueue::Geometry);
+		}
+		else
+		{
+			return m_impl->m_renderQueue;
+		}
 	}
 
 	//========== Static Region ==========

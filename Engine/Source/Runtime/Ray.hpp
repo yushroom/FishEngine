@@ -11,14 +11,20 @@ namespace FishEngine
 	public:
 		//InjectSerializationFunctionsNonVirtual(Ray)
 		
+		// The origin point of the ray.
 		Vector3 origin;
+
+		// The direction of the ray.
 		Vector3 direction;
 
-		Ray(const Vector3& origin, const Vector3& direction) : origin(origin), direction(direction.normalized())
+		// Creates a ray starting at origin along direction.
+		Ray(const Vector3& origin, const Vector3& direction)
+			: origin(origin), direction(direction.normalized())
 		{
 
 		}
 
+		// Returns a point at distance units along the ray.
 		Vector3 GetPoint(float distance)
 		{
 			return origin + direction * distance;

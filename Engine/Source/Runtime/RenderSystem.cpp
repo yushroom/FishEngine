@@ -19,6 +19,24 @@
 #include "SkinnedMeshRenderer.hpp"
 #include "RenderTarget.hpp"
 #include "Timer.hpp"
+#include "MeshFilter.hpp"
+
+using namespace FishEngine;
+
+struct RenderObject
+{
+	int				renderQueue;
+	RendererPtr		renderer;
+	MaterialPtr		material;
+	MeshPtr			mesh;
+	int				subMeshID = -1;
+
+	RenderObject(int renderQueue, RendererPtr renderer, MaterialPtr material, MeshPtr mesh, int subMeshID = -1)
+		: renderer(renderer), renderQueue(renderQueue), material(material), mesh(mesh), subMeshID(subMeshID)
+	{
+
+	}
+};
 
 namespace FishEngine
 {
@@ -134,16 +152,13 @@ namespace FishEngine
 		/************************************************************************/
 		/* Scene                                                                */
 		/************************************************************************/
-		// 3 color buffer: G-BUffer
-		// depth buffer
-		Pipeline::PushRenderTarget(m_deferredRenderTarget);
-		glClearBufferfv(GL_COLOR, 0, black);
-		glClearBufferfv(GL_COLOR, 1, error_color);
-		glClearBufferfv(GL_COLOR, 2, error_color);
-		glClearBufferfv(GL_DEPTH, 0, white);
 
-		std::vector<GameObjectPtr> transparentQueue;
-		std::vector<GameObjectPtr> forwardQueue;
+		// forward
+		std::list<RenderObject> forwardRenderQueueGeometry;
+		std::list<RenderObject> forwardRenderQueueTransparent;
+		
+		// deferred
+		std::list<RenderObject> deferredRenderQueue;	// for now, geometry only
 
 		bool deferred_enabled = false;
 
@@ -161,40 +176,58 @@ namespace FishEngine
 				gameObjects.push_back(child->gameObject());
 			}
 
-			if (!go->activeInHierarchy()) continue;
-			RendererPtr renderer = go->GetComponent<MeshRenderer>();
-
-			if (renderer == nullptr)
-			{
-				renderer = go->GetComponent<SkinnedMeshRenderer>();
-			}
+			if (!go->activeInHierarchy())
+				continue;
+			RendererPtr renderer = go->GetComponent<Renderer>();
 			if (renderer == nullptr || !renderer->enabled())
 				continue;
 
-			if (renderer->material() == nullptr)
+			MeshPtr mesh;
+			if (renderer->ClassID() == ClassID<MeshRenderer>())
 			{
-				// TODO
-				// draw error material;
-				continue;
+				auto meshFilter = go->GetComponent<MeshFilter>();
+				if (meshFilter == nullptr)
+					continue;
+				mesh = meshFilter->mesh();
+			}
+			else
+			{
+				mesh = As<SkinnedMeshRenderer>(renderer)->sharedMesh();
 			}
 
-			if (renderer->material()->shader()->IsTransparent())
-			{
-				transparentQueue.push_back(go);
+			if (mesh == nullptr)
 				continue;
-			}
-			else if (!renderer->material()->shader()->IsDeferred())
-			{
-				forwardQueue.push_back(go);
-				continue;
-			}
 
-			// Deferred
-			deferred_enabled = true;
-			renderer->Render();
+			auto & materials = renderer->materials();
+			for (int i = 0; i < materials.size(); ++i)
+			{
+				auto & material = materials[i];
+				if (material == nullptr)
+				{
+					continue;
+				}
+
+				// TODO: find correct render queue and submeshID
+
+				if (material->shader()->IsTransparent())
+				{
+					forwardRenderQueueTransparent.emplace_back(0, renderer, material, mesh, i);
+					continue;
+				}
+				else if (material->shader()->IsDeferred())
+				{
+					// Deferred
+					deferred_enabled = true;
+					deferredRenderQueue.emplace_back(0, renderer, material, mesh, i);
+					continue;
+				}
+				else
+				{
+					forwardRenderQueueGeometry.emplace_back(0, renderer, material, mesh, i);
+				}
+				
+			}
 		}
-
-		Pipeline::PopRenderTarget();
 
 		// 1 color buffer
 		// depth buffer
@@ -207,6 +240,22 @@ namespace FishEngine
 		/************************************************************************/
 		if (deferred_enabled)
 		{
+			// 3 color buffer: G-BUffer
+			// depth buffer
+			Pipeline::PushRenderTarget(m_deferredRenderTarget);
+			glClearBufferfv(GL_COLOR, 0, black);
+			glClearBufferfv(GL_COLOR, 1, error_color);
+			glClearBufferfv(GL_COLOR, 2, error_color);
+			glClearBufferfv(GL_DEPTH, 0, white);
+
+			for (auto & ro : deferredRenderQueue)
+			{
+				ro.renderer->PreRender();
+				Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
+			}
+
+			Pipeline::PopRenderTarget();
+
 			glDepthFunc(GL_ALWAYS);
 			glDepthMask(GL_FALSE);
 			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
@@ -223,17 +272,11 @@ namespace FishEngine
 		/************************************************************************/
 		/* Forward                                                              */
 		/************************************************************************/
-		for (auto& go : forwardQueue)
+		for (auto & ro : forwardRenderQueueGeometry)
 		{
-			RendererPtr renderer = go->GetComponent<MeshRenderer>();
-			if (renderer == nullptr)
-			{
-				renderer = go->GetComponent<SkinnedMeshRenderer>();
-			}
-			if (renderer->enabled())
-				renderer->Render();
+			ro.renderer->PreRender();
+			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}
-		forwardQueue.clear();
 
 		Pipeline::PopRenderTarget(); // m_mainRenderTarget
 
@@ -347,17 +390,11 @@ namespace FishEngine
 		/************************************************************************/
 		/* Transparent                                                          */
 		/************************************************************************/
-		for (auto& go : transparentQueue)
+		for (auto & ro : forwardRenderQueueTransparent)
 		{
-//			RendererPtr renderer = go->GetComponent<MeshRenderer>();
-//			if (renderer == nullptr)
-//			{
-//				renderer = go->GetComponent<SkinnedMeshRenderer>();
-//			}
-			auto renderer = go->GetComponent<Renderer>();
-			renderer->Render();
+			ro.renderer->PreRender();
+			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}
-		transparentQueue.clear();
 
 #if 0
 		glDepthFunc(GL_ALWAYS);

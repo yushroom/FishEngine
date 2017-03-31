@@ -198,7 +198,9 @@ namespace FishEngine
 		// Shorthand for writing Vector3(1, 0, 0).
 		const static Vector3 right;
 
-		
+		const static Vector3 xAxis;
+		const static Vector3 yAxis;
+		const static Vector3 zAxis;
 
 	private:
 		bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z); }
@@ -257,6 +259,11 @@ namespace FishEngine
 		return x*x + y*y + z*z;
 	}
 
+	inline Vector3 Vector3::Slerp(const Vector3& a, const Vector3& b, float t)
+	{
+		return SlerpUnclamped(a, b, Mathf::Clamp01(t));
+	}
+
 	inline void Vector3::Set(float newX, float newY, float newZ)
 	{
 		x = newX;
@@ -297,7 +304,7 @@ namespace FishEngine
 
 	inline float Vector3::Angle(const Vector3& from, const Vector3& to)
 	{
-		return ::std::acosf(Dot(Normalize(from), Normalize(to))) * Mathf::Rad2Deg;
+		return ::std::acosf(Mathf::Clamp( Dot(Normalize(from), Normalize(to)), -1.0f, 1.0f )) * Mathf::Rad2Deg;
 	}
 
 	inline float Vector3::Magnitude(const Vector3& a)

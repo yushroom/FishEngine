@@ -120,11 +120,6 @@ namespace FishEditor
 		//Input::Update();
 		m_cameraGameObject->GetComponent<CameraController>()->Update();
 		//Scene::Update();
-
-//        if (Input::GetKeyDown(KeyCode::F))
-//        {
-//            Camera::main()->FrameSelected(Selection::activeGameObject());
-//        }
 	}
 
 	void SceneViewEditor::Render()
@@ -145,7 +140,10 @@ namespace FishEditor
 
 		Gizmos::setColor(Color::red);
 		Bounds b = Scene::bounds();
-		Gizmos::DrawWireCube(b.center(), b.size());
+		if (b.IsValid())
+		{
+			Gizmos::DrawWireCube(b.center(), b.size());
+		}
 		 
 		/************************************************************************/
 		/* Grid                                                                 */
@@ -372,7 +370,7 @@ namespace FishEditor
 				DrawScaleGizmo();
 		}
 		
-		if (!m_mouseEventHandled && Input::GetMouseButtonDown(0))
+		if (!m_mouseEventHandled && Input::GetMouseButtonDown(0) && !Input::GetKey(KeyCode::LeftAlt))
 		{
 			Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
 			auto go = Scene::IntersectRay(ray);
@@ -414,6 +412,22 @@ namespace FishEditor
 		return tmid;
 	}
 
+	Vector3 CenterOfGameObject(GameObjectPtr const & go, TransformPivot pivot)
+	{
+		Vector3 center = go->transform()->position();
+		if (pivot == TransformPivot::Center)
+		{
+			RendererPtr renderer = go->GetComponent<Renderer>();
+			if (renderer != nullptr)
+			{
+				auto bounds = renderer->bounds();
+				if (bounds.IsValid())
+					center = bounds.center();
+			}
+		}
+		return center;
+	}
+
 	void SceneViewEditor::DrawTranslateGizmo()
 	{
 		constexpr float translate_gizmo_length = 0.2f;
@@ -423,7 +437,8 @@ namespace FishEditor
 		auto selectedGO = Selection::activeGameObject();
 
 		auto camera = Camera::main();
-		Vector3 center = selectedGO->transform()->position();
+		const Vector3 pivotCenter = CenterOfGameObject(selectedGO, m_transformPivot);
+		Vector3 center = pivotCenter;
 		Vector3 camera_pos = camera->transform()->position();
 		Vector3 dir = center - camera_pos;
 		center = dir.normalized() + camera_pos;
@@ -527,7 +542,8 @@ namespace FishEditor
 				return ((o1.z*x - o1.x*z) - (o2.z*x - o2.x*z)) / (dir2.z*x - dir2.x*z);
 		};
 
-		center = selectedGO->transform()->position();
+		//center = selectedGO->transform()->position();
+		center = pivotCenter;
 
 		auto& axis_selected = axis[m_selectedAxis];
 
@@ -560,7 +576,7 @@ namespace FishEditor
 			// solve: camera_pos + t1 * new_view_dir = lastMousePosition + t2 * axis
 			float t = solve(camera_pos, new_view_dir, lastMousePosition, axis_selected);
 			//selectedGO->transform()->setPosition(lastCenter + t*axis_selected);
-			auto translation = lastCenter + t*axis_selected - selectedGO->transform()->position();
+			auto translation = lastCenter + t*axis_selected - pivotCenter;
 			//selectedGO->transform()->Translate(translation, Space::World);
 			for (auto & t : Selection::transforms())
 			{
@@ -897,7 +913,7 @@ namespace FishEditor
 			ray.direction = inv_model.MultiplyVector(Vector3::forward);
 		}
 
-		auto s = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
+		auto scaleMat = Matrix4x4::Scale(0.5f, 0.75f, 0.5f);
 
 		float f[] = {
 			-1,  0,  0,   0, 0, -90,
@@ -933,8 +949,7 @@ namespace FishEditor
 			}
 			t.setLocalPosition(pos);
 			t.setLocalEulerAngles(f[j + 3], f[j + 4], f[j + 5]);
-			auto modelMat = model * t.localToWorldMatrix() * s;
-			sceneGizmoMaterial->SetVector3("_Color", color);
+			auto modelMat = model * t.localToWorldMatrix() * scaleMat;
 			sceneGizmoMaterial->SetMatrix("MATRIX_MVP", vp * modelMat);
 			sceneGizmoMaterial->SetMatrix("MATRIX_IT_MV", (view*modelMat).inverse().transpose());
 			sceneGizmoMaterial->SetVector3("_Color", color);
@@ -974,12 +989,11 @@ namespace FishEditor
 				Vector3 offset(f + hoverIndex * 6);
 				Vector3 up(0, 1, 0);
 				if (offset.y == 1) {
-					up.Set(0, 0, -1);
-				} else if (offset.y == -1) {
 					up.Set(0, 0, 1);
+				} else if (offset.y == -1) {
+					up.Set(0, 0, -1);
 				}
-				camera->transform()->setLocalPosition(camera->m_focusPoint + offset * 4);
-				camera->transform()->LookAt(camera->m_focusPoint, up);
+				camera->transform()->setRotation(Quaternion::LookRotation(-offset, up));
 			}
 		}
 
@@ -1004,15 +1018,20 @@ namespace FishEditor
 		Light::ResizeShadowMaps();
 	}
 
-	void SceneViewEditor::FrameSelected(const GameObjectPtr &selected)
+	void SceneViewEditor::FrameSelected()
 	{
+		auto selected = FishEditor::Selection::activeGameObject();
 		if (selected == nullptr)
 			return;
+
 		auto camera = m_cameraGameObject->transform();
-		float focus_distance = Vector3::Distance(camera->position(), m_camera->m_focusPoint);
-		m_camera->m_focusPoint = selected->transform()->position();
+		auto controller = m_cameraGameObject->GetComponent<CameraController>();
+		Vector3 oldCenter = controller->m_orbitCenter;
+		float focus_distance = Vector3::Distance(camera->position(), oldCenter);
+		Vector3 newCenter = CenterOfGameObject(selected, TransformPivot::Center);
+		controller->m_orbitCenter = newCenter;
 		auto camera_dir = camera->forward().normalized();
-		auto target_camera_position = m_camera->m_focusPoint - camera_dir * focus_distance;
+		auto target_camera_position = newCenter - camera_dir * focus_distance;
 		auto translation = target_camera_position - camera->position();
 		camera->Translate(translation, Space::World);
 	}

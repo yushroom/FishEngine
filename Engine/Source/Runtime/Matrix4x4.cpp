@@ -303,30 +303,35 @@ namespace FishEngine {
 	
 	Matrix4x4 Matrix4x4::FromRotation(const Quaternion& rotation)
 	{
+		//rotation should be unit quaternion
+
 		// Real-time rendering 3rd, p76
 		auto& q = rotation;
 		Matrix4x4 result;
-		float qxx = q.x * q.x;
-		float qyy = q.y * q.y;
-		float qzz = q.z * q.z;
-		float qxz = q.x * q.z;
-		float qxy = q.x * q.y;
-		float qyz = q.y * q.z;
-		float qwx = q.w * q.x;
-		float qwy = q.w * q.y;
-		float qwz = q.w * q.z;
+		float x = 2.0f * rotation.x;
+		float y = 2.0f * rotation.y;
+		float z = 2.0f * rotation.z;
+		float qxx = q.x * x;
+		float qyy = q.y * y;
+		float qzz = q.z * z;
+		float qxy = q.x * y;
+		float qxz = q.x * z;
+		float qyz = q.y * z;
+		float qwx = q.w * x;
+		float qwy = q.w * y;
+		float qwz = q.w * z;
 		
-		result.m[0][0] = 1.f - 2.f * (qyy + qzz);
-		result.m[1][0] = 2.f * (qxy + qwz);
-		result.m[2][0] = 2.f * (qxz - qwy);
+		result.m[0][0] = 1.f - (qyy + qzz);
+		result.m[1][0] = qxy + qwz;
+		result.m[2][0] = qxz - qwy;
 		
-		result.m[0][1] = 2.f * (qxy - qwz);
-		result.m[1][1] = 1.f - 2.f * (qxx + qzz);
-		result.m[2][1] = 2.f * (qyz + qwx);
+		result.m[0][1] = qxy - qwz;
+		result.m[1][1] = 1.f - (qxx + qzz);
+		result.m[2][1] = qyz + qwx;
 		
-		result.m[0][2] = 2.f * (qxz + qwy);
-		result.m[1][2] = 2.f * (qyz - qwx);
-		result.m[2][2] = 1.f - 2.f * (qxx + qyy);
+		result.m[0][2] = qxz + qwy;
+		result.m[1][2] = qyz - qwx;
+		result.m[2][2] = 1.f - (qxx + qyy);
 		return result;
 	}
 

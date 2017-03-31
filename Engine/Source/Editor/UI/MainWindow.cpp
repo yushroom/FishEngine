@@ -74,8 +74,37 @@ MainWindow::MainWindow(QWidget *parent) :
 		}
 	});
 
+	//auto space = FishEditor::MainEditor::m_mainSceneViewEditor->transformSpace();
+	//if (space == FishEditor::TransformSpace::Global)
+	//	this->ui->actionLocalOrGlobal->setText("Global");
+	//else
+	//	this->ui->actionLocalOrGlobal->setText("Local");
+	////FishEditor::MainEditor::m_mainSceneViewEditor->setTransformSpace(FishEditor::TransformSpace::Global);
+
+	//auto pivot = FishEditor::MainEditor::m_mainSceneViewEditor->transformPivot();
+	//if (pivot == FishEditor::TransformPivot::Center)
+	//	this->ui->actionCenterOrPivot->setText("Center");
+	//else
+	//	this->ui->actionCenterOrPivot->setText("Pivot");
+	////FishEditor::MainEditor::m_mainSceneViewEditor->setTransformPivot(FishEditor::TransformPivot::Center);
+
 	this->ui->actionLocalOrGlobal->setText("Global");
-	//FishEditor::MainEditor::m_mainSceneViewEditor->setTransformSpace(FishEditor::TransformSpace::Global);
+	this->ui->actionCenterOrPivot->setText("Center");
+
+	connect(ui->actionCenterOrPivot, &QAction::triggered, [this]() {
+		auto pivot = FishEditor::MainEditor::m_mainSceneViewEditor->transformPivot();
+
+		if (pivot == FishEditor::TransformPivot::Pivot)
+		{
+			this->ui->actionCenterOrPivot->setText("Center");
+			FishEditor::MainEditor::m_mainSceneViewEditor->setTransformPivot(FishEditor::TransformPivot::Center);
+		}
+		if (pivot == FishEditor::TransformPivot::Center)
+		{
+			this->ui->actionCenterOrPivot->setText("Pivot");
+			FishEditor::MainEditor::m_mainSceneViewEditor->setTransformPivot(FishEditor::TransformPivot::Pivot);
+		}
+	});
 
 	connect(ui->actionLocalOrGlobal, &QAction::triggered, [this]() {
 		auto space = FishEditor::MainEditor::m_mainSceneViewEditor->transformSpace();
@@ -130,7 +159,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(ui->actionFrameSelected, &QAction::triggered, [](){
 		//FishEngine::Camera::main()->FrameSelected(FishEditor::Selection::activeGameObject());
-		FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected(FishEditor::Selection::activeGameObject());
+		FishEditor::MainEditor::m_mainSceneViewEditor->FrameSelected();
 	});
 	
 	connect(ui->sceneViewDrawModeButton, &QToolButton::clicked, this, &MainWindow::ShowSceneViewDrawModeMenu);

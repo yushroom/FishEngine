@@ -75,13 +75,17 @@ namespace FishEngine
 	void Input::Update()
 	{
 		for (auto& s : m_keyStates) {
-			if (s == KeyState::Up || s == KeyState::Down)
+			if (s == KeyState::Down)
+				s = KeyState::Held;
+			if (s == KeyState::Up)
 				s = KeyState::None;
 		}
 
 		for (auto& b : m_mouseButtonStates) {
-			if (b == MouseButtonState::Down) b = MouseButtonState::Held;
-			else if (b == MouseButtonState::Up) b = MouseButtonState::None;
+			if (b == MouseButtonState::Down)
+				b = MouseButtonState::Held;
+			else if (b == MouseButtonState::Up)
+				b = MouseButtonState::None;
 		}
 
 		for (auto& a : m_axis) {
@@ -105,13 +109,13 @@ namespace FishEngine
 
 	void Input::UpdateKeyState(int key, KeyState state)
 	{
-		assert(key >= 0 && key < keyCount);
-		m_keyStates[key] = state;
+		if (key >= 0 && key < keyCount)
+			m_keyStates[key] = state;
 	}
 
 	void Input::UpdateMouseButtonState(int button, MouseButtonState state)
 	{
-		assert(button >= 0 && button <= 3);
-		m_mouseButtonStates[button] = state;
+		if (button >= 0 && button <= 3)
+			m_mouseButtonStates[button] = state;
 	}
 }

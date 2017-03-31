@@ -9,9 +9,9 @@
 #include <Debug.hpp>
 #include <Camera.hpp>
 #include <GameObject.hpp>
-#include <CameraController.hpp>
+//#include <CameraController.hpp>
 #include <ModelImporter.hpp>
-#include <TextureImporter.hpp>
+//#include <TextureImporter.hpp>
 #include <Shader.hpp>
 #include <Scene.hpp>
 #include <Screen.hpp>
@@ -24,7 +24,7 @@
 #include <Material.hpp>
 #include <PhysicsSystem.hpp>
 #include <Application.hpp>
-#include <Prefab.hpp>
+//#include <Prefab.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -61,13 +61,13 @@ namespace FishEditor
 		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.fbx"));
 		auto sponza_go = Object::Instantiate(sponza_model);
 		
-#if 0
+#if 1
 		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
 		assert(shader1 != nullptr);
-		auto createMaterial1 = [&sponza_go, &shader1] (const std::string& diffuse_tex, const std::string& mask_tex) -> MaterialPtr
+		auto applyMaterial1 = [&sponza_go, &shader1] (const std::string& diffuse_tex, const std::string& mask_tex, MaterialPtr mtl)
 		{
-			auto mtl = Material::CreateMaterial();
-			mtl->setName(diffuse_tex);
+			//auto mtl = Material::CreateMaterial();
+			//mtl->setName(diffuse_tex);
 			mtl->setShader(shader1);
 			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ diffuse_tex + ".png"));
 			assert(diffuse != nullptr);
@@ -77,7 +77,7 @@ namespace FishEditor
 			mtl->SetTexture("MaskTex", mask);
 			mtl->SetFloat("Roughness", 0.5f);
 			mtl->SetFloat("Specular", 0.5f);
-			return mtl;
+			//return mtl;
 		};
 
 		
@@ -96,27 +96,32 @@ namespace FishEditor
 			return mtl;
 		};
 
-		auto material = createMaterial2("background");
-		material = createMaterial2("lion");
-		material = createMaterial2("spnza_bricks_a_diff");
-		material = createMaterial2("sponza_arch_diff");
-		material = createMaterial2("sponza_ceiling_a_diff");
-		material = createMaterial2("sponza_column_a_diff");
-		material = createMaterial2("sponza_column_b_diff");
-		material = createMaterial2("sponza_column_c_diff");
-		material = createMaterial2("sponza_curtain_blue_diff");
-		material = createMaterial2("sponza_curtain_diff");
-		material = createMaterial2("sponza_curtain_green_diff");
-		material = createMaterial2("sponza_details_diff");
-		material = createMaterial2("sponza_fabric_blue_diff");
-		material = createMaterial2("sponza_fabric_diff");
-		material = createMaterial2("sponza_fabric_green_diff");
-		material = createMaterial2("sponza_flagpole_diff");
-		material = createMaterial2("sponza_floor_a_diff");
-		material = createMaterial2("sponza_roof_diff");
-		material = createMaterial2("vase_dif");
-		material = createMaterial2("vase_hanging");
-		material = createMaterial1("sponza_thorn_diff", "sponza_thorn_mask");
+		auto sponza_thron = FindNamedChild(sponza_go, "sponza_00")->GetComponent<Renderer>()->material();
+		applyMaterial1("sponza_thorn_diff", "sponza_thorn_mask", sponza_thron);
+
+		auto vase_plant = FindNamedChild(sponza_go, "sponza_01")->GetComponent<Renderer>()->material();
+		applyMaterial1("vase_plant", "vase_plant_mask", vase_plant);
+
+		//auto material = createMaterial2("background");
+		//material = createMaterial2("lion");
+		//material = createMaterial2("spnza_bricks_a_diff");
+		//material = createMaterial2("sponza_arch_diff");
+		//material = createMaterial2("sponza_ceiling_a_diff");
+		//material = createMaterial2("sponza_column_a_diff");
+		//material = createMaterial2("sponza_column_b_diff");
+		//material = createMaterial2("sponza_column_c_diff");
+		//material = createMaterial2("sponza_curtain_blue_diff");
+		//material = createMaterial2("sponza_curtain_diff");
+		//material = createMaterial2("sponza_curtain_green_diff");
+		//material = createMaterial2("sponza_details_diff");
+		//material = createMaterial2("sponza_fabric_blue_diff");
+		//material = createMaterial2("sponza_fabric_diff");
+		//material = createMaterial2("sponza_fabric_green_diff");
+		//material = createMaterial2("sponza_flagpole_diff");
+		//material = createMaterial2("sponza_floor_a_diff");
+		//material = createMaterial2("sponza_roof_diff");
+		//material = createMaterial2("vase_dif");
+		//material = createMaterial2("vase_hanging");
 #endif
 		
 		
@@ -394,7 +399,6 @@ namespace FishEditor
 	void InitializeScene_TestShadow()
 	{
 		//QualitySettings::setShadowDistance(20);
-		ModelImporter importer;
 		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/Terrain.obj"));
 		auto terrainGO = Object::Instantiate(model);
 		auto material = Material::InstantiateBuiltinMaterial("DebugCSM");

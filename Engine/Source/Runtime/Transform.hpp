@@ -103,21 +103,26 @@ namespace FishEngine
 		// direction (1, 0, 0) in world space.
 		Vector3 right() const
 		{
-			return Vector3::Normalize(rotation() * Vector3::right);
+			return rotation() * Vector3::right;
 		}
 		
 		// direction (0, 1, 0) in world space
 		Vector3 up() const
 		{
-			return Vector3::Normalize(rotation() * Vector3::up);
+			return rotation() * Vector3::up;
 		}
 		
 		// direction (0, 0, 1) in world space.
 		Vector3 forward() const
 		{
-			return Vector3::Normalize(rotation() * Vector3::forward);
+			return rotation() * Vector3::forward;
 		}
-		
+
+		void setForward(Vector3 const & newForward)
+		{
+			//this->LookAt(position() + newForward, this->up());
+			setRotation(Quaternion::LookRotation(newForward));
+		}
 
 		// The rotation of the transform in world space stored as a Quaternion.
 		Quaternion rotation() const

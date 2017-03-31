@@ -12,8 +12,8 @@
 	FGBufferData CalcGBuffer(VS_OUT v2f)
 	{
 		float mask = texture(MaskTex, v2f.uv).r;
-    	if (mask < 0.5)
-    		discard;
+		if (mask < 0.5)
+			discard;
 		FGBufferData GBuffer;
 		GBuffer.WorldNormal = v2f.normal;
 

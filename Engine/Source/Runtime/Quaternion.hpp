@@ -78,7 +78,7 @@ namespace FishEngine
 		 * @param const Vector3 & upwards The vector that defines in which direction up is.
 		 * @return FishEngine::Quaternion 
 		 */
-		//static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards = Vector3::up);
+		static Quaternion LookRotation(const Vector3& forward, const Vector3& upwards = Vector3::up);
 
 		/**
 		 * Creates a rotation with the specified forward and upwards directions.
@@ -87,10 +87,10 @@ namespace FishEngine
 		 * @param const Vector3 & up The vector that defines in which direction up is.
 		 * @return void
 		 */
-		//void SetLookRotation(const Vector3& view, const Vector3& up = Vector3::up)
-		//{
-		//	*this = Quaternion::LookRotation(view, up);
-		//}
+		void SetLookRotation(const Vector3& view, const Vector3& up = Vector3::up)
+		{
+			*this = Quaternion::LookRotation(view, up);
+		}
 
 
 		// Spherically interpolates between a and b by t. The parameter t is clamped to the range [0, 1].
@@ -116,13 +116,13 @@ namespace FishEngine
 		}
 
 		// Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis(in that order).
-		static Quaternion Euler(float x, float y, float z)
-		{
-			return Euler(Vector3(x, y, z));
-		}
+		static Quaternion Euler(float x, float y, float z);
 
 		// Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis (in that order).
-		static Quaternion Euler(const Vector3& euler);
+		static Quaternion Euler(const Vector3& euler)
+		{
+			return Euler(euler.x, euler.y, euler.z);
+		}
 
 
 		Quaternion operator *(const Quaternion & rhs) const

@@ -2,12 +2,17 @@
 #include "UI/MainWindow.hpp"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "UI/MenuStyle.hpp"
 #include "UI/OpenProjectDialog.hpp"
 
 int main(int argc, char *argv[])
 {
 	//FishEngine::Resources::SetAssetsDirectory("/Users/yushroom/program/graphics/FishEngine/Example/Sponza");
 	QApplication a(argc, argv);
+
+	// http://stackoverflow.com/questions/37020992/qt-prevent-menubar-from-grabbing-focus-after-alt-pressed-on-windows
+	a.setStyle(new MenuStyle);
+
 	QSurfaceFormat format;
 	format.setDepthBufferSize(24);
 	format.setStencilBufferSize(8);

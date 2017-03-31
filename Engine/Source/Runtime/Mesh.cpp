@@ -99,6 +99,7 @@ namespace FishEngine
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
 		m_triangleCount = static_cast<uint32_t>(triangles.size() / 3);
 		m_subMeshIndexOffset.push_back(m_triangleCount);
+		RecalculateBounds();
 	}
 
 	//Mesh::Mesh(Mesh&& m)
@@ -138,6 +139,29 @@ namespace FishEngine
 		glDeleteBuffers(1, &m_indexVBO);
 	}
 
+
+	void Mesh::RecalculateBounds()
+	{
+		Vector3 bmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
+		Vector3 bmax(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity);
+		for (auto & v : m_vertices)
+		{
+			if (bmin.x > v.x)
+				bmin.x = v.x;
+			if (bmin.y > v.y)
+				bmin.y = v.y;
+			if (bmin.z > v.z)
+				bmin.z = v.z;
+
+			if (bmax.x < v.x)
+				bmax.x = v.x;
+			if (bmax.y < v.y)
+				bmax.y = v.y;
+			if (bmax.z < v.z)
+				bmax.z = v.z;
+		}
+		m_bounds.SetMinMax(bmin, bmax);
+	}
 
 	void Mesh::UploadMeshData(bool markNoLogerReadable /*= true*/)
 	{

@@ -78,11 +78,16 @@ namespace FishEngine
 	Bounds Transform::TransformBounds(const Bounds& bounds) const
 	{
 		//Update();
+		if (!bounds.IsValid())
+			return bounds;
 		auto l2w = localToWorldMatrix();
 		auto center = bounds.center();
 		auto extents = bounds.extents();
-		float weights[] = { 1, 1, 1,  1, 1, -1,  1, -1, 1,  -1, 1, 1,
-			1, -1, -1,  -1, 1, -1,  -1, -1, 1,  -1, -1, -1};
+		float weights[] = {
+			1, 1, 1,  1, 1, -1,
+			1, -1, 1,  -1, 1, 1,
+			1, -1, -1,  -1, 1, -1,
+			-1, -1, 1,  -1, -1, -1};
 		Bounds result;
 		for (int i = 0; i < 8; ++i)
 		{
@@ -96,7 +101,7 @@ namespace FishEngine
 	Bounds Transform::InverseTransformBounds(const Bounds& bounds) const
 	{
 		// TODO: hack for empty scene
-		if (bounds.IsEmpty())
+		if (bounds.IsValid())
 			return bounds;
 		auto w2l = worldToLocalMatrix();
 		auto center = bounds.center();

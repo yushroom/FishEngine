@@ -20,17 +20,17 @@ public:
 	~GLWidget() = default;
 
 protected:
-	void initializeGL() Q_DECL_OVERRIDE;
-	void paintGL() Q_DECL_OVERRIDE;
-	void resizeGL(int width, int height) Q_DECL_OVERRIDE;
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int width, int height) override;
 
-	//void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+	//void mouseMoveEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
+	void wheelEvent(QWheelEvent *event) override;
 
-	//void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-	//void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+	void keyPressEvent(QKeyEvent *event) override;
+	void keyReleaseEvent(QKeyEvent *event) override;
 };
 
 #endif // GLWIDGET_H

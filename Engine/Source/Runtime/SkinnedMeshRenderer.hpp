@@ -17,7 +17,7 @@ namespace FishEngine
 
 		virtual void Update() override;
 
-		//protected:
+		virtual void PreRender() const override;
 		virtual void Render() const override;
 
 		void setAvatar(AvatarPtr avatar)

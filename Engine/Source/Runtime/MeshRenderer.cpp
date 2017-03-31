@@ -23,12 +23,20 @@ namespace FishEngine
 
 	}
 
+
 	Bounds MeshRenderer::localBounds() const
 	{
 		auto mf = gameObject()->GetComponent<MeshFilter>();
 		if (mf == nullptr || mf->mesh() == nullptr)
 			return Bounds();
 		return mf->mesh()->bounds();
+	}
+
+
+	void MeshRenderer::PreRender() const
+	{
+		auto model = transform()->localToWorldMatrix();
+		Pipeline::UpdatePerDrawUniforms(model);
 	}
 
 	void MeshRenderer::Render() const
@@ -39,15 +47,9 @@ namespace FishEngine
 			return;
 		}
 
-		auto model = transform()->localToWorldMatrix();
-		Pipeline::UpdatePerDrawUniforms(model);
+		PreRender();
 
 		const auto& mesh = meshFilter->mesh();
-//		for (auto& m : m_materials)
-//		{
-//			Graphics::DrawMesh(mesh, m);
-//		}
-		
 		auto materialCount = m_materials.size();
 		auto submeshCount = mesh->subMeshCount();
 		
@@ -55,13 +57,13 @@ namespace FishEngine
 		{
 			for (int i = 0; i < materialCount; ++i)
 			{
-				auto & m = m_materials[i];
-				Graphics::DrawMesh(mesh, m, i);
+				auto & material = m_materials[i];
+				Graphics::DrawMesh(mesh, material, i);
 			}
 		}
 		else
 		{
-			Debug::LogWarning("[MeshRenderer::Render] Material size and submesh count not match");
+			Debug::LogWarning("[MeshRenderer::Render] Material size and submesh count mismatch");
 			if (materialCount < submeshCount)
 			{
 				int materialId = 0;

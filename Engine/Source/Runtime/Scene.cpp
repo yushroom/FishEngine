@@ -29,7 +29,9 @@ namespace FishEngine
 
 	GameObjectPtr Scene::CreateGameObject(const std::string& name)
 	{
-		auto go = std::make_shared<GameObject>(name);
+		//auto go = std::make_shared<GameObject>(name);
+		auto go = GameObject::Create();
+		go->setName(name);
 		go->transform()->m_gameObject = go;
 		m_gameObjects.push_back(go);
 		return go;
@@ -37,7 +39,9 @@ namespace FishEngine
 
 	GameObjectPtr Scene::CreateCamera()
 	{
-		auto camera_go = Scene::CreateGameObject("Camera");
+		//auto camera_go = Scene::CreateGameObject("Camera");
+		auto camera_go = GameObject::Create();
+		camera_go->setName("Camera");
 		//camera_go->AddComponent<Camera>();
 		auto camera = Camera::Create();	// make sure camera is in Camera::allcameras
 		camera_go->AddComponent(camera);
@@ -75,9 +79,8 @@ namespace FishEngine
 		}
 		m_gameObjectsToBeDestroyed.clear(); // release (the last) strong refs, game objects should be destroyed automatically.
 
-		//m_bounds = Bounds();
-		
-		for (auto& go : m_gameObjects) {
+		for (auto& go : m_gameObjects)
+		{
 			if (!go->activeInHierarchy()) continue;
 			go->Update();
 		}
@@ -422,65 +425,81 @@ namespace FishEngine
 	void Scene::UpdateBounds()
 	{
 		m_bounds = Bounds();
+		
 		for (auto& go : m_gameObjects)
 		{
-			//if (go->transform()->parent() == nullptr)
+			auto renderers = go->GetComponentsInChildren<Renderer>();
+			for (auto & render : renderers)
 			{
-				Bounds bound;
-				auto rend = go->GetComponent<MeshRenderer>();
-				if (rend == nullptr)
-				{
-					auto srend = go->GetComponent<SkinnedMeshRenderer>();
-					if (srend == nullptr)
-						continue;
-					bound = srend->bounds();
-				}
-				else {
-					bound = rend->bounds();
-				}
-				m_bounds.Encapsulate(bound);
+				m_bounds.Encapsulate(render->bounds());
 			}
 		}
 	}
 	
 	GameObjectPtr Scene::IntersectRay(const Ray& ray)
 	{
-		if (!m_bounds.IntersectRay(ray))
-			return nullptr;
-		
+		//if (!m_bounds.IntersectRay(ray))
+		//	return nullptr;
+
+		m_bounds = Bounds();
+
 		GameObjectPtr selected = nullptr;
+		float tmin = Mathf::Infinity;
 		for (auto& go : m_gameObjects)
 		{
-			//if (go->transform()->parent() == nullptr)
-			if (true)
+			auto renderers = go->GetComponentsInChildren<Renderer>();
+			for (auto & renderer : renderers)
 			{
-				Bounds bound;
-				auto rend = go->GetComponent<MeshRenderer>();
-				if (rend == nullptr)
-				{
-					auto srend = go->GetComponent<SkinnedMeshRenderer>();
-					if (srend == nullptr)
-						continue;
-					bound = srend->bounds();
-				}
-				else {
-					bound = rend->bounds();
-				}
-				//m_bounds.Encapsulate(bound);
-
-				float tmin = Mathf::Infinity;
+				Bounds bound = renderer->bounds();
+				m_bounds.Encapsulate(bound);
+				//float tmin = Mathf::Infinity;
 				float t = Mathf::Infinity;
 				if (bound.IntersectRay(ray, &t))
 				{
-					if (t < tmin)
+					if (t > 0 && t < tmin)
 					{
 						tmin = t;
-						selected = go;
+						selected = renderer->gameObject();
 					}
 				}
 			}
 		}
+
+		return selected;
 		
+		//GameObjectPtr selected = nullptr;
+		//for (auto& go : m_gameObjects)
+		//{
+		//	//if (go->transform()->parent() == nullptr)
+		//	if (true)
+		//	{
+		//		Bounds bound;
+		//		auto rend = go->GetComponent<MeshRenderer>();
+		//		if (rend == nullptr)
+		//		{
+		//			auto srend = go->GetComponent<SkinnedMeshRenderer>();
+		//			if (srend == nullptr)
+		//				continue;
+		//			bound = srend->bounds();
+		//		}
+		//		else {
+		//			bound = rend->bounds();
+		//		}
+		//		//m_bounds.Encapsulate(bound);
+
+		//		float tmin = Mathf::Infinity;
+		//		float t = Mathf::Infinity;
+		//		if (bound.IntersectRay(ray, &t))
+		//		{
+		//			if (t < tmin)
+		//			{
+		//				tmin = t;
+		//				selected = go;
+		//			}
+		//		}
+		//	}
+		//}
+		//
 		return selected;
 	}
 	

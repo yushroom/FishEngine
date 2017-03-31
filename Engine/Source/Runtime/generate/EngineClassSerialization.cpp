@@ -255,13 +255,9 @@ namespace FishEngine
 	{
 		//archive.BeginClass();
 		FishEngine::Script::Serialize(archive);
-		archive << FishEngine::make_nvp("m_isRotating", m_isRotating); // bool
 		archive << FishEngine::make_nvp("m_lookAtMode", m_lookAtMode); // bool
 		archive << FishEngine::make_nvp("m_rotateSpeed", m_rotateSpeed); // float
 		archive << FishEngine::make_nvp("m_dragSpeed", m_dragSpeed); // float
-		archive << FishEngine::make_nvp("m_originalPosition", m_originalPosition); // FishEngine::Vector3
-		archive << FishEngine::make_nvp("m_originalRotation", m_originalRotation); // FishEngine::Quaternion
-		archive << FishEngine::make_nvp("m_originalScale", m_originalScale); // FishEngine::Vector3
 		//archive.EndClass();
 	}
 
@@ -269,13 +265,9 @@ namespace FishEngine
 	{
 		//archive.BeginClass(2);
 		FishEngine::Script::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_isRotating", m_isRotating); // bool
 		archive >> FishEngine::make_nvp("m_lookAtMode", m_lookAtMode); // bool
 		archive >> FishEngine::make_nvp("m_rotateSpeed", m_rotateSpeed); // float
 		archive >> FishEngine::make_nvp("m_dragSpeed", m_dragSpeed); // float
-		archive >> FishEngine::make_nvp("m_originalPosition", m_originalPosition); // FishEngine::Vector3
-		archive >> FishEngine::make_nvp("m_originalRotation", m_originalRotation); // FishEngine::Quaternion
-		archive >> FishEngine::make_nvp("m_originalScale", m_originalScale); // FishEngine::Vector3
 		//archive.EndClass();
 	}
 
@@ -290,13 +282,9 @@ namespace FishEngine
 	void FishEngine::CameraController::CopyValueTo(std::shared_ptr<FishEngine::CameraController> target, FishEngine::CloneUtility & cloneUtility) const
 	{
 		FishEngine::Script::CopyValueTo(target, cloneUtility);
-		cloneUtility.Clone(this->m_isRotating, target->m_isRotating); // bool
 		cloneUtility.Clone(this->m_lookAtMode, target->m_lookAtMode); // bool
 		cloneUtility.Clone(this->m_rotateSpeed, target->m_rotateSpeed); // float
 		cloneUtility.Clone(this->m_dragSpeed, target->m_dragSpeed); // float
-		cloneUtility.Clone(this->m_originalPosition, target->m_originalPosition); // FishEngine::Vector3
-		cloneUtility.Clone(this->m_originalRotation, target->m_originalRotation); // FishEngine::Quaternion
-		cloneUtility.Clone(this->m_originalScale, target->m_originalScale); // FishEngine::Vector3
 	}
 
 

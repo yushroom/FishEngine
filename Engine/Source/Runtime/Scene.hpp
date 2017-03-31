@@ -146,6 +146,7 @@ namespace FishEngine
 
 		static Bounds bounds()
 		{
+			UpdateBounds();
 			return m_bounds;
 		}
 		
@@ -172,7 +173,7 @@ namespace FishEngine
 		
 		static Bounds                   m_bounds;
 		//static SceneOctree              m_octree;
-		
+
 		static void UpdateBounds();
 	};
 }

@@ -9,13 +9,23 @@ namespace FishEngine
 {
 	class FE_EXPORT Bounds
 	{
+	private:
+		// The center of the bounding box.
+		Vector3 m_center;
+
+		// The extents of the box.This is always half of the size.
+		Vector3 m_extents;
+
 	public:
 		
 		InjectSerializationFunctionsNonPolymorphic(Bounds);
 		
-		Bounds() : m_center(0, 0, 0), m_extents(Mathf::NegativeInfinity, Mathf::NegativeInfinity, Mathf::NegativeInfinity) {}
+		Bounds() : m_center(0, 0, 0), m_extents(-1, -1, -1)	// make it invalid
+		{
+		}
 		
-		Bounds(const Vector3& center, const Vector3& size) : m_center(center), m_extents(size*0.5f)
+		Bounds(const Vector3& center, const Vector3& size) 
+			: m_center(center), m_extents(size*0.5f)
 		{
 		}
 		
@@ -33,49 +43,76 @@ namespace FishEngine
 
 		// The minimal point of the box. This is always equal to center-extents.
 		Vector3 min() const { return m_center - m_extents; }
-		void setMin(const Vector3& min) { SetMinMax(min, max()); }
+		void setMin(const Vector3& value) { SetMinMax(value, max()); }
 
 		// The maximal point of the box. This is always equal to center+extents.
 		Vector3 max() const { return m_center + m_extents; }
-		void setMax(const Vector3& max) { SetMinMax(min(), max); }
+		void setMax(const Vector3& value) { SetMinMax(this->min(), value); }
 
-		void SetMinMax(const Vector3& min, const Vector3& max) {
+		void SetMinMax(const Vector3& min, const Vector3& max)
+		{
 			m_extents = (max - min) * 0.5f;
 			m_center = min + m_extents;
-		} 
+		}
 
 
 		// Grows the Bounds to include the point.
 		void Encapsulate(const Vector3& point)
 		{
-			SetMinMax(Vector3::Min(min(), point), Vector3::Max(max(), point));
+			if (IsValid())
+			{
+				SetMinMax(Vector3::Min(this->min(), point), Vector3::Max(this->max(), point));
+			}
+			else
+			{
+				m_extents = Vector3::zero;
+				m_center = point;
+			}
 		}
 
 		// Grow the bounds to encapsulate the bounds.
 		void Encapsulate(const Bounds& bounds)
 		{
-			Encapsulate(bounds.m_center - bounds.m_extents);
-			Encapsulate(bounds.m_center + bounds.m_extents);
+			if (!bounds.IsValid())
+				return;
+			if (IsValid())
+			{
+				Encapsulate(bounds.m_center - bounds.m_extents);
+				Encapsulate(bounds.m_center + bounds.m_extents);
+			}
+			else
+			{
+				m_center = bounds.m_center;
+				m_extents = bounds.m_extents;
+			}
 		}
 
 		// Expand the bounds by increasing its size by amount along each side.
 		void Expand(float amount)
 		{
-			amount *= 0.5f;
-			m_extents += Vector3(amount, amount, amount);
+			if (IsValid())
+			{
+				amount *= 0.5f;
+				m_extents += amount;
+			}
 		}
 
 		// Expand the bounds by increasing its size by amount along each side.
 		void Expand(const Vector3& amount)
 		{
-			m_extents += amount * 0.5f;
+			if (IsValid())
+			{
+				m_extents += amount * 0.5f;
+			}
 		}
 
 		// Does another bounding box intersect with this bounding box ?
 		bool Intersects(const Bounds& bounds)
 		{
-			auto pmin = min();
-			auto pmax = max();
+			if (! (IsValid() && bounds.IsValid()) )
+				return false;
+			auto pmin = this->min();
+			auto pmax = this->max();
 			auto bpmin = bounds.min();
 			auto bpmax = bounds.max();
 			return pmin.x <= bpmax.x && pmax.x >= bpmin.x && pmin.y <= bpmax.y && pmax.y >= bpmin.y && pmin.z <= bpmax.z && pmax.z >= bpmin.z;
@@ -96,8 +133,10 @@ namespace FishEngine
 		// Is point contained in the bounding box?
 		bool Contains(const Vector3& point)
 		{
-			auto pmin = min();
-			auto pmax = max();
+			if (!IsValid())
+				return false;
+			auto pmin = this->min();
+			auto pmax = this->max();
 			return (point.x > pmin.x) && (point.y < pmax.x) && (point.y > pmin.y) && (point.y < pmax.y) && (point.z > pmin.z) && (point.z < pmax.z);
 		}
 
@@ -113,14 +152,10 @@ namespace FishEngine
 		// return The point on the bounding box or inside the bounding box.
 		Vector3 ClosestPoint(const Vector3& point);
 		
-		bool IsEmpty() const
+		bool IsValid() const
 		{
-			return m_extents.x < 0 || m_extents.y < 0 || m_extents.z < 0;
+			return m_extents.x >= 0 && m_extents.y >= 0 && m_extents.z >= 0;
 		}
-
-	private:
-		Vector3 m_center;
-		Vector3 m_extents;
 	};
 }
 

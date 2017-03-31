@@ -392,6 +392,15 @@ namespace FishEngine
 			return Mathf::Abs(b - a) < Mathf::Max(1E-06f * Mathf::Max(Mathf::Abs(a), Mathf::Abs(b)), Mathf::Epsilon * 8.f);
 		}
 
+
+		// Returns true if the distance between f0 and f1 is smaller than epsilon
+		static bool CompareApproximately(float f0, float f1, float epsilon = 0.000001F)
+		{
+			float dist = (f0 - f1);
+			dist = fabsf(dist);
+			return dist < epsilon;
+		}
+
 		/**
 		 * Gradually changes a value towards a desired goal over time.
 		 *

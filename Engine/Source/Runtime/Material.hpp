@@ -50,12 +50,30 @@ namespace FishEngine
 		 */
 		 Color color() const;
 
+		// The main material's color.
+		// The same as using GetColor or SetColor with "_Color" name.
+		void setColor(const Color& color);
+
+
+		// The material's texture.
+		// The same as using GetTexture or SetTexture with "_MainTex" name.
+		void setMainTexture(TexturePtr texture);
+
+		TexturePtr mainTexture() const;
+
+
+		int passCount();
+
+		int renderQueue();
+
+
+
 		/**
 		 * The shader used by the material.
 		 *
 		 * @return FishEngine::ShaderPtr
 		 */
-		 ShaderPtr shader() const
+		ShaderPtr shader() const
 		{
 			return m_shader;
 		}
@@ -112,14 +130,6 @@ namespace FishEngine
 
 		// Set a named texture
 		void SetTexture(const std::string& name, TexturePtr texture);
-
-		// The material's texture.
-		// The same as using GetTexture or SetTexture with "_MainTex" name.
-		void setMainTexture(TexturePtr texture);
-
-		// The main material's color.
-		// The same as using GetColor or SetColor with "_Color" name.
-		void setColor(const Color& color);
 
 		void BindTextures(const std::map<std::string, TexturePtr>& textures);
 

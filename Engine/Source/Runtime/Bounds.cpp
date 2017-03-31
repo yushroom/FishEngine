@@ -5,6 +5,8 @@ using namespace FishEngine;
 
 bool FishEngine::Bounds::IntersectRay(const Ray& ray, float* outDistance /*= nullptr*/)
 {
+	if (!IsValid())
+		return false;
 	// PBRT 4.2.1
 	auto pmin = this->min();
 	auto pmax = this->max();

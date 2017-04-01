@@ -465,17 +465,32 @@ namespace FishEditor
 #endif
 		if ( !boost::filesystem::exists(shared_lib_path) )
 		{
-			Debug::LogError("%s not found", shared_lib_path.string().c_str());
+			LogError(shared_lib_path.string() + " not found");
 			abort();
 		}
 		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
 		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
 		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
-			Debug::Log("Delete from dll");
+			LogInfo("Delete from dll");
 			deleteFunc(s);
 		});
 		
 		cube->AddComponent(rotator);
+	}
+
+	void InitializeScene_Empty()
+	{
+		auto whiteCube = GameObject::CreatePrimitive(PrimitiveType::Cube);
+		auto blackSperer = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+		
+
+		auto white = Material::InstantiateBuiltinMaterial("Diffuse");
+		white->setMainTexture(Texture2D::whiteTexture());
+		whiteCube->GetComponent<Renderer>()->SetMaterial(white);
+
+		auto black = Material::InstantiateBuiltinMaterial("Diffuse");
+		black->setMainTexture(Texture2D::blackTexture());
+		blackSperer->GetComponent<Renderer>()->SetMaterial(black);
 	}
 	
 
@@ -550,6 +565,10 @@ namespace FishEditor
 		else if (projectName == "TestScript")
 		{
 			InitializeScene_TestScript();
+		}
+		else if (projectName == "Empty")
+		{
+			InitializeScene_Empty();
 		}
 
 		glClearColor(1.0f, 0.0f, 0.0f, 1);

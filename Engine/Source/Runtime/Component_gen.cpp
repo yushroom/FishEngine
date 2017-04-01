@@ -38,7 +38,8 @@ AddComponentToGameObject(
 	}
 	CASE(CameraController)
 #undef CASE
-	Debug::LogError("UNKNOWN component type name: %s", componentClassName.c_str());
+	//Debug::LogError("UNKNOWN component type name: %s", componentClassName.c_str());
+	LogError("UNKNOWN component type name: " + componentClassName);
 	//abort();
 	return nullptr;
 }

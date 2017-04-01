@@ -214,11 +214,11 @@ void ProjectView::OnIconSizeChanged(int size)
 
 void ProjectView::OnFileChanged(QString const & path)
 {
-	FishEngine::Debug::Log("ProjectView::OnFileChanged: %s", path.toStdString().c_str());
+	LogInfo(path.toStdString());
 }
 
 
 void ProjectView::OnDirectoryChanged(QString const & path)
 {
-	FishEngine::Debug::Log("ProjectView::OnDirectoryChanged: %s", path.toStdString().c_str());
+	LogInfo(path.toStdString());
 }

@@ -156,7 +156,7 @@ void PrintNode(YAML::Node const & node)
 {
 	if (node.IsScalar())
 	{
-		Debug::Log("%s", node.as<std::string>().c_str());
+		LogInfo(node.as<std::string>());
 	}
 	else if (node.IsSequence())
 	{

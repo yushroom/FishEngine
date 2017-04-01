@@ -46,7 +46,7 @@ namespace FishEditor
 		// temp
 		m_size.x = Screen::width();
 		m_size.y = Screen::height();
-		Debug::Log("size: x = %d, y = %d", m_size.x, m_size.y);
+		LogInfo(Format( "size: x = %1%, y = %2%", m_size.x, m_size.y ));
 
 		m_camera = Camera::Create(60.0, 0.1f, 1000.f, CameraType::SceneView);
 		m_cameraGameObject = std::make_shared<GameObject>("EditorCamera");
@@ -560,7 +560,7 @@ namespace FishEditor
 			lastMousePosition = ray.GetPoint(t);
 			const auto position = selectedGO->transform()->position();
 			undo_function = [selectedGO, position]() {
-				Debug::LogWarning("Undo translation");
+				LogWarning("Undo translation");
 				selectedGO->transform()->setPosition(position);
 			};
 		}
@@ -588,7 +588,7 @@ namespace FishEditor
 			m_mouseEventHandled = false;
 			const auto position = selectedGO->transform()->position();
 			redo_function = [selectedGO, position]() {
-				Debug::LogWarning("Redo translation");
+				LogWarning("Redo translation");
 				selectedGO->transform()->setPosition(position);
 			};
 			//CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
@@ -648,7 +648,7 @@ namespace FishEditor
 						
 						const auto rotation = selectedGO->transform()->rotation();
 						undo_function = [selectedGO, rotation]() {
-							Debug::LogWarning("Undo rotation");
+							LogWarning("Undo rotation");
 							selectedGO->transform()->setRotation(rotation);
 						};
 
@@ -703,7 +703,7 @@ namespace FishEditor
 			m_mouseEventHandled = false;
 			const auto rotation = selectedGO->transform()->rotation();
 			redo_function = [selectedGO, rotation]() {
-				Debug::LogWarning("Redo rotation");
+				LogWarning("Redo rotation");
 				selectedGO->transform()->setRotation(rotation);
 			};
 			CommandManager::AddCommand(std::make_pair(undo_function, redo_function));
@@ -979,7 +979,7 @@ namespace FishEditor
 
 		if (interested && Input::GetMouseButtonDown(0))
 		{
-			Debug::Log("%d", hoverIndex);
+			//Debug::Log("%d", hoverIndex);
 			if (hoverIndex == 6)
 			{
 				camera->setOrthographic(!camera->orghographic());
@@ -1005,7 +1005,7 @@ namespace FishEditor
 
 	void SceneViewEditor::Resize(int width, int height)
 	{
-		FishEngine::Debug::Log("SceneViewEditor::Resize %d %d", width, height);
+		LogInfo(Format( "SceneViewEditor::Resize %1% %2%", width, height ));
 		m_size.x = width;
 		m_size.y = height;
 		Screen::set(width, height);

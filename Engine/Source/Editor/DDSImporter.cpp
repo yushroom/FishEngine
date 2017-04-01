@@ -39,7 +39,7 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 	gli::texture gli_texture = gli::load(path);
 	if (gli_texture.empty())
 	{
-		Debug::LogError("Texture %s not found", path.c_str());
+		LogError("Texture not found: " + path);
 		abort();
 	}
 	
@@ -196,7 +196,7 @@ GLuint CreateTextureFromDDS(char const* path, FishEngine::TextureDimension* out_
 	gli::texture gli_texture = gli::load(path);
 	if (gli_texture.empty())
 	{
-		Debug::LogError("Texture %s not found", path);
+		LogError(std::string("Texture not found: ") + path);
 		abort();
 	}
 

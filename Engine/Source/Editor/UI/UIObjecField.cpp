@@ -37,7 +37,7 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
 
 	if (m_label != label)
 	{
-		Debug::Log("[UIObjecField] new label: %s", m_label.c_str());
+		LogInfo("[UIObjecField] new label: " + m_label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());

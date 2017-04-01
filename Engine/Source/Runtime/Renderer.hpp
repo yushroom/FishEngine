@@ -47,8 +47,11 @@ namespace FishEngine
 
 		void SetMaterial(MaterialPtr material)
 		{
-			m_materials.clear();
-			m_materials.push_back(material);
+			//m_materials.clear();
+			if (m_materials.empty())
+				m_materials.push_back(material);
+			else
+				m_materials[0] = material;
 		}
 
 		virtual Bounds localBounds() const = 0;

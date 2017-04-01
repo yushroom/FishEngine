@@ -56,7 +56,7 @@ namespace FishEngine
 		static void AddTag(std::string const & tag)
 		{
 			if (Exists(tag)) {
-				Debug::LogError("tag %s has already exists", tag.c_str());
+				LogError("tag " + tag + " has already exists");
 			}
 			else{
 				s_tags.push_back(tag);

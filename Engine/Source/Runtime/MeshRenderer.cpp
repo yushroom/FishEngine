@@ -43,7 +43,7 @@ namespace FishEngine
 	{
 		auto meshFilter = gameObject()->GetComponent<MeshFilter>();
 		if (meshFilter == nullptr) {
-			Debug::LogWarning("This GameObject has no MeshFilter");
+			LogWarning("This GameObject has no MeshFilter");
 			return;
 		}
 
@@ -63,7 +63,7 @@ namespace FishEngine
 		}
 		else
 		{
-			Debug::LogWarning("[MeshRenderer::Render] Material size and submesh count mismatch");
+			LogWarning("Material size and submesh count mismatch");
 			if (materialCount < submeshCount)
 			{
 				int materialId = 0;

@@ -107,11 +107,15 @@ namespace FishEngine
 		RG32,   // **New**, uint16_t * 2
 	};
 
+	// eg. return 4 for RGBA32, 3 for RGB24
+	// return -1 for compression format
+	int BytePerPixel(TextureFormat format);
+
 	void TextureFormat2GLFormat(
 		TextureFormat format,
-		GLenum& out_internalFormat,
-		GLenum& out_externalFormat,
-		GLenum& out_pixelType);
+		GLenum* out_internalFormat,
+		GLenum* out_externalFormat,
+		GLenum* out_pixelType);
 
 	enum class CubemapFace
 	{

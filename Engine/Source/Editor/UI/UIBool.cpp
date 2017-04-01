@@ -26,7 +26,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
 {
 	if (m_changed)
 	{
-		Debug::Log("[UIBool] value changed");
+		LogInfo("[UIBool] value changed");
 		value = m_value;
 		m_changed = false;
 		return true;
@@ -34,7 +34,7 @@ bool UIBool::CheckUpdate(const std::string &label, bool &value)
 
 	if (m_label != label)
 	{
-		Debug::Log("[UIBool] new label: %s", m_label.c_str());
+		LogInfo("[UIBool] new label: " + m_label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());
@@ -50,7 +50,7 @@ void UIBool::SetValue(bool value)
 	if (m_value != value)
 	{
 		m_value = value;
-		Debug::Log("[UIBool] new value");
+		LogInfo("[UIBool] new value");
 		LOG;
 		ui->checkBox->blockSignals(true);
 		ui->checkBox->setChecked(value);

@@ -78,7 +78,7 @@ namespace FishEditor
 		{
 			if (Editor::m_AllowMultiObjectAccess)
 			{
-				FishEngine::Debug::LogError("The serializedObject should not be used inside OnSceneGUI or OnPreviewGUI. Use the target property directly instead.");
+				LogError("The serializedObject should not be used inside OnSceneGUI or OnPreviewGUI. Use the target property directly instead.");
 			}
 			return this->GetSerializedObjectInternal();
 		}

@@ -28,7 +28,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 {
 	if (m_changed)
 	{
-		Debug::Log("[float] value changed");
+		LogInfo("[float] value changed");
 		value = m_value;
 		m_changed = false;
 		return true;
@@ -36,7 +36,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 
 	if (m_label != label)
 	{
-		Debug::Log("[float] new label: %s", m_label.c_str());
+		LogInfo("[float] new label: " + m_label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());
@@ -46,7 +46,7 @@ bool UIFloat::CheckUpdate(const std::string &label, float &value)
 	{
 		if (!ui->value->hasFocus())
 		{
-			Debug::Log("[float] new value");
+			LogInfo("[float] new value");
 			LOG;
 			m_value = value;
 			//ui->value->blockSignals(true);
@@ -64,7 +64,7 @@ void UIFloat::SetValue(float value)
 	{
 		//if (!ui->value->hasFocus())
 		//{
-			Debug::Log("[float] new value");
+			LogInfo("[float] new value");
 			LOG;
 			m_value = value;
 			//ui->value->blockSignals(true);

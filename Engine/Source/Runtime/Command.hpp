@@ -31,7 +31,7 @@ public:
 	{
 		if (!Undoable())
 		{
-			Debug::LogWarning("no more command to undo");
+			LogWarning("no more command to undo");
 			return;
 		}
 		s_commands[s_index].first();
@@ -42,7 +42,7 @@ public:
 	{
 		if (!Redoable())
 		{
-			Debug::LogWarning("no more command to redo");
+			LogWarning("no more command to redo");
 			return;
 		}
 		s_index++;

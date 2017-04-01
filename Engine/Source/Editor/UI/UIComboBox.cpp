@@ -33,7 +33,7 @@ bool UIComboBox::CheckUpdate(const std::string &label, int & index, const char *
 {
 	if (m_changed)
 	{
-		FishEngine::Debug::Log("[Enum] index changed");
+		LogInfo("[Enum] index changed");
 		index = m_index;
 		m_changed = false;
 		return true;
@@ -41,7 +41,7 @@ bool UIComboBox::CheckUpdate(const std::string &label, int & index, const char *
 
 	if (m_label != label)
 	{
-		FishEngine::Debug::Log("[Enum] new label: %s", label.c_str());
+		LogInfo("[Enum] new label: ", label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());
@@ -49,7 +49,7 @@ bool UIComboBox::CheckUpdate(const std::string &label, int & index, const char *
 
 	if (enumStringArray != m_enumStringArray)
 	{
-		FishEngine::Debug::Log("[Enum] new enum");
+		LogInfo("[Enum] new enum");
 		m_enumStringArray = enumStringArray;
 		m_index = index;
 		QStringList sl;
@@ -79,7 +79,7 @@ void UIComboBox::SetValue(int index)
 {
 	if (m_index != index)
 	{
-		FishEngine::Debug::Log("[Enum] new index");
+		LogInfo("[Enum] new index");
 		m_index = index;
 		LOG;
 		ui->comboBox->blockSignals(true);

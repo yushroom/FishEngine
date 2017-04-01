@@ -17,7 +17,7 @@ std::shared_ptr<ColorBuffer> ColorBuffer::Create(const int width, const int heig
 	assert(t->m_GLNativeTexture > 0);
 	glBindTexture(GL_TEXTURE_2D, t->m_GLNativeTexture);
 	GLenum internal_format, external_format, pixel_type;
-	TextureFormat2GLFormat(format, internal_format, external_format, pixel_type);
+	TextureFormat2GLFormat(format, &internal_format, &external_format, &pixel_type);
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, t->m_width, t->m_height, 0, external_format, pixel_type, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -34,13 +34,13 @@ std::shared_ptr<ColorBuffer> ColorBuffer::Create(const int width, const int heig
 
 void ColorBuffer::Resize(const int newWidth, const int newHeight)
 {
-	Debug::Log("ColorBuffer::Resize");
+	LogInfo("ColorBuffer::Resize");
 	if (newWidth == m_width && newHeight == m_height)
 		return;
 	m_width = newWidth;
 	m_height = newHeight;
 	GLenum internal_format, external_format, pixel_type;
-	TextureFormat2GLFormat(m_format, internal_format, external_format, pixel_type);
+	TextureFormat2GLFormat(m_format, &internal_format, &external_format, &pixel_type);
 	glBindTexture(GL_TEXTURE_2D, m_GLNativeTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0, external_format, pixel_type, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -72,7 +72,7 @@ std::shared_ptr<DepthBuffer> DepthBuffer::Create(const int width, const int heig
 
 void DepthBuffer::Resize(const int newWidth, const int newHeight)
 {
-	Debug::Log("DepthBuffer::Resize");
+	LogInfo("DepthBuffer::Resize");
 	if (newWidth == m_width && newHeight == m_height)
 		return;
 	m_width = newWidth;
@@ -158,7 +158,7 @@ std::shared_ptr<LayeredDepthBuffer> LayeredDepthBuffer::Create(const int width, 
 
 void FishEngine::LayeredDepthBuffer::Resize(const int newWidth, const int newHeight)
 {
-	Debug::Log("LayeredDepthBuffer::Resize");
+	LogInfo("LayeredDepthBuffer::Resize");
 	if (newWidth == m_width && newHeight == m_height)
 		return;
 	m_width = newWidth;

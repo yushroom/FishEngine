@@ -61,7 +61,7 @@ ShaderPtr EditorResources::builtinShader(const std::string& name)
 	{
 		return it->second;
 	}
-	Debug::LogWarning("No built-in shader called %s", name.c_str());
+	LogWarning("No built-in shader called: " + name);
 	abort();
 	return nullptr;
 }
@@ -80,7 +80,7 @@ FishEngine::MaterialPtr EditorResources::builtinMaterial(const std::string& name
 
 MaterialPtr EditorResources::InstantiateBuiltinMaterial(const std::string& name)
 {
-	Debug::Log("Material::InstantiateBuiltinMaterial, %s", name.c_str());
+	LogInfo(name);
 	auto shader = builtinShader(name);
 	assert(shader != nullptr);
 	auto material = Material::CreateMaterial();

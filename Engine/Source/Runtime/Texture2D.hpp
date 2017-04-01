@@ -12,7 +12,7 @@ namespace FishEngine
 
 		Texture2D() = default;
 
-		Texture2D(int width, int height, TextureFormat format, uint8_t* data, int byteCount);
+		Texture2D(int width, int height, TextureFormat format, const uint8_t* data, int byteCount = -1);
 
 		// The format of the pixel data in the texture (Read Only).
 		TextureFormat format() const
@@ -25,6 +25,13 @@ namespace FishEngine
 		{
 			return m_mipmapCount;
 		}
+
+		// Get a small texture with all white pixels.
+		static Texture2DPtr whiteTexture();
+
+		static Texture2DPtr blackTexture();
+		
+
 	protected:
 
 		virtual void UploadToGPU() override;
@@ -43,7 +50,6 @@ namespace FishEngine
 		// How many mipmap levels are in this texture (Read Only).
 		uint32_t m_mipmapCount;
 
-		static Texture2DPtr m_blackTexture;
-		static Texture2DPtr m_whiteTexture;
+		
 	};
 }

@@ -89,7 +89,7 @@ namespace FishEditor
 			}
 		}
 #endif
-		Debug::Log("Generate .meta file: %s", meta_path.c_str());
+		LogInfo("Generate .meta file: " + meta_path);
 		auto importer = std::make_shared<AssetImporterType>();
 		importer->setName(name);
 		// do not set assetTimeStamp here

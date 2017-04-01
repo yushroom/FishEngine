@@ -66,11 +66,9 @@ namespace FishEngine
 		auto err = glewInit();
 		if (err != GLEW_OK)
 		{
-			Debug::Log("%s", glewGetErrorString(err));
-		}
-		else
-		{
-			Debug::Log("GlEW initialized");
+			//LogInfo(std::string(glewGetErrorString(err)));
+			LogError("GLEW not initialized");
+			abort();
 		}
 #endif
 	}

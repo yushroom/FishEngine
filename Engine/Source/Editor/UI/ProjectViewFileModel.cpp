@@ -58,7 +58,7 @@ Qt::ItemFlags ProjectViewFileModel::flags(const QModelIndex &index) const
 
 bool ProjectViewFileModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
-	Debug::LogWarning("ProjectViewFileModel::setData");
+	LogWarning("ProjectViewFileModel::setData");
 	//return true;
 	if (!index.isValid())
 	{

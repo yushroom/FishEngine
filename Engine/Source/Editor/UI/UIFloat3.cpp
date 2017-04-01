@@ -42,7 +42,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 {
 	if (m_changed)
 	{
-		Debug::Log("[float3] value changed");
+		LogInfo("[float3] value changed");
 		x = m_x;
 		y = m_y;
 		z = m_z;
@@ -52,7 +52,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 
 	if (m_label != label)
 	{
-		Debug::Log("[float3] new label: %s", label.c_str());
+		LogInfo("[float3] new label: %s", label.c_str());
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());
@@ -62,7 +62,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 	{
 		if (!ui->x->hasFocus())
 		{
-			Debug::Log("[float3] new x");
+			LogInfo("[float3] new x");
 			LOG;
 			ui->x->blockSignals(true);
 			ui->x->setValue(x);
@@ -74,7 +74,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 	{
 		if (!ui->y->hasFocus())
 		{
-			Debug::Log("[float3] new y");
+			LogInfo("[float3] new y");
 			LOG;
 			ui->y->blockSignals(true);
 			ui->y->setValue(y);
@@ -86,7 +86,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 	{
 		if (!ui->z->hasFocus())
 		{
-			Debug::Log("[float3] new z");
+			LogInfo("[float3] new z");
 			LOG;
 			ui->z->blockSignals(true);
 			ui->z->setValue(z);

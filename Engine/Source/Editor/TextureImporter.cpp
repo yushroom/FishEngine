@@ -53,11 +53,11 @@ private:
 		const char* typeName = FreeImage_GetFormatFromFIF(fif);
 		if (typeName)
 		{
-			Debug::LogError("FreeImage error: '%s' when loading format", message, typeName);
+			LogError(Format( "FreeImage error: %1% when loading format %2%", message, typeName ));
 		}
 		else
 		{
-			Debug::LogError("FreeImage error: '%s'", message);
+			LogError(std::string("FreeImage error: ") + message);
 		}
 	}
 };
@@ -259,7 +259,7 @@ namespace FishEditor
 			
 			if (needResize)
 			{
-				Debug::LogWarning("resize image");
+				LogWarning("resize image");
 				auto newdib = FreeImage_Rescale(dib, width, height);
 				FreeImage_Unload(dib);
 				newdib = dib;

@@ -1,18 +1,11 @@
 #include "Debug.hpp"
-#include <cstdio>
-#include <cstdarg>
 #include <iostream>
 
 #if FISHENGINE_PLATFORM_WINDOWS
 #include <windows.h>
 static HANDLE hstdout;
-#define vsprintf vsprintf_s
-#elif FISHENGINE_PLATFORM_APPL
-#else
 #endif
 
-constexpr int SPRINT_BUF_SIZE = 4096 * 8;
-static char sprint_buf[SPRINT_BUF_SIZE];
 
 using std::cout;
 
@@ -37,8 +30,9 @@ namespace FishEngine
 #endif
 	}
 
-
-	void Debug::Log(const char *fmt, ...)
+#if 0
+	void  Debug::_Log(const std::string & message)
+	//void Debug::Log(const char *fmt, ...)
 	{
 		if (s_colorMode)
 		{
@@ -51,12 +45,8 @@ namespace FishEngine
 			printf("\e[0;37m");    // white
 #endif
 		}
-		std::cout << "[INFO] ";
-		va_list args;
-		va_start(args, fmt);
-		int n = vsprintf(sprint_buf, fmt, args);
-		va_end(args);
-		std::cout.write(sprint_buf, n);
+
+		std::cout << message;
 		std::cout << std::endl;
 
 #if FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
@@ -67,7 +57,7 @@ namespace FishEngine
 #endif
 	}
 
-	void Debug::LogWarning(const char *fmt, ...)
+	void Debug::_LogWarning(const std::string & message)
 	{
 		if (s_colorMode)
 		{
@@ -79,13 +69,9 @@ namespace FishEngine
 #endif
 		}
 		
-		std::cout << "[WARNING] ";
-		va_list args;
-		va_start(args, fmt);
-		int n = vsprintf(sprint_buf, fmt, args);
-		va_end(args);
-		std::cout.write(sprint_buf, n);
+		std::cout << message;
 		std::cout << std::endl;
+
 #if FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
 		if (s_colorMode)
 		{
@@ -94,7 +80,7 @@ namespace FishEngine
 #endif
 	}
 
-	void Debug::LogError(const char *fmt, ...)
+	void Debug::_LogError(const std::string & message)
 	{
 		if (s_colorMode)
 		{
@@ -104,12 +90,7 @@ namespace FishEngine
 			printf("\e[0;31m");    // red
 #endif
 		}
-		std::cout << "[ERROR] ";
-		va_list args;
-		va_start(args, fmt);
-		int n = vsprintf(sprint_buf, fmt, args);
-		va_end(args);
-		std::cout.write(sprint_buf, n);
+		std::cout << message;
 		std::cout << std::endl;
 #if FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
 		if (s_colorMode)
@@ -118,7 +99,49 @@ namespace FishEngine
 		}
 #endif
 	}
-
+#endif
 }
 
-#undef vsprintf_s
+void FishEngine::Debug::Log(LogChannel channel, std::string const & message, const char* file, int line, const char * func)
+{
+#if FISHENGINE_PLATFORM_WINDOWS
+	WORD colorAttr = 0x0F;
+	switch (channel)
+	{
+	case LogChannel::Warning:
+		colorAttr = 0x0E;
+		break;
+	case LogChannel::Error:
+		colorAttr = 0x0C;
+		break;
+	}
+	SetConsoleTextAttribute(hstdout, colorAttr);
+#elif FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
+	// http://stackoverflow.com/questions/9005769/any-way-to-print-in-color-with-nslog#
+	// https://wiki.archlinux.org/index.php/Color_Bash_Prompt#List_of_colors_for_prompt_and_Bash
+
+	if (channel == LogChannel::Info)
+	{
+		printf("\e[0;37m");    // white
+	}
+	else if (channel == LogChannel::Warning)
+	{
+		printf("\e[0;33m");    // yellow
+	}
+	else
+	{
+		printf("\e[0;31m");    // red
+	}
+#endif
+
+	std::cout << "[" << file << ":" << line << ", " << func << "] ";
+	std::cout << message;
+	std::cout << std::endl;
+
+#if FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
+	if (s_colorMode)
+	{
+		printf("\e[m");
+	}
+#endif
+	}

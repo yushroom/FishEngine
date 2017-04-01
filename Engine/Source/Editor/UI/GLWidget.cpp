@@ -22,7 +22,7 @@ GLWidget::GLWidget(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	setFocusPolicy(Qt::FocusPolicy::ClickFocus);
-	FishEngine::Debug::Log("GLWidget::ctor");
+	//LogInfo("GLWidget::ctor");
 	//Init();
 	//auto filter = new EventFilter;
 	//installEventFilter(filter);
@@ -60,9 +60,9 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-	Debug::Log("resize w=%d h =%d", width, height);
+	LogInfo(Format( "resize w=%1% h =%2%", width, height ));
 	int ratio = QApplication::desktop()->devicePixelRatio();
-	Debug::Log("[GLWidget::resizeGL] ratio = %d", ratio);
+	LogInfo(Format("ratio = %1%", ratio ));
 	Screen::setPixelsPerPoint(ratio);
 	MainEditor::Resize(width, height);
 	//m_mainSceneViewEditor->Resize(width*ratio, height*ratio);
@@ -89,7 +89,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 		button = 2;
 	else
 	{
-		Debug::LogWarning("GLWidget::mousePressEvent: unknown mousebutton");
+		LogWarning("GLWidget::mousePressEvent: unknown mousebutton");
 		return;
 	}
 	//Debug::LogWarning("mouse down: %d", button);
@@ -108,7 +108,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 		button = 2;
 	else
 	{
-		Debug::LogWarning("GLWidget::mousePressEvent: unknown mousebutton");
+		LogWarning("GLWidget::mousePressEvent: unknown mousebutton");
 		return;
 	}
 	//Debug::LogWarning("mouse up: %d", button);

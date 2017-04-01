@@ -122,7 +122,7 @@ namespace FishEngine
 				m_properties.emplace_back(MaterialProperty{ u.name, MaterialPropertyType::TextureCube });
 			}
 			else {
-				Debug::LogError("Unknown shader property type");
+				LogError("Unknown shader property type");
 				abort();
 			}
 		}
@@ -242,7 +242,7 @@ namespace FishEngine
 
 	MaterialPtr Material::InstantiateBuiltinMaterial(const std::string& name)
 	{
-		Debug::Log("Material::InstantiateBuiltinMaterial, %s", name.c_str());
+		LogInfo(name);
 		auto shader = Shader::builtinShader(name);
 		assert(shader != nullptr);
 		auto material = CreateMaterial();
@@ -271,7 +271,7 @@ namespace FishEngine
 	{
 		//s_defaultMaterial = CreateMaterial();
 		auto s_defaultMaterial = defaultMaterial();
-		s_defaultMaterial->setName("DefaultMaterial");
+		s_defaultMaterial->setName("Default-Material");
 		s_defaultMaterial->setShader(Shader::builtinShader("PBR"));
 		s_defaultMaterial->SetFloat("Metallic", 0);
 		s_defaultMaterial->SetFloat("Roughness", 0.5f);

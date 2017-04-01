@@ -37,35 +37,45 @@ namespace FishEngine {
 		//return Vector3(pitch(), yaw(), roll());
 	}
 
-	void Quaternion::NormalizeSelf()
+
+	float Quaternion::Angle(const Quaternion& a, const Quaternion& b)
 	{
-		float inv_len = 1.0f / std::sqrtf(x*x + y*y + z*z + w*w);
-		x *= inv_len;
-		y *= inv_len;
-		z *= inv_len;
-		w *= inv_len;
+		float f = Quaternion::Dot(a, b);
+		return Mathf::Acos(Mathf::Min(Mathf::Abs(f), 1.f)) * 2.f * 57.29578f;
 	}
 
-	FishEngine::Vector3 Quaternion::operator*(const Vector3 & point) const
+
+	FishEngine::Vector3 Quaternion::Internal_MakePositive(Vector3 euler)
 	{
-		float num = x * 2.f;
-		float num2 = y * 2.f;
-		float num3 = z * 2.f;
-		float num4 = x * num;
-		float num5 = y * num2;
-		float num6 = z * num3;
-		float num7 = x * num2;
-		float num8 = x * num3;
-		float num9 = y * num3;
-		float num10 = w * num;
-		float num11 = w * num2;
-		float num12 = w * num3;
-		Vector3 result;
-		result.x = (1.f - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z;
-		result.y = (num7 + num12) * point.x + (1.f - (num4 + num6)) * point.y + (num9 - num10) * point.z;
-		result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1.f - (num4 + num5)) * point.z;
-		return result;
+		float num = -0.005729578f;
+		float num2 = 360.f + num;
+		if (euler.x < num)
+		{
+			euler.x += 360.f;
+		}
+		else if (euler.x > num2)
+		{
+			euler.x -= 360.f;
+		}
+		if (euler.y < num)
+		{
+			euler.y += 360.f;
+		}
+		else if (euler.y > num2)
+		{
+			euler.y -= 360.f;
+		}
+		if (euler.z < num)
+		{
+			euler.z += 360.f;
+		}
+		else if (euler.z > num2)
+		{
+			euler.z -= 360.f;
+		}
+		return euler;
 	}
+
 
 	FishEngine::Quaternion Quaternion::AngleAxis(const float angle, const Vector3& axis)
 	{
@@ -89,6 +99,7 @@ namespace FishEngine {
 		return result;
 	}
 
+
 	void Quaternion::ToAngleAxis(float* angle, Vector3* axis)
 	{
 		*angle = Mathf::Degrees( 2.0f * std::acosf(w) );
@@ -103,12 +114,14 @@ namespace FishEngine {
 		}
 	}
 
+
 	void SinCos(float degrees, float *s, float * c)
 	{
 		float rad = Mathf::Radians(degrees);
 		*s = std::sinf(rad);
 		*c = std::cosf(rad);
 	}
+
 
 	Quaternion Quaternion::Euler(float x, float y, float z)
 	{
@@ -151,6 +164,7 @@ namespace FishEngine {
 		return qy * qx * qz;
 #endif
 	}
+
 
 	Quaternion Quaternion::FromToRotation(const Vector3& fromDirection, const Vector3& toDirection)
 	{
@@ -205,10 +219,6 @@ namespace FishEngine {
 		return Quaternion::FromToRotation(Vector3::zAxis, z);
 	}
 
-	FishEngine::Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b, float t)
-	{
-		return SlerpUnclamped(a, b, Mathf::Clamp01(t));
-	}
 
 	FishEngine::Quaternion Quaternion::SlerpUnclamped(const Quaternion& a, const Quaternion& b, float t)
 	{
@@ -298,6 +308,28 @@ namespace FishEngine {
 			sclp * a.w + sclq * end.w);
 #endif
 	}
+
+
+	FishEngine::Quaternion Quaternion::LerpUnclamped(const Quaternion& a, const Quaternion& b, float t)
+	{
+		if (Quaternion::Dot(a, b) < 0.0f)
+		{
+			return Quaternion(
+				a.x + t*(-b.x - a.x),
+				a.y + t*(-b.y - a.y),
+				a.z + t*(-b.z - a.z),
+				a.w + t*(-b.w - a.w));
+		}
+		else
+		{
+			return Quaternion(
+				a.x + t*(b.x - a.x),
+				a.y + t*(b.y - a.y),
+				a.z + t*(b.z - a.z),
+				a.w + t*(b.w - a.w));
+		}
+	}
+
 
 	FishEngine::Quaternion Quaternion::RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta)
 	{

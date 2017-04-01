@@ -71,7 +71,7 @@ namespace FishEditor
 		FishEngine::Path p;
 		if (path.is_absolute())
 		{
-			FishEngine::Debug::LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
+			LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
 			p = path;
 		}
 		else

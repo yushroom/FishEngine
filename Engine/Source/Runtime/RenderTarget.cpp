@@ -87,7 +87,7 @@ namespace FishEngine
 		auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (result != GL_FRAMEBUFFER_COMPLETE)
 		{
-			Debug::LogError("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+			LogError("Framebuffer is not complete!");
 			std::string str;
 #define TEMP_CASE(c) case c: str = #c; break;
 			switch (result)
@@ -104,7 +104,7 @@ namespace FishEngine
 				str = "UNKNOWN";
 				break;
 			}
-			Debug::LogError("%s", str.c_str());
+			LogError(str);
 #undef TEMP_CASE
 		}
 

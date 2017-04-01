@@ -45,7 +45,7 @@ namespace FishEngine
 			return m_mouseButtonStates[button] == MouseButtonState::Held;
 		}
 		else {
-			Debug::LogWarning("invalid mouse button id: %d", button);
+			LogWarning(Format("invalid mouse button id: %1%", button));
 			return false;
 		}
 	}
@@ -56,7 +56,7 @@ namespace FishEngine
 			return m_mouseButtonStates[button] == MouseButtonState::Down;
 		}
 		else {
-			Debug::LogWarning("invalid mouse button id: %d", button);
+			LogWarning(Format("invalid mouse button id: %1%", button));
 			return false;
 		}
 	}
@@ -67,7 +67,7 @@ namespace FishEngine
 			return m_mouseButtonStates[button] == MouseButtonState::Up;
 		}
 		else {
-			Debug::LogWarning("invalid mouse button id: %d", button);
+			LogWarning(Format("invalid mouse button id: %1%", button));
 			return false;
 		}
 	}

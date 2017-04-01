@@ -1,7 +1,8 @@
 #include "Matrix4x4.hpp"
 #include <cassert>
 
-namespace FishEngine {
+namespace FishEngine
+{
 
 	Matrix4x4 Matrix4x4::Inverse(const Matrix4x4& m)
 	{
@@ -68,6 +69,7 @@ namespace FishEngine {
 		return (f-1 < 1e-4f) && (f-1 > -1e-4f);
 	}
 	
+
 	bool Matrix4x4::isIdentity() const
 	{
 		return
@@ -76,7 +78,8 @@ namespace FishEngine {
 		Zero(m[2][0]) && Zero(m[2][1]) && One(m[2][2]) && Zero(m[2][3]) &&
 		Zero(m[3][0]) && Zero(m[3][1]) && Zero(m[3][2]) && One(m[3][3]);
 	}
-	
+
+
 	float Matrix4x4::Determinant(const Matrix4x4& m)
 	{
 		float SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
@@ -97,29 +100,6 @@ namespace FishEngine {
 			m[0][2] * DetCof[2] + m[0][3] * DetCof[3];
 	}
 
-	FishEngine::Matrix4x4 Matrix4x4::Transpose(const Matrix4x4& mat)
-	{
-		Matrix4x4 result;
-		for (int i = 0; i < 4; ++i)
-		{
-			for (int j = 0; j < 4; ++j)
-			{
-				result.m[i][j] = mat.m[j][i];
-			}
-		}
-		return result;
-	}
-
-	//Matrix4x4 translate(const Matrix4x4& m, float tx, float ty, float tz)
-	//{
-	//    Matrix4x4 result = m;
-	//    Vector4 col3(tx, ty, tz, 1.f);
-	//    result.m[0][3] = Vector4::Dot(m.rows[0], col3);
-	//    result.m[1][3] = Vector4::Dot(m.rows[1], col3);
-	//    result.m[2][3] = Vector4::Dot(m.rows[2], col3);
-	//    result.m[3][3] = Vector4::Dot(m.rows[3], col3);
-	//    return result;
-	//}
 
 	FishEngine::Matrix4x4 Matrix4x4::TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
 	{
@@ -236,6 +216,7 @@ namespace FishEngine {
 		rot_mat.m[3][3] = 1;
 		*outRotation = rot_mat.ToRotation();
 	}
+
 
 	Quaternion Matrix4x4::ToRotation() const
 	{
@@ -359,6 +340,8 @@ namespace FishEngine {
 		return result;
 	}
 
+	
+
 	FishEngine::Matrix4x4 Matrix4x4::Ortho(const float left, const float right, const float bottom, const float top, const float zNear, const float zFar)
 	{
 		//return glm::orthoLH(left, right, bottom, top, zNear, zFar);
@@ -411,5 +394,4 @@ namespace FishEngine {
 		0, 0, 0, 0,
 		0, 0, 0, 0,
 		0, 0, 0, 0);
-
 }

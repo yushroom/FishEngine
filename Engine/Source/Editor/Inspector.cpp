@@ -352,7 +352,7 @@ void Inspector::Bind(const GameObjectPtr & go)
 
 	if (EditorGUI::Button("Add Component"))
 	{
-		Debug::Log("clicked");
+		//Debug::Log("clicked");
 		//auto name = s_inspectorWidget->ShowAddComponentMenu();
 		auto const & name = ShowAddComponentMenu();
 		AddComponentToGameObject(name, go);
@@ -488,7 +488,7 @@ QAction* FishEditor::Inspector::ShowComponentMenu()
 
 void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
-	Debug::Log("[BeginComponentImpl] Not Implemented for %s", component->ClassName().c_str());
+	LogInfo("Not Implemented for " + component->ClassName());
 	UIHeaderState state;
 	if ( EditorGUI::BeginComponent( component->ClassName(), &state ) )
 	{

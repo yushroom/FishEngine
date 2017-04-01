@@ -52,7 +52,7 @@ FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &comp
 
 	if (m_enabled != enabled)
 	{
-		Debug::Log("[Header] new enabled");
+		LogInfo("[Header] new enabled");
 		m_enabled = enabled;
 		LOG;
 		ui->checkBox->setChecked(m_enabled);
@@ -60,7 +60,7 @@ FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &comp
 
 	if (componentTypeName != m_componentTypeName)
 	{
-		Debug::Log("[Header] new component name: %s", componentTypeName.c_str());
+		LogInfo("[Header] new component name: " + componentTypeName);
 		m_componentTypeName = componentTypeName;
 		LOG;
 		ui->label->setText(QString(componentTypeName.c_str()));
@@ -84,7 +84,7 @@ FishEditor::UIHeaderState UIComponentHeader::CheckUpdate(const std::string &comp
 
 	if (componentTypeName != m_componentTypeName)
 	{
-		Debug::Log("[Header] new component name: %s", componentTypeName.c_str());
+		LogInfo("[Header] new component name: " + componentTypeName);
 		m_componentTypeName = componentTypeName;
 		LOG;
 		ui->label->setText(QString(componentTypeName.c_str()));

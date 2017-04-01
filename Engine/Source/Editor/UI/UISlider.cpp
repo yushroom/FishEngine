@@ -38,7 +38,7 @@ bool UISlider::CheckUpdate(const std::string &label, float &value)
 {
 	if (m_changed)
 	{
-		Debug::Log("[UISlider] value changed");
+		LogInfo("[UISlider] value changed");
 		value = m_value;
 		m_changed = false;
 		return true;

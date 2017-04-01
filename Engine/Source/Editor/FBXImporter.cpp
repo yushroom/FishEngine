@@ -10,6 +10,7 @@
 #include <MeshRenderer.hpp>
 #include <SkinnedMeshRenderer.hpp>
 #include <Texture.hpp>
+#include <Texture2D.hpp>
 #include <Application.hpp>
 
 #include "AssetDataBase.hpp"
@@ -544,10 +545,6 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 		return m_model.m_materials[it->second];
 	}
 
-	auto ret_material = Material::InstantiateBuiltinMaterial("Diffuse");
-	m_model.m_fbxMaterialLookup[pMaterial] = m_model.m_materials.size();
-	m_model.m_materials.push_back(ret_material);
-
 	FbxProperty lProperty;
 	//Diffuse Textures
 	lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
@@ -555,42 +552,46 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	
 	std::string diffuseTexturePath;
 	int lNbTextures = lProperty.GetSrcObjectCount<FbxTexture>();
-	if (lNbTextures > 0)
+	for (int j = 0; j < lNbTextures; ++j)
 	{
-		for (int j = 0; j < lNbTextures; ++j)
+		FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
+		if (lTexture)
 		{
-			FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
-			if (lTexture)
+			std::string textureName = lTexture->GetName();
+			
+			auto * lFileTexture = FbxCast<FbxFileTexture>(lTexture);
+			if (lFileTexture == nullptr)
 			{
-				std::string textureName = lTexture->GetName();
-				ret_material->setName(textureName);
-				auto * lFileTexture = FbxCast<FbxFileTexture>(lTexture);
-				if (lFileTexture == nullptr)
-				{
-					// do not support non-file texture
-					abort();
-				}
-				diffuseTexturePath = lFileTexture->GetFileName();
-				//Debug::LogWarning("diffuse texture: %s", texturePath.c_str());
-				break;
+				// do not support non-file texture
+				//abort();
+				continue;
 			}
-			else
-			{
-				abort();
-			}
+			diffuseTexturePath = lFileTexture->GetFileName();
+			//Debug::LogWarning("diffuse texture: %s", texturePath.c_str());
+			break;
 		}
 	}
-	else
+
+	MaterialPtr ret_material = Material::defaultMaterial();
+	if (!diffuseTexturePath.empty())
 	{
-		abort();
+		auto textureName = Path(diffuseTexturePath).filename();
+		auto texturePath = Application::dataPath() / "textures" / textureName;
+		auto diffuseTexture = As<Texture>(AssetDatabase::LoadAssetAtPath(texturePath));
+		ret_material = Material::InstantiateBuiltinMaterial("Diffuse");
+		ret_material->setName(textureName.string());
+		if (diffuseTexture != nullptr)
+		{
+			ret_material->setMainTexture(diffuseTexture);
+		}
+		else
+		{
+			LogWarning("Texture not found: " + textureName.string());
+			ret_material->setMainTexture(Texture2D::whiteTexture());
+		}
 	}
-	
-	
-	auto texturePath = Application::dataPath() / "textures" / Path(diffuseTexturePath).filename();
-	auto diffuseTexture = As<Texture>( AssetDatabase::LoadAssetAtPath(texturePath) );
-	//assert(diffuseTexture != nullptr);
-	ret_material->setMainTexture(diffuseTexture);
-	
+	m_model.m_fbxMaterialLookup[pMaterial] = m_model.m_materials.size();
+	m_model.m_materials.push_back(ret_material);
 	return ret_material;
 }
 
@@ -607,7 +608,7 @@ void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHe
 			FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
 			if (lLayeredTexture)
 			{
-				Debug::Log("    Layered Texture: %d", j);
+				//Debug::Log("    Layered Texture: %d", j);
 				int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
 				for (int k = 0; k < lNbTextures; ++k)
 				{
@@ -649,7 +650,7 @@ void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHe
 					//DisplayInt("        Texture ", j);
 					//DisplayTextureInfo(lTexture, -1);
 					FbxFileTexture *lFileTexture = FbxCast<FbxFileTexture>(lTexture);
-					FishEngine::Debug::Log("Texture: %s", (char *) lFileTexture->GetFileName());
+					//FishEngine::Debug::Log("Texture: %s", (char *) lFileTexture->GetFileName());
 				}
 			}
 		}
@@ -854,13 +855,13 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 }
 
 
-void PrintMatrix(Matrix4x4 const & m)
-{
-	for (int i = 0; i < 4; ++i)
-	{
-		Debug::Log("%lf %lf %lf %lf", m.m[i][0], m.m[i][1], m.m[i][2], m.m[i][3]);
-	}
-}
+//void PrintMatrix(Matrix4x4 const & m)
+//{
+//	for (int i = 0; i < 4; ++i)
+//	{
+//		Debug::Log("%lf %lf %lf %lf", m.m[i][0], m.m[i][1], m.m[i][2], m.m[i][3]);
+//	}
+//}
 
 void FishEditor::FBXImporter::ImportTo(FishEngine::GameObjectPtr & model)
 {
@@ -900,8 +901,8 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	// Use the first argument as the filename for the importer.
 	if (!lImporter->Initialize(path.string().c_str(), -1, lSdkManager->GetIOSettings()))
 	{
-		FishEngine::Debug::LogError("Call to FbxImporter::Initialize() failed.");
-		FishEngine::Debug::LogError("Error returned: %s", lImporter->GetStatus().GetErrorString());
+		LogError("Call to FbxImporter::Initialize() failed.");
+		LogError(std::string( "Error returned: ") + lImporter->GetStatus().GetErrorString() );
 		abort();
 	}
 

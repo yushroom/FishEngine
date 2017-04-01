@@ -31,7 +31,7 @@ bool UIColor::CheckUpdate(const std::string &label, QColor &value)
 {
 	if (m_changed)
 	{
-		Debug::Log("[UIColor] value changed");
+		LogInfo("[UIColor] value changed");
 		value = m_value;
 		m_changed = false;
 		return true;

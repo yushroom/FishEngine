@@ -77,7 +77,7 @@ namespace FishEngine
 
 	void RenderTexture::Resize(const int newWidth, const int newHeight)
 	{
-		Debug::Log("RenderTexture::Resize");
+		LogInfo("RenderTexture::Resize");
 		if (newWidth == m_width && newHeight == m_height)
 			return;
 		m_width = newWidth;

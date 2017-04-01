@@ -38,7 +38,7 @@ namespace FishEngine
 			}
 		}
 		// more than MaxBoneForEachVertex
-		Debug::Log("[BoneWeight::AddBoneData] more than %d bones", MaxBoneForEachVertex);
+		LogInfo(Format( "more than %1% bones", MaxBoneForEachVertex ));
 
 		int minId = 0;
 		float minWeight = this->weight[0];
@@ -211,12 +211,12 @@ namespace FishEngine
 			
 		if (subMeshIndex < 0 && subMeshIndex != -1)
 		{
-			Debug::LogWarning("invalid subMeshIndex %d", subMeshIndex);
+			LogWarning(Format( "invalid subMeshIndex %1%", subMeshIndex ));
 			subMeshIndex = -1;
 		}
 		else if (subMeshIndex >= m_subMeshCount)
 		{
-			Debug::LogWarning("invalid subMeshIndex %d", subMeshIndex);
+			//Debug::LogWarning("invalid subMeshIndex %d", subMeshIndex);
 			subMeshIndex = m_subMeshCount;
 		}
 			

@@ -27,9 +27,9 @@ void FishEngine::Timer::Print() const
 	auto elapse = m_stopTime - m_startTime;
 	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapse).count();
 	if (ms >= 1000)
-		Debug::Log("Time info for [%s]: %f s", m_label.c_str(), float(ms) / 1000.0f);
+		LogInfo(Format( "Time info for [%1%]: %2% s", m_label, float(ms) / 1000.0f ));
 	else
-		Debug::Log("Time info for [%s]: %lld ms", m_label.c_str(), ms);
+		LogInfo(Format( "Time info for [%1%]: %2% ms", m_label, ms ));
 }
 
 void FishEngine::Timer::StopAndPrint()

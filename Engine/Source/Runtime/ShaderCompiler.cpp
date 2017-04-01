@@ -19,7 +19,7 @@ static std::string ReadFile(const FishEngine::Path& path)
 {
 	std::ifstream fin(path.string());
 	if (!fin.is_open()) {
-		FishEngine::Debug::LogError("Can not open shader file: %s", path.string().c_str());
+		LogError("Can not open shader file: " + path.string());
 		throw ShaderCompileError(ShaderCompileStage::Preprocessor, 0, ShaderCompileErrorType::FileNotFound);
 	}
 	return std::string(
@@ -433,7 +433,7 @@ namespace FishEngine
 				}
 				else if (tok == "@geometry")
 				{
-					Debug::Log("Geometry shader enabled");
+					LogInfo("Geometry shader enabled");
 					m_hasGeometryShader = true;
 					parsed += parseSubShader(shaderText, cursor, "GEOMETRY_SHADER", localDir);
 				}

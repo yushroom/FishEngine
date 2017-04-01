@@ -28,7 +28,7 @@ UITextureState UITexture::CheckUpdate(const std::string &label, const int textur
 {
 	if (m_label != label)
 	{
-		Debug::Log("[UITexture] new label: %s", m_label.c_str());
+		LogInfo("[UITexture] new label: " + m_label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());

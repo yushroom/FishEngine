@@ -189,20 +189,20 @@ QSize HierarchyTreeView::sizeHint() const
 
 void HierarchyTreeView::dragEnterEvent(QDragEnterEvent *event)
 {
-	Debug::Log("HierarchyTreeView::dragEnterEvent");
+	LogInfo("HierarchyTreeView::dragEnterEvent");
 	m_inDragDropMode = true;
 	QTreeView::dragEnterEvent(event);
 }
 
 void HierarchyTreeView::dropEvent(QDropEvent *event)
 {
-	Debug::Log("HierarchyTreeView::dropEvent");
+	LogInfo("HierarchyTreeView::dropEvent");
 	m_inDragDropMode = false;
 	const QModelIndex & index = indexAt(event->pos());
 
 	if (!index.isValid()) // set null parent
 	{
-		Debug::Log("HierarchyTreeView::dropEvent, invalid");
+		LogInfo("HierarchyTreeView::dropEvent, invalid");
 
 		for (auto const & t : Selection::transforms())
 		{

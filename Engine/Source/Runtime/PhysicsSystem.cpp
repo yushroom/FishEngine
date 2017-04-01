@@ -17,7 +17,7 @@ public:
 							 int line) override
 	{
 		// error processing implementation
-		Debug::LogWarning("PyhsX Error[file %s at line %d]: %s", file, line, message);
+		LogWarning(Format( "PyhsX Error[file %s at line %d]: %s", file, line, message ));
 		//abort();
 	}
 };
@@ -98,5 +98,5 @@ void FishEngine::PhysicsSystem::Clean()
 	profileZoneManager->release();
 	gFoundation->release();
 	
-	Debug::Log("Clean up PhysX.");
+	LogInfo("Clean up PhysX.");
 }

@@ -72,7 +72,7 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 		else
 		{
 			LOG;
-			Debug::Log("[CheckNextWidget] add new QTreeWidgetItem");
+			LogInfo("[CheckNextWidget] add new QTreeWidgetItem");
 			item = new QTreeWidgetItem;
 			s_treeWidget->addTopLevelItem(item);
 			item->setExpanded(true);
@@ -108,7 +108,7 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 	if (widget == nullptr)
 	{
 		LOG;
-		Debug::Log("[CheckNextWidget] new widget");
+		LogInfo("[CheckNextWidget] new widget");
 		widget = new T(args...);
 		s_treeWidget->setItemWidget(item, 0, widget);
 	}
@@ -146,7 +146,7 @@ void EditorGUI::End()
 			break;  // do not check the rest of rows
 		item->setHidden(true);
 		LOG;
-		Debug::Log("[EditorGUI::End]hide %d", i);
+		LogInfo(Format( "hide %1%", i ));
 	}
 }
 
@@ -347,7 +347,7 @@ void FishEditor::EditorGUI::HideRedundantChildItemsOfLastGroup()
 			break;  // do not check the rest of rows
 		item->setHidden(true);
 		LOG;
-		Debug::Log("[EditorGUI::PopGroup] hide %d", i);
+		//Debug::Log("[EditorGUI::PopGroup] hide %d", i);
 	}
 }
 
@@ -361,6 +361,6 @@ void FishEditor::EditorGUI::HideAllChildOfLastItem()
 			break;  // do not check the rest of rows
 		item->setHidden(true);
 		LOG;
-		Debug::Log("[EditorGUI::PopGroup] hide %d", i);
+		//Debug::Log("[EditorGUI::PopGroup] hide %d", i);
 	}
 }

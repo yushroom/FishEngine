@@ -18,7 +18,7 @@ CapsuleCollider(const Vector3&  center,
 	: m_center(center), m_height(height), m_radius(radius)
 {
 	if (height < 2*radius) {
-		Debug::LogWarning("Invalid parameter height");
+		LogWarning("Invalid parameter height");
 		m_height = 2*radius;
 	}
 }

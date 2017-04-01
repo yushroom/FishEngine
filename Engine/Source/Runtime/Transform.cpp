@@ -189,7 +189,7 @@ namespace FishEngine
 		{
 			if (p.get() == this)
 			{
-				Debug::LogError("%s", "new parent can not be child of this");
+				LogError("new parent can not be child of this");
 				return;
 			}
 			p = p->parent();
@@ -256,7 +256,7 @@ namespace FishEngine
 	TransformPtr Transform::GetChild(const size_t index)
 	{
 		if (index >= m_children.size()) {
-			Debug::LogWarning("%s %d %s index out of range", __FILE__, __LINE__, __FUNCTION__);
+			LogWarning("index out of range");
 			return nullptr;
 		}
 

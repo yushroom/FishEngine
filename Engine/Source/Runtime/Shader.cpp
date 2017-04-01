@@ -357,7 +357,7 @@ namespace FishEngine
 
 	ShaderPtr Shader::CreateFromFile(const Path& path)
 	{
-		Debug::Log("Compiling %s", path.string().c_str());
+		LogInfo("Compiling " + path.string());
 		auto s = std::make_shared<Shader>();
 		if (s->FromFile(path))
 			return s;
@@ -398,7 +398,7 @@ namespace FishEngine
 
 	void Shader::PrintErrorMessage(std::string const & errorMessage) noexcept
 	{
-		Debug::LogError("%s", errorMessage.c_str());
+		LogError(errorMessage);
 
 		std::vector<std::string> lines;
 		boost::split(lines, errorMessage, boost::is_any_of("\n"));
@@ -448,8 +448,8 @@ namespace FishEngine
 				context_lines << '#' << i + start_line << '\t' << text.substr(cursor, new_cursor - cursor) << '\n';
 				cursor = new_cursor + 1;
 			}
-			Debug::LogError("%s", line.c_str());
-			Debug::Log("%s", context_lines.str().c_str());
+			LogError(line);
+			LogInfo(context_lines.str());
 			cout << endl;
 		}
 	}
@@ -497,7 +497,7 @@ namespace FishEngine
 				return;
 			}
 		}
-		Debug::LogWarning("Uniform %s not found!", name);
+		LogWarning(Format( "Uniform %1% not found!", name ));
 	}
 
 	void Shader::BindUniformMat4(const char* name, const Matrix4x4& value)
@@ -511,7 +511,7 @@ namespace FishEngine
 				return;
 			}
 		}
-		Debug::LogWarning("Uniform %s not found!", name);
+		LogWarning(Format("Uniform %1% not found!", name));
 	}
 
 	void Shader::BindMatrixArray(const std::string& name, const std::vector<Matrix4x4>& matrixArray)
@@ -525,7 +525,7 @@ namespace FishEngine
 				return;
 			}
 		}
-		Debug::LogWarning("Uniform %s not found!", name.c_str());
+		LogWarning(Format("Uniform %1% not found!", name));
 	}
 
 	void Shader::BindUniforms(const ShaderUniforms& uniforms)
@@ -541,7 +541,7 @@ namespace FishEngine
 					u.binded = true;
 				}
 				else {
-					Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+					LogWarning(Format( "%1% of type %2% not found", u.name, u.type));
 				}
 			}
 			else if (u.type == GL_FLOAT_VEC2)
@@ -554,7 +554,7 @@ namespace FishEngine
 				}
 				else
 				{
-					Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+					LogWarning(Format("%1% of type %2% not found", u.name, u.type));
 				}
 			}
 			else if (u.type == GL_FLOAT_VEC3)
@@ -567,7 +567,7 @@ namespace FishEngine
 				}
 				else
 				{
-					Debug::LogWarning("%s of type %u not found", u.name.c_str(), u.type);
+					LogWarning(Format("%1% of type %2% not found", u.name, u.type));
 				}
 			}
 			else if (u.type == GL_FLOAT)
@@ -706,7 +706,7 @@ namespace FishEngine
 		{
 			if (!u.binded)
 			{
-				Debug::LogWarning("Uniform %s[%s] not binded!", u.name.c_str(), GLenumToString(u.type));
+				LogWarning(Format( "Uniform %1%[%2%] not binded!", u.name.c_str(), GLenumToString(u.type) ));
 			}
 		}
 	}
@@ -718,7 +718,7 @@ namespace FishEngine
 		{
 			return it->second;
 		}
-		Debug::LogWarning("No built-in shader called %s", name.c_str());
+		LogWarning("No built-in shader called " + name);
 		abort();
 		return nullptr;
 	}

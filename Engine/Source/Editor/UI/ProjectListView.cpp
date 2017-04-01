@@ -227,7 +227,7 @@ void ProjectListView::InstantiateAsset()
 
 void ProjectListView::dragEnterEvent(QDragEnterEvent *e)
 {
-    FishEngine::Debug::Log("%s", "ProjectListView::dragEnterEvent");
+	LogInfo("ProjectListView::dragEnterEvent");
 	if (e->mimeData()->hasUrls())
 		e->acceptProposedAction();
 }
@@ -260,7 +260,7 @@ Path getUniqueName(Path const & dir, Path const & filename)
 
 void ProjectListView::dropEvent(QDropEvent *e)
 {
-	FishEngine::Debug::Log("%s", "ProjectListView::dropEvent");
+	LogInfo("ProjectListView::dropEvent");
 	auto mimeData = e->mimeData();
 
 	auto currentDir = Path(m_fileModel->rootPath().toStdString()).remove_trailing_separator().make_preferred();
@@ -278,7 +278,7 @@ void ProjectListView::dropEvent(QDropEvent *e)
 			{
 				auto dest = getUniqueName(currentDir, src.filename());
 				boost::filesystem::copy(src, dest);
-				FishEngine::Debug::Log("copy file from: [%s] --> [%s]", src.string().c_str(), dest.string().c_str());
+				LogInfo(FishEngine::Format( "copy file from: [%1%] --> [%2%]", src.string(), dest.string() ));
 				// TODO: .meta
 			}
 			else

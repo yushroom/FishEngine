@@ -1,6 +1,8 @@
 #include "GLEnvironment.hpp"
 #include "Debug.hpp"
 
+using namespace FishEngine;
+
 void _checkOpenGLError(const char *file, int line)
 {
 	GLenum err(glGetError());
@@ -19,7 +21,7 @@ void _checkOpenGLError(const char *file, int line)
 		default:                        error = "UNKNOWN_ERROR";
 		}
 
-		FishEngine::Debug::LogError("GL_%s - %s:%d", error.c_str(), file, line);
+		LogError(Format("GL_%1% - %2%:%3%", error, file, line));
 		err = glGetError();
 	}
 }

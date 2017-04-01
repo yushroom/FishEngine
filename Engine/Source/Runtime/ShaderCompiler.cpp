@@ -568,6 +568,16 @@ namespace FishEngine
 			t.ExpectEndOfFile();
 			m_Colors[name] = color;
 		}
+		else if (type == "2D")
+		{
+			Tokenizer t(defalutValueString);
+			t.NextTokenUntil('"');
+			auto defaultTextureName = t.NextTokenUntil('"');
+			t.Expect('{');
+			t.Expect('}');
+			t.ExpectEndOfFile();
+			m_TexEnvs[name] = nullptr;
+		}
 		else
 		{
 			//abort(); // unknown property type

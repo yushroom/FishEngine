@@ -1,0 +1,82 @@
+#include <UnrealSupport.inc>
+#include <BRDF.inc>
+#include <Ambient.inc>
+
+@Properties
+{
+	_Color		("BaseColor", Color) = (1,1,1,1)
+	_MainTex	("Albedo", 2D) = "white" {}
+	_Metallic	("Metallic", Range(0,1)) = 0
+	_Roughness	("Roughness", Range(0,1)) = 0.5
+	_Specular	("Specular", Range(0,1)) = 0.5
+}
+
+uniform vec3  _Color;	// BaseColor
+uniform float _Metallic;
+uniform float _Roughness;
+uniform float _Specular;
+
+struct PixelMaterialInputs
+{
+	vec3 _Color;
+	float _Metallic;
+	float _Roughness;
+	float _Specular;
+};
+
+#ifdef NO_DEFAULT_MATERIAL 
+	PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s);
+#else
+	PixelMaterialInputs CalcPixelMaterialInputs(in SurfaceData s)
+	{
+		PixelMaterialInputs inputs;
+
+		inputs._Color = _Color;
+		inputs._Metallic = _Metallic;
+		inputs._Roughness = _Roughness;
+		inputs._Specular = _Specular;
+		return inputs;
+	}
+#endif
+
+vec4 ps_main(SurfaceData surfaceData)
+{
+	PixelMaterialInputs s = CalcPixelMaterialInputs(surfaceData);
+	vec4 outColor = vec4(0, 0, 0, 1);
+	vec3 L = surfaceData.L;
+	vec3 V = surfaceData.V;
+	vec3 N = surfaceData.N;
+
+	vec3 DiffuseColor = s._Color - s._Color * s._Metallic;
+	vec3 _SpecularColor = mix( vec3(0.08 * s._Specular), s._Color, s._Metallic);
+	float NoL = saturate( dot(N, L) );
+	//float NoV = max( dot(N, V), 1e-5 );
+	float NoV = saturate( dot(N, V) );
+	// Point lobe in off-_Specular peak direction
+
+	outColor.rgb = PI * LightColor.rgb * NoL * StandardShading(DiffuseColor, _SpecularColor, vec3(s._Roughness), vec3(1), L, V, N);
+	
+#ifdef _AMBIENT_IBL
+	float3 R0 = 2 * dot( V, N ) * N - V;
+	float a = Square( _Roughness );
+	float3 R = lerp( N, R0, (1 - a) * ( sqrt(1 - a) + a ) );
+
+	float3 Non_SpecularContribution = vec3(0);
+	float3 _SpecularContribution = vec3(0);
+
+	float AbsoluteDiffuseMip = AmbientCubemapMipAdjust.z;
+	//float3 DiffuseLookup =  TextureCubeSampleLevel(AmbientCubemap, AmbientCubemapSampler, N, AbsoluteDiffuseMip).rgb;
+	float3 DiffuseLookup = textureLod(AmbientCubemap, N, AbsoluteDiffuseMip).rgb;
+	Non_SpecularContribution += DiffuseColor * DiffuseLookup;
+
+	float Mip = ComputeCubemapMipFrom_Roughness(_Roughness, AmbientCubemapMipAdjust.w);
+	float3 SampleColor = textureLod(AmbientCubemap, R, Mip).rgb;
+	//_SpecularContribution += SampleColor * EnvBRDFApprox(_SpecularColor, _Roughness, NoV);
+	_SpecularContribution += SampleColor * EnvBRDF(_SpecularColor, _Roughness, NoV);
+
+	outColor.rgb += _SpecularContribution + Non_SpecularContribution;
+	//outColor.rgb += _SpecularContribution;
+	//outColor.rgb += Non_SpecularContribution;
+#endif
+	return outColor;
+}

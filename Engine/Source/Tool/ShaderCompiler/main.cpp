@@ -8,10 +8,9 @@ using namespace FishEngine;
 
 int main(int argc, char* argv[])
 {
-	//Debug::Init();
+	Debug::Init();
 	//Debug::setColorMode(false);
-	//Resources::Init();
-	Debug::Log("Compiling...");
+	LogInfo("Compiling...");
 	
 	glfwInit();
 	// Set all the required options for GLFW
@@ -33,7 +32,7 @@ int main(int argc, char* argv[])
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
 	glewInit();
-	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\PBR.surf)";
+	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\Standard.surf)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
 	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/PBR.surf";
@@ -57,6 +56,6 @@ int main(int argc, char* argv[])
 	if (shader == nullptr)
 		return 1;
 
-	Debug::Log("OK");
+	LogInfo("OK");
 	return 0;
 }

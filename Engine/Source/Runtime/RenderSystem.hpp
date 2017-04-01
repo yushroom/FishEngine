@@ -30,9 +30,11 @@ namespace FishEngine
 		static ColorBufferPtr   m_mainColorBuffer;
 		static RenderTargetPtr  m_mainRenderTarget;
 
-		static ColorBufferPtr   m_blurredScreenShadowMap;
-		static RenderTargetPtr  m_blurScreenShadowMapRenderTarget1;
-		static RenderTargetPtr  m_blurScreenShadowMapRenderTarget2;
+		static RenderTargetPtr  m_colorOnlyRenderTarget;
+
+		//static ColorBufferPtr   m_blurredScreenShadowMap;
+		//static RenderTargetPtr  m_blurScreenShadowMapRenderTarget1;
+		//static RenderTargetPtr  m_blurScreenShadowMapRenderTarget2;
 	};
 }
 

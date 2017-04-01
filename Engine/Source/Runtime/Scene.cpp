@@ -39,9 +39,9 @@ namespace FishEngine
 
 	GameObjectPtr Scene::CreateCamera()
 	{
-		//auto camera_go = Scene::CreateGameObject("Camera");
-		auto camera_go = GameObject::Create();
-		camera_go->setName("Camera");
+		auto camera_go = Scene::CreateGameObject("Camera");
+		//auto camera_go = GameObject::Create();
+		//camera_go->setName("Camera");
 		//camera_go->AddComponent<Camera>();
 		auto camera = Camera::Create();	// make sure camera is in Camera::allcameras
 		camera_go->AddComponent(camera);

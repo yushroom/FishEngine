@@ -51,9 +51,11 @@ namespace FishEngine
 	FishEngine::ColorBufferPtr      RenderSystem::m_mainColorBuffer;
 	FishEngine::RenderTargetPtr     RenderSystem::m_mainRenderTarget;
 
-	FishEngine::ColorBufferPtr      RenderSystem::m_blurredScreenShadowMap;
-	FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget1;
-	FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget2;
+	FishEngine::RenderTargetPtr     RenderSystem::m_colorOnlyRenderTarget;
+
+	//FishEngine::ColorBufferPtr      RenderSystem::m_blurredScreenShadowMap;
+	//FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget1;
+	//FishEngine::RenderTargetPtr     RenderSystem::m_blurScreenShadowMapRenderTarget2;
 
 
 	void RenderSystem::InitializeGL()
@@ -112,12 +114,15 @@ namespace FishEngine
 		m_mainRenderTarget = std::make_shared<RenderTarget>();
 		m_mainRenderTarget->Set(m_mainColorBuffer, m_mainDepthBuffer);
 
-		m_blurredScreenShadowMap = ColorBuffer::Create(w, h, TextureFormat::R8);
-		m_blurredScreenShadowMap->setFilterMode(FilterMode::Bilinear);
-		m_blurScreenShadowMapRenderTarget1 = std::make_shared<RenderTarget>();
-		m_blurScreenShadowMapRenderTarget2 = std::make_shared<RenderTarget>();
-		m_blurScreenShadowMapRenderTarget1->SetColorBufferOnly(m_blurredScreenShadowMap);
-		m_blurScreenShadowMapRenderTarget2->SetColorBufferOnly(m_screenShadowMap);
+		m_colorOnlyRenderTarget = std::make_shared<RenderTarget>();
+		m_colorOnlyRenderTarget->SetColorBufferOnly(m_mainColorBuffer);
+
+		//m_blurredScreenShadowMap = ColorBuffer::Create(w, h, TextureFormat::R8);
+		//m_blurredScreenShadowMap->setFilterMode(FilterMode::Bilinear);
+		//m_blurScreenShadowMapRenderTarget1 = std::make_shared<RenderTarget>();
+		//m_blurScreenShadowMapRenderTarget2 = std::make_shared<RenderTarget>();
+		//m_blurScreenShadowMapRenderTarget1->SetColorBufferOnly(m_blurredScreenShadowMap);
+		//m_blurScreenShadowMapRenderTarget2->SetColorBufferOnly(m_screenShadowMap);
 	}
 
 	void RenderSystem::Render()
@@ -207,7 +212,7 @@ namespace FishEngine
 					continue;
 				}
 
-				// TODO: find correct render queue and submeshID
+				// TODO: find correct renderqueue and submeshID
 
 				if (material->shader()->IsTransparent())
 				{
@@ -233,7 +238,7 @@ namespace FishEngine
 		// depth buffer
 		Pipeline::PushRenderTarget(m_mainRenderTarget);
 		glClearBufferfv(GL_COLOR, 0, error_color);
-		//glClearBufferfv(GL_DEPTH, 0, white);
+		glClearBufferfv(GL_DEPTH, 0, white);
 
 		/************************************************************************/
 		/* Deferred Rendering                                                   */
@@ -256,6 +261,7 @@ namespace FishEngine
 
 			Pipeline::PopRenderTarget();
 
+			Pipeline::PushRenderTarget(m_colorOnlyRenderTarget);
 			glDepthFunc(GL_ALWAYS);
 			glDepthMask(GL_FALSE);
 			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
@@ -267,6 +273,7 @@ namespace FishEngine
 			Graphics::DrawMesh(quad, mtl);
 			glDepthMask(GL_TRUE);
 			glDepthFunc(GL_LESS);
+			Pipeline::PopRenderTarget();
 		}
 
 		/************************************************************************/
@@ -313,60 +320,23 @@ namespace FishEngine
 			glDepthFunc(GL_LESS);
 		}
 		Pipeline::PopRenderTarget();
-
-#if 0
-		// blur shadow map, pass 1
-		m_screenShadowMap->setFilterMode(FilterMode::Bilinear);
-		Pipeline::PushRenderTarget(m_blurScreenShadowMapRenderTarget1);
-		{
-			glDepthFunc(GL_ALWAYS);
-			glDepthMask(GL_FALSE);
-			glClearBufferfv(GL_COLOR, 0, black);
-			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
-			auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
-			Vector2 direction(1.0f / static_cast<float>(m_screenShadowMap->width()), 0);
-			mtl->SetVector2("Direction", direction);
-			mtl->setMainTexture(m_screenShadowMap);
-			Graphics::DrawMesh(quad, mtl);
-			glDepthMask(GL_TRUE);
-			glDepthFunc(GL_LESS);
-		}
-		Pipeline::PopRenderTarget();
-		m_screenShadowMap->setFilterMode(FilterMode::Point);
-
-		// blur shadow map, pass 2
-		Pipeline::PushRenderTarget(m_blurScreenShadowMapRenderTarget2);
-		{
-			glDepthFunc(GL_ALWAYS);
-			glDepthMask(GL_FALSE);
-			glClearBufferfv(GL_COLOR, 0, black);
-			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
-			auto mtl = Material::builtinMaterial("PostProcessGaussianBlur");
-			Vector2 direction(0, 1.0f / static_cast<float>(m_screenShadowMap->height()));
-			mtl->SetVector2("Direction", direction);
-			mtl->setMainTexture(m_blurredScreenShadowMap);
-			Graphics::DrawMesh(quad, mtl);
-			glDepthMask(GL_TRUE);
-			glDepthFunc(GL_LESS);
-		}
-		Pipeline::PopRenderTarget();
-#endif
 		
 		// add shadow
-		{
-			glDepthFunc(GL_ALWAYS);
-			glDepthMask(GL_FALSE);
-			//Pipeline::PushRenderTarget(m_addShadowRenderTarget);
-			//glClearBufferfv(GL_COLOR, 0, black);
-			auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
-			auto mtl = Material::builtinMaterial("PostProcessShadow");
-			mtl->setMainTexture(m_mainColorBuffer);
-			mtl->SetTexture("ScreenShadow", m_screenShadowMap);
-			Graphics::DrawMesh(quad, mtl);
-			//Pipeline::PopRenderTarget();
-			glDepthMask(GL_TRUE);
-			glDepthFunc(GL_LESS);
-		}
+		glDepthFunc(GL_ALWAYS);
+		glDepthMask(GL_FALSE);
+		//Pipeline::PushRenderTarget(m_addShadowRenderTarget);
+		//glClearBufferfv(GL_COLOR, 0, black);
+		auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
+		auto mtl = Material::builtinMaterial("PostProcessShadow");
+		mtl->setMainTexture(m_mainColorBuffer);
+		mtl->SetTexture("ScreenShadow", m_screenShadowMap);
+		Graphics::DrawMesh(quad, mtl);
+		//Pipeline::PopRenderTarget();
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+#else
+		m_mainRenderTarget->AttachForRead();
+		glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 #endif
 
 		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
@@ -439,7 +409,7 @@ namespace FishEngine
 		for (auto& gb : m_GBuffer)
 			gb->Resize(width, height);
 		m_screenShadowMap->Resize(width, height);
-		m_blurredScreenShadowMap->Resize(width, height);
+		//m_blurredScreenShadowMap->Resize(width, height);
 	}
 
 } // namespace FishEngine

@@ -380,9 +380,9 @@ void Inspector::Bind(FishEngine::ObjectPtr const & object)
 	{
 		Bind(std::dynamic_pointer_cast<ModelImporter>(object));
 	}
-	else if (object->ClassID() == ClassID<Material>())
+	else // if (object->ClassID() == ClassID<Material>())
 	{
-
+		HideAll();
 	}
 }
 

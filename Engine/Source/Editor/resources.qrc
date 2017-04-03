@@ -2,19 +2,7 @@
     <qresource prefix="/">
         <file>Resources/cancel.png</file>
         <file>Resources/cancelActive.png</file>
-        <file>Resources/End_black.png</file>
-        <file>Resources/End_blue.png</file>
-        <file>Resources/Play_blue.png</file>
-        <file>Resources/Pause_black.png</file>
-        <file>Resources/Pause_blue.png</file>
-        <file>Resources/Play_black.png</file>
-        <file>Resources/Stop_100.png</file>
-        <file>Resources/Rotate_000000_100.png</file>
-        <file>Resources/Resize Four Directions_000000_100.png</file>
         <file>Resources/Whole Hand_000000_100.png</file>
-        <file>Resources/Expand_000000_100.png</file>
-        <file>Resources/Expand_000000_100 2.png</file>
-        <file>Resources/Resize Four Directions_000000_100 2.png</file>
         <file>Resources/folder.png</file>
         <file>Resources/unknown_file.png</file>
         <file>Resources/circled_dot.png</file>
@@ -23,5 +11,18 @@
         <file>Resources/MaterialIcon.png</file>
         <file>Resources/MeshIcon.png</file>
         <file>Resources/PrefabIcon.png</file>
+        <file>Resources/project_icon_shader.png</file>
+        <file>Resources/toolbar_pausebutton.png</file>
+        <file>Resources/toolbar_pausebutton_on.png</file>
+        <file>Resources/toolbar_playbutton.png</file>
+        <file>Resources/toolbar_playbutton_on.png</file>
+        <file>Resources/toolbar_stepbutton.png</file>
+        <file>Resources/toolbar_stepbutton_on.png</file>
+        <file>Resources/transform_tool__rotate.png</file>
+        <file>Resources/transform_tool_move.png</file>
+        <file>Resources/transform_tool_scale.png</file>
+        <file>Resources/transform_tool_view_move.png</file>
+        <file>Resources/transform_tool_view_orbit.png</file>
+        <file>Resources/transform_tool_view_zoom.png</file>
     </qresource>
 </RCC>

@@ -62,14 +62,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionPlay, &QAction::triggered, [this](){
 		if (Application::isPlaying())
 		{
-			this->ui->actionPlay->setIcon(QIcon(":/Resources/Play_black.png"));
-			this->ui->actionPlay->setChecked(true);
+			this->ui->actionPlay->setIcon(QIcon(":/Resources/toolbar_playbutton.png"));
+			this->ui->actionPlay->setChecked(false);
 			FishEditor::MainEditor::Stop();
 		}
 		else
 		{
-			this->ui->actionPlay->setIcon(QIcon(":/Resources/Stop_100.png"));
-			this->ui->actionPlay->setChecked(false);
+			this->ui->actionPlay->setIcon(QIcon(":/Resources/toolbar_playbutton_on.png"));
+			this->ui->actionPlay->setChecked(true);
 			FishEditor::MainEditor::Play();
 		}
 	});

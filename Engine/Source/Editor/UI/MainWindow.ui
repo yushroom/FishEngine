@@ -447,7 +447,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Play_black.png</normaloff>:/Resources/Play_black.png</iconset>
+     <normaloff>:/Resources/toolbar_playbutton.png</normaloff>:/Resources/toolbar_playbutton.png</iconset>
    </property>
    <property name="text">
     <string>Play</string>
@@ -462,7 +462,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Pause_black.png</normaloff>:/Resources/Pause_black.png</iconset>
+     <normaloff>:/Resources/toolbar_pausebutton.png</normaloff>:/Resources/toolbar_pausebutton.png</iconset>
    </property>
    <property name="text">
     <string>Pause</string>
@@ -477,7 +477,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/End_black.png</normaloff>:/Resources/End_black.png</iconset>
+     <normaloff>:/Resources/toolbar_stepbutton.png</normaloff>:/Resources/toolbar_stepbutton.png</iconset>
    </property>
    <property name="text">
     <string>Step</string>
@@ -492,7 +492,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Whole Hand_000000_100.png</normaloff>:/Resources/Whole Hand_000000_100.png</iconset>
+     <normaloff>:/Resources/transform_tool_view_move.png</normaloff>:/Resources/transform_tool_view_move.png</iconset>
    </property>
    <property name="text">
     <string>Hand</string>
@@ -507,7 +507,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Resize Four Directions_000000_100 2.png</normaloff>:/Resources/Resize Four Directions_000000_100 2.png</iconset>
+     <normaloff>:/Resources/transform_tool_move.png</normaloff>:/Resources/transform_tool_move.png</iconset>
    </property>
    <property name="text">
     <string>Translate</string>
@@ -522,7 +522,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Rotate_000000_100.png</normaloff>:/Resources/Rotate_000000_100.png</iconset>
+     <normaloff>:/Resources/transform_tool__rotate.png</normaloff>:/Resources/transform_tool__rotate.png</iconset>
    </property>
    <property name="text">
     <string>Rotation</string>
@@ -537,7 +537,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/Resources/Expand_000000_100 2.png</normaloff>:/Resources/Expand_000000_100 2.png</iconset>
+     <normaloff>:/Resources/transform_tool_scale.png</normaloff>:/Resources/transform_tool_scale.png</iconset>
    </property>
    <property name="text">
     <string>Scale</string>

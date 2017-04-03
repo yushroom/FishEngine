@@ -38,11 +38,16 @@ namespace FishEditor
 		static QIcon material_icon(":/Resources/MaterialIcon.png");
 		static QIcon mesh_icon(":/Resources/MeshIcon.png");
 		static QIcon prefab_icon(":/Resources/PrefabIcon.png");
+		static QIcon shader_icon(":/Resources/project_icon_shader.png");
 
 		auto type = FishEngine::Resources::GetAssetType(path.extension());
 		if (type == FishEngine::AssetType::Material)
 		{
 			return material_icon;
+		}
+		else if (type == FishEngine::AssetType::Shader)
+		{
+			return shader_icon;
 		}
 		else if (type == FishEngine::AssetType::Prefab)
 		{

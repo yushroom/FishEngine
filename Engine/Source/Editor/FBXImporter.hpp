@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include "FishEditor.hpp"
 #include "ModelImporter.hpp"
+#include "FBXImporter/FBXImportData.hpp"
 #include <Path.hpp>
 #include <Prefab.hpp>
 
@@ -16,9 +17,6 @@ namespace fbxsdk
 	class FbxSurfaceMaterial;
 }
 
-class FBXAnimationClip;
-class FBXImportScene;
-
 namespace FishEditor
 {
 	struct Meta(NonSerializable) ModelCollection
@@ -26,6 +24,10 @@ namespace FishEditor
 		FishEngine::PrefabPtr					m_modelPrefab;
 		FishEngine::GameObjectPtr				m_rootNode;
 		FishEngine::AvatarPtr					m_avatar;
+
+		FBXImportNode *							m_rootFbxNode;
+		std::unordered_map<fbxsdk::FbxNode*, FBXImportNode*>
+												m_fbxNodeLookup;
 
 		std::vector<FishEngine::MeshPtr>		m_meshes;
 		std::unordered_map<fbxsdk::FbxMesh*, size_t> 
@@ -41,6 +43,8 @@ namespace FishEditor
 		std::vector<FishEngine::Matrix4x4>		m_bindposes;
 		std::vector<FishEngine::SkinnedMeshRendererPtr> 
 												m_skinnedMeshRenderers;
+
+		std::vector<FBXAnimationClip>			m_clips;
 	};
 	
 	class Meta(NonSerializable) FBXImporter : public ModelImporter
@@ -59,13 +63,17 @@ namespace FishEditor
 		virtual void BuildFileIDToRecycleName() override;
 		
 	private:
+
+		// Baking Transform Components Into the Standard TRS Transforms
+		void BakeTransforms(fbxsdk::FbxScene * scene);
+
+		void ParseScene(fbxsdk::FbxScene * scene);
+
 		FishEngine::GameObjectPtr ParseNodeRecursively(fbxsdk::FbxNode* pNode);
 
 		FishEngine::MeshPtr ParseMesh(fbxsdk::FbxMesh* fbxMesh);
 
 		FishEngine::MaterialPtr ParseMaterial(fbxsdk::FbxSurfaceMaterial * pMaterial);
-
-		FishEngine::TexturePtr GetTextureInfo(fbxsdk::FbxGeometry* pGeometry);
 
 		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping);
 

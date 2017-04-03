@@ -1,5 +1,7 @@
 #include "FBXImporter.hpp"
 
+#include <unordered_set>
+
 #include <fbxsdk.h>
 #include <fbxsdk/utils/fbxgeometryconverter.h>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -16,9 +18,15 @@
 #include "AssetDataBase.hpp"
 #include "private/RawMesh.hpp"
 
-using namespace FishEngine;
+#include <Animation/AnimationUtility.hpp>
+#include <Animation/AnimationClip.hpp>
+//#include <Animation/AnimationClipInfo.hpp>
+#include <Animation/AnimationSplitInfo.hpp>
 
-typedef std::uint32_t UINT32;
+using namespace FishEngine;
+using namespace FishEditor;
+
+typedef std::uint32_t uint32_t;
 
 Matrix4x4 FBXToNativeType(fbxsdk::FbxAMatrix const & fmatrix)
 {
@@ -33,8 +41,6 @@ Matrix4x4 FBXToNativeType(fbxsdk::FbxAMatrix const & fmatrix)
 	}
 	return Matrix4x4(f44);
 }
-
-
 
 Vector3 FBXToNativeType(const FbxVector4& value)
 {
@@ -81,6 +87,194 @@ FbxSurfaceMaterial* FBXToNativeType(FbxSurfaceMaterial* const& value)
 int FBXToNativeType(const int & value)
 {
 	return value;
+}
+
+
+
+void convertAnimations(
+	const std::vector<FBXAnimationClip>& clips,
+	const std::vector<AnimationSplitInfo>& splits,
+	const std::shared_ptr<Skeleton>& skeleton,
+	bool importRootMotion,
+	std::vector<FBXAnimationClipData>& output)
+{
+	std::unordered_set<std::string> names;
+
+	std::string rootBoneName;
+	if (skeleton == nullptr)
+		importRootMotion = false;
+	else
+	{
+		uint32_t rootBoneIdx = skeleton->getRootBoneIndex();
+		if (rootBoneIdx == (uint32_t)-1)
+			importRootMotion = false;
+		else
+			rootBoneName = skeleton->getBoneInfo(rootBoneIdx).name;
+	}
+
+	bool isFirstClip = true;
+	for (auto& clip : clips)
+	{
+		std::shared_ptr<AnimationCurves> curves = std::make_shared<AnimationCurves>();
+		std::shared_ptr<RootMotion> rootMotion;
+
+		// Find offset so animations start at time 0
+		float animStart = std::numeric_limits<float>::infinity();
+
+		for (auto& bone : clip.boneAnimations)
+		{
+			if (bone.translation.getNumKeyFrames() > 0)
+				animStart = std::min(bone.translation.getKeyFrame(0).time, animStart);
+
+			if (bone.rotation.getNumKeyFrames() > 0)
+				animStart = std::min(bone.rotation.getKeyFrame(0).time, animStart);
+
+			if (bone.scale.getNumKeyFrames() > 0)
+				animStart = std::min(bone.scale.getKeyFrame(0).time, animStart);
+		}
+
+		for (auto& anim : clip.blendShapeAnimations)
+		{
+			if (anim.curve.getNumKeyFrames() > 0)
+				animStart = std::min(anim.curve.getKeyFrame(0).time, animStart);
+		}
+
+		AnimationCurveFlags blendShapeFlags = AnimationCurveFlag::ImportedCurve | AnimationCurveFlag::MorphFrame;
+		if (animStart != 0.0f && animStart != std::numeric_limits<float>::infinity())
+		{
+			for (auto& bone : clip.boneAnimations)
+			{
+				TAnimationCurve<Vector3> translation = AnimationUtility::offsetCurve(bone.translation, -animStart);
+				TAnimationCurve<Quaternion> rotation = AnimationUtility::offsetCurve(bone.rotation, -animStart);
+				TAnimationCurve<Vector3> scale = AnimationUtility::offsetCurve(bone.scale, -animStart);
+
+				if (importRootMotion && bone.node->name == rootBoneName)
+					rootMotion = std::make_shared<RootMotion>(translation, rotation);
+				else
+				{
+					curves->position.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, translation });
+					curves->rotation.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, rotation });
+					curves->scale.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, scale });
+				}
+			}
+
+			for (auto& anim : clip.blendShapeAnimations)
+			{
+				TAnimationCurve<float> curve = AnimationUtility::offsetCurve(anim.curve, -animStart);
+				curves->generic.push_back({ anim.blendShape, blendShapeFlags, curve });
+			}
+		}
+		else
+		{
+			for (auto& bone : clip.boneAnimations)
+			{
+				if (importRootMotion && bone.node->name == rootBoneName)
+					rootMotion = std::make_shared<RootMotion>(bone.translation, bone.rotation);
+				else
+				{
+					curves->position.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.translation });
+					curves->rotation.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.rotation });
+					curves->scale.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.scale });
+				}
+			}
+
+			for (auto& anim : clip.blendShapeAnimations)
+				curves->generic.push_back({ anim.blendShape, blendShapeFlags, anim.curve });
+		}
+
+		// See if any splits are required. We only split the first clip as it is assumed if FBX has multiple clips the
+		// user has the ability to split them externally.
+		if (isFirstClip && !splits.empty())
+		{
+			float secondsPerFrame = 1.0f / clip.sampleRate;
+
+			for (auto& split : splits)
+			{
+				auto splitClipCurve = std::make_shared<AnimationCurves>();
+				std::shared_ptr<RootMotion> splitRootMotion;
+
+				auto splitCurves = [&](auto& inCurves, auto& outCurves)
+				{
+					uint32_t numCurves = (uint32_t)inCurves.size();
+					outCurves.resize(numCurves);
+
+					for (uint32_t i = 0; i < numCurves; i++)
+					{
+						auto& animCurve = inCurves[i].curve;
+						outCurves[i].name = inCurves[i].name;
+
+						uint32_t numFrames = animCurve.getNumKeyFrames();
+						if (numFrames == 0)
+							continue;
+
+						float startTime = split.startFrame * secondsPerFrame;
+						float endTime = split.endFrame * secondsPerFrame;
+
+						outCurves[i].curve = inCurves[i].curve.split(startTime, endTime);
+
+						if (split.isAdditive)
+							outCurves[i].curve.makeAdditive();
+					}
+				};
+
+				splitCurves(curves->position, splitClipCurve->position);
+				splitCurves(curves->rotation, splitClipCurve->rotation);
+				splitCurves(curves->scale, splitClipCurve->scale);
+				splitCurves(curves->generic, splitClipCurve->generic);
+
+				if (rootMotion != nullptr)
+				{
+					auto splitCurve = [&](auto& inCurve, auto& outCurve)
+					{
+						uint32_t numFrames = inCurve.getNumKeyFrames();
+						if (numFrames > 0)
+						{
+							float startTime = split.startFrame * secondsPerFrame;
+							float endTime = split.endFrame * secondsPerFrame;
+
+							outCurve = inCurve.split(startTime, endTime);
+
+							if (split.isAdditive)
+								outCurve.makeAdditive();
+						}
+					};
+
+					splitRootMotion = std::make_shared<RootMotion>();
+					splitCurve(rootMotion->position, splitRootMotion->position);
+					splitCurve(rootMotion->rotation, splitRootMotion->rotation);
+				}
+
+				// Search for a unique name
+				std::string name = split.name;
+				uint32_t attemptIdx = 0;
+				while (names.find(name) != names.end())
+				{
+					name = clip.name + "_" + ToString(attemptIdx);
+					attemptIdx++;
+				}
+
+				names.insert(name);
+				output.push_back(FBXAnimationClipData(name, split.isAdditive, clip.sampleRate, splitClipCurve,
+					splitRootMotion));
+			}
+		}
+		else
+		{
+			// Search for a unique name
+			std::string name = clip.name;
+			uint32_t attemptIdx = 0;
+			while (names.find(name) != names.end())
+			{
+				name = clip.name + "_" + ToString(attemptIdx);
+				attemptIdx++;
+			}
+
+			names.insert(name);
+			output.push_back(FBXAnimationClipData(name, false, clip.sampleRate, curves, rootMotion));
+		}
+
+		isFirstClip = false;
+	}
 }
 
 
@@ -595,96 +789,119 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	return ret_material;
 }
 
-void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex)
+
+//FBXImportNode* CreateImportNode(FbxNode * fbxNode, FBXImportNode * parent)
+//{
+//	auto node = new FBXImportNode();
+//
+//	Vector3 translation = FBXToNativeType(fbxNode->LclTranslation.Get());
+//	Vector3 rotationEuler = FBXToNativeType(fbxNode->LclRotation.Get());
+//	Vector3 scale = FBXToNativeType(fbxNode->LclScaling.Get());
+//
+//	FbxDouble3 r = fbxNode->LclRotation.Get();
+//	EFbxRotationOrder order1;
+//	fbxNode->GetRotationOrder(FbxNode::eDestinationPivot, order1);
+//
+//	EFbxRotationOrder order2;
+//	fbxNode->GetRotationOrder(FbxNode::eSourcePivot, order2);
+//	//pNode->SetRotationOrder(FbxNode::eDestinationPivot, EFbxRotationOrder::eOrderZYX);
+//	//r[0] = -r[0];
+//	float scale = m_fileScale * m_globalScale;
+//	go->transform()->setLocalPosition(t[0] * scale, t[1] * scale, t[2] * scale);
+//	//go->transform()->setLocalEulerAngles(r[0], r[1], r[2]);
+//	go->transform()->setLocalScale(s[0], s[1], s[2]);
+//
+//	auto AngleX = [](float x) {
+//		return Quaternion::AngleAxis(x, Vector3(1, 0, 0));
+//	};
+//	auto AngleY = [](float y) {
+//		return Quaternion::AngleAxis(y, Vector3(0, 1, 0));
+//	};
+//	auto AngleZ = [](float z) {
+//		return Quaternion::AngleAxis(z, Vector3(0, 0, 1));
+//	};
+//
+//	if (order1 != EFbxRotationOrder::eOrderXYZ)
+//	{
+//		abort();
+//	}
+//
+//	if (order2 == EFbxRotationOrder::eOrderZXY)
+//	{
+//		Quaternion q = AngleY(r[1]) * AngleX(r[0]) * AngleZ(r[2]);
+//		go->transform()->setLocalRotation(q);
+//	}
+//	else if (order2 == EFbxRotationOrder::eOrderXYZ)
+//	{
+//		Quaternion q = AngleZ(r[2]) * AngleY(r[1]) * AngleX(r[0]);
+//		go->transform()->setLocalRotation(q);
+//	}
+//	else
+//	{
+//		abort();
+//	}
+//}
+//
+//void FishEditor::FBXImporter::ParseScene(fbxsdk::FbxScene * scene)
+//{
+//	
+//}
+
+void FishEditor::FBXImporter::BakeTransforms(FbxScene * scene)
 {
+	// FBX stores transforms in a more complex way than just translation-rotation-scale as used by Banshee.
+	// Instead they also support rotations offsets and pivots, scaling pivots and more. We wish to bake all this data
+	// into a standard transform so we can access it using node's local TRS properties (e.g. FbxNode::LclTranslation).
 
-	if (pProperty.IsValid())
+	// fbx sdk doc:
+	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
+
+	double frameRate = FbxTime::GetFrameRate(scene->GetGlobalSettings().GetTimeMode());
+
+	//bs_frame_mark();
 	{
-		int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
+		std::stack<FbxNode*> todo;
+		todo.push(scene->GetRootNode());
 
-		for (int j = 0; j < lTextureCount; ++j)
+		while (todo.size() > 0)
 		{
-			//Here we have to check if it's layeredtextures, or just textures:
-			FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
-			if (lLayeredTexture)
+			FbxNode* node = todo.top();
+			todo.pop();
+
+			FbxVector4 zero(0, 0, 0);
+			FbxVector4 one(1, 1, 1);
+
+			// Activate pivot converting
+			node->SetPivotState(FbxNode::eSourcePivot, FbxNode::ePivotActive);
+			node->SetPivotState(FbxNode::eDestinationPivot, FbxNode::ePivotActive);
+
+			// We want to set all these to 0 (1 for scale) and bake them into the transforms
+			node->SetPostRotation(FbxNode::eDestinationPivot, zero);
+			node->SetPreRotation(FbxNode::eDestinationPivot, zero);
+			node->SetRotationOffset(FbxNode::eDestinationPivot, zero);
+			node->SetScalingOffset(FbxNode::eDestinationPivot, zero);
+			node->SetRotationPivot(FbxNode::eDestinationPivot, zero);
+			node->SetScalingPivot(FbxNode::eDestinationPivot, zero);
+			node->SetGeometricTranslation(FbxNode::eDestinationPivot, zero);
+			node->SetGeometricRotation(FbxNode::eDestinationPivot, zero);
+			node->SetGeometricScaling(FbxNode::eDestinationPivot, one);
+
+			// FishEngine assumes euler angles are in ZXY order
+			node->SetRotationOrder(FbxNode::eDestinationPivot, EFbxRotationOrder::eOrderZXY);
+
+			// Keep interpolation as is
+			node->SetQuaternionInterpolation(FbxNode::eDestinationPivot, node->GetQuaternionInterpolation(FbxNode::eSourcePivot));
+
+			for (int i = 0; i < node->GetChildCount(); i++)
 			{
-				//Debug::Log("    Layered Texture: %d", j);
-				int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
-				for (int k = 0; k < lNbTextures; ++k)
-				{
-					FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
-					if (lTexture)
-					{
-
-						if (pDisplayHeader) {
-							//DisplayInt("    Textures connected to Material ", pMaterialIndex);
-							pDisplayHeader = false;
-						}
-
-						//NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
-						//Why is that?  because one texture can be shared on different layered textures and might
-						//have different blend modes.
-
-						FbxLayeredTexture::EBlendMode lBlendMode;
-						lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
-						//Debug::Log("    Textures for ", pProperty.GetName());
-						//Debug::Log("        Texture ", k);
-						//DisplayTextureInfo(lTexture, (int)lBlendMode);
-					}
-
-				}
-			}
-			else
-			{
-				//no layered texture simply get on the property
-				FbxTexture* lTexture = pProperty.GetSrcObject<FbxTexture>(j);
-				if (lTexture)
-				{
-					//display connected Material header only at the first time
-					if (pDisplayHeader) {
-						//DisplayInt("    Textures connected to Material ", pMaterialIndex);
-						pDisplayHeader = false;
-					}
-
-					//DisplayString("    Textures for ", pProperty.GetName());
-					//DisplayInt("        Texture ", j);
-					//DisplayTextureInfo(lTexture, -1);
-					FbxFileTexture *lFileTexture = FbxCast<FbxFileTexture>(lTexture);
-					//FishEngine::Debug::Log("Texture: %s", (char *) lFileTexture->GetFileName());
-				}
+				FbxNode* childNode = node->GetChild(i);
+				todo.push(childNode);
 			}
 		}
-	}//end if pProperty
-}
 
-
-FishEngine::TexturePtr FishEditor::FBXImporter::GetTextureInfo(fbxsdk::FbxGeometry* pGeometry)
-{
-	int lMaterialIndex;
-	FbxProperty lProperty;
-	if (pGeometry->GetNode() == nullptr)
-	{
-		return nullptr;
+		scene->GetRootNode()->ConvertPivotAnimationRecursive(nullptr, FbxNode::eDestinationPivot, frameRate);
 	}
-	int lNbMat = pGeometry->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
-	for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++) {
-		FbxSurfaceMaterial *lMaterial = pGeometry->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
-		bool lDisplayHeader = true;
-
-		//go through all the possible textures
-		if (lMaterial) {
-
-			int lTextureIndex;
-			FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
-			{
-				lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
-				FindAndDisplayTextureInfoByProperty(lProperty, lDisplayHeader, lMaterialIndex);
-			}
-
-		}//end if(lMaterial)
-
-	}// end for lMaterialIndex
-	return nullptr;
+	//bs_frame_clear();
 }
 
 /**
@@ -715,6 +932,9 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	auto mat = FbxAMatrixToMatrix4x4(fmat);
 	go->transform()->setLocalToWorldMatrix(mat);
 #else
+
+	// SetRotationOrder did not work, so handle rotation order here
+
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
 	FbxDouble3 s = pNode->LclScaling.Get();
@@ -723,8 +943,12 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	
 	EFbxRotationOrder order2;
 	pNode->GetRotationOrder(FbxNode::eSourcePivot, order2);
-	//pNode->SetRotationOrder(FbxNode::eDestinationPivot, EFbxRotationOrder::eOrderZYX);
-	//r[0] = -r[0];
+
+	//if (order2 != EFbxRotationOrder::eOrderZXY)
+	//{
+	//	abort();
+	//}
+
 	float scale = m_fileScale * m_globalScale;
 	go->transform()->setLocalPosition(t[0] * scale, t[1] * scale, t[2] * scale);
 	//go->transform()->setLocalEulerAngles(r[0], r[1], r[2]);
@@ -740,10 +964,10 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 		return Quaternion::AngleAxis(z, Vector3(0, 0, 1));
 	};
 	
-	if (order1 != EFbxRotationOrder::eOrderXYZ)
-	{
-		abort();
-	}
+	//if (order1 != EFbxRotationOrder::eOrderXYZ)
+	//{
+	//	abort();
+	//}
 	
 	if (order2 == EFbxRotationOrder::eOrderZXY)
 	{
@@ -823,9 +1047,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				material = ParseMaterial(lMaterial);
 				renderer->AddMaterial(material);
 			}
-
-
-			//auto texture = GetTextureInfo(lMesh);
 		}
 //		else if (type == FbxNodeAttribute::eSkeleton)
 //		{
@@ -914,6 +1135,8 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	// Import the contents of the file into the scene.
 	lImporter->Import(lScene);
 
+	BakeTransforms(lScene);
+
 	// The file is imported, so get rid of the importer.
 	lImporter->Destroy();
 
@@ -967,6 +1190,7 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	}
 	
 	ImportAnimations(lScene);
+
 	
 	// Destroy the SDK manager and all the other objects it was handling.
 	lSdkManager->Destroy();
@@ -1111,20 +1335,6 @@ void FishEditor::FBXImporter::BuildFileIDToRecycleName()
 	RecursivelyBuildFileIDToRecycleName(m_model.m_modelPrefab->rootGameObject()->transform());
 }
 
-struct FBXBoneAnimation
-{
-	//FBXImportNode* node;
-	
-};
-
-struct FBXAnimationClip
-{
-	std::string name;
-	float start;
-	float end;
-	uint32_t sampleRate;
-};
-
 void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 {
 	FbxNode * root = scene->GetRootNode();
@@ -1133,7 +1343,8 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 	{
 		FbxAnimStack* animStack = scene->GetSrcObject<FbxAnimStack>(i);
 		
-		FBXAnimationClip clip;
+		m_model.m_clips.emplace_back();
+		auto & clip = m_model.m_clips.back();
 		clip.name = animStack->GetName();
 		FbxTimeSpan timeSpan = animStack->GetLocalTimeSpan();
 		clip.start = (float) timeSpan.GetStart().GetSecondDouble();
@@ -1144,7 +1355,6 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 		if (layerCount == 1)
 		{
 			FbxAnimLayer* animLayer = animStack->GetMember<FbxAnimLayer>(0);
-			
 			ImportAnimations(animLayer, root, clip);
 		}
 		else
@@ -1153,6 +1363,205 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 		}
 	}
 }
+
+
+TAnimationCurve<Vector3> reduceKeyframes(TAnimationCurve<Vector3>& curve)
+{
+	uint32_t keyCount = curve.getNumKeyFrames();
+
+	std::vector<TKeyframe<Vector3>> newKeyframes;
+
+	bool lastWasEqual = false;
+	for (uint32_t i = 0; i < keyCount; i++)
+	{
+		bool isEqual = true;
+
+		const TKeyframe<Vector3>& curKey = curve.getKeyFrame(i);
+		if (i > 0)
+		{
+			TKeyframe<Vector3>& prevKey = newKeyframes.back();
+
+			isEqual = isEqual && (prevKey.value == curKey.value) && (prevKey.outTangent == curKey.inTangent);
+		}
+		else
+			isEqual = false;
+
+		// More than two keys in a row are equal, remove previous key by replacing it with this one
+		if (lastWasEqual && isEqual)
+		{
+			TKeyframe<Vector3>& prevKey = newKeyframes.back();
+
+			// Other properties are guaranteed unchanged
+			prevKey.time = curKey.time;
+			prevKey.outTangent = curKey.outTangent;
+
+			continue;
+		}
+
+		newKeyframes.push_back(curKey);
+		lastWasEqual = isEqual;
+	}
+
+	return TAnimationCurve<Vector3>(newKeyframes);
+}
+
+
+void setKeyframeValues(TKeyframe<Vector3>& keyFrame, int idx, float value, float inTangent, float outTangent)
+{
+	keyFrame.value.Set(value, value, value);
+	keyFrame.inTangent.Set(inTangent, inTangent, inTangent);
+	keyFrame.outTangent.Set(outTangent, outTangent, outTangent);
+}
+
+
+template<class T, int C>
+TAnimationCurve<T> importCurve(FbxAnimCurve*(&fbxCurve)[C], float(&defaultValues)[C], float start, float end)
+{
+	int keyCounts[C];
+	for (int i = 0; i < C; i++)
+	{
+		if (fbxCurve[i] != nullptr)
+			keyCounts[i] = fbxCurve[i]->KeyGetCount();
+		else
+			keyCounts[i] = 0;
+	}
+
+	// If curve key-counts don't match, we need to force resampling 
+	bool forceResample = false;
+	if (!forceResample)
+	{
+		for (int i = 1; i < C; i++)
+		{
+			forceResample |= keyCounts[i - 1] != keyCounts[i];
+			if (forceResample)
+				break;
+		}
+	}
+
+	// Read keys directly
+	if (!forceResample)
+	{
+		bool foundMismatch = false;
+		int keyCount = keyCounts[0];
+		std::vector<TKeyframe<T>> keyframes;
+		for (int i = 0; i < keyCount; i++)
+		{
+			FbxTime fbxTime = fbxCurve[0]->KeyGetTime(i);
+			float time = (float)fbxTime.GetSecondDouble();
+
+			// Ensure times from other curves match
+			for (int j = 1; j < C; j++)
+			{
+				fbxTime = fbxCurve[j]->KeyGetTime(i);
+				float otherTime = (float)fbxTime.GetSecondDouble();
+
+				if (!Mathf::CompareApproximately(time, otherTime))
+				{
+					foundMismatch = true;
+					break;
+				}
+			}
+
+			if (foundMismatch)
+				break;
+
+			if (time < start || time > end)
+				continue;
+
+			keyframes.push_back(TKeyframe<T>());
+			TKeyframe<T>& keyFrame = keyframes.back();
+
+			keyFrame.time = time;
+
+			for (int j = 0; j < C; j++)
+			{
+				setKeyframeValues(keyFrame, j,
+					fbxCurve[j]->KeyGetValue(i),
+					fbxCurve[j]->KeyGetLeftDerivative(i),
+					fbxCurve[j]->KeyGetRightDerivative(i));
+			}
+		}
+
+		if (!foundMismatch)
+			return TAnimationCurve<T>(keyframes);
+		else
+			forceResample = true;
+	}
+
+	//if (!importOptions.animResample && forceResample)
+	//	LOGWRN("Animation has different keyframes for different curve components, forcing resampling.");
+
+
+	// Resample keys
+	float curveStart = std::numeric_limits<float>::infinity();
+	float curveEnd = -std::numeric_limits<float>::infinity();
+
+	for (uint32_t i = 0; i < C; i++)
+	{
+		if (fbxCurve[i] == nullptr)
+		{
+			curveStart = std::min(0.0f, curveStart);
+			curveEnd = std::max(0.0f, curveEnd);
+
+			continue;
+		}
+
+		int keyCount = keyCounts[i];
+		for (int j = 0; j < keyCount; j++)
+		{
+			FbxTime fbxTime = fbxCurve[i]->KeyGetTime(j);
+			float time = (float)fbxTime.GetSecondDouble();
+
+			curveStart = std::min(time, curveStart);
+			curveEnd = std::max(time, curveEnd);
+		}
+	}
+
+	curveStart = Mathf::Clamp(curveStart, start, end);
+	curveEnd = Mathf::Clamp(curveEnd, start, end);
+
+	float curveLength = curveEnd - curveStart;
+	constexpr float animSampleRate = 1.0f / 30.0f;
+	int numSamples = Mathf::CeilToInt(curveLength / animSampleRate);
+
+	// We don't use the exact provided sample rate but instead modify it slightly so it
+	// completely covers the curve range including start/end points while maintaining
+	// constant time step between keyframes.
+	float dt = curveLength / (float)numSamples;
+
+	int lastKeyframe[] = { 0, 0, 0 };
+	int lastLeftTangent[] = { 0, 0, 0 };
+	int lastRightTangent[] = { 0, 0, 0 };
+
+	std::vector<TKeyframe<T>> keyframes(numSamples);
+	for (int i = 0; i < numSamples; i++)
+	{
+		float sampleTime = std::min(curveStart + i * dt, curveEnd);
+		FbxTime fbxSampleTime;
+		fbxSampleTime.SetSecondDouble(sampleTime);
+
+		TKeyframe<T>& keyFrame = keyframes[i];
+		keyFrame.time = sampleTime;
+
+		for (int j = 0; j < C; j++)
+		{
+			if (fbxCurve[j] != nullptr)
+			{
+				setKeyframeValues(keyFrame, j,
+					fbxCurve[j]->Evaluate(fbxSampleTime, &lastKeyframe[j]),
+					fbxCurve[j]->EvaluateLeftDerivative(fbxSampleTime, &lastLeftTangent[j]),
+					fbxCurve[j]->EvaluateRightDerivative(fbxSampleTime, &lastRightTangent[j]));
+			}
+			else
+			{
+				setKeyframeValues(keyFrame, j, defaultValues[C], 0.0f, 0.0f);
+			}
+		}
+	}
+
+	return TAnimationCurve<T>(keyframes);
+}
+
 
 void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxsdk::FbxNode * node, FBXAnimationClip & clip)
 {
@@ -1187,27 +1596,26 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 	};
 	
 	bool hasBoneAnimation = hasCurveValues(translation) || hasCurveValues(rotation) || hasCurveValues(scale);
-#if 0
 	if (hasBoneAnimation)
 	{
 		clip.boneAnimations.push_back(FBXBoneAnimation());
 		FBXBoneAnimation& boneAnim = clip.boneAnimations.back();
-		boneAnim.node = importScene.nodeMap[node];
+		//boneAnim.node = importScene.nodeMap[node];
 		
 		if (hasCurveValues(translation))
 		{
 			float defaultValues[3];
 			memcpy(defaultValues, &defaultTranslation, sizeof(defaultValues));
 			
-			boneAnim.translation = importCurve<Vector3, 3>(translation, defaultValues, importOptions,
+			boneAnim.translation = importCurve<Vector3, 3>(translation, defaultValues,
 														   clip.start, clip.end);
 		}
 		else
 		{
-			Vector<TKeyframe<Vector3>> keyframes(1);
+			std::vector<TKeyframe<Vector3>> keyframes(1);
 			keyframes[0].value = defaultTranslation;
-			keyframes[0].inTangent = Vector3::ZERO;
-			keyframes[0].outTangent = Vector3::ZERO;
+			keyframes[0].inTangent = Vector3::zero;
+			keyframes[0].outTangent = Vector3::zero;
 			
 			boneAnim.translation = TAnimationCurve<Vector3>(keyframes);
 		}
@@ -1217,14 +1625,14 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 			float defaultValues[3];
 			memcpy(defaultValues, &defaultScale, sizeof(defaultValues));
 			
-			boneAnim.scale = importCurve<Vector3, 3>(scale, defaultValues, importOptions, clip.start, clip.end);
+			boneAnim.scale = importCurve<Vector3, 3>(scale, defaultValues, clip.start, clip.end);
 		}
 		else
 		{
-			Vector<TKeyframe<Vector3>> keyframes(1);
+			std::vector<TKeyframe<Vector3>> keyframes(1);
 			keyframes[0].value = defaultScale;
-			keyframes[0].inTangent = Vector3::ZERO;
-			keyframes[0].outTangent = Vector3::ZERO;
+			keyframes[0].inTangent = Vector3::zero;
+			keyframes[0].outTangent = Vector3::zero;
 			
 			boneAnim.scale = TAnimationCurve<Vector3>(keyframes);
 		}
@@ -1235,29 +1643,31 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 			float defaultValues[3];
 			memcpy(defaultValues, &defaultRotation, sizeof(defaultValues));
 			
-			eulerAnimation = importCurve<Vector3, 3>(rotation, defaultValues, importOptions, clip.start, clip.end);
+			eulerAnimation = importCurve<Vector3, 3>(rotation, defaultValues, clip.start, clip.end);
 		}
 		else
 		{
-			Vector<TKeyframe<Vector3>> keyframes(1);
+			std::vector<TKeyframe<Vector3>> keyframes(1);
 			keyframes[0].value = defaultRotation;
-			keyframes[0].inTangent = Vector3::ZERO;
-			keyframes[0].outTangent = Vector3::ZERO;
+			keyframes[0].inTangent = Vector3::zero;
+			keyframes[0].outTangent = Vector3::zero;
 			
 			eulerAnimation = TAnimationCurve<Vector3>(keyframes);
 		}
 		
-		if(importOptions.reduceKeyframes)
-		{
-			boneAnim.translation = reduceKeyframes(boneAnim.translation);
-			boneAnim.scale = reduceKeyframes(boneAnim.scale);
-			eulerAnimation = reduceKeyframes(eulerAnimation);
-		}
+		//if(importOptions.reduceKeyframes)
+		//{
+		//	boneAnim.translation = reduceKeyframes(boneAnim.translation);
+		//	boneAnim.scale = reduceKeyframes(boneAnim.scale);
+		//	eulerAnimation = reduceKeyframes(eulerAnimation);
+		//}
 		
-		boneAnim.translation = AnimationUtility::scaleCurve(boneAnim.translation, importScene.scaleFactor);
+		if (m_fileScale != 1.0f)
+		{
+			boneAnim.translation = AnimationUtility::scaleCurve(boneAnim.translation, m_fileScale);
+		}
 		boneAnim.rotation = AnimationUtility::eulerToQuaternionCurve(eulerAnimation);
 	}
-#endif
 	
 	int childCount = node->GetChildCount();
 	for (int i = 0; i < childCount; i++)
@@ -1266,3 +1676,4 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 		ImportAnimations(layer, child, clip);
 	}
 }
+

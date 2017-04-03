@@ -21,7 +21,7 @@ namespace FishEngine
 		InjectClassName(AnimationClip);
 		
 		// Animation Events for this animation clip.
-		std::vector<AnimationClip> events;
+		//std::vector<AnimationEvent> events;
 		
 		// Frame rate at which keyframes are sampled. (Read Only)
 		// This is the frame rate that was used in the animation program you used to create the animation or model.

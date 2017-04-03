@@ -52,7 +52,7 @@ bool UIFloat3::CheckUpdate(std::string const & label, float &x, float &y, float 
 
 	if (m_label != label)
 	{
-		LogInfo("[float3] new label: %s", label.c_str());
+		LogInfo("[float3] new label: " + label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());

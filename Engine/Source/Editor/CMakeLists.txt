@@ -67,7 +67,7 @@ SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
 SOURCE_GROUP( Inspector FILES ${InspectorFiles} )
 SOURCE_GROUP( Editor FILES ${EditorFiles})
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} resources.qrc ${RESOURCE_FILES} )
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} resources.qrc ${RESOURCE_FILES} ${Asset_SRCS})
 
 SET( INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
 MESSAGE("hhhh" ${INFO_PLIST})

@@ -341,4 +341,5 @@ namespace FishEngine {
 		float t = Mathf::Min(1.f, maxDegreesDelta / num);
 		return Quaternion::SlerpUnclamped(from, to, t);
 	}
+
 }

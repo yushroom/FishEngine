@@ -35,9 +35,10 @@ FILE(GLOB EditorFiles
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 #FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
-FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
+FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.*)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
+FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.*)
 foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})

@@ -118,7 +118,9 @@ namespace FishEditor
 	void SceneViewEditor::Update()
 	{
 		//Input::Update();
-		m_cameraGameObject->GetComponent<CameraController>()->Update();
+		bool modified = false;
+		m_cameraGameObject->GetComponent<CameraController>()->Check(&modified);
+		m_enableGizmoOperation = !modified;
 		//Scene::Update();
 	}
 
@@ -316,9 +318,9 @@ namespace FishEditor
 		/************************************************************************/
 		/* Selection Gizmos                                                     */
 		/************************************************************************/
-		auto go = Selection::activeGameObject();
-		if (go != nullptr)
-			go->OnDrawGizmosSelected();
+		auto selectedGO = Selection::activeGameObject();
+		if (selectedGO != nullptr)
+			selectedGO->OnDrawGizmosSelected();
 
 		/************************************************************************/
 		/* Camera Preview                                                       */
@@ -354,7 +356,6 @@ namespace FishEditor
 		glClear(GL_DEPTH_BUFFER_BIT);
 		DrawSceneGizmo();
 
-		auto selectedGO = Selection::activeGameObject();
 		if (m_lastSelectedGameObject.lock() != selectedGO)
 		{
 			m_selectedAxis = -1;
@@ -528,6 +529,9 @@ namespace FishEditor
 		if (m_selectedAxis < 0)
 			return;
 
+		if (!m_enableGizmoOperation)
+			return;
+
 		// get intersected point of two Rays
 		// solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
 		auto solve = [](const Vector3& o1, const Vector3 dir1, const Vector3& o2, const Vector3& dir2) -> float
@@ -678,7 +682,8 @@ namespace FishEditor
 
 		if (m_selectedAxis < 0)
 			return;
-
+		if (!m_enableGizmoOperation)
+			return;
 
 		if (Input::GetMouseButton(0)) // rotating
 		{
@@ -802,6 +807,8 @@ namespace FishEditor
 		}
 
 		if (m_selectedAxis < 0)
+			return;
+		if (!m_enableGizmoOperation)
 			return;
 
 		// get intersected point of two Rays
@@ -976,6 +983,9 @@ namespace FishEditor
 		cubeMesh->Render();
 
 		shader->PostRender();
+
+		//if (!m_enableGizmoOperation)
+		//	return;
 
 		if (interested && Input::GetMouseButtonDown(0))
 		{

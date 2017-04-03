@@ -175,7 +175,7 @@ namespace FishEditor
 		material->setMainTexture(stageBaseTexture);
 		plane->GetComponent<Renderer>()->SetMaterial(material);
 		
-		auto chanMainShader = As<Shader>(AssetDatabase::LoadAssetAtPath("CharaMain.shader"));
+		auto chanMainShader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/CharaMain.shader"));
 		auto bodyMaterial = Material::CreateMaterial();
 		bodyMaterial->setName("body");
 		bodyMaterial->setShader(chanMainShader);
@@ -189,13 +189,13 @@ namespace FishEditor
 		bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
 		
 		constexpr float edgeThickness = 0.5f;
-		auto texture2side = As<Shader>(AssetDatabase::LoadAssetAtPath("TextureDoubleSided.surf"));
+		auto texture2side = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/TextureDoubleSided.surf"));
 		material = Material::CreateMaterial();
 		material->setShader(texture2side);
 		//material = bodyMaterial;
 		//material = Material::builtinMaterial("SkinnedMesh");
 		material->SetTexture("_MainTex", bodyTexture);
-		auto outline_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Outline.shader"));
+		auto outline_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Outline.shader"));
 		auto outline_material = Material::CreateMaterial();
 		outline_material->setShader(outline_shader);
 		outline_material->setName("Outline");
@@ -412,6 +412,7 @@ namespace FishEditor
 		terrainGO->GetComponentInChildren<Renderer>()->SetMaterial(material);
 	}
 	
+
 	void InitializeScene_IllustrativeRendering()
 	{
 		auto light_go = Light::mainLight()->gameObject();
@@ -477,6 +478,7 @@ namespace FishEditor
 		
 		cube->AddComponent(rotator);
 	}
+
 
 	void InitializeScene_Empty()
 	{

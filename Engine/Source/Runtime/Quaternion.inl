@@ -86,6 +86,52 @@ namespace FishEngine
 		return result;
 	}
 
+
+	inline Quaternion Quaternion::operator-() const
+	{
+		return Quaternion(-x, -y, -z, -w);
+	}
+
+
+	inline Quaternion operator* (Quaternion const & q, float scale)
+	{
+		return Quaternion(q.x*scale, q.y*scale, q.z*scale, q.w*scale);
+	}
+
+	inline Quaternion operator*(float scale, Quaternion const & q)
+	{
+		return Quaternion(q.x*scale, q.y*scale, q.z*scale, q.w*scale);
+	}
+
+	inline Quaternion & Quaternion::operator+=(const Quaternion& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
+		return *this;
+	}
+
+	inline Quaternion & Quaternion::operator-=(const Quaternion& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
+		return *this;
+	}
+
+	inline Quaternion operator + (const Quaternion& lhs, const Quaternion& rhs)
+	{
+		return Quaternion(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
+	}
+
+	inline Quaternion operator - (const Quaternion& lhs, const Quaternion& rhs)
+	{
+		return Quaternion(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
+	}
+
+
 	inline void Quaternion::SetFromToRotation(const Vector3& fromDirection, const Vector3& toDirection)
 	{
 		*this = Quaternion::FromToRotation(fromDirection, toDirection);

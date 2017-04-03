@@ -78,6 +78,7 @@ foreach (x Texture Texture2D TextureProperty RenderBuffer RenderTexture Cubemap 
 endforeach()
 SOURCE_GROUP(Texture FILES ${Texture_SRCS})
 
+FILE(GLOB Animation_SRCS ${CMAKE_CURRENT_LIST_DIR}/Animation/*.*)
 foreach (x AnimationClip Animator)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
@@ -87,7 +88,7 @@ endforeach()
 SOURCE_GROUP(Animation FILES ${Animation_SRCS})
 
 
-add_library (FishEngine SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
+add_library (FishEngine SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles} ${Animation_SRCS})
 target_link_libraries(FishEngine ${Boost_LIBRARIES})
 target_link_libraries(FishEngine ${PhysXSDK_LIBRARIES})
 target_link_libraries(FishEngine yaml-cpp)

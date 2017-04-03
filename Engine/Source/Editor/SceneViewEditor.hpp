@@ -150,6 +150,7 @@ namespace FishEditor
 
 		int         m_selectedAxis          = -1; // temp
 		std::weak_ptr<FishEngine::GameObject> m_lastSelectedGameObject; // temp
+		bool m_enableGizmoOperation = true;
 		void DrawTranslateGizmo();
 		void DrawRotateGizmo();
 		void DrawScaleGizmo();

@@ -96,11 +96,21 @@ namespace FishEngine
 		static Quaternion Euler(const Vector3& euler);
 
 
+		Quaternion  operator -() const;
 		Quaternion  operator* (const Quaternion & rhs) const;
 		Quaternion  operator*=(const Quaternion & rhs);
 		Vector3     operator* (const Vector3    & point) const;
 		friend bool operator==(const Quaternion & lhs, const Quaternion& rhs);
 		friend bool operator!=(const Quaternion & lhs, const Quaternion& rhs);
+
+		friend Quaternion  operator* (Quaternion const & q, float scale);
+		friend Quaternion  operator* (float scale, Quaternion const & q);
+
+		Quaternion & Quaternion::operator+=(const Quaternion& rhs);
+		Quaternion & Quaternion::operator-=(const Quaternion& rhs);
+		friend Quaternion operator + (const Quaternion& lhs, const Quaternion& rhs);
+		friend Quaternion operator - (const Quaternion& lhs, const Quaternion& rhs);
+
 
 		// The dot product between two rotations.
 		static float Dot(const Quaternion& a, const Quaternion& b);

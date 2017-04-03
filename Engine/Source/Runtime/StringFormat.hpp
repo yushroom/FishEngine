@@ -5,7 +5,8 @@
 
 namespace FishEngine
 {
-	inline std::string ToString(int value)
+	template<class T>
+	inline std::string ToString(T const & value)
 	{
 		return boost::lexical_cast<std::string>(value);
 	}

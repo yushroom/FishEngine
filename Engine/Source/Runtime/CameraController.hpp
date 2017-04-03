@@ -28,7 +28,7 @@ namespace FishEngine
 			Zoom,
 		};
 
-		virtual void Update() override
+		void Check(bool * out_modified)
 		{
 			bool alt = Input::GetKey(KeyCode::LeftAlt) || Input::GetKey(KeyCode::RightAlt);
 			bool ctrl = Input::GetKey(KeyCode::LeftControl) || Input::GetKey(KeyCode::RightControl);
@@ -49,6 +49,8 @@ namespace FishEngine
 			else if (right)
 				type = ControlType::Rotate;
 
+			if (out_modified != nullptr)
+				*out_modified = true;
 			if (type == ControlType::Move)
 			{
 				float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
@@ -87,6 +89,16 @@ namespace FishEngine
 				}
 				transform()->Translate(deltaZ*forward, Space::World);
 			}
+			else
+			{
+				if (out_modified != nullptr)
+					out_modified = false;
+			}
+		}
+
+		virtual void Update() override
+		{
+			Check(nullptr);
 		}
 	};
 }

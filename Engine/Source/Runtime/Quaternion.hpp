@@ -106,8 +106,8 @@ namespace FishEngine
 		friend Quaternion  operator* (Quaternion const & q, float scale);
 		friend Quaternion  operator* (float scale, Quaternion const & q);
 
-		Quaternion & Quaternion::operator+=(const Quaternion& rhs);
-		Quaternion & Quaternion::operator-=(const Quaternion& rhs);
+		Quaternion & operator+=(const Quaternion& rhs);
+		Quaternion & operator-=(const Quaternion& rhs);
 		friend Quaternion operator + (const Quaternion& lhs, const Quaternion& rhs);
 		friend Quaternion operator - (const Quaternion& lhs, const Quaternion& rhs);
 

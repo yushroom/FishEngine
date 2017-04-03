@@ -41,7 +41,7 @@ bool UIComboBox::CheckUpdate(const std::string &label, int & index, const char *
 
 	if (m_label != label)
 	{
-		LogInfo("[Enum] new label: ", label);
+		LogInfo("[Enum] new label: " + label);
 		m_label = label;
 		LOG;
 		ui->label->setText(m_label.c_str());

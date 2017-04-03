@@ -118,9 +118,7 @@ namespace FishEditor
 	void SceneViewEditor::Update()
 	{
 		//Input::Update();
-		bool modified = false;
-		m_cameraGameObject->GetComponent<CameraController>()->Check(&modified);
-		m_enableGizmoOperation = !modified;
+		m_enableGizmoOperation = !m_cameraGameObject->GetComponent<CameraController>()->Check();
 		//Scene::Update();
 	}
 

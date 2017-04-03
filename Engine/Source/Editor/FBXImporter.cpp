@@ -14,7 +14,7 @@
 #include <Application.hpp>
 
 #include "AssetDataBase.hpp"
-#include "private/RawMesh.hpp"
+#include "FBXImporter/RawMesh.hpp"
 
 using namespace FishEngine;
 

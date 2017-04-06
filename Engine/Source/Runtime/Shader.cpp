@@ -458,14 +458,23 @@ namespace FishEngine
 	{
 	}
 
-	void Shader::Use()
+	void Shader::Use() noexcept
 	{
 		if (m_GLNativeProgram == 0)
 		{
-			m_impl->CompileAndLink(m_keywords);
-			m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+			try {
+				m_impl->CompileAndLink(m_keywords);
+				m_GLNativeProgram = m_impl->glslProgram(m_keywords, m_uniforms);
+			}
+			catch (const std::exception & e)
+			{
+				PrintErrorMessage(e.what());
+				m_GLNativeProgram = 0;
+			}
 		}
-		assert(m_GLNativeProgram != 0);
+		//if (m_GLNativeProgram == 0)
+		//	abort();
+		//assert(m_GLNativeProgram != 0);
 		glUseProgram(m_GLNativeProgram);
 		for (auto& u : m_uniforms)
 		{
@@ -711,7 +720,7 @@ namespace FishEngine
 		}
 	}
 
-	ShaderPtr Shader::builtinShader(const std::string& name)
+	ShaderPtr Shader::FindBuiltin(const std::string& name)
 	{
 		auto it = m_builtinShaders.find(name);
 		if (it != m_builtinShaders.end())
@@ -760,6 +769,11 @@ namespace FishEngine
 		{
 			return m_impl->m_renderQueue;
 		}
+	}
+
+	bool Shader::IsValid()
+	{
+		return m_GLNativeProgram != 0;
 	}
 
 	//========== Static Region ==========

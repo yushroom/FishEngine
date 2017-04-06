@@ -12,10 +12,10 @@
 
 	struct VS_OUT
 	{
-	    vec3 position;      // in world space
-	    vec3 normal;        // in world space
-	    vec3 tangent;
-	    vec2 uv;
+		vec3 position;      // in world space
+		vec3 normal;        // in world space
+		vec3 tangent;
+		vec2 uv;
 	};
 
 	in VS_OUT vs_out;

@@ -1,7 +1,8 @@
 #ifndef CGSupport_inc
 #define CGSupport_inc
 
-#include <CG.inc>
+#define PI 3.141592653589793
+#define INV_PI 0.3183098861837907
 
 #define float2 vec2
 #define float3 vec3

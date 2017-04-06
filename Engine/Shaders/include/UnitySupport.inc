@@ -20,6 +20,8 @@
 #define UNITY_MATRIX_MVP MATRIX_MVP
 #define Object2World MATRIX_M
 #define unity_ObjectToWorld Object2World
+#define unity_WorldToObject MATRIX_IT_M
+#define unity_MatrixVP MATRIX_VP
 
 // UnituShaderVariables.cginc
 #define UNITY_MATRIX_P glstate_matrix_projection
@@ -34,16 +36,16 @@
 #define WorldSpaceLightPos0 WorldSpaceLightPos
 #define LightColor0 LightColor
 
-// Tranforms position from object to homogenous space
-float4 UnityObjectToClipPos( in float3 pos )
-{
-	return mul(UNITY_MATRIX_MVP, float4(pos, 1.0));
-}
 
-float4 UnityObjectToClipPos(float4 pos) // overload for float4; avoids "implicit truncation" warning for existing shaders
-{
-	return UnityObjectToClipPos(pos.xyz);
-}
+#define inline
+
+// #if defined(UNITY_REVERSED_Z)
+// #define UNITY_NEAR_CLIP_VALUE (1.0)
+// #elif defined(SHADER_API_D3D9)  || defined(SHADER_API_WIIU) || defined(SHADER_API_D3D11_9X)
+// #define UNITY_NEAR_CLIP_VALUE (0.0)
+// #else
+// #define UNITY_NEAR_CLIP_VALUE (-1.0)
+// #endif
 
 
 #endif // UnitySupport_inc

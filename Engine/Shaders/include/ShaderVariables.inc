@@ -8,6 +8,9 @@
 #define BoneIndexIndex 4
 #define BoneWeightIndex 5
 
+#define CBUFFER_START(name) layout(std140, row_major) uniform name {
+#define CBUFFER_END };
+
 layout(std140, row_major) uniform PerCameraUniforms
 {
 	mat4 MATRIX_P;			// CameraProjection;
@@ -53,11 +56,11 @@ layout(std140, row_major) uniform PerCameraUniforms
 
 layout(std140, row_major) uniform PerDrawUniforms
 {
-	mat4 MATRIX_MVP;	
-	mat4 MATRIX_MV;		
+	mat4 MATRIX_MVP;
+	mat4 MATRIX_MV;
 	mat4 MATRIX_IT_MV;
 	mat4 MATRIX_M;		// ObjectToWorld
-	mat4 MATRIX_IT_M;   // WorldToObject
+	mat4 MATRIX_IT_M;	// WorldToObject
 };
 
 // layout(std140, row_major) uniform PerFrameUniforms
@@ -73,11 +76,23 @@ layout(std140, row_major) uniform LightingUniforms
 	vec4 CascadesFar;
 	vec4 CascadesSplitPlaneNear;
 	vec4 CascadesSplitPlaneFar;
-	vec4 fish_LightShadowBias;
+	vec4 unity_LightShadowBias;
 	//mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
 	// macOS bug
 	layout(column_major) mat4 LightMatrix[4]; // world -> clip (VP)
 };
+
+// CBUFFER_START(UnityShadows)
+// 	//float4 unity_ShadowSplitSpheres[4];
+// 	//float4 unity_ShadowSplitSqRadii;
+// 	float4 unity_LightShadowBias;
+// 	float4 _LightSplitsNear;
+// 	float4 _LightSplitsFar;
+// 	float4x4 unity_WorldToShadow[4];
+// 	half4 _LightShadowData;
+// 	float4 unity_ShadowFadeCenterAndType;
+// CBUFFER_END
+
 
 
 #define MAX_BONE_SIZE 128
@@ -87,8 +102,5 @@ layout(std140, column_major) uniform Bones
 	mat4 BoneTransformations[MAX_BONE_SIZE];
 };
 
-
-#define PI 3.141592653589793
-#define INV_PI 0.3183098861837907
 
 #endif // ShaderVariables_inc

@@ -4,6 +4,7 @@
 #include <DeferredShadingCommon.inc>
 #include <ShadingModels.inc>
 //#include <ShadowCommon.inc>
+#include <CG.inc>
 
 struct V2F
 {

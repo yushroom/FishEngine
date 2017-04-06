@@ -243,7 +243,7 @@ namespace FishEngine
 	MaterialPtr Material::InstantiateBuiltinMaterial(const std::string& name)
 	{
 		LogInfo(name);
-		auto shader = Shader::builtinShader(name);
+		auto shader = Shader::FindBuiltin(name);
 		assert(shader != nullptr);
 		auto material = CreateMaterial();
 		material->setName(name);
@@ -272,7 +272,7 @@ namespace FishEngine
 		//s_defaultMaterial = CreateMaterial();
 		auto s_defaultMaterial = defaultMaterial();
 		s_defaultMaterial->setName("Default-Material");
-		s_defaultMaterial->setShader(Shader::builtinShader("PBR"));
+		s_defaultMaterial->setShader(Shader::FindBuiltin("PBR"));
 		s_defaultMaterial->SetFloat("Metallic", 0);
 		s_defaultMaterial->SetFloat("Roughness", 0.5f);
 		s_defaultMaterial->SetFloat("Specular", 0.5f);

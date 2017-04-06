@@ -312,7 +312,8 @@ namespace FishEngine
 			
 			if (mesh != nullptr)
 			{
-				shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
+				Pipeline::UpdatePerDrawUniforms(go->transform()->localToWorldMatrix());
+				//shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
 				shader->CheckStatus();
 				mesh->Render();
 			}

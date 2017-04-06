@@ -30,6 +30,7 @@ struct VS_OUT
 @fragment
 {
 	#include <CGSupport.inc>
+	#include <ShaderVariables.inc>
 
 	in VS_OUT vs_out;
 

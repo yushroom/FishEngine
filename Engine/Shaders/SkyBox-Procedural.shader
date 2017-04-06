@@ -3,6 +3,7 @@
 @ZWrite Off
 
 #include <UnitySupport.inc>
+#include <CG.inc>
 
 #define _SUNDISK_HIGH_QUALITY
 #define UNITY_COLORSPACE_GAMMA

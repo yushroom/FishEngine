@@ -6,6 +6,7 @@ struct VS_OUT
 @vertex
 {
 	#include <AppData.inc>
+	#include <ShaderVariables.inc>
 
 	uniform vec3 _Color = vec3(1, 1, 1);
 
@@ -16,7 +17,8 @@ struct VS_OUT
 	void vs_main(AppData appdata)
 	{
 		gl_Position = MATRIX_MVP * appdata.position;
-		float c = dot(normalize(mat3(MATRIX_IT_MV) * appdata.normal), normalize(LightPosition));
+		vec3 lightDir = normalize(WorldSpaceLightPos.xyz);
+		float c = dot(normalize(mat3(MATRIX_IT_MV) * appdata.normal), lightDir);
 		c = clamp(c, 0, 1);
 		vs_out.color = _Color * c;
 	}

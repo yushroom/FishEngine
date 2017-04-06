@@ -2,6 +2,8 @@
 @ZWrite Off
 
 #include <UnitySupport.inc>
+#include <ShaderVariables.inc>
+#include <CG.inc>
 
 uniform samplerCube _Tex;
 uniform vec4        _Tint;

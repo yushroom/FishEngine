@@ -33,7 +33,7 @@ namespace FishEngine
 
 		static ShaderPtr CreateFromFile(const Path& path);
 
-		void Use();
+		void Use() noexcept;
 
 		bool HasUniform(const std::string& name);
 
@@ -68,7 +68,6 @@ namespace FishEngine
 			return m_uniforms;
 		}
 
-		static ShaderPtr builtinShader(const std::string& name);
 
 		static const std::map<std::string, ShaderPtr>& allShaders()
 		{
@@ -98,6 +97,11 @@ namespace FishEngine
 		void DisableLocalKeywords(ShaderKeywords keyword);
 
 		int renderQueue();
+
+		bool IsValid();
+
+		static ShaderPtr Find(const std::string & name);
+		static ShaderPtr FindBuiltin(const std::string & name);
 
 	private:
 		friend class Material;

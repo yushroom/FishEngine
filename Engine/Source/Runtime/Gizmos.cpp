@@ -114,7 +114,7 @@ void Gizmos::Init()
 
 void Gizmos::DrawLine(const Vector3& from, const Vector3& to)
 {
-	auto shader = Shader::builtinShader("SolidColor-Internal");
+	auto shader = Shader::FindBuiltin("SolidColor-Internal");
 	static DynamicMesh lineMesh;
 	float vertices[6];
 	vertices[0] = from.x;
@@ -174,7 +174,7 @@ DrawWireSphere(
 	Matrix4x4 m;
 	auto const & view = Camera::main()->worldToCameraMatrix();
 	auto const & proj = Camera::main()->projectionMatrix();
-	auto shader = Shader::builtinShader("SolidColor-Internal");
+	auto shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	shader->BindUniformVec4("_Color", s_color);
 	
@@ -201,7 +201,7 @@ DrawHalfWireSphere(
 	const float         radius,
 	const Matrix4x4&    modelMatrix)
 {
-	auto shader = Shader::builtinShader("SolidColor-Internal");
+	auto shader = Shader::FindBuiltin("SolidColor-Internal");
 	Matrix4x4 m;
 	auto const & v = Camera::main()->worldToCameraMatrix();
 	auto const & p = Camera::main()->projectionMatrix();
@@ -239,7 +239,7 @@ DrawWireCube(
 	const Vector3& center,
 	const Vector3& size)
 {
-	auto shader = Shader::builtinShader("SolidColor-Internal");
+	auto shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	Matrix4x4 m;
 	m.SetTRS(center, Quaternion::identity, size);
@@ -281,7 +281,7 @@ DrawHalfCircle(
 	const Vector3&  dir1,
 	const Vector3&  dir2)
 {
-	const auto& shader = Shader::builtinShader("SolidColor-Internal");
+	const auto& shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	auto const & v = Camera::main()->worldToCameraMatrix();
 	auto const & p = Camera::main()->projectionMatrix();
@@ -316,7 +316,7 @@ DrawCircle(
 	const float     radius,
 	const Vector3&  direction)
 {
-	const auto& shader = Shader::builtinShader("SolidColor-Internal");
+	const auto& shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	auto const & v = Camera::main()->worldToCameraMatrix();
 	auto const & p = Camera::main()->projectionMatrix();
@@ -333,7 +333,7 @@ DrawLight(
 	const Vector3& center,
 	const Vector3& direction)
 {
-	const auto& shader = Shader::builtinShader("SolidColor-Internal");
+	const auto& shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	float scale = getScaleForConstantSizeGeometry(center, 0.02f);
 	Matrix4x4 m;
@@ -397,7 +397,7 @@ DrawFrustum(
 
 	auto const & view = Camera::main()->worldToCameraMatrix();
 	auto const & proj = Camera::main()->projectionMatrix();
-	auto shader = Shader::builtinShader("SolidColor-Internal");
+	auto shader = Shader::FindBuiltin("SolidColor-Internal");
 	shader->Use();
 	shader->BindUniformMat4("MATRIX_MVP", proj*view);
 	shader->BindUniformVec4("_Color", s_color);

@@ -30,9 +30,14 @@ vec4 GetShadowCoord( vec4 WorldPosition, vec4 CascadeWeights )
 }
 
 
+/**
+ * PCF shadowmap filtering based on a 5x5 kernel (optimized with 9 taps)
+ *
+ * Algorithm: http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1/
+ * Implementation example: http://mynameismjp.wordpress.com/2013/09/10/shadow-maps/
+ */
 float SampleCascadeShadowMap_PCF5x5( vec3 Coord, float Section )
 {
-#if 1
 	const float2 offset = float2(0.5,0.5);
 	float2 uv = (Coord.xy * _ShadowMapTexture_TexelSize.zw) + offset;
 	float2 base_uv = (floor(uv) - offset) * _ShadowMapTexture_TexelSize.xy;
@@ -69,9 +74,12 @@ float SampleCascadeShadowMap_PCF5x5( vec3 Coord, float Section )
 	sum += accum.z * texture( CascadedShadowMap, vec4(base_uv+float2(u.z, v.z), Section, z ));
 
 	shadow = sum / 144.0f;
-#else
-#endif
 	return shadow;
+}
+
+half UnityComputeShadowFade(float fadeDist)
+{
+    return saturate(fadeDist * _LightShadowData.z + _LightShadowData.w);
 }
 
 // @param WorldPosition position in world space
@@ -87,7 +95,8 @@ float CalcShadowTerm(vec4 WorldPosition, float Depth)
 	ProjCoords.xyz = ProjCoords.xyz * (0.5 / ProjCoords.w) + 0.5;
 	float Z = ProjCoords.z;
 	float Shadow = SampleCascadeShadowMap_PCF5x5(ProjCoords.xyz, fSection);
-	Shadow += saturate(Z * 0.03333 - 2.7); // from unity
+	//Shadow += saturate(Z * 0.03333 - 2.7); // from unity
+	Shadow += UnityComputeShadowFade(Z);
 	// return shadow;
 	return saturate(Shadow);
 }

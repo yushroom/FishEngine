@@ -132,6 +132,7 @@ struct v2f
 	void main()
 	{
 		gl_Position = UnityObjectToClipPos(InputPositon);
+		gl_Position.w = gl_Position.z + 0.1f;	// make sure skybox will not be clipped by far clip plane, see https://www.gamedev.net/topic/577973-skybox-and-depth-buffer/
 
 		float3 kSkyTintInGammaSpace = COLOR_2_GAMMA(_SkyTint).rgb; // convert tint from Linear back to Gamma
 		float3 kScatteringWavelength = lerp (

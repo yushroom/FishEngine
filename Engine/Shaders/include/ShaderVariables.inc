@@ -76,6 +76,7 @@ layout(std140, row_major) uniform LightingUniforms
 	vec4 CascadesFar;
 	vec4 CascadesSplitPlaneNear;
 	vec4 CascadesSplitPlaneFar;
+	vec4 _LightShadowData;
 	vec4 unity_LightShadowBias;
 	//mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
 	// macOS bug

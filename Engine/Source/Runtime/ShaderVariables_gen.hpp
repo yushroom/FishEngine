@@ -75,6 +75,7 @@ struct LightingUniforms
 	vec4 CascadesFar;
 	vec4 CascadesSplitPlaneNear;
 	vec4 CascadesSplitPlaneFar;
+	vec4 _LightShadowData;
 	vec4 fish_LightShadowBias;
 	//mat4 LightMatrix; // World-to-light matrix. Used to sample cookie & attenuation textures.
 	mat4 LightMatrix[4];

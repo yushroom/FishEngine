@@ -95,6 +95,7 @@ namespace FishEngine
 		float m_shadowBias = 0.05f;
 		float m_shadowNormalBias = 0.4f;
 		float m_shadowNearPlane = 0.2f;
+		float m_shadowStrength = 1.0f;
 
 		Meta(NonSerializable)
 		LayeredDepthBufferPtr m_shadowMap;

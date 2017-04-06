@@ -7,6 +7,7 @@
 #include "Screen.hpp"
 #include "RenderTexture.hpp"
 #include "RenderTarget.hpp"
+#include "QualitySettings.hpp"
 
 #include <cassert>
 
@@ -75,6 +76,48 @@ namespace FishEngine
 		glCheckError();
 	}
 
+	float CalculateShadowDistance(CameraPtr & camera)
+	{
+		return std::min(QualitySettings::shadowDistance(), camera->farClipPlane());
+	}
+
+	constexpr float kShadowFadeRange = 0.2f;
+
+	float CalculateShadowSphereOffset(CameraPtr & camera)
+	{
+		float fov = camera->fieldOfView();
+		constexpr float maxDegrees = 180.0f;
+		constexpr float maxOffset = (1.0f - kShadowFadeRange) * 0.5f;
+		float weight = Mathf::Clamp01(1.0f - fov / maxDegrees);
+		return maxOffset * weight;
+	}
+
+	Vector4 CalculateShadowFade(CameraPtr & camera, float shadowStrength)
+	{
+		Vector4 outLightShadowData;
+		float shadowDistance = CalculateShadowDistance(camera);
+		float shadowRange = shadowDistance;
+		float sphereOffset = CalculateShadowSphereOffset(camera);
+		shadowRange *= (1.0f - sphereOffset);
+		outLightShadowData.x = 1.0f - shadowStrength;
+		if (shadowRange > 0.0f)
+		{
+			outLightShadowData.y = camera->farClipPlane() / shadowDistance;
+			const float shadowStartFade = shadowRange - shadowDistance * kShadowFadeRange;
+			const float shadowFadeInvLen = 1.0f / (shadowRange - shadowStartFade);
+			outLightShadowData.z = shadowFadeInvLen;
+			outLightShadowData.w = -shadowStartFade * shadowFadeInvLen;
+		}
+		else
+		{
+			outLightShadowData.y = Mathf::Infinity;
+			outLightShadowData.z = 0;
+			outLightShadowData.w = 1;
+		}
+
+		return outLightShadowData;
+	}
+
 	void Pipeline::BindLight(const LightPtr& light)
 	{
 		s_lightingUniforms.LightColor = light->m_color;
@@ -83,7 +126,8 @@ namespace FishEngine
 		s_lightingUniforms.CascadesFar = light->m_cascadesFar;
 		s_lightingUniforms.CascadesSplitPlaneNear = light->m_cascadesSplitPlaneNear;
 		s_lightingUniforms.CascadesSplitPlaneFar = light->m_cascadesSplitPlaneFar;
-		s_lightingUniforms.fish_LightShadowBias.x = -light->m_shadowBias;
+		s_lightingUniforms._LightShadowData = CalculateShadowFade(Camera::main(), light->m_shadowStrength);
+		s_lightingUniforms.fish_LightShadowBias.x = light->m_shadowBias;
 		s_lightingUniforms.fish_LightShadowBias.y = 1;
 		s_lightingUniforms.fish_LightShadowBias.z = light->m_shadowNormalBias;
 		s_lightingUniforms.fish_LightShadowBias.w = 0;

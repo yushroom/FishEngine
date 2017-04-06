@@ -95,12 +95,13 @@ namespace FishEngine
 			return;
 		}
 		
+
 #define DEBUG_SHADOW 1
 		auto    camera = Camera::main();
 		auto    camera_to_world = camera->transform()->localToWorldMatrix();
 		float   near = camera->nearClipPlane();
 		//float   far = camera->farClipPlane();
-		float far = QualitySettings::shadowDistance();
+		float  far = std::min( QualitySettings::shadowDistance(), camera->farClipPlane() );
 
 		Vector3 light_dir = light->transform()->forward();
 		Frustum total_frustum = camera->frustum();

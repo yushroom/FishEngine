@@ -2,7 +2,6 @@
 *.pro.user
 
 # 3rd party libs
-/Engine/ThirdParty/boost/lib64-msvc-14.0/
 
 # generated
 # /Engine/Source/Runtime/generate/
@@ -23,8 +22,6 @@
 # cmake build
 /Engine/[Bb]uild
 CMakeLists.txt.user
-/Engine/ThirdParty/boost/lib
-/Engine/ThirdParty/boost_1_63
 
 # vscode
 /.vscode/

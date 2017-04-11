@@ -1,9 +1,9 @@
 glew 2.0.0 https://github.com/nigels-com/glew
-stb commit e71369 https://github.com/nothings/stb
-assimp 3.3.1 https://github.com/assimp/assimp
+glfw 3.2.1 https://github.com/glfw/glfw
 gli 8.1.1 https://github.com/g-truc/gli
 glm 0.9.8.4 https://github.com/g-truc/glm
 physx 3.3.4 https://developer.nvidia.com/physx-sdk
-fbxsdk 2017.0.1 http://www.autodesk.com/products/fbx/overview
-boost 1.62.0 http://www.boost.org/
+fbxsdk 2017.1 http://www.autodesk.com/products/fbx/overview
+boost 1.63.0 http://www.boost.org/
 clang 3.9.0 http://clang.llvm.org
+freeimage 3.17.0 http://freeimage.sourceforge.net/

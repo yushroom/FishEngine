@@ -15,19 +15,29 @@ ObjectListModel::ObjectListModel(QObject *parent)
 	//Debug::LogError("ObjectListModel::ObjectListModel");
 }
 
+void ObjectListModel::SetObjectType(int classID)
+{
+	m_cachedObjects.clear();
+	for (auto const & pair : AssetImporter::s_importerGUIDToObject)
+	{
+		if (FishEngine::IsDerivedFrom(pair.second->ClassID(), classID))
+		{
+			m_cachedObjects.push_back(pair.second);
+		}
+	}
+}
+
 std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 {
-	//auto it = AssetImporter::s_importerGUIDToTexture.begin();
-	//for (int i = 0; i < index.row(); ++i)
-	//	it++;
-	//return it->second;
+	int row = index.row();
+	if (row >= 0 && row < m_cachedObjects.size())
+		return m_cachedObjects[index.row()];
 	return nullptr;
 }
 
 int ObjectListModel::rowCount(const QModelIndex &) const
 {
-	//return static_cast<int>( AssetImporter::s_importerGUIDToTexture.size() );
-	return 0;
+	return m_cachedObjects.size();
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const

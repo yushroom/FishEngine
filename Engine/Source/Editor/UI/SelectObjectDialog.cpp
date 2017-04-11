@@ -25,9 +25,10 @@ SelectObjectDialog::~SelectObjectDialog()
 	delete ui;
 }
 
-void SelectObjectDialog::ShowWithCallback(const Callback &callback)
+void SelectObjectDialog::ShowWithCallback(int classID, const Callback &callback)
 {
 	m_callback = callback;
+	m_model->SetObjectType(classID);
 	this->exec();
 }
 

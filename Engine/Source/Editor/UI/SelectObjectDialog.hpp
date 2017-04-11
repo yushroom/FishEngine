@@ -27,7 +27,7 @@ public:
 	typedef std::function<void(std::shared_ptr<FishEngine::Object>)> Callback;
 
 	//template <class T>
-	void ShowWithCallback( Callback const & callback );
+	void ShowWithCallback(int classID, Callback const & callback );
 
 private:
 	void OnIconSizeChanged(int size);

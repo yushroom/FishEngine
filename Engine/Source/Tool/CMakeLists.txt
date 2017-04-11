@@ -17,4 +17,3 @@ MACRO(SETUP_TOOL EXE_NAME)
 ENDMACRO(SETUP_TOOL)
 
 add_subdirectory(./ShaderCompiler)
-add_subdirectory(./ModelConverter)

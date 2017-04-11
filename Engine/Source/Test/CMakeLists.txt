@@ -22,6 +22,4 @@ MACRO(SETUP_TEST EXE_NAME)
 	SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES FOLDER "Tests")
 ENDMACRO(SETUP_TEST)
 
-add_subdirectory(./Sponza)
-add_subdirectory(./AssetSerialization)
 add_subdirectory(./Test)

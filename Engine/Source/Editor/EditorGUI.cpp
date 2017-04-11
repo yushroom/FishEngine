@@ -273,7 +273,7 @@ bool FishEditor::EditorGUI::TextureField(std::string const & label, FishEngine::
 	{
 		SelectObjectDialog dialog;
 		//dialog.exec();
-		dialog.ShowWithCallback( [&texture](FishEngine::ObjectPtr obj) {
+		dialog.ShowWithCallback(FishEngine::ClassID<FishEngine::Texture2D>(), [&texture](FishEngine::ObjectPtr obj) {
 			auto tex = std::dynamic_pointer_cast<FishEngine::Texture>(obj);
 			*texture = tex;
 			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());

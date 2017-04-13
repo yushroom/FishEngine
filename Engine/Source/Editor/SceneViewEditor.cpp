@@ -264,11 +264,9 @@ namespace FishEditor
 					if (skinnedMeshRenderer != nullptr)
 					{
 						mesh = skinnedMeshRenderer->sharedMesh();
-						//bool useSkinnedVersion = FishEditorWindow::InPlayMode();
 						skinned = true;
 						material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
 						Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->matrixPalette());
-						//material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 					}
 				}
 				if (!skinned)

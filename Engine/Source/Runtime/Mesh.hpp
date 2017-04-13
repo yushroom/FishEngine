@@ -34,6 +34,7 @@ namespace FishEngine
 			std::vector<Vector3>	&& tangents,
 			std::vector<uint32_t>	&& triangles);
 
+		// noncopyable
 		Mesh(const Mesh&) = delete;
 		void operator=(const Mesh&) = delete;
 
@@ -267,11 +268,14 @@ namespace FishEngine
 		Meta(NonSerializable)
 		GLuint m_boneWeightVBO = 0;
 
-		//GLuint m_TFBO;              // transform feedback buffer object, for Animation
-		//GLuint m_animationOutputVAO;
-		//GLuint m_animationOutputVBO; // animation output buffer object
-
-		//static std::map<std::string, PMesh> m_meshes;
+		Meta(NonSerializable)
+		GLuint m_TFBO = 0;              // transform feedback buffer object, for Animation
+		
+		Meta(NonSerializable)
+		GLuint m_animationOutputVAO = 0;
+		
+		Meta(NonSerializable)
+		GLuint m_animationOutputVBO = 0; // animation output buffer object
 
 		void GenerateBuffer();
 		void BindBuffer();

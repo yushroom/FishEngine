@@ -165,18 +165,18 @@ namespace FishEngine
 
 		bool deferred_enabled = false;
 
-		std::list<GameObjectPtr> gameObjects;
+		std::deque<GameObjectPtr> todo;
 		for (auto& go : Scene::m_gameObjects)
 		{
-			gameObjects.push_back(go);
+			todo.push_back(go);
 		}
-		while (!gameObjects.empty())
+		while (!todo.empty())
 		{
-			auto go = gameObjects.front();
-			gameObjects.pop_front();
+			auto go = todo.front();
+			todo.pop_front();
 			for (auto && child : go->transform()->children())
 			{
-				gameObjects.push_back(child->gameObject());
+				todo.push_back(child->gameObject());
 			}
 
 			if (!go->activeInHierarchy())
@@ -279,6 +279,8 @@ namespace FishEngine
 		/************************************************************************/
 		for (auto & ro : forwardRenderQueueGeometry)
 		{
+			if (ro.mesh->name() == "hair_front")
+				LogWarning("here");
 			ro.renderer->PreRender();
 			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}

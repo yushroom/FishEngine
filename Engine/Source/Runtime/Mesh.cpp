@@ -9,7 +9,6 @@
 #include "Debug.hpp"
 #include "Common.hpp"
 #include "ShaderVariables_gen.hpp"
-//#include "Serialization/archives/binary.hpp"
 #include "generate/Enum_PrimitiveType.hpp"
 
 using namespace std;
@@ -17,32 +16,6 @@ using namespace std;
 namespace FishEngine
 {
 	std::map<PrimitiveType, MeshPtr> Mesh::s_builtinMeshes;
-
-	//std::map<std::string, Mesh::PMesh> Mesh::m_meshes;
-
-	//Mesh::Mesh(const int n_vertex, const int n_face, float* positions, uint32_t* indices)
-	//    : m_vertices(positions, positions + n_vertex * 3),
-	//    m_triangles(indices, indices + n_face * 3)
-	//{
-	//    GenerateBuffer((int)VertexUsage::Position);
-	//    BindBuffer((int)VertexUsage::Position);
-	//}
-
-	//Mesh::Mesh(std::vector<float> position_buffer, std::vector<uint32_t> index_buffer)
-	//    : m_vertices(position_buffer), m_triangles(index_buffer)
-	//{
-	//    GenerateBuffer((int)VertexUsage::Position);
-	//    BindBuffer((int)VertexUsage::Position);
-	//}
-
-	//Mesh::Mesh(const int n_vertex, const int n_face, float* positions, float* normals, uint32_t* indices)
-	//    : m_vertices(positions, positions + n_vertex * 3),
-	//    m_normals(normals, normals + n_vertex * 3),
-	//    m_triangles(indices, indices + n_face * 3)
-	//{
-	//    GenerateBuffer((int)VertexUsage::PN);
-	//    BindBuffer((int)VertexUsage::PN);
-	//}
 
 	Mesh::Mesh(std::vector<Vector3>	&& vertices,
 		std::vector<Vector3>	&& normals,
@@ -82,15 +55,8 @@ namespace FishEngine
 	//    m.m_tangentVBO = 0;
 	//}
 
-
-	//Mesh::Mesh(const std::string& objModelPath, int vertexUsage)
-	//{
-	//    FromObjFile(objModelPath, vertexUsage);
-	//}
-
 	Mesh::~Mesh()
 	{
-		// Properly de-allocate all resources once they've outlived their purpose
 		glDeleteVertexArrays(1, &m_VAO);
 		glDeleteBuffers(1, &m_positionVBO);
 		glDeleteBuffers(1, &m_normalVBO);
@@ -231,7 +197,7 @@ namespace FishEngine
 		return mesh;
 	}
 
-	FishEngine::MeshPtr Mesh::FromTextFile(std::istream & is)
+	MeshPtr Mesh::FromTextFile(std::istream & is)
 	{
 		auto mesh = std::make_shared<Mesh>();
 		is >> mesh->m_vertexCount >> mesh->m_triangleCount;
@@ -299,7 +265,7 @@ namespace FishEngine
 		}
 	}
 
-	FishEngine::MeshPtr Mesh::builtinMesh(const PrimitiveType type)
+	MeshPtr Mesh::builtinMesh(const PrimitiveType type)
 	{
 		return s_builtinMeshes[type];
 	}
@@ -356,6 +322,11 @@ namespace FishEngine
 			glGenBuffers(1, &m_boneWeightVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
 			glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(float), boneWeightBuffer.data(), GL_STATIC_DRAW);
+
+			//glGenBuffers(1, &m_TFBO);
+			//glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_TFBO);
+			//glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, m_vertices.size() * 3 * 4, NULL, GL_DYNAMIC_COPY);
+
 		}
 	}
 

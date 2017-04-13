@@ -11,6 +11,7 @@
 
 namespace FishEngine
 {
+#if 0
 	struct FE_EXPORT Vector3Key
 	{
 		float time;
@@ -94,6 +95,16 @@ namespace FishEngine
 		void RecursivelyUpdate(const GameObjectPtr& go);
 		//void RecursivelyUpdate2(const std::shared_ptr<GameObject>& go);
 		std::map<std::string, std::weak_ptr<GameObject>> m_nameToGameObject;
+	};
+#endif
+
+	class FE_EXPORT Meta(DisallowMultipleComponent) Animator : public Component
+	{
+	public:
+		DefineComponent(Animator);
+
+		//std::list<std::shared_ptr<AnimationClip>> m_clips;
+		//AnimationClipPtr m_clip;
 	};
 }
 

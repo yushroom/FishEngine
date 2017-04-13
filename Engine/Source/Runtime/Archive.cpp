@@ -58,3 +58,57 @@ void FishEngine::OutputArchive::Serialize(Matrix4x4 const & value)
 	this->EndClass();
 }
 
+
+FishEngine::InputArchive & FishEngine::operator >> (FishEngine::InputArchive & archive, FishEngine::Vector2 & value)
+{
+	archive.BeginClass();
+	archive >> FishEngine::make_nvp("x", value.x); // float
+	archive >> FishEngine::make_nvp("y", value.y); // float
+	archive.EndClass();
+	return archive;
+}
+
+FishEngine::InputArchive & FishEngine::operator >> (FishEngine::InputArchive & archive, FishEngine::Vector3 & value)
+{
+	archive.BeginClass();
+	archive >> FishEngine::make_nvp("x", value.x); // float
+	archive >> FishEngine::make_nvp("y", value.y); // float
+	archive >> FishEngine::make_nvp("z", value.z); // float
+	archive.EndClass();
+	return archive;
+}
+
+
+FishEngine::InputArchive & FishEngine::operator >> (FishEngine::InputArchive & archive, FishEngine::Vector4 & value)
+{
+	archive.BeginClass();
+	archive >> FishEngine::make_nvp("x", value.x); // float
+	archive >> FishEngine::make_nvp("y", value.y); // float
+	archive >> FishEngine::make_nvp("z", value.z); // float
+	archive >> FishEngine::make_nvp("w", value.w); // float
+	archive.EndClass();
+	return archive;
+}
+
+FishEngine::InputArchive & FishEngine::operator >> (FishEngine::InputArchive & archive, FishEngine::Quaternion & value)
+{
+	archive.BeginClass();
+	archive >> FishEngine::make_nvp("x", value.x); // float
+	archive >> FishEngine::make_nvp("y", value.y); // float
+	archive >> FishEngine::make_nvp("z", value.z); // float
+	archive >> FishEngine::make_nvp("w", value.w); // float
+	archive.EndClass();
+	return archive;
+}
+
+
+FishEngine::InputArchive & FishEngine::operator >> (FishEngine::InputArchive & archive, FishEngine::Matrix4x4 & value)
+{
+	archive.BeginClass();
+	archive >> FishEngine::make_nvp("rows[0]", value.rows[0]); // FishEngine::Vector4
+	archive >> FishEngine::make_nvp("rows[1]", value.rows[1]); // FishEngine::Vector4
+	archive >> FishEngine::make_nvp("rows[2]", value.rows[2]); // FishEngine::Vector4
+	archive >> FishEngine::make_nvp("rows[3]", value.rows[3]); // FishEngine::Vector4
+	archive.EndClass();
+	return archive;
+}

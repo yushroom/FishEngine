@@ -55,6 +55,7 @@ namespace FishEngine
 		
 		//std::vector<std::uint8_t> m_data;
 		// face->mipmap
+		Meta(NonSerializable)
 		std::array<std::vector<std::vector<std::uint8_t>>, 6> m_pixels;
 	};
 }

@@ -1,9 +1,8 @@
-#include "AnimationUtility.hpp"
-#include "TAnimationCurve.hpp"
+#include "AnimationCurveUtility.hpp"
 
 using namespace FishEngine;
 
-void AnimationUtility::wrapTime(float& time, float start, float end, bool loop)
+void AnimationCurveUtility::WrapTime(float& time, float start, float end, bool loop)
 {
 	float length = end - start;
 
@@ -35,7 +34,7 @@ void AnimationUtility::wrapTime(float& time, float start, float end, bool loop)
 void setStepTangent(const TKeyframe<Vector3>& lhsIn, const TKeyframe<Vector3>& rhsIn,
 	TKeyframe<Quaternion>& lhsOut, TKeyframe<Quaternion>& rhsOut)
 {
-	for (UINT32 i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (lhsIn.outTangent[i] != std::numeric_limits<float>::infinity() &&
 			rhsIn.inTangent[i] != std::numeric_limits<float>::infinity())
@@ -46,7 +45,7 @@ void setStepTangent(const TKeyframe<Vector3>& lhsIn, const TKeyframe<Vector3>& r
 	}
 }
 
-TAnimationCurve<Quaternion> AnimationUtility::eulerToQuaternionCurve(const TAnimationCurve<Vector3>& eulerCurve)
+TAnimationCurve<Quaternion> AnimationCurveUtility::EulerToQuaternionCurve(const TAnimationCurve<Vector3>& eulerCurve, RotationOrder rotationOrder)
 {
 	// TODO: We calculate tangents by sampling which can introduce error in the tangents. The error can be exacerbated
 	// by the fact we constantly switch between the two representations, possibly losing precision every time. Instead 
@@ -55,7 +54,7 @@ TAnimationCurve<Quaternion> AnimationUtility::eulerToQuaternionCurve(const TAnim
 	// Consider: 
 	//  - Sampling multiple points to calculate tangents to improve precision
 	//  - Store the original quaternion curve with the euler curve
-	//    - This way conversion from euler to quaternion can be done while individual keyframes are being modified
+	//    - This way conversion from euler to quaternion can be done while individual key frame are being modified
 	//      ensuring the conversion results are immediately visible, and that no accumulation error happens are curves
 	//		are converted between two formats back and forth.
 	//  - Don't store rotation tangents directly, instead store tangent parameters (TCB) which can be shared between
@@ -65,68 +64,57 @@ TAnimationCurve<Quaternion> AnimationUtility::eulerToQuaternionCurve(const TAnim
 	// the same.
 	const float FIT_TIME = 0.001f;
 
-	auto eulerToQuaternion = [&](INT32 keyIdx, Vector3& angles, const Quaternion& lastQuat)
+	auto eulerToQuaternion = [&](int keyIdx, Vector3& angles, const Quaternion& lastQuat)
 	{
-		//Quaternion quat(
-		//	Degree(angles.x),
-		//	Degree(angles.y),
-		//	Degree(angles.z));
-
-		Quaternion quat = Quaternion::Euler(Mathf::Degrees(angles.x), Mathf::Degrees(angles.y), Mathf::Degrees(angles.z));
+		//Quaternion quat = Quaternion::Euler(Mathf::Degrees(angles.x), Mathf::Degrees(angles.y), Mathf::Degrees(angles.z));
+		Quaternion quat = Quaternion::Euler(rotationOrder, angles);
 
 		// Flip quaternion in case rotation is over 180 degrees (use shortest path)
 		if (keyIdx > 0)
 		{
 			float dot = Quaternion::Dot(quat, lastQuat);
 			if (dot < 0.0f)
-			{
-				//quat = -quat;
-				quat.x = -quat.x;
-				quat.y = -quat.y;
-				quat.z = -quat.z;
-				quat.w = -quat.w;
-			}
-				
+				quat = -quat;
 		}
 
 		return quat;
 	};
 
-	INT32 numKeys = (INT32)eulerCurve.getNumKeyFrames();
+	uint32_t numKeys = (uint32_t)eulerCurve.keyframeCount();
 	std::vector<TKeyframe<Quaternion>> quatKeyframes(numKeys);
 
 	// Calculate key values
-	Quaternion lastQuat;
-	for (INT32 i = 0; i < numKeys; i++)
+	Quaternion lastQuat(0, 0, 0, 0);
+	for (uint32_t i = 0; i < numKeys; i++)
 	{
-		float time = eulerCurve.getKeyFrame(i).time;
-		Vector3 angles = eulerCurve.getKeyFrame(i).value;
+		float time = eulerCurve.keyframeAt(i).time;
+		Vector3 angles = eulerCurve.keyframeAt(i).value;
 		Quaternion quat = eulerToQuaternion(i, angles, lastQuat);
 
 		quatKeyframes[i].time = time;
 		quatKeyframes[i].value = quat;
-		quatKeyframes[i].inTangent = Quaternion::identity;
-		quatKeyframes[i].outTangent = Quaternion::identity;
+		quatKeyframes[i].inTangent = Quaternion(0, 0, 0, 0);
+		quatKeyframes[i].outTangent = Quaternion(0, 0, 0, 0);
 
 		lastQuat = quat;
 	}
 
 	// Calculate extra values between keys so we can approximate tangents. If we're sampling very close to the key
 	// the values should pretty much exactly match the tangent (assuming the curves are cubic hermite)
-	for (INT32 i = 0; i < numKeys - 1; i++)
+	for (uint32_t i = 0; i < numKeys - 1; i++)
 	{
 		TKeyframe<Quaternion>& currentKey = quatKeyframes[i];
 		TKeyframe<Quaternion>& nextKey = quatKeyframes[i + 1];
 
-		const TKeyframe<Vector3>& currentEulerKey = eulerCurve.getKeyFrame(i);
-		const TKeyframe<Vector3>& nextEulerKey = eulerCurve.getKeyFrame(i + 1);
+		const TKeyframe<Vector3>& currentEulerKey = eulerCurve.keyframeAt(i);
+		const TKeyframe<Vector3>& nextEulerKey = eulerCurve.keyframeAt(i + 1);
 
 		float dt = nextKey.time - currentKey.time;
 		float startFitTime = currentKey.time + dt * FIT_TIME;
 		float endFitTime = currentKey.time + dt * (1.0f - FIT_TIME);
 
-		Vector3 anglesStart = eulerCurve.evaluate(startFitTime, false);
-		Vector3 anglesEnd = eulerCurve.evaluate(endFitTime, false);
+		Vector3 anglesStart = eulerCurve.Evaluate(startFitTime, false);
+		Vector3 anglesEnd = eulerCurve.Evaluate(endFitTime, false);
 		Quaternion startFitValue = eulerToQuaternion(i, anglesStart, currentKey.value);
 		Quaternion endFitValue = eulerToQuaternion(i, anglesEnd, startFitValue);
 
@@ -141,14 +129,14 @@ TAnimationCurve<Quaternion> AnimationUtility::eulerToQuaternionCurve(const TAnim
 }
 
 template<class T>
-TAnimationCurve<T> AnimationUtility::scaleCurve(const TAnimationCurve<T>& curve, float factor)
+TAnimationCurve<T> AnimationCurveUtility::ScaleCurve(const TAnimationCurve<T>& curve, float factor)
 {
-	INT32 numKeys = (INT32)curve.getNumKeyFrames();
+	int32_t numKeys = (int32_t)curve.keyframeCount();
 
 	std::vector<TKeyframe<T>> newKeyframes(numKeys);
-	for (INT32 i = 0; i < numKeys; i++)
+	for (int32_t i = 0; i < numKeys; i++)
 	{
-		const TKeyframe<T>& key = curve.getKeyFrame(i);
+		const TKeyframe<T>& key = curve.keyframeAt(i);
 		newKeyframes[i].time = key.time;
 		newKeyframes[i].value = key.value * factor;
 		newKeyframes[i].inTangent = key.inTangent * factor;
@@ -159,14 +147,14 @@ TAnimationCurve<T> AnimationUtility::scaleCurve(const TAnimationCurve<T>& curve,
 }
 
 template<class T>
-TAnimationCurve<T> AnimationUtility::offsetCurve(const TAnimationCurve<T>& curve, float offset)
+TAnimationCurve<T> AnimationCurveUtility::OffsetCurve(const TAnimationCurve<T>& curve, float offset)
 {
-	INT32 numKeys = (INT32)curve.getNumKeyFrames();
+	int32_t numKeys = (int32_t)curve.keyframeCount();
 
 	std::vector<TKeyframe<T>> newKeyframes(numKeys);
-	for (INT32 i = 0; i < numKeys; i++)
+	for (int32_t i = 0; i < numKeys; i++)
 	{
-		const TKeyframe<T>& key = curve.getKeyFrame(i);
+		const TKeyframe<T>& key = curve.keyframeAt(i);
 		newKeyframes[i].time = key.time + offset;
 		newKeyframes[i].value = key.value;
 		newKeyframes[i].inTangent = key.inTangent;
@@ -176,10 +164,10 @@ TAnimationCurve<T> AnimationUtility::offsetCurve(const TAnimationCurve<T>& curve
 	return TAnimationCurve<T>(newKeyframes);
 }
 
-template FE_EXPORT TAnimationCurve<Vector3> AnimationUtility::scaleCurve(const TAnimationCurve<Vector3>& curve, float factor);
-template FE_EXPORT TAnimationCurve<Quaternion> AnimationUtility::scaleCurve(const TAnimationCurve<Quaternion>& curve, float factor);
-template FE_EXPORT TAnimationCurve<float> AnimationUtility::scaleCurve(const TAnimationCurve<float>& curve, float factor);
+template FE_EXPORT TAnimationCurve<Vector3> AnimationCurveUtility::ScaleCurve(const TAnimationCurve<Vector3>& curve, float factor);
+template FE_EXPORT TAnimationCurve<Quaternion> AnimationCurveUtility::ScaleCurve(const TAnimationCurve<Quaternion>& curve, float factor);
+template FE_EXPORT TAnimationCurve<float> AnimationCurveUtility::ScaleCurve(const TAnimationCurve<float>& curve, float factor);
 
-template FE_EXPORT TAnimationCurve<Vector3> AnimationUtility::offsetCurve(const TAnimationCurve<Vector3>& curve, float offset);
-template FE_EXPORT TAnimationCurve<Quaternion> AnimationUtility::offsetCurve(const TAnimationCurve<Quaternion>& curve, float offset);
-template FE_EXPORT TAnimationCurve<float> AnimationUtility::offsetCurve(const TAnimationCurve<float>& curve, float offset);
+template FE_EXPORT TAnimationCurve<Vector3> AnimationCurveUtility::OffsetCurve(const TAnimationCurve<Vector3>& curve, float offset);
+template FE_EXPORT TAnimationCurve<Quaternion> AnimationCurveUtility::OffsetCurve(const TAnimationCurve<Quaternion>& curve, float offset);
+template FE_EXPORT TAnimationCurve<float> AnimationCurveUtility::OffsetCurve(const TAnimationCurve<float>& curve, float offset);

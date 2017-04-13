@@ -3,11 +3,14 @@
 #include "Vector2.hpp"
 #include "Mathf.hpp"
 #include "Vector3.hpp"
+#include "Macro.hpp"
 
 namespace FishEngine
 {
 	class Rect
 	{
+		InjectSerializationFunctionsNonPolymorphic(Rect);
+
 	private:
 		float m_XMin;
 		float m_YMin;
@@ -300,5 +303,6 @@ namespace FishEngine
 		{
 			return lhs.m_XMin == rhs.m_XMin && lhs.m_YMin == rhs.m_YMin && lhs.m_Width == rhs.m_Width && lhs.m_Height == rhs.m_Height;
 		}
+
 	};
 }

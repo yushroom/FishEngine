@@ -54,7 +54,7 @@ InspectorWidget::InspectorWidget(QWidget *parent)
 	
 	auto timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &InspectorWidget::Update);
-	timer->start(1000 / 15.0f); // 15 fps
+	timer->start(1000 / 10.0f); // 10 fps
 }
 
 void InspectorWidget::Bind(std::shared_ptr<FishEngine::Object> obj)

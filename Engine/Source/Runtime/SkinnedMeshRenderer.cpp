@@ -7,7 +7,7 @@
 #include "Scene.hpp"
 #include "Mesh.hpp"
 #include "Light.hpp"
-#include "Animator.hpp"
+//#include "Animator.hpp"
 #include "Pipeline.hpp"
 #include "Camera.hpp"
 #include "Gizmos.hpp"
@@ -102,6 +102,7 @@ namespace FishEngine
 		Pipeline::UpdateBonesUniforms(m_matrixPalette);
 	}
 
+#if 0
 	void SkinnedMeshRenderer::Render() const
 	{
 		PreRender();
@@ -113,6 +114,7 @@ namespace FishEngine
 			material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 		}
 	}
+#endif
 
 	void SkinnedMeshRenderer::OnDrawGizmosSelected()
 	{

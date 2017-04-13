@@ -125,28 +125,6 @@ namespace FishEngine {
 
 	Quaternion Quaternion::Euler(float x, float y, float z)
 	{
-#if 0
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
-        Quaternion result;
-        auto rad = euler * (Mathf::Deg2Rad * 0.5f);
-        //auto c = Vector3(cos(rad.x), cos(rad.y), cos(rad.z));
-        //auto s = Vector3(sin(rad.x), sin(rad.y), sin(rad.z));
-        //result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-        //result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-        //result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-        //result.z = c.x * c.y * s.z - s.x * s.y * c.z;
-
-        // heading, attitude, bank -> y,z,x
-        auto c = Vector3(cos(rad.y), cos(rad.z), cos(rad.x));
-        auto s = Vector3(sin(rad.y), sin(rad.z), sin(rad.x));
-        result.w = c.x * c.y * c.z - s.x * s.y * s.z;
-        result.x = s.x * s.y * c.z + c.x * c.y * s.z;
-        result.y = s.x * c.y * c.z + c.x * s.y * s.z;
-        result.z = c.x * s.y * c.z - s.x * c.y * s.z;
-        return result;
-#elif 0
-		return AngleAxis(y, Vector3{0,1,0}) * AngleAxis(x, Vector3{1, 0, 0}) * AngleAxis(z, Vector3{0, 0, 1});
-#else
 		float sx, cx;
 		SinCos(x / 2.0f, &sx, &cx);
 
@@ -162,9 +140,45 @@ namespace FishEngine {
 
 		// TODO
 		return qy * qx * qz;
-#endif
 	}
 
+
+	FishEngine::Quaternion Quaternion::Euler(RotationOrder order, float x, float y, float z)
+	{
+		float sx, cx;
+		SinCos(x / 2.0f, &sx, &cx);
+
+		float sy, cy;
+		SinCos(y / 2.0f, &sy, &cy);
+
+		float sz, cz;
+		SinCos(z / 2.0f, &sz, &cz);
+
+		Quaternion qx(sx, 0.0f, 0.0f, cx);
+		Quaternion qy(0.0f, sy, 0.0f, cy);
+		Quaternion qz(0.0f, 0.0f, sz, cz);
+
+		switch (order)
+		{
+		case RotationOrder::XYZ:
+			return qz * qy * qx;
+		case RotationOrder::XZY:
+			return qy * qz * qx;
+		case RotationOrder::YXZ:
+			return qz * qx * qy;
+		case RotationOrder::YZX:
+			return qx * qz * qy;
+		case RotationOrder::ZXY:
+			return qy * qx * qz;
+		case RotationOrder::ZYX:
+			return qx * qy * qz;
+		}
+	}
+
+	FishEngine::Quaternion Quaternion::Euler(RotationOrder order, const Vector3& euler)
+	{
+		return Euler(order, euler.x, euler.y, euler.z);
+	}
 
 	Quaternion Quaternion::FromToRotation(const Vector3& fromDirection, const Vector3& toDirection)
 	{

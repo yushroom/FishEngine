@@ -4,6 +4,15 @@
 
 namespace FishEngine
 {
+	enum class RotationOrder
+	{
+		ZXY, // default
+		XYZ,
+		YZX,
+		XZY,
+		YXZ,
+		ZYX,
+	};
 
 	class FE_EXPORT Quaternion
 	{
@@ -94,6 +103,9 @@ namespace FishEngine
 
 		// Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis (in that order).
 		static Quaternion Euler(const Vector3& euler);
+
+		static Quaternion Euler(RotationOrder order, float x, float y, float z);
+		static Quaternion Euler(RotationOrder order, const Vector3& euler);
 
 
 		Quaternion  operator -() const;

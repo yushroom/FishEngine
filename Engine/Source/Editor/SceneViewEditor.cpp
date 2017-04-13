@@ -252,6 +252,7 @@ namespace FishEditor
 					selections.push_back(c->gameObject());
 				}
 				MeshPtr mesh;
+				bool skinned = false;
 				auto meshFilter = go->GetComponent<MeshFilter>();
 				if (meshFilter != nullptr)
 				{
@@ -264,14 +265,15 @@ namespace FishEditor
 					{
 						mesh = skinnedMeshRenderer->sharedMesh();
 						//bool useSkinnedVersion = FishEditorWindow::InPlayMode();
-						bool useSkinnedVersion = true;
-						if (useSkinnedVersion)
-						{
-							material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-							Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->m_matrixPalette);
-							material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
-						}
+						skinned = true;
+						material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+						Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->matrixPalette());
+						//material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 					}
+				}
+				if (!skinned)
+				{
+					material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 				}
 				if (mesh != nullptr)
 				{

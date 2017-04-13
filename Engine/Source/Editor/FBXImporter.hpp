@@ -3,9 +3,10 @@
 #include <unordered_map>
 #include "FishEditor.hpp"
 #include "ModelImporter.hpp"
-#include "FBXImporter/FBXImportData.hpp"
+//#include "FBXImporter/FBXImportData.hpp"
 #include <Path.hpp>
 #include <Prefab.hpp>
+#include <Animation/AnimationCurve.hpp>
 
 namespace fbxsdk
 {
@@ -19,15 +20,55 @@ namespace fbxsdk
 
 namespace FishEditor
 {
+	//struct FBXImportNode
+	//{
+	//	~FBXImportNode()
+	//	{
+	//		for (auto child : children)
+	//			delete child;
+	//	}
+
+	//	FishEngine::Vector3			localPosition;
+	//	FishEngine::Quaternion		localQuaternion;
+	//	FishEngine::Vector3			localScale;
+
+	//	std::string					name;
+	//	fbxsdk::FbxNode *			fbxNode;
+	//	std::vector<FBXImportNode*> children;
+	//};
+
+	struct FBXBoneAnimation
+	{
+		//FBXImportNode * node;
+		FishEngine::TransformPtr node;
+		FishEngine::TAnimationCurve<FishEngine::Vector3> translation;
+		FishEngine::TAnimationCurve<FishEngine::Quaternion> rotation;
+		FishEngine::TAnimationCurve<FishEngine::Vector3> eulers;
+		FishEngine::TAnimationCurve<FishEngine::Vector3> scale;
+	};
+
+	/** Animation clip containing a set of bone or blend shape animations. */
+	struct FBXAnimationClip
+	{
+		std::string name;
+		float start;
+		float end;
+		uint32_t sampleRate;
+
+		std::vector<FBXBoneAnimation> boneAnimations;
+		//std::vector<FBXBlendShapeAnimation> blendShapeAnimations;
+	};
+
 	struct Meta(NonSerializable) ModelCollection
 	{
 		FishEngine::PrefabPtr					m_modelPrefab;
 		FishEngine::GameObjectPtr				m_rootNode;
 		FishEngine::AvatarPtr					m_avatar;
 
-		FBXImportNode *							m_rootFbxNode;
-		std::unordered_map<fbxsdk::FbxNode*, FBXImportNode*>
-												m_fbxNodeLookup;
+		//FBXImportNode *							m_rootFbxNode;
+		//std::unordered_map<fbxsdk::FbxNode*, FBXImportNode*>
+		//										m_fbxNodeLookup;
+		std::unordered_map<fbxsdk::FbxNode*, FishEngine::TransformPtr> m_fbxNodeLookup;
 
 		std::vector<FishEngine::MeshPtr>		m_meshes;
 		std::unordered_map<fbxsdk::FbxMesh*, size_t> 
@@ -45,6 +86,8 @@ namespace FishEditor
 												m_skinnedMeshRenderers;
 
 		std::vector<FBXAnimationClip>			m_clips;
+		//std::vector<FishEngine::AnimationClipPtr> m_clips;
+		std::vector<FishEngine::AnimationClipPtr>			m_animationClips;
 	};
 	
 	class Meta(NonSerializable) FBXImporter : public ModelImporter
@@ -82,7 +125,12 @@ namespace FishEditor
 		void ImportAnimations(fbxsdk::FbxScene* scene);
 		
 		void ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxsdk::FbxNode * node, FBXAnimationClip & clip);
-		
+
+		//void ImportAnimations(fbxsdk::FbxScene* scene);
+
+		//void ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxsdk::FbxNode * node, AnimationClipPtr & clip);
+
+
 		int m_boneCount = 0;
 		//std::vector<FishEngine::TransformPtr> m_bones;
 		

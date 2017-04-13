@@ -125,6 +125,8 @@ namespace FishEngine
 		bool        m_blend = false;
 		bool        m_deferred = false;
 		int					m_blendFactorCount = 0;
+
+		Meta(NonSerializable)
 		ShaderBlendFactor	m_blendFactors[4];
 
 		Meta(NonSerializable)

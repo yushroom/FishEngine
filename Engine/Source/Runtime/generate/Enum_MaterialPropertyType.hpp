@@ -13,7 +13,7 @@ namespace FishEngine
 
 // enum count
 template<>
-constexpr int EnumCount<FishEngine::MaterialPropertyType>() { return 10; }
+constexpr int EnumCount<FishEngine::MaterialPropertyType>() { return 11; }
 
 // string array
 static const char* MaterialPropertyTypeStrings[] =
@@ -26,6 +26,7 @@ static const char* MaterialPropertyTypeStrings[] =
 	"Mat4",
 	"Texture2D",
 	"Texture2DArray",
+	"Texture2DArrayShadow",
 	"Texture3D",
 	"TextureCube"
 };
@@ -50,8 +51,9 @@ inline FishEngine::MaterialPropertyType ToEnum<FishEngine::MaterialPropertyType>
 	case 5: return FishEngine::MaterialPropertyType::Mat4; break;
 	case 6: return FishEngine::MaterialPropertyType::Texture2D; break;
 	case 7: return FishEngine::MaterialPropertyType::Texture2DArray; break;
-	case 8: return FishEngine::MaterialPropertyType::Texture3D; break;
-	case 9: return FishEngine::MaterialPropertyType::TextureCube; break;
+	case 8: return FishEngine::MaterialPropertyType::Texture2DArrayShadow; break;
+	case 9: return FishEngine::MaterialPropertyType::Texture3D; break;
+	case 10: return FishEngine::MaterialPropertyType::TextureCube; break;
 	
     default: abort(); break;
     }
@@ -70,8 +72,9 @@ inline int EnumToIndex<FishEngine::MaterialPropertyType>(FishEngine::MaterialPro
 	case FishEngine::MaterialPropertyType::Mat4: return 5; break;
 	case FishEngine::MaterialPropertyType::Texture2D: return 6; break;
 	case FishEngine::MaterialPropertyType::Texture2DArray: return 7; break;
-	case FishEngine::MaterialPropertyType::Texture3D: return 8; break;
-	case FishEngine::MaterialPropertyType::TextureCube: return 9; break;
+	case FishEngine::MaterialPropertyType::Texture2DArrayShadow: return 8; break;
+	case FishEngine::MaterialPropertyType::Texture3D: return 9; break;
+	case FishEngine::MaterialPropertyType::TextureCube: return 10; break;
 	
     default: abort(); break;
     }
@@ -89,6 +92,7 @@ inline FishEngine::MaterialPropertyType ToEnum<FishEngine::MaterialPropertyType>
 	if (s == "Mat4") return FishEngine::MaterialPropertyType::Mat4;
 	if (s == "Texture2D") return FishEngine::MaterialPropertyType::Texture2D;
 	if (s == "Texture2DArray") return FishEngine::MaterialPropertyType::Texture2DArray;
+	if (s == "Texture2DArrayShadow") return FishEngine::MaterialPropertyType::Texture2DArrayShadow;
 	if (s == "Texture3D") return FishEngine::MaterialPropertyType::Texture3D;
 	if (s == "TextureCube") return FishEngine::MaterialPropertyType::TextureCube;
 	

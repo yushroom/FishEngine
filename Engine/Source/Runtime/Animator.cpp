@@ -4,6 +4,8 @@
 
 using namespace FishEngine;
 
+#if 0
+
 void Animator::Update() {
 	if (!m_playing)
 		return;
@@ -165,3 +167,5 @@ void FishEngine::Animator::NextFrame()
 //        RecursivelyUpdate2(child.lock()->gameObject());
 //    }
 //}
+
+#endif

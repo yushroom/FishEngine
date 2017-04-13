@@ -5,21 +5,17 @@
 
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
-#include "../AssetImporter.hpp" 
-#include "../ShaderImporter.hpp" 
-#include "../DDSImporter.hpp" 
-#include "../EditorUtility.hpp" 
-#include "../ProjectSettings.hpp" 
-#include "../EditorGUILayout.hpp" 
-#include "../NativeFormatImporter.hpp" 
-#include "../SerializedProperty.hpp" 
-#include "../PropertyModification.hpp" 
-#include "../IPreviewable.hpp" 
-#include "../TextureImporter.hpp" 
-#include "../ModelImporter.hpp" 
-#include "../PrefabUtility.hpp" 
-#include "../SerializedObject.hpp" 
-#include "../TextureImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\EditorGUILayout.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\ModelImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\EditorUtility.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\TextureImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\AssetImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\PrefabUtility.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\DDSImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\ProjectSettings.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\PropertyModification.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\NativeFormatImporter.hpp" 
+#include "D:\program\github\FishEngine\Engine\Source\Editor\ShaderImporter.hpp" 
 
 namespace FishEditor
 {
@@ -81,20 +77,22 @@ namespace FishEditor
 
 
 
-	// FishEditor::EditorUtility
-	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::EditorUtility const & value )
+	// FishEditor::NativeFormatImporter
+	void FishEditor::NativeFormatImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
-		archive.BeginClass();
-		archive.EndClass();
-		return archive;
+		//archive.BeginClass();
+		FishEditor::AssetImporter::Serialize(archive);
+		//archive.EndClass();
 	}
 
-	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::EditorUtility & value )
+	void FishEditor::NativeFormatImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
-		archive.BeginClass();
-		archive.EndClass();
-		return archive;
+		//archive.BeginClass(2);
+		FishEditor::AssetImporter::Deserialize(archive);
+		//archive.EndClass();
 	}
+
+
 
 	// FishEditor::ProjectSettings
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ProjectSettings const & value )
@@ -126,41 +124,40 @@ namespace FishEditor
 		return archive;
 	}
 
-	// FishEditor::NativeFormatImporter
-	void FishEditor::NativeFormatImporter::Serialize ( FishEngine::OutputArchive & archive ) const
-	{
-		//archive.BeginClass();
-		FishEditor::AssetImporter::Serialize(archive);
-		//archive.EndClass();
-	}
-
-	void FishEditor::NativeFormatImporter::Deserialize ( FishEngine::InputArchive & archive )
-	{
-		//archive.BeginClass(2);
-		FishEditor::AssetImporter::Deserialize(archive);
-		//archive.EndClass();
-	}
-
-
-	// FishEditor::TextureSettings
-	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::TextureSettings const & value )
+	// FishEditor::EditorUtility
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::EditorUtility const & value )
 	{
 		archive.BeginClass();
-		archive << FishEngine::make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
-		archive << FishEngine::make_nvp("m_aniso", value.m_aniso); // int
-		archive << FishEngine::make_nvp("m_mipBias", value.m_mipBias); // float
-		archive << FishEngine::make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
 		archive.EndClass();
 		return archive;
 	}
 
-	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::TextureSettings & value )
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::EditorUtility & value )
 	{
 		archive.BeginClass();
-		archive >> FishEngine::make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
-		archive >> FishEngine::make_nvp("m_aniso", value.m_aniso); // int
-		archive >> FishEngine::make_nvp("m_mipBias", value.m_mipBias); // float
-		archive >> FishEngine::make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
+		archive.EndClass();
+		return archive;
+	}
+
+	// FishEditor::PropertyModification
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::PropertyModification const & value )
+	{
+		archive.BeginClass();
+		archive << FishEngine::make_nvp("target", value.target); // FishEngine::ObjectPtr
+		archive << FishEngine::make_nvp("propertyPath", value.propertyPath); // std::string
+		archive << FishEngine::make_nvp("value", value.value); // std::string
+		archive << FishEngine::make_nvp("objectReference", value.objectReference); // FishEngine::ObjectPtr
+		archive.EndClass();
+		return archive;
+	}
+
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::PropertyModification & value )
+	{
+		archive.BeginClass();
+		archive >> FishEngine::make_nvp("target", value.target); // FishEngine::ObjectPtr
+		archive >> FishEngine::make_nvp("propertyPath", value.propertyPath); // std::string
+		archive >> FishEngine::make_nvp("value", value.value); // std::string
+		archive >> FishEngine::make_nvp("objectReference", value.objectReference); // FishEngine::ObjectPtr
 		archive.EndClass();
 		return archive;
 	}
@@ -201,6 +198,29 @@ namespace FishEditor
 	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::PrefabUtility & value )
 	{
 		archive.BeginClass();
+		archive.EndClass();
+		return archive;
+	}
+
+	// FishEditor::TextureSettings
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::TextureSettings const & value )
+	{
+		archive.BeginClass();
+		archive << FishEngine::make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
+		archive << FishEngine::make_nvp("m_aniso", value.m_aniso); // int
+		archive << FishEngine::make_nvp("m_mipBias", value.m_mipBias); // float
+		archive << FishEngine::make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
+		archive.EndClass();
+		return archive;
+	}
+
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::TextureSettings & value )
+	{
+		archive.BeginClass();
+		archive >> FishEngine::make_nvp("m_filterMode", value.m_filterMode); // FishEngine::FilterMode
+		archive >> FishEngine::make_nvp("m_aniso", value.m_aniso); // int
+		archive >> FishEngine::make_nvp("m_mipBias", value.m_mipBias); // float
+		archive >> FishEngine::make_nvp("m_wrapMode", value.m_wrapMode); // FishEngine::TextureWrapMode
 		archive.EndClass();
 		return archive;
 	}

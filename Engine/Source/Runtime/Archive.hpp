@@ -8,6 +8,10 @@
 #include "Serialization/NameValuePair.hpp"
 #include "GUID.hpp"
 #include "Path.hpp"
+#include "Vector2.hpp"
+#include "Vector3.hpp"
+#include "Vector4.hpp"
+#include "Matrix4x4.hpp"
 
 namespace FishEngine
 {	
@@ -515,4 +519,10 @@ namespace FishEngine
 
 		//std::ostream & m_ostream;
 	};
+
+	FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, FishEngine::Vector2 & value);
+	FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, FishEngine::Vector3 & value);
+	FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, FishEngine::Vector4 & value);
+	FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, FishEngine::Quaternion & value);
+	FishEngine::InputArchive & operator >> (FishEngine::InputArchive & archive, FishEngine::Matrix4x4 & value);
 }

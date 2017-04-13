@@ -18,6 +18,7 @@
 #include "Camera.hpp"
 
 #include "GLEnvironment.hpp"
+#include "Graphics.hpp"
 
 namespace FishEngine
 {
@@ -255,8 +256,8 @@ namespace FishEngine
 
 		glEnable(GL_DEPTH_CLAMP);
 
-		auto shader = shadow_map_material->shader();
-		shader->Use();
+		//auto shader = shadow_map_material->shader();
+		//shader->Use();
 		//shader->BindUniformMat4("TestMat", Matrix4x4::identity);
 
 #if 1
@@ -275,50 +276,67 @@ namespace FishEngine
 				gameObjects.push_back(child->gameObject());
 			}
 
-			bool is_skinned = false;
+			RendererPtr renderer = go->GetComponent<Renderer>();
+			if (renderer == nullptr || !renderer->enabled() || renderer->shadowCastingMode() == ShadowCastingMode::Off)
+				continue;
 
 			MeshPtr mesh;
-			auto mesh_renderer = go->GetComponent<MeshRenderer>();
-			if (mesh_renderer != nullptr)
+			if (renderer->ClassID() == ClassID<SkinnedMeshRenderer>())
 			{
-				if (mesh_renderer->shadowCastingMode() != ShadowCastingMode::Off)
-				{
-					auto meshFilter = go->GetComponent<MeshFilter>();
-					if (meshFilter != nullptr)
-					{
-						mesh = meshFilter->mesh();
-					}
-				}
+				mesh = As<SkinnedMeshRenderer>(renderer)->sharedMesh();
 			}
 			else
 			{
-				auto renderer = go->GetComponent<SkinnedMeshRenderer>();
-				if (renderer != nullptr && renderer->shadowCastingMode() != ShadowCastingMode::Off)
-				{
-					mesh = renderer->sharedMesh();
-					if (renderer->m_avatar != nullptr)
-					{
-						shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-						is_skinned = true;
-						Pipeline::UpdateBonesUniforms(renderer->matrixPalette());
-					}
-				}
-			}
-			
-			if (!is_skinned)
-			{
-				shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+				auto meshFilter = go->GetComponent<MeshFilter>();
+				if (meshFilter != nullptr)
+					mesh = meshFilter->mesh();
 			}
 
-			
-			if (mesh != nullptr)
-			{
-				Pipeline::UpdatePerDrawUniforms(go->transform()->localToWorldMatrix());
-				//shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
-				shader->CheckStatus();
-				mesh->Render();
-			}
+			if (mesh == nullptr)
+				continue;
 
+			renderer->PreRender();
+			Graphics::DrawMesh(mesh, shadow_map_material);
+
+			//auto mesh_renderer = go->GetComponent<MeshRenderer>();
+			//if (mesh_renderer != nullptr)
+			//{
+			//	if (mesh_renderer->shadowCastingMode() != ShadowCastingMode::Off)
+			//	{
+			//		auto meshFilter = go->GetComponent<MeshFilter>();
+			//		if (meshFilter != nullptr)
+			//		{
+			//			mesh = meshFilter->mesh();
+			//		}
+			//	}
+			//}
+			//else
+			//{
+			//	auto renderer = go->GetComponent<SkinnedMeshRenderer>();
+			//	if (renderer != nullptr && renderer->shadowCastingMode() != ShadowCastingMode::Off)
+			//	{
+			//		mesh = renderer->sharedMesh();
+			//		if (renderer->m_avatar != nullptr)
+			//		{
+			//			shadow_map_material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+			//			is_skinned = true;
+			//			Pipeline::UpdateBonesUniforms(renderer->matrixPalette());
+			//		}
+			//	}
+			//}
+			//
+			//if (!is_skinned)
+			//{
+			//	shadow_map_material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+			//}
+
+			//if (mesh != nullptr)
+			//{
+			//	Pipeline::UpdatePerDrawUniforms(go->transform()->localToWorldMatrix());
+			//	//shader->BindUniformMat4("ObjectToWorld", go->transform()->localToWorldMatrix());
+			//	shader->CheckStatus();
+			//	mesh->Render();
+			//}
 		}
 		
 #else

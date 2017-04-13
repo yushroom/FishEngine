@@ -37,8 +37,10 @@ namespace FishEngine
 	{
 		auto model = transform()->localToWorldMatrix();
 		Pipeline::UpdatePerDrawUniforms(model);
+
 	}
 
+#if 0
 	void MeshRenderer::Render() const
 	{
 		auto meshFilter = gameObject()->GetComponent<MeshFilter>();
@@ -85,6 +87,7 @@ namespace FishEngine
 			}
 		}
 	}
+#endif
 
 	void MeshRenderer::OnDrawGizmosSelected()
 	{

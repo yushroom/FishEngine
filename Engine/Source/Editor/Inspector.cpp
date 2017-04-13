@@ -28,6 +28,8 @@
 #include <CapsuleCollider.hpp>
 #include <Shader.hpp>
 #include <Material.hpp>
+#include <Animation.hpp>
+#include <AnimationClip.hpp>
 
 #include "EditorGUI.hpp"
 //#include "private/EditorGUI_p.hpp"
@@ -47,6 +49,7 @@
 #include <generate/Enum_TextureImporterType.hpp>
 #include <generate/Enum_TextureWrapMode.hpp>
 #include <generate/Enum_FilterMode.hpp>
+
 
 using namespace FishEngine;
 using namespace FishEditor;
@@ -273,6 +276,19 @@ void Inspector::OnInspectorGUI(const FishEngine::CapsuleColliderPtr& collider)
 	EditorGUI::FloatField("Height", &collider->m_height);
 	static const char * direction_enum[] = { "X-Axis", "Y-Axis", "Z-Axis" };
 	EditorGUI::EnumPopup("Direction", &collider->m_direction, direction_enum, 3);
+}
+
+template<>
+void Inspector::OnInspectorGUI(const FishEngine::BehaviourPtr & behaviour)
+{
+	//OnInspectorGUI<Component>(behaviour);
+}
+
+template<>
+void Inspector::OnInspectorGUI(const std::shared_ptr<FishEngine::Animation> & animation)
+{
+	OnInspectorGUI<Behaviour>(animation);
+	EditorGUI::ObjectField("clip", animation->m_clip);
 }
 
 #if 0
@@ -576,6 +592,7 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 		CASE(SphereCollider)
 		CASE(CapsuleCollider)
 		CASE(Script)
+		CASE(Animation)
 		default:
 			//Foldout( component->ClassName() );
 			BeginComponentImpl(component);

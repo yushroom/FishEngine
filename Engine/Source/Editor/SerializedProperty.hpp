@@ -3,13 +3,14 @@
 #include "FishEditor.hpp"
 #include "SerializedPropertyType.hpp"
 #include <boost/any.hpp>
+#include <Macro.hpp>
 
 namespace FishEditor
 {
 	class SerializedProperty
 	{
 		friend class SerializedObjectArchive;
-		
+		InjectSerializationFunctionsNonPolymorphic(SerializedProperty);
 	private:
 		SerializedObjectPtr m_SerializedObject;
 

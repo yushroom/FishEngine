@@ -163,7 +163,7 @@ namespace FishEngine
 		//assert(m_uploaded);
 		if (!m_uploaded)
 		{
-			UploadMeshData();
+			UploadMeshData(false);
 		}
 		
 		glBindVertexArray(m_VAO);

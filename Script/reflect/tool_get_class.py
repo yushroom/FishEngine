@@ -108,7 +108,8 @@ def internal_parse_class(node):
         return
     class_name = node.type.spelling
     print('class', class_name)
-    header_file = os.path.basename( node.location.file.name )
+    #header_file = os.path.basename( node.location.file.name )
+    header_file = node.location.file.name
 
     if class_name in classes:
         ''' duplicate class?
@@ -297,9 +298,8 @@ def ExtractClasses(path):
                 R'D:\program\github\FishEngine/Engine/ThirdParty/',
                 R'D:\program\github\FishEngine/Engine/Source/Runtime',
                 R'D:\program\github\FishEngine/Engine/ThirdParty/yaml-cpp/include',
-                R'D:\program\github\FishEngine/Engine/ThirdParty/PhysXSDK/Include',
+                R'D:\program\PhysX-3.3\PhysXSDK/Include',
                 R'D:\program\github\FishEngine\Engine\ThirdParty\glew\include',
-                R'D:\program\FishEngine\Engine\ThirdParty\PhysXSDK\Include',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtGui',
                 #R'D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\include\QtWidgets',

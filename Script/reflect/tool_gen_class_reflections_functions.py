@@ -20,7 +20,7 @@ serialization_template_str = '''
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
 % for h in headers:
-#include "../${h}" 
+#include "${h}" 
 % endfor
 
 namespace ${scope}
@@ -106,10 +106,13 @@ namespace ${scope}
 '''
 serialization_template = Template(serialization_template_str)
 
-skip_types = ()
+blacklist = ("FishEngine::Vector2",
+	"FishEngine::Vector3",
+	"FishEngine::Vector4",
+	"FishEngine::Matrix4x4",
+	"FishEngine::Quaternion");
 
 def GenSerializationFunctions(classinfo, scope):
-
 	def IsObject(name):
 		if name == "FishEngine::Object":
 			return True
@@ -129,10 +132,10 @@ def GenSerializationFunctions(classinfo, scope):
 
 	for key in classinfo.keys():
 		#register(key)
+		if key in blacklist:
+			continue
 		c = {}
 		c['ClassName'] = key
-		if key in skip_types:
-			continue
 		item = classinfo[key]
 		headers.append(item['header_file'])
 		if IsObject(key):
@@ -145,6 +148,7 @@ def GenSerializationFunctions(classinfo, scope):
 		c['isComponent'] = IsComponent(key)
 		ClassInfo.append(c)
 
+	headers = set(headers)
 	return serialization_template.render(headers = headers, scope = scope, ClassInfo=ClassInfo)
 
 #register_teamplate

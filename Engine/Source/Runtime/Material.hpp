@@ -155,11 +155,13 @@ namespace FishEngine
 	private:
 		friend class FishEditor::Inspector;
 
+		Meta(NonSerializable)
 		ShaderPtr                           m_shader = nullptr;
 		std::map<std::string, TexturePtr>   m_textures;
 		ShaderUniforms                      m_uniforms;
 		std::vector<MaterialProperty>       m_properties;
 
+		Meta(NonSerializable)
 		ShaderLabProperties m_savedProperties;
 
 		static std::map<std::string, MaterialPtr>   s_builtinMaterialInstance;

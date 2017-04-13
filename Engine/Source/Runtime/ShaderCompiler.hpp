@@ -28,7 +28,7 @@ namespace FishEngine
 		FileNotExist,
 	};
 
-	class FE_EXPORT ShaderCompiler
+	class FE_EXPORT Meta(NonSerializable) ShaderCompiler
 	{
 	public:
 		InjectSerializationFunctionsNonPolymorphic(ShaderCompiler);

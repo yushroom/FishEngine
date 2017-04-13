@@ -124,6 +124,12 @@ namespace FishEngine
 	typedef std::shared_ptr<DepthBuffer> DepthBufferPtr;
 	typedef std::shared_ptr<LayeredColorBuffer> LayeredColorBufferPtr;
 	typedef std::shared_ptr<LayeredDepthBuffer> LayeredDepthBufferPtr;
+
+	class Animator;
+	typedef std::shared_ptr<Animator> AnimatorPtr;
+
+	class AnimationClip;
+	typedef std::shared_ptr<AnimationClip> AnimationClipPtr;
 }
 
 // hack: inject FishEditor namespace
@@ -131,12 +137,9 @@ namespace FishEditor
 {
 	class EditorGUI;
 	class Inspector;
-	//class EditorRenderSystem;
 	class MainEditor;
 	class SceneViewEditor;
 	class AssetDatabase;
-	//class EditorInput;
-	//class MainWindow;
 }
 
 class UIGameObjectHeader;

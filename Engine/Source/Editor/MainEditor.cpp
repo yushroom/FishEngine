@@ -25,6 +25,8 @@
 #include <PhysicsSystem.hpp>
 #include <Application.hpp>
 //#include <Prefab.hpp>
+#include <Animation.hpp>
+#include <Time.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -148,9 +150,9 @@ namespace FishEditor
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 		
-		//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
-		//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
-		//		auto chan_texture_dir = example_root / "textures";
+//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
+//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
+//		auto chan_texture_dir = example_root / "textures";
 		As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tag"));
 		auto bodyTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tga"));
 		auto skinTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/skin_01.tga"));
@@ -309,6 +311,10 @@ namespace FishEditor
 			renderer->setShadowCastingMode(ShadowCastingMode::Off);
 			renderer->setReceiveShadows(false);
 		}
+
+		auto model_run = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/unitychan_RUN00_F.fbx"));
+		auto animation = modelGO->GetComponent<Animation>();
+		animation->m_clip = model_run->GetComponent<Animation>()->m_clip;
 	}
 	
 	
@@ -587,6 +593,12 @@ namespace FishEditor
 
 		if (Application::isPlaying())
 		{
+			static auto time = std::chrono::high_resolution_clock::now();
+			auto now = std::chrono::high_resolution_clock::now();
+			auto elapse = now - time;
+			auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapse).count();
+			time = now;
+			Time::m_deltaTime = ms / 1000.0f;
 			Scene::Update();
 			PhysicsSystem::FixedUpdate();
 		}
@@ -623,6 +635,7 @@ namespace FishEditor
 		//m_inPlayMode = true;
 		Camera::setMainCamera(nullptr);
 		//Camera::m_mainCamera = nullptr;
+		Time::m_time = 0;
 		Scene::Start();
 	}
 

@@ -134,7 +134,8 @@ void FishEngine::Debug::Log(LogChannel channel, std::string const & message, con
 	}
 #endif
 
-	std::cout << "[" << file << ":" << line << ", " << func << "] ";
+	//std::cout << "[" << file << ":" << line << ", " << func << "] ";
+	std::cout << "[" << func << "] ";
 	std::cout << message;
 	std::cout << std::endl;
 

@@ -24,7 +24,10 @@ namespace FishEngine
 
 	inline void Quaternion::NormalizeSelf()
 	{
-		float inv_len = 1.0f / std::sqrtf(x*x + y*y + z*z + w*w);
+		float sqr_len = x*x + y*y + z*z + w*w;
+		if (fabsf(sqr_len) < 1e-6)
+			return;
+		float inv_len = 1.0f / sqrtf(sqr_len);
 		x *= inv_len;
 		y *= inv_len;
 		z *= inv_len;

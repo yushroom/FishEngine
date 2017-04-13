@@ -34,6 +34,15 @@ namespace FishEngine
 			//shader->BindTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
 			material->SetTexture("PreIntegratedGF", RenderSettings::preintegratedGF());
 		}
+		if (mesh->m_skinned)
+		{
+			material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+		}
+		else
+		{
+			material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+		}
+
 		shader->PreRender();
 		material->BindProperties();
 		shader->CheckStatus();

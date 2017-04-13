@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ReflectEnum.hpp>
-#include <Object.hpp>
+#include <HideFlags.hpp>
 
 namespace FishEngine
 {

@@ -25,7 +25,7 @@ namespace FishEngine
 	};
 
 
-	struct ShaderLabProperties
+	struct Meta(NonSerializable) ShaderLabProperties
 	{
 	public:
 

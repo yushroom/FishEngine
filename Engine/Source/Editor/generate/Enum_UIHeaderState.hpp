@@ -20,7 +20,7 @@ static const char* UIHeaderStateStrings[] =
 {
     "none",
 	"enabledChanged",
-	"remove"
+	"menuButtonClicked"
 };
 
 // cstring array
@@ -37,7 +37,7 @@ inline FishEditor::UIHeaderState ToEnum<FishEditor::UIHeaderState>(const int ind
     switch (index) {
     case 0: return FishEditor::UIHeaderState::none; break;
 	case 1: return FishEditor::UIHeaderState::enabledChanged; break;
-	case 2: return FishEditor::UIHeaderState::remove; break;
+	case 2: return FishEditor::UIHeaderState::menuButtonClicked; break;
 	
     default: abort(); break;
     }
@@ -50,7 +50,7 @@ inline int EnumToIndex<FishEditor::UIHeaderState>(FishEditor::UIHeaderState e)
     switch (e) {
     case FishEditor::UIHeaderState::none: return 0; break;
 	case FishEditor::UIHeaderState::enabledChanged: return 1; break;
-	case FishEditor::UIHeaderState::remove: return 2; break;
+	case FishEditor::UIHeaderState::menuButtonClicked: return 2; break;
 	
     default: abort(); break;
     }
@@ -62,7 +62,7 @@ inline FishEditor::UIHeaderState ToEnum<FishEditor::UIHeaderState>(const std::st
 {
     if (s == "none") return FishEditor::UIHeaderState::none;
 	if (s == "enabledChanged") return FishEditor::UIHeaderState::enabledChanged;
-	if (s == "remove") return FishEditor::UIHeaderState::remove;
+	if (s == "menuButtonClicked") return FishEditor::UIHeaderState::menuButtonClicked;
 	
     abort();
 }

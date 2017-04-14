@@ -158,7 +158,7 @@ void TextureImporterInspector::Bind(std::shared_ptr<FishEditor::TextureImporter>
 		m_assetHeader->SetIcon(icon);
 		
 		*m_cachedImporter = *m_importer;
-		auto texture = As<Texture>(m_importer->m_assetObject);
+		auto texture = As<Texture>(m_importer->m_asset->m_assetObjects.front());
 		m_widthEdit->SetValue(texture->width());
 		m_heightEdit->SetValue(texture->height());
 		m_readWriteToggle->SetValue(m_cachedImporter->m_isReadable);

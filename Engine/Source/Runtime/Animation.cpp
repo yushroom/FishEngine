@@ -1,32 +1,45 @@
 #include "Animation.hpp"
+
 #include <deque>
-#include <Transform.hpp>
-#include <AnimationClip.hpp>
-#include <Time.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include "Transform.hpp"
+#include "AnimationClip.hpp"
+#include "Time.hpp"
+#include "Avatar.hpp"
 
 using namespace FishEngine;
 
-void GetSkeleton(const TransformPtr & t, std::string const & path, std::map<std::string, TransformPtr>& skeleton)
+void GetSkeleton(
+	const TransformPtr &					t,
+	std::string const &						path,
+	std::map<std::string, TransformPtr>&	skeleton,
+	std::map<std::string, int> const &		boneToIndex)
 {
-	auto current_path = path + "/" + t->name();
-
-	// TODO: remove this hack
-	if (path == "")	// root node
+	std::string current_path;
+	if (path != "")
 	{
-		current_path = "unitychan_RUN00_F/group1";
+		current_path = path + "/";
 	}
-	skeleton[current_path] = t;
+
+	auto name = t->name();
+	if (boneToIndex.find(name) != boneToIndex.end())
+		current_path += name;
+
+	if (current_path != "")
+		skeleton[current_path] = t;
 	for (auto & child : t->children())
 	{
-		GetSkeleton(child, current_path, skeleton);
+		GetSkeleton(child, current_path, skeleton, boneToIndex);
 	}
 }
 
 void Animation::Start()
 {
+	if (m_clip == nullptr)
+		return;
 	auto t = transform();
-	GetSkeleton(t, "", m_skeleton);
+	GetSkeleton(t, "", m_skeleton, m_clip->m_avatar->m_boneToIndex);
 }
 
 TransformPtr GetBone(std::string const & path, std::map<std::string, TransformPtr> const & skeleton)

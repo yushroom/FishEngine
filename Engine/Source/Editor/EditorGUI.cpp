@@ -116,8 +116,6 @@ T* EditorGUI::CheckNextWidget(Args&&... args )
 }
 
 
-//ComponentPtr componentToBeDestroyed;
-
 void EditorGUI::Begin()
 {
 	s_currentGroupHeaderItem = nullptr;
@@ -150,7 +148,7 @@ void EditorGUI::End()
 	}
 }
 
-bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName, UIHeaderState * outState)
+bool EditorGUI::BeginComponent(std::string const & componentTypeName, UIHeaderState * outState)
 {
 	auto header = CheckNextWidget<UIComponentHeader>(componentTypeName);
 	*outState = header->CheckUpdate(componentTypeName);
@@ -159,7 +157,7 @@ bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName
 	return expanded;
 }
 
-bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName, bool enabled, UIHeaderState * outState)
+bool EditorGUI::BeginComponent(std::string const & componentTypeName, bool enabled, UIHeaderState * outState)
 {
 	auto header = CheckNextWidget<UIComponentHeader>(componentTypeName, enabled);
 	*outState = header->CheckUpdate(componentTypeName, enabled);
@@ -168,12 +166,12 @@ bool FishEditor::EditorGUI::BeginComponent(std::string const & componentTypeName
 	return expanded;
 }
 
-void FishEditor::EditorGUI::EndComponent()
+void EditorGUI::EndComponent()
 {
 	PopGroup();
 }
 
-bool FishEditor::EditorGUI::BeginMaterial(std::string const & materialName)
+bool EditorGUI::BeginMaterial(std::string const & materialName)
 {
 	auto header = CheckNextWidget<UIMaterialHeader>(materialName);
 	header->CheckUpdate(materialName);
@@ -182,7 +180,7 @@ bool FishEditor::EditorGUI::BeginMaterial(std::string const & materialName)
 	return expanded;
 }
 
-void FishEditor::EditorGUI::EndMaterial()
+void EditorGUI::EndMaterial()
 {
 	PopGroup();
 }
@@ -249,14 +247,34 @@ bool EditorGUI::Vector3Field(const std::string &label, Vector3 *v)
 }
 
 
-bool FishEditor::EditorGUI::Vector4Field(std::string const & label, FishEngine::Vector4 * v)
+bool EditorGUI::Vector4Field(std::string const & label, FishEngine::Vector4 * v)
 {
 	UIFloat4 * float4 = CheckNextWidget<UIFloat4>(label, v->x, v->y, v->z, v->w);
 	return float4->CheckUpdate(label, v->x, v->y, v->z, v->w);
 }
 
 
-bool FishEditor::EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr * texture)
+bool EditorGUI::ObjectField(std::string const & label, FishEngine::ObjectPtr & obj)
+{
+	std::string name = "none";
+	if (obj != nullptr)
+		name = obj->name();
+	UIObjecField * objField = CheckNextWidget<UIObjecField>(label, name);
+	if (objField->CheckUpdate(label, name))
+	{
+		LogWarning("Select Object");
+		SelectObjectDialog dialog;
+		//dialog.exec();
+		dialog.ShowWithCallback(obj->ClassID(), [&obj](FishEngine::ObjectPtr object) {
+			obj = object;
+			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());
+		});
+	}
+	return false;
+}
+
+
+bool EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr * texture)
 {
 	//FishEngine::Debug::LogError("EditorGUI::TextureField");
 	UITexture * t = CheckNextWidget<UITexture>(label);
@@ -311,13 +329,6 @@ void EditorGUI::PopGroup()
 	s_itemIndexStack.pop();
 }
 
-bool EditorGUI::ObjectField(const std::string &label, const ObjectPtr &obj)
-{
-	auto name = obj == nullptr ? "none" : obj->name();
-	UIObjecField * objField = CheckNextWidget<UIObjecField>(label, name);
-	return objField->CheckUpdate(label, name);
-}
-
 
 std::string EditorGUI::ShowAddComponentMenu()
 {
@@ -333,7 +344,7 @@ std::string EditorGUI::ShowAddComponentMenu()
 }
 
 
-void FishEditor::EditorGUI::HideRedundantChildItemsOfLastGroup()
+void EditorGUI::HideRedundantChildItemsOfLastGroup()
 {
 	if (!s_currentGroupHeaderItem->isExpanded())
 	{
@@ -351,7 +362,7 @@ void FishEditor::EditorGUI::HideRedundantChildItemsOfLastGroup()
 	}
 }
 
-void FishEditor::EditorGUI::HideAllChildOfLastItem()
+void EditorGUI::HideAllChildOfLastItem()
 {
 	int rowCount = s_currentItem->childCount();
 	for (int i = 0; i < rowCount; i++)

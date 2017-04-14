@@ -167,7 +167,7 @@ namespace FishEditor
 			m_fileScale = fileScale;
 		}
 		
-		ModelPtr LoadFromFile( const FishEngine::Path& path );
+		//ModelPtr LoadFromFile( const FishEngine::Path& path );
 
 		void setImportNormals( ModelImporterNormals importNormals )
 		{

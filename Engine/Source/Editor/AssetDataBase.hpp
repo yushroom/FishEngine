@@ -5,6 +5,8 @@
 #include <QIcon>
 #include <ReflectClass.hpp>
 #include <GUID.hpp>
+#include <AssetImporter.hpp>
+#include <Application.hpp>
 
 namespace FishEngine
 {
@@ -34,14 +36,6 @@ namespace FishEditor
 		ForceUncompressedImport,
 	};
 	
-	
-	// Asset is a collection of imported objects
-	// Some asset files may contain multiple objects.
-	class Meta(NonSerializable) Asset
-	{
-	public:
-		
-	};
 	
 	class Meta(NonSerializable) AssetDatabase
 	{
@@ -74,6 +68,9 @@ namespace FishEditor
 		
 		// Returns the first asset object of type type at given path assetPath.
 		static FishEngine::ObjectPtr LoadAssetAtPath(FishEngine::Path const & path);
+
+		template<class T>
+		static std::shared_ptr<T> LoadAssetAtPath2(FishEngine::Path const & path);
 		
 //		template <class T>
 //		static std::shared_ptr<T> LoadAssetAtPath(FishEngine::Path const & path)
@@ -85,4 +82,38 @@ namespace FishEditor
 
 		static std::set<std::shared_ptr<FishEngine::Object>> s_allAssetObjects;
 	};
+
+
+
+	template<class T>
+	std::shared_ptr<T> AssetDatabase::LoadAssetAtPath2(FishEngine::Path const & path)
+	{
+		static_assert(std::is_base_of<FishEngine::Object, T>::value, "Object only");
+		FishEngine::Path p;
+		if (path.is_absolute())
+		{
+			LogWarning("AssetDatabase::LoadAssetAtPath, path should be relative to project root dir, eg. Assets/a.fbx");
+			p = path;
+		}
+		else
+		{
+			p = FishEngine::Application::dataPath().parent_path() / path;
+		}
+		if (!boost::filesystem::exists(p))
+		{
+			return nullptr;
+		}
+		auto importer = AssetImporter::GetAtPath(p);
+		if (importer == nullptr)
+			return nullptr;
+		//return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
+		//return AssetImporter::s_importerGUIDToObject[importer->GetGUID()]->mainObject();
+		for (auto & obj : importer->asset()->m_assetObjects)
+		{
+			if (FishEngine::IsSubClassOf<T>( obj->ClassID() ))
+				return FishEngine::As<T>(obj);
+		}
+		abort();
+		return nullptr;
+	}
 }

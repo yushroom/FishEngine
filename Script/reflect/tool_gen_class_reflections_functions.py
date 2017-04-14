@@ -151,35 +151,30 @@ def GenSerializationFunctions(classinfo, scope):
 	headers = set(headers)
 	return serialization_template.render(headers = headers, scope = scope, ClassInfo=ClassInfo)
 
-#register_teamplate
-componentInheritance_template_str = '''
-static std::map<std::string, std::string> s_componentInheritance =
+objectInheritance_template_str = '''
+static std::map<int, int> s_objectInheritance =
 {
 	${pairs}
 };
 '''
 
-classname_template_str = '''
-
-'''
-
-def GenComponentInheritance(class_info):
-	def IsComponent(name):
-		if name == "Component":
+def GenObjectInheritance(class_info):
+	def IsObject(name):
+		if name == "FishEngine::Object":
 			return True
 		if 'parent' not in class_info[name]:
 			return False
-		return IsComponent(class_info[name]['parent'])
+		return IsObject(class_info[name]['parent'])
 
 	pairs = []
 	for key in class_info.keys():
-		if "Component" == key:
+		if "FishEngine::Object" == key:
 			 pairs.append((key, ''))
-		elif IsComponent(key):
+		elif IsObject(key):
 			pairs.append((key, class_info[key]['parent']))
 	pairs = ['{{ClassID<{0}>(), ClassID<{1}>()}},'.format(x, y) for (x, y) in pairs]
 	#print(pairs)
-	print(Template(componentInheritance_template_str).render(pairs='\n\t'.join(pairs)))
+	print(Template(objectInheritance_template_str).render(pairs='\n\t'.join(pairs)))
 
 DynamicSerializeObject_template_str = '''
 namespace ${scope}
@@ -230,8 +225,8 @@ if __name__ == "__main__":
 	with open('temp/class.json') as f:
 		class_info = json.loads(f.read())
 		class_info = OrderedDict(sorted(class_info.items()))
-	#GenComponentInheritance(class_info)
-	UpdateFile('../../Engine/Source/Runtime/generate/EngineClassSerialization.cpp', GenSerialization_Engine(class_info))
-	UpdateFile('../../Engine/Source/Editor/generate/EditorClassSerialization.cpp', GenSerialization_Editor(class_info))
+	GenObjectInheritance(class_info)
+	#UpdateFile('../../Engine/Source/Runtime/generate/EngineClassSerialization.cpp', GenSerialization_Engine(class_info))
+	#UpdateFile('../../Engine/Source/Editor/generate/EditorClassSerialization.cpp', GenSerialization_Editor(class_info))
 	
 

@@ -4,7 +4,7 @@
 FishEngine::ShaderPtr FishEditor::ShaderImporter::Load()
 {
 	auto shader = FishEngine::Shader::CreateFromFile(m_assetPath);
-	m_assetObject = shader;
+	m_asset->Add( shader );
 	return shader;
 }
 

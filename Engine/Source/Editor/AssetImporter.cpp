@@ -22,14 +22,14 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-	std::map<FishEngine::GUID, FishEngine::ObjectPtr> AssetImporter::s_importerGUIDToObject;
+	std::map<FishEngine::GUID, AssetPtr> AssetImporter::s_importerGUIDToObject;
 	std::map<int, FishEngine::Path> AssetImporter::s_objectInstanceIDToPath;
 	std::map<FishEngine::Path, std::shared_ptr<AssetImporter>> AssetImporter::s_pathToImpoter;
 
 	AssetImporter::AssetImporter()
 		: m_guid(boost::uuids::random_generator()())
 	{
-
+		m_asset = std::make_shared<Asset>();
 	}
 
 	void AssetImporter::SaveAndReimport()
@@ -117,13 +117,10 @@ namespace FishEditor
 				s_pathToImpoter[path] = importer;
 				//Timer t(path.string());
 				auto texture = importer->Load();
-				if (texture != nullptr)
-				{
-					texture->setName(path.stem().string());
-					s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
-					s_importerGUIDToObject[importer->GetGUID()] = texture;
-					ret = importer;
-				}
+				texture->setName(path.stem().string());
+				s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
+				importer->asset()->Add(texture);
+				ret = importer;
 				//t.StopAndPrint();
 			}
 			else
@@ -133,8 +130,8 @@ namespace FishEditor
 				//Timer t(path.string());
 				auto texture = importer->Import(path);
 				texture->setName(path.stem().string());
+				//importer->asset()->Add(texture);
 				s_objectInstanceIDToPath[texture->GetInstanceID()] = path;
-				s_importerGUIDToObject[importer->GetGUID()] = texture;
 				//t.StopAndPrint();
 				ret = importer;
 			}
@@ -146,8 +143,8 @@ namespace FishEditor
 			s_pathToImpoter[path] = importer;
 			auto shader = importer->Load();
 			shader->setName(path.stem().string());
+			importer->asset()->Add(shader);
 			s_objectInstanceIDToPath[shader->GetInstanceID()] = path;
-			s_importerGUIDToObject[importer->GetGUID()] = shader;
 			ret = importer;
 		}
 		else if (ext == ".fbx" || ext == ".FBX" || ext == ".obj")
@@ -160,7 +157,6 @@ namespace FishEditor
 			modelPrefab->rootGameObject()->setName(path.stem().string());
 			s_objectInstanceIDToPath[modelPrefab->GetInstanceID()] = path;
 			s_objectInstanceIDToPath[modelPrefab->rootGameObject()->GetInstanceID()] = path;
-			s_importerGUIDToObject[importer->GetGUID()] = modelPrefab->rootGameObject();
 			ret = importer;
 			t.StopAndPrint();
 
@@ -174,10 +170,16 @@ namespace FishEditor
 			auto importer = GetAssetImporter<NativeFormatImporter>(path);
 			auto material = importer->Load(path);
 			material->setName(path.stem().string());
+			importer->m_asset->Add(material);
 			s_pathToImpoter[path] = importer;
 			s_objectInstanceIDToPath[material->GetInstanceID()] = path;
-			s_importerGUIDToObject[importer->GetGUID()] = material;
 			ret = importer;
+		}
+
+		// TODO: move to ...
+		if (ret != nullptr)
+		{
+			s_importerGUIDToObject[ret->GetGUID()] = ret->asset();
 		}
 
 		if (ret != nullptr && ret->m_assetTimeStamp == 0)	// if the .meta file is newly created

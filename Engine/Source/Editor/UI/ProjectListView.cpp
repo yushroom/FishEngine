@@ -184,7 +184,7 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 		//FishEngine::BinaryOutputArchive archive(sstream);
 		//archive << model;
 		//FishEngine::Scene::AddGameObject(model);
-		auto model = FishEngine::As<FishEngine::GameObject>( FishEditor::AssetDatabase::LoadAssetAtPath(path) );
+		auto model = FishEditor::AssetDatabase::LoadAssetAtPath2<FishEngine::GameObject>(path);
 		FishEngine::Object::Instantiate(model);
 	}
 }

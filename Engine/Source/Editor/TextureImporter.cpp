@@ -417,13 +417,13 @@ namespace FishEditor
 		m_assetPath = path;
 		auto texture = std::make_shared<Texture2D>();
 		this->ImportTo(texture);
-		m_assetObject = texture;
+		m_asset->Add(texture);
 		return texture;
 	}
 	
 	void TextureImporter::Reimport()
 	{
-		auto texture = AssetImporter::s_importerGUIDToObject[this->m_guid];
+		auto texture = AssetImporter::s_importerGUIDToObject[this->m_guid]->mainObject();
 		auto texture2d = std::dynamic_pointer_cast<Texture2D>(texture);
 		ImportTo(texture2d);
 	}

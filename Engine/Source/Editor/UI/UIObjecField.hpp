@@ -7,11 +7,6 @@ namespace Ui {
 class UIObjecField;
 }
 
-//namespace FishEngine
-//{
-//    class Object;
-//}
-
 class UIObjecField : public QWidget
 {
 	Q_OBJECT
@@ -28,7 +23,7 @@ private:
 
 	Ui::UIObjecField *ui;
 
-	bool        m_changed = false;
+	bool m_selectButtonClicked = false;
 	std::string m_label;
 	std::string m_objectName;
 

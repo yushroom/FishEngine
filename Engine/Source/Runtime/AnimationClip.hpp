@@ -1,3 +1,5 @@
+#pragma once
+
 #include "FishEngine.hpp"
 #include "Object.hpp"
 #include "Animation/WrapMode.hpp"
@@ -61,6 +63,9 @@ namespace FishEngine
 
 		Meta(NonSerializable)
 		std::vector<Vector3Curve> m_scaleCurves;
+
+		Meta(NonSerializable)
+		AvatarPtr m_avatar;
 	};
 
 

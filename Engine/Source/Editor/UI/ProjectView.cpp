@@ -184,7 +184,7 @@ void ProjectView::OnListViewSelectionChanged(const QModelIndex &current, const Q
 	}
 	else if (importer->ClassID() == ClassID<NativeFormatImporter>())
 	{
-		Selection::setActiveObject(importer->assetObject());
+		Selection::setActiveObject(importer->asset()->m_assetObjects.front());
 	}
 	else
 	{

@@ -6,6 +6,7 @@
 #include <Resources.hpp>
 #include <ReflectClass.hpp>
 #include <GUID.hpp>
+#include <Asset.hpp>
 
 namespace FishEditor
 {
@@ -48,9 +49,9 @@ namespace FishEditor
 			return m_guid;
 		}
 
-		FishEngine::ObjectPtr assetObject() const
+		AssetPtr asset() const
 		{
-			return m_assetObject;
+			return m_asset;
 		}
 		
 	protected:
@@ -99,10 +100,10 @@ namespace FishEditor
 		std::map<std::string, int>		m_recycleNameToFileID;
 
 		Meta(NonSerializable)
-		FishEngine::ObjectPtr			m_assetObject;
+		AssetPtr						m_asset;
 
 	public:
-		static std::map<FishEngine::GUID, FishEngine::ObjectPtr> s_importerGUIDToObject;
+		static std::map<FishEngine::GUID, AssetPtr> s_importerGUIDToObject;
 		static std::map<FishEngine::Path, AssetImporterPtr> s_pathToImpoter;
 		static std::map<int, FishEngine::Path> s_objectInstanceIDToPath;
 	};

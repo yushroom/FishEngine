@@ -7,11 +7,14 @@
 
 namespace FishEditor
 {
-	class Model;
-	typedef std::shared_ptr<Model> ModelPtr;
+	//class Model;
+	//typedef std::shared_ptr<Model> ModelPtr;
 
-	struct ModelNode;
-	typedef std::shared_ptr<ModelNode> ModelNodePtr;
+	//struct ModelNode;
+	//typedef std::shared_ptr<ModelNode> ModelNodePtr;
+
+	class Asset;
+	typedef std::shared_ptr<Asset> AssetPtr;
 
 	class AssetImporter;
 	typedef std::shared_ptr<AssetImporter> AssetImporterPtr;

@@ -15,6 +15,10 @@ namespace FishEngine
 {
 	template<class T>
 	constexpr int ClassID();
+
+	class Object;
+	template<>
+	constexpr int ClassID<Object>() { return 0; }
 	
 	class GameObject;
 	template<>

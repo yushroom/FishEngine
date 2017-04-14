@@ -14,7 +14,7 @@ namespace FishEditor
 
 		FishEngine::ShaderPtr GetShader()
 		{
-			return FishEngine::As<FishEngine::Shader>(m_assetObject);
+			return FishEngine::As<FishEngine::Shader>(m_asset->m_assetObjects.front());
 		}
 
 		FishEngine::ShaderPtr Load();

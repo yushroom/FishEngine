@@ -26,6 +26,7 @@
 #include <Application.hpp>
 //#include <Prefab.hpp>
 #include <Animation.hpp>
+#include <AnimationClip.hpp>
 #include <Time.hpp>
 
 #include "SceneViewEditor.hpp"
@@ -60,20 +61,20 @@ namespace FishEditor
 	void InitializeScene_Sponza()
 	{
 		//QualitySettings::setShadowDistance(30);
-		auto sponza_model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/sponza.fbx"));
+		auto sponza_model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/sponza.fbx");
 		auto sponza_go = Object::Instantiate(sponza_model);
 		
 #if 1
-		auto shader1 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_mask_twosided.shader"));
+		auto shader1 = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/diffuse_mask_twosided.shader");
 		assert(shader1 != nullptr);
 		auto applyMaterial1 = [&sponza_go, &shader1] (const std::string& diffuse_tex, const std::string& mask_tex, MaterialPtr mtl)
 		{
 			//auto mtl = Material::CreateMaterial();
 			//mtl->setName(diffuse_tex);
 			mtl->setShader(shader1);
-			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ diffuse_tex + ".png"));
+			auto diffuse = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/"+ diffuse_tex + ".png");
 			assert(diffuse != nullptr);
-			auto mask = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ mask_tex + ".png"));
+			auto mask = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/"+ mask_tex + ".png");
 			assert(mask != nullptr);
 			mtl->SetTexture("DiffuseTex", diffuse);
 			mtl->SetTexture("MaskTex", mask);
@@ -83,14 +84,14 @@ namespace FishEditor
 		};
 
 		
-		auto shader2 = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/diffuse_bump.shader"));
+		auto shader2 = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/diffuse_bump.shader");
 		assert(shader2 != nullptr);
 		auto createMaterial2 = [&shader2] (const std::string& diffuse_tex) -> MaterialPtr
 		{
 			auto mtl = Material::CreateMaterial();
 			mtl->setName(diffuse_tex);
 			mtl->setShader(shader2);
-			auto diffuse = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/"+ diffuse_tex + ".png"));
+			auto diffuse = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/"+ diffuse_tex + ".png");
 			assert(diffuse != nullptr);
 			mtl->SetFloat("Roughness", 0.5f);
 			mtl->SetFloat("Specular", 0.5f);
@@ -150,34 +151,29 @@ namespace FishEditor
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 		
-//		auto sky_texture = texture_importer.FromFile(textures_root / "StPeters" / "DiffuseMap.dds");
-//		auto checkboard_texture = texture_importer.FromFile(textures_root / "checkboard.png");
-//		auto chan_texture_dir = example_root / "textures";
-		As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tag"));
-		auto bodyTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01.tga"));
-		auto skinTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/skin_01.tga"));
-		auto hairTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/hair_01.tga"));
-		auto faceTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/face_00.tga"));
-		auto eyelineTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eyeline_00.tga"));
-		auto eyeirisLTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eye_iris_L_00.tga"));
-		auto eyeirisRTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/eye_iris_R_00.tga"));
-		auto cheekTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/cheek_00.tga"));
+		auto bodyTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01.tga");
+		auto skinTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/skin_01.tga");
+		auto hairTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/hair_01.tga");
+		auto faceTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/face_00.tga");
+		auto eyelineTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eyeline_00.tga");
+		auto eyeirisLTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eye_iris_L_00.tga");
+		auto eyeirisRTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eye_iris_R_00.tga");
+		auto cheekTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/cheek_00.tga");
 		
-		//auto bodyTexture = Texture::CreateFromFile(chan_texture_dir + "cheek_00.tga");
-		auto rolloffTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/FO_CLOTH1.tga"));
-		auto rimLightTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/FO_RIM1.tga"));
-		auto specularTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01_SPEC.tga"));
-		auto envTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/ENV2.tga"));
-		auto normalMapTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/body_01_NRM.tga"));
+		auto rolloffTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/FO_CLOTH1.tga");
+		auto rimLightTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/FO_RIM1.tga");
+		auto specularTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01_SPEC.tga");
+		auto envTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/ENV2.tga");
+		auto normalMapTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01_NRM.tga");
 		
-		auto stageBaseTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/unitychan_tile3.png"));
-		auto stageMaskTexture = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/textures/AlphaMask.png"));
+		auto stageBaseTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/unitychan_tile3.png");
+		auto stageMaskTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/AlphaMask.png");
 		
 		auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 		material->setMainTexture(stageBaseTexture);
 		plane->GetComponent<Renderer>()->SetMaterial(material);
 		
-		auto chanMainShader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/CharaMain.shader"));
+		auto chanMainShader = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/CharaMain.shader");
 		auto bodyMaterial = Material::CreateMaterial();
 		bodyMaterial->setName("body");
 		bodyMaterial->setShader(chanMainShader);
@@ -191,13 +187,13 @@ namespace FishEditor
 		bodyMaterial->SetTexture("_NormalMapSampler", normalMapTexture);
 		
 		constexpr float edgeThickness = 0.5f;
-		auto texture2side = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/TextureDoubleSided.surf"));
+		auto texture2side = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/TextureDoubleSided.surf");
 		material = Material::CreateMaterial();
 		material->setShader(texture2side);
 		//material = bodyMaterial;
 		//material = Material::builtinMaterial("SkinnedMesh");
 		material->SetTexture("_MainTex", bodyTexture);
-		auto outline_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Outline.shader"));
+		auto outline_shader = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/Outline.shader");
 		auto outline_material = Material::CreateMaterial();
 		outline_material->setShader(outline_shader);
 		outline_material->setName("Outline");
@@ -205,7 +201,7 @@ namespace FishEditor
 		outline_material->setMainTexture(bodyTexture);
 		outline_material->SetFloat("_EdgeThickness", edgeThickness);
 		
-		auto model = As<GameObject>( AssetDatabase::LoadAssetAtPath("Assets/unitychan.fbx") );
+		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/unitychan.fbx");
 		auto modelGO = Object::Instantiate(model);
 		
 		for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK", "hair_accce"}) {
@@ -312,17 +308,18 @@ namespace FishEditor
 			renderer->setReceiveShadows(false);
 		}
 
-		auto model_run = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/unitychan_RUN00_F.fbx"));
+		//auto model_run = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/unitychan_RUN00_F.fbx");
+		auto animationClip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/unitychan_RUN00_F.fbx");
 		auto animation = modelGO->GetComponent<Animation>();
-		animation->m_clip = model_run->GetComponent<Animation>()->m_clip;
+		animation->m_clip = animationClip;
 	}
 	
 	
 	void InitializeScene_PBR()
 	{
-		auto envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross.dds"));
+		auto envmap = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/uffizi_cross.dds");
 		assert(envmap != nullptr);
-		auto filtered_envmap = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/uffizi_cross_128_filtered.dds"));
+		auto filtered_envmap = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/uffizi_cross_128_filtered.dds");
 		assert(filtered_envmap != nullptr);
 		RenderSettings::setAmbientCubemap(filtered_envmap);
 		auto skybox = Material::InstantiateBuiltinMaterial("SkyboxCubed");
@@ -405,7 +402,7 @@ namespace FishEditor
 	void InitializeScene_TestShadow()
 	{
 		//QualitySettings::setShadowDistance(20);
-		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/Terrain.obj"));
+		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/Terrain.obj");
 		auto terrainGO = Object::Instantiate(model);
 		auto material = Material::InstantiateBuiltinMaterial("DebugCSM");
 		//auto material = Material::defaultMaterial();
@@ -426,19 +423,19 @@ namespace FishEditor
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
 		
-		auto model = As<GameObject>(AssetDatabase::LoadAssetAtPath("Assets/heavy_reference.fbx"));
+		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/heavy_reference.fbx");
 		model = Object::Instantiate(model);
 		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/ground.jpg"));
+			auto tex = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/ground.jpg");
 			assert(tex != nullptr);
 			auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 			material->setMainTexture(tex);
 			plane->GetComponent<MeshRenderer>()->SetMaterial(material);
 		}
 		
-		auto albedo_shader = As<Shader>(AssetDatabase::LoadAssetAtPath("Assets/Albedo.surf"));
+		auto albedo_shader = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/Albedo.surf");
 		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/hvyweapon_red.tga"));
+			auto tex = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/hvyweapon_red.tga");
 			assert(tex != nullptr);
 			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 			auto material = Material::CreateMaterial();
@@ -451,7 +448,7 @@ namespace FishEditor
 			}
 		}
 		{
-			auto tex = As<Texture>(AssetDatabase::LoadAssetAtPath("Assets/heavy_head.tga"));
+			auto tex = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/heavy_head.tga");
 			assert(tex != nullptr);
 			//auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 			auto material = Material::CreateMaterial();

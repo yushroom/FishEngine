@@ -49,11 +49,20 @@ bool UIObjecField::CheckUpdate(const std::string &label, const std::string &obje
 		LOG;
 		ui->lineEdit->setText(objectName.c_str());
 	}
+
+
+	if (m_selectButtonClicked)
+	{
+		m_selectButtonClicked = false;
+		return true;
+	}
+
 	return false;
 }
 
 void UIObjecField::OnPickerClicked()
 {
-	SelectObjectDialog dialog;
-	dialog.exec();
+	//SelectObjectDialog dialog;
+	//dialog.exec();
+	m_selectButtonClicked = true;
 }

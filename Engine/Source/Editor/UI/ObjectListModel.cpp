@@ -20,9 +20,12 @@ void ObjectListModel::SetObjectType(int classID)
 	m_cachedObjects.clear();
 	for (auto const & pair : AssetImporter::s_importerGUIDToObject)
 	{
-		if (FishEngine::IsDerivedFrom(pair.second->ClassID(), classID))
+		for (auto & obj : pair.second->m_assetObjects)
 		{
-			m_cachedObjects.push_back(pair.second);
+			if (FishEngine::IsDerivedFrom(obj->ClassID(), classID))
+			{
+				m_cachedObjects.push_back(obj);
+			}
 		}
 	}
 }
@@ -37,7 +40,7 @@ std::shared_ptr<Object> ObjectListModel::object(const QModelIndex &index) const
 
 int ObjectListModel::rowCount(const QModelIndex &) const
 {
-	return m_cachedObjects.size();
+	return static_cast<int>(m_cachedObjects.size());
 }
 
 QVariant ObjectListModel::data(const QModelIndex &index, int role) const

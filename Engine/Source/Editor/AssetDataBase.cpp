@@ -91,6 +91,6 @@ namespace FishEditor
 		if (importer == nullptr)
 			return nullptr;
 		//return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
-		return AssetImporter::s_importerGUIDToObject[importer->GetGUID()];
+		return importer->asset()->mainObject();
 	}
 }

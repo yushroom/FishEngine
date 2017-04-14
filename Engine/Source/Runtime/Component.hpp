@@ -27,7 +27,7 @@ namespace FishEngine
 		std::string tag() const;
 
 		// The tag of this game object.
-		virtual std::string name() const override;
+		virtual std::string name() const override final;
 
 		// The Transform attached to this GameObject (null if there is none attached).
 		TransformPtr transform() const;

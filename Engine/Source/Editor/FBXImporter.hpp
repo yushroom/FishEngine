@@ -120,11 +120,15 @@ namespace FishEditor
 
 		void GetLinkData(fbxsdk::FbxMesh* pGeometry, FishEngine::MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping);
 
+		void ImportSkeleton(fbxsdk::FbxScene* scene);
+
 		void UpdateBones(FishEngine::TransformPtr const & node);
 		
 		void ImportAnimations(fbxsdk::FbxScene* scene);
 		
 		void ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxsdk::FbxNode * node, FBXAnimationClip & clip);
+
+		FishEngine::AnimationClipPtr ConvertAnimationClip(const FBXAnimationClip& fbxClip);
 
 		//void ImportAnimations(fbxsdk::FbxScene* scene);
 

@@ -118,196 +118,6 @@ int FBXToNativeType(const int & value)
 	return value;
 }
 
-#if 0
-
-void convertAnimations(
-	const std::vector<FBXAnimationClip>& clips,
-	const std::vector<AnimationSplitInfo>& splits,
-	const std::shared_ptr<Skeleton>& skeleton,
-	bool importRootMotion,
-	std::vector<FBXAnimationClipData>& output)
-{
-	std::unordered_set<std::string> names;
-
-	std::string rootBoneName;
-	if (skeleton == nullptr)
-		importRootMotion = false;
-	else
-	{
-		uint32_t rootBoneIdx = skeleton->getRootBoneIndex();
-		if (rootBoneIdx == (uint32_t)-1)
-			importRootMotion = false;
-		else
-			rootBoneName = skeleton->getBoneInfo(rootBoneIdx).name;
-	}
-
-	bool isFirstClip = true;
-	for (auto& clip : clips)
-	{
-		std::shared_ptr<AnimationCurves> curves = std::make_shared<AnimationCurves>();
-		std::shared_ptr<RootMotion> rootMotion;
-
-		// Find offset so animations start at time 0
-		float animStart = std::numeric_limits<float>::infinity();
-
-		for (auto& bone : clip.boneAnimations)
-		{
-			if (bone.translation.getNumKeyFrames() > 0)
-				animStart = std::min(bone.translation.getKeyFrame(0).time, animStart);
-
-			if (bone.rotation.getNumKeyFrames() > 0)
-				animStart = std::min(bone.rotation.getKeyFrame(0).time, animStart);
-
-			if (bone.scale.getNumKeyFrames() > 0)
-				animStart = std::min(bone.scale.getKeyFrame(0).time, animStart);
-		}
-
-		for (auto& anim : clip.blendShapeAnimations)
-		{
-			if (anim.curve.getNumKeyFrames() > 0)
-				animStart = std::min(anim.curve.getKeyFrame(0).time, animStart);
-		}
-
-		AnimationCurveFlags blendShapeFlags = AnimationCurveFlag::ImportedCurve | AnimationCurveFlag::MorphFrame;
-		if (animStart != 0.0f && animStart != std::numeric_limits<float>::infinity())
-		{
-			for (auto& bone : clip.boneAnimations)
-			{
-				TAnimationCurve<Vector3> translation = AnimationUtility::offsetCurve(bone.translation, -animStart);
-				TAnimationCurve<Quaternion> rotation = AnimationUtility::offsetCurve(bone.rotation, -animStart);
-				TAnimationCurve<Vector3> scale = AnimationUtility::offsetCurve(bone.scale, -animStart);
-
-				if (importRootMotion && bone.node->name == rootBoneName)
-					rootMotion = std::make_shared<RootMotion>(translation, rotation);
-				else
-				{
-					curves->position.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, translation });
-					curves->rotation.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, rotation });
-					curves->scale.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, scale });
-				}
-			}
-
-			for (auto& anim : clip.blendShapeAnimations)
-			{
-				TAnimationCurve<float> curve = AnimationUtility::offsetCurve(anim.curve, -animStart);
-				curves->generic.push_back({ anim.blendShape, blendShapeFlags, curve });
-			}
-		}
-		else
-		{
-			for (auto& bone : clip.boneAnimations)
-			{
-				if (importRootMotion && bone.node->name == rootBoneName)
-					rootMotion = std::make_shared<RootMotion>(bone.translation, bone.rotation);
-				else
-				{
-					curves->position.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.translation });
-					curves->rotation.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.rotation });
-					curves->scale.push_back({ bone.node->name, AnimationCurveFlag::ImportedCurve, bone.scale });
-				}
-			}
-
-			for (auto& anim : clip.blendShapeAnimations)
-				curves->generic.push_back({ anim.blendShape, blendShapeFlags, anim.curve });
-		}
-
-		// See if any splits are required. We only split the first clip as it is assumed if FBX has multiple clips the
-		// user has the ability to split them externally.
-		if (isFirstClip && !splits.empty())
-		{
-			float secondsPerFrame = 1.0f / clip.sampleRate;
-
-			for (auto& split : splits)
-			{
-				auto splitClipCurve = std::make_shared<AnimationCurves>();
-				std::shared_ptr<RootMotion> splitRootMotion;
-
-				auto splitCurves = [&](auto& inCurves, auto& outCurves)
-				{
-					uint32_t numCurves = (uint32_t)inCurves.size();
-					outCurves.resize(numCurves);
-
-					for (uint32_t i = 0; i < numCurves; i++)
-					{
-						auto& animCurve = inCurves[i].curve;
-						outCurves[i].name = inCurves[i].name;
-
-						uint32_t numFrames = animCurve.getNumKeyFrames();
-						if (numFrames == 0)
-							continue;
-
-						float startTime = split.startFrame * secondsPerFrame;
-						float endTime = split.endFrame * secondsPerFrame;
-
-						outCurves[i].curve = inCurves[i].curve.split(startTime, endTime);
-
-						if (split.isAdditive)
-							outCurves[i].curve.makeAdditive();
-					}
-				};
-
-				splitCurves(curves->position, splitClipCurve->position);
-				splitCurves(curves->rotation, splitClipCurve->rotation);
-				splitCurves(curves->scale, splitClipCurve->scale);
-				splitCurves(curves->generic, splitClipCurve->generic);
-
-				if (rootMotion != nullptr)
-				{
-					auto splitCurve = [&](auto& inCurve, auto& outCurve)
-					{
-						uint32_t numFrames = inCurve.getNumKeyFrames();
-						if (numFrames > 0)
-						{
-							float startTime = split.startFrame * secondsPerFrame;
-							float endTime = split.endFrame * secondsPerFrame;
-
-							outCurve = inCurve.split(startTime, endTime);
-
-							if (split.isAdditive)
-								outCurve.makeAdditive();
-						}
-					};
-
-					splitRootMotion = std::make_shared<RootMotion>();
-					splitCurve(rootMotion->position, splitRootMotion->position);
-					splitCurve(rootMotion->rotation, splitRootMotion->rotation);
-				}
-
-				// Search for a unique name
-				std::string name = split.name;
-				uint32_t attemptIdx = 0;
-				while (names.find(name) != names.end())
-				{
-					name = clip.name + "_" + ToString(attemptIdx);
-					attemptIdx++;
-				}
-
-				names.insert(name);
-				output.push_back(FBXAnimationClipData(name, split.isAdditive, clip.sampleRate, splitClipCurve,
-					splitRootMotion));
-			}
-		}
-		else
-		{
-			// Search for a unique name
-			std::string name = clip.name;
-			uint32_t attemptIdx = 0;
-			while (names.find(name) != names.end())
-			{
-				name = clip.name + "_" + ToString(attemptIdx);
-				attemptIdx++;
-			}
-
-			names.insert(name);
-			output.push_back(FBXAnimationClipData(name, false, clip.sampleRate, curves, rootMotion));
-		}
-
-		isFirstClip = false;
-	}
-}
-
-#endif
-
 
 // skinned data
 void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping)
@@ -330,8 +140,6 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 
 	FbxCluster::ELinkMode lClusterMode = ((FbxSkin*)pMesh->GetDeformer(0, FbxDeformer::eSkin))->GetCluster(0)->GetLinkMode();
 	
-//	for ( int lSkinIndex = 0; lSkinIndex < lSkinCount; ++lSkinIndex )
-//	{
 	FbxSkin * lSkinDeformer = (FbxSkin *)pMesh->GetDeformer(0, FbxDeformer::eSkin);
 	FbxSkin::EType lSkinningType = lSkinDeformer->GetSkinningType();
 
@@ -339,7 +147,6 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 	int lClusterCount = lSkinDeformer->GetClusterCount();
 	std::vector<uint32_t> boneIndices(lClusterCount);
 
-	//mesh->m_bindposes.resize(lClusterCount);
 	mesh->m_boneNames.resize(lClusterCount);
 	
 	float scale = m_fileScale * m_globalScale;
@@ -367,20 +174,23 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 		}
 		else
 		{
-			boneId = m_boneCount;
-			m_model.m_avatar->m_boneToIndex[boneName] = boneId;
-			m_model.m_avatar->m_indexToBone[boneId] = boneName;
-			//fbxsdk::FbxAMatrix transformMatrix;
-			//lCluster->GetTransformMatrix(transformMatrix);
-			fbxsdk::FbxAMatrix bindPoseMatrix;
-			lCluster->GetTransformLinkMatrix(bindPoseMatrix);	// this bind pose is in world(global) space
-			auto mat = FBXToNativeType(bindPoseMatrix);
-			mat.m[0][3] *= scale;
-			mat.m[1][3] *= scale;
-			mat.m[2][3] *= scale;
-			m_model.m_bindposes.push_back(mat);
-			m_boneCount++;
+			// bone not in skeletion;
+			abort();
+			//boneId = m_boneCount;
+			//m_model.m_avatar->m_boneToIndex[boneName] = boneId;
+			//m_model.m_avatar->m_indexToBone[boneId] = boneName;
+			////fbxsdk::FbxAMatrix transformMatrix;
+			////lCluster->GetTransformMatrix(transformMatrix);
+			//m_boneCount++;
 		}
+
+		fbxsdk::FbxAMatrix bindPoseMatrix;
+		lCluster->GetTransformLinkMatrix(bindPoseMatrix);	// this bind pose is in world(global) space
+		auto mat = FBXToNativeType(bindPoseMatrix);
+		mat.m[0][3] *= scale;
+		mat.m[1][3] *= scale;
+		mat.m[2][3] *= scale;
+		m_model.m_bindposes[boneId] = mat;
 		
 		boneIndices[lClusterIndex] = boneId;
 		
@@ -399,7 +209,46 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 		}
 	}
 	m_model.m_boneIndicesForEachMesh.emplace(mesh, std::move(boneIndices));
-//	}
+}
+
+void FishEditor::FBXImporter::ImportSkeleton(fbxsdk::FbxScene* scene)
+{
+	std::deque<FbxNode*> todo;
+	todo.push_back(scene->GetRootNode());
+	while (!todo.empty())
+	{
+		FbxNode* node = todo.front();
+		todo.pop_front();
+		for (int i = 0; i < node->GetChildCount(); ++i)
+		{
+			auto child = node->GetChild(i);
+			todo.push_back(child);
+		}
+
+		const char* nodeName = node->GetName();
+		auto nodeAttributeCount = node->GetNodeAttributeCount();
+		for (int i = 0; i < nodeAttributeCount; ++i)
+		{
+			auto nodeAttribute = node->GetNodeAttributeByIndex(i);
+			auto type = nodeAttribute->GetAttributeType();
+			if (type == FbxNodeAttribute::eSkeleton)
+			{
+				//FbxSkeleton* lSkeleton = (FbxSkeleton*)nodeAttribute;
+				std::string boneName = nodeName;
+				auto it = m_model.m_avatar->m_boneToIndex.find(boneName);
+				if (it != m_model.m_avatar->m_boneToIndex.end())
+				{
+					// handle same name
+					abort();
+				}
+				m_model.m_avatar->m_boneToIndex[boneName] = m_boneCount;
+				m_model.m_avatar->m_indexToBone[m_boneCount] = boneName;
+				m_boneCount++;
+			}
+		}
+	}
+
+	m_model.m_bindposes.resize(m_boneCount);
 }
 
 void FishEditor::FBXImporter::UpdateBones(FishEngine::TransformPtr const & node)
@@ -496,13 +345,6 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 
 	int subMeshCount = lMaterialCount;
 	int hasSubMesh = subMeshCount > 1;
-
-
-//	for (int i = 0; i < lMaterialCount; ++i)
-//	{
-//		auto lMaterial = fbxMesh->GetNode()->GetMaterial(i);
-//		ParseMaterial(lMaterial);
-//	}
 
 	// TODO:
 	// if this mesh only has one material, we assume this material applies to all polygons.
@@ -802,7 +644,7 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	{
 		auto textureName = Path(diffuseTexturePath).filename();
 		auto texturePath = Application::dataPath() / "textures" / textureName;
-		auto diffuseTexture = As<Texture>(AssetDatabase::LoadAssetAtPath(texturePath));
+		auto diffuseTexture = AssetDatabase::LoadAssetAtPath2<Texture>(texturePath);
 		ret_material = Material::InstantiateBuiltinMaterial("Diffuse");
 		ret_material->setName(textureName.string());
 		if (diffuseTexture != nullptr)
@@ -820,63 +662,6 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	return ret_material;
 }
 
-
-//FBXImportNode* CreateImportNode(FbxNode * fbxNode, FBXImportNode * parent)
-//{
-//	auto node = new FBXImportNode();
-//
-//	Vector3 translation = FBXToNativeType(fbxNode->LclTranslation.Get());
-//	Vector3 rotationEuler = FBXToNativeType(fbxNode->LclRotation.Get());
-//	Vector3 scale = FBXToNativeType(fbxNode->LclScaling.Get());
-//
-//	FbxDouble3 r = fbxNode->LclRotation.Get();
-//	EFbxRotationOrder order1;
-//	fbxNode->GetRotationOrder(FbxNode::eDestinationPivot, order1);
-//
-//	EFbxRotationOrder order2;
-//	fbxNode->GetRotationOrder(FbxNode::eSourcePivot, order2);
-//	//pNode->SetRotationOrder(FbxNode::eDestinationPivot, EFbxRotationOrder::eOrderZYX);
-//	//r[0] = -r[0];
-//	float scale = m_fileScale * m_globalScale;
-//	go->transform()->setLocalPosition(t[0] * scale, t[1] * scale, t[2] * scale);
-//	//go->transform()->setLocalEulerAngles(r[0], r[1], r[2]);
-//	go->transform()->setLocalScale(s[0], s[1], s[2]);
-//
-//	auto AngleX = [](float x) {
-//		return Quaternion::AngleAxis(x, Vector3(1, 0, 0));
-//	};
-//	auto AngleY = [](float y) {
-//		return Quaternion::AngleAxis(y, Vector3(0, 1, 0));
-//	};
-//	auto AngleZ = [](float z) {
-//		return Quaternion::AngleAxis(z, Vector3(0, 0, 1));
-//	};
-//
-//	if (order1 != EFbxRotationOrder::eOrderXYZ)
-//	{
-//		abort();
-//	}
-//
-//	if (order2 == EFbxRotationOrder::eOrderZXY)
-//	{
-//		Quaternion q = AngleY(r[1]) * AngleX(r[0]) * AngleZ(r[2]);
-//		go->transform()->setLocalRotation(q);
-//	}
-//	else if (order2 == EFbxRotationOrder::eOrderXYZ)
-//	{
-//		Quaternion q = AngleZ(r[2]) * AngleY(r[1]) * AngleX(r[0]);
-//		go->transform()->setLocalRotation(q);
-//	}
-//	else
-//	{
-//		abort();
-//	}
-//}
-//
-//void FishEditor::FBXImporter::ParseScene(fbxsdk::FbxScene * scene)
-//{
-//	
-//}`
 
 void FishEditor::FBXImporter::BakeTransforms(FbxScene * scene)
 {
@@ -948,8 +733,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	go->setPrefabInternal(m_model.m_modelPrefab);
 	go->transform()->setPrefabInternal(m_model.m_modelPrefab);
 
-	// SetRotationOrder did not work, so handle rotation order here
-
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
 	FbxDouble3 s = pNode->LclScaling.Get();
@@ -967,11 +750,10 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	m_model.m_fbxNodeLookup[pNode] = go->transform();
 	FishEditor::AssetDatabase::s_allAssetObjects.insert(go);
 
-	//auto nodeAttributeCount = pNode->GetNodeAttributeCount();
-	auto nodeAttribute = pNode->GetNodeAttribute();
-	
-	if (nodeAttribute != nullptr)
+	auto nodeAttributeCount = pNode->GetNodeAttributeCount();
+	for (int i = 0; i < nodeAttributeCount; ++i)
 	{
+		auto nodeAttribute = pNode->GetNodeAttributeByIndex(i);
 		auto type = nodeAttribute->GetAttributeType();
 		if (type == FbxNodeAttribute::eMesh)
 		{
@@ -1027,14 +809,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 				renderer->AddMaterial(material);
 			}
 		}
-//		else if (type == FbxNodeAttribute::eSkeleton)
-//		{
-//			FbxSkeleton* lSkeleton = (FbxSkeleton*)nodeAttribute;
-//			std::string boneName = nodeName;
-//			m_model.m_avatar->m_boneToIndex[boneName] = m_boneCount;
-//			m_model.m_avatar->m_indexToBone[m_boneCount] = boneName;
-//			m_boneCount++;
-//		}
 	}
 
 
@@ -1054,14 +828,6 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	return go;
 }
 
-
-//void PrintMatrix(Matrix4x4 const & m)
-//{
-//	for (int i = 0; i < 4; ++i)
-//	{
-//		Debug::Log("%lf %lf %lf %lf", m.m[i][0], m.m[i][1], m.m[i][2], m.m[i][3]);
-//	}
-//}
 
 void FishEditor::FBXImporter::ImportTo(FishEngine::GameObjectPtr & model)
 {
@@ -1155,6 +921,8 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	//converter.SplitMeshesPerMaterial(lScene, true);
 
 	BakeTransforms(lScene);
+
+	ImportSkeleton(lScene);
 
 	// Print the nodes of the scene and their attributes recursively.
 	// Note that we are not printing the root node because it should
@@ -1272,6 +1040,14 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 		BuildFileIDToRecycleName();
 	}
 	
+	m_asset->Add(m_model.m_modelPrefab->rootGameObject());
+	for (auto & mesh : m_model.m_meshes)
+		m_asset->Add(mesh);
+
+	for (auto & clip : m_model.m_animationClips)
+		m_asset->Add(clip);
+	m_asset->Add(m_model.m_avatar);
+
 	return m_model.m_modelPrefab;
 }
 
@@ -1327,12 +1103,18 @@ void FishEditor::FBXImporter::BuildFileIDToRecycleName()
 }
 
 
-AnimationClipPtr ConvertAnimationClip(const FBXAnimationClip& fbxClip)
+AnimationClipPtr FishEditor::FBXImporter::ConvertAnimationClip(const FBXAnimationClip& fbxClip)
 {
 	auto result = std::make_shared<AnimationClip>();
 	result->setName(fbxClip.name);
 	result->frameRate = fbxClip.sampleRate;
 	result->length = fbxClip.end - fbxClip.start;
+
+	auto IsBone = [this](std::string const& name) {
+		auto it = m_model.m_avatar->m_boneToIndex.find(name);
+		return it != m_model.m_avatar->m_boneToIndex.end();
+	};
+
 	for (auto & animation : fbxClip.boneAnimations)
 	{
 		// TODO: move
@@ -1342,6 +1124,8 @@ AnimationClipPtr ConvertAnimationClip(const FBXAnimationClip& fbxClip)
 		node = node->parent();
 		while (node != nullptr)
 		{
+			if (!IsBone(node->name()))
+				break;
 			path = node->name() + "/" + path;
 			node = node->parent();
 		}
@@ -1387,7 +1171,9 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 
 	for (auto clip : m_model.m_clips)
 	{
-		m_model.m_animationClips.push_back(ConvertAnimationClip(clip));
+		auto animationClip = ConvertAnimationClip(clip);
+		m_model.m_animationClips.push_back(animationClip);
+		animationClip->m_avatar = m_model.m_avatar;
 	}
 }
 

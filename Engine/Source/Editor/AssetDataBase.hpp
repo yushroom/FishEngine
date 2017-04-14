@@ -34,6 +34,15 @@ namespace FishEditor
 		ForceUncompressedImport,
 	};
 	
+	
+	// Asset is a collection of imported objects
+	// Some asset files may contain multiple objects.
+	class Meta(NonSerializable) Asset
+	{
+	public:
+		
+	};
+	
 	class Meta(NonSerializable) AssetDatabase
 	{
 	public:

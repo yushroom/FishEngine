@@ -79,7 +79,7 @@ endforeach()
 SOURCE_GROUP(Texture FILES ${Texture_SRCS})
 
 FILE(GLOB Animation_SRCS ${CMAKE_CURRENT_LIST_DIR}/Animation/*.*)
-foreach (x AnimationClip Animator)
+foreach (x AnimationClip Animator Animation)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Animation_SRCS ${Animation_SRCS} ${f})

@@ -32,7 +32,7 @@ struct RenderObject
 	int				subMeshID = -1;
 
 	RenderObject(int renderQueue, RendererPtr renderer, MaterialPtr material, MeshPtr mesh, int subMeshID = -1)
-		: renderer(renderer), renderQueue(renderQueue), material(material), mesh(mesh), subMeshID(subMeshID)
+		: renderQueue(renderQueue), renderer(renderer), material(material), mesh(mesh), subMeshID(subMeshID)
 	{
 
 	}
@@ -279,8 +279,6 @@ namespace FishEngine
 		/************************************************************************/
 		for (auto & ro : forwardRenderQueueGeometry)
 		{
-			if (ro.mesh->name() == "hair_front")
-				LogWarning("here");
 			ro.renderer->PreRender();
 			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}

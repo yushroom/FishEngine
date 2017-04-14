@@ -5,7 +5,7 @@
 
 #include "Object.hpp"
 #include "ShaderProperty.hpp"
-#include "shader/ShaderLabProperties.hpp"
+#include "Shader/ShaderLabProperties.hpp"
 
 namespace FishEngine
 {

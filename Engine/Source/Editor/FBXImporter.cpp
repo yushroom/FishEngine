@@ -87,6 +87,32 @@ FbxSurfaceMaterial* FBXToNativeType(FbxSurfaceMaterial* const& value)
 	return value;
 }
 
+
+RotationOrder FBXToNativeType(EFbxRotationOrder order)
+{
+	RotationOrder rotationOrder;
+	//EFbxRotationOrder order;
+	//node->GetRotationOrder(FbxNode::eDestinationPivot, order);
+	switch (order)
+	{
+		case eEulerXYZ:
+			rotationOrder = RotationOrder::XYZ; break;
+		case eEulerXZY:
+			rotationOrder = RotationOrder::XZY; break;
+		case eEulerYXZ:
+			rotationOrder = RotationOrder::YXZ; break;
+		case eEulerYZX:
+			rotationOrder = RotationOrder::YZX; break;
+		case eEulerZXY:
+			rotationOrder = RotationOrder::ZXY; break;
+		case eEulerZYX:
+			rotationOrder = RotationOrder::ZYX; break;
+		default: // do not support eSphericXYZ
+			abort();
+	}
+	return rotationOrder;
+}
+
 int FBXToNativeType(const int & value)
 {
 	return value;
@@ -421,8 +447,8 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 	fbxMesh->RemoveBadPolygons();
 	fbxMesh->GenerateNormals(false, true, false);
 	fbxMesh->GenerateTangentsDataForAllUVSets();
-	auto name1 = fbxMesh->GetName();
-	auto name2 = fbxMesh->GetNode()->GetName();
+	//auto name1 = fbxMesh->GetName();
+	//auto name2 = fbxMesh->GetNode()->GetName();
 
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_mesh_html
 	// A control point is an XYZ coordinate, it is synonym of vertex.
@@ -863,50 +889,52 @@ void FishEditor::FBXImporter::BakeTransforms(FbxScene * scene)
 
 	double frameRate = FbxTime::GetFrameRate(scene->GetGlobalSettings().GetTimeMode());
 
-	//bs_frame_mark();
+	std::deque<FbxNode*> todo;
+	todo.push_back(scene->GetRootNode());
+
+	while (todo.size() > 0)
 	{
-		std::deque<FbxNode*> todo;
-		todo.push_back(scene->GetRootNode());
+		FbxNode* node = todo.front();
+		todo.pop_front();
 
-		while (todo.size() > 0)
+		FbxVector4 zero(0, 0, 0);
+		FbxVector4 one(1, 1, 1);
+
+		// Activate pivot converting
+		node->SetPivotState(FbxNode::eSourcePivot, FbxNode::ePivotActive);
+		node->SetPivotState(FbxNode::eDestinationPivot, FbxNode::ePivotActive);
+
+		// We want to set all these to 0 (1 for scale) and bake them into the transforms
+		node->SetPostRotation(FbxNode::eDestinationPivot, zero);
+		node->SetPreRotation(FbxNode::eDestinationPivot, zero);
+		node->SetRotationOffset(FbxNode::eDestinationPivot, zero);
+		node->SetScalingOffset(FbxNode::eDestinationPivot, zero);
+		node->SetRotationPivot(FbxNode::eDestinationPivot, zero);
+		node->SetScalingPivot(FbxNode::eDestinationPivot, zero);
+		node->SetGeometricTranslation(FbxNode::eDestinationPivot, zero);
+		node->SetGeometricRotation(FbxNode::eDestinationPivot, zero);
+		node->SetGeometricScaling(FbxNode::eDestinationPivot, one);
+
+		// FishEngine assumes euler angles are in ZXY order
+		// do not use this line, since it will mess up animation curves
+		//node->SetRotationOrder(FbxNode::eDestinationPivot, eEulerZXY);
+		
+		EFbxRotationOrder lRotationOrder;
+		node->GetRotationOrder(FbxNode::eSourcePivot , lRotationOrder);
+		node->SetRotationOrder(FbxNode::eDestinationPivot , lRotationOrder);
+
+		// Keep interpolation as is
+		node->SetQuaternionInterpolation(FbxNode::eDestinationPivot, node->GetQuaternionInterpolation(FbxNode::eSourcePivot));
+
+		for (int i = 0; i < node->GetChildCount(); i++)
 		{
-			FbxNode* node = todo.front();
-			todo.pop_front();
-
-			FbxVector4 zero(0, 0, 0);
-			FbxVector4 one(1, 1, 1);
-
-			// Activate pivot converting
-			node->SetPivotState(FbxNode::eSourcePivot, FbxNode::ePivotActive);
-			node->SetPivotState(FbxNode::eDestinationPivot, FbxNode::ePivotActive);
-
-			// We want to set all these to 0 (1 for scale) and bake them into the transforms
-			node->SetPostRotation(FbxNode::eDestinationPivot, zero);
-			node->SetPreRotation(FbxNode::eDestinationPivot, zero);
-			node->SetRotationOffset(FbxNode::eDestinationPivot, zero);
-			node->SetScalingOffset(FbxNode::eDestinationPivot, zero);
-			node->SetRotationPivot(FbxNode::eDestinationPivot, zero);
-			node->SetScalingPivot(FbxNode::eDestinationPivot, zero);
-			node->SetGeometricTranslation(FbxNode::eDestinationPivot, zero);
-			node->SetGeometricRotation(FbxNode::eDestinationPivot, zero);
-			node->SetGeometricScaling(FbxNode::eDestinationPivot, one);
-
-			// FishEngine assumes euler angles are in ZXY order
-			node->SetRotationOrder(FbxNode::eDestinationPivot, eEulerZXY);
-
-			// Keep interpolation as is
-			node->SetQuaternionInterpolation(FbxNode::eDestinationPivot, node->GetQuaternionInterpolation(FbxNode::eSourcePivot));
-
-			for (int i = 0; i < node->GetChildCount(); i++)
-			{
-				FbxNode* childNode = node->GetChild(i);
-				todo.push_back(childNode);
-			}
+			FbxNode* childNode = node->GetChild(i);
+			todo.push_back(childNode);
 		}
-
-		scene->GetRootNode()->ConvertPivotAnimationRecursive(nullptr, FbxNode::eDestinationPivot, frameRate);
 	}
-	//bs_frame_clear();
+
+	scene->GetRootNode()->ConvertPivotAnimationRecursive(nullptr, FbxNode::eDestinationPivot, frameRate);
+	//scene->GetRootNode()->ResetPivotSetAndConvertAnimation();
 }
 
 /**
@@ -925,35 +953,21 @@ GameObjectPtr FishEditor::FBXImporter::ParseNodeRecursively(FbxNode* pNode)
 	FbxDouble3 t = pNode->LclTranslation.Get();
 	FbxDouble3 r = pNode->LclRotation.Get();
 	FbxDouble3 s = pNode->LclScaling.Get();
-	//EFbxRotationOrder order1;
-	//pNode->GetRotationOrder(FbxNode::eDestinationPivot, order1);
 	
-	EFbxRotationOrder rotationOrder;
-	pNode->GetRotationOrder(FbxNode::eSourcePivot, rotationOrder);
-
 	float scale = m_fileScale * m_globalScale;
 	go->transform()->setLocalPosition(t[0] * scale, t[1] * scale, t[2] * scale);
 	go->transform()->setLocalScale(s[0], s[1], s[2]);
-
-	Quaternion rot;
-	if (rotationOrder == EFbxRotationOrder::eOrderZXY)
-	{
-		rot = Quaternion::Euler(RotationOrder::ZXY, r[0], r[1], r[2]);
-	}
-	else if (rotationOrder == EFbxRotationOrder::eOrderXYZ)
-	{
-		rot = Quaternion::Euler(RotationOrder::XYZ, r[0], r[1], r[2]);
-	}
-	else
-	{
-		abort();
-	}
-
+	
+	EFbxRotationOrder rotationOrder;
+	pNode->GetRotationOrder(FbxNode::eSourcePivot, rotationOrder);
+	RotationOrder order = FBXToNativeType(rotationOrder);
+	Quaternion rot = Quaternion::Euler(order, r[0], r[1], r[2]);
 	go->transform()->setLocalRotation(rot);
+	
 	m_model.m_fbxNodeLookup[pNode] = go->transform();
 	FishEditor::AssetDatabase::s_allAssetObjects.insert(go);
 
-	auto nodeAttributeCount = pNode->GetNodeAttributeCount();
+	//auto nodeAttributeCount = pNode->GetNodeAttributeCount();
 	auto nodeAttribute = pNode->GetNodeAttribute();
 	
 	if (nodeAttribute != nullptr)
@@ -1103,12 +1117,10 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	// The file is imported, so get rid of the importer.
 	lImporter->Destroy();
 
-	FbxGeometryConverter converter(lSdkManager);
-	converter.Triangulate(lScene, true);
-	//converter.SplitMeshesPerMaterial(lScene, true);
+
 	
-	FbxAxisSystem::MayaYUp.ConvertScene(lScene);
-	//FbxAxisSystem::DirectX.ConvertScene(lScene);
+	//FbxAxisSystem::MayaYUp.ConvertScene(lScene);
+	//FbxAxisSystem::DirectX.ConvertScene(lScene); // wrong!
 	// FbxSystemUnit::m.ConvertScene(lScene);
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_CC93340E_C4A1_49EE_B048_E898F856CFBF_htm
 	// do NOT use FbxSystemUnit::ConvertScene(lScene), which just simply set transform.scale of root nodes.
@@ -1132,6 +1144,15 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 	{
 		abort();
 	}
+//	auto sceneSystemUnit = lScene->GetGlobalSettings().GetSystemUnit();
+//	if (sceneSystemUnit.GetScaleFactor() != 1.0f)
+//	{
+//		FbxSystemUnit::m.ConvertScene(lScene);
+//	}
+	
+	FbxGeometryConverter converter(lSdkManager);
+	converter.Triangulate(lScene, true);
+	//converter.SplitMeshesPerMaterial(lScene, true);
 
 	BakeTransforms(lScene);
 
@@ -1328,8 +1349,8 @@ AnimationClipPtr ConvertAnimationClip(const FBXAnimationClip& fbxClip)
 			result->m_positionCurve.emplace_back(Vector3Curve{ path, animation.translation });
 		if (animation.rotation.keyframeCount() > 0)
 			result->m_rotationCurves.emplace_back(QuaternionCurve{ path, animation.rotation });
-		if (animation.eulers.keyframeCount() > 0)
-			result->m_eulersCurves.emplace_back(Vector3Curve{ path, animation.eulers});
+//		if (animation.eulers.keyframeCount() > 0)
+//			result->m_eulersCurves.emplace_back(Vector3Curve{ path, animation.eulers});
 		if (animation.scale.keyframeCount() > 0)
 			result->m_scaleCurves.emplace_back(Vector3Curve{ path, animation.scale });
 	}
@@ -1601,24 +1622,9 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 		return false;
 	};
 
-	RotationOrder rotationOrder;
 	EFbxRotationOrder order;
-	node->GetRotationOrder(FbxNode::eSourcePivot, order);
-	switch (order)
-	{
-	case eEulerXYZ:
-		rotationOrder = RotationOrder::XYZ; break;
-	case eEulerXZY:
-		rotationOrder = RotationOrder::XZY; break;
-	case eEulerYXZ:
-		rotationOrder = RotationOrder::YXZ; break;
-	case eEulerYZX:
-		rotationOrder = RotationOrder::YZX; break;
-	case eEulerZXY:
-		rotationOrder = RotationOrder::ZXY; break;
-	case eEulerZYX:
-		rotationOrder = RotationOrder::ZYX; break;
-	}
+	node->GetRotationOrder(FbxNode::eDestinationPivot, order);
+	RotationOrder rotationOrder = FBXToNativeType(order);
 	
 	bool hasBoneAnimation = hasCurveValues(translation) || hasCurveValues(rotation) || hasCurveValues(scale);
 	
@@ -1691,8 +1697,9 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxAnimLayer* layer, fbxs
 		//}
 		
 		boneAnim.translation = AnimationCurveUtility::ScaleCurve(boneAnim.translation, m_fileScale * m_globalScale);
+		//boneAnim.eulers = eulerAnimation;
 		boneAnim.rotation = AnimationCurveUtility::EulerToQuaternionCurve(eulerAnimation, rotationOrder);
-		boneAnim.eulers = eulerAnimation;
+		
 	}
 	
 	int childCount = node->GetChildCount();

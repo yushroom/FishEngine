@@ -56,8 +56,8 @@ namespace FishEngine
 		Meta(NonSerializable)
 		std::vector<QuaternionCurve> m_rotationCurves;
 
-		Meta(NonSerializable)
-		std::vector<Vector3Curve> m_eulersCurves;
+		//Meta(NonSerializable)
+		//std::vector<Vector3Curve> m_eulersCurves;
 
 		Meta(NonSerializable)
 		std::vector<Vector3Curve> m_scaleCurves;

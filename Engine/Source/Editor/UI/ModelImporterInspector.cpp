@@ -13,7 +13,7 @@
 #include <ModelImporter.hpp>
 
 #include "../AssetDataBase.hpp"
-#include "generate/Enum_ModelimporterNormals.hpp"
+#include "generate/Enum_ModelImporterNormals.hpp"
 #include "generate/Enum_ModelImporterTangents.hpp"
 #include "generate/Enum_ModelImporterMaterialSearch.hpp"
 

@@ -43,7 +43,7 @@ namespace FishEditor
 		FishEngine::TransformPtr node;
 		FishEngine::TAnimationCurve<FishEngine::Vector3> translation;
 		FishEngine::TAnimationCurve<FishEngine::Quaternion> rotation;
-		FishEngine::TAnimationCurve<FishEngine::Vector3> eulers;
+		//FishEngine::TAnimationCurve<FishEngine::Vector3> eulers;
 		FishEngine::TAnimationCurve<FishEngine::Vector3> scale;
 	};
 

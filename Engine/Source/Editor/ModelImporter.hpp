@@ -194,8 +194,11 @@ namespace FishEditor
 
 		static void Init();
 
+		// Global scale factor for importing.
 		float m_globalScale = 1.0f;
 		
+		// File scale factor (if available) or default one. (Read-only).
+		// fileSscale is determined by model file and can not be modified by user.
 		Meta(NonSerializable)
 		float m_fileScale = 1.0f;
 

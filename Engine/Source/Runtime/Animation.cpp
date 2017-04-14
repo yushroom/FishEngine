@@ -3,6 +3,7 @@
 #include <Transform.hpp>
 #include <AnimationClip.hpp>
 #include <Time.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace FishEngine;
 
@@ -45,33 +46,32 @@ void Animation::Update()
 	{
 		auto t = GetBone(curve.path, m_skeleton);
 		auto v = curve.curve.Evaluate(m_localTimer, true);
-		assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
+		//assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
 		t->setLocalPosition(v);
 	}
-	//for (auto & curve : m_clip->m_rotationCurves)
-	//{
-	//	auto t = GetBone(curve.path, m_skeleton);
-	//	auto v = curve.curve.Evaluate(m_localTimer, true);
-	//	if (isnan(v.x) || isnan(v.y) || isnan(v.z) || isnan(v.w))
-	//	{
-	//		abort();
-	//	}
-	//	v.NormalizeSelf();
-	//	t->setLocalRotation(v);
-	//}
-	for (auto & curve : m_clip->m_eulersCurves)
+	for (auto & curve : m_clip->m_rotationCurves)
 	{
 		auto t = GetBone(curve.path, m_skeleton);
 		auto v = curve.curve.Evaluate(m_localTimer, true);
-		assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
-		//t->setLocalEulerAngles(v);
-		t->setLocalRotation(Quaternion::Euler(RotationOrder::ZXY, v));
+//		if (isnan(v.x) || isnan(v.y) || isnan(v.z) || isnan(v.w))
+//		{
+//			abort();
+//		}
+		v.NormalizeSelf();
+		t->setLocalRotation(v);
 	}
+//	for (auto & curve : m_clip->m_eulersCurves)
+//	{
+//		auto t = GetBone(curve.path, m_skeleton);
+//		auto v = curve.curve.Evaluate(m_localTimer, true);
+//		assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
+//		t->setLocalRotation(Quaternion::Euler(RotationOrder::XYZ, v));
+//	}
 	for (auto & curve : m_clip->m_scaleCurves)
 	{
 		auto t = GetBone(curve.path, m_skeleton);
 		auto v = curve.curve.Evaluate(m_localTimer, true);
-		assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
+		//assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
 		t->setLocalScale(v);
 	}
 }

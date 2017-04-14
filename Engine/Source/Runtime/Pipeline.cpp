@@ -76,14 +76,14 @@ namespace FishEngine
 		glCheckError();
 	}
 
-	float CalculateShadowDistance(CameraPtr & camera)
+	float CalculateShadowDistance(const CameraPtr & camera)
 	{
 		return std::min(QualitySettings::shadowDistance(), camera->farClipPlane());
 	}
 
 	constexpr float kShadowFadeRange = 0.2f;
 
-	float CalculateShadowSphereOffset(CameraPtr & camera)
+	float CalculateShadowSphereOffset(const CameraPtr & camera)
 	{
 		float fov = camera->fieldOfView();
 		constexpr float maxDegrees = 180.0f;
@@ -92,7 +92,7 @@ namespace FishEngine
 		return maxOffset * weight;
 	}
 
-	Vector4 CalculateShadowFade(CameraPtr & camera, float shadowStrength)
+	Vector4 CalculateShadowFade(const CameraPtr & camera, float shadowStrength)
 	{
 		Vector4 outLightShadowData;
 		float shadowDistance = CalculateShadowDistance(camera);

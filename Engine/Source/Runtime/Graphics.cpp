@@ -23,7 +23,6 @@ namespace FishEngine
 	void Graphics::DrawMesh(const MeshPtr& mesh, const MaterialPtr& material, int subMeshIndex)
 	{
 		auto shader = material->shader();
-		shader->Use();
 		if (shader->HasUniform("AmbientCubemap"))
 		{
 			//shader->BindTexture("AmbientCubemap", RenderSettings::ambientCubemap());
@@ -42,7 +41,8 @@ namespace FishEngine
 		{
 			material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
 		}
-
+		
+		shader->Use();
 		shader->PreRender();
 		material->BindProperties();
 		shader->CheckStatus();

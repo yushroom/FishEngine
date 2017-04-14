@@ -170,6 +170,8 @@ T TAnimationCurve<T>::Evaluate(float time, bool loop) const
 
 	//T output = cubicHermite(t, leftKey.value, rightKey.value, leftTangent, rightTangent);
 	//setStepValue(leftKey, rightKey, output);
+	
+	// TODO
 	T output = Lerp<T>(leftKey.value, rightKey.value, t);
 
 	return output;
@@ -219,6 +221,6 @@ uint32_t TAnimationCurve<T>::FindKey(float time)
 	return rightKeyIdx;
 }
 
-template class TAnimationCurve<Vector3>;
-template class TAnimationCurve<Quaternion>;
-template class TAnimationCurve<float>;
+template class FishEngine::TAnimationCurve<Vector3>;
+template class FishEngine::TAnimationCurve<Quaternion>;
+template class FishEngine::TAnimationCurve<float>;

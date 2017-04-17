@@ -22,23 +22,24 @@ namespace FishEngine
 	
 	void Graphics::DrawMesh(const MeshPtr& mesh, const MaterialPtr& material, int subMeshIndex)
 	{
-		if (mesh->m_skinned)
-		{
-			//material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-			auto shader = Shader::FindBuiltin("Internal-BoneAnimation");
-			shader->Use();
-			glCheckError();
-			shader->PreRender();
-			glCheckError();
-			mesh->RenderSkinned();
-			glCheckError();
-			shader->PostRender();
-			glCheckError();
-		}
-		else
-		{
-			//material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
-		}
+		//if (mesh->m_skinned)
+		//{
+		//	//material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+		//	auto shader = Shader::FindBuiltin("Internal-BoneAnimation");
+		//	shader->Use();
+		//	shader->PreRender();
+		//	shader->CheckStatus();
+		//	mesh->RenderSkinned();
+		//	shader->PostRender();
+		//	glCheckError();
+		//	//auto emitSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		//	//glWaitSync(emitSync, 0, GL_TIMEOUT_IGNORED);
+		//	//glDeleteSync(emitSync);
+		//}
+		//else
+		//{
+		//	//material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+		//}
 		
 		auto shader = material->shader();
 		if (shader->HasUniform("AmbientCubemap"))

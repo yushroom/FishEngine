@@ -108,9 +108,9 @@ LinkShader_tf(GLuint vs,
 		if (tcs != 0) glAttachShader(program, tcs);
 		glAttachShader(program, tes);
 	}
-	const char* const varyings[] = {"gl_Position"};
+	const char* const varyings[] = {"OutputPosition", "OutputNormal", "OutputTangent"};
 	glCheckError();
-	glTransformFeedbackVaryings(program, 1, varyings, GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(program, 3, varyings, GL_SEPARATE_ATTRIBS);
 	glCheckError();
 	glLinkProgram(program);
 	GLint success;
@@ -427,7 +427,7 @@ namespace FishEngine
 		try
 		{
 			ShaderCompiler compiler(path);
-			if (path.stem() == "Internal-BoneAnimation")
+			if (path.stem() == "Internal-GPUSkinning")
 			{
 				m_impl->m_transformFeedback = true;
 			}
@@ -851,7 +851,7 @@ namespace FishEngine
 
 		for (auto& n : { "ScreenTexture", "Deferred", "CascadedShadowMap",
 			"DisplayCSM", "DrawQuad", "GatherScreenSpaceShadow", "SolidColor",
-			"PostProcessShadow", "PostProcessGaussianBlur", "PostProcessSelectionOutline", "Internal-BoneAnimation" })
+			"PostProcessShadow", "PostProcessGaussianBlur", "PostProcessSelectionOutline", "Internal-GPUSkinning" })
 		{
 			m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
 			m_builtinShaders[n]->setName(n);

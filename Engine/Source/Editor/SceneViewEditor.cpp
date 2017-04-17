@@ -264,15 +264,15 @@ namespace FishEditor
 					if (skinnedMeshRenderer != nullptr)
 					{
 						mesh = skinnedMeshRenderer->sharedMesh();
-						skinned = true;
-						material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-						Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->matrixPalette());
+						//skinned = true;
+						//material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
+						//Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->matrixPalette());
 					}
 				}
-				if (!skinned)
-				{
-					material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
-				}
+				//if (!skinned)
+				//{
+				//	material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
+				//}
 				if (mesh != nullptr)
 				{
 					auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);

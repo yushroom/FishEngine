@@ -64,7 +64,6 @@ namespace FishEngine
 		glDeleteBuffers(1, &m_indexVBO);
 	}
 
-
 	void Mesh::RecalculateBounds()
 	{
 		Vector3 bmin(Mathf::Infinity, Mathf::Infinity, Mathf::Infinity);
@@ -168,19 +167,31 @@ namespace FishEngine
 				boneIndexBuffer.emplace_back(b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]);
 				boneWeightBuffer.emplace_back(b.weight[0], b.weight[1], b.weight[2], b.weight[3]);
 			}
+
+			glGenTransformFeedbacks(1, &m_TFBO);
+
+			glGenVertexArrays(1, &m_animationInputVAO);
+
+			glGenBuffers(1, &m_animationOutputPositionVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputPositionVBO);
+			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 			
+			glGenBuffers(1, &m_animationOutputNormalVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputNormalVBO);
+			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+
+			glGenBuffers(1, &m_animationOutputTangentVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputTangentVBO);
+			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+
 			glGenBuffers(1, &m_boneIndexVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
 			glBufferData(GL_ARRAY_BUFFER, boneIndexBuffer.size() * 4 * sizeof(int), boneIndexBuffer.data(), GL_STATIC_DRAW);
+
 			glGenBuffers(1, &m_boneWeightVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
-			glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(float), boneWeightBuffer.data(), GL_STATIC_DRAW);
-			
-			glGenTransformFeedbacks(1, &m_TFBO);
-			glGenVertexArrays(1, &m_animationInputVAO);
-			glGenBuffers(1, &m_animationOutputPositionVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputPositionVBO);
-			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(GLfloat), boneWeightBuffer.data(), GL_STATIC_DRAW);
+
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 	}
@@ -192,12 +203,20 @@ namespace FishEngine
 			// Transform feedback input
 			glBindVertexArray(m_animationInputVAO);
 			
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-			
 			// position
 			glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
 			glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 			glEnableVertexAttribArray(PositionIndex);
+
+			// normal
+			glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+			glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(NormalIndex);
+
+			// tangent
+			glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+			glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(TangentIndex);
 			
 			// bone indices
 			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
@@ -214,6 +233,8 @@ namespace FishEngine
 			
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputPositionVBO);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, m_animationOutputNormalVBO);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, m_animationOutputTangentVBO);
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 		}
 		
@@ -233,7 +254,15 @@ namespace FishEngine
 		glEnableVertexAttribArray(PositionIndex);
 		
 		
-		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		if (m_skinned)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputNormalVBO);
+		}
+		else
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		}
+		//glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
 		glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(NormalIndex);
 		
@@ -241,7 +270,15 @@ namespace FishEngine
 		glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(UVIndex);
 		
-		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		if (m_skinned)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputTangentVBO);
+		}
+		else
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		}
+		//glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
 		glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(TangentIndex);
 		
@@ -304,10 +341,13 @@ namespace FishEngine
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
 		glEnable(GL_RASTERIZER_DISCARD);
 		glBindVertexArray(m_animationInputVAO);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputPositionVBO);
+		//glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_animationOutputPositionVBO);
+		//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputPositionVBO);
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, m_vertexCount);
 		glEndTransformFeedback();
+		//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);
+		//glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 		glBindVertexArray(0);
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 		glDisable(GL_RASTERIZER_DISCARD);
@@ -415,10 +455,6 @@ namespace FishEngine
 	{
 		return s_builtinMeshes[type];
 	}
-
-
-
-
 
 	SimpleMesh::SimpleMesh(const float* positionBuffer, uint32_t vertexCount, GLenum drawMode)
 		: m_positionBuffer(positionBuffer, positionBuffer + vertexCount * 3),

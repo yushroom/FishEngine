@@ -11,10 +11,6 @@ struct VS_OUT {
 {
 	layout (location = PositionIndex) 	in vec3 InputPositon;
 	layout (location = NormalIndex)		in vec3 InputNormal;
-	#ifdef _SKINNED
-		layout (location = BoneIndexIndex) 	in ivec4 boneIndex;
-		layout (location = BoneWeightIndex) in vec4 boneWeight;
-	#endif
 
 	out VS_OUT vs_out;
 
@@ -22,14 +18,6 @@ struct VS_OUT {
 	{
 		vec4 position = vec4(InputPositon, 1);
 		vec3 normal = InputNormal;
-		#ifdef _SKINNED
-			mat4 boneTransformation = BoneTransformations[boneIndex[0]] * boneWeight[0];
-			boneTransformation += BoneTransformations[boneIndex[1]] * boneWeight[1];
-			boneTransformation += BoneTransformations[boneIndex[2]] * boneWeight[2];
-			boneTransformation += BoneTransformations[boneIndex[3]] * boneWeight[3];
-			position	= boneTransformation * position;
-			normal 		= mat3(boneTransformation) * InputNormal;
-		#endif // _SKINNED
 		//gl_Position = ObjectToWorld * ObjectPosition;
 		//position = UnityClipSpaceShadowCasterPos2(position, normal);
 		//position = UnityApplyLinearShadowBias(position);

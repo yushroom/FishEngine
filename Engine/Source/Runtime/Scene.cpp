@@ -295,7 +295,9 @@ namespace FishEngine
 			if (mesh == nullptr)
 				continue;
 
-			renderer->PreRender();
+			//renderer->PreRender();
+			auto model = renderer->transform()->localToWorldMatrix();
+			Pipeline::UpdatePerDrawUniforms(model);
 			Graphics::DrawMesh(mesh, shadow_map_material);
 
 			//auto mesh_renderer = go->GetComponent<MeshRenderer>();

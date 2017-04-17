@@ -135,33 +135,18 @@ namespace FishEngine
 		auto camera = Camera::main();
 		Pipeline::BindCamera(camera);
 
-
 		/************************************************************************/
-		/* Shadow                                                               */
-		/************************************************************************/
-//        auto& lights = Light::lights();
-//        for (auto& l : lights)
-//        {
-//            Scene::RenderShadow(l.lock()); // note: RenderShadow will change viewport
-//        }
-
-		Scene::RenderShadow(Light::mainLight());
-
-		auto v = Camera::main()->viewport();
-		const int w = Screen::width();
-		const int h = Screen::height();
-		glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
-
-		/************************************************************************/
-		/* Scene                                                                */
+		/* Render Queue                                                         */
 		/************************************************************************/
 
 		// forward
-		std::list<RenderObject> forwardRenderQueueGeometry;
-		std::list<RenderObject> forwardRenderQueueTransparent;
+		std::deque<RenderObject> forwardRenderQueueGeometry;
+		std::deque<RenderObject> forwardRenderQueueTransparent;
 		
 		// deferred
-		std::list<RenderObject> deferredRenderQueue;	// for now, geometry only
+		std::deque<RenderObject> deferredRenderQueue;	// for now, geometry only
+
+		std::deque<SkinnedMeshRendererPtr> skinnedMeshRenderers;	// for animation
 
 		bool deferred_enabled = false;
 
@@ -195,7 +180,9 @@ namespace FishEngine
 			}
 			else
 			{
-				mesh = As<SkinnedMeshRenderer>(renderer)->sharedMesh();
+				auto r = As<SkinnedMeshRenderer>(renderer);
+				mesh = r->sharedMesh();
+				skinnedMeshRenderers.push_back(r);
 			}
 
 			if (mesh == nullptr)
@@ -210,7 +197,7 @@ namespace FishEngine
 					continue;
 				}
 
-				// TODO: find correct renderqueue and submeshID
+				// TODO: find correct render queue and submeshID
 
 				if (material->shader()->IsTransparent())
 				{
@@ -231,6 +218,27 @@ namespace FishEngine
 				
 			}
 		}
+
+		for (auto & r : skinnedMeshRenderers)
+		{
+			r->UpdataAnimation();
+		}
+		skinnedMeshRenderers.clear();
+
+
+		/************************************************************************/
+		/* Shadow                                                               */
+		/************************************************************************/
+		Scene::RenderShadow(Light::mainLight());
+		auto v = Camera::main()->viewport();
+		const int w = Screen::width();
+		const int h = Screen::height();
+		glViewport(GLint(v.x*w), GLint(v.y*h), GLsizei(v.z*w), GLsizei(v.w*h));
+
+
+		/************************************************************************/
+		/* Scene                                                                */
+		/************************************************************************/
 
 		// 1 color buffer
 		// depth buffer
@@ -253,7 +261,9 @@ namespace FishEngine
 
 			for (auto & ro : deferredRenderQueue)
 			{
-				ro.renderer->PreRender();
+				//ro.renderer->PreRender();
+				auto model = ro.renderer->transform()->localToWorldMatrix();
+				Pipeline::UpdatePerDrawUniforms(model);
 				Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 			}
 
@@ -279,7 +289,9 @@ namespace FishEngine
 		/************************************************************************/
 		for (auto & ro : forwardRenderQueueGeometry)
 		{
-			ro.renderer->PreRender();
+			//ro.renderer->PreRender();
+			auto model = ro.renderer->transform()->localToWorldMatrix();
+			Pipeline::UpdatePerDrawUniforms(model);
 			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}
 
@@ -360,7 +372,9 @@ namespace FishEngine
 		/************************************************************************/
 		for (auto & ro : forwardRenderQueueTransparent)
 		{
-			ro.renderer->PreRender();
+			//ro.renderer->PreRender();
+			auto model = ro.renderer->transform()->localToWorldMatrix();
+			Pipeline::UpdatePerDrawUniforms(model);
 			Graphics::DrawMesh(ro.mesh, ro.material, ro.subMeshID);
 		}
 

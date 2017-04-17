@@ -77,14 +77,14 @@ namespace FishEngine
 		}
 	}
 	
-	std::vector<Matrix4x4> const & SkinnedMeshRenderer::matrixPalette() const
-	{
-		if (m_sharedMesh != nullptr && m_matrixPalette.size() != m_sharedMesh->boneCount())
-		{
-			UpdateMatrixPalette();
-		}
-		return m_matrixPalette;
-	}
+	//std::vector<Matrix4x4> const & SkinnedMeshRenderer::matrixPalette() const
+	//{
+	//	if (m_sharedMesh != nullptr && m_matrixPalette.size() != m_sharedMesh->boneCount())
+	//	{
+	//		UpdateMatrixPalette();
+	//	}
+	//	return m_matrixPalette;
+	//}
 
 	void SkinnedMeshRenderer::Update()
 	{
@@ -92,14 +92,24 @@ namespace FishEngine
 	}
 
 
-	void SkinnedMeshRenderer::PreRender() const
+	//void SkinnedMeshRenderer::PreRender() const
+	//{
+	//	auto model = transform()->localToWorldMatrix();
+	//	Pipeline::UpdatePerDrawUniforms(model);
+	//}
+
+	void SkinnedMeshRenderer::UpdataAnimation()
 	{
-		auto model = transform()->localToWorldMatrix();
-		Pipeline::UpdatePerDrawUniforms(model);
-
 		UpdateMatrixPalette();
-
 		Pipeline::UpdateBonesUniforms(m_matrixPalette);
+
+		auto shader = Shader::FindBuiltin("Internal-GPUSkinning");
+		shader->Use();
+		shader->PreRender();
+		shader->CheckStatus();
+		m_sharedMesh->RenderSkinned();
+		shader->PostRender();
+		glCheckError();
 	}
 
 #if 0

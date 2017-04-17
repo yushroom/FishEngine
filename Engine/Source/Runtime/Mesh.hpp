@@ -272,16 +272,19 @@ namespace FishEngine
 		GLuint m_boneWeightVBO = 0;
 
 		Meta(NonSerializable)
-		GLuint m_TFBO = 0;              // transform feedback buffer object, for Animation
+		GLuint m_TFBO = 0;				// transform feedback buffer object, for Animation
 		
 		Meta(NonSerializable)
 		GLuint m_animationInputVAO = 0;	// for transform feedback
 		
-//		Meta(NonSerializable)
-//		GLuint m_animationVAO = 0;
-		
 		Meta(NonSerializable)
-		GLuint m_animationOutputPositionVBO = 0; // animation output buffer object
+		GLuint m_animationOutputPositionVBO = 0;
+
+		Meta(NonSerializable)
+		GLuint m_animationOutputNormalVBO = 0;
+
+		Meta(NonSerializable)
+		GLuint m_animationOutputTangentVBO = 0;
 
 		void GenerateBuffer();
 		void BindBuffer();

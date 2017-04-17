@@ -39,9 +39,9 @@ namespace FishEngine
 	enum class ShaderKeyword
 	{
 		None = 0,
-		SkinnedAnimation = 1,
+		//SkinnedAnimation = 1,
 		AmbientIBL = 2,
-		All = SkinnedAnimation | AmbientIBL,
+		All = AmbientIBL // | SkinnedAnimation,
 	};
 
 	typedef std::uint32_t ShaderKeywords;

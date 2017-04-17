@@ -33,12 +33,11 @@ namespace FishEngine
 	}
 
 
-	void MeshRenderer::PreRender() const
-	{
-		auto model = transform()->localToWorldMatrix();
-		Pipeline::UpdatePerDrawUniforms(model);
-
-	}
+	//void MeshRenderer::PreRender() const
+	//{
+	//	auto model = transform()->localToWorldMatrix();
+	//	Pipeline::UpdatePerDrawUniforms(model);
+	//}
 
 #if 0
 	void MeshRenderer::Render() const

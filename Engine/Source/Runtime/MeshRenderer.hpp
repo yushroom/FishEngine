@@ -14,7 +14,7 @@ namespace FishEngine
 
 		MeshRenderer(MaterialPtr material);
 
-		virtual void PreRender() const override;
+		//virtual void PreRender() const override;
 		//virtual void Render() const override;
 
 		virtual Bounds localBounds() const override;

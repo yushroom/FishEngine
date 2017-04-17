@@ -149,21 +149,6 @@ def internal_parse_class(node):
         elif child.kind == clang.cindex.CursorKind.FUNCTION_TEMPLATE:
             print('\t', 'template', child.spelling)
 
-        # elif child.kind == clang.cindex.CursorKind.UNION_DECL:
-        #     ''' eg. Vector4, Color...
-        #     '''
-        #     print('\t', 'union', child.spelling)
-        #     for c in child.get_children():
-        #         print('\t\t', c.spelling, c.kind)
-        #         if c.kind == clang.cindex.CursorKind.STRUCT_DECL:
-        #             for cc in c.get_children():
-        #                 print('\t\t\t', cc.spelling, cc.kind, cc.type.spelling)
-        #                 if cc.kind == clang.cindex.CursorKind.FIELD_DECL:
-        #                     #annotation = internal_get_annotation(cc)
-        #                     #if (annotation is not None) and (annotation.spelling == 'Serialize'):
-        #                     #    internal_append_to_list_of_a_map(classes[node.spelling], 'member', {'name': cc.spelling, 'type': cc.type.spelling})
-        #                     internal_append_to_list_of_a_map(classes[node.spelling], 'member', {'name': cc.spelling, 'type': cc.type.spelling})
-
         elif child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
             #print('\t', child.type.spelling, child.spelling)
             if child.spelling not in all_attributes:
@@ -177,31 +162,10 @@ def internal_parse_class(node):
                 return
 
         elif child.kind == clang.cindex.CursorKind.FIELD_DECL:
-            # hack
-            # libclang(python binding) not recognize stl class(std::list, std::vector, std::map...)(or forward declared type) and treats it as 'int'
-            # when this happens, get actual type from raw tokens
             member_type = child.type.spelling
-            # maybe_error_type = (child.type.spelling == 'int')
-            # #maybe_error_type = True
-            # if maybe_error_type:
-            #     #print('\tFIELD_DECL', child.spelling, child.type.spelling)
-            #     toks = []
-            #     end = False
-            #     for tok in child.get_tokens():
-            #         if child.spelling == tok.spelling:
-            #             end = True
-            #             break
-            #         if tok not in ('mutable', 'volatile'):
-            #             toks.append(tok.spelling)
-            #     if not end:
-            #         raise ValueError(toks)
-            #     member_type = ''.join(toks)
-            #     print('\tFIELD_DECL', child.spelling, child.type.spelling, member_type)
             NonSerializable = False
             HideInInspector = False
             for c in child.get_children():
-                # if (maybe_error_type):
-                #     print('\t\t', c.spelling, c.kind)
                 if c.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
                     #print('\t', child.type.spelling, child.spelling)
                     if c.spelling not in all_attributes:
@@ -278,6 +242,7 @@ def ExtractClasses(path):
                 R'/Users/yushroom/program/FishEngine/Engine/ThirdParty/yaml-cpp/include',
                 R'/Users/yushroom/program/FishEngine/Engine/ThirdParty/PhysXSDK/Include',
                 R'/Users/yushroom/program/FishEngine/Engine/Source/Runtime',
+                R'/Users/yushroom/program/github/PhysX-3.3/PhysXSDK/Include',
                 # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtWidgets.framework/Headers',
                 # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtGui.framework/Headers',
                 # R'/Users/yushroom/program/library/Qt5.8/5.8/clang_64/lib/QtCore.framework/Headers'

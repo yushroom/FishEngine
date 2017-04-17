@@ -175,6 +175,9 @@ namespace FishEngine
 		
 		// -1: reander all submeshes
 		void Render(int subMeshIndex = -1);
+		
+		void RenderSkinned();
+		
 		//void renderPatch(const Shader& shader);
 		// Returns the number of vertices in the Mesh
 		
@@ -272,10 +275,13 @@ namespace FishEngine
 		GLuint m_TFBO = 0;              // transform feedback buffer object, for Animation
 		
 		Meta(NonSerializable)
-		GLuint m_animationOutputVAO = 0;
+		GLuint m_animationInputVAO = 0;	// for transform feedback
+		
+//		Meta(NonSerializable)
+//		GLuint m_animationVAO = 0;
 		
 		Meta(NonSerializable)
-		GLuint m_animationOutputVBO = 0; // animation output buffer object
+		GLuint m_animationOutputPositionVBO = 0; // animation output buffer object
 
 		void GenerateBuffer();
 		void BindBuffer();

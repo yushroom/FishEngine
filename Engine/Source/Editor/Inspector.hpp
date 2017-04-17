@@ -36,7 +36,7 @@ namespace FishEditor
 		static void HideAll();
 
 		template<class T>
-		static void OnInspectorGUI(T & component);
+		static void OnInspectorGUI(std::shared_ptr<T> const & component);
 
 		static std::string ShowAddComponentMenu();
 		static QAction* ShowComponentMenu();
@@ -53,18 +53,18 @@ namespace FishEditor
 		
 
 	public:
-		static void BeginComponent(FishEngine::Component & component);
+		static void BeginComponent(FishEngine::ComponentPtr const & component);
 
-		static void BeginComponentImpl(FishEngine::Component & component);
+		static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 
 		template<class T, std::enable_if_t<can_be_enabled<T>::value, int> = 0>
-		static void BeginComponentImpl(FishEngine::Component & component);
+		static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 
 		template<class T, std::enable_if_t<!can_be_enabled<T>::value, int> = 0>
-		static void BeginComponentImpl(FishEngine::Component & component);
+		static void BeginComponentImpl(FishEngine::ComponentPtr const & component);
 
 		template<class T, std::enable_if_t<!std::is_base_of<FishEngine::Component, T>::value, int> = 0>
-		static void BeginComponentImpl(FishEngine::Component & component) = delete;
+		static void BeginComponentImpl(FishEngine::ComponentPtr const & component) = delete;
 	};
 
 }

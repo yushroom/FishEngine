@@ -412,6 +412,9 @@ namespace FishEngine
 					boost::split(lines, properitesString, boost::is_any_of("\n"));
 					for (auto & line : lines)
 					{
+						boost::trim(line);
+						if (line.empty())
+							continue;
 						Tokenizer tokenizer(line);
 						std::string name = tokenizer.NextTokenUntil('(');
 						boost::trim(name);

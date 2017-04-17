@@ -51,14 +51,15 @@ QVariant ObjectListModel::data(const QModelIndex &index, int role) const
 	if (row >= rowCount() || row < 0)
 		return QVariant();
 
-	auto tex = this->object(index);
-	auto path = AssetDatabase::GetAssetPath(tex->GetInstanceID());
+	auto object = this->object(index);
+	auto path = AssetDatabase::GetAssetPath(object->GetInstanceID());
 
 	switch (role)
 	{
 	case Qt::EditRole:
 	case Qt::DisplayRole:
-		return QString::fromStdString(path.stem().string());
+		//return QString::fromStdString(path.stem().string());
+			return QString::fromStdString(object->name());
 		break;
 	case Qt::DecorationRole:
 		return FishEditor::AssetDatabase::GetCacheIcon(boost::filesystem::absolute(path).string());

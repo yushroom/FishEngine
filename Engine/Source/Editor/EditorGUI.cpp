@@ -254,7 +254,7 @@ bool EditorGUI::Vector4Field(std::string const & label, FishEngine::Vector4 * v)
 }
 
 
-bool EditorGUI::ObjectField(std::string const & label, FishEngine::ObjectPtr & obj)
+bool EditorGUI::ObjectField(std::string const & label, FishEngine::ObjectPtr const & obj)
 {
 	std::string name = "none";
 	if (obj != nullptr)
@@ -266,7 +266,7 @@ bool EditorGUI::ObjectField(std::string const & label, FishEngine::ObjectPtr & o
 		SelectObjectDialog dialog;
 		//dialog.exec();
 		dialog.ShowWithCallback(obj->ClassID(), [&obj](FishEngine::ObjectPtr object) {
-			obj = object;
+			//obj = object;
 			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());
 		});
 	}

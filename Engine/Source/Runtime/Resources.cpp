@@ -5,7 +5,7 @@ namespace FishEngine
 	AssetType Resources::GetAssetType(Path const & ext)
 	{
 		//auto ext = path.extension();
-		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga" || ext == ".dds")
+		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga" || ext == ".dds" || ext == ".psd")
 		{
 			return AssetType::Texture;
 		}

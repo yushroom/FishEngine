@@ -16,7 +16,7 @@ namespace FishEngine
 		virtual void Update() override;
 
 		// the default animation
-		Meta(NonSerializable)
+		//Meta(NonSerializable)
 		AnimationClipPtr m_clip;
 
 		bool m_isPlaying = false;
@@ -26,8 +26,10 @@ namespace FishEngine
 		WrapMode m_wrapMode;
 
 		// temp
+		Meta(NonSerializable)
 		float m_localTimer = 0.0f;
 
+		Meta(NonSerializable)
 		std::map<std::string, TransformPtr> m_skeleton;
 	};
 }

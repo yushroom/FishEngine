@@ -64,8 +64,8 @@ namespace FishEditor
 			{
 				return it->second;
 			}
-			s_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
-			return s_cacheIcons[path];
+//			s_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
+//			return s_cacheIcons[path];
 		}
 		return unknown_icon;
 	}

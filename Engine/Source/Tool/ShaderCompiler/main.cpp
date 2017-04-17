@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\Internal-ErrorShader.shader)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
-	std::string path = "/Users/yushroom/program/FishEngine/Engine/Shaders/PBR.surf";
+	std::string path = "/Users/yushroom/program/FishEngine/Example/UnityChan-crs/Assets/UnityChan/CandyRocyStar/Shader/Unitychan_chara_fuku_ds.shader";
 	ShaderCompiler::setShaderIncludeDir("/Users/yushroom/program/FishEngine/Engine/Shaders/include");
 #endif
 

@@ -106,23 +106,23 @@ namespace FishEngine
 		}
 	}
 	
-	void CloneUtility::Clone(FishEngine::MaterialPtr const & source, FishEngine::MaterialPtr & dest)
-	{
-		dest = source;
-	}
-	
-	void CloneUtility::Clone(FishEngine::AvatarPtr const & source, FishEngine::AvatarPtr & dest)
-	{
-		dest = source;
-	}
-	
-	void CloneUtility::Clone(FishEngine::ShaderPtr const & source, FishEngine::ShaderPtr & dest)
-	{
-		dest = source;
-	}
-	
-	void CloneUtility::Clone(FishEngine::MeshPtr const & source, FishEngine::MeshPtr & dest)
-	{
-		dest = source;
-	}
+//	void CloneUtility::Clone(FishEngine::MaterialPtr const & source, FishEngine::MaterialPtr & dest)
+//	{
+//		dest = source;
+//	}
+//	
+//	void CloneUtility::Clone(FishEngine::AvatarPtr const & source, FishEngine::AvatarPtr & dest)
+//	{
+//		dest = source;
+//	}
+//	
+//	void CloneUtility::Clone(FishEngine::ShaderPtr const & source, FishEngine::ShaderPtr & dest)
+//	{
+//		dest = source;
+//	}
+//	
+//	void CloneUtility::Clone(FishEngine::MeshPtr const & source, FishEngine::MeshPtr & dest)
+//	{
+//		dest = source;
+//	}
 }

@@ -91,6 +91,53 @@ LinkShader(GLuint vs,
 	return program;
 }
 
+GLuint
+LinkShader_tf(GLuint vs,
+		   GLuint tcs,
+		   GLuint tes,
+		   GLuint gs,
+		   GLuint fs)
+{
+	glCheckError();
+	GLuint program = glCreateProgram();
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+	if (gs != 0)
+		glAttachShader(program, gs);
+	if (tes != 0) {
+		if (tcs != 0) glAttachShader(program, tcs);
+		glAttachShader(program, tes);
+	}
+	const char* const varyings[] = {"gl_Position"};
+	glCheckError();
+	glTransformFeedbackVaryings(program, 1, varyings, GL_INTERLEAVED_ATTRIBS);
+	glCheckError();
+	glLinkProgram(program);
+	GLint success;
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		GLint infoLogLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+		std::vector<char> infoLog(infoLogLength + 1);
+		glGetProgramInfoLog(program, infoLogLength, NULL, infoLog.data());
+		throw std::runtime_error(infoLog.data());
+	}
+	
+	glDetachShader(program, vs);
+	glDetachShader(program, fs);
+	if (gs != 0) {
+		glDetachShader(program, gs);
+	}
+	if (tes != 0) {
+		if (tcs != 0) glDetachShader(program, tcs);
+		glDetachShader(program, tes);
+	}
+	
+	glCheckError();
+	return program;
+}
+
 std::string AddLineNumber(const std::string& str)
 {
 	stringstream ss;
@@ -174,7 +221,16 @@ namespace FishEngine
 			if (m_hasGeometryShader)
 				gs = Compile(ShaderType::GeometryShader, keywords);
 			auto fs = Compile(ShaderType::FragmentShader, keywords);
-			auto glsl_program = LinkShader(vs, 0, 0, gs, fs);
+			//auto glsl_program = LinkShader(vs, 0, 0, gs, fs);
+			GLuint glsl_program = LinkShader(vs, 0, 0, gs, fs);
+			if (m_transformFeedback)
+			{
+				glsl_program = LinkShader_tf(vs, 0, 0, gs, fs);
+			}
+			else
+			{
+				glsl_program = LinkShader(vs, 0, 0, gs, fs);
+			}
 			m_keywordToGLPrograms[keywords] = glsl_program;
 			GetAllUniforms(glsl_program);
 			glDeleteShader(vs);
@@ -205,6 +261,8 @@ namespace FishEngine
 			return m_shaderTextRaw;
 		}
 
+		bool m_transformFeedback = false;
+		
 		bool m_hasGeometryShader = false;
 		uint32_t m_lineCount;   // for error message
 
@@ -245,10 +303,10 @@ namespace FishEngine
 				add_macro_definition("GEOMETRY_SHADER");
 			}
 
-			if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::SkinnedAnimation))
-			{
-				add_macro_definition("_SKINNED");
-			}
+//			if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::SkinnedAnimation))
+//			{
+//				add_macro_definition("_SKINNED");
+//			}
 			if (keywords & static_cast<ShaderKeywords>(ShaderKeyword::AmbientIBL))
 			{
 				add_macro_definition("_AMBIENT_IBL");
@@ -369,6 +427,10 @@ namespace FishEngine
 		try
 		{
 			ShaderCompiler compiler(path);
+			if (path.stem() == "Internal-BoneAnimation")
+			{
+				m_impl->m_transformFeedback = true;
+			}
 			std::string parsed_shader_text = compiler.Preprocess();
 			std::map<std::string, std::string> settings = compiler.m_settings;
 			m_impl->m_hasGeometryShader = compiler.m_hasGeometryShader;
@@ -789,7 +851,7 @@ namespace FishEngine
 
 		for (auto& n : { "ScreenTexture", "Deferred", "CascadedShadowMap",
 			"DisplayCSM", "DrawQuad", "GatherScreenSpaceShadow", "SolidColor",
-			"PostProcessShadow", "PostProcessGaussianBlur", "PostProcessSelectionOutline" })
+			"PostProcessShadow", "PostProcessGaussianBlur", "PostProcessSelectionOutline", "Internal-BoneAnimation" })
 		{
 			m_builtinShaders[n] = Shader::CreateFromFile(root_dir / (string(n) + ".shader"));
 			m_builtinShaders[n]->setName(n);

@@ -2,15 +2,8 @@ from mako.template import Template
 import json
 from tool_helper import UpdateFile
 from collections import OrderedDict
+import os
 
-temp = '''
-	${T} & ${T}::operator=(${T} const & rhs)
-	{
-	% for member in c['members']:
-		this->${member['name']} = rhs.${member['name']}; // ${member['type']}
-	% endfor
-	} 
-'''
 
 serialization_template_str = '''
 /**************************************************
@@ -112,7 +105,8 @@ blacklist = ("FishEngine::Vector2",
 	"FishEngine::Matrix4x4",
 	"FishEngine::Quaternion");
 
-def GenSerializationFunctions(classinfo, scope):
+
+def GenSerializationFunctions(classinfo, scope, root_dir):
 	def IsObject(name):
 		if name == "FishEngine::Object":
 			return True
@@ -137,7 +131,9 @@ def GenSerializationFunctions(classinfo, scope):
 		c = {}
 		c['ClassName'] = key
 		item = classinfo[key]
-		headers.append(item['header_file'])
+		header_path = item['header_file']
+		header_path = os.path.relpath(header_path, root_dir)
+		headers.append(header_path)
 		if IsObject(key):
 			c['isPolymorphic'] = True
 		else:
@@ -150,6 +146,7 @@ def GenSerializationFunctions(classinfo, scope):
 
 	headers = set(headers)
 	return serialization_template.render(headers = headers, scope = scope, ClassInfo=ClassInfo)
+
 
 objectInheritance_template_str = '''
 static std::map<int, int> s_objectInheritance =
@@ -211,22 +208,22 @@ def Gen_DynamicSerializeObject(class_info, scope):
 	return Template(DynamicSerializeObject_template_str).render(dynamic_seqs = seqs, scope = scope)
 
 
-def GenSerialization(class_info, scope_prefix):
+def GenSerialization(class_info, scope_prefix, root_dir):
 	filtered_class_info = {k: v for k, v in class_info.iteritems() if v['scope_prefix'].startswith(scope_prefix)}
-	return GenSerializationFunctions(filtered_class_info, scope_prefix) #+ Gen_DynamicSerializeObject(filtered_class_info, scope_prefix)
+	return GenSerializationFunctions(filtered_class_info, scope_prefix, root_dir)
 
 def GenSerialization_Engine(class_info):
-	return GenSerialization(class_info, "FishEngine")
+	return GenSerialization(class_info, "FishEngine", "../../Engine/Source/Runtime/generate")
 
 def GenSerialization_Editor(class_info):
-	return GenSerialization(class_info, "FishEditor")
+	return GenSerialization(class_info, "FishEditor", "../../Engine/Source/Editor/generate")
 
 if __name__ == "__main__":
 	with open('temp/class.json') as f:
 		class_info = json.loads(f.read())
 		class_info = OrderedDict(sorted(class_info.items()))
-	GenObjectInheritance(class_info)
-	#UpdateFile('../../Engine/Source/Runtime/generate/EngineClassSerialization.cpp', GenSerialization_Engine(class_info))
-	#UpdateFile('../../Engine/Source/Editor/generate/EditorClassSerialization.cpp', GenSerialization_Editor(class_info))
+	#GenObjectInheritance(class_info)
+	UpdateFile('../../Engine/Source/Runtime/generate/EngineClassSerialization.cpp', GenSerialization_Engine(class_info))
+	UpdateFile('../../Engine/Source/Editor/generate/EditorClassSerialization.cpp', GenSerialization_Editor(class_info))
 	
 

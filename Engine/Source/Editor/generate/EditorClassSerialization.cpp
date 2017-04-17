@@ -5,17 +5,17 @@
 
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
-#include "../EditorGUILayout.hpp" 
-#include "../ModelImporter.hpp" 
-#include "../EditorUtility.hpp" 
+#include "../DDSImporter.hpp" 
+#include "../ShaderImporter.hpp" 
 #include "../TextureImporter.hpp" 
 #include "../AssetImporter.hpp" 
-#include "../PrefabUtility.hpp" 
-#include "../DDSImporter.hpp" 
 #include "../ProjectSettings.hpp" 
 #include "../PropertyModification.hpp" 
 #include "../NativeFormatImporter.hpp" 
-#include "../ShaderImporter.hpp" 
+#include "../PrefabUtility.hpp" 
+#include "../ModelImporter.hpp" 
+#include "../EditorGUILayout.hpp" 
+#include "../EditorUtility.hpp" 
 
 namespace FishEditor
 {
@@ -247,6 +247,7 @@ namespace FishEditor
 		archive << FishEngine::make_nvp("m_sRGBTexture", m_sRGBTexture); // bool
 		archive << FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
 		archive << FishEngine::make_nvp("m_mipmapEnabled", m_mipmapEnabled); // bool
+		archive << FishEngine::make_nvp("m_npotScale", m_npotScale); // FishEditor::TextureImporterNPOTScale
 		//archive.EndClass();
 	}
 
@@ -271,6 +272,7 @@ namespace FishEditor
 		archive >> FishEngine::make_nvp("m_sRGBTexture", m_sRGBTexture); // bool
 		archive >> FishEngine::make_nvp("m_isReadable", m_isReadable); // bool
 		archive >> FishEngine::make_nvp("m_mipmapEnabled", m_mipmapEnabled); // bool
+		archive >> FishEngine::make_nvp("m_npotScale", m_npotScale); // FishEditor::TextureImporterNPOTScale
 		//archive.EndClass();
 	}
 

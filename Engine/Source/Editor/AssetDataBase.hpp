@@ -7,6 +7,7 @@
 #include <GUID.hpp>
 #include <AssetImporter.hpp>
 #include <Application.hpp>
+#include <Debug.hpp>
 
 namespace FishEngine
 {

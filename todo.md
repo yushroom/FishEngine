@@ -42,6 +42,12 @@ subclass QStyledItemDelegate之后发现icon不能居中。。。https://bugrepo
 
 
 
+Animation retargeting
+
+GPU skinning
+
+
+
 ## Engine
 
 - [x] 数学库换成左手系

@@ -123,6 +123,132 @@ namespace FishEngine
 		m_boneWeights.clear();
 		m_boneWeights.shrink_to_fit();
 	}
+	
+	//void Model::renderPatch(const Shader &shader) {
+	//    glBindVertexArray(m_VAO);
+	//    glDrawElements(GL_PATCHES, (GLsizei)m_triangles.size(), GL_UNSIGNED_INT, 0);
+	//    glBindVertexArray(0);
+	//}
+	
+	void Mesh::GenerateBuffer()
+	{
+		// VAO
+		assert(m_VAO == 0);
+		glGenVertexArrays(1, &m_VAO);
+		
+		// index VBO
+		glGenBuffers(1, &m_indexVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_triangles.size() * 4, m_triangles.data(), GL_STATIC_DRAW);
+		
+		glGenBuffers(1, &m_positionVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, m_vertices.data(), GL_STATIC_DRAW);
+		
+		glGenBuffers(1, &m_normalVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_normals.size() * 3 * 4, m_normals.data(), GL_STATIC_DRAW);
+		
+		glGenBuffers(1, &m_uvVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
+		
+		glGenBuffers(1, &m_tangentVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);
+		
+		if (m_skinned)
+		{
+			std::vector<Int4> boneIndexBuffer;
+			std::vector<Vector4> boneWeightBuffer;
+			boneIndexBuffer.reserve(m_boneWeights.size());
+			boneIndexBuffer.reserve(m_boneWeights.size());
+			for (auto const & b : m_boneWeights)
+			{
+				boneIndexBuffer.emplace_back(b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]);
+				boneWeightBuffer.emplace_back(b.weight[0], b.weight[1], b.weight[2], b.weight[3]);
+			}
+			
+			glGenBuffers(1, &m_boneIndexVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
+			glBufferData(GL_ARRAY_BUFFER, boneIndexBuffer.size() * 4 * sizeof(int), boneIndexBuffer.data(), GL_STATIC_DRAW);
+			glGenBuffers(1, &m_boneWeightVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
+			glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(float), boneWeightBuffer.data(), GL_STATIC_DRAW);
+			
+			glGenTransformFeedbacks(1, &m_TFBO);
+			glGenVertexArrays(1, &m_animationInputVAO);
+			glGenBuffers(1, &m_animationOutputPositionVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputPositionVBO);
+			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, NULL, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+	}
+	
+	void Mesh::BindBuffer()
+	{
+		if (m_skinned)
+		{
+			// Transform feedback input
+			glBindVertexArray(m_animationInputVAO);
+			
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
+			
+			// position
+			glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
+			glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(PositionIndex);
+			
+			// bone indices
+			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
+			glVertexAttribIPointer(BoneIndexIndex, 4, GL_INT, 4 * sizeof(GLint), (GLvoid*)0);
+			glEnableVertexAttribArray(BoneIndexIndex);
+			
+			// bone weights
+			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
+			glVertexAttribPointer(BoneWeightIndex, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(BoneWeightIndex);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+			
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputPositionVBO);
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+		}
+		
+		glBindVertexArray(m_VAO);
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
+		
+		if (m_skinned)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_animationOutputPositionVBO);
+		}
+		else
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
+		}
+		glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(PositionIndex);
+		
+		
+		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
+		glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(NormalIndex);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
+		glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(UVIndex);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+		glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(TangentIndex);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
+		
+		glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+	}
 
 	void Mesh::Render( int subMeshIndex /* = -1*/)
 	{
@@ -166,6 +292,26 @@ namespace FishEngine
 		}
 		
 		glBindVertexArray(0);
+	}
+	
+	void Mesh::RenderSkinned()
+	{
+		if (!m_uploaded)
+		{
+			UploadMeshData();
+		}
+		
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TFBO);
+		glEnable(GL_RASTERIZER_DISCARD);
+		glBindVertexArray(m_animationInputVAO);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_animationOutputPositionVBO);
+		glBeginTransformFeedback(GL_POINTS);
+		glDrawArrays(GL_POINTS, 0, m_vertexCount);
+		glEndTransformFeedback();
+		glBindVertexArray(0);
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+		glDisable(GL_RASTERIZER_DISCARD);
+		glCheckError();
 	}
 
 	void Mesh::ToBinaryFile(std::ostream & os)
@@ -270,103 +416,7 @@ namespace FishEngine
 		return s_builtinMeshes[type];
 	}
 
-	//void Model::renderPatch(const Shader &shader) {
-	//    glBindVertexArray(m_VAO);
-	//    glDrawElements(GL_PATCHES, (GLsizei)m_triangles.size(), GL_UNSIGNED_INT, 0);
-	//    glBindVertexArray(0);
-	//}
 
-	void Mesh::GenerateBuffer()
-	{
-		// VAO
-		assert(m_VAO == 0);
-		glGenVertexArrays(1, &m_VAO);
-
-		// index VBO
-		glGenBuffers(1, &m_indexVBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_triangles.size() * 4, m_triangles.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_positionVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
-		glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * 3 * 4, m_vertices.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_normalVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
-		glBufferData(GL_ARRAY_BUFFER, m_normals.size() * 3 * 4, m_normals.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_uvVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
-		glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_tangentVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
-		glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);
-
-		if (m_skinned)
-		{
-			std::vector<Int4> boneIndexBuffer;
-			boneIndexBuffer.reserve(m_boneWeights.size());
-			std::vector<Vector4> boneWeightBuffer;
-			boneIndexBuffer.reserve(m_boneWeights.size());
-
-			for (auto const & b : m_boneWeights)
-			{
-				boneIndexBuffer.emplace_back(b.boneIndex[0], b.boneIndex[1], b.boneIndex[2], b.boneIndex[3]);
-				boneWeightBuffer.emplace_back(b.weight[0], b.weight[1], b.weight[2], b.weight[3]);
-			}
-
-			glGenBuffers(1, &m_boneIndexVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
-			glBufferData(GL_ARRAY_BUFFER, boneIndexBuffer.size() * 4 * sizeof(int), boneIndexBuffer.data(), GL_STATIC_DRAW);
-			glGenBuffers(1, &m_boneWeightVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
-			glBufferData(GL_ARRAY_BUFFER, boneWeightBuffer.size() * 4 * sizeof(float), boneWeightBuffer.data(), GL_STATIC_DRAW);
-
-			//glGenBuffers(1, &m_TFBO);
-			//glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_TFBO);
-			//glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, m_vertices.size() * 3 * 4, NULL, GL_DYNAMIC_COPY);
-
-		}
-	}
-
-	void Mesh::BindBuffer()
-	{
-		glBindVertexArray(m_VAO);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_positionVBO);
-		glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(PositionIndex);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_normalVBO);
-		glVertexAttribPointer(NormalIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(NormalIndex);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
-		glVertexAttribPointer(UVIndex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(UVIndex);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
-		glVertexAttribPointer(TangentIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(TangentIndex);
-
-		if (m_skinned)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_boneIndexVBO);
-			glVertexAttribIPointer(BoneIndexIndex, 4, GL_INT, 4 * sizeof(GLint), (GLvoid*)0);
-			glEnableVertexAttribArray(BoneIndexIndex);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_boneWeightVBO);
-			glVertexAttribPointer(BoneWeightIndex, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-			glEnableVertexAttribArray(BoneWeightIndex);
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-		glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-	}
 
 
 

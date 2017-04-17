@@ -1,6 +1,8 @@
 #pragma once
 
 #include "AnimationClipInfo.hpp"
+#include "AnimationBlendMode.hpp"
+#include "WrapMode.hpp"
 
 namespace FishEngine
 {

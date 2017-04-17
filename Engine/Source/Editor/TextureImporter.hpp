@@ -171,6 +171,9 @@ namespace FishEditor
 		
 		// Select this to enable mip-map generation. Mip maps are smaller versions of the Texture that get used when the Texture is very small on screen.
 		bool m_mipmapEnabled = true;
+		
+		// Scaling mode for non power of two textures in TextureImporter.
+		TextureImporterNPOTScale m_npotScale = TextureImporterNPOTScale::ToNearest;
 	};
 
 }

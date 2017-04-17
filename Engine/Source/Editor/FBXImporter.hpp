@@ -37,7 +37,7 @@ namespace FishEditor
 	//	std::vector<FBXImportNode*> children;
 	//};
 
-	struct FBXBoneAnimation
+	struct Meta(NonSerializable) FBXBoneAnimation
 	{
 		//FBXImportNode * node;
 		FishEngine::TransformPtr node;
@@ -48,7 +48,7 @@ namespace FishEditor
 	};
 
 	/** Animation clip containing a set of bone or blend shape animations. */
-	struct FBXAnimationClip
+	struct Meta(NonSerializable) FBXAnimationClip
 	{
 		std::string name;
 		float start;

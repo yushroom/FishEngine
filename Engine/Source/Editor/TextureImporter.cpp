@@ -182,14 +182,14 @@ namespace FishEditor
 	{
 		auto fm_instance = FreeImagePlugin::instance();
 		//std::shared_ptr<Texture> texture;
-		auto ext = m_assetPath.extension();
-		if (ext == ".dds")
-		{
-			//abort();
-			return;
-		}
-		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
-		{
+//		auto ext = m_assetPath.extension();
+//		if (ext == ".dds")
+//		{
+//			//abort();
+//			return;
+//		}
+//		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
+//		{
 			FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 			FIBITMAP *dib = nullptr;
 			uint8_t * bits = nullptr;
@@ -262,7 +262,7 @@ namespace FishEditor
 				LogWarning("resize image");
 				auto newdib = FreeImage_Rescale(dib, width, height);
 				FreeImage_Unload(dib);
-				newdib = dib;
+				dib = newdib;
 			}
 			
 			auto imageType = FreeImage_GetImageType(dib);
@@ -405,11 +405,11 @@ namespace FishEditor
 
 			FreeImage_Unload(dib);
 			return;
-		}
-		else
-		{
-			abort();
-		}
+//		}
+//		else
+//		{
+//			abort();
+//		}
 	}
 
 	FishEngine::TexturePtr TextureImporter::Import(Path const & path)

@@ -6,7 +6,7 @@
 #include <Resources.hpp>
 #include <ReflectClass.hpp>
 #include <GUID.hpp>
-#include <Asset.hpp>
+#include "Asset.hpp"
 
 namespace FishEditor
 {

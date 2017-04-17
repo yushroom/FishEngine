@@ -62,29 +62,23 @@ std::weak_ptr<FishEngine::Component> FishEditor::Inspector::s_targetComponent;
 ComponentPtr componentToBeDestroyed;
 
 template<>
-void Inspector::OnInspectorGUI(Object & object)
+void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
 {
-	EditorGUI::FloatField("Instance ID", object.GetInstanceID());
-}
-
-template<>
-void Inspector::OnInspectorGUI(Transform & t)
-{
-	Inspector::OnInspectorGUI<Object>(t);
-	if (EditorGUI::Vector3Field("Position", &t.m_localPosition))
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
+	if (EditorGUI::Vector3Field("Position", &t->m_localPosition))
 	{
-		t.MakeDirty();
+		t->MakeDirty();
 	}
 
-	auto localEulerAngles = t.m_localRotation.eulerAngles();
+	auto localEulerAngles = t->m_localRotation.eulerAngles();
 	if (EditorGUI::Vector3Field("Rotation", &localEulerAngles))
 	{
-		t.setLocalEulerAngles(localEulerAngles);
+		t->setLocalEulerAngles(localEulerAngles);
 	}
 
-	if (EditorGUI::Vector3Field("Scale", &t.m_localScale))
+	if (EditorGUI::Vector3Field("Scale", &t->m_localScale))
 	{
-		t.MakeDirty();
+		t->MakeDirty();
 	}
 
 	//auto worldPostion = t->position();
@@ -96,105 +90,105 @@ void Inspector::OnInspectorGUI(Transform & t)
 }
 
 template<>
-void Inspector::OnInspectorGUI(Camera & camera)
+void Inspector::OnInspectorGUI(std::shared_ptr<Camera> const & camera)
 {
-	Inspector::OnInspectorGUI<Object>(camera);
+	EditorGUI::FloatField("Instance ID", camera->GetInstanceID());
 	// note: must be *static* array
 	static const char* listbox_items[] = {
 		"Perspective", "Orthographic"
 	};
-	int list_item_current = camera.m_orthographic ? 1 : 0;
+	int list_item_current = camera->m_orthographic ? 1 : 0;
 	EditorGUI::EnumPopup("Projection", &list_item_current, listbox_items, 2);
-	if (camera.m_orthographic != (list_item_current == 1))
+	if (camera->m_orthographic != (list_item_current == 1))
 	{
-		camera.setOrthographic(!camera.m_orthographic);
+		camera->setOrthographic(!camera->m_orthographic);
 	}
 
-	if (camera.m_orthographic)
+	if (camera->m_orthographic)
 	{
-		if (EditorGUI::FloatField("Size", &camera.m_orthographicSize))
+		if (EditorGUI::FloatField("Size", &camera->m_orthographicSize))
 		{
-			camera.m_isDirty = true;
+			camera->m_isDirty = true;
 		}
 	}
 	else
 	{
-		if (EditorGUI::Slider("Field of View", &camera.m_fieldOfView, 1, 179))
+		if (EditorGUI::Slider("Field of View", &camera->m_fieldOfView, 1, 179))
 		{
-			camera.m_isDirty = true;
+			camera->m_isDirty = true;
 		}
 	}
 
-	if (EditorGUI::FloatField("Clipping Planes(Near)", &camera.m_nearClipPlane))
+	if (EditorGUI::FloatField("Clipping Planes(Near)", &camera->m_nearClipPlane))
 	{
-		camera.m_isDirty = true;
+		camera->m_isDirty = true;
 	}
-	if (EditorGUI::FloatField("Clipping Planes(Far)", &camera.m_farClipPlane))
+	if (EditorGUI::FloatField("Clipping Planes(Far)", &camera->m_farClipPlane))
 	{
-		camera.m_isDirty = true;
+		camera->m_isDirty = true;
 	}
 }
 
 template<>
-void Inspector::OnInspectorGUI(Light & light)
+void Inspector::OnInspectorGUI(const FishEngine::LightPtr& light)
 {
-	Inspector::OnInspectorGUI<Object>(light);
-	EditorGUI::EnumPopup<LightType>("Type", &light.m_type);
-	if (light.m_type != LightType::Directional)
+	EditorGUI::FloatField("Instance ID", light->GetInstanceID());
+	EditorGUI::EnumPopup<LightType>("Type", &light->m_type);
+	if (light->m_type != LightType::Directional)
 	{
-		EditorGUI::FloatField("Range", &light.m_range);
+		EditorGUI::FloatField("Range", &light->m_range);
 	}
-	if (light.m_type == LightType::Spot)
+	if (light->m_type == LightType::Spot)
 	{
-		EditorGUI::Slider("Spot Angle", &light.m_spotAngle, 1, 179);
+		EditorGUI::Slider("Spot Angle", &light->m_spotAngle, 1, 179);
 	}
-	EditorGUI::ColorField("Color",         &light.m_color);
-	EditorGUI::Slider("Intensity",         &light.m_intensity, 0, 8);
+	EditorGUI::ColorField("Color",         &light->m_color);
+	EditorGUI::Slider("Intensity",         &light->m_intensity, 0, 8);
 	
-	EditorGUI::Slider("Bias",              &light.m_shadowBias, 0, 2);
-	EditorGUI::Slider("Normal Bias",       &light.m_shadowNormalBias, 0, 3);
-	EditorGUI::Slider("Shadow Near Plane", &light.m_shadowNearPlane, 0.1f, 10.f);
+	EditorGUI::Slider("Bias",              &light->m_shadowBias, 0, 2);
+	EditorGUI::Slider("Normal Bias",       &light->m_shadowNormalBias, 0, 3);
+	EditorGUI::Slider("Shadow Near Plane", &light->m_shadowNearPlane, 0.1f, 10.f);
 }
 
 
 template<>
-void Inspector::OnInspectorGUI(MeshFilter & meshFilter)
+void Inspector::OnInspectorGUI(const FishEngine::MeshFilterPtr& meshFilter)
 {
-	Inspector::OnInspectorGUI<Object>(meshFilter);
-	EditorGUI::ObjectField("Mesh", meshFilter.m_mesh);
-	EditorGUI::FloatField("mesh verts", meshFilter.m_mesh->vertexCount());
-	//EditorGUI::FloatField("mesh tris", meshFilter.m_mesh->triangles());
+	EditorGUI::FloatField("Instance ID", meshFilter->GetInstanceID());
+	EditorGUI::ObjectField("Mesh", meshFilter->m_mesh);
+	EditorGUI::FloatField("mesh verts", meshFilter->m_mesh->vertexCount());
+	//EditorGUI::FloatField("mesh tris", meshFilter->m_mesh->triangles());
 }
 
 
 template<>
-void Inspector::OnInspectorGUI(Material & material)
+void Inspector::OnInspectorGUI(const FishEngine::MaterialPtr& material)
 {
-	Inspector::OnInspectorGUI<Object>(material);
-	auto& uniforms = material.m_shader->uniforms();
+	EditorGUI::FloatField("Instance ID", material->GetInstanceID());
+	auto& uniforms = material->m_shader->uniforms();
 	for (auto& u : uniforms)
 	{
 		if (u.type == GL_FLOAT)
 		{
-			//EditorGUI::Slider(u.name.c_str(), &material.m_uniforms.floats[u.name], 0, 1);
-			EditorGUI::FloatField(u.name, &material.m_uniforms.floats[u.name]);
+			//EditorGUI::Slider(u.name.c_str(), &material->m_uniforms.floats[u.name], 0, 1);
+			EditorGUI::FloatField(u.name, &material->m_uniforms.floats[u.name]);
 		}
 		else if (u.type == GL_FLOAT_VEC3)
 		{
-			EditorGUI::Vector3Field(u.name, &material.m_uniforms.vec3s[u.name]);
+			EditorGUI::Vector3Field(u.name, &material->m_uniforms.vec3s[u.name]);
 		}
 		else if (u.type == GL_FLOAT_VEC4)
 		{
-			EditorGUI::Vector4Field(u.name, &material.m_uniforms.vec4s[u.name]);
+			EditorGUI::Vector4Field(u.name, &material->m_uniforms.vec4s[u.name]);
 		}
 		else if (u.type == GL_SAMPLER_2D)
 		{
-			//auto& tex = material.m_textures[u.name];
+			//auto& tex = material->m_textures[u.name];
 			//ImGui::LabelText(u.name.c_str(), "%s", tex->name().c_str());
 			//ImGui::Image((void*)tex->GetNativeTexturePtr(), ImVec2(64, 64));
 			//ImGui::SameLine();
 			//ImGui::Button("Select");
-			auto& tex = material.m_textures[u.name];
+			auto& tex = material->m_textures[u.name];
 			EditorGUI::TextureField(u.name, &tex);
 		}
 	}
@@ -202,100 +196,100 @@ void Inspector::OnInspectorGUI(Material & material)
 
 
 template<>
-void Inspector::OnInspectorGUI(Renderer & renderer)
+void Inspector::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
 {
-	Inspector::OnInspectorGUI<Object>(renderer);
-	EditorGUI::EnumPopup("Cast Shadows", &renderer.m_shadowCastingMode);
-	EditorGUI::Toggle("Receive Shadows", &renderer.m_receiveShadows);
-	for (auto const & material : renderer.m_materials)
+	EditorGUI::FloatField("Instance ID", renderer->GetInstanceID());
+	EditorGUI::EnumPopup("Cast Shadows", &renderer->m_shadowCastingMode);
+	EditorGUI::Toggle("Receive Shadows", &renderer->m_receiveShadows);
+	for (auto const & material : renderer->m_materials)
 	{
 		EditorGUI::ObjectField("Material", material);
 	}
 }
 
 template<>
-void Inspector::OnInspectorGUI(MeshRenderer & renderer)
+void Inspector::OnInspectorGUI(const FishEngine::MeshRendererPtr& renderer)
 {
 	OnInspectorGUI<Renderer>(renderer);
 }
 
 template<>
-void Inspector::OnInspectorGUI(Script & t)
+void Inspector::OnInspectorGUI(const std::shared_ptr<Script>& t)
 {
-	Inspector::OnInspectorGUI<Object>(t);
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
 }
 
 template<>
-void Inspector::OnInspectorGUI(SkinnedMeshRenderer & renderer)
+void Inspector::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& renderer)
 {
 	OnInspectorGUI<Renderer>(renderer);
-	EditorGUI::ObjectField( "Mesh", renderer.m_sharedMesh );
-	EditorGUI::ObjectField( "Root Bone", renderer.m_rootBone.lock() );
-	EditorGUI::FloatField( "Submesh Count", renderer.m_sharedMesh->subMeshCount() );
+	EditorGUI::ObjectField( "Mesh", renderer->m_sharedMesh );
+	EditorGUI::ObjectField( "Root Bone", renderer->m_rootBone.lock() );
+	EditorGUI::FloatField( "Submesh Count", renderer->m_sharedMesh->subMeshCount() );
 }
 
 template<>
-void Inspector::OnInspectorGUI(CameraController & t)
+void Inspector::OnInspectorGUI(const std::shared_ptr<CameraController>& t)
 {
-	EditorGUI::FloatField("Instance ID", t.GetInstanceID());
+	EditorGUI::FloatField("Instance ID", t->GetInstanceID());
 }
 
 template<>
-void Inspector::OnInspectorGUI(Rigidbody & rigidBody)
+void Inspector::OnInspectorGUI(const FishEngine::RigidbodyPtr& rigidBody)
 {
-	EditorGUI::FloatField("Instance ID", rigidBody.GetInstanceID());
-	EditorGUI::FloatField("Mass", &rigidBody.m_mass);
-	EditorGUI::FloatField("Drag", &rigidBody.m_drag);
-	EditorGUI::FloatField("Angular", &rigidBody.m_angularDrag);
-	EditorGUI::Toggle("Use Gravity", &rigidBody.m_useGravity);
-	EditorGUI::Toggle("Is Kinematic", &rigidBody.m_isKinematic);
+	EditorGUI::FloatField("Instance ID", rigidBody->GetInstanceID());
+	EditorGUI::FloatField("Mass", &rigidBody->m_mass);
+	EditorGUI::FloatField("Drag", &rigidBody->m_drag);
+	EditorGUI::FloatField("Angular", &rigidBody->m_angularDrag);
+	EditorGUI::Toggle("Use Gravity", &rigidBody->m_useGravity);
+	EditorGUI::Toggle("Is Kinematic", &rigidBody->m_isKinematic);
 }
 
 template<>
-void Inspector::OnInspectorGUI(Collider & collider)
+void Inspector::OnInspectorGUI(const FishEngine::ColliderPtr& collider)
 {
-	EditorGUI::FloatField("Instance ID", collider.GetInstanceID());
-	EditorGUI::Toggle("Is Trigger", &collider.m_isTrigger);
+	EditorGUI::FloatField("Instance ID", collider->GetInstanceID());
+	EditorGUI::Toggle("Is Trigger", &collider->m_isTrigger);
 }
 
 template<>
-void Inspector::OnInspectorGUI(BoxCollider & boxCollider)
+void Inspector::OnInspectorGUI(const FishEngine::BoxColliderPtr& boxCollider)
 {
 	OnInspectorGUI<Collider>(boxCollider);
-	EditorGUI::Vector3Field("Center", &boxCollider.m_center);
-	EditorGUI::Vector3Field("Size", &boxCollider.m_size);
+	EditorGUI::Vector3Field("Center", &boxCollider->m_center);
+	EditorGUI::Vector3Field("Size", &boxCollider->m_size);
 }
 
 template<>
-void Inspector::OnInspectorGUI(SphereCollider & collider)
+void Inspector::OnInspectorGUI(const FishEngine::SphereColliderPtr& collider)
 {
 	OnInspectorGUI<Collider>(collider);
-	EditorGUI::Vector3Field("Center", &collider.m_center);
-	EditorGUI::FloatField("Radius", &collider.m_radius);
+	EditorGUI::Vector3Field("Center", &collider->m_center);
+	EditorGUI::FloatField("Radius", &collider->m_radius);
 }
 
 template<>
-void Inspector::OnInspectorGUI(CapsuleCollider & collider)
+void Inspector::OnInspectorGUI(const FishEngine::CapsuleColliderPtr& collider)
 {
 	OnInspectorGUI<Collider>(collider);
-	EditorGUI::Vector3Field("Center", &collider.m_center);
-	EditorGUI::FloatField("Radius", &collider.m_radius);
-	EditorGUI::FloatField("Height", &collider.m_height);
+	EditorGUI::Vector3Field("Center", &collider->m_center);
+	EditorGUI::FloatField("Radius", &collider->m_radius);
+	EditorGUI::FloatField("Height", &collider->m_height);
 	static const char * direction_enum[] = { "X-Axis", "Y-Axis", "Z-Axis" };
-	EditorGUI::EnumPopup("Direction", &collider.m_direction, direction_enum, 3);
+	EditorGUI::EnumPopup("Direction", &collider->m_direction, direction_enum, 3);
 }
 
 template<>
-void Inspector::OnInspectorGUI(Behaviour & behaviour)
+void Inspector::OnInspectorGUI(const FishEngine::BehaviourPtr & behaviour)
 {
 	//OnInspectorGUI<Component>(behaviour);
 }
 
 template<>
-void Inspector::OnInspectorGUI(Animation & animation)
+void Inspector::OnInspectorGUI(const std::shared_ptr<FishEngine::Animation> & animation)
 {
 	OnInspectorGUI<Behaviour>(animation);
-	EditorGUI::ObjectField("clip", animation.m_clip);
+	EditorGUI::ObjectField("clip", animation->m_clip);
 }
 
 #if 0
@@ -344,11 +338,11 @@ void Inspector::Bind(const GameObjectPtr & go)
 	EditorGUI::Begin();
 	auto t = go->transform();
 
-	BeginComponentImpl<Transform>(*t);
+	BeginComponentImpl<Transform>(t);
 
 	for (auto const & comp : go->m_components)
 	{
-		Inspector::BeginComponent(*comp);
+		Inspector::BeginComponent(comp);
 	}
 
 	//UIHeaderState state;    // ignore state
@@ -361,7 +355,7 @@ void Inspector::Bind(const GameObjectPtr & go)
 			assert(material != nullptr);
 			if ( EditorGUI::BeginMaterial( material->name() ))
 			{
-				Inspector::OnInspectorGUI<Material>(*material);
+				Inspector::OnInspectorGUI<Material>(material);
 			}
 			EditorGUI::EndMaterial();
 		}
@@ -509,11 +503,11 @@ QAction* FishEditor::Inspector::ShowComponentMenu()
 
 #if 1
 
-void Inspector::BeginComponentImpl(Component & component)
+void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
-	LogInfo("Not Implemented for " + component.ClassName());
+	LogInfo("Not Implemented for " + component->ClassName());
 	UIHeaderState state;
-	if ( EditorGUI::BeginComponent( component.ClassName(), &state ) )
+	if ( EditorGUI::BeginComponent( component->ClassName(), &state ) )
 	{
 		//OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
 		//HideRedundantChildItems();
@@ -528,14 +522,14 @@ void Inspector::BeginComponentImpl(Component & component)
 }
 
 template<class T, std::enable_if_t<can_be_enabled<T>::value, int>>
-void Inspector::BeginComponentImpl(FishEngine::Component & component)
+void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
-	T p = component;
+	auto p = std::static_pointer_cast<T>(component);
 	bool enabled = p->enabled();
 	//bool changed = false;
 	UIHeaderState state;
 	//bool expanded = EditorGUI::BeginComponent( T::StaticClassName(), enabled, state );
-	bool expanded = EditorGUI::BeginComponent( component.ClassName(), enabled, &state );
+	bool expanded = EditorGUI::BeginComponent( component->ClassName(), enabled, &state );
 	if ( expanded )
 	{
 		OnInspectorGUI<T>(p);
@@ -559,13 +553,13 @@ void Inspector::BeginComponentImpl(FishEngine::Component & component)
 }
 
 template<class T, std::enable_if_t<!can_be_enabled<T>::value, int>>
-void Inspector::BeginComponentImpl(FishEngine::Component & component)
+void Inspector::BeginComponentImpl(FishEngine::ComponentPtr const & component)
 {
 	static_assert(std::is_base_of<Component, T>(), "T must be derived from Component");
 	UIHeaderState state;
 	if ( EditorGUI::BeginComponent( T::StaticClassName(), &state ) )
 	{
-		OnInspectorGUI<T>(component);
+		OnInspectorGUI<T>(std::static_pointer_cast<T>(component));
 	}
 	EditorGUI::EndComponent();
 
@@ -582,10 +576,10 @@ void Inspector::BeginComponentImpl(FishEngine::Component & component)
 	}
 }
 
-void Inspector::BeginComponent(Component & component)
+void Inspector::BeginComponent(const ComponentPtr &component)
 {
 #define CASE(T) case FishEngine::ClassID<T>(): BeginComponentImpl<T>(component); break;
-	switch (component.ClassID())
+	switch (component->ClassID())
 	{
 		CASE(Transform)
 		CASE(Camera)

@@ -138,10 +138,10 @@ void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map
 	int n_vertices = mesh->vertexCount();
 	mesh->m_boneWeights.resize(n_vertices);
 
-	FbxCluster::ELinkMode lClusterMode = ((FbxSkin*)pMesh->GetDeformer(0, FbxDeformer::eSkin))->GetCluster(0)->GetLinkMode();
+	//FbxCluster::ELinkMode lClusterMode = ((FbxSkin*)pMesh->GetDeformer(0, FbxDeformer::eSkin))->GetCluster(0)->GetLinkMode();
 	
 	FbxSkin * lSkinDeformer = (FbxSkin *)pMesh->GetDeformer(0, FbxDeformer::eSkin);
-	FbxSkin::EType lSkinningType = lSkinDeformer->GetSkinningType();
+	//FbxSkin::EType lSkinningType = lSkinDeformer->GetSkinningType();
 
 	// cluser == bone
 	int lClusterCount = lSkinDeformer->GetClusterCount();

@@ -46,7 +46,11 @@ TransformPtr GetBone(std::string const & path, std::map<std::string, TransformPt
 {
 	auto it = skeleton.find(path);
 	if (it == skeleton.end())
-		abort();
+	{
+		//abort();
+		LogWarning(Format("Bone [%1%] not found", path));
+		return nullptr;
+	}
 	return it->second;
 }
 
@@ -58,20 +62,21 @@ void Animation::Update()
 	for (auto & curve : m_clip->m_positionCurve)
 	{
 		auto t = GetBone(curve.path, m_skeleton);
-		auto v = curve.curve.Evaluate(m_localTimer, true);
-		//assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
-		t->setLocalPosition(v);
+		if (t != nullptr)
+		{
+			auto v = curve.curve.Evaluate(m_localTimer, true);
+			t->setLocalPosition(v);
+		}
 	}
 	for (auto & curve : m_clip->m_rotationCurves)
 	{
 		auto t = GetBone(curve.path, m_skeleton);
-		auto v = curve.curve.Evaluate(m_localTimer, true);
-//		if (isnan(v.x) || isnan(v.y) || isnan(v.z) || isnan(v.w))
-//		{
-//			abort();
-//		}
-		v.NormalizeSelf();
-		t->setLocalRotation(v);
+		if (t != nullptr)
+		{
+			auto v = curve.curve.Evaluate(m_localTimer, true);
+			v.NormalizeSelf();
+			t->setLocalRotation(v);
+		}
 	}
 //	for (auto & curve : m_clip->m_eulersCurves)
 //	{
@@ -83,8 +88,10 @@ void Animation::Update()
 	for (auto & curve : m_clip->m_scaleCurves)
 	{
 		auto t = GetBone(curve.path, m_skeleton);
-		auto v = curve.curve.Evaluate(m_localTimer, true);
-		//assert(!(isnan(v.x) || isnan(v.y) || isnan(v.z)));
-		t->setLocalScale(v);
+		if (t != nullptr)
+		{
+			auto v = curve.curve.Evaluate(m_localTimer, true);
+			t->setLocalScale(v);
+		}
 	}
 }

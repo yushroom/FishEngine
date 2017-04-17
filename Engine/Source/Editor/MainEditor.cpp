@@ -314,6 +314,14 @@ namespace FishEditor
 		animation->m_clip = animationClip;
 	}
 	
+	void InitializeScene_UnityChan_crs()
+	{
+		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChan/CandyRocyStar/CandyRockStar.fbx");
+		auto modelGO = Object::Instantiate(model);
+		auto animation = modelGO->AddComponent<Animation>();
+		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_001_SAK01_Final.fbx");
+	}
+	
 	
 	void InitializeScene_PBR()
 	{
@@ -550,6 +558,10 @@ namespace FishEditor
 		if (projectName == "UnityChan")
 		{
 			InitializeScene_UnityChan();
+		}
+		else if (projectName == "UnityChan-crs")
+		{
+			InitializeScene_UnityChan_crs();
 		}
 		else if (projectName == "Sponza")
 		{

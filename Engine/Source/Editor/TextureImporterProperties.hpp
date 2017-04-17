@@ -31,10 +31,10 @@ namespace FishEditor
 
 	enum class TextureImporterNPOTScale
 	{
-		None,
-		ToNearest,
-		ToLarger,
-		ToSmaller,
+		None,		// Keep non power of two textures as is.
+		ToNearest,	// Scale to nearest power of two.
+		ToLarger,	// Scale to larger power of two.
+		ToSmaller,	// Scale to smaller power of two.
 	};
 
 	enum class TextureImporterMipFilter

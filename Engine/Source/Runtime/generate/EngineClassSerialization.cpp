@@ -5,49 +5,49 @@
 
 #include <Archive.hpp>
 #include <private/CloneUtility.hpp>
-#include "../AnimationClip.hpp" 
-#include "../IntVector.hpp" 
-#include "../Texture.hpp" 
-#include "../ShaderProperty.hpp" 
-#include "../CameraController.hpp" 
-#include "../Script.hpp" 
-#include "../Renderer.hpp" 
-#include "../SkinnedMeshRenderer.hpp" 
-#include "../Bounds.hpp" 
-#include "../Scene.hpp" 
-#include "../Frustum.hpp" 
-#include "../MeshRenderer.hpp" 
-#include "../Prefab.hpp" 
-#include "../MeshFilter.hpp" 
-#include "../Color.hpp" 
-#include "../CapsuleCollider.hpp" 
-#include "../Animation/AnimationState.hpp"
-#include "../Rect.hpp" 
-#include "../Ray.hpp" 
-#include "../Shader.hpp" 
-#include "../Transform.hpp" 
-#include "../Texture2D.hpp" 
-#include "../Material.hpp" 
-#include "../Component.hpp" 
-#include "../Animation/AnimationEvent.hpp"
-#include "../Animation/AnimationClipInfo.hpp"
-#include "../Behaviour.hpp" 
-#include "../Mesh.hpp" 
-#include "../Collider.hpp" 
-#include "../Object.hpp" 
-#include "../Cubemap.hpp" 
-#include "../BoneWeight.hpp" 
 #include "../BoxCollider.hpp" 
-#include "../Light.hpp" 
+#include "../Rect.hpp" 
+#include "../Animation/AnimationEvent.hpp" 
+#include "../CapsuleCollider.hpp" 
 #include "../Camera.hpp" 
-#include "../Skybox.hpp" 
-#include "../SphereCollider.hpp" 
-#include "../Shader/ShaderLabProperties.hpp" 
-#include "../GameObject.hpp" 
-#include "../Avatar.hpp" 
 #include "../Animator.hpp" 
+#include "../Animation/AnimationState.hpp" 
+#include "../AnimationClip.hpp" 
+#include "../Material.hpp" 
+#include "../SphereCollider.hpp" 
+#include "../Transform.hpp" 
+#include "../Texture.hpp" 
+#include "../Ray.hpp" 
+#include "../Component.hpp" 
+#include "../Texture2D.hpp" 
+#include "../Object.hpp" 
+#include "../Behaviour.hpp" 
+#include "../Bounds.hpp" 
+#include "../BoneWeight.hpp" 
 #include "../Rigidbody.hpp" 
+#include "../Scene.hpp" 
+#include "../Light.hpp" 
+#include "../IntVector.hpp" 
+#include "../SkinnedMeshRenderer.hpp" 
+#include "../MeshFilter.hpp" 
 #include "../Animation.hpp" 
+#include "../CameraController.hpp" 
+#include "../MeshRenderer.hpp" 
+#include "../ShaderProperty.hpp" 
+#include "../Skybox.hpp" 
+#include "../GameObject.hpp" 
+#include "../Frustum.hpp" 
+#include "../Color.hpp" 
+#include "../Prefab.hpp" 
+#include "../Mesh.hpp" 
+#include "../Animation/AnimationClipInfo.hpp" 
+#include "../Script.hpp" 
+#include "../Shader.hpp" 
+#include "../Avatar.hpp" 
+#include "../Cubemap.hpp" 
+#include "../Renderer.hpp" 
+#include "../Collider.hpp" 
+#include "../Shader/ShaderLabProperties.hpp" 
 
 namespace FishEngine
 {
@@ -1417,6 +1417,7 @@ namespace FishEngine
 	{
 		//archive.BeginClass();
 		FishEngine::Behaviour::Serialize(archive);
+		archive << FishEngine::make_nvp("m_clip", m_clip); // AnimationClipPtr
 		archive << FishEngine::make_nvp("m_isPlaying", m_isPlaying); // bool
 		archive << FishEngine::make_nvp("m_playAutomatically", m_playAutomatically); // bool
 		archive << FishEngine::make_nvp("m_wrapMode", m_wrapMode); // FishEngine::WrapMode
@@ -1427,6 +1428,7 @@ namespace FishEngine
 	{
 		//archive.BeginClass(2);
 		FishEngine::Behaviour::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_clip", m_clip); // AnimationClipPtr
 		archive >> FishEngine::make_nvp("m_isPlaying", m_isPlaying); // bool
 		archive >> FishEngine::make_nvp("m_playAutomatically", m_playAutomatically); // bool
 		archive >> FishEngine::make_nvp("m_wrapMode", m_wrapMode); // FishEngine::WrapMode
@@ -1444,6 +1446,7 @@ namespace FishEngine
 	void FishEngine::Animation::CopyValueTo(std::shared_ptr<FishEngine::Animation> target, FishEngine::CloneUtility & cloneUtility) const
 	{
 		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
+		cloneUtility.Clone(this->m_clip, target->m_clip); // AnimationClipPtr
 		cloneUtility.Clone(this->m_isPlaying, target->m_isPlaying); // bool
 		cloneUtility.Clone(this->m_playAutomatically, target->m_playAutomatically); // bool
 		cloneUtility.Clone(this->m_wrapMode, target->m_wrapMode); // FishEngine::WrapMode

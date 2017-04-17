@@ -19,13 +19,13 @@ namespace FishEngine
 			dest = source;
 		}
 		
-		template<class T>
-		inline void Clone(std::shared_ptr<T> const & source, std::shared_ptr<T> & dest)
-		{
-			static_assert(std::is_base_of<Object, T>::value, "T must be Object");
-			//*dest = *source;
-			source->CopyValueTo(dest, *this);
-		}
+//		template<class T>
+//		inline void Clone(std::shared_ptr<T> const & source, std::shared_ptr<T> & dest)
+//		{
+//			static_assert(std::is_base_of<Object, T>::value, "T must be Object");
+//			//*dest = *source;
+//			source->CopyValueTo(dest, *this);
+//		}
 
 		//std::vector<std::weak_ptr<Transform>> m_bones
 		template<class T>
@@ -48,18 +48,18 @@ namespace FishEngine
 		
 		void Clone(FishEngine::PrefabPtr const & source, FishEngine::PrefabPtr & dest);
 		
-		void Clone(FishEngine::MaterialPtr const & source, FishEngine::MaterialPtr & dest);
-		
-		void Clone(FishEngine::AvatarPtr const & source, FishEngine::AvatarPtr & dest);
-		
-		void Clone(FishEngine::ShaderPtr const & source, FishEngine::ShaderPtr & dest);
-		
-		void Clone(FishEngine::MeshPtr const & source, FishEngine::MeshPtr & dest);
-
-		void Clone(std::string const & source, std::string & dest)
-		{
-			dest = source;
-		}
+//		void Clone(FishEngine::MaterialPtr const & source, FishEngine::MaterialPtr & dest);
+//		
+//		void Clone(FishEngine::AvatarPtr const & source, FishEngine::AvatarPtr & dest);
+//		
+//		void Clone(FishEngine::ShaderPtr const & source, FishEngine::ShaderPtr & dest);
+//		
+//		void Clone(FishEngine::MeshPtr const & source, FishEngine::MeshPtr & dest);
+//
+//		void Clone(std::string const & source, std::string & dest)
+//		{
+//			dest = source;
+//		}
 
 	//private:
 

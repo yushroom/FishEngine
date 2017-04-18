@@ -114,11 +114,6 @@ float4 UnityClipSpaceShadowCasterPos(float4 vertex, float3 normal)
 
 	return mul(UNITY_MATRIX_VP, wPos);
 }
-// Legacy, not used anymore; kept around to not break existing user shaders
-float4 UnityClipSpaceShadowCasterPos(float3 vertex, float3 normal)
-{
-	return UnityClipSpaceShadowCasterPos(float4(vertex, 1), normal);
-}
 
 #define UNITY_NEAR_CLIP_VALUE -1.0
 

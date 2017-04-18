@@ -30,6 +30,8 @@
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
 
+#define _WorldSpaceCameraPos WorldSpaceCameraPos
+
 #define _WorldSpaceLightPos0 WorldSpaceLightPos
 #define _LightColor0 LightColor
 
@@ -37,6 +39,7 @@
 #define LightColor0 LightColor
 
 
+// no keyword inline in glsl
 #define inline
 
 // #if defined(UNITY_REVERSED_Z)

@@ -314,12 +314,232 @@ namespace FishEditor
 		animation->m_clip = animationClip;
 	}
 	
+
 	void InitializeScene_UnityChan_crs()
 	{
-		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChan/CandyRocyStar/CandyRockStar.fbx");
+		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChan/CandyRockStar/CandyRockStar.fbx");
 		auto modelGO = Object::Instantiate(model);
 		auto animation = modelGO->AddComponent<Animation>();
 		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_001_SAK01_Final.fbx");
+
+#define MATERIAL(shader_name, mat_name) \
+		auto shader_name = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/UnityChan/CandyRockStar/Shader/" #shader_name ".shader"); \
+		MaterialPtr mat_name = Material::CreateMaterial(); \
+		mat_name->setShader(shader_name); \
+		mat_name->setName(#mat_name); \
+
+		MATERIAL(Unitychan_chara_fuku_ds, body);
+		MATERIAL(Unitychan_chara_fuku, Effector);
+		MATERIAL(Unitychan_chara_akarami_blend, body_trans);
+		MATERIAL(Unitychan_chara_hada, skin);
+		MATERIAL(Unitychan_chara_hair_ds, hair);
+		MATERIAL(Unitychan_chara_eye_blend, eye_L1);
+		MATERIAL(Unitychan_chara_eye, eyebase);
+		MATERIAL(Unitychan_chara_eyelash_blend, eyeline);
+#undef MATERIAL
+
+		MaterialPtr face = Material::CreateMaterial();
+		face->setShader(Unitychan_chara_hada);
+		face->setName("face");
+
+		MaterialPtr mat_cheek = Material::CreateMaterial();
+		mat_cheek->setShader(Unitychan_chara_akarami_blend);
+		mat_cheek->setName("mat_cheek");
+
+		MaterialPtr eye_R1 = Material::CreateMaterial();
+		eye_R1->setShader(Unitychan_chara_eye_blend);
+		eye_R1->setName("eye_R1");
+
+		Path texture_root = "Assets/UnityChan/CandyRockStar/Textures";
+		auto body_00   = AssetDatabase::LoadAssetAtPath2<Texture>( texture_root / "body_00.tga" );
+		auto FO_CLOTH1 = AssetDatabase::LoadAssetAtPath2<Texture>( texture_root / "FO_CLOTH1.tga" );
+		auto FO_RIM1   = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "FO_RIM1.tga");
+		auto body_00_SPEC = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "body_00_SPEC.tga");
+		auto ENV2 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "ENV2.tga");
+		auto body_00_NRM = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "body_00_NRM.tga");
+
+		auto body_01 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "body_01.tga");
+		auto body_01_NRM = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "body_01_NRM.tga");
+		auto body_01_SPEC = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "body_01_SPEC.tga");
+
+		auto skin_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "skin_00.tga");
+		auto FO_SKIN1 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "FO_SKIN1.tga");
+
+		auto cheek_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "cheek_00.tga");
+
+		auto face_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "face_00.tga");
+
+		auto hair_01 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "hair_01.tga");
+		auto hair_01_NRM = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "hair_01_NRM.tga");
+		auto hair_01_SPEC = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "hair_01_SPEC.tga");
+
+		auto eye_iris_L_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "eye_iris_L_00.tga");
+		auto eye_iris_R_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "eye_iris_R_00.tga");
+		auto eyeline_00 = AssetDatabase::LoadAssetAtPath2<Texture>(texture_root / "eyeline_00.tga");
+
+		body->setMainTexture(body_00);
+		body->setColor(Color::white);
+		body->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1.0f, 1.0f));
+		body->SetFloat("_SpecularPower", 20.0f);
+		body->SetFloat("_EdgeThickness", 0.5f);
+		body->SetTexture("_FalloffSampler", FO_CLOTH1);
+		body->SetTexture("_RimLightSampler", FO_RIM1);
+		body->SetTexture("_SpecularReflectionSampler", body_00_SPEC);
+		body->SetTexture("_EnvMapSampler", ENV2);
+		body->SetTexture("_NormalMapSampler", body_00_NRM);
+		for (auto & name : { "BodyParts_new01", "Globe_new01", "HairBand_DS_new01", "Jacket_BK_new01",
+			"Jacket_FR_new01", "jacketEri_new01", "JacketSode_new01", "Kneeso_new01", "Mizugi_new01",
+			"Pants_new01", "Shoes_new01" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(body);
+		}
+
+		Effector->setColor(Color::white);
+		Effector->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1.0f, 1.0f));
+		Effector->SetFloat("_SpecularPower", 20.0f);
+		Effector->SetFloat("_EdgeThickness", 0.5f);
+		Effector->setMainTexture(body_01);
+		Effector->SetTexture("_FalloffSampler", FO_CLOTH1);
+		Effector->SetTexture("_RimLightSampler", FO_RIM1);
+		Effector->SetTexture("_SpecularReflectionSampler", body_01_SPEC);
+		Effector->SetTexture("_EnvMapSampler", ENV2);
+		Effector->SetTexture("_NormalMapSampler", body_01_NRM);
+		for (auto & name : { "Effector_new01" })
+		{
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(Effector);
+		}
+
+		body_trans->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		body_trans->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		body_trans->SetFloat("_EdgeThickness", 1);
+		body_trans->setMainTexture(body_00);
+		body_trans->SetTexture("_FalloffSampler", FO_CLOTH1);
+		body_trans->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "JacketFrill_DS_new01", "PantsFrill_DS_new01" })
+		{
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(body_trans);
+		}
+
+		mat_cheek->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		mat_cheek->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		mat_cheek->SetFloat("_EdgeThickness", 1);
+		mat_cheek->setMainTexture(cheek_00);
+		mat_cheek->SetTexture("_FalloffSampler", FO_SKIN1);
+		mat_cheek->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "cheek" })
+		{
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(mat_cheek);
+		}
+
+		skin->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		skin->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		skin->SetFloat("_EdgeThickness", 1);
+		skin->setMainTexture(skin_00);
+		skin->SetTexture("_FalloffSampler", FO_SKIN1);
+		skin->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "Skin" })
+		{
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(skin);
+		}
+
+		face->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		face->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		face->SetFloat("_EdgeThickness", 1);
+		face->setMainTexture(face_00);
+		face->SetTexture("_FalloffSampler", FO_SKIN1);
+		face->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "EYE_DEF", "head_back", "MTH_DEF" })
+		{
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(face);
+		}
+
+		hair->setMainTexture(hair_01);
+		hair->setColor(Color::white);
+		hair->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1.0f, 1.0f));
+		hair->SetFloat("_SpecularPower", 20.0f);
+		hair->SetFloat("_EdgeThickness", 0.5f);
+		hair->SetTexture("_FalloffSampler", FO_CLOTH1);
+		hair->SetTexture("_RimLightSampler", FO_RIM1);
+		hair->SetTexture("_SpecularReflectionSampler", hair_01_SPEC);
+		hair->SetTexture("_EnvMapSampler", ENV2);
+		hair->SetTexture("_NormalMapSampler", body_00_NRM);
+		for (auto & name : { "HairBack_DS_new01", "HairFront_DS_new01", "HairSide_DS_new01" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(hair);
+		}
+
+		eye_L1->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		eye_L1->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		eye_L1->SetFloat("_EdgeThickness", 1);
+		eye_L1->setMainTexture(eye_iris_L_00);
+		eye_L1->SetTexture("_FalloffSampler", FO_SKIN1);
+		eye_L1->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "eye_L_old" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(eye_L1);
+		}
+
+
+		eye_R1->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		eye_R1->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		eye_R1->SetFloat("_EdgeThickness", 1);
+		eye_R1->setMainTexture(eye_iris_R_00);
+		eye_R1->SetTexture("_FalloffSampler", FO_SKIN1);
+		eye_R1->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "eye_R_old" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(eye_R1);
+		}
+
+
+		eyebase->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		eyebase->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		eyebase->SetFloat("_EdgeThickness", 1);
+		eyebase->setMainTexture(eyeline_00);
+		eyebase->SetTexture("_FalloffSampler", FO_SKIN1);
+		eyebase->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "eye_base_old" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(eyebase);
+		}
+
+		eyeline->SetVector4("_Color", Vector4(1, 1, 1, 1));
+		eyeline->SetVector4("_ShadowColor", Vector4(0.8f, 0.8f, 1, 1));
+		eyeline->SetFloat("_EdgeThickness", 1);
+		eyeline->setMainTexture(eyeline_00);
+		eyeline->SetTexture("_FalloffSampler", FO_SKIN1);
+		eyeline->SetTexture("_RimLightSampler", FO_RIM1);
+		for (auto & name : { "BLW_DEF" }) {
+			auto child = FindNamedChild(modelGO, name);
+			assert(child != nullptr);
+			auto renderer = child->GetComponent<Renderer>();
+			renderer->SetMaterial(eyeline);
+		}
 	}
 	
 	

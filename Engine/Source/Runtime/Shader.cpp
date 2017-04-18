@@ -542,7 +542,7 @@ namespace FishEngine
 		{
 			if (u.textureBindPoint >= 0)
 			{
-				glUniform1i(u.location, u.textureBindPoint);
+				glProgramUniform1i(m_GLNativeProgram, u.location, u.textureBindPoint);
 			}
 		}
 	}
@@ -563,9 +563,9 @@ namespace FishEngine
 		{
 			if (u.name == name)
 			{
-				glUniform4fv(u.location, 1, value.data());
+				glProgramUniform4fv(m_GLNativeProgram, u.location, 1, value.data());
 				u.binded = true;
-				return;
+				return; 
 			}
 		}
 		LogWarning(Format( "Uniform %1% not found!", name ));
@@ -577,7 +577,7 @@ namespace FishEngine
 		{
 			if (boost::starts_with(u.name, name))
 			{
-				glUniformMatrix4fv(u.location, 1, GL_TRUE, value.data());
+				glProgramUniformMatrix4fv(m_GLNativeProgram, u.location, 1, GL_TRUE, value.data());
 				u.binded = true;
 				return;
 			}
@@ -591,7 +591,7 @@ namespace FishEngine
 		{
 			if (boost::starts_with(u.name, name))
 			{
-				glUniformMatrix4fv(u.location, static_cast<GLsizei>(matrixArray.size()), GL_TRUE, matrixArray.data()->data());
+				glProgramUniformMatrix4fv(m_GLNativeProgram, u.location, static_cast<GLsizei>(matrixArray.size()), GL_TRUE, matrixArray.data()->data());
 				u.binded = true;
 				return;
 			}
@@ -608,7 +608,7 @@ namespace FishEngine
 				auto it = uniforms.mat4s.find(u.name);
 				if (it != uniforms.mat4s.end())
 				{
-					glUniformMatrix4fv(u.location, 1, GL_TRUE, it->second.data());
+					glProgramUniformMatrix4fv(m_GLNativeProgram, u.location, 1, GL_TRUE, it->second.data());
 					u.binded = true;
 				}
 				else {
@@ -620,7 +620,7 @@ namespace FishEngine
 				auto it = uniforms.vec2s.find(u.name);
 				if (it != uniforms.vec2s.end())
 				{
-					glUniform2fv(u.location, 1, it->second.data());
+					glProgramUniform2fv(m_GLNativeProgram, u.location, 1, it->second.data());
 					u.binded = true;
 				}
 				else
@@ -633,7 +633,7 @@ namespace FishEngine
 				auto it = uniforms.vec3s.find(u.name);
 				if (it != uniforms.vec3s.end())
 				{
-					glUniform3fv(u.location, 1, it->second.data());
+					glProgramUniform3fv(m_GLNativeProgram, u.location, 1, it->second.data());
 					u.binded = true;
 				}
 				else
@@ -646,7 +646,7 @@ namespace FishEngine
 				auto it = uniforms.floats.find(u.name);
 				if (it != uniforms.floats.end())
 				{
-					glUniform1f(u.location, it->second);
+					glProgramUniform1f(m_GLNativeProgram, u.location, it->second);
 					u.binded = true;
 				}
 			}
@@ -655,7 +655,7 @@ namespace FishEngine
 				auto it = uniforms.vec4s.find(u.name);
 				if (it != uniforms.vec4s.end())
 				{
-					glUniform4fv(u.location, 1, it->second.data());
+					glProgramUniform4fv(m_GLNativeProgram, u.location, 1, it->second.data());
 					u.binded = true;
 				}
 			}
@@ -742,22 +742,21 @@ namespace FishEngine
 		if (m_blend)
 		{
 			glEnable(GL_BLEND);
-//			if (m_blendFactorCount == 2)
-//			{
+			if (m_blendFactorCount == 2)
+			{
 				auto f1 = ShaderBlendFactorToGL(m_blendFactors[0]);
 				auto f2 = ShaderBlendFactorToGL(m_blendFactors[1]);
-				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBlendFunc(f1, f2);
-//			}
-//			else
-//			{
-//				auto f1 = ShaderBlendFactorToGL(m_blendFactors[0]);
-//				auto f2 = ShaderBlendFactorToGL(m_blendFactors[1]);
-//				auto f3 = ShaderBlendFactorToGL(m_blendFactors[2]);
-//				auto f4 = ShaderBlendFactorToGL(m_blendFactors[3]);
-//				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//				glBlendFunc(f1, f2, );
-//			}
+			}
+			else
+			{
+				auto f1 = ShaderBlendFactorToGL(m_blendFactors[0]);
+				auto f2 = ShaderBlendFactorToGL(m_blendFactors[1]);
+				auto f3 = ShaderBlendFactorToGL(m_blendFactors[2]);
+				auto f4 = ShaderBlendFactorToGL(m_blendFactors[3]);
+				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFuncSeparate(f1, f2, f3, f4);
+			}
 		}
 	}
 

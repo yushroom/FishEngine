@@ -152,6 +152,12 @@ namespace FishEngine
 		glBindBuffer(GL_ARRAY_BUFFER, m_uvVBO);
 		glBufferData(GL_ARRAY_BUFFER, m_uv.size() * 2 * 4, m_uv.data(), GL_STATIC_DRAW);
 		
+		//float* tangents = new float[m_tangents.size() * 4];
+		//for (int i = 0; i < m_tangents.size(); ++i)
+		//{
+		//	Vector3 const & n = m_normals[i];
+		//	Vector3 const & t = m_tangents[i];
+		//}
 		glGenBuffers(1, &m_tangentVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
 		glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * 3 * 4, m_tangents.data(), GL_STATIC_DRAW);

@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
 	glewInit();
-	std::string path = R"(D:\program\github\FishEngine\Engine\Shaders\Internal-ErrorShader.shader)";
+	std::string path = R"(D:\program\github\FishEngine\Example\UnityChan-crs\Assets\UnityChan\CandyRockStar\Shader\Unitychan_chara_akarami_blend.shader)";
 	ShaderCompiler::setShaderIncludeDir(R"(D:\program\github\FishEngine\Engine\Shaders\include)");
 #else
 	std::string path = "/Users/yushroom/program/FishEngine/Example/UnityChan-crs/Assets/UnityChan/CandyRocyStar/Shader/Unitychan_chara_fuku_ds.shader";

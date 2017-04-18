@@ -1,0 +1,144 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Character skin shader
+// Includes falloff shadow
+
+#include <UnitySupport.inc>
+#include <CG.inc>
+
+@Properties
+{
+	_Color ("Main Color", Color) = (1, 1, 1, 1)
+	_ShadowColor ("Shadow Color", Color) = (0.8, 0.8, 1, 1)
+	_EdgeThickness ("Outline Thickness", Float) = 1
+			
+	_MainTex ("Diffuse", 2D) = "white" {}
+	_FalloffSampler ("Falloff Control", 2D) = "white" {}
+	_RimLightSampler ("RimLight Control", 2D) = "white" {}
+}
+
+// Material parameters
+uniform float4 _Color;
+uniform float4 _ShadowColor;
+//uniform float4 _LightColor0;
+uniform float4 _MainTex_ST;
+
+// Textures
+uniform sampler2D _MainTex;
+uniform sampler2D _FalloffSampler;
+uniform sampler2D _RimLightSampler;
+
+// Constants
+#define FALLOFF_POWER 1.0
+
+#ifdef ENABLE_CAST_SHADOWS
+
+// Structure from vertex shader to fragment shader
+struct v2f
+{
+	float4 pos    : SV_POSITION;
+	LIGHTING_COORDS( 0, 1 )
+	float3 normal : TEXCOORD2;
+	float2 uv     : TEXCOORD3;
+	float3 eyeDir : TEXCOORD4;
+	float3 lightDir : TEXCOORD5;
+};
+
+#else
+
+// Structure from vertex shader to fragment shader
+struct v2f
+{
+//	float4 pos    : SV_POSITION;
+	float3 normal;
+	float2 uv;
+	float3 eyeDir;
+	float3 lightDir;
+};
+
+#endif
+
+// Float types
+// #define float_t  half
+// #define float2_t half2
+// #define float3_t half3
+// #define float4_t half4
+#define float_t float
+#define float2_t vec2
+#define float3_t vec3
+#define float4_t vec4
+
+@vertex
+{
+
+	#include <AppData.inc>
+
+	layout(location = 0) out v2f o;
+
+	// Vertex shader
+	//v2f vert( AppData v )
+	void vs_main( AppData v )
+	{
+		//v2f o;
+		//o.pos = UnityObjectToClipPos( v.position );
+		gl_Position = UnityObjectToClipPos( v.position );
+		//o.uv = TRANSFORM_TEX( v.uv.xy, _MainTex );
+		o.uv = v.uv;
+		o.normal = normalize( mul( unity_ObjectToWorld, float4_t( v.normal, 0 ) ).xyz );
+
+		// Eye direction vector
+		float4_t worldPos =  mul( unity_ObjectToWorld, v.position );
+		o.eyeDir = normalize( _WorldSpaceCameraPos.xyz - worldPos.xyz );
+
+		o.lightDir = UnityWorldSpaceLightDir( worldPos.xyz );
+
+	#ifdef ENABLE_CAST_SHADOWS
+		TRANSFER_VERTEX_TO_FRAGMENT( o );
+	#endif
+
+		//return o;
+	}
+}
+
+@fragment
+{
+	layout(location = 0) in v2f i;
+
+	layout(location = 0) out float4 OutColor;
+
+	// Fragment shader
+	//float4 frag( v2f i )
+	void main()
+	{
+		float4_t diffSamplerColor = tex2D( _MainTex, i.uv );
+
+		// Falloff. Convert the angle between the normal and the camera direction into a lookup for the gradient
+		float_t normalDotEye = dot( i.normal, i.eyeDir );
+		float_t falloffU = clamp( 1 - abs( normalDotEye ), 0.02, 0.98 );
+		float4_t falloffSamplerColor = FALLOFF_POWER * tex2D( _FalloffSampler, float2( falloffU, 0.25f ) );
+		float3_t combinedColor = lerp( diffSamplerColor.rgb, falloffSamplerColor.rgb * diffSamplerColor.rgb, falloffSamplerColor.a );
+
+		// Rimlight
+	#ifdef ENABLE_RIMLIGHT
+		float_t rimlightDot = saturate( 0.5 * ( dot( i.normal, i.lightDir ) + 1.0 ) );
+		falloffU = saturate( rimlightDot * falloffU );
+		//falloffU = saturate( ( rimlightDot * falloffU - 0.5 ) * 32.0 );
+		falloffU = tex2D( _RimLightSampler, float2( falloffU, 0.25f ) ).r;
+		float3_t lightColor = diffSamplerColor.rgb * 0.5; // * 2.0;
+		combinedColor += falloffU * lightColor;
+	#endif
+
+	#ifdef ENABLE_CAST_SHADOWS
+		// Cast shadows
+		float3_t shadowColor = _ShadowColor.rgb * combinedColor;
+		float_t attenuation = saturate( 2.0 * LIGHT_ATTENUATION( i ) - 1.0 );
+		combinedColor = lerp( shadowColor, combinedColor, attenuation );
+	#endif
+
+		float4_t finalColor = float4_t( combinedColor, diffSamplerColor.a ) * _Color;
+		finalColor.rgb *= _LightColor0.rgb;
+		//return finalColor;
+		OutColor = finalColor;
+	}
+}

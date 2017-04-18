@@ -468,7 +468,10 @@ namespace FishEngine
 					{
 						m_blendEnabled = true;
 						//m_settings[nam]
+						//auto begin = cursor;
 						//readToNewline(shaderText, cursor);
+						//auto line = shaderText.substr(begin, cursor - begin);
+						//auto t = Tokenizer(line);
 						ignoreSpace(shaderText, cursor);
 						auto factor1 = nextTok(shaderText, cursor);
 						ignoreSpace(shaderText, cursor);

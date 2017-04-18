@@ -34,7 +34,7 @@ uniform sampler2D _NormalMapSampler;
 // Structure from vertex shader to fragment shader
 struct v2f
 {
-	float4 pos;
+//	float4 pos;
 	LIGHTING_COORDS( 0, 1 );
 	float2 uv;
 	float3 eyeDir;
@@ -51,7 +51,7 @@ struct v2f
 // Structure from vertex shader to fragment shader
 struct VS_OUT
 {
-	float4 pos;
+//	float4 pos;
 	float2 uv;
 	float3 eyeDir;
 	float3 lightDir;
@@ -69,7 +69,8 @@ struct VS_OUT
 #define float2_t   half2
 #define float3_t   half3
 #define float4_t   half4
-#define float3x3_t half3x3
+//#define float3x3_t half3x3
+#define float3x3_t float3x3
 
 
 @vertex
@@ -83,9 +84,10 @@ struct VS_OUT
 	void vs_main( AppData v )
 	{
 		//v2f o;
-		vs_out.pos = mul( UNITY_MATRIX_MVP, v.position );
+		//vs_out.pos = mul( UNITY_MATRIX_MVP, v.position );
+		gl_Position = mul( UNITY_MATRIX_MVP, v.position );
 		//vs_out.uv.xy = TRANSFORM_TEX( v.texcoord.xy, _MainTex );
-		vs_out.uv.xy = v.uv.xy;
+		vs_out.uv = v.uv;
 		vs_out.normal = normalize( mul( unity_ObjectToWorld, float4_t( v.normal, 0 ) ).xyz );
 
 		// Eye direction vector
@@ -96,14 +98,15 @@ struct VS_OUT
 	#ifdef ENABLE_NORMAL_MAP
 		// Binormal and tangent (for normal map)
 		vs_out.tangent = normalize( mul( unity_ObjectToWorld, float4_t( v.tangent.xyz, 0 ) ).xyz );
-		vs_out.binormal = normalize( cross( vs_out.normal, vs_out.tangent ) * v.tangent.w );
+		//vs_out.binormal = normalize( cross( vs_out.normal, vs_out.tangent ) * v.tangent.w );
+		vs_out.binormal = normalize( cross( vs_out.normal, vs_out.tangent ) );
 	#endif
 
 	#ifdef ENABLE_CAST_SHADOWS
 		TRANSFER_VERTEX_TO_FRAGMENT( vs_out );
 	#endif
 
-		return vs_out;
+		//return vs_out;
 	}
 }
 
@@ -126,7 +129,7 @@ struct VS_OUT
 	#ifdef ENABLE_NORMAL_MAP
 
 	// Compute normal from normal map
-	inline float3_t GetNormalFromMap( v2f input )
+	inline float3_t GetNormalFromMap( VS_OUT input )
 	{
 		float3_t normalVec = normalize( tex2D( _NormalMapSampler, input.uv ).xyz * 2.0 - 1.0 );
 		float3x3_t localToWorldTranspose = float3x3_t(
@@ -176,7 +179,7 @@ struct VS_OUT
 
 		// Reflection
 	#ifdef ENABLE_REFLECTION
-		float3_t reflectVector = reflect( -i.eyeDir.xyz, normalVec ).xzy;
+		float3_t reflectVector = reflect( -vs_out.eyeDir.xyz, normalVec ).xzy;
 		float2_t sphereMapCoords = 0.5 * ( float2_t( 1.0, 1.0 ) + reflectVector.xy );
 		float3_t reflectColor = tex2D( _EnvMapSampler, sphereMapCoords ).rgb;
 		reflectColor = GetOverlayColor( reflectColor, combinedColor );
@@ -195,7 +198,7 @@ struct VS_OUT
 
 		// Rimlight
 	#ifdef ENABLE_RIMLIGHT
-		float_t rimlightDot = saturate( 0.5 * ( dot( normalVec, i.lightDir ) + 1.0 ) );
+		float_t rimlightDot = saturate( 0.5 * ( dot( normalVec, vs_out.lightDir ) + 1.0 ) );
 		falloffU = saturate( rimlightDot * falloffU );
 		falloffU = tex2D( _RimLightSampler, float2( falloffU, 0.25f ) ).r;
 		float3_t lightColor = diffSamplerColor.rgb; // * 2.0;
@@ -238,7 +241,7 @@ ENDCG
 			"LightMode"="ForwardBase"
 		}		
 
-        LOD 450
+		LOD 450
 
 		Pass
 		{
@@ -282,7 +285,7 @@ ENDCG
 			"LightMode"="ForwardBase"
 		}
 
-        LOD 400
+		LOD 400
 
 		Pass
 		{
@@ -313,7 +316,7 @@ CGPROGRAM
 ENDCG
 		}
 
-    }
+	}
 
 
 	SubShader
@@ -325,7 +328,7 @@ ENDCG
 			"LightMode"="ForwardBase"
 		}
 
-        LOD 300
+		LOD 300
 
 		Pass
 		{
@@ -343,7 +346,7 @@ CGPROGRAM
 ENDCG
 		}
 
-    }
+	}
 
 	SubShader
 	{
@@ -354,7 +357,7 @@ ENDCG
 			"LightMode"="ForwardBase"
 		}
 
-        LOD 250
+		LOD 250
 
 		Pass
 		{
@@ -381,7 +384,7 @@ ENDCG
 			"Queue"="Geometry"
 		}
 
-        LOD 200
+		LOD 200
 
 		Pass
 		{

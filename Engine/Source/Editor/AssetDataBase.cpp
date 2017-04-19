@@ -93,4 +93,5 @@ namespace FishEditor
 		//return As<T>( AssetImporter::s_importerGUIDToObject[importer->GetGUID()] );
 		return importer->asset()->mainObject();
 	}
+
 }

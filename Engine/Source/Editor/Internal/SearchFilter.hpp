@@ -75,7 +75,7 @@ namespace FishEditor
 			return state == State::SearchingInAllAssets || state == State::SearchingInFolders || state == State::SearchingInAssetStore;
 		}
 
-		bool SetNewFilter(SearchFilter newFilter)
+		bool SetNewFilter(SearchFilter const & newFilter)
 		{
 			bool result = false;
 			if (newFilter.m_NameFilter != this->m_NameFilter)
@@ -232,29 +232,29 @@ namespace FishEditor
 		std::string FilterToSearchFieldString()
 		{
 			std::string text = "";
-			if (!std::string.IsNullOrEmpty(this->m_NameFilter))
+			if (!this->m_NameFilter.empty())
 			{
 				text += this->m_NameFilter;
 			}
-			this->AddToString<std::string>("t:", this->m_ClassNames, ref text);
-			this->AddToString<std::string>("l:", this->m_AssetLabels, ref text);
-			this->AddToString<std::string>("v:", this->m_VersionControlStates, ref text);
-			this->AddToString<std::string>("b:", this->m_AssetBundleNames, ref text);
+			this->AddToString<std::string>("t:", this->m_ClassNames, text);
+			this->AddToString<std::string>("l:", this->m_AssetLabels, text);
+			this->AddToString<std::string>("v:", this->m_VersionControlStates, text);
+			this->AddToString<std::string>("b:", this->m_AssetBundleNames, text);
 			return text;
 		}
 
-		void AddToString<T>(std::string prefix, T[] list, ref string result)
+		template <class T>
+		void AddToString(std::string prefix, std::vector<T> const & list, std::string & result)
 		{
-			if (list != null)
+			if (!list.empty())
 			{
-				if (result == null)
+//				if (result == null)
+//				{
+//					result = "";
+//				}
+				for (auto const & t : list)
 				{
-					result = "";
-				}
-				for (int i = 0; i < list.Length; i++)
-				{
-					T t = list[i];
-					if (!string.IsNullOrEmpty(result))
+					if (!result.empty())
 					{
 						result += " ";
 					}

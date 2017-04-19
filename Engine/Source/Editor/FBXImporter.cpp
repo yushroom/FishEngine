@@ -643,8 +643,9 @@ FishEngine::MaterialPtr FishEditor::FBXImporter::ParseMaterial(fbxsdk::FbxSurfac
 	if (!diffuseTexturePath.empty())
 	{
 		auto textureName = Path(diffuseTexturePath).filename();
-		auto texturePath = Application::dataPath() / "textures" / textureName;
-		auto diffuseTexture = AssetDatabase::LoadAssetAtPath2<Texture>(texturePath);
+//		auto texturePath = Application::dataPath() / "textures" / textureName;
+//		auto diffuseTexture = AssetDatabase::LoadAssetAtPath2<Texture>(texturePath);
+		auto diffuseTexture = AssetDatabase::FindAssetByFilename<Texture>(textureName.string());
 		ret_material = Material::InstantiateBuiltinMaterial("Diffuse");
 		ret_material->setName(textureName.string());
 		if (diffuseTexture != nullptr)

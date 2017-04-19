@@ -3,6 +3,8 @@
 
 // Character skin shader
 // Includes falloff shadow
+#extension GL_ARB_explicit_attrib_location : require
+#extension GL_ARB_separate_shader_objects : require
 
 #include <UnitySupport.inc>
 #include <CG.inc>
@@ -74,7 +76,7 @@ struct v2f
 
 	#include <AppData.inc>
 
-	layout(location = 0) out v2f o;
+	layout(location = 0) out v2f vs_out;
 
 	// Vertex shader
 	//v2f vert( AppData v )
@@ -84,17 +86,17 @@ struct v2f
 		//o.pos = UnityObjectToClipPos( v.position );
 		gl_Position = UnityObjectToClipPos( v.position );
 		//o.uv = TRANSFORM_TEX( v.uv.xy, _MainTex );
-		o.uv = v.uv;
-		o.normal = normalize( mul( unity_ObjectToWorld, float4_t( v.normal, 0 ) ).xyz );
+		vs_out.uv = v.uv;
+		vs_out.normal = normalize( mul( unity_ObjectToWorld, float4_t( v.normal, 0 ) ).xyz );
 
 		// Eye direction vector
 		float4_t worldPos =  mul( unity_ObjectToWorld, v.position );
-		o.eyeDir = normalize( _WorldSpaceCameraPos.xyz - worldPos.xyz );
+		vs_out.eyeDir = normalize( _WorldSpaceCameraPos.xyz - worldPos.xyz );
 
-		o.lightDir = UnityWorldSpaceLightDir( worldPos.xyz );
+		vs_out.lightDir = UnityWorldSpaceLightDir( worldPos.xyz );
 
 	#ifdef ENABLE_CAST_SHADOWS
-		TRANSFER_VERTEX_TO_FRAGMENT( o );
+		TRANSFER_VERTEX_TO_FRAGMENT( vs_out );
 	#endif
 
 		//return o;
@@ -103,7 +105,7 @@ struct v2f
 
 @fragment
 {
-	layout(location = 0) in v2f i;
+	layout(location = 0) in v2f vs_out;
 
 	layout(location = 0) out float4 OutColor;
 
@@ -111,17 +113,17 @@ struct v2f
 	//float4 frag( v2f i )
 	void main()
 	{
-		float4_t diffSamplerColor = tex2D( _MainTex, i.uv );
+		float4_t diffSamplerColor = tex2D( _MainTex, vs_out.uv );
 
 		// Falloff. Convert the angle between the normal and the camera direction into a lookup for the gradient
-		float_t normalDotEye = dot( i.normal, i.eyeDir );
+		float_t normalDotEye = dot( vs_out.normal, vs_out.eyeDir );
 		float_t falloffU = clamp( 1 - abs( normalDotEye ), 0.02, 0.98 );
 		float4_t falloffSamplerColor = FALLOFF_POWER * tex2D( _FalloffSampler, float2( falloffU, 0.25f ) );
 		float3_t combinedColor = lerp( diffSamplerColor.rgb, falloffSamplerColor.rgb * diffSamplerColor.rgb, falloffSamplerColor.a );
 
 		// Rimlight
 	#ifdef ENABLE_RIMLIGHT
-		float_t rimlightDot = saturate( 0.5 * ( dot( i.normal, i.lightDir ) + 1.0 ) );
+		float_t rimlightDot = saturate( 0.5 * ( dot( vs_out.normal, vs_out.lightDir ) + 1.0 ) );
 		falloffU = saturate( rimlightDot * falloffU );
 		//falloffU = saturate( ( rimlightDot * falloffU - 0.5 ) * 32.0 );
 		falloffU = tex2D( _RimLightSampler, float2( falloffU, 0.25f ) ).r;
@@ -132,7 +134,7 @@ struct v2f
 	#ifdef ENABLE_CAST_SHADOWS
 		// Cast shadows
 		float3_t shadowColor = _ShadowColor.rgb * combinedColor;
-		float_t attenuation = saturate( 2.0 * LIGHT_ATTENUATION( i ) - 1.0 );
+		float_t attenuation = saturate( 2.0 * LIGHT_ATTENUATION( vs_out ) - 1.0 );
 		combinedColor = lerp( shadowColor, combinedColor, attenuation );
 	#endif
 

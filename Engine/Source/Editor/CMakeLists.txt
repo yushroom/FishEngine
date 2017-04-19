@@ -35,10 +35,13 @@ FILE(GLOB EditorFiles
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 #FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
-FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.*)
+FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.*)
+FILE(GLOB InternalSources ${CMAKE_CURRENT_LIST_DIR}/Internal/*.hpp ${CMAKE_CURRENT_LIST_DIR}/Internal/*.cpp )
+SOURCE_GROUP(Internal FILES ${InternalSources})
+
+FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.hpp ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.cpp)
 foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
@@ -55,7 +58,7 @@ IF( NOT WIN32 )
     FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt)
     FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png)
     FILE( GLOB Shader_headers ${SHADER_DIR}/include/*.inc)
-    FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.*)
+    FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.hpp ${SHADER_DIR}/Editor/*.cpp)
     FILE( GLOB Shaders ${SHADER_DIR}/*.*)
     SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders})
 ENDIF()
@@ -67,7 +70,7 @@ SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
 SOURCE_GROUP( Inspector FILES ${InspectorFiles} )
 SOURCE_GROUP( Editor FILES ${EditorFiles})
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} resources.qrc ${RESOURCE_FILES} ${Asset_SRCS})
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
 
 SET( INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
 MESSAGE("hhhh" ${INFO_PLIST})

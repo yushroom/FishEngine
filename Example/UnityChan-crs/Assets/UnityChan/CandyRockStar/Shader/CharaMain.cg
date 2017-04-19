@@ -129,13 +129,13 @@ struct VS_OUT
 	#ifdef ENABLE_NORMAL_MAP
 
 	// Compute normal from normal map
-	inline float3_t GetNormalFromMap( VS_OUT input )
+	inline float3_t GetNormalFromMap( VS_OUT v )
 	{
-		float3_t normalVec = normalize( tex2D( _NormalMapSampler, input.uv ).xyz * 2.0 - 1.0 );
+		float3_t normalVec = normalize( tex2D( _NormalMapSampler, v.uv ).xyz * 2.0 - 1.0 );
 		float3x3_t localToWorldTranspose = float3x3_t(
-			input.tangent,
-			input.binormal,
-			input.normal
+			v.tangent,
+			v.binormal,
+			v.normal
 		);
 
 		normalVec = normalize( mul( normalVec, localToWorldTranspose ) );

@@ -78,6 +78,9 @@ namespace FishEditor
 //		{
 //			return FishEngine::As<T>( LoadAssetAtPath(path) );
 //		}
+		
+		template <class T>
+		static std::shared_ptr<T> FindAssetByFilename(std::string const & filename);
 
 		static std::map<FishEngine::Path, QIcon> s_cacheIcons;
 
@@ -115,6 +118,21 @@ namespace FishEditor
 				return FishEngine::As<T>(obj);
 		}
 		abort();
+		return nullptr;
+	}
+	
+	
+	template <class T>
+	std::shared_ptr<T> AssetDatabase::FindAssetByFilename(std::string const & filename)
+	{
+		for (auto & pair : AssetImporter::s_pathToImpoter)
+		{
+			auto & path = pair.first;
+			if (path.has_filename() && path.filename() == filename)
+			{
+				return LoadAssetAtPath2<T>(path);
+			}
+		}
 		return nullptr;
 	}
 }

@@ -181,235 +181,221 @@ namespace FishEditor
 	void TextureImporter::ImportTo(FishEngine::Texture2DPtr & texture)
 	{
 		auto fm_instance = FreeImagePlugin::instance();
-		//std::shared_ptr<Texture> texture;
-//		auto ext = m_assetPath.extension();
-//		if (ext == ".dds")
-//		{
-//			//abort();
-//			return;
-//		}
-//		else if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".hdr")
-//		{
-			FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-			FIBITMAP *dib = nullptr;
-			uint8_t * bits = nullptr;
-			unsigned int width = 0, height = 0;
+		FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+		FIBITMAP *dib = nullptr;
+		uint8_t * bits = nullptr;
+		unsigned int width = 0, height = 0;
 #if FISHENGINE_PLATFORM_WINDOWS
-			auto filename = m_assetPath.wstring().c_str();
-			fif = FreeImage_GetFileTypeU(filename);
-			if (fif == FIF_UNKNOWN)
-			{
-				fif = FreeImage_GetFIFFromFilenameU(filename);
-			}
-			if (fif == FIF_UNKNOWN)
-			{
-				abort();
-			}
-			if (FreeImage_FIFSupportsReading(fif))
-			{
-				dib = FreeImage_LoadU(fif, filename);
-			}
-			else
-			{
-				abort();
-			}
+		auto filename = m_assetPath.wstring().c_str();
+		fif = FreeImage_GetFileTypeU(filename);
+		if (fif == FIF_UNKNOWN)
+		{
+			fif = FreeImage_GetFIFFromFilenameU(filename);
+		}
+		if (fif == FIF_UNKNOWN)
+		{
+			abort();
+		}
+		if (FreeImage_FIFSupportsReading(fif))
+		{
+			dib = FreeImage_LoadU(fif, filename);
+		}
+		else
+		{
+			abort();
+		}
 #else
-			auto filename = m_assetPath.c_str();
-			fif = FreeImage_GetFileType(filename);
-			if (fif == FIF_UNKNOWN)
-			{
-				fif = FreeImage_GetFIFFromFilename(filename);
-			}
-			if (fif == FIF_UNKNOWN)
-			{
-				abort();
-			}
-			if (FreeImage_FIFSupportsReading(fif))
-			{
-				dib = FreeImage_Load(fif, filename);
-			}
-			else
-			{
-				abort();
-			}
+		auto filename = m_assetPath.c_str();
+		fif = FreeImage_GetFileType(filename);
+		if (fif == FIF_UNKNOWN)
+		{
+			fif = FreeImage_GetFIFFromFilename(filename);
+		}
+		if (fif == FIF_UNKNOWN)
+		{
+			abort();
+		}
+		if (FreeImage_FIFSupportsReading(fif))
+		{
+			dib = FreeImage_Load(fif, filename);
+		}
+		else
+		{
+			abort();
+		}
 #endif
 			
-			//retrieve the image data
-			bits = FreeImage_GetBits(dib);
-			//get the image width and height
-			width = FreeImage_GetWidth(dib);
-			height = FreeImage_GetHeight(dib);
-			//if this somehow one of these failed (they shouldn't), return failure
-			if ((bits == 0) || (width == 0) || (height == 0))
-			{
-				abort();
-			}
+		//retrieve the image data
+		bits = FreeImage_GetBits(dib);
+		//get the image width and height
+		width = FreeImage_GetWidth(dib);
+		height = FreeImage_GetHeight(dib);
+		//if this somehow one of these failed (they shouldn't), return failure
+		if ((bits == 0) || (width == 0) || (height == 0))
+		{
+			abort();
+		}
 
-			bool needResize = false;
-			if ( ! Mathf::IsPowerOfTwo(width) )
-			{
-				width = Mathf::NextPowerOfTwo(width);
-				needResize = true;
-			}
-			if ( ! Mathf::IsPowerOfTwo(height) )
-			{
-				height = Mathf::NextPowerOfTwo(height);
-				needResize = true;
-			}
+		bool needResize = false;
+		if ( ! Mathf::IsPowerOfTwo(width) )
+		{
+			width = Mathf::NextPowerOfTwo(width);
+			needResize = true;
+		}
+		if ( ! Mathf::IsPowerOfTwo(height) )
+		{
+			height = Mathf::NextPowerOfTwo(height);
+			needResize = true;
+		}
 			
-			if (needResize)
+		if (needResize)
+		{
+			LogWarning("resize image");
+			auto newdib = FreeImage_Rescale(dib, width, height);
+			FreeImage_Unload(dib);
+			dib = newdib;
+		}
+			
+		auto imageType = FreeImage_GetImageType(dib);
+		auto colorType = FreeImage_GetColorType(dib);
+		auto bpp = FreeImage_GetBPP(dib);
+			
+		TextureFormat format;
+			
+		if (imageType == FIT_BITMAP)
+		{
+			if (colorType == FIC_MINISWHITE || colorType == FIC_MINISBLACK)
 			{
-				LogWarning("resize image");
-				auto newdib = FreeImage_Rescale(dib, width, height);
+				auto newBitmap = FreeImage_ConvertToGreyscale(dib);
 				FreeImage_Unload(dib);
-				dib = newdib;
+				dib = newBitmap;
+				bpp = FreeImage_GetBPP(dib);
+				colorType = FreeImage_GetColorType(dib);
 			}
-			
-			auto imageType = FreeImage_GetImageType(dib);
-			auto colorType = FreeImage_GetColorType(dib);
-			auto bpp = FreeImage_GetBPP(dib);
-			
-			TextureFormat format;
-			
-			if (imageType == FIT_BITMAP)
+			else if (bpp < 8 || colorType == FIC_PALETTE || colorType == FIC_CMYK)
 			{
-				if (colorType == FIC_MINISWHITE || colorType == FIC_MINISBLACK)
-				{
-					auto newBitmap = FreeImage_ConvertToGreyscale(dib);
-					FreeImage_Unload(dib);
-					dib = newBitmap;
-					bpp = FreeImage_GetBPP(dib);
-					colorType = FreeImage_GetColorType(dib);
-				}
-				else if (bpp < 8 || colorType == FIC_PALETTE || colorType == FIC_CMYK)
-				{
-					auto newBitmap = FreeImage_ConvertTo24Bits(dib);
-					FreeImage_Unload(dib);
-					dib = newBitmap;
-					bpp = FreeImage_GetBPP(dib);
-					colorType = FreeImage_GetColorType(dib);
-				}
+				auto newBitmap = FreeImage_ConvertTo24Bits(dib);
+				FreeImage_Unload(dib);
+				dib = newBitmap;
+				bpp = FreeImage_GetBPP(dib);
+				colorType = FreeImage_GetColorType(dib);
+			}
 				
-				// by this stage, 8-bit is greyscale, 16/24/32 bit are RGB[A]
-				switch (bpp)
-				{
-					case 8:
-						format = TextureFormat::R8;
-						break;
-					case 16:
-						if (FreeImage_GetGreenMask(dib) == FI16_565_GREEN_MASK)
-						{
-							//"Format not supported by the engine. TODO."
-							abort();
-						}
-						else
-						{
-							//"Format not supported by the engine. TODO."
-							abort();
-						}
-						break;
-					case 24:
+			// by this stage, 8-bit is greyscale, 16/24/32 bit are RGB[A]
+			switch (bpp)
+			{
+				case 8:
+					format = TextureFormat::R8;
+					break;
+				case 16:
+					if (FreeImage_GetGreenMask(dib) == FI16_565_GREEN_MASK)
+					{
+						//"Format not supported by the engine. TODO."
+						abort();
+					}
+					else
+					{
+						//"Format not supported by the engine. TODO."
+						abort();
+					}
+					break;
+				case 24:
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
-						// unity does not support BGR24
-						SwapRedBlue32(dib);
+					// unity does not support BGR24
+					SwapRedBlue32(dib);
 #endif
-						format = TextureFormat::RGB24;
-						break;
-					case 32:
+					format = TextureFormat::RGB24;
+					break;
+				case 32:
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
-						format = TextureFormat::RGBA32;
+					format = TextureFormat::RGBA32;
 #else
-						format = TextureFormat::BGRA32;
+					format = TextureFormat::BGRA32;
 #endif
-						break;
-					default:
-						break;
-				}
+					break;
+				default:
+					break;
 			}
-			else if (imageType == FIT_UINT16 || imageType == FIT_INT16)
-			{
-				// "No INT pixel formats supported currently. TODO."
-				abort();
-			}
-			else if (imageType == FIT_FLOAT)
-			{
-				format = TextureFormat::RFloat;
-			}
-			else if (imageType == FIT_RGB16)
-			{
-				// Format not supported by the engine. TODO.
-				abort();
-			}
-			else
-			{
-				abort();
-			}
+		}
+		else if (imageType == FIT_UINT16 || imageType == FIT_INT16)
+		{
+			// "No INT pixel formats supported currently. TODO."
+			abort();
+		}
+		else if (imageType == FIT_FLOAT)
+		{
+			format = TextureFormat::RFloat;
+		}
+		else if (imageType == FIT_RGB16)
+		{
+			// Format not supported by the engine. TODO.
+			abort();
+		}
+		else
+		{
+			abort();
+		}
 			
-			unsigned char* srcData = FreeImage_GetBits(dib);
-			unsigned srcPitch = FreeImage_GetPitch(dib);
-			if (srcPitch != width * (bpp / 8))
-			{
-				abort();
-			}
+		unsigned char* srcData = FreeImage_GetBits(dib);
+		unsigned srcPitch = FreeImage_GetPitch(dib);
+		if (srcPitch != width * (bpp / 8))
+		{
+			abort();
+		}
 			
-			int length = width * height * (bpp / 8);
+		int length = width * height * (bpp / 8);
 //			if (expectedBytes != length)
 //			{
 //				abort();
 //			}
-			auto data = srcData;
-			texture->m_width = width;
-			texture->m_height = height;
-			texture->m_format = format;
-			texture->m_data.resize(length);
-			std::copy(data, data + length, texture->m_data.begin());
+		auto data = srcData;
+		texture->m_width = width;
+		texture->m_height = height;
+		texture->m_format = format;
+		texture->m_data.resize(length);
+		std::copy(data, data + length, texture->m_data.begin());
 			
-			// get icon
-			//FreeImage_Rescale();
-			auto thumbnail = FreeImage_MakeThumbnail(dib, 64);
-			FreeImage_FlipVertical(thumbnail);	// flip for Qt
-			QImage::Format qformat;
-			if (format == TextureFormat::RGBA32)
-			{
-				qformat = QImage::Format_RGBA8888;
-			}
-			else if (format == TextureFormat::BGRA32)
-			{
-				// TODO
-				SwapRedBlue32(thumbnail);
-				//data = FreeImage_GetBits(dib);
-				qformat = QImage::Format_RGBA8888;
-			}
-			else if (format == TextureFormat::RGB24)
-			{
-				qformat = QImage::Format_RGB888;
+		// get icon
+		//FreeImage_Rescale();
+		auto thumbnail = FreeImage_MakeThumbnail(dib, 64);
+		FreeImage_FlipVertical(thumbnail);	// flip for Qt
+		QImage::Format qformat;
+		if (format == TextureFormat::RGBA32)
+		{
+			qformat = QImage::Format_RGBA8888;
+		}
+		else if (format == TextureFormat::BGRA32)
+		{
+			// TODO
+			SwapRedBlue32(thumbnail);
+			//data = FreeImage_GetBits(dib);
+			qformat = QImage::Format_RGBA8888;
+		}
+		else if (format == TextureFormat::RGB24)
+		{
+			qformat = QImage::Format_RGB888;
 				
-			}
-			else if (format == TextureFormat::R8)
-			{
-				qformat = QImage::Format_Grayscale8;
-			}
-			else
-			{
-				abort();
-			}
-			data = FreeImage_GetBits(thumbnail);
-			width = FreeImage_GetWidth(thumbnail);
-			height = FreeImage_GetHeight(thumbnail);
-			length = width * height * (bpp / 8);
-			auto qimage = QImage(width, height, qformat);
-			std::copy(data, data + length, qimage.bits());
-			auto qpixmap = QPixmap::fromImage(std::move(qimage));
-			AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(qpixmap);
-			FreeImage_Unload(thumbnail);
+		}
+		else if (format == TextureFormat::R8)
+		{
+			qformat = QImage::Format_Grayscale8;
+		}
+		else
+		{
+			abort();
+		}
+		data = FreeImage_GetBits(thumbnail);
+		width = FreeImage_GetWidth(thumbnail);
+		height = FreeImage_GetHeight(thumbnail);
+		length = width * height * (bpp / 8);
+		auto qimage = QImage(width, height, qformat);
+		std::copy(data, data + length, qimage.bits());
+		auto qpixmap = QPixmap::fromImage(std::move(qimage));
+		AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(qpixmap);
 
-			FreeImage_Unload(dib);
-			return;
-//		}
-//		else
-//		{
-//			abort();
-//		}
+		// clean
+		FreeImage_Unload(thumbnail);
+		FreeImage_Unload(dib);
 	}
 
 	FishEngine::TexturePtr TextureImporter::Import(Path const & path)

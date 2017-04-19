@@ -7,12 +7,6 @@
 
 namespace FishEditor
 {
-	//class Model;
-	//typedef std::shared_ptr<Model> ModelPtr;
-
-	//struct ModelNode;
-	//typedef std::shared_ptr<ModelNode> ModelNodePtr;
-
 	class Asset;
 	typedef std::shared_ptr<Asset> AssetPtr;
 
@@ -37,6 +31,9 @@ namespace FishEditor
 	
 	class SerializedObject;
 	typedef std::shared_ptr<SerializedObject> SerializedObjectPtr;
+
+	class Editor;
+	typedef std::shared_ptr<Editor> EditorPtr;
 
 
 	//typedef std::list<Actor> Action;

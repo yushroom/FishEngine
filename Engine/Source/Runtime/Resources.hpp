@@ -20,6 +20,7 @@ namespace FishEngine
 		Material,
 		Script,
 		Prefab,
+		AudioClip,
 	};
 
 	enum class SystemDirectoryType

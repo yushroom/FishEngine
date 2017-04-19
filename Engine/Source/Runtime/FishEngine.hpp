@@ -130,6 +130,12 @@ namespace FishEngine
 
 	class AnimationClip;
 	typedef std::shared_ptr<AnimationClip> AnimationClipPtr;
+
+	class AudioClip;
+	typedef std::shared_ptr<AudioClip> AudioClipPtr;
+
+	class AudioSource;
+	typedef std::shared_ptr<AudioSource> AudioSourcePtr;
 }
 
 // hack: inject FishEditor namespace

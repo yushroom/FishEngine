@@ -39,6 +39,7 @@ namespace FishEditor
 		static QIcon mesh_icon(":/Resources/MeshIcon.png");
 		static QIcon prefab_icon(":/Resources/PrefabIcon.png");
 		static QIcon shader_icon(":/Resources/project_icon_shader.png");
+		static QIcon audioclip_icon(":/Resources/project_icon_audioclip.png");
 
 		auto type = FishEngine::Resources::GetAssetType(path.extension());
 		if (type == FishEngine::AssetType::Material)
@@ -56,6 +57,10 @@ namespace FishEditor
 		else if (type == FishEngine::AssetType::Model)
 		{
 			return mesh_icon;
+		}
+		else if (type == FishEngine::AssetType::AudioClip)
+		{
+			return audioclip_icon;
 		}
 		else if (type == FishEngine::AssetType::Texture)
 		{

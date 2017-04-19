@@ -574,6 +574,30 @@ namespace FishEngine
 			t.ExpectEndOfFile();
 			m_Colors[name] = color;
 		}
+		else if (type == "Vector")
+		{
+			FishEngine::Vector4 v;
+			Tokenizer t(defalutValueString);
+			t.NextTokenUntil('(');
+			auto str = t.NextTokenUntil(',');
+			float value = boost::lexical_cast<float>(str);
+			v.x = value;
+
+			str = t.NextTokenUntil(',');
+			value = boost::lexical_cast<float>(str);
+			v.y = value;
+
+			str = t.NextTokenUntil(',');
+			value = boost::lexical_cast<float>(str);
+			v.z = value;
+
+			str = t.NextTokenUntil(')');
+			value = boost::lexical_cast<float>(str);
+			v.w = value;
+
+			t.ExpectEndOfFile();
+			m_Vectors[name] = v;
+		}
 		else if (type == "2D")
 		{
 			Tokenizer t(defalutValueString);

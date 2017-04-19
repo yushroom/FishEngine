@@ -98,10 +98,10 @@ namespace FishEditor
 
 		SerializedProperty CopyInternal();
 		
-		//std::string m_displayName;
-		//std::string m_name;
-		//std::string m_type;
-		//std::string m_tooltip;
+		std::string m_displayName;
+		std::string m_name;
+		std::string m_type;
+		std::string m_tooltip;
 		SerializedPropertyType m_propertyType = SerializedPropertyType::Generic;
 		std::string m_propertyPath;
 		boost::any m_value;

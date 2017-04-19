@@ -2,6 +2,7 @@
 #define UnitySupport_inc
 
 #include <CGSupport.inc>
+#include <ShaderVariables.inc>
 
 #define UNITY_PI	3.14159265359f
 

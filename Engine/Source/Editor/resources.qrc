@@ -24,5 +24,6 @@
         <file>Resources/transform_tool_view_move.png</file>
         <file>Resources/transform_tool_view_orbit.png</file>
         <file>Resources/transform_tool_view_zoom.png</file>
+        <file>Resources/project_icon_audioclip.png</file>
     </qresource>
 </RCC>

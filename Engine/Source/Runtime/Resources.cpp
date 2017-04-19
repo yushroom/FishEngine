@@ -29,6 +29,10 @@ namespace FishEngine
 		{
 			return AssetType::Prefab;
 		}
+		else if (ext == ".mp3")
+		{
+			return AssetType::AudioClip;
+		}
 		return AssetType::Unknown;
 	}
 }

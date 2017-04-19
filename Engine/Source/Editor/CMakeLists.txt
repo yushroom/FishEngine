@@ -38,8 +38,8 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-FILE(GLOB InternalSources ${CMAKE_CURRENT_LIST_DIR}/Internal/*.hpp ${CMAKE_CURRENT_LIST_DIR}/Internal/*.cpp )
-SOURCE_GROUP(Internal FILES ${InternalSources})
+# FILE(GLOB InternalSources ${CMAKE_CURRENT_LIST_DIR}/Internal/*.hpp ${CMAKE_CURRENT_LIST_DIR}/Internal/*.cpp )
+# SOURCE_GROUP(Internal FILES ${InternalSources})
 
 FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.hpp ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.cpp)
 foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter)

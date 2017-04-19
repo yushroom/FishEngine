@@ -322,6 +322,26 @@ namespace FishEditor
 		auto animation = modelGO->AddComponent<Animation>();
 		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_001_SAK01_Final.fbx");
 
+		auto stage_model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChanStage/Models/stage.fbx");
+		auto stage_go = Object::Instantiate(stage_model);
+
+		auto Light_Decay = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/UnityChanStage/Effects/Light Beam/Light Decay.psd");
+		auto Smoke_L = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/UnityChanStage/Effects/Light Beam/Smoke L.psd");
+		auto Smoke_S = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/UnityChanStage/Effects/Light Beam/Smoke S.psd");
+		auto light_beam_shader = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/UnityChanStage/Effects/Shaders/Light Beam.shader");
+		auto light_beam_material = Material::CreateMaterial();
+		light_beam_material->setShader(light_beam_shader);
+		light_beam_material->setName("LightBeam");
+		light_beam_material->setColor(Color(201.0f / 255.0f, 1.0f, 180 / 255.0f));
+		light_beam_material->setMainTexture(Light_Decay);
+		light_beam_material->SetTexture("_NoiseTex1", Smoke_L);
+		light_beam_material->SetTexture("_NoiseTex2", Smoke_S);
+		light_beam_material->SetVector4("_NoiseScale", Vector4(0.3f, 0.3f, 0.3f, 0.3f));
+		light_beam_material->SetVector4("_NoiseSpeed", Vector4(0.03f, -0.0931f, -0.012f, 0.0435f));
+		auto light_beam_model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChanStage/Effects/Light Beam/Light Beam.fbx");
+		auto light_beam_go = Object::Instantiate(light_beam_model);
+		light_beam_go->GetComponentInChildren<Renderer>()->SetMaterial(light_beam_material);
+
 #define MATERIAL(shader_name, mat_name) \
 		auto shader_name = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/UnityChan/CandyRockStar/Shader/" #shader_name ".shader"); \
 		MaterialPtr mat_name = Material::CreateMaterial(); \

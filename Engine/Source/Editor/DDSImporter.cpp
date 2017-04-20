@@ -45,11 +45,11 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 	
 	gli::gl GL(gli::gl::PROFILE_GL33);
 	gli::gl::format const gli_format = GL.translate(gli_texture.format(), gli_texture.swizzles());
-	GLenum target = GL.translate(gli_texture.target());
+	//GLenum target = GL.translate(gli_texture.target());
 	
 	glm::tvec3<GLsizei> const extent = gli_texture.extent();
 	//GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
-	auto type = gli_format.Type;
+	//auto type = gli_format.Type;
 	
 	int width = extent.x;
 	int height = extent.y;

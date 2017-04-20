@@ -42,7 +42,7 @@ SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 # SOURCE_GROUP(Internal FILES ${InternalSources})
 
 FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.hpp ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.cpp)
-foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter)
+foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter AudioImporter)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})

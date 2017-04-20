@@ -47,8 +47,6 @@ ELSE()
 	SET( FBXSDK_LIB_DEBUG ${FBXSDK_LIB_DIR}/debug/libfbxsdk.a )
 	SET( FBXSDK_LIB_RELEASE ${FBXSDK_LIB_DIR}/release/libfbxsdk.a )
 ENDIF()
-SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
-
 IF(NOT EXISTS ${FBXSDK_LIB_DEBUG})
 	MESSAGE(FATAL_ERROR "${FBXSDK_LIB_DEBUG} not found")
 ENDIF ()
@@ -56,6 +54,18 @@ ENDIF ()
 IF(NOT EXISTS ${FBXSDK_LIB_RELEASE})
 	MESSAGE(FATAL_ERROR "${FBXSDK_LIB_RELEASE} not found")
 ENDIF ()
+SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
+
+
+# fmod
+SET( FMOD_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/fmod)
+include_directories( ${FMOD_DIR}/include )
+IF (WIN32)
+ELSE()
+	SET( FMOD_LIB_DEBUG ${FMOD_DIR}/lib/libfmodL.dylib)
+	SET( FMOD_LIB_RELEASE ${FMOD_DIR}/lib/libfmod.dylib)
+ENDIF()
+SET( FMOD_LIB debug ${FMOD_LIB_DEBUG} optimized ${FMOD_LIB_RELEASE} )
 
 
 include_directories(./Source/Runtime)

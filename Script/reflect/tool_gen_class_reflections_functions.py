@@ -133,6 +133,7 @@ def GenSerializationFunctions(classinfo, scope, root_dir):
 		item = classinfo[key]
 		header_path = item['header_file']
 		header_path = os.path.relpath(header_path, root_dir)
+		header_path = header_path.replace('\\', '/')
 		headers.append(header_path)
 		if IsObject(key):
 			c['isPolymorphic'] = True

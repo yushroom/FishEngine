@@ -13,25 +13,29 @@
 #include "../Animator.hpp" 
 #include "../Animation/AnimationState.hpp" 
 #include "../AnimationClip.hpp" 
-#include "../Material.hpp" 
 #include "../SphereCollider.hpp" 
+#include "../Material.hpp" 
+#include "../IntVector.hpp" 
 #include "../Transform.hpp" 
 #include "../Texture.hpp" 
 #include "../Ray.hpp" 
 #include "../Component.hpp" 
 #include "../Texture2D.hpp" 
 #include "../Object.hpp" 
+#include "../AudioSource.hpp" 
 #include "../Behaviour.hpp" 
 #include "../Bounds.hpp" 
 #include "../BoneWeight.hpp" 
 #include "../Rigidbody.hpp" 
 #include "../Scene.hpp" 
 #include "../Light.hpp" 
-#include "../IntVector.hpp" 
+#include "../AudioListener.hpp" 
 #include "../SkinnedMeshRenderer.hpp" 
 #include "../MeshFilter.hpp" 
 #include "../Animation.hpp" 
 #include "../CameraController.hpp" 
+#include "../AudioSystem.hpp" 
+#include "../AudioClip.hpp" 
 #include "../MeshRenderer.hpp" 
 #include "../ShaderProperty.hpp" 
 #include "../Skybox.hpp" 
@@ -490,6 +494,21 @@ namespace FishEngine
 	}
 
 
+	// FishEngine::AudioSystem
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEngine::AudioSystem const & value )
+	{
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
+	}
+
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEngine::AudioSystem & value )
+	{
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
+	}
+
 	// FishEngine::Component
 	void FishEngine::Component::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
@@ -835,38 +854,41 @@ namespace FishEngine
 	}
 
 
-	// FishEngine::SphereCollider
-	void FishEngine::SphereCollider::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEngine::AudioListener
+	void FishEngine::AudioListener::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
 		//archive.BeginClass();
-		FishEngine::Collider::Serialize(archive);
-		archive << FishEngine::make_nvp("m_center", m_center); // FishEngine::Vector3
-		archive << FishEngine::make_nvp("m_radius", m_radius); // float
+		FishEngine::Behaviour::Serialize(archive);
+		archive << FishEngine::make_nvp("m_volume", m_volume); // float
+		archive << FishEngine::make_nvp("m_pause", m_pause); // bool
+		archive << FishEngine::make_nvp("m_velocityUpdateMode", m_velocityUpdateMode); // FishEngine::AudioVelocityUpdateMode
 		//archive.EndClass();
 	}
 
-	void FishEngine::SphereCollider::Deserialize ( FishEngine::InputArchive & archive )
+	void FishEngine::AudioListener::Deserialize ( FishEngine::InputArchive & archive )
 	{
 		//archive.BeginClass(2);
-		FishEngine::Collider::Deserialize(archive);
-		archive >> FishEngine::make_nvp("m_center", m_center); // FishEngine::Vector3
-		archive >> FishEngine::make_nvp("m_radius", m_radius); // float
+		FishEngine::Behaviour::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_volume", m_volume); // float
+		archive >> FishEngine::make_nvp("m_pause", m_pause); // bool
+		archive >> FishEngine::make_nvp("m_velocityUpdateMode", m_velocityUpdateMode); // FishEngine::AudioVelocityUpdateMode
 		//archive.EndClass();
 	}
 
-	FishEngine::ComponentPtr FishEngine::SphereCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
+	FishEngine::ComponentPtr FishEngine::AudioListener::Clone(FishEngine::CloneUtility & cloneUtility) const
 	{
-		auto ret = FishEngine::MakeShared<FishEngine::SphereCollider>();
+		auto ret = FishEngine::MakeShared<FishEngine::AudioListener>();
 		cloneUtility.m_clonedObject[this->GetInstanceID()] = ret;
 		this->CopyValueTo(ret, cloneUtility);
 		return ret;
 	}
 
-	void FishEngine::SphereCollider::CopyValueTo(std::shared_ptr<FishEngine::SphereCollider> target, FishEngine::CloneUtility & cloneUtility) const
+	void FishEngine::AudioListener::CopyValueTo(std::shared_ptr<FishEngine::AudioListener> target, FishEngine::CloneUtility & cloneUtility) const
 	{
-		FishEngine::Collider::CopyValueTo(target, cloneUtility);
-		cloneUtility.Clone(this->m_center, target->m_center); // FishEngine::Vector3
-		cloneUtility.Clone(this->m_radius, target->m_radius); // float
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
+		cloneUtility.Clone(this->m_volume, target->m_volume); // float
+		cloneUtility.Clone(this->m_pause, target->m_pause); // bool
+		cloneUtility.Clone(this->m_velocityUpdateMode, target->m_velocityUpdateMode); // FishEngine::AudioVelocityUpdateMode
 	}
 
 
@@ -1219,6 +1241,41 @@ namespace FishEngine
 
 
 
+	// FishEngine::SphereCollider
+	void FishEngine::SphereCollider::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Collider::Serialize(archive);
+		archive << FishEngine::make_nvp("m_center", m_center); // FishEngine::Vector3
+		archive << FishEngine::make_nvp("m_radius", m_radius); // float
+		//archive.EndClass();
+	}
+
+	void FishEngine::SphereCollider::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Collider::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_center", m_center); // FishEngine::Vector3
+		archive >> FishEngine::make_nvp("m_radius", m_radius); // float
+		//archive.EndClass();
+	}
+
+	FishEngine::ComponentPtr FishEngine::SphereCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
+	{
+		auto ret = FishEngine::MakeShared<FishEngine::SphereCollider>();
+		cloneUtility.m_clonedObject[this->GetInstanceID()] = ret;
+		this->CopyValueTo(ret, cloneUtility);
+		return ret;
+	}
+
+	void FishEngine::SphereCollider::CopyValueTo(std::shared_ptr<FishEngine::SphereCollider> target, FishEngine::CloneUtility & cloneUtility) const
+	{
+		FishEngine::Collider::CopyValueTo(target, cloneUtility);
+		cloneUtility.Clone(this->m_center, target->m_center); // FishEngine::Vector3
+		cloneUtility.Clone(this->m_radius, target->m_radius); // float
+	}
+
+
 	// FishEngine::Camera
 	void FishEngine::Camera::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
@@ -1451,6 +1508,143 @@ namespace FishEngine
 		cloneUtility.Clone(this->m_playAutomatically, target->m_playAutomatically); // bool
 		cloneUtility.Clone(this->m_wrapMode, target->m_wrapMode); // FishEngine::WrapMode
 	}
+
+
+	// FishEngine::AudioSource
+	void FishEngine::AudioSource::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Behaviour::Serialize(archive);
+		archive << FishEngine::make_nvp("m_volume", m_volume); // float
+		archive << FishEngine::make_nvp("m_pitch", m_pitch); // float
+		archive << FishEngine::make_nvp("m_time", m_time); // float
+		archive << FishEngine::make_nvp("m_timeSamples", m_timeSamples); // int
+		archive << FishEngine::make_nvp("m_clip", m_clip); // AudioClipPtr
+		archive << FishEngine::make_nvp("m_isPlaying", m_isPlaying); // bool
+		archive << FishEngine::make_nvp("m_isVirtual", m_isVirtual); // bool
+		archive << FishEngine::make_nvp("m_loop", m_loop); // bool
+		archive << FishEngine::make_nvp("m_ignoreListenerVolume", m_ignoreListenerVolume); // bool
+		archive << FishEngine::make_nvp("m_ignoreListenerPause", m_ignoreListenerPause); // bool
+		archive << FishEngine::make_nvp("m_playOnAwake", m_playOnAwake); // bool
+		archive << FishEngine::make_nvp("m_panStereo", m_panStereo); // float
+		archive << FishEngine::make_nvp("m_spatialBlend", m_spatialBlend); // float
+		archive << FishEngine::make_nvp("m_spatialize", m_spatialize); // bool
+		archive << FishEngine::make_nvp("m_spatializePostEffects", m_spatializePostEffects); // bool
+		archive << FishEngine::make_nvp("m_reverbZoneMix", m_reverbZoneMix); // float
+		archive << FishEngine::make_nvp("m_bypassEffects", m_bypassEffects); // bool
+		archive << FishEngine::make_nvp("m_bypassListenerEffects", m_bypassListenerEffects); // bool
+		archive << FishEngine::make_nvp("m_bypassReverbZones", m_bypassReverbZones); // bool
+		archive << FishEngine::make_nvp("m_dopplerLevel", m_dopplerLevel); // float
+		archive << FishEngine::make_nvp("m_spread", m_spread); // float
+		archive << FishEngine::make_nvp("m_priority", m_priority); // int
+		archive << FishEngine::make_nvp("m_mute", m_mute); // bool
+		archive << FishEngine::make_nvp("m_minDistance", m_minDistance); // float
+		archive << FishEngine::make_nvp("m_maxDistance", m_maxDistance); // float
+		//archive.EndClass();
+	}
+
+	void FishEngine::AudioSource::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Behaviour::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_volume", m_volume); // float
+		archive >> FishEngine::make_nvp("m_pitch", m_pitch); // float
+		archive >> FishEngine::make_nvp("m_time", m_time); // float
+		archive >> FishEngine::make_nvp("m_timeSamples", m_timeSamples); // int
+		archive >> FishEngine::make_nvp("m_clip", m_clip); // AudioClipPtr
+		archive >> FishEngine::make_nvp("m_isPlaying", m_isPlaying); // bool
+		archive >> FishEngine::make_nvp("m_isVirtual", m_isVirtual); // bool
+		archive >> FishEngine::make_nvp("m_loop", m_loop); // bool
+		archive >> FishEngine::make_nvp("m_ignoreListenerVolume", m_ignoreListenerVolume); // bool
+		archive >> FishEngine::make_nvp("m_ignoreListenerPause", m_ignoreListenerPause); // bool
+		archive >> FishEngine::make_nvp("m_playOnAwake", m_playOnAwake); // bool
+		archive >> FishEngine::make_nvp("m_panStereo", m_panStereo); // float
+		archive >> FishEngine::make_nvp("m_spatialBlend", m_spatialBlend); // float
+		archive >> FishEngine::make_nvp("m_spatialize", m_spatialize); // bool
+		archive >> FishEngine::make_nvp("m_spatializePostEffects", m_spatializePostEffects); // bool
+		archive >> FishEngine::make_nvp("m_reverbZoneMix", m_reverbZoneMix); // float
+		archive >> FishEngine::make_nvp("m_bypassEffects", m_bypassEffects); // bool
+		archive >> FishEngine::make_nvp("m_bypassListenerEffects", m_bypassListenerEffects); // bool
+		archive >> FishEngine::make_nvp("m_bypassReverbZones", m_bypassReverbZones); // bool
+		archive >> FishEngine::make_nvp("m_dopplerLevel", m_dopplerLevel); // float
+		archive >> FishEngine::make_nvp("m_spread", m_spread); // float
+		archive >> FishEngine::make_nvp("m_priority", m_priority); // int
+		archive >> FishEngine::make_nvp("m_mute", m_mute); // bool
+		archive >> FishEngine::make_nvp("m_minDistance", m_minDistance); // float
+		archive >> FishEngine::make_nvp("m_maxDistance", m_maxDistance); // float
+		//archive.EndClass();
+	}
+
+	FishEngine::ComponentPtr FishEngine::AudioSource::Clone(FishEngine::CloneUtility & cloneUtility) const
+	{
+		auto ret = FishEngine::MakeShared<FishEngine::AudioSource>();
+		cloneUtility.m_clonedObject[this->GetInstanceID()] = ret;
+		this->CopyValueTo(ret, cloneUtility);
+		return ret;
+	}
+
+	void FishEngine::AudioSource::CopyValueTo(std::shared_ptr<FishEngine::AudioSource> target, FishEngine::CloneUtility & cloneUtility) const
+	{
+		FishEngine::Behaviour::CopyValueTo(target, cloneUtility);
+		cloneUtility.Clone(this->m_volume, target->m_volume); // float
+		cloneUtility.Clone(this->m_pitch, target->m_pitch); // float
+		cloneUtility.Clone(this->m_time, target->m_time); // float
+		cloneUtility.Clone(this->m_timeSamples, target->m_timeSamples); // int
+		cloneUtility.Clone(this->m_clip, target->m_clip); // AudioClipPtr
+		cloneUtility.Clone(this->m_isPlaying, target->m_isPlaying); // bool
+		cloneUtility.Clone(this->m_isVirtual, target->m_isVirtual); // bool
+		cloneUtility.Clone(this->m_loop, target->m_loop); // bool
+		cloneUtility.Clone(this->m_ignoreListenerVolume, target->m_ignoreListenerVolume); // bool
+		cloneUtility.Clone(this->m_ignoreListenerPause, target->m_ignoreListenerPause); // bool
+		cloneUtility.Clone(this->m_playOnAwake, target->m_playOnAwake); // bool
+		cloneUtility.Clone(this->m_panStereo, target->m_panStereo); // float
+		cloneUtility.Clone(this->m_spatialBlend, target->m_spatialBlend); // float
+		cloneUtility.Clone(this->m_spatialize, target->m_spatialize); // bool
+		cloneUtility.Clone(this->m_spatializePostEffects, target->m_spatializePostEffects); // bool
+		cloneUtility.Clone(this->m_reverbZoneMix, target->m_reverbZoneMix); // float
+		cloneUtility.Clone(this->m_bypassEffects, target->m_bypassEffects); // bool
+		cloneUtility.Clone(this->m_bypassListenerEffects, target->m_bypassListenerEffects); // bool
+		cloneUtility.Clone(this->m_bypassReverbZones, target->m_bypassReverbZones); // bool
+		cloneUtility.Clone(this->m_dopplerLevel, target->m_dopplerLevel); // float
+		cloneUtility.Clone(this->m_spread, target->m_spread); // float
+		cloneUtility.Clone(this->m_priority, target->m_priority); // int
+		cloneUtility.Clone(this->m_mute, target->m_mute); // bool
+		cloneUtility.Clone(this->m_minDistance, target->m_minDistance); // float
+		cloneUtility.Clone(this->m_maxDistance, target->m_maxDistance); // float
+	}
+
+
+	// FishEngine::AudioClip
+	void FishEngine::AudioClip::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Object::Serialize(archive);
+		archive << FishEngine::make_nvp("m_length", m_length); // float
+		archive << FishEngine::make_nvp("m_samples", m_samples); // int
+		archive << FishEngine::make_nvp("m_channels", m_channels); // int
+		archive << FishEngine::make_nvp("m_frequency", m_frequency); // int
+		archive << FishEngine::make_nvp("m_preloadAudioData", m_preloadAudioData); // bool
+		archive << FishEngine::make_nvp("m_loadType", m_loadType); // FishEngine::AudioClipLoadType
+		archive << FishEngine::make_nvp("m_loadState", m_loadState); // FishEngine::AudioDataLoadState
+		archive << FishEngine::make_nvp("m_loadInBackground", m_loadInBackground); // bool
+		//archive.EndClass();
+	}
+
+	void FishEngine::AudioClip::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Object::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_length", m_length); // float
+		archive >> FishEngine::make_nvp("m_samples", m_samples); // int
+		archive >> FishEngine::make_nvp("m_channels", m_channels); // int
+		archive >> FishEngine::make_nvp("m_frequency", m_frequency); // int
+		archive >> FishEngine::make_nvp("m_preloadAudioData", m_preloadAudioData); // bool
+		archive >> FishEngine::make_nvp("m_loadType", m_loadType); // FishEngine::AudioClipLoadType
+		archive >> FishEngine::make_nvp("m_loadState", m_loadState); // FishEngine::AudioDataLoadState
+		archive >> FishEngine::make_nvp("m_loadInBackground", m_loadInBackground); // bool
+		//archive.EndClass();
+	}
+
 
 
 } // namespace FishEngine

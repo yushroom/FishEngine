@@ -33,7 +33,8 @@ namespace FishEditor
 
 		virtual SerializedObjectPtr GetSerializedObjectInternal() override
 		{
-			if (this->m_SerializedObject)
+			//if (this->m_SerializedObject)
+			return nullptr;
 		}
 
 	private:

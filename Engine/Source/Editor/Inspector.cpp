@@ -30,6 +30,9 @@
 #include <Material.hpp>
 #include <Animation.hpp>
 #include <AnimationClip.hpp>
+#include <AudioClip.hpp>
+#include <AudioSource.hpp>
+#include <AudioListener.hpp>
 
 #include "EditorGUI.hpp"
 //#include "private/EditorGUI_p.hpp"
@@ -292,6 +295,22 @@ void Inspector::OnInspectorGUI(const std::shared_ptr<FishEngine::Animation> & an
 	EditorGUI::ObjectField("clip", animation->m_clip);
 }
 
+template<>
+void Inspector::OnInspectorGUI(const AudioSourcePtr & c)
+{
+	OnInspectorGUI<Behaviour>(c);
+	EditorGUI::ObjectField("AudioClip", c->m_clip);
+	EditorGUI::Toggle("Mute", &c->m_mute);
+	EditorGUI::Toggle("Play On Awake", &c->m_playOnAwake);
+	EditorGUI::Toggle("Loop", &c->m_loop);
+}
+
+template<>
+void Inspector::OnInspectorGUI(const AudioListenerPtr & c)
+{
+	OnInspectorGUI<Behaviour>(c);
+}
+
 #if 0
 
 template<>
@@ -505,7 +524,7 @@ QAction* FishEditor::Inspector::ShowComponentMenu()
 
 void Inspector::BeginComponentImpl(const ComponentPtr &component)
 {
-	LogInfo("Not Implemented for " + component->ClassName());
+	LogWarning("Not Implemented for " + component->ClassName());
 	UIHeaderState state;
 	if ( EditorGUI::BeginComponent( component->ClassName(), &state ) )
 	{
@@ -594,6 +613,8 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 		CASE(CapsuleCollider)
 		CASE(Script)
 		CASE(Animation)
+		CASE(AudioSource)
+		CASE(AudioListener)
 		default:
 			//Foldout( component->ClassName() );
 			BeginComponentImpl(component);

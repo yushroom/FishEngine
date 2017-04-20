@@ -9,6 +9,7 @@
 #include "../ShaderImporter.hpp" 
 #include "../TextureImporter.hpp" 
 #include "../AssetImporter.hpp" 
+#include "../AudioImporterSampleSettings.hpp" 
 #include "../ProjectSettings.hpp" 
 #include "../PropertyModification.hpp" 
 #include "../NativeFormatImporter.hpp" 
@@ -16,6 +17,7 @@
 #include "../ModelImporter.hpp" 
 #include "../EditorGUILayout.hpp" 
 #include "../EditorUtility.hpp" 
+#include "../AudioImporter.hpp" 
 
 namespace FishEditor
 {
@@ -77,22 +79,20 @@ namespace FishEditor
 
 
 
-	// FishEditor::NativeFormatImporter
-	void FishEditor::NativeFormatImporter::Serialize ( FishEngine::OutputArchive & archive ) const
+	// FishEditor::EditorUtility
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::EditorUtility const & value )
 	{
-		//archive.BeginClass();
-		FishEditor::AssetImporter::Serialize(archive);
-		//archive.EndClass();
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
 	}
 
-	void FishEditor::NativeFormatImporter::Deserialize ( FishEngine::InputArchive & archive )
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::EditorUtility & value )
 	{
-		//archive.BeginClass(2);
-		FishEditor::AssetImporter::Deserialize(archive);
-		//archive.EndClass();
+		archive.BeginClass();
+		archive.EndClass();
+		return archive;
 	}
-
-
 
 	// FishEditor::ProjectSettings
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::ProjectSettings const & value )
@@ -124,20 +124,22 @@ namespace FishEditor
 		return archive;
 	}
 
-	// FishEditor::EditorUtility
-	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::EditorUtility const & value )
+	// FishEditor::NativeFormatImporter
+	void FishEditor::NativeFormatImporter::Serialize ( FishEngine::OutputArchive & archive ) const
 	{
-		archive.BeginClass();
-		archive.EndClass();
-		return archive;
+		//archive.BeginClass();
+		FishEditor::AssetImporter::Serialize(archive);
+		//archive.EndClass();
 	}
 
-	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::EditorUtility & value )
+	void FishEditor::NativeFormatImporter::Deserialize ( FishEngine::InputArchive & archive )
 	{
-		archive.BeginClass();
-		archive.EndClass();
-		return archive;
+		//archive.BeginClass(2);
+		FishEditor::AssetImporter::Deserialize(archive);
+		//archive.EndClass();
 	}
+
+
 
 	// FishEditor::PropertyModification
 	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::PropertyModification const & value )
@@ -158,6 +160,58 @@ namespace FishEditor
 		archive >> FishEngine::make_nvp("propertyPath", value.propertyPath); // std::string
 		archive >> FishEngine::make_nvp("value", value.value); // std::string
 		archive >> FishEngine::make_nvp("objectReference", value.objectReference); // FishEngine::ObjectPtr
+		archive.EndClass();
+		return archive;
+	}
+
+	// FishEditor::AudioImporter
+	void FishEditor::AudioImporter::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEditor::AssetImporter::Serialize(archive);
+		archive << FishEngine::make_nvp("m_defaultSampleSettings", m_defaultSampleSettings); // FishEditor::AudioImporterSampleSettings
+		archive << FishEngine::make_nvp("m_forceToMono", m_forceToMono); // bool
+		archive << FishEngine::make_nvp("m_loadInBackground", m_loadInBackground); // bool
+		archive << FishEngine::make_nvp("m_preloadAudioData", m_preloadAudioData); // bool
+		//archive.EndClass();
+	}
+
+	void FishEditor::AudioImporter::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEditor::AssetImporter::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_defaultSampleSettings", m_defaultSampleSettings); // FishEditor::AudioImporterSampleSettings
+		archive >> FishEngine::make_nvp("m_forceToMono", m_forceToMono); // bool
+		archive >> FishEngine::make_nvp("m_loadInBackground", m_loadInBackground); // bool
+		archive >> FishEngine::make_nvp("m_preloadAudioData", m_preloadAudioData); // bool
+		//archive.EndClass();
+	}
+
+
+
+	// FishEditor::AudioImporterSampleSettings
+	FishEngine::OutputArchive & operator << ( FishEngine::OutputArchive & archive, FishEditor::AudioImporterSampleSettings const & value )
+	{
+		archive.BeginClass();
+		archive << FishEngine::make_nvp("loadType", value.loadType); // FishEngine::AudioClipLoadType
+		archive << FishEngine::make_nvp("sampleRateSetting", value.sampleRateSetting); // FishEditor::AudioSampleRateSetting
+		archive << FishEngine::make_nvp("sampleRateOverride", value.sampleRateOverride); // uint32_t
+		archive << FishEngine::make_nvp("compressionFormat", value.compressionFormat); // FishEngine::AudioCompressionFormat
+		archive << FishEngine::make_nvp("quality", value.quality); // float
+		archive << FishEngine::make_nvp("conversionMode", value.conversionMode); // int
+		archive.EndClass();
+		return archive;
+	}
+
+	FishEngine::InputArchive & operator >> ( FishEngine::InputArchive & archive, FishEditor::AudioImporterSampleSettings & value )
+	{
+		archive.BeginClass();
+		archive >> FishEngine::make_nvp("loadType", value.loadType); // FishEngine::AudioClipLoadType
+		archive >> FishEngine::make_nvp("sampleRateSetting", value.sampleRateSetting); // FishEditor::AudioSampleRateSetting
+		archive >> FishEngine::make_nvp("sampleRateOverride", value.sampleRateOverride); // uint32_t
+		archive >> FishEngine::make_nvp("compressionFormat", value.compressionFormat); // FishEngine::AudioCompressionFormat
+		archive >> FishEngine::make_nvp("quality", value.quality); // float
+		archive >> FishEngine::make_nvp("conversionMode", value.conversionMode); // int
 		archive.EndClass();
 		return archive;
 	}

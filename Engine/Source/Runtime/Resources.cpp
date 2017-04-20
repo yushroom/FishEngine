@@ -1,9 +1,11 @@
 #include "Resources.hpp"
+#include <boost/algorithm/string.hpp>
 
 namespace FishEngine
 {
-	AssetType Resources::GetAssetType(Path const & ext)
+	AssetType Resources::GetAssetType(Path const & extension)
 	{
+		auto ext = boost::to_lower_copy(extension.string());
 		//auto ext = path.extension();
 		if (ext == ".jpg" || ext == ".png" || ext == ".jpeg" || ext == ".tga" || ext == ".dds" || ext == ".psd")
 		{
@@ -29,7 +31,7 @@ namespace FishEngine
 		{
 			return AssetType::Prefab;
 		}
-		else if (ext == ".mp3")
+		else if (ext == ".mp3" || ext == ".ogg" || ext == ".wav")
 		{
 			return AssetType::AudioClip;
 		}

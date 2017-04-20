@@ -13,7 +13,7 @@ namespace FishEngine
 
 // enum count
 template<>
-constexpr int EnumCount<FishEngine::AssetType>() { return 8; }
+constexpr int EnumCount<FishEngine::AssetType>() { return 9; }
 
 // string array
 static const char* AssetTypeStrings[] =
@@ -25,7 +25,8 @@ static const char* AssetTypeStrings[] =
 	"Shader",
 	"Material",
 	"Script",
-	"Prefab"
+	"Prefab",
+	"AudioClip"
 };
 
 // cstring array
@@ -48,6 +49,7 @@ inline FishEngine::AssetType ToEnum<FishEngine::AssetType>(const int index)
 	case 5: return FishEngine::AssetType::Material; break;
 	case 6: return FishEngine::AssetType::Script; break;
 	case 7: return FishEngine::AssetType::Prefab; break;
+	case 8: return FishEngine::AssetType::AudioClip; break;
 	
     default: abort(); break;
     }
@@ -66,6 +68,7 @@ inline int EnumToIndex<FishEngine::AssetType>(FishEngine::AssetType e)
 	case FishEngine::AssetType::Material: return 5; break;
 	case FishEngine::AssetType::Script: return 6; break;
 	case FishEngine::AssetType::Prefab: return 7; break;
+	case FishEngine::AssetType::AudioClip: return 8; break;
 	
     default: abort(); break;
     }
@@ -83,6 +86,7 @@ inline FishEngine::AssetType ToEnum<FishEngine::AssetType>(const std::string& s)
 	if (s == "Material") return FishEngine::AssetType::Material;
 	if (s == "Script") return FishEngine::AssetType::Script;
 	if (s == "Prefab") return FishEngine::AssetType::Prefab;
+	if (s == "AudioClip") return FishEngine::AssetType::AudioClip;
 	
     abort();
 }

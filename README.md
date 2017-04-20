@@ -18,6 +18,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with so
 - Deferred Rendering
 - Asset management (WIP)
 - Physics system (WIP)
+- Audio
 
 
 
@@ -73,12 +74,13 @@ cmake --build . --target FishEditor --config Release
 
 - [boost](http://www.boost.org/) (filesystem)
 - [Autodesk FBX SDK](http://www.autodesk.com/products/fbx/overview) (.fbx model importer)
-- [Qt](https://www.qt.io) (Editor only,  GUI / image loader)
+- [Qt](https://www.qt.io) (Editor only,  GUI)
 - [gli](https://github.com/g-truc/gli) (dds texture loader) and [glm](https://github.com/g-truc/glm) (required by gli)
 - [freeimage](http://freeimage.sourceforge.net/) (image loader)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp) (serialization)
 - [PhysX](https://developer.nvidia.com/physx-sdk) (physics system)
 - [glfw](https://github.com/glfw/glfw)(window and input)
+- [FMOD](http://www.fmod.org/download/)(audio)
 
 
 **for MS Windows:**

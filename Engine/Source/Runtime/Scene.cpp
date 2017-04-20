@@ -16,6 +16,7 @@
 //#include "Serialization.hpp"
 //#include "Serialization/archives/yaml.hpp"
 #include "Camera.hpp"
+#include "AudioListener.hpp"
 
 #include "GLEnvironment.hpp"
 #include "Graphics.hpp"
@@ -47,6 +48,7 @@ namespace FishEngine
 		auto camera = Camera::Create();	// make sure camera is in Camera::allcameras
 		camera_go->AddComponent(camera);
 		camera_go->AddComponent<CameraController>();
+		camera_go->AddComponent<AudioListener>();
 		return camera_go;
 	}
 

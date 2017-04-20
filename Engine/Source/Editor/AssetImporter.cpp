@@ -5,12 +5,14 @@
 #include <GameObject.hpp>
 #include <Timer.hpp>
 #include <Shader.hpp>
+#include <AudioClip.hpp>
 
 #include "TextureImporter.hpp"
 #include "FBXImporter.hpp"
 #include "NativeFormatImporter.hpp"
 #include "ShaderImporter.hpp"
 #include "DDSImporter.hpp"
+#include "AudioImporter.hpp"
 
 #include "AssetArchive.hpp"
 #include "SceneArchive.hpp"
@@ -114,7 +116,7 @@ namespace FishEditor
 			if (ext == ".dds")
 			{
 				auto importer = GetAssetImporter<DDSImporter>(path);
-				s_pathToImpoter[path] = importer;
+				//s_pathToImpoter[path] = importer;
 				//Timer t(path.string());
 				auto texture = importer->Load();
 				texture->setName(path.stem().string());
@@ -126,7 +128,7 @@ namespace FishEditor
 			else
 			{
 				auto importer = GetAssetImporter<TextureImporter>(path);
-				s_pathToImpoter[path] = importer;
+				//s_pathToImpoter[path] = importer;
 				//Timer t(path.string());
 				auto texture = importer->Import(path);
 				texture->setName(path.stem().string());
@@ -140,18 +142,18 @@ namespace FishEditor
 		{
 			//auto shader = Shader::CreateFromFile(path);
 			auto importer = GetAssetImporter<ShaderImporter>(path);
-			s_pathToImpoter[path] = importer;
+			//s_pathToImpoter[path] = importer;
 			auto shader = importer->Load();
 			shader->setName(path.stem().string());
 			importer->asset()->Add(shader);
 			s_objectInstanceIDToPath[shader->GetInstanceID()] = path;
 			ret = importer;
 		}
-		else if (ext == ".fbx" || ext == ".FBX" || ext == ".obj")
+		else if (type == AssetType::Model)
 		{
 			Timer t(path.string());
 			auto importer = GetAssetImporter<FBXImporter>(path);
-			s_pathToImpoter[path] = importer;
+			//s_pathToImpoter[path] = importer;
 			auto modelPrefab = importer->Load(path);
 			modelPrefab->setName(path.stem().string());
 			modelPrefab->rootGameObject()->setName(path.stem().string());
@@ -165,13 +167,22 @@ namespace FishEditor
 			//archive.setSerializePrefab(true);
 			//archive << modelPrefab;
 		}
-		else if (ext == ".mat")
+		else if (type == AssetType::AudioClip)
+		{
+			auto importer = GetAssetImporter<AudioImporter>(path);
+			auto clip = importer->Import(path);
+			clip->setName(path.stem().string());
+			importer->asset()->Add(clip);
+			s_objectInstanceIDToPath[clip->GetInstanceID()] = path;
+			ret = importer;
+		}
+		else if (type == AssetType::Material)
 		{
 			auto importer = GetAssetImporter<NativeFormatImporter>(path);
 			auto material = importer->Load(path);
 			material->setName(path.stem().string());
 			importer->m_asset->Add(material);
-			s_pathToImpoter[path] = importer;
+			//s_pathToImpoter[path] = importer;
 			s_objectInstanceIDToPath[material->GetInstanceID()] = path;
 			ret = importer;
 		}
@@ -180,6 +191,7 @@ namespace FishEditor
 		if (ret != nullptr)
 		{
 			s_importerGUIDToObject[ret->GetGUID()] = ret->asset();
+			s_pathToImpoter[path] = ret;
 		}
 
 		if (ret != nullptr && ret->m_assetTimeStamp == 0)	// if the .meta file is newly created

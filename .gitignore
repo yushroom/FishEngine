@@ -2,6 +2,10 @@
 *.pro.user
 
 # 3rd party libs
+/Engine/ThirdParty/**/*.lib
+/Engine/ThirdParty/**/*.dll
+/Engine/ThirdParty/**/*.dylib
+/Engine/ThirdParty/**/*.a
 
 # generated
 # /Engine/Source/Runtime/generate/
@@ -14,10 +18,24 @@
 /temp/
 *.pyc
 /Script/reflect/temp/
+/Engine/Source/Runtime/**/temp/
 
 # Example
 /Example/*/build
-*.meta
+/Example/**/*.meta
+# image
+/Example/**/*.psd
+/Example/**/*.png
+/Example/**/*.tga
+/Example/**/*.dds
+/Example/**/*.jpg
+# 3d model
+/Example/**/*.fbx
+/Example/**/*.obj
+# audio
+/Example/**/*.mp3
+/Example/**/*.ogg
+/Example/**/*.wav
 
 # cmake build
 /Engine/[Bb]uild

@@ -11,6 +11,7 @@
 #include "NativeFormatImporter.hpp"
 #include "ShaderImporter.hpp"
 #include "DDSImporter.hpp"
+#include "AudioImporter.hpp"
 
 using namespace FishEngine;
 
@@ -132,6 +133,10 @@ FishEditor::AssetImporterPtr FishEditor::MetaInputArchive::DeserializeAssetImpor
 		else if (key == "DDSImporter")
 		{
 			importer = std::make_shared<DDSImporter>();
+		}
+		else if (key == "AudioImporter")
+		{
+			importer = std::make_shared<AudioImporter>();
 		}
 		else
 		{

@@ -136,6 +136,9 @@ namespace FishEngine
 
 	class AudioSource;
 	typedef std::shared_ptr<AudioSource> AudioSourcePtr;
+
+	class AudioListener;
+	typedef std::shared_ptr<AudioListener> AudioListenerPtr;
 }
 
 // hack: inject FishEditor namespace

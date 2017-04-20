@@ -9,6 +9,7 @@ namespace FishEditor
 	class NativeFormatImporter;
 	class ShaderImporter;
 	class DDSImporter;
+	class AudioImporter;
 }
 
 namespace FishEngine
@@ -820,9 +821,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<AvatarMask>() { return 1011; }
 	
-	class AudioImporter;
+	//class AudioImporter;
 	template<>
-	constexpr int ClassID<AudioImporter>() { return 1020; }
+	constexpr int ClassID<FishEditor::AudioImporter>() { return 1020; }
 	
 	class HierarchyState;
 	template<>

@@ -9,9 +9,7 @@
 #include <Debug.hpp>
 #include <Camera.hpp>
 #include <GameObject.hpp>
-//#include <CameraController.hpp>
 #include <ModelImporter.hpp>
-//#include <TextureImporter.hpp>
 #include <Shader.hpp>
 #include <Scene.hpp>
 #include <Screen.hpp>
@@ -28,6 +26,9 @@
 #include <Animation.hpp>
 #include <AnimationClip.hpp>
 #include <Time.hpp>
+#include <AudioSystem.hpp>
+#include <AudioSource.hpp>
+#include <AudioClip.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -35,6 +36,7 @@
 #include "SceneViewEditor.hpp"
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
+
 
 using namespace FishEngine;
 using namespace std;
@@ -321,6 +323,10 @@ namespace FishEditor
 		auto modelGO = Object::Instantiate(model);
 		auto animation = modelGO->AddComponent<Animation>();
 		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_001_SAK01_Final.fbx");
+
+		auto unite_in_the_sky = AssetDatabase::LoadAssetAtPath2<AudioClip>("Assets/UniteInTheSky/Unite In The Sky (full).mp3");
+		auto audio_source = modelGO->AddComponent<AudioSource>();
+		audio_source->setClip(unite_in_the_sky);
 
 		auto stage_model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChanStage/Models/stage.fbx");
 		auto stage_go = Object::Instantiate(stage_model);
@@ -731,6 +737,16 @@ namespace FishEditor
 	}
 
 
+	void InitializeScene_TestAudio()
+	{
+		auto c_ogg = AssetDatabase::LoadAssetAtPath2<AudioClip>("Assets/c.ogg");
+		auto swish = AssetDatabase::LoadAssetAtPath2<AudioClip>("Assets/swish.wav");
+		//AudioSource::PlayClipAtPoint(c_ogg, Vector3::zero);
+		auto go = Scene::CreateGameObject("Aduio");
+		auto audio_source = go->AddComponent<AudioSource>();
+		audio_source->setClip(swish);
+	}
+
 	void InitializeScene_Empty()
 	{
 		auto whiteCube = GameObject::CreatePrimitive(PrimitiveType::Cube);
@@ -823,6 +839,10 @@ namespace FishEditor
 		{
 			InitializeScene_TestScript();
 		}
+		else if (projectName == "TestAudio")
+		{
+			InitializeScene_TestAudio();
+		}
 		else if (projectName == "Empty")
 		{
 			InitializeScene_Empty();
@@ -850,6 +870,7 @@ namespace FishEditor
 			Time::m_deltaTime = ms / 1000.0f;
 			Scene::Update();
 			PhysicsSystem::FixedUpdate();
+			AudioSystem::Update();
 		}
 		else
 		{

@@ -1,33 +1,32 @@
-#if 0
-#include <string>
-
 #include "GameApp.hpp"
-#include "GLEnvironment.hpp"
-#include <glfw/glfw3.h>
 
-#include "Debug.hpp"
-#include "Resources.hpp"
-#include "Input.hpp"
-#include "Screen.hpp"
-#include "RenderSystem.hpp"
-#include "Scene.hpp"
-#include "Camera.hpp"
-#include "PhysicsSystem.hpp"
-#include "RenderTarget.hpp"
-#include "Pipeline.hpp"
-#include "Material.hpp"
-//#include "ModelImporter.hpp"
-#include "Graphics.hpp"
+#include <string>
+#include <GLFW/glfw3.h>
+
+#include <GLEnvironment.hpp>
+#include <Debug.hpp>
+#include <Resources.hpp>
+#include <Input.hpp>
+#include <Screen.hpp>
+#include <RenderSystem.hpp>
+#include <Scene.hpp>
+#include <Camera.hpp>
+#include <PhysicsSystem.hpp>
+#include <RenderTarget.hpp>
+#include <Pipeline.hpp>
+#include <Material.hpp>
+#include <Graphics.hpp>
+#include <Shader.hpp>
+#include <ShaderCompiler.hpp>
+#include <Mesh.hpp>
 
 using namespace std;
+using namespace FishEngine;
+//using namespace FishGame;
 
-namespace FishEngine
-{
-
-	GLFWwindow* GameApp::m_window = nullptr;
-
-	int GameApp::m_windowWidth = 128;
-int GameApp::m_windowHeight = 128;
+GLFWwindow* GameApp::m_window = nullptr;
+int GameApp::m_windowWidth = 640;
+int GameApp::m_windowHeight = 480;
 
 int GameApp::Run()
 {
@@ -78,7 +77,14 @@ int GameApp::Run()
 	Screen::m_height = h;
 	Screen::m_pixelsPerPoint = static_cast<float>(w) / m_windowWidth;
 
-	Resources::Init();
+	auto shaderRoot = FishEngine::Path("/Users/yushroom/program/FishEngine/Engine/Shaders");
+	auto shaderIncludeDir = shaderRoot / "include";
+	ShaderCompiler::setShaderIncludeDir(shaderIncludeDir.string());
+	Shader::Init(shaderRoot.string());
+	
+	Mesh::Init("/Users/yushroom/program/FishEngine/assets/Models");
+	
+	//Resources::Init();
 	Input::Init();
 	RenderSystem::Init();
 	//WindowSizeCallback(m_window, m_windowWidth, m_windowHeight);
@@ -89,6 +95,8 @@ int GameApp::Run()
 
 	Scene::Start();
 	//PhysicsSystem::Start();
+	
+	Init();
 
 	constexpr int report_frames = 100;
 	int frames = 0;
@@ -215,7 +223,3 @@ void GameApp::WindowSizeCallback(GLFWwindow* window, int width, int height)
 //{
 //    ImGui_ImplGlfwGL3_CharCallback(window, codepoint);
 //}
-
-}
-
-#endif

@@ -8,6 +8,7 @@
 #include "UI/UIHeaderState.hpp"
 #include <ReflectEnum.hpp>
 
+#include <Object.hpp>
 #include <Color.hpp>
 #include <ReflectClass.hpp>
 

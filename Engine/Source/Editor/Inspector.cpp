@@ -227,7 +227,7 @@ void Inspector::OnInspectorGUI(const FishEngine::SkinnedMeshRendererPtr& rendere
 {
 	OnInspectorGUI<Renderer>(renderer);
 	EditorGUI::ObjectField( "Mesh", renderer->m_sharedMesh );
-	EditorGUI::ObjectField( "Root Bone", renderer->m_rootBone.lock() );
+	//EditorGUI::ObjectField( "Root Bone", renderer->m_rootBone.lock() );
 	EditorGUI::FloatField( "Submesh Count", renderer->m_sharedMesh->subMeshCount() );
 }
 

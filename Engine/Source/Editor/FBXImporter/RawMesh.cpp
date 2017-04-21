@@ -86,7 +86,7 @@ std::shared_ptr<Mesh> FishEngine::RawMesh::ToMesh()
 	}
 
 	// now positionBuffer.size() == normalBuffer.size() == uvBuffer.size() == tangentBuffer.size()
-	auto ret = std::make_shared<Mesh>(std::move(positionBuffer), std::move(normalBuffer), std::move(uvBuffer), std::move(tangentBuffer), std::move(indexBuffer));
+	auto ret = MakeShared<Mesh>(std::move(positionBuffer), std::move(normalBuffer), std::move(uvBuffer), std::move(tangentBuffer), std::move(indexBuffer));
 	if (m_subMeshCount > 1)
 	{
 		ret->m_subMeshCount = m_subMeshCount;

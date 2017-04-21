@@ -23,7 +23,7 @@ namespace FishEngine
 
 	FishEngine::TexturePtr Texture::Create()
 	{
-		auto t = std::make_shared<Texture>();
+		auto t = MakeShared<Texture>();
 		s_textures.push_back(t);
 		return t;
 	}

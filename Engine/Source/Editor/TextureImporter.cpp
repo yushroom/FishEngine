@@ -401,7 +401,7 @@ namespace FishEditor
 	FishEngine::TexturePtr TextureImporter::Import(Path const & path)
 	{
 		m_assetPath = path;
-		auto texture = std::make_shared<Texture2D>();
+		auto texture = MakeShared<Texture2D>();
 		this->ImportTo(texture);
 		m_asset->Add(texture);
 		return texture;

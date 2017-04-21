@@ -29,7 +29,7 @@ namespace FishEngine
 		float farClipPlane, 
 		CameraType type /*= CameraType::Game*/)
 	{
-		auto camera = std::make_shared<Camera>(fov, nearClipPlane, farClipPlane);
+		auto camera = MakeShared<Camera>(fov, nearClipPlane, farClipPlane);
 		camera->m_cameraType = type;
 		m_allCameras.push_back(camera);
 		return camera;

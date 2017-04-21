@@ -111,7 +111,7 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 	
 	if (dimension == TextureDimension::Tex2D)
 	{
-		auto tex2d = std::make_shared<Texture2D>();
+		auto tex2d = MakeShared<Texture2D>();
 		tex2d->m_format = format;
 		tex2d->m_width = width;
 		tex2d->m_height = height;
@@ -130,7 +130,7 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 		assert(gli_texture.faces() == 6);
 		assert(gli_texture.layers() == 1);
 		
-		auto texCube = std::make_shared<Cubemap>(width, format, true);
+		auto texCube = MakeShared<Cubemap>(width, format, true);
 		texCube->m_mipmapCount = mipmapCount;
 		for (auto & face: texCube->m_pixels)
 		{

@@ -199,7 +199,7 @@ void ProjectListView::CreateMaterial()
 {
 	//auto index = m_fileModel->AddItem("New Material.mat", false);
 	//this->edit(index);
-	//auto mat = std::make_shared<FishEngine::Material>();
+	//auto mat = MakeShared<FishEngine::Material>();
 	auto mat = FishEngine::Material::defaultMaterial();
 	auto path = Path(m_fileModel->rootPath().toStdString()) / "New Material.mat";
 	std::ofstream fout(path.string());

@@ -192,7 +192,7 @@ void Inspector::OnInspectorGUI(const FishEngine::MaterialPtr& material)
 			//ImGui::SameLine();
 			//ImGui::Button("Select");
 			auto& tex = material->m_textures[u.name];
-			EditorGUI::TextureField(u.name, &tex);
+			EditorGUI::TextureField(u.name, tex);
 		}
 	}
 }
@@ -204,7 +204,7 @@ void Inspector::OnInspectorGUI(const FishEngine::RendererPtr& renderer)
 	EditorGUI::FloatField("Instance ID", renderer->GetInstanceID());
 	EditorGUI::EnumPopup("Cast Shadows", &renderer->m_shadowCastingMode);
 	EditorGUI::Toggle("Receive Shadows", &renderer->m_receiveShadows);
-	for (auto const & material : renderer->m_materials)
+	for (auto & material : renderer->m_materials)
 	{
 		EditorGUI::ObjectField("Material", material);
 	}
@@ -299,6 +299,9 @@ template<>
 void Inspector::OnInspectorGUI(const AudioSourcePtr & c)
 {
 	OnInspectorGUI<Behaviour>(c);
+	//auto clip = EditorGUI::ObjectField("AudioClip", c->m_clip);
+	//if (clip->GetInstanceID() != c->m_clip->GetInstanceID())
+	//	c->m_clip = As<AudioClip>( clip );
 	EditorGUI::ObjectField("AudioClip", c->m_clip);
 	EditorGUI::Toggle("Mute", &c->m_mute);
 	EditorGUI::Toggle("Play On Awake", &c->m_playOnAwake);

@@ -55,9 +55,24 @@ namespace FishEditor
 
 		static bool Slider(std::string const & label, float * value, float leftValue, float rightValue);
 
-		static bool ObjectField(std::string const & label, FishEngine::ObjectPtr const & obj);
-		static bool TextureField(std::string const & label, FishEngine::TexturePtr * texture);
+		//typedef std::function<ObjectPtr>
+		template<class T>
+		static bool ObjectField(std::string const & label, std::shared_ptr<T> & obj)
+		{
+			static_assert(std::is_base_of<FishEngine::Object, T>::value, "Object only");
+			auto ret = ObjectFieldImpl(label, obj);
+			bool changed = false;
+			if (ret->GetInstanceID() != obj->GetInstanceID())
+			{
+				obj = FishEngine::As<T>(ret);
+				changed = true;
+			}
+			return changed;
+		}
+		static FishEngine::ObjectPtr ObjectFieldImpl(std::string const & label, FishEngine::ObjectPtr const & obj);
 		
+		static bool TextureField(std::string const & label, FishEngine::TexturePtr & texture);
+
 		static void RevertApplyButtons(bool enabled);
 
 	private:

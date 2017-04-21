@@ -254,35 +254,35 @@ bool EditorGUI::Vector4Field(std::string const & label, FishEngine::Vector4 * v)
 }
 
 
-bool EditorGUI::ObjectField(std::string const & label, FishEngine::ObjectPtr const & obj)
+FishEngine::ObjectPtr EditorGUI::ObjectFieldImpl(std::string const & label, FishEngine::ObjectPtr const & obj)
 {
 	std::string name = "none";
 	if (obj != nullptr)
 		name = obj->name();
 	UIObjecField * objField = CheckNextWidget<UIObjecField>(label, name);
+	auto ret = obj;
 	if (objField->CheckUpdate(label, name))
 	{
-		LogWarning("Select Object");
+		//LogWarning("Select Object");
 		SelectObjectDialog dialog;
-		//dialog.exec();
-		dialog.ShowWithCallback(obj->ClassID(), [&obj](FishEngine::ObjectPtr object) {
-			//obj = object;
-			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());
+		dialog.ShowWithCallback(obj->ClassID(), [&ret](FishEngine::ObjectPtr object) {
+			ret = object;
+			//LogWarning(FishEngine::Format("Select Object %1%", ret->name().c_str()));
 		});
 	}
-	return false;
+	return ret;
 }
 
 
-bool EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr * texture)
+bool EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr & texture)
 {
-	//FishEngine::Debug::LogError("EditorGUI::TextureField");
 	UITexture * t = CheckNextWidget<UITexture>(label);
-	if (*texture == nullptr)
+	if (texture == nullptr)
 	{
 		return false;
 	}
-	UITextureState state = t->CheckUpdate(label, (*texture)->GetInstanceID());
+	bool changed = false;
+	UITextureState state = t->CheckUpdate(label, texture->GetInstanceID());
 	if (state == UITextureState::TextureClicked)
 	{
 
@@ -290,14 +290,16 @@ bool EditorGUI::TextureField(std::string const & label, FishEngine::TexturePtr *
 	else if (state == UITextureState::SelectButtonClicked)
 	{
 		SelectObjectDialog dialog;
-		//dialog.exec();
-		dialog.ShowWithCallback(FishEngine::ClassID<FishEngine::Texture2D>(), [&texture](FishEngine::ObjectPtr obj) {
-			auto tex = std::dynamic_pointer_cast<FishEngine::Texture>(obj);
-			*texture = tex;
-			//FishEngine::Debug::LogError("Select Texture %s", obj->name().c_str());
+		dialog.ShowWithCallback(FishEngine::ClassID<FishEngine::Texture2D>(), [&texture, &changed](FishEngine::ObjectPtr obj) {
+			if (texture->GetInstanceID() != obj->GetInstanceID())
+			{
+				texture = FishEngine::As<Texture>(obj);
+				changed = true;
+			}
+			//LogError(Format("Select Texture %s", obj->name().c_str()));
 		});
 	}
-	return false;
+	return changed;
 }
 
 void EditorGUI::PushGroup()

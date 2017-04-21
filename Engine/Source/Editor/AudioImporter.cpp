@@ -30,7 +30,7 @@ AudioClipPtr AudioImporter::Import(Path const & path)
 	unsigned int length_samples;
 	sound->getLength(&length_samples, FMOD_TIMEUNIT_PCM);
 
-	auto clip = std::make_shared<AudioClip>();
+	auto clip = MakeShared<AudioClip>();
 	clip->m_frequency = static_cast<int>(frequency);
 	clip->m_channels = numChannels;
 	clip->m_length = length_ms / 1000.0f;

@@ -68,7 +68,7 @@ FishEngine::MaterialPtr FishEditor::MaterialArchive::DeserializeMaterial()
 			abort();
 		}
 
-		auto material = std::make_shared<Material>();
+		auto material = MakeShared<Material>();
 		m_workingNodes.push(it->second);
 		material->Deserialize(*this);
 		m_workingNodes.pop();
@@ -116,27 +116,27 @@ FishEditor::AssetImporterPtr FishEditor::MetaInputArchive::DeserializeAssetImpor
 		AssetImporterPtr importer;
 		if (key == "TextureImporter")
 		{
-			importer = std::make_shared<TextureImporter>();
+			importer = MakeShared<TextureImporter>();
 		}
 		else if (key == "ModelImporter")
 		{
-			importer = std::make_shared<FBXImporter>();
+			importer = MakeShared<FBXImporter>();
 		}
 		else if (key == "NativeFormatImporter")
 		{
-			importer = std::make_shared<NativeFormatImporter>();
+			importer = MakeShared<NativeFormatImporter>();
 		}
 		else if (key == "ShaderImporter")
 		{
-			importer = std::make_shared<ShaderImporter>();
+			importer = MakeShared<ShaderImporter>();
 		}
 		else if (key == "DDSImporter")
 		{
-			importer = std::make_shared<DDSImporter>();
+			importer = MakeShared<DDSImporter>();
 		}
 		else if (key == "AudioImporter")
 		{
-			importer = std::make_shared<AudioImporter>();
+			importer = MakeShared<AudioImporter>();
 		}
 		else
 		{

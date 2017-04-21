@@ -654,7 +654,7 @@ namespace FishEditor
 	
 	void ModelImporter::Init()
 	{
-		auto importer = std::make_shared<ModelImporter>();
+		auto importer = MakeShared<ModelImporter>();
 		auto nameAndIDs = std::vector<std::pair<PrimitiveType, int>>{
 			{PrimitiveType::Cube,     10202},
 			{PrimitiveType::Cylinder, 10206},

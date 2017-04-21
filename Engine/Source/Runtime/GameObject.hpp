@@ -161,7 +161,7 @@ namespace FishEngine
 			{
 				return nullptr;
 			}
-			auto component = std::make_shared<T>();
+			auto component = MakeShared<T>();
 			component->m_gameObject = m_transform->gameObject();
 			m_components.push_back(component);
 			return component;

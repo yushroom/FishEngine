@@ -105,7 +105,7 @@ namespace FishEngine
 		importer.setFilterMode(FilterMode::Bilinear);
 		return importer.FromRawData((uint8_t*)DestBuffer, size, size, texture_format);
 #else
-		return std::make_shared<Texture2D>(size, size, texture_format, (uint8_t*)DestBuffer, byte_count);
+		return MakeShared<Texture2D>(size, size, texture_format, (uint8_t*)DestBuffer, byte_count);
 #endif
 	}
 

@@ -2,6 +2,7 @@
 #define Object_hpp
 
 #include <string>
+#include <map>
 
 #include "FishEngine.hpp"
 #include "Macro.hpp"
@@ -107,12 +108,23 @@ namespace FishEngine
 		Meta(NonSerializable)
 		int			m_instanceID = 0;
 
+	public:	// TODO make it private
+		static std::multimap<int, ObjectPtr> s_classIDToObjects;
+
+		template<class T>
+		static void FindObjectsOfType(std::vector<std::shared_ptr<T>> & out_objects);
+
+		template<class T>
+		static std::shared_ptr<T> FindObjectOfType();
 	};	// end of Class Object
 
-	template<class T>
-	inline std::shared_ptr<T> MakeShared()
+	template< class T, class... Args >
+	inline std::shared_ptr<T> MakeShared(Args&&... args)
 	{
-		return std::make_shared<T>();
+		static_assert(std::is_base_of<Object, T>::value, "Object only");
+		auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+		Object::s_classIDToObjects.emplace( ClassID<T>(), ret );
+		return ret;
 	}
 
 	template<>
@@ -135,6 +147,28 @@ namespace FishEngine
 	inline std::shared_ptr<T> As(ObjectPtr const & object)
 	{
 		return std::dynamic_pointer_cast<T>(object);
+	}
+
+	template<class T>
+	void Object::FindObjectsOfType(std::vector<std::shared_ptr<T>> & out_objects)
+	{
+		out_objects.clear();
+		auto result = s_classIDToObjects.equal_range(FishEngine::ClassID<T>());
+		for (auto it = result.first; it != result.second; ++it)
+		{
+			out_objects.push_back(As<T>(it->second));
+		}
+	}
+
+	template<class T>
+	std::shared_ptr<T> Object::FindObjectOfType()
+	{
+		auto result = s_classIDToObjects.find(FishEngine::ClassID<T>());
+		if (result != s_classIDToObjects.end())
+		{
+			return As<T>(result->second);
+		}
+		return nullptr;
 	}
 }
 

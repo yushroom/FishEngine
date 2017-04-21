@@ -143,7 +143,7 @@ namespace FishEngine
 
 		static MaterialPtr CreateMaterial()
 		{
-			return std::make_shared<Material>();
+			return MakeShared<Material>();
 		}
 
 		static MaterialPtr builtinMaterial(const std::string& name);

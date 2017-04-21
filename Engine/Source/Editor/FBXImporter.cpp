@@ -845,12 +845,12 @@ PrefabPtr FishEditor::FBXImporter::Load(FishEngine::Path const & path)
 {
 	if (m_model.m_modelPrefab == nullptr)
 	{
-		m_model.m_modelPrefab = std::make_shared<Prefab>();
+		m_model.m_modelPrefab = MakeShared<Prefab>();
 		m_model.m_modelPrefab->setIsPrefabParent(true);
 	}
 	if (m_model.m_avatar == nullptr)
 	{
-		m_model.m_avatar = std::make_shared<Avatar>();
+		m_model.m_avatar = MakeShared<Avatar>();
 	}
 	
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_29C09995_47A9_4B49_9535_2F6BDC5C4107_htm
@@ -1106,7 +1106,7 @@ void FishEditor::FBXImporter::BuildFileIDToRecycleName()
 
 AnimationClipPtr FishEditor::FBXImporter::ConvertAnimationClip(const FBXAnimationClip& fbxClip)
 {
-	auto result = std::make_shared<AnimationClip>();
+	auto result = MakeShared<AnimationClip>();
 	result->setName(fbxClip.name);
 	result->frameRate = fbxClip.sampleRate;
 	result->length = fbxClip.end - fbxClip.start;

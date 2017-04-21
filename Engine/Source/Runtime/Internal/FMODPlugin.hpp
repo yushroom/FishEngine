@@ -15,7 +15,7 @@ void static CheckFMODError(FMOD_RESULT result)
 	}
 }
 
-class FMODPlugin
+class FE_EXPORT FMODPlugin
 {
 public:
 	static FMODPlugin * instance()
@@ -50,10 +50,7 @@ private:
 		Cleanup();
 	}
 
-	void Cleanup()
-	{
-		m_system->release();
-	}
+	void Cleanup();
 
 	// noncopyable
 	FMODPlugin(FMODPlugin const &) = delete;

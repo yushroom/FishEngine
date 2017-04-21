@@ -416,7 +416,7 @@ namespace FishEngine
 	ShaderPtr Shader::CreateFromFile(const Path& path)
 	{
 		LogInfo("Compiling " + path.string());
-		auto s = std::make_shared<Shader>();
+		auto s = MakeShared<Shader>();
 		if (s->FromFile(path))
 			return s;
 		return nullptr;

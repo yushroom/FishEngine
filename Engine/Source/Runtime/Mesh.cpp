@@ -373,7 +373,7 @@ namespace FishEngine
 
 	MeshPtr Mesh::FromBinaryFile(std::istream &is)
 	{
-		auto mesh = std::make_shared<Mesh>();
+		auto mesh = MakeShared<Mesh>();
 		is.read((char*)&mesh->m_vertexCount, sizeof(mesh->m_vertexCount));
 		is.read((char*)&mesh->m_triangleCount, sizeof(mesh->m_triangleCount));
 		mesh->m_vertices.resize(mesh->m_vertexCount);
@@ -391,7 +391,7 @@ namespace FishEngine
 
 	MeshPtr Mesh::FromTextFile(std::istream & is)
 	{
-		auto mesh = std::make_shared<Mesh>();
+		auto mesh = MakeShared<Mesh>();
 		is >> mesh->m_vertexCount >> mesh->m_triangleCount;
 		mesh->m_vertices.resize(mesh->m_vertexCount);
 		mesh->m_normals.resize(mesh->m_vertexCount);
@@ -446,7 +446,7 @@ namespace FishEngine
 			std::vector<Vector2> uv = { {0,1},  {1,1},  {0,0},  {1,0} };
 			std::vector<Vector3> t = { {1,0,0},  {1,0,0},  {1,0,0},  {1,0,0} };
 			std::vector<uint32_t> index = { 2,1,0,  3,1,2 };
-			auto mesh = std::make_shared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
+			auto mesh = MakeShared<Mesh>(std::move(p), std::move(n), std::move(uv), std::move(t), std::move(index));
 			mesh->setName("ScreenAlignedQuad");
 			s_builtinMeshes[PrimitiveType::ScreenAlignedQuad] = mesh;
 		}

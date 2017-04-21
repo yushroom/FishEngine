@@ -19,6 +19,10 @@ namespace FishEngine
 		AudioClip();
 		~AudioClip();
 
+		AudioClip(AudioClip const &) = delete;
+		AudioClip(AudioClip &&) = delete;
+		AudioClip operator=(AudioClip const &) = delete;
+
 		void Cleanup();
 
 		// The length of the audio clip in seconds. (Read Only)

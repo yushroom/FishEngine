@@ -4,6 +4,7 @@ namespace FishEditor
 {
 	class AssetImporter;
 	class ModelImporter;
+	class FBXImporter;
 	class TextureImporter;
 	class AssetDatabase;
 	class NativeFormatImporter;
@@ -873,9 +874,9 @@ namespace FishEngine
 	template<>
 	constexpr int ClassID<FishEditor::ModelImporter>() { return 1040; }
 	
-	class FBXImporter;
+	//class FBXImporter;
 	template<>
-	constexpr int ClassID<FBXImporter>() { return 1041; }
+	constexpr int ClassID<FishEditor::FBXImporter>() { return 1041; }
 	
 	class TrueTypeFontImporter;
 	template<>

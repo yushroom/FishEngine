@@ -55,7 +55,7 @@ namespace FishEngine
 
 	LightPtr Light::Create()
 	{
-		auto l = std::make_shared<Light>();
+		auto l = MakeShared<Light>();
 		m_lights.push_back(l);
 		return l;
 	}

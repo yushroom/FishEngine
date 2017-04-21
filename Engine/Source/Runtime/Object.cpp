@@ -6,9 +6,15 @@
 #include "Scene.hpp"
 #include "GameObject.hpp"
 #include "Prefab.hpp"
+#include <map>
+
+using namespace FishEngine;
+
+static std::multimap<int, ObjectPtr> s_classIDToObjects;
 
 namespace FishEngine
 {
+	std::multimap<int, ObjectPtr> Object::s_classIDToObjects;
 
 	GameObjectPtr Object::Instantiate(GameObjectPtr const & original)
 	{
@@ -81,16 +87,10 @@ namespace FishEngine
 		return cloned;
 	}
 
-	//ComponentPtr Object::Instantiate(ComponentPtr const & original)
-	//{
-	//	abort();
-	//	return nullptr;
-	//}
-
 	FishEngine::PrefabPtr Object::Instantiate(PrefabPtr const & original)
 	{
 		CloneUtility cloneUtility;
-		auto instance = std::make_shared<Prefab>();
+		auto instance = MakeShared<Prefab>();
 		instance->m_isPrefabParent = false;
 		instance->m_parentPrefab = original->m_rootGameObject->prefabInternal();
 		while (instance->m_parentPrefab->m_parentPrefab != nullptr)

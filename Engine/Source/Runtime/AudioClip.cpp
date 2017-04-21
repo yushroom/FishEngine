@@ -15,7 +15,8 @@ void FishEngine::AudioClip::Cleanup()
 {
 	if (m_fmodSound != nullptr)
 	{
-		m_fmodSound->release();
+		FMOD_RESULT result = m_fmodSound->release();
+		CheckFMODError(result);
 		m_fmodSound = nullptr;
 	}
 }

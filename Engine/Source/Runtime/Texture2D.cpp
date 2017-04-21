@@ -90,13 +90,13 @@ namespace FishEngine
 
 	FishEngine::Texture2DPtr Texture2D::whiteTexture()
 	{
-		static Texture2DPtr m_whiteTexture = std::make_shared<Texture2D>(2, 2, TextureFormat::RGBA32, allWhite, 2 * 2 * 4);
+		static Texture2DPtr m_whiteTexture = MakeShared<Texture2D>(2, 2, TextureFormat::RGBA32, allWhite, 2 * 2 * 4);
 		return m_whiteTexture;
 	}
 
 	FishEngine::Texture2DPtr Texture2D::blackTexture()
 	{
-		static Texture2DPtr m_blackTexture = std::make_shared<Texture2D>(2, 2, TextureFormat::RGBA32, allBlack, 2 * 2 * 4);
+		static Texture2DPtr m_blackTexture = MakeShared<Texture2D>(2, 2, TextureFormat::RGBA32, allBlack, 2 * 2 * 4);
 		return m_blackTexture;
 	}
 

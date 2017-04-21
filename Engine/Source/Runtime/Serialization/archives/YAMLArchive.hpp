@@ -36,7 +36,7 @@ namespace FishEngine
 			auto currentNode = CurrentNode();
 			assert(currentNode.IsMap());
 			m_workingNodes.push(currentNode[T::StaticClassName()]);
-			auto p = std::make_shared<T>();
+			auto p = MakeShared<T>();
 			p->Deserialize(*this);
 			m_workingNodes.pop();
 			return p;

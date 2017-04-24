@@ -5,8 +5,8 @@
 
 constexpr int PositionIndex = 0;
 constexpr int NormalIndex = 1;
-constexpr int UVIndex = 2;
-constexpr int TangentIndex = 3;
+constexpr int TangentIndex = 2;
+constexpr int UVIndex = 3;
 constexpr int BoneIndexIndex = 4;
 constexpr int BoneWeightIndex = 5;
 

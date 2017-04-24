@@ -3,8 +3,8 @@
 
 #define PositionIndex 0
 #define NormalIndex 1
-#define UVIndex 2
-#define TangentIndex 3
+#define TangentIndex 2
+#define UVIndex 3
 #define BoneIndexIndex 4
 #define BoneWeightIndex 5
 

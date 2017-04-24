@@ -1,6 +1,7 @@
 #include "GameApp.hpp"
 
 #include <string>
+#include <chrono>
 #include <GLFW/glfw3.h>
 
 #include <GLEnvironment.hpp>
@@ -101,7 +102,8 @@ int GameApp::Run()
 	constexpr int report_frames = 100;
 	int frames = 0;
 	int fps = 30;
-	float time_stamp = static_cast<float>(glfwGetTime());
+	//float time_stamp = static_cast<float>(glfwGetTime());
+	auto time_stamp = std::chrono::high_resolution_clock::now();
 	
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(m_window))
@@ -124,8 +126,11 @@ int GameApp::Run()
 		frames++;
 		if (frames >= report_frames)
 		{
-			float new_time_stamp = static_cast<float>(glfwGetTime());
-			fps = static_cast<int>(report_frames / (new_time_stamp - time_stamp));
+			auto new_time_stamp = std::chrono::high_resolution_clock::now();
+			//float new_time_stamp = static_cast<float>(glfwGetTime());
+			auto elapse = new_time_stamp - time_stamp;
+			auto seconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapse).count() / 1000.0f;
+			fps = static_cast<int>(report_frames / seconds);
 			string title = "FishEngine FPS: " + to_string(fps);
 			glfwSetWindowTitle(m_window, title.c_str());
 			time_stamp = new_time_stamp;

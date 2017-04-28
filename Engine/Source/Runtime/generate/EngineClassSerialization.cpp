@@ -30,6 +30,7 @@
 #include "../Scene.hpp" 
 #include "../Light.hpp" 
 #include "../AudioListener.hpp" 
+#include "../MeshCollider.hpp" 
 #include "../SkinnedMeshRenderer.hpp" 
 #include "../MeshFilter.hpp" 
 #include "../Animation.hpp" 
@@ -1448,6 +1449,47 @@ namespace FishEngine
 		//archive.EndClass();
 	}
 
+
+
+	// FishEngine::MeshCollider
+	void FishEngine::MeshCollider::Serialize ( FishEngine::OutputArchive & archive ) const
+	{
+		//archive.BeginClass();
+		FishEngine::Collider::Serialize(archive);
+		archive << FishEngine::make_nvp("m_sharedMesh", m_sharedMesh); // MeshPtr
+		archive << FishEngine::make_nvp("m_convex", m_convex); // bool
+		archive << FishEngine::make_nvp("m_inflateMesh", m_inflateMesh); // bool
+		archive << FishEngine::make_nvp("m_skinWidth", m_skinWidth); // float
+		//archive.EndClass();
+	}
+
+	void FishEngine::MeshCollider::Deserialize ( FishEngine::InputArchive & archive )
+	{
+		//archive.BeginClass(2);
+		FishEngine::Collider::Deserialize(archive);
+		archive >> FishEngine::make_nvp("m_sharedMesh", m_sharedMesh); // MeshPtr
+		archive >> FishEngine::make_nvp("m_convex", m_convex); // bool
+		archive >> FishEngine::make_nvp("m_inflateMesh", m_inflateMesh); // bool
+		archive >> FishEngine::make_nvp("m_skinWidth", m_skinWidth); // float
+		//archive.EndClass();
+	}
+
+	FishEngine::ComponentPtr FishEngine::MeshCollider::Clone(FishEngine::CloneUtility & cloneUtility) const
+	{
+		auto ret = FishEngine::MakeShared<FishEngine::MeshCollider>();
+		cloneUtility.m_clonedObject[this->GetInstanceID()] = ret;
+		this->CopyValueTo(ret, cloneUtility);
+		return ret;
+	}
+
+	void FishEngine::MeshCollider::CopyValueTo(std::shared_ptr<FishEngine::MeshCollider> target, FishEngine::CloneUtility & cloneUtility) const
+	{
+		FishEngine::Collider::CopyValueTo(target, cloneUtility);
+		cloneUtility.Clone(this->m_sharedMesh, target->m_sharedMesh); // MeshPtr
+		cloneUtility.Clone(this->m_convex, target->m_convex); // bool
+		cloneUtility.Clone(this->m_inflateMesh, target->m_inflateMesh); // bool
+		cloneUtility.Clone(this->m_skinWidth, target->m_skinWidth); // float
+	}
 
 
 	// FishEngine::AnimationEvent

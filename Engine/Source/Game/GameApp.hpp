@@ -10,9 +10,9 @@ namespace FishEngine
 	{
 
 	public:
-		int Run();
-		virtual void Init() = 0;
-		virtual void Update() = 0;
+		FE_EXPORT int Run();
+		FE_EXPORT virtual void Init() = 0;
+		FE_EXPORT virtual void Update() = 0;
 		//virtual void Render() = 0;
 
 	protected:
@@ -29,5 +29,4 @@ namespace FishEngine
 		static int      m_windowWidth;
 		static int      m_windowHeight;
 	};
-
 }

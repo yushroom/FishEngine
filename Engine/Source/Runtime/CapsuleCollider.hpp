@@ -16,6 +16,23 @@ namespace FishEngine
 						const float     height,
 						const float     radius);
 		
+		// The center of the capsule, measured in the object's local space.
+		Vector3 center() const { return m_center; }
+		void setCenter(Vector3 const & center) { m_center = center; }
+
+		// The radius of the sphere, measured in the object's local space.
+		float radius() const { return m_radius; }
+		void setRadius(float radius) { m_radius = radius; }
+
+		// The height of the capsule measured in the object's local space.
+		float height() const { return m_height; }
+		void setHeight(float height) { m_height = height; }
+
+		// The direction of the capsule.
+		// The value can be 0, 1 or 2 corresponding to the X, Y and Z axes, respectively.
+		int direction() const { return m_direction; }
+		void setDirection(int direction) { m_direction = direction; }
+
 		virtual void OnDrawGizmosSelected() override;
 		
 	private:

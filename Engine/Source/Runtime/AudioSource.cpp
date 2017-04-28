@@ -7,7 +7,7 @@
 
 void FishEngine::AudioSource::PlayClipAtPoint(AudioClipPtr clip, Vector3 const & position, float volume /*= 1.0f*/)
 {
-	FMODPlugin::instance()->system()->playSound(clip->m_fmodSound, 0, false, nullptr);
+	FMODPlugin::GetInstance().system()->playSound(clip->m_fmodSound, 0, false, nullptr);
 }
 
 void FishEngine::AudioSource::Start()

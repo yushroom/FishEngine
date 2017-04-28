@@ -182,6 +182,11 @@ HierarchyTreeView::HierarchyTreeView(QWidget *parent)
 	timer->start(1000 / 10.0f); // 10 fps
 }
 
+HierarchyTreeView::~HierarchyTreeView()
+{
+	LogWarning("~HierarchyTreeView");
+}
+
 QSize HierarchyTreeView::sizeHint() const
 {
 	return QSize(200, 400);

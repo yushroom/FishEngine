@@ -1,7 +1,7 @@
 #ifndef Input_hpp
 #define Input_hpp
 
-#include "GLEnvironment.hpp"
+//#include "GLEnvironment.hpp"
 #include "Vector3.hpp"
 #include "Screen.hpp"
 //#include <glfw/glfw3.h>
@@ -107,6 +107,7 @@ namespace FishEngine
 
 		static void UpdateAxis(Axis axis, float value);
 		static void UpdateMousePosition(float xpos, float ypos);
+		static void UpdateKeyState(KeyCode key, KeyState state);
 		static void UpdateKeyState(int key, KeyState state);
 		static void UpdateMouseButtonState(int button, MouseButtonState state);
 

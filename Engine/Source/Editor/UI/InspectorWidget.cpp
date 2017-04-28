@@ -6,6 +6,9 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTreeWidget>
+
+#include <Debug.hpp>
+
 #include "UI/UIGameObjectHeader.hpp"
 #include "UI/UIMaterialHeader.hpp"
 #include "UI/UIAssetHeader.hpp"
@@ -55,6 +58,11 @@ InspectorWidget::InspectorWidget(QWidget *parent)
 	auto timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &InspectorWidget::Update);
 	timer->start(1000 / 10.0f); // 10 fps
+}
+
+InspectorWidget::~InspectorWidget()
+{
+	LogWarning("~InspectorWidget");
 }
 
 void InspectorWidget::Bind(std::shared_ptr<FishEngine::Object> obj)

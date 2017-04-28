@@ -32,6 +32,7 @@ class InspectorWidget : public QWidget
 	Q_OBJECT
 public:
 	explicit InspectorWidget(QWidget *parent = 0);
+	~InspectorWidget();
 
 	void Bind(std::shared_ptr<FishEngine::Object> obj);
 	void Bind(std::shared_ptr<FishEngine::GameObject> go);

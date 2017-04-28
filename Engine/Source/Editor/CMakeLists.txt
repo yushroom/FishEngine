@@ -98,6 +98,7 @@ target_link_libraries(FishEditor FishEngine)
 #target_link_libraries(FishEditor ${Boost_LIBRARIES})
 target_link_libraries(FishEditor ${FBXSDK_LIB})
 target_link_libraries(FishEditor freeimage)
+target_link_libraries(FishEditor ${PYTHON35_LIB})
 
 if (MSVC)
     # target_link_libraries(FishEditor opengl32.lib)
@@ -161,4 +162,8 @@ if( WIN32 )
     add_custom_command(TARGET FishEditor POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} $<TARGET_FILE_DIR:FishEditor>/Shaders
     )
+
+    set(EDITOR_SCRIPT ${FISHENGINE_SCRIPT_ENGINE}/Editor)
+    add_custom_command(TARGET FishEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EDITOR_SCRIPT}/BuildProject.py $<TARGET_FILE_DIR:FishEditor>/BuildProject.py)
 endif()

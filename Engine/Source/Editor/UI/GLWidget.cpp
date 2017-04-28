@@ -28,6 +28,11 @@ GLWidget::GLWidget(QWidget *parent)
 	//installEventFilter(filter);
 }
 
+GLWidget::~GLWidget()
+{
+	LogWarning("~GLWidget");
+}
+
 void GLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
@@ -179,29 +184,24 @@ void GLWidget::keyPressEvent(QKeyEvent * event)
 	int key = KeyCodeFromQKeyEvent( event );
 	Input::UpdateKeyState(key, KeyState::Down);
 	int modifiers = event->modifiers();
+	// TODO: left / right
 	if (modifiers & Qt::KeyboardModifier::AltModifier)
 	{
 		//Debug::Log("Alt down");
-		key = static_cast<int>(KeyCode::LeftAlt);
-		Input::UpdateKeyState(key, KeyState::Down);
-		key = static_cast<int>(KeyCode::RightAlt);
-		Input::UpdateKeyState(key, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::LeftAlt, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::RightAlt, KeyState::Down);
 	}
 	if (modifiers & Qt::KeyboardModifier::ControlModifier)
 	{
 		//Debug::Log("ctrl down");
-		key = static_cast<int>(KeyCode::LeftControl);
-		Input::UpdateKeyState(key, KeyState::Down);
-		key = static_cast<int>(KeyCode::RightControl);
-		Input::UpdateKeyState(key, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::LeftControl, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::RightControl, KeyState::Down);
 	}
 	if (modifiers & Qt::KeyboardModifier::ShiftModifier)
 	{
 		//Debug::Log("shift down");
-		key = static_cast<int>(KeyCode::LeftShift);
-		Input::UpdateKeyState(key, KeyState::Down);
-		key = static_cast<int>(KeyCode::RightShift);
-		Input::UpdateKeyState(key, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::LeftShift, KeyState::Down);
+		Input::UpdateKeyState(KeyCode::RightShift, KeyState::Down);
 	}
 }
 
@@ -215,25 +215,19 @@ void GLWidget::keyReleaseEvent(QKeyEvent * event)
 	if (key == Qt::Key_Alt)
 	{
 		//Debug::Log("Alt up");
-		key = static_cast<int>(KeyCode::LeftAlt);
-		Input::UpdateKeyState(key, KeyState::Up);
-		key = static_cast<int>(KeyCode::RightAlt);
-		Input::UpdateKeyState(key, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::LeftAlt, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::RightAlt, KeyState::Up);
 	}
 	if (key == Qt::Key_Control)
 	{
 		//Debug::Log("ctrl up");
-		key = static_cast<int>(KeyCode::LeftControl);
-		Input::UpdateKeyState(key, KeyState::Up);
-		key = static_cast<int>(KeyCode::RightControl);
-		Input::UpdateKeyState(key, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::LeftControl, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::RightControl, KeyState::Up);
 	}
 	if (key == Qt::Key_Shift)
 	{
 		//Debug::Log("shift up");
-		key = static_cast<int>(KeyCode::LeftShift);
-		Input::UpdateKeyState(key, KeyState::Up);
-		key = static_cast<int>(KeyCode::RightShift);
-		Input::UpdateKeyState(key, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::LeftShift, KeyState::Up);
+		Input::UpdateKeyState(KeyCode::RightShift, KeyState::Up);
 	}
 }

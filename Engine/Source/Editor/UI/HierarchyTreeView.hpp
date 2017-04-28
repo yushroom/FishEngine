@@ -18,6 +18,7 @@ class HierarchyTreeView : public QTreeView
 	Q_OBJECT
 public:
 	explicit HierarchyTreeView(QWidget *parent = 0);
+	~HierarchyTreeView();
 
 	virtual QSize sizeHint() const override;
 	

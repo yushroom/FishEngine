@@ -133,6 +133,7 @@ namespace FishEditor
 		bool        m_highlightSelections   = true;
 
 		bool        m_mouseEventHandled     = false;
+		bool		m_mouseEventHandledByController = false;
 		
 		ShadingMode m_shadingMode           = ShadingMode::Shaded;
 		bool        m_showGizmos            = true;

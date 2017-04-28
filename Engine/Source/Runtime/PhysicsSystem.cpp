@@ -16,8 +16,8 @@ public:
 							 const char* file,
 							 int line) override
 	{
-		// error processing implementation
-		LogWarning(Format( "PyhsX Error[file %s at line %d]: %s", file, line, message ));
+		//if (code & PxErrorCode::eDEBUG_INFO != 0)
+		LogError(Format( "PyhsX Error[file %s at line %d]: %s", file, line, message ));
 		//abort();
 	}
 };

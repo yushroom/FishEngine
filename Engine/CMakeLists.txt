@@ -21,6 +21,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
+set(FISHENGINE_SCRIPT_ENGINE ${CMAKE_CURRENT_LIST_DIR}/../Script)
 
 #message("lib output directory: " ${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE})
 
@@ -69,6 +70,21 @@ ELSE()
 ENDIF()
 SET( FMOD_LIB debug ${FMOD_LIB_DEBUG} optimized ${FMOD_LIB_RELEASE} )
 
+# python27
+# SET( PYTHON27_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/python27 )
+# include_directories( ${PYTHON27_DIR}/include )
+# IF (WIN32)
+# 	SET( PYTHON27_LIB debug ${PYTHON27_DIR}/libs/python27.lib optimized ${PYTHON27_DIR}/libs/python27.lib )
+# ELSE()
+# 	SET( PYTHON27_LIB ${PYTHON27_DIR}/lib/libpython27.a )
+# ENDIF()
+SET( PYTHON35_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/python35 )
+include_directories( ${PYTHON35_DIR}/include )
+IF (WIN32)
+	SET( PYTHON35_LIB debug ${PYTHON35_DIR}/libs/python35.lib optimized ${PYTHON35_DIR}/libs/python35.lib )
+ELSE()
+	SET( PYTHON35_LIB ${PYTHON35_DIR}/lib/libpython35.a )
+ENDIF()
 
 include_directories(./Source/Runtime)
 include_directories(./ThirdParty/)

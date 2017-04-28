@@ -4,6 +4,6 @@
 
 void FishEngine::AudioSystem::Update()
 {
-	FMODPlugin::instance()->Update();
+	FMODPlugin::GetInstance().Update();
 }
 

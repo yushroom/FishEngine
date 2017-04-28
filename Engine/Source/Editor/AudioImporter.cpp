@@ -14,7 +14,7 @@ using namespace FishEditor;
 AudioClipPtr AudioImporter::Import(Path const & path)
 {
 	FMOD::Sound * sound;
-	auto result = FMODPlugin::instance()->system()->createSound(path.string().c_str(), FMOD_CREATESAMPLE, nullptr, &sound);
+	auto result = FMODPlugin::GetInstance().system()->createSound(path.string().c_str(), FMOD_CREATESAMPLE, nullptr, &sound);
 	CheckFMODError(result);
 
 	FMOD_SOUND_FORMAT format;

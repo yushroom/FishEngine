@@ -2,9 +2,8 @@
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
-
+#include "../ReflectClass.hpp"
 #include "../Debug.hpp"
-#include "../StringFormat.hpp"
 
 void static CheckFMODError(FMOD_RESULT result)
 {
@@ -18,16 +17,13 @@ void static CheckFMODError(FMOD_RESULT result)
 class FE_EXPORT FMODPlugin
 {
 public:
-	static FMODPlugin * instance()
+	static FMODPlugin & GetInstance()
 	{
 		static FMODPlugin plugin;
-		return &plugin;
+		return plugin;
 	}
 
-	static void Update()
-	{
-		instance()->m_system->update();
-	}
+	static void Update();
 
 	FMOD::System * system() const
 	{
@@ -36,14 +32,7 @@ public:
 
 private:
 
-	FMODPlugin()
-	{
-		FMOD_RESULT result;
-		result = FMOD::System_Create(&m_system);
-		CheckFMODError(result);
-
-		result = m_system->init(512, FMOD_INIT_NORMAL, 0);
-	}
+	FMODPlugin();
 
 	~FMODPlugin()
 	{

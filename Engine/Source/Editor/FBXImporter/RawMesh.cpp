@@ -32,7 +32,7 @@ std::shared_ptr<Mesh> FishEngine::RawMesh::ToMesh()
 
 	for (int subMeshId = 0; subMeshId < m_subMeshCount; ++subMeshId)
 	{
-		subMeshOffset[subMeshId] = indexBuffer.size();
+		subMeshOffset[subMeshId] = static_cast<int>(indexBuffer.size());
 		for (uint32_t faceId = 0; faceId < m_faceCount; ++faceId)
 		{
 			for (int cornerId = 0; cornerId < 3; ++cornerId)

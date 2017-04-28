@@ -113,6 +113,12 @@ namespace FishEngine
 			m_keyStates[key] = state;
 	}
 
+	void Input::UpdateKeyState(KeyCode key, KeyState state)
+	{
+		int iKey = static_cast<int>(key);
+		UpdateKeyState(iKey, state);
+	}
+
 	void Input::UpdateMouseButtonState(int button, MouseButtonState state)
 	{
 		if (button >= 0 && button <= 3)

@@ -1,7 +1,7 @@
 #include "MainEditor.hpp"
 
 #include <iostream>
-#include <boost/dll/import.hpp>
+//#include <boost/dll/import.hpp>
 #include <boost/lexical_cast.hpp>
 #include <QDir>
 #include <QCoreApplication>
@@ -29,6 +29,8 @@
 #include <AudioSystem.hpp>
 #include <AudioSource.hpp>
 #include <AudioClip.hpp>
+#include <CapsuleCollider.hpp>
+#include <Rigidbody.hpp>
 
 #include "SceneViewEditor.hpp"
 #include "Selection.hpp"
@@ -36,6 +38,7 @@
 #include "SceneViewEditor.hpp"
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
+#include "ScriptManager.hpp"
 
 
 using namespace FishEngine;
@@ -152,24 +155,28 @@ namespace FishEditor
 		//QualitySettings::setShadowDistance(20);
 		light_go->transform()->setLocalEulerAngles(50, 150, 0);
 		auto plane = GameObject::CreatePrimitive(PrimitiveType::Plane);
+
+		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
+		cube->transform()->setLocalScale(10, 0.1f, 10);
+		cube->transform()->setLocalPosition(0, -0.051f, 0);
 		
-		auto bodyTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01.tga");
-		auto skinTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/skin_01.tga");
-		auto hairTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/hair_01.tga");
-		auto faceTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/face_00.tga");
-		auto eyelineTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eyeline_00.tga");
-		auto eyeirisLTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eye_iris_L_00.tga");
-		auto eyeirisRTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/eye_iris_R_00.tga");
-		auto cheekTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/cheek_00.tga");
+		auto bodyTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/body_01.tga");
+		auto skinTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/skin_01.tga");
+		auto hairTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/hair_01.tga");
+		auto faceTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/face_00.tga");
+		auto eyelineTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/eyeline_00.tga");
+		auto eyeirisLTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/eye_iris_L_00.tga");
+		auto eyeirisRTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/eye_iris_R_00.tga");
+		auto cheekTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/cheek_00.tga");
 		
-		auto rolloffTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/FO_CLOTH1.tga");
-		auto rimLightTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/FO_RIM1.tga");
-		auto specularTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01_SPEC.tga");
-		auto envTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/ENV2.tga");
-		auto normalMapTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/body_01_NRM.tga");
+		auto rolloffTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/FO_CLOTH1.tga");
+		auto rimLightTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/FO_RIM1.tga");
+		auto specularTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/body_01_SPEC.tga");
+		auto envTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/ENV2.tga");
+		auto normalMapTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/body_01_NRM.tga");
 		
-		auto stageBaseTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/unitychan_tile3.png");
-		auto stageMaskTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/AlphaMask.png");
+		auto stageBaseTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/unitychan_tile3.png");
+		auto stageMaskTexture = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/Textures/AlphaMask.png");
 		
 		auto material = Material::InstantiateBuiltinMaterial("Diffuse");
 		material->setMainTexture(stageBaseTexture);
@@ -205,6 +212,14 @@ namespace FishEditor
 		
 		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/unitychan.fbx");
 		auto modelGO = Object::Instantiate(model);
+		auto unitychan_contrl = ScriptManager::GetInstance().CreateScript("UnityChanControlScriptWithRgidBody");
+		modelGO->AddComponent(unitychan_contrl);
+
+		//auto collider = modelGO->AddComponent<CapsuleCollider>();
+		//collider->setCenter(Vector3(0, 0.75, 0));
+		//collider->setRadius(0.5f);
+		//collider->setHeight(1.5f);
+		//modelGO->AddComponent<Rigidbody>();
 		
 		for (auto name : {"hairband", "button", "Leg", "Shirts", "shirts_sode", "shirts_sode_BK", "uwagi", "uwagi_BK", "hair_accce"}) {
 			auto child = FindNamedChild(modelGO, name);
@@ -716,23 +731,8 @@ namespace FishEditor
 	void InitializeScene_TestScript()
 	{
 		auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
-#if FISHENGINE_PLATFORM_WINDOWS
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/TestScript.dll";
-#else
-		FishEngine::Path shared_lib_path = Application::dataPath() / "../build/RelWithDebInfo/libTestScript.dylib";
-#endif
-		if ( !boost::filesystem::exists(shared_lib_path) )
-		{
-			LogError(shared_lib_path.string() + " not found");
-			abort();
-		}
-		static auto createFunc = boost::dll::import<Script*(const char*)>(shared_lib_path, "CreateCustomScript");
-		static auto deleteFunc = boost::dll::import<void(Script*)>(shared_lib_path, "DestroyCustomScript");
-		auto rotator = std::shared_ptr<Script>(createFunc("Rotator"), [](auto s) {
-			LogInfo("Delete from dll");
-			deleteFunc(s);
-		});
-		
+		//ScriptManager::GetInstance().BuildScriptsInProject();
+		auto rotator = ScriptManager::GetInstance().CreateScript("Rotator");
 		cube->AddComponent(rotator);
 	}
 

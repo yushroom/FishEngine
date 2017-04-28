@@ -87,8 +87,9 @@ namespace FishEngine
 			return nullptr;
 		}
 
+		// TODO: includeInactive
 		template<typename T>
-		std::shared_ptr<T> GetComponentInChildren() const
+		std::shared_ptr<T> GetComponentInChildren(bool includeInactive = false) const
 		{
 			static_assert(std::is_base_of<Component, T>::value, "Component only");
 			auto comp = this->GetComponent<T>();
@@ -98,6 +99,7 @@ namespace FishEngine
 			}
 			for (auto & child : m_transform->m_children)
 			{
+				//if (!includeInactive && child->gameObject()->activeSelf())
 				auto comp = child->m_gameObjectStrongRef->GetComponentInChildren<T>();
 				if (comp != nullptr)
 				{
@@ -106,28 +108,60 @@ namespace FishEngine
 			}
 			return nullptr;
 		}
+
+		template<typename T>
+		std::vector< std::shared_ptr<T> > GetComponents() const
+		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
+			std::vector<std::shared_ptr<T>> results;
+			GetComponents<T>(results);
+			return results;
+		}
+
+		template<typename T>
+		void GetComponents(std::vector<std::shared_ptr<T>> & out_components) const
+		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
+			for (auto& comp : m_components)
+			{
+				int id = comp->ClassID();
+				if (IsSubClassOf<T>(id))
+				{
+					out_components.push_back( std::static_pointer_cast<T>(comp) );
+				}
+			}
+		}
 		
 		template<typename T>
-		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const
+		std::vector<std::shared_ptr<T>> GetComponentsInChildren(bool includeInactive = false) const
 		{
 			static_assert(std::is_base_of<Component, T>::value, "Component only");
 			std::vector<std::shared_ptr<T>> result;
 			this->GetComponentsInChildren(result);
 			return result;
 		}
+
+		template<typename T>
+		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const
+		{
+			static_assert(std::is_base_of<Component, T>::value, "Component only");
+			std::vector<std::shared_ptr<T>> results;
+			GetComponentsInChildren<T>(results);
+			return results;
+		}
 		
 		template<typename T>
-		void GetComponentsInChildren(std::vector<std::shared_ptr<T>> & components) const
+		void GetComponentsInChildren(std::vector<std::shared_ptr<T>> & out_components) const
 		{
 			static_assert(std::is_base_of<Component, T>::value, "Component only");
 			auto comp = this->GetComponent<T>();
 			if (comp != nullptr)
 			{
-				components.push_back(comp);
+				out_components.push_back(comp);
 			}
 			for (auto & child : m_transform->m_children)
 			{
-				child->m_gameObjectStrongRef->GetComponentsInChildren(components);
+				child->m_gameObjectStrongRef->GetComponentsInChildren(out_components);
 			}
 		}
 

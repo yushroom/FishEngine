@@ -17,7 +17,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
 	explicit GLWidget(QWidget *parent = 0);
-	~GLWidget() = default;
+	~GLWidget();
 
 protected:
 	void initializeGL() override;

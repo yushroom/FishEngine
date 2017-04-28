@@ -33,9 +33,9 @@ namespace FishEngine
 			bool alt = Input::GetKey(KeyCode::LeftAlt) || Input::GetKey(KeyCode::RightAlt);
 			bool ctrl = Input::GetKey(KeyCode::LeftControl) || Input::GetKey(KeyCode::RightControl);
 			bool cmd = Input::GetKey(KeyCode::LeftCommand) || Input::GetKey(KeyCode::RightCommand);
-			bool left = Input::GetMouseButton(0);
-			bool right = Input::GetMouseButton(1);
-			bool middle = Input::GetMouseButton(2);
+			bool left = Input::GetMouseButtonDown(0) || Input::GetMouseButton(0);
+			bool right = Input::GetMouseButtonDown(1) || Input::GetMouseButton(1);
+			bool middle = Input::GetMouseButtonDown(2) || Input::GetMouseButton(2);
 			float scrollValue = Input::GetAxis(Axis::MouseScrollWheel);
 			bool scroll = scrollValue != 0.0f;
 
@@ -55,6 +55,7 @@ namespace FishEngine
 				float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
 				float y = m_dragSpeed * Input::GetAxis(Axis::MouseY);
 				transform()->Translate(-x, -y, 0);
+				LogWarning("Move");
 			}
 			else if (type == ControlType::Rotate)
 			{
@@ -63,6 +64,7 @@ namespace FishEngine
 				auto pivot = transform()->position();
 				transform()->RotateAround(pivot, Vector3::up, x);
 				transform()->RotateAround(pivot, transform()->right(), -y);
+				LogWarning("Rotate");
 			}
 			else if (type == ControlType::Orbit)
 			{
@@ -70,6 +72,7 @@ namespace FishEngine
 				float y = m_rotateSpeed * Input::GetAxis(Axis::MouseY);
 				transform()->RotateAround(m_orbitCenter, Vector3::up, x);
 				transform()->RotateAround(m_orbitCenter, transform()->right(), -y);
+				LogWarning("Orbit");
 			}
 			else if (type == ControlType::Zoom)
 			{
@@ -87,6 +90,7 @@ namespace FishEngine
 					deltaZ = fabsf(x) > fabsf(y) ? x : -y;
 				}
 				transform()->Translate(deltaZ*forward, Space::World);
+				LogWarning("Zoom");
 			}
 			else
 			{

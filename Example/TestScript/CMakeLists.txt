@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
-
+set(Project_Name TestScript)
+SET(SRCS "./project.generate.cpp")
+SET(HEADERS ${HEADERS} "Assets/Rotator.hpp")
 # Target at least C++14
 set(CMAKE_CXX_STANDARD 14)
 
-aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
-FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/Assets/*.hpp)
+# aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
+# FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/Assets/*.hpp)
 
 SET(FishEngineRootDir ${CMAKE_CURRENT_LIST_DIR}/../../Engine)
 IF (MSVC)
@@ -22,5 +24,5 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/Assets)
 INCLUDE_DIRECTORIES(${FishEngineRootDir}/Source/Runtime)
 LINK_DIRECTORIES(${FishEngineRootDir}/Binary/lib/Debug)
 
-add_library (TestScript SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS} ${SceneManagement_SRCS} ${PrivateFiles})
-target_link_libraries(TestScript FishEngine)
+add_library (${Project_Name} SHARED ${SRCS} ${HEADERS} ${Serialization_SRCS})
+target_link_libraries(${Project_Name} FishEngine)

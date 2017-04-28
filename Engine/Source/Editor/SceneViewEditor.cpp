@@ -118,7 +118,8 @@ namespace FishEditor
 	void SceneViewEditor::Update()
 	{
 		//Input::Update();
-		m_enableGizmoOperation = !m_cameraGameObject->GetComponent<CameraController>()->Check();
+		m_mouseEventHandledByController = m_cameraGameObject->GetComponent<CameraController>()->Check();
+		m_enableGizmoOperation = !m_mouseEventHandledByController;
 		//Scene::Update();
 	}
 
@@ -369,8 +370,9 @@ namespace FishEditor
 				DrawScaleGizmo();
 		}
 		
-		if (!m_mouseEventHandled && Input::GetMouseButtonDown(0) && !Input::GetKey(KeyCode::LeftAlt))
+		if (!m_mouseEventHandledByController && Input::GetMouseButtonDown(0))
 		{
+			LogError("Clicked");
 			Ray ray = Camera::main()->ScreenPointToRay(Input::mousePosition());
 			auto go = Scene::IntersectRay(ray);
 			if (go == nullptr)

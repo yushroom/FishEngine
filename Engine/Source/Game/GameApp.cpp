@@ -2,9 +2,9 @@
 
 #include <string>
 #include <chrono>
+#include <GLEnvironment.hpp>
 #include <GLFW/glfw3.h>
 
-#include <GLEnvironment.hpp>
 #include <Debug.hpp>
 #include <Resources.hpp>
 #include <Input.hpp>
@@ -64,11 +64,12 @@ int GameApp::Run()
 	auto err = glewInit();
 	if (err != GLEW_OK)
 	{
-		Debug::LogError("%s", glewGetErrorString(err));
+		//LogError(glewGetErrorString(err));
+		LogError("GLEW not initialized");
 	}
 	else
 	{
-		Debug::Log("GlEW initialized");
+		LogInfo("GlEW initialized");
 	}
 #endif
 	
@@ -78,12 +79,20 @@ int GameApp::Run()
 	Screen::m_height = h;
 	Screen::m_pixelsPerPoint = static_cast<float>(w) / m_windowWidth;
 
+#if FISHENGINE_PLATFORM_WINDOWS
+	auto shaderRoot = FishEngine::Path(R"(D:\program\github\FishEngine\Engine\Shaders)");
+#else
 	auto shaderRoot = FishEngine::Path("/Users/yushroom/program/FishEngine/Engine/Shaders");
+#endif
 	auto shaderIncludeDir = shaderRoot / "include";
 	ShaderCompiler::setShaderIncludeDir(shaderIncludeDir.string());
 	Shader::Init(shaderRoot.string());
 	
+#if FISHENGINE_PLATFORM_WINDOWS
+	Mesh::Init(R"(D:\program\github\FishEngine\assets\Models)");
+#else
 	Mesh::Init("/Users/yushroom/program/FishEngine/assets/Models");
+#endif
 	
 	//Resources::Init();
 	Input::Init();
@@ -99,7 +108,7 @@ int GameApp::Run()
 	
 	Init();
 
-	constexpr int report_frames = 100;
+	constexpr int report_frames = 1000;
 	int frames = 0;
 	int fps = 30;
 	//float time_stamp = static_cast<float>(glfwGetTime());
@@ -145,33 +154,54 @@ int GameApp::Run()
 	return 0;
 }
 
+int KeyCodeFromGLFWKey(int key)
+{
+	if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)
+	{
+		constexpr int offset = static_cast<int>(KeyCode::A) - GLFW_KEY_A;
+		return key + offset;
+	}
+	else if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9)
+	{
+		constexpr int offset = static_cast<int>(KeyCode::Alpha0) - GLFW_KEY_0;
+		return key + offset;
+	}
+	else if (key >= GLFW_KEY_F1 && key <= GLFW_KEY_F15)
+	{
+		constexpr int offset = static_cast<int>(KeyCode::F1) - GLFW_KEY_F1;
+		return key + offset;
+	}
+}
+
 void GameApp::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	//ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+	KeyState state = action == GLFW_RELEASE ? KeyState::Up : KeyState::Down;
 
-	Input::UpdateKeyState(key, (KeyState)action);
+	Input::UpdateKeyState(KeyCodeFromGLFWKey(key), state);
+
 	if (mods & GLFW_MOD_ALT)
 	{
-		Input::UpdateKeyState(GLFW_KEY_LEFT_ALT, (KeyState)action);
-		Input::UpdateKeyState(GLFW_KEY_RIGHT_ALT, (KeyState)action);
+		Input::UpdateKeyState(KeyCode::LeftAlt, state);
+		Input::UpdateKeyState(KeyCode::RightAlt, state);
 	}
 	if (mods & GLFW_MOD_CONTROL)
 	{
-		Input::UpdateKeyState(GLFW_KEY_LEFT_CONTROL, (KeyState)action);
-		Input::UpdateKeyState(GLFW_KEY_RIGHT_CONTROL, (KeyState)action);
+		Input::UpdateKeyState(KeyCode::LeftControl, state);
+		Input::UpdateKeyState(KeyCode::RightControl, state);
 	}
 	if (mods & GLFW_MOD_SUPER)
 	{
-		Input::UpdateKeyState(GLFW_KEY_LEFT_SUPER, (KeyState)action);
-		Input::UpdateKeyState(GLFW_KEY_RIGHT_SUPER, (KeyState)action);
+		Input::UpdateKeyState(KeyCode::LeftCommand, state);
+		Input::UpdateKeyState(KeyCode::RightCommand, state);
 	}
 	if (mods & GLFW_MOD_SHIFT)
 	{
-		Input::UpdateKeyState(GLFW_KEY_LEFT_SHIFT, (KeyState)action);
-		Input::UpdateKeyState(GLFW_KEY_RIGHT_SHIFT, (KeyState)action);
+		Input::UpdateKeyState(KeyCode::LeftShift, state);
+		Input::UpdateKeyState(KeyCode::RightShift, state);
 	}
 
 }

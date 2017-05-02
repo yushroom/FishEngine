@@ -23,6 +23,7 @@
 #include "SceneViewEditor.hpp"
 #include "FileInfo.hpp"
 #include "Selection.hpp"
+#include "EditorApplication.hpp"
 
 #include <fstream>
 #include <GameObject.hpp>
@@ -195,8 +196,12 @@ void MainWindow::Init()
 #if FISHENGINE_PLATFORM_APPLE
 	cwd.cdUp();
 #endif
+
+	auto & editorPath = FishEditor::EditorApplication::m_applicationPath;
+	editorPath = FishEngine::Path(cwd.absolutePath().toStdString());
+
 	//s_rootSystemDirectory = cwd.absolutePath().toStdString();
-	auto shaderRoot = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders";
+	auto shaderRoot = editorPath / "shaders";
 	auto shaderIncludeDir = shaderRoot / "include";
 	//auto p = FishEngine::Path(cwd.absolutePath().toStdString()) / "shaders" / "include";
 	ShaderCompiler::setShaderIncludeDir(shaderIncludeDir.string());

@@ -46,6 +46,14 @@ foreach (x Vector2 Vector3 Vector4 Matrix4x4 Quaternion Mathf Frustum IntVector 
 endforeach()
 SOURCE_GROUP(Math FILES ${Math_SRCS})
 
+foreach (x Object GameObject Component Behaviour Transform Script)
+    foreach (ext hpp cpp)
+        set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
+        SET(Core_SRCS ${Core_SRCS} ${f})
+    endforeach ()
+endforeach()
+SOURCE_GROUP(Core FILES ${Core_SRCS})
+
 foreach (x Attribute ReflectEnum ReflectClass ClassID Component_gen)
     foreach (ext hpp cpp)
         set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})

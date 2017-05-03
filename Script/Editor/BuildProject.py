@@ -1,4 +1,4 @@
-import os
+import os, sys
 from mako.template import Template
 
 
@@ -110,34 +110,42 @@ def prepareProject(project_path):
 	CMakeLists_txt_tempalte += '\n'.join(['SET(SRCS ${{SRCS}} {0})\n'.format(c) for c in sources])
 	CMakeLists_txt_tempalte += CMakeLists_txt_tempalte_str2
 	UpdateFile( os.path.join(project_path, 'CMakeLists.txt'), CMakeLists_txt_tempalte)
-	
+
 	# prepare project.gererate.cpp
 	project_generate_cpp_content = project_generate_cpp_template.render(headers=headers, classNames=classNames)
 	UpdateFile( os.path.join(project_path, 'project.generate.cpp'), project_generate_cpp_content )
 
 
-def buildProject(project_path, build_type):
+def buildProject(project_path, build_type, cmake_path):
+	print(os.getcwd())
 	prepareProject( project_path )
 
 	build_path = os.path.join( project_path, 'build' )
 	if not os.path.exists(build_path):
 		os.makedirs(build_path)
-	cmd = 'cd {0} & cmake -G "Visual Studio 14 Win64" ..'.format(build_path)
+	if sys.platform == 'darwin':
+		generator = 'Xcode'
+		separator = '&&'
+	else:
+		gererator = 'Visual Studio 14 Win64'
+		separator = '&'
+	cmd = 'cd {build_path} {separator} {cmake} --warn-uninitialized --warn-ununsed-vars -G "{generator}" ..'.format(build_path=build_path, separator=separator, cmake=cmake_path, generator=generator)
 	print(cmd)
 	result = os.system(cmd)
 	log_file_path = build_path + '/../build.log'
-	cmd = 'cmake --build {0} --config {1} > {2}'
-	cmd = cmd.format(build_path, build_type, log_file_path)
+	cmd = '{cmake} --build {build_path} --config {build_type} > {log_file_path}'
+	cmd = cmd.format(cmake=cmake_path, build_path=build_path, build_type=build_type, log_file_path=log_file_path)
 	print(cmd)
 	result = os.system(cmd)
 	if result == 0:
 		print('build succeeded')
 	else:
-		print('build failed. see log file in ' + build_path)
+		print('build failed. see log file in ' + log_file_path)
 	return result
 
 if __name__ == "__main__":
-	project_path = r'D:\program\github\FishEngine\Example\TestScript'
-	# buildProject(project_path, 'RelWithDebInfo')
-	# buildProject(project_path, 'Release')
-	buildProject(project_path, 'Debug')
+	project_path = '../../Example/TestScript'
+	cmake_path = '../../Tools/cmake/bin/cmake'
+	project_path = os.path.abspath(project_path)
+	cmake_path = os.path.abspath(cmake_path)
+	buildProject(project_path, 'Debug', cmake_path)

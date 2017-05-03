@@ -22,7 +22,7 @@ namespace FishEngine
 		/********** Editor **********/
 
 		// Reset is called in the Editor when the script is attached or reset
-		virtual void Reset() {}
+		virtual void Reset() override {}
 
 
 		/************************************************************************/

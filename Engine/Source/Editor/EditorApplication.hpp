@@ -1,5 +1,7 @@
 #include <Path.hpp>
 
+class MainWindow;
+
 namespace FishEditor
 {
 	class EditorApplication
@@ -8,10 +10,16 @@ namespace FishEditor
 
 		// Path to the Unity editor contents folder. (Read Only)
 		// The contents folder contains several items internally required by the editor for building players.
-		static FishEngine::Path applicationContentsPath();
+		static FishEngine::Path applicationContentsPath()
+		{
+			return m_applicationContentsPath;
+		}
 
 		// Returns the path to the Unity editor application. (Read Only)
-		static FishEngine::Path applicationPath();
+		static FishEngine::Path applicationPath()
+		{
+			return m_applicationPath;
+		}
 
 		// Is editor currently compiling scripts? (Read Only)
 		static bool isCompiling();
@@ -27,7 +35,7 @@ namespace FishEditor
 		static void setIsPlaying();
 
 	private:
-		friend class MainWindow;
+		friend class ::MainWindow;
 		static FishEngine::Path m_applicationContentsPath;
 		static FishEngine::Path m_applicationPath;
 	};

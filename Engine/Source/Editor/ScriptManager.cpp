@@ -13,6 +13,8 @@
 #include <Application.hpp>
 #include <Debug.hpp>
 
+#include <EditorApplication.hpp>
+
 
 using namespace FishEngine;
 using namespace FishEditor;
@@ -69,25 +71,44 @@ ScriptPtr ScriptManager::CreateScript(std::string const & name)
 void FishEditor::ScriptManager::BuildScriptsInProject()
 {
 	try {
+		auto python_lib_paths = {
+			L"/Users/yushroom/Downloads/Python-3.6.1/Lib",	// sys lib
+			L"/Users/yushroom/.pyenv/versions/3.6.1/lib/python3.6/site-packages", // mako
+			L"/Users/yushroom/program/FishEngine/Script/Editor", // editor
+			L"/Users/yushroom/Downloads/Python-3.6.1/debug/build/lib.macosx-10.12-x86_64-3.6-pydebug" // sys lib
+		};
+		std::wstring path;
+		for (auto & p : python_lib_paths)
+		{
+			path += p;
+			path += L":";
+		}
+		Py_SetPath(path.c_str());
 		Py_Initialize();
-		//PyRun_SimpleString("print('Hello Python')\n");
+		PyRun_SimpleString("import os\nfrom mako.template import Template\nprint('Hello Python')\n");
 		auto pName = PyUnicode_DecodeFSDefault("BuildProject");
 		auto pModule = PyImport_Import(pName);
+		assert(pModule != nullptr);
 		auto pFunc = PyObject_GetAttrString(pModule, "buildProject");
 		if (!pFunc || !PyCallable_Check(pFunc))
 			abort();
-		auto build_path = Application::dataPath().parent_path();
-		auto pbuildPath = PyUnicode_DecodeFSDefault(build_path.string().c_str());
-		auto pbuildType = PyUnicode_DecodeFSDefault(CMAKE_INTDIR);
-		auto pArgs = PyTuple_New(2);
-		PyTuple_SetItem(pArgs, 0, pbuildPath);
-		PyTuple_SetItem(pArgs, 1, pbuildType);
+		auto buildPath = Application::dataPath().parent_path();
+		auto pBuildPath = PyUnicode_DecodeFSDefault(buildPath.string().c_str());
+		auto pBuildType = PyUnicode_DecodeFSDefault(CMAKE_INTDIR);
+		auto cmakePath = EditorApplication::applicationPath() / "Tools/cmake/bin/cmake";
+		auto pCmakePath = PyUnicode_DecodeFSDefault(cmakePath.string().c_str());
+		auto pArgs = PyTuple_New(3);
+		PyTuple_SetItem(pArgs, 0, pBuildPath);
+		PyTuple_SetItem(pArgs, 1, pBuildType);
+		PyTuple_SetItem(pArgs, 2, pCmakePath);
 		PyObject_CallObject(pFunc, pArgs);
-		//Py_DECREF(s);
-		//Py_DECREF(pArgs);
-		//Py_DECREF(pFunc);
-		//Py_DECREF(pModule);
-		//Py_DECREF(pName);
+//		Py_DECREF(pCmakePath);
+//		Py_DECREF(pBuildType);
+//		Py_DECREF(pBuildPath);
+		Py_DECREF(pArgs);
+		Py_DECREF(pFunc);
+		Py_DECREF(pModule);
+		Py_DECREF(pName);
 		Py_Finalize();
 	}
 	catch (std::exception & e)

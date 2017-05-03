@@ -11,6 +11,7 @@
 #include "CapsuleCollider.hpp"
 #include "Rigidbody.hpp"
 #include "MeshRenderer.hpp"
+#include "Script.hpp"
 
 #include "TagManager.hpp"
 #include "generate/Enum_PrimitiveType.hpp"

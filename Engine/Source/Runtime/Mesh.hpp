@@ -249,6 +249,9 @@ namespace FishEngine
 
 		Meta(NonSerializable)
 		GLuint m_VAO = 0;
+		
+		Meta(NonSerializable)
+		GLuint m_VBO = 0;
 
 		Meta(NonSerializable)
 		GLuint m_indexVBO = 0;

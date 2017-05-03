@@ -14,6 +14,8 @@ namespace FishEngine
 
 		InjectClassName(Component)
 
+		virtual void Reset() {}
+		
 		// TODO: remove this
 		virtual void OnInspectorGUI() {}
 
@@ -33,58 +35,22 @@ namespace FishEngine
 		TransformPtr transform() const;
 
 		template< class T >
-		std::shared_ptr<T> GetComponent()
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return nullptr;
-			return gameObject()->GetComponent<T>();
-		}
+		std::shared_ptr<T> GetComponent();
 
 		template< class T >
-		std::shared_ptr<T> GetComponentInChildren()
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return nullptr;
-			return gameObject()->GetComponentInChildren()<T>();
-		}
-
-		template<typename T>
-		std::vector< std::shared_ptr<T> > GetComponents() const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return {};
-			return gameObject()->GetComponents<T>();
-		}
-
-		template<typename T>
-		void GetComponents(std::vector<std::shared_ptr<T>> & out_components) const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return;
-			gameObject()->GetComponents<T>(out_components);
-		}
+		std::shared_ptr<T> GetComponentInChildren();
 
 		template< class T >
-		std::vector< std::shared_ptr<T> > GetComponentsInChildren()
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return nullptr;
-			return gameObject()->GetComponentsInChildren<T>();
-		}
+		std::vector< std::shared_ptr<T> > GetComponents() const;
 
 		template< class T >
-		void GetComponentsInChildren(std::vector< std::shared_ptr<T> > & out_components)
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (m_gameObject.expired())
-				return;
-			gameObject()->GetComponentsInChildren<T>(out_components);
-		}
+		void GetComponents(std::vector<std::shared_ptr<T>> & out_components) const;
+
+		template< class T >
+		std::vector< std::shared_ptr<T> > GetComponentsInChildren();
+
+		template< class T >
+		void GetComponentsInChildren(std::vector< std::shared_ptr<T> > & out_components);
 
 
 		//virtual void Init() {}
@@ -109,6 +75,8 @@ namespace FishEngine
 		bool m_isStartFunctionCalled = false;
 	};
 }
+
+//#include "GameObject.hpp"
 
 
 #endif // Component_hpp

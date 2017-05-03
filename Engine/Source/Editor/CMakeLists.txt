@@ -2,9 +2,51 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+# Autodesk FBX sdk
+SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
+include_directories( ${FBXSDK_DIR}/include )
+IF (WIN32)
+    SET( FBXSDK_LIB_DIR ${FBXSDK_DIR}/lib/vs2015/x64 )
+    SET( FBXSDK_LIB_DEBUG ${FBXSDK_LIB_DIR}/debug/libfbxsdk-md.lib )
+    SET( FBXSDK_LIB_RELEASE ${FBXSDK_LIB_DIR}/release/libfbxsdk-md.lib )
+ELSE()
+    SET( FBXSDK_LIB_DIR ${FBXSDK_DIR}/lib/clang )
+    SET( FBXSDK_LIB_DEBUG ${FBXSDK_LIB_DIR}/debug/libfbxsdk.a )
+    SET( FBXSDK_LIB_RELEASE ${FBXSDK_LIB_DIR}/release/libfbxsdk.a )
+ENDIF()
+
+IF(NOT EXISTS ${FBXSDK_LIB_DEBUG})
+    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_DEBUG} not found")
+ENDIF ()
+
+IF(NOT EXISTS ${FBXSDK_LIB_RELEASE})
+    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_RELEASE} not found")
+ENDIF ()
+SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
+
+
+# FreeImage
 SET(FreeImage_Root ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage)
 include_directories(${FreeImage_Root}/include)
 link_directories(${FreeImage_Root}/lib)
+
+
+# Python3
+IF (WIN32)
+    SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
+    include_directories( ${PYTHON3_DIR}/include )
+    SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/python35.lib optimized ${PYTHON3_DIR}/libs/python35.lib )
+ELSE()
+    SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
+    include_directories( ${PYTHON3_DIR}/include )
+    SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/libpython3.6dm.a optimized ${PYTHON3_DIR}/libs/libpython3.6m.a )
+    # SET( PYTHON3_DIR /Users/yushroom/.pyenv/versions/3.6.1)
+    # include_directories( ${PYTHON3_DIR}/include/python3.6m )
+    # SET( PYTHON3_LIB ${PYTHON3_DIR}/lib/libpython3.6m.a)
+    #include_directories( /Users/yushroom/.pyenv/versions/3.6.1/include/python3.6m )
+    #SET( PYTHON3_LIB /Users/yushroom/.pyenv/versions/3.6.1/lib/libpython3.6m.a )
+ENDIF()
+
 
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
@@ -55,12 +97,13 @@ endforeach()
 SET( ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../assets)
 SET( SHADER_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Shaders)
 IF( NOT WIN32 )
-    FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt)
-    FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png)
-    FILE( GLOB Shader_headers ${SHADER_DIR}/include/*.inc)
-    FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.hpp ${SHADER_DIR}/Editor/*.cpp)
-    FILE( GLOB Shaders ${SHADER_DIR}/*.*)
-    SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders})
+    FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt )
+    FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png )
+    FILE( GLOB Shader_headers ${SHADER_DIR}/include/*.inc )
+    FILE( GLOB Editor_shaders ${SHADER_DIR}/Editor/*.* )
+    FILE( GLOB Shaders ${SHADER_DIR}/*.* )
+    SET( SCRIPTS ${FISHENGINE_SCRIPT_DIR}/Editor/BuildProject.py )
+    SET( RESOURCE_FILES ${Models} ${Gizmos} ${Shaders} ${Shader_headers} ${Editor_shaders} ${SCRIPTS})
 ENDIF()
 
 SOURCE_GROUP( Asset FILES ${Asset_SRCS} )
@@ -85,6 +128,7 @@ IF( NOT WIN32 )
     SET_SOURCE_FILES_PROPERTIES(${Shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders)
     SET_SOURCE_FILES_PROPERTIES(${Shader_headers} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/include)
     SET_SOURCE_FILES_PROPERTIES(${Editor_shaders} PROPERTIES MACOSX_PACKAGE_LOCATION Shaders/Editor)
+    SET_SOURCE_FILES_PROPERTIES(${SCRIPTS} PROPERTIES MACOSX_PACKAGE_LOCATION .)
 ENDIF()
 
 # IF( WIN32 )
@@ -98,7 +142,7 @@ target_link_libraries(FishEditor FishEngine)
 #target_link_libraries(FishEditor ${Boost_LIBRARIES})
 target_link_libraries(FishEditor ${FBXSDK_LIB})
 target_link_libraries(FishEditor freeimage)
-target_link_libraries(FishEditor ${PYTHON35_LIB})
+target_link_libraries(FishEditor ${PYTHON3_LIB})
 
 if (MSVC)
     # target_link_libraries(FishEditor opengl32.lib)
@@ -163,7 +207,10 @@ if( WIN32 )
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} $<TARGET_FILE_DIR:FishEditor>/Shaders
     )
 
-    set(EDITOR_SCRIPT ${FISHENGINE_SCRIPT_ENGINE}/Editor)
+    set(EDITOR_SCRIPT ${FISHENGINE_SCRIPT_DIR}/Editor)
     add_custom_command(TARGET FishEditor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EDITOR_SCRIPT}/BuildProject.py $<TARGET_FILE_DIR:FishEditor>/BuildProject.py)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EDITOR_SCRIPT}/BuildProject.py $<TARGET_FILE_DIR:FishEditor>/BuildProject.py
+    )
 endif()
+
+

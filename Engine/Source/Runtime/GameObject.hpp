@@ -1,15 +1,20 @@
 #ifndef GameObject_hpp
 #define GameObject_hpp
 
+#include <memory>
+
 #include "Transform.hpp"
-#include "Script.hpp"
 #include "Object.hpp"
 #include "ReflectClass.hpp"
+#include "PrimitiveType.hpp"
 #include "generate/Class_ComponentInfo.hpp"
 #include "Component_gen.hpp"
 
-#include <memory>
-#include "PrimitiveType.hpp"
+template< class T >
+using PtrVector = std::vector< std::shared_ptr<T> >;
+
+template< class T >
+using PtrList = std::list< std::shared_ptr<T> >;
 
 namespace FishEngine
 {
@@ -46,24 +51,18 @@ namespace FishEngine
 		}
 
 		// The layer the game object is in. A layer is in the range [0...31].
-		int layer() const
-		{
-			return m_layer;
-		}
+		int layer() const { return m_layer; }
+		void setLayer(int layer) { m_layer = layer; }
 
-		void setLayer(int layer) 
-		{
-			m_layer = layer;
-		}
-
+		
 		// The tag of this game object.
 		std::string const & tag() const;
 		void setTag(const std::string& tag);
 
+		
 		// The Transform attached to this GameObject.
 		TransformPtr transform() const
 		{
-
 			return m_transform;
 		}
 
@@ -73,133 +72,31 @@ namespace FishEngine
 
 		// Returns the component of Type type if the game object has one attached, null if it doesn't.
 		template<typename T>
-		std::shared_ptr<T> GetComponent() const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			for (auto& comp : m_components)
-			{
-				int id = comp->ClassID();
-				if ( IsSubClassOf<T>(id) )
-				{
-					return std::static_pointer_cast<T>(comp);
-				}
-			}
-			return nullptr;
-		}
+		std::shared_ptr<T> GetComponent() const;
 
-		// TODO: includeInactive
+		// Returns the component of type T in the GameObject or any of its children using depth first search.
+		// If includeInactive is set true, a component is returned only if it is found on an active GameObject.
 		template<typename T>
-		std::shared_ptr<T> GetComponentInChildren(bool includeInactive = false) const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			auto comp = this->GetComponent<T>();
-			if (comp != nullptr)
-			{
-				return comp;
-			}
-			for (auto & child : m_transform->m_children)
-			{
-				//if (!includeInactive && child->gameObject()->activeSelf())
-				auto comp = child->m_gameObjectStrongRef->GetComponentInChildren<T>();
-				if (comp != nullptr)
-				{
-					return comp;
-				}
-			}
-			return nullptr;
-		}
+		std::shared_ptr<T>
+		GetComponentInChildren(bool includeInactive = false) const;
 
 		template<typename T>
-		std::vector< std::shared_ptr<T> > GetComponents() const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			std::vector<std::shared_ptr<T>> results;
-			GetComponents<T>(results);
-			return results;
-		}
-
-		template<typename T>
-		void GetComponents(std::vector<std::shared_ptr<T>> & out_components) const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			for (auto& comp : m_components)
-			{
-				int id = comp->ClassID();
-				if (IsSubClassOf<T>(id))
-				{
-					out_components.push_back( std::static_pointer_cast<T>(comp) );
-				}
-			}
-		}
+		PtrVector<T> GetComponents() const;
 		
 		template<typename T>
-		std::vector<std::shared_ptr<T>> GetComponentsInChildren(bool includeInactive = false) const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			std::vector<std::shared_ptr<T>> result;
-			this->GetComponentsInChildren(result);
-			return result;
-		}
+		PtrVector<T> GetComponentsInChildren(bool includeInactive = false) const;
 
 		template<typename T>
-		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			std::vector<std::shared_ptr<T>> results;
-			GetComponentsInChildren<T>(results);
-			return results;
-		}
+		void GetComponents(PtrVector<T> & out_components) const;
 		
 		template<typename T>
-		void GetComponentsInChildren(std::vector<std::shared_ptr<T>> & out_components) const
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			auto comp = this->GetComponent<T>();
-			if (comp != nullptr)
-			{
-				out_components.push_back(comp);
-			}
-			for (auto & child : m_transform->m_children)
-			{
-				child->m_gameObjectStrongRef->GetComponentsInChildren(out_components);
-			}
-		}
+		void GetComponentsInChildren(PtrVector<T> & out_components) const;
 
-		//bool AddComponent(std::string const & typeName);
-
-#if 1
 		// Adds a component class named className to the game object.
-		bool AddComponent(ComponentPtr component)
-		{
-			// TODO
-			//if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
-			//{
-			//    return false;
-			//}
-			component->m_gameObject = m_transform->gameObject();
-			m_components.push_back(component);
-			if (IsScript(component->ClassID()))
-			{
-				auto script = std::static_pointer_cast<Script>(component);
-				script->Reset();
-			}
-			return true;
-		}
-#endif
+		bool AddComponent(ComponentPtr component);
 
 		template<class T>
-		std::shared_ptr<T> AddComponent()
-		{
-			static_assert(std::is_base_of<Component, T>::value, "Component only");
-			if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
-			{
-				return nullptr;
-			}
-			auto component = MakeShared<T>();
-			component->m_gameObject = m_transform->gameObject();
-			m_components.push_back(component);
-			return component;
-		}
+		std::shared_ptr<T> AddComponent();
 
 		void RemoveComponent(ComponentPtr component)
 		{
@@ -258,5 +155,196 @@ namespace FishEngine
 		TransformPtr	m_transform;
 	};
 }
+
+
+/************************************************************************/
+/*                          Implementation                              */
+/************************************************************************/
+
+template<typename T>
+std::shared_ptr<T> FishEngine::GameObject::GetComponent() const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	for (auto& comp : m_components)
+	{
+		int id = comp->ClassID();
+		if ( IsSubClassOf<T>(id) )
+		{
+			return std::static_pointer_cast<T>(comp);
+		}
+	}
+	return nullptr;
+}
+
+
+template<typename T>
+std::shared_ptr<T> FishEngine::GameObject::GetComponentInChildren(bool includeInactive) const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	
+	if ( !includeInactive && !activeInHierarchy() )
+	{
+		return nullptr;
+	}
+	
+	auto comp = this->GetComponent<T>();
+	if (comp != nullptr)
+	{
+		return comp;
+	}
+	
+	// DFS
+	for (auto & child : m_transform->m_children)
+	{
+		if (!includeInactive && !child->gameObject()->activeSelf())
+		{
+			continue;
+		}
+		auto comp = child->m_gameObjectStrongRef->GetComponentInChildren<T>();
+		if (comp != nullptr)
+		{
+			return comp;
+		}
+	}
+	return nullptr;
+}
+
+
+template<typename T>
+PtrVector<T> FishEngine::GameObject::GetComponents() const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	std::vector<std::shared_ptr<T>> results;
+	GetComponents<T>(results);
+	return results;
+}
+
+
+template<typename T>
+void FishEngine::GameObject::GetComponents(PtrVector<T> & out_components) const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	for (auto& comp : m_components)
+	{
+		int id = comp->ClassID();
+		if (IsSubClassOf<T>(id))
+		{
+			out_components.push_back( std::static_pointer_cast<T>(comp) );
+		}
+	}
+}
+
+
+template<typename T>
+PtrVector<T> FishEngine::GameObject::GetComponentsInChildren(bool includeInactive) const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	std::vector<std::shared_ptr<T>> result;
+	this->GetComponentsInChildren(result);
+	return result;
+}
+
+
+template<typename T>
+void FishEngine::GameObject::GetComponentsInChildren(PtrVector<T> & out_components) const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	auto comp = this->GetComponent<T>();
+	if (comp != nullptr)
+	{
+		out_components.push_back(comp);
+	}
+	for (auto & child : m_transform->m_children)
+	{
+		child->m_gameObjectStrongRef->GetComponentsInChildren(out_components);
+	}
+}
+
+
+// Adds a component class named className to the game object.
+inline bool FishEngine::GameObject::AddComponent(ComponentPtr component)
+{
+	// TODO
+	//if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
+	//{
+	//    return false;
+	//}
+	component->m_gameObject = m_transform->gameObject();
+	m_components.push_back(component);
+	component->Reset();
+	return true;
+}
+
+
+template<class T>
+std::shared_ptr<T> FishEngine::GameObject::AddComponent()
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (IsUniqueComponent<T>() && GetComponent<T>() != nullptr)
+	{
+		return nullptr;
+	}
+	auto component = MakeShared<T>();
+	component->m_gameObject = m_transform->gameObject();
+	m_components.push_back(component);
+	return component;
+}
+
+
+template< class T >
+std::shared_ptr<T> FishEngine::Component::GetComponent()
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return nullptr;
+	return gameObject()->GetComponent<T>();
+}
+
+template< class T >
+std::shared_ptr<T> FishEngine::Component::GetComponentInChildren()
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return nullptr;
+	return gameObject()->GetComponentInChildren<T>();
+}
+
+template<typename T>
+std::vector< std::shared_ptr<T> > FishEngine::Component::GetComponents() const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return {};
+	return gameObject()->GetComponents<T>();
+}
+
+template<typename T>
+void FishEngine::Component::GetComponents(std::vector<std::shared_ptr<T>> & out_components) const
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return;
+	gameObject()->GetComponents<T>(out_components);
+}
+
+template< class T >
+std::vector< std::shared_ptr<T> > FishEngine::Component::GetComponentsInChildren()
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return nullptr;
+	return gameObject()->GetComponentsInChildren<T>();
+}
+
+template< class T >
+void FishEngine::Component::GetComponentsInChildren(std::vector< std::shared_ptr<T> > & out_components)
+{
+	static_assert(std::is_base_of<Component, T>::value, "Component only");
+	if (m_gameObject.expired())
+		return;
+	gameObject()->GetComponentsInChildren<T>(out_components);
+}
+
+
 
 #endif // GameObject_hpp

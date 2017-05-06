@@ -70,50 +70,58 @@ ScriptPtr ScriptManager::CreateScript(std::string const & name)
 
 void FishEditor::ScriptManager::BuildScriptsInProject()
 {
-	try {
-		auto python_lib_paths = {
-			L"/Users/yushroom/Downloads/Python-3.6.1/Lib",	// sys lib
-			L"/Users/yushroom/.pyenv/versions/3.6.1/lib/python3.6/site-packages", // mako
-			L"/Users/yushroom/program/FishEngine/Script/Editor", // editor
-			L"/Users/yushroom/Downloads/Python-3.6.1/debug/build/lib.macosx-10.12-x86_64-3.6-pydebug" // sys lib
-		};
-		std::wstring path;
-		for (auto & p : python_lib_paths)
-		{
-			path += p;
-			path += L":";
-		}
-		Py_SetPath(path.c_str());
-		Py_Initialize();
-		PyRun_SimpleString("import os\nfrom mako.template import Template\nprint('Hello Python')\n");
-		auto pName = PyUnicode_DecodeFSDefault("BuildProject");
-		auto pModule = PyImport_Import(pName);
-		assert(pModule != nullptr);
-		auto pFunc = PyObject_GetAttrString(pModule, "buildProject");
-		if (!pFunc || !PyCallable_Check(pFunc))
-			abort();
-		auto buildPath = Application::dataPath().parent_path();
-		auto pBuildPath = PyUnicode_DecodeFSDefault(buildPath.string().c_str());
-		auto pBuildType = PyUnicode_DecodeFSDefault(CMAKE_INTDIR);
-		auto cmakePath = EditorApplication::applicationPath() / "Tools/cmake/bin/cmake";
-		auto pCmakePath = PyUnicode_DecodeFSDefault(cmakePath.string().c_str());
-		auto pArgs = PyTuple_New(3);
-		PyTuple_SetItem(pArgs, 0, pBuildPath);
-		PyTuple_SetItem(pArgs, 1, pBuildType);
-		PyTuple_SetItem(pArgs, 2, pCmakePath);
-		PyObject_CallObject(pFunc, pArgs);
+#if FISHENGINE_PLATFORM_APPLE
+	auto python_lib_paths = {
+		L"/Users/yushroom/Downloads/Python-3.6.1/Lib",	// sys lib
+		L"/Users/yushroom/.pyenv/versions/3.6.1/lib/python3.6/site-packages", // mako
+		L"/Users/yushroom/program/FishEngine/Script/Editor", // editor
+		L"/Users/yushroom/Downloads/Python-3.6.1/debug/build/lib.macosx-10.12-x86_64-3.6-pydebug" // sys lib
+	};
+	std::wstring path;
+	for (auto & p : python_lib_paths)
+	{
+		path += p;
+		path += L":";
+	}
+#else
+	auto python_lib_paths = {
+		LR"(D:\program\github\FishEngine\Engine\Binary\Debug\Tools\Python36\Lib)",	// sys lib
+		LR"(D:\program\github\FishEngine\Engine\Binary\Debug\Tools\Python36\DLLs)",
+		LR"(D:\program\github\FishEngine\Engine\Binary\Debug\Scripts)",
+		LR"(D:\program\github\FishEngine\Tools\Python36\Lib\site-packages)", // mako
+	};
+	std::wstring path;
+	for (auto & p : python_lib_paths)
+	{
+		path += p;
+		path += L";";
+	}
+#endif
+	Py_SetPath(path.c_str());
+	Py_Initialize();
+	PyRun_SimpleString("import os\nfrom mako.template import Template\nprint('Hello Python')\n");
+	auto pName = PyUnicode_DecodeFSDefault("BuildProject");
+	auto pModule = PyImport_Import(pName);
+	assert(pModule != nullptr);
+	auto pFunc = PyObject_GetAttrString(pModule, "buildProject");
+	if (!pFunc || !PyCallable_Check(pFunc))
+		abort();
+	auto buildPath = Application::dataPath().parent_path();
+	auto pBuildPath = PyUnicode_DecodeFSDefault(buildPath.string().c_str());
+	auto pBuildType = PyUnicode_DecodeFSDefault(CMAKE_INTDIR);
+	auto cmakePath = EditorApplication::applicationPath() / "Tools/cmake/bin/cmake";
+	auto pCmakePath = PyUnicode_DecodeFSDefault(cmakePath.string().c_str());
+	auto pArgs = PyTuple_New(3);
+	PyTuple_SetItem(pArgs, 0, pBuildPath);
+	PyTuple_SetItem(pArgs, 1, pBuildType);
+	PyTuple_SetItem(pArgs, 2, pCmakePath);
+	PyObject_CallObject(pFunc, pArgs);
 //		Py_DECREF(pCmakePath);
 //		Py_DECREF(pBuildType);
 //		Py_DECREF(pBuildPath);
-		Py_DECREF(pArgs);
-		Py_DECREF(pFunc);
-		Py_DECREF(pModule);
-		Py_DECREF(pName);
-		Py_Finalize();
-	}
-	catch (std::exception & e)
-	{
-		LogError(e.what());
-		abort();
-	}
+	Py_DECREF(pArgs);
+	Py_DECREF(pFunc);
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_Finalize();
 }

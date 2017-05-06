@@ -5,7 +5,7 @@
 #include <vector>
 #include <cassert>
 
-#include <Serialization/archives/YAMLArchive.hpp>
+#include <Serialization/YAMLArchive.hpp>
 
 namespace FishEditor
 {

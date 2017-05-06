@@ -2,7 +2,7 @@
 
 #include "SerializedProperty.hpp"
 
-#include <Archive.hpp>
+#include <Serialization/Archive.hpp>
 #include <boost/any.hpp>
 
 namespace FishEditor

@@ -1,5 +1,5 @@
-#include <Archive.hpp>
-#include <Serialization/archives/YAMLArchive.hpp>
+#include <Serialization/Archive.hpp>
+#include <Serialization/YAMLArchive.hpp>
 
 #include "AssetImporter.hpp"
 

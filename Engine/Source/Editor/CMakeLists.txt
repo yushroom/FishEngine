@@ -32,19 +32,12 @@ link_directories(${FreeImage_Root}/lib)
 
 
 # Python3
+SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
+include_directories( ${PYTHON3_DIR}/include )
 IF (WIN32)
-    SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
-    include_directories( ${PYTHON3_DIR}/include )
-    SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/python35.lib optimized ${PYTHON3_DIR}/libs/python35.lib )
+    SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/python36.lib optimized ${PYTHON3_DIR}/libs/python36.lib )
 ELSE()
-    SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
-    include_directories( ${PYTHON3_DIR}/include )
     SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/libpython3.6dm.a optimized ${PYTHON3_DIR}/libs/libpython3.6m.a )
-    # SET( PYTHON3_DIR /Users/yushroom/.pyenv/versions/3.6.1)
-    # include_directories( ${PYTHON3_DIR}/include/python3.6m )
-    # SET( PYTHON3_LIB ${PYTHON3_DIR}/lib/libpython3.6m.a)
-    #include_directories( /Users/yushroom/.pyenv/versions/3.6.1/include/python3.6m )
-    #SET( PYTHON3_LIB /Users/yushroom/.pyenv/versions/3.6.1/lib/libpython3.6m.a )
 ENDIF()
 
 

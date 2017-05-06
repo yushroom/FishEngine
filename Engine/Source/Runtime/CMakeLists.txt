@@ -2,26 +2,9 @@ aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
 AUX_SOURCE_DIRECTORY( ${CMAKE_CURRENT_LIST_DIR}/SceneManagement SceneManagement_SRCS)
 SOURCE_GROUP(SceneManagement FILES ${SceneManagement_SRCS})
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
-SET(
-    Serialization_SRCS
-    ${CMAKE_CURRENT_LIST_DIR}/Archive.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Archive.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/helper.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/NameValuePair.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/types/list.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/types/map.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/types/vector.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/binary.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/text.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/generate/EngineClassSerialization.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLArchive.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serialization/archives/YAMLArchive.hpp
-)
-foreach (x ${Serialization_SRCS})
-    IF(NOT EXISTS ${x})
-        MESSAGE(FATAL_ERROR "source files does not exist: ${x}")
-    ENDIF ()
-endforeach ()
+
+FILE(GLOB Serialization_SRCS ${CMAKE_CURRENT_LIST_DIR}/Serialization/*.*)
+SET(Serialization_SRCS ${Serialization_SRCS} ${CMAKE_CURRENT_LIST_DIR}/generate/EngineClassSerialization.cpp)
 SOURCE_GROUP(Serialization FILES ${Serialization_SRCS})
 
 FILE(GLOB PrivateFiles ${CMAKE_CURRENT_LIST_DIR}/private/*.*)

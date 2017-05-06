@@ -1,10 +1,13 @@
 #include "Debug.hpp"
+
 #include <iostream>
 
 #if FISHENGINE_PLATFORM_WINDOWS
 #include <windows.h>
 static HANDLE hstdout;
 #endif
+
+#include "Internal/SimpleLogger.hpp"
 
 
 using std::cout;
@@ -102,16 +105,16 @@ namespace FishEngine
 #endif
 }
 
-void FishEngine::Debug::Log(LogChannel channel, std::string const & message, const char* file, int line, const char * func)
+void FishEngine::Debug::Log(LogType channel, std::string const & message, const char* file, int line, const char * func)
 {
 #if FISHENGINE_PLATFORM_WINDOWS
 	WORD colorAttr = 0x0F;
 	switch (channel)
 	{
-	case LogChannel::Warning:
+	case LogType::Warning:
 		colorAttr = 0x0E;
 		break;
-	case LogChannel::Error:
+	case LogType::Error:
 		colorAttr = 0x0C;
 		break;
 	}
@@ -120,11 +123,11 @@ void FishEngine::Debug::Log(LogChannel channel, std::string const & message, con
 	// http://stackoverflow.com/questions/9005769/any-way-to-print-in-color-with-nslog#
 	// https://wiki.archlinux.org/index.php/Color_Bash_Prompt#List_of_colors_for_prompt_and_Bash
 
-	if (channel == LogChannel::Info)
+	if (channel == LogType::Log)
 	{
 		printf("\e[0;37m");    // white
 	}
-	else if (channel == LogChannel::Warning)
+	else if (channel == LogType::Warning)
 	{
 		printf("\e[0;33m");    // yellow
 	}
@@ -145,4 +148,6 @@ void FishEngine::Debug::Log(LogChannel channel, std::string const & message, con
 		printf("\e[m");
 	}
 #endif
-	}
+	
+	FishEngine::SimpleLogger::GetInstance().Log(LogData{channel, message, file, line, func});
+}

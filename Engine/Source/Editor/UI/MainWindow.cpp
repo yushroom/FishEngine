@@ -34,6 +34,7 @@
 #include "SceneArchive.hpp"
 #include "AssetArchive.hpp"
 #include "ShaderCompiler.hpp"
+#include "LogView.hpp"
 
 using namespace FishEngine;
 
@@ -178,6 +179,9 @@ MainWindow::MainWindow(QWidget *parent) :
 //    FishEditor::MainEditor::OnInitialized += [this](){
 //        ui->projectView->SetRootPath(FishEngine::Application::dataPath());
 //    };
+	
+	auto view = new LogView();
+	view->show();
 }
 
 MainWindow::~MainWindow()

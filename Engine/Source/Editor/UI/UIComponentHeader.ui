@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>200</width>
-    <height>27</height>
+    <height>29</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,7 +78,7 @@
      </property>
      <property name="icon">
       <iconset resource="../resources.qrc">
-       <normaloff>:/Resources/settings.png</normaloff>:/Resources/settings.png</iconset>
+       <normaloff>:/Resources/inspector_popup.png</normaloff>:/Resources/inspector_popup.png</iconset>
      </property>
      <property name="flat">
       <bool>true</bool>

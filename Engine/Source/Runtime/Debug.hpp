@@ -4,16 +4,10 @@
 #include "FishEngine.hpp"
 #include "ReflectClass.hpp"
 #include "StringFormat.hpp"
+#include "Internal/LogType.hpp"
 
 namespace FishEngine
 {
-	enum class LogChannel
-	{
-		Info,
-		Warning,
-		Error
-	};
-
 	class FE_EXPORT Meta(NonSerializable) Debug
 	{
 	public:
@@ -31,7 +25,7 @@ namespace FishEngine
 		//static void LogError(const char *format, ...);
 		//static void _LogError(const std::string & message);
 
-		static void Log(LogChannel channel, std::string const & message, const char* file, int line, const char * func);
+		static void Log(LogType channel, std::string const & message, const char* file, int line, const char * func);
 		
 		static void setColorMode(bool value)
 		{
@@ -49,8 +43,8 @@ namespace FishEngine
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
-#define LogInfo(message) FishEngine::Debug::Log(FishEngine::LogChannel::Info, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#define LogWarning(message) FishEngine::Debug::Log(FishEngine::LogChannel::Warning, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#define LogError(message) FishEngine::Debug::Log(FishEngine::LogChannel::Error, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define LogInfo(message) FishEngine::Debug::Log(FishEngine::LogType::Log, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define LogWarning(message) FishEngine::Debug::Log(FishEngine::LogType::Warning, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define LogError(message) FishEngine::Debug::Log(FishEngine::LogType::Error, (message), __FILE__, __LINE__, __PRETTY_FUNCTION__)
 
 #endif /* Debug_hpp */

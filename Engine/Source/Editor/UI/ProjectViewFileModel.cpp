@@ -39,9 +39,6 @@ QVariant ProjectViewFileModel::data(const QModelIndex &index, int role) const
 		return QString::fromStdString(node->stem());
 		break;
 	case Qt::DecorationRole:
-		if (node->isDir())
-			return QIcon(":/Resources/folder.png");
-		//return QIcon(":/Resources/unknown_file.png");
 		return FishEditor::AssetDatabase::GetCacheIcon(node->absoluteFilePath());
 		break;
 	}
@@ -232,7 +229,7 @@ QVariant ProjectViewDirModel::data(const QModelIndex &index, int role) const
 		return QString::fromStdString(node->fileName());
 		break;
 	case Qt::DecorationRole:
-		return QIcon(":/Resources/folder.png");
+		return QIcon(":/Resources/Assets/Folder@64.png");
 		break;
 	}
 

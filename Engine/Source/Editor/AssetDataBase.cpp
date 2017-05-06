@@ -34,13 +34,19 @@ namespace FishEditor
 
 	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
-		static QIcon unknown_icon(":/Resources/unknown_file.png");
-		static QIcon material_icon(":/Resources/MaterialIcon.png");
-		static QIcon mesh_icon(":/Resources/MeshIcon.png");
-		static QIcon prefab_icon(":/Resources/PrefabIcon.png");
-		static QIcon shader_icon(":/Resources/project_icon_shader.png");
-		static QIcon audioclip_icon(":/Resources/project_icon_audioclip.png");
+		static QIcon default_icon(  ":/Resources/Assets/DefaultAsset@64.png");
+		static QIcon material_icon( ":/Resources/Assets/Material@64.png");
+		static QIcon model_icon(    ":/Resources/Assets/PrefabModel@64.png");
+		static QIcon prefab_icon(   ":/Resources/Assets/Prefab@64.png");
+		static QIcon shader_icon(   ":/Resources/Assets/Shader@64.png");
+		static QIcon audioclip_icon(":/Resources/Assets/AudioClip@64.png");
+		static QIcon folder_icon(   ":/Resources/Assets/Folder@64.png");
 
+		if (boost::filesystem::is_directory(path))
+		{
+			return folder_icon;
+		}
+		
 		auto type = FishEngine::Resources::GetAssetType(path.extension());
 		if (type == FishEngine::AssetType::Material)
 		{
@@ -56,7 +62,7 @@ namespace FishEditor
 		}
 		else if (type == FishEngine::AssetType::Model)
 		{
-			return mesh_icon;
+			return model_icon;
 		}
 		else if (type == FishEngine::AssetType::AudioClip)
 		{
@@ -72,7 +78,7 @@ namespace FishEditor
 //			s_cacheIcons.emplace(path, QIcon(QString::fromStdString(path.string())));
 //			return s_cacheIcons[path];
 		}
-		return unknown_icon;
+		return default_icon;
 	}
 
 

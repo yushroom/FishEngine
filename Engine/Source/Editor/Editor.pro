@@ -91,7 +91,8 @@ SOURCES += \
     Selection.cpp \
     TextureImporter.cpp \
     UI/OpenProjectDialog.cpp \
-    UI/ProjectListView.cpp
+    UI/ProjectListView.cpp \
+    UI/LogView.cpp
 
 HEADERS += \
     generate/Enum_ImportAssetOptions.hpp \
@@ -161,7 +162,8 @@ HEADERS += \
     TextureImporter.hpp \
     TextureImporterProperties.hpp \
     UI/OpenProjectDialog.hpp \
-    UI/ProjectListView.hpp
+    UI/ProjectListView.hpp \
+    UI/LogView.hpp
 
 FORMS   += \
     UI/AssetProgressDialog.ui \
@@ -183,7 +185,8 @@ FORMS   += \
     UI/UISlider.ui \
     UI/UIString.ui \
     UI/UITexture.ui \
-    UI/OpenProjectDialog.ui
+    UI/OpenProjectDialog.ui \
+    UI/LogView.ui
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12 # no effect, set QMAKE_MACOSX_DEPLOYMENT_TARGET in <QtDir>/clang_64/mkspecs/macx-clang/qmake.conf instead
 

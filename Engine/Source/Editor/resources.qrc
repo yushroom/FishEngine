@@ -1,17 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>Resources/cancel.png</file>
-        <file>Resources/cancelActive.png</file>
-        <file>Resources/Whole Hand_000000_100.png</file>
-        <file>Resources/folder.png</file>
-        <file>Resources/unknown_file.png</file>
         <file>Resources/circled_dot.png</file>
         <file>Resources/M.png</file>
-        <file>Resources/settings.png</file>
-        <file>Resources/MaterialIcon.png</file>
-        <file>Resources/MeshIcon.png</file>
-        <file>Resources/PrefabIcon.png</file>
-        <file>Resources/project_icon_shader.png</file>
         <file>Resources/toolbar_pausebutton.png</file>
         <file>Resources/toolbar_pausebutton_on.png</file>
         <file>Resources/toolbar_playbutton.png</file>
@@ -24,6 +14,17 @@
         <file>Resources/transform_tool_view_move.png</file>
         <file>Resources/transform_tool_view_orbit.png</file>
         <file>Resources/transform_tool_view_zoom.png</file>
-        <file>Resources/project_icon_audioclip.png</file>
+        <file>Resources/Assets/AudioClip@64.png</file>
+        <file>Resources/Assets/DefaultAsset@64.png</file>
+        <file>Resources/Assets/Folder@64.png</file>
+        <file>Resources/Assets/Font@64.png</file>
+        <file>Resources/Assets/Material@64.png</file>
+        <file>Resources/Assets/Prefab@64.png</file>
+        <file>Resources/Assets/PrefabModel@64.png</file>
+        <file>Resources/Assets/Shader@64.png</file>
+        <file>Resources/inspector_popup.png</file>
+        <file>Resources/console_error.png</file>
+        <file>Resources/console_info.png</file>
+        <file>Resources/console_warn.png</file>
     </qresource>
 </RCC>

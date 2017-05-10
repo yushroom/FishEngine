@@ -7,6 +7,11 @@
 
 #include <Serialization/YAMLArchive.hpp>
 
+namespace YAML
+{
+	class Node;
+}
+
 namespace FishEditor
 {
 	class SceneInputArchive : public FishEngine::YAMLInputArchive
@@ -19,7 +24,16 @@ namespace FishEditor
 
 		void LoadAll();
 
+
 	protected:
+		
+		void RecursiveLoad(YAML::Node const & node);
+		
+		
+		//virtual void DeserializeObject(FishEngine::ObjectPtr const & obj) override
+		//{
+		//	abort();
+		//}
 	};
 
 	class SingleObjectOutputArchive : public FishEngine::YAMLOutputArchive

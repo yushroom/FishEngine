@@ -15,7 +15,7 @@ namespace FishEngine
 
 		bool m_lookAtMode = false;
 		float m_rotateSpeed = 200;
-		float m_dragSpeed = 10;
+		float m_dragSpeed = 20;
 		Vector3 m_orbitCenter = Vector3::zero;
 
 		// https://docs.unity3d.com/Manual/SceneViewNavigation.html

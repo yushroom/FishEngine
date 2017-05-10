@@ -49,6 +49,7 @@ ScriptManager::ScriptManager()
 	{
 		LogError(sharedLibPath.string() + " not found");
 		abort();
+		//return;
 	}
 	m_impl = new ScriptManagerImpl(sharedLibPath);
 }
@@ -116,12 +117,12 @@ void FishEditor::ScriptManager::BuildScriptsInProject()
 	PyTuple_SetItem(pArgs, 1, pBuildType);
 	PyTuple_SetItem(pArgs, 2, pCmakePath);
 	PyObject_CallObject(pFunc, pArgs);
-//		Py_DECREF(pCmakePath);
-//		Py_DECREF(pBuildType);
-//		Py_DECREF(pBuildPath);
-	Py_DECREF(pArgs);
-	Py_DECREF(pFunc);
-	Py_DECREF(pModule);
-	Py_DECREF(pName);
+//	Py_CLEAR(pCmakePath);
+//	Py_CLEAR(pBuildType);
+//	Py_CLEAR(pBuildPath);
+//	Py_CLEAR(pArgs);
+//	Py_CLEAR(pFunc);
+//	Py_CLEAR(pModule);
+//	Py_CLEAR(pName);
 	Py_Finalize();
 }

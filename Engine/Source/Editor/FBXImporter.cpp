@@ -119,6 +119,14 @@ int FBXToNativeType(const int & value)
 }
 
 
+inline Vector3 FbxVector4ToVector3WithXFlipped(FbxVector4 const & v)
+{
+	return Vector3(static_cast<float>(v[0]),
+				   static_cast<float>(v[1]),
+				   static_cast<float>(v[2]) );
+}
+
+
 // skinned data
 void FishEditor::FBXImporter::GetLinkData(FbxMesh* pMesh, MeshPtr mesh, std::map<uint32_t, uint32_t> const & vertexIndexRemapping)
 {
@@ -409,10 +417,11 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 	{
 		auto & p = controlPoints[controlPointIndex];
 		float scale = m_fileScale * m_globalScale;
-		float x = p[0] * scale;
-		float y = p[1] * scale;
-		float z = p[2] * scale;
-		rawMesh.m_vertexPositions.emplace_back(x, y, z);
+//		float x = -p[0] * scale;
+//		float y = p[1] * scale;
+//		float z = p[2] * scale;
+		auto pp = FbxVector4ToVector3WithXFlipped(p);
+		rawMesh.m_vertexPositions.emplace_back(pp * scale);
 	}
 	
 	// indices(triangles)
@@ -469,14 +478,14 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 					{
 						//Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
 						auto n = leNormal->GetDirectArray().GetAt(vertexId);
-						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
+						rawMesh.m_wedgeNormals.emplace_back(FbxVector4ToVector3WithXFlipped(n));
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leNormal->GetIndexArray().GetAt(vertexId);
 						//Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
 						auto n = leNormal->GetDirectArray().GetAt(id);
-						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
+						rawMesh.m_wedgeNormals.emplace_back(FbxVector4ToVector3WithXFlipped(n));
 					}
 					else
 					{
@@ -489,13 +498,13 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 					if (mode == FbxGeometryElement::eDirect)
 					{
 						auto n = leNormal->GetDirectArray().GetAt(lControlPointIndex);
-						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
+						rawMesh.m_wedgeNormals.emplace_back(FbxVector4ToVector3WithXFlipped(n));
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leNormal->GetIndexArray().GetAt(lControlPointIndex);
 						auto n = leNormal->GetDirectArray().GetAt(id);
-						rawMesh.m_wedgeNormals.emplace_back((float)n[0], (float)n[1], (float)n[2]);
+						rawMesh.m_wedgeNormals.emplace_back(FbxVector4ToVector3WithXFlipped(n));
 					}
 					else
 					{
@@ -521,14 +530,14 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 					{
 						//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
 						auto t = leTangent->GetDirectArray().GetAt(vertexId);
-						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
+						rawMesh.m_wedgeTangents.emplace_back(FbxVector4ToVector3WithXFlipped(t));
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leTangent->GetIndexArray().GetAt(vertexId);
 						//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
 						auto t = leTangent->GetDirectArray().GetAt(id);
-						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
+						rawMesh.m_wedgeTangents.emplace_back(FbxVector4ToVector3WithXFlipped(t));
 					}
 					else
 					{
@@ -541,13 +550,13 @@ MeshPtr FishEditor::FBXImporter::ParseMesh(FbxMesh* fbxMesh)
 					if (mode == FbxGeometryElement::eDirect)
 					{
 						auto t = leTangent->GetDirectArray().GetAt(lControlPointIndex);
-						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
+						rawMesh.m_wedgeTangents.emplace_back(FbxVector4ToVector3WithXFlipped(t));
 					}
 					else if (mode == FbxGeometryElement::eIndexToDirect)
 					{
 						int id = leTangent->GetIndexArray().GetAt(lControlPointIndex);
 						auto t = leTangent->GetDirectArray().GetAt(id);
-						rawMesh.m_wedgeTangents.emplace_back((float)t[0], (float)t[1], (float)t[2]);
+						rawMesh.m_wedgeTangents.emplace_back(FbxVector4ToVector3WithXFlipped(t));
 					}
 					else
 					{
@@ -1166,7 +1175,8 @@ void FishEditor::FBXImporter::ImportAnimations(fbxsdk::FbxScene* scene)
 		}
 		else
 		{
-			abort();
+			//abort();
+			LogError(Format("multiple animation clip in model: %1%", this->m_assetPath.string()));
 		}
 	}
 

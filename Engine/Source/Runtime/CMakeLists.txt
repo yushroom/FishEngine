@@ -1,7 +1,8 @@
 aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
-AUX_SOURCE_DIRECTORY( ${CMAKE_CURRENT_LIST_DIR}/SceneManagement SceneManagement_SRCS)
-SOURCE_GROUP(SceneManagement FILES ${SceneManagement_SRCS})
 FILE(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
+
+FILE(GLOB SceneManagement_SRCS ${CMAKE_CURRENT_LIST_DIR}/SceneManagement/*.*)
+SOURCE_GROUP(SceneManagement FILES ${SceneManagement_SRCS})
 
 FILE(GLOB Serialization_SRCS ${CMAKE_CURRENT_LIST_DIR}/Serialization/*.*)
 SET(Serialization_SRCS ${Serialization_SRCS} ${CMAKE_CURRENT_LIST_DIR}/generate/EngineClassSerialization.cpp)

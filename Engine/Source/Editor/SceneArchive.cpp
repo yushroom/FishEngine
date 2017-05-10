@@ -5,6 +5,8 @@
 
 #include <Debug.hpp>
 
+#include <GameObject.hpp>
+
 using namespace FishEngine;
 
 void FishEditor::SceneOutputArchive::SerializeObject_impl(FishEngine::ObjectPtr obj)
@@ -152,7 +154,31 @@ void FishEditor::SceneOutputArchive::SerializeObject(FishEngine::ObjectPtr const
 	}
 }
 
-void PrintNode(YAML::Node const & node)
+
+void FishEditor::SceneInputArchive::LoadAll()
+{
+	std::list<GameObjectPtr> gameObjects;
+//	for (auto & node : m_nodes)
+//	{
+//		RecursiveLoad(node);
+//	}
+	for (auto & node : m_nodes)
+	{
+		assert(node.IsMap());
+		auto className = node.begin()->first.as<std::string>();
+		LogInfo(className);
+		if ( className == "GameObject")
+		{
+			auto go = MakeShared<GameObject>();
+			m_workingNodes.push(node.begin()->second);
+			go->Deserialize(*this);
+			m_workingNodes.pop();
+		}
+	}
+}
+
+
+void FishEditor::SceneInputArchive::RecursiveLoad(YAML::Node const & node)
 {
 	if (node.IsScalar())
 	{
@@ -162,27 +188,19 @@ void PrintNode(YAML::Node const & node)
 	{
 		for (auto it = node.begin(); it != node.end(); ++it)
 		{
-			PrintNode(*it);
+			RecursiveLoad(*it);
 		}
 	}
 	else if (node.IsMap())
 	{
 		for (auto it = node.begin(); it != node.end(); ++it)
 		{
-			PrintNode(it->first);
-			PrintNode(it->second);
+			RecursiveLoad(it->first);
+			RecursiveLoad(it->second);
 		}
 	}
 }
 
-void FishEditor::SceneInputArchive::LoadAll()
-{
-	std::list<GameObjectPtr> gameObjects;
-	for (auto & node : m_nodes)
-	{
-		PrintNode(node);
-	}
-}
 
 void FishEditor::SingleObjectOutputArchive::SerializeObject(FishEngine::ObjectPtr const & object)
 {

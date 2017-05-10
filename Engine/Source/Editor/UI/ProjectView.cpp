@@ -21,6 +21,8 @@ ProjectView::ProjectView(QWidget *parent) :
 	ui(new Ui::ProjectView)
 {
 	ui->setupUi(this);
+	
+	ui->resourcesTreeView->hide();
 
 	m_dirModel = new ProjectViewDirModel(this);
 	//dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);

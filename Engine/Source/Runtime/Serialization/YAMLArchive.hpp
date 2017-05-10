@@ -4,6 +4,8 @@
 #include <cassert>
 #include <stack>
 
+#include <Debug.hpp>
+
 namespace FishEngine
 {
 	class FE_EXPORT YAMLInputArchive : public InputArchive
@@ -124,7 +126,11 @@ namespace FishEngine
 
 		virtual void DeserializeObject(FishEngine::ObjectPtr const & obj) override
 		{
-
+			//obj->Deserialize(*this);
+			auto const & current = CurrentNode();
+			assert(current.IsMap());
+			auto fileID = current["fileID"].as<int>();
+			LogWarning(Format("fileID %1%", fileID));
 		}
 
 		virtual void DeserializeWeakObject(std::weak_ptr<FishEngine::Object> const & obj) override
@@ -184,6 +190,9 @@ namespace FishEngine
 		uint32_t					m_nodeIndex = 0;
 		std::stack<YAML::Node>		m_workingNodes;
 		YAML::const_iterator		m_mapOrSequenceiterator;
+
+		std::map<int, int>			m_fileIDToIndex;
+		std::map<int, ObjectPtr>	m_fileIDToObject;
 	};
 
 

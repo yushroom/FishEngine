@@ -762,6 +762,28 @@ namespace FishEditor
 		blackSperer->GetComponent<Renderer>()->SetMaterial(black);
 	}
 	
+	void InitializeScene_StandardAssets()
+	{
+//		auto scene = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/SampleScenes/Models/GroundObstacles.FBX");
+//		auto sceneGo = Object::Instantiate(scene);
+//		
+//		std::vector<Vector3> cubePositions = {
+//			{-30.5, 6.2,  0},
+//			{-30.5, 7.4,  -15},
+//			{-30.5, 7.4,  -21},
+//			{-16.5, 7.4,  -21},
+//			{-0.82, 5,    -21},
+//			{25.86, 7.88, -21}
+//		};
+//		
+//		for (auto & p : cubePositions)
+//		{
+//			auto cube = GameObject::CreatePrimitive(PrimitiveType::Cube);
+//			//cube->GetComponent<MeshRenderer>()->
+//			cube->transform()->setPosition(p);
+//		}
+	}
+	
 
 	void DefaultScene()
 	{
@@ -846,6 +868,10 @@ namespace FishEditor
 		else if (projectName == "Empty")
 		{
 			InitializeScene_Empty();
+		}
+		else if (projectName == "Standard Assets")
+		{
+			InitializeScene_StandardAssets();
 		}
 
 		glClearColor(1.0f, 0.0f, 0.0f, 1);

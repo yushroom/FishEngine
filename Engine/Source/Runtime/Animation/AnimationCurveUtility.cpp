@@ -80,12 +80,12 @@ TAnimationCurve<Quaternion> AnimationCurveUtility::EulerToQuaternionCurve(const 
 		return quat;
 	};
 
-	uint32_t numKeys = (uint32_t)eulerCurve.keyframeCount();
+	int numKeys = (int)eulerCurve.keyframeCount();
 	std::vector<TKeyframe<Quaternion>> quatKeyframes(numKeys);
 
 	// Calculate key values
 	Quaternion lastQuat(0, 0, 0, 0);
-	for (uint32_t i = 0; i < numKeys; i++)
+	for (int i = 0; i < numKeys; i++)
 	{
 		float time = eulerCurve.keyframeAt(i).time;
 		Vector3 angles = eulerCurve.keyframeAt(i).value;
@@ -101,7 +101,7 @@ TAnimationCurve<Quaternion> AnimationCurveUtility::EulerToQuaternionCurve(const 
 
 	// Calculate extra values between keys so we can approximate tangents. If we're sampling very close to the key
 	// the values should pretty much exactly match the tangent (assuming the curves are cubic hermite)
-	for (uint32_t i = 0; i < numKeys - 1; i++)
+	for (int i = 0; i < numKeys - 1; i++)
 	{
 		TKeyframe<Quaternion>& currentKey = quatKeyframes[i];
 		TKeyframe<Quaternion>& nextKey = quatKeyframes[i + 1];

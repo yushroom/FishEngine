@@ -180,8 +180,10 @@ MainWindow::MainWindow(QWidget *parent) :
 //        ui->projectView->SetRootPath(FishEngine::Application::dataPath());
 //    };
 	
-	auto view = new LogView();
-	view->show();
+//	auto view = new LogView();
+//	view->show();
+	
+	OpenScene();
 }
 
 MainWindow::~MainWindow()

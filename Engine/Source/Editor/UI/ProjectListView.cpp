@@ -150,7 +150,9 @@ void ProjectListView::ShowContexMenu(const QPoint& pos)
 	}
 
 	auto path = fileInfo->path();
-	bool isModel = path.extension() == ".fbx" || path.extension() == ".obj";
+	auto ext = path.extension().string();
+	boost::to_lower( ext );
+	bool isModel = ext == ".fbx" || ext == ".obj";
 	m_actionMoveToScene->setEnabled(isModel);
 
 	auto action = m_menu->exec(QCursor::pos());

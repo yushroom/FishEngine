@@ -356,7 +356,6 @@ namespace FishEditor
 		std::copy(data, data + length, texture->m_data.begin());
 			
 		// get icon
-		//FreeImage_Rescale();
 		auto thumbnail = FreeImage_MakeThumbnail(dib, 64);
 		FreeImage_FlipVertical(thumbnail);	// flip for Qt
 		QImage::Format qformat;

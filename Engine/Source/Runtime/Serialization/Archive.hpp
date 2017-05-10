@@ -175,13 +175,15 @@ namespace FishEngine
 		template<class T>
 		InputArchive & operator >> (std::list<T> & t)
 		{
-			//BeginSequence(t.size());
-			//for (auto & item : t)
-			//{
-			//	(*this) << item;
-			//}
-			//EndSequence();
-			abort();
+			auto size = BeginSequence();
+			t.resize(size);
+			for (auto & x : t)
+			{
+				BeforeASequenceItem();
+				(*this) >> x;
+				AfterASequenceItem();
+			}
+			EndSequence();
 			return *this;
 		}
 

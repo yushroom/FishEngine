@@ -2,7 +2,7 @@
 
 ## What is FishEngine
 
-FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with some C++14 features).
+FishEngine is a simple, Unity-like game engine, mainly written in C++14.
 
 ![1](Snapshot/20161129.png)
 
@@ -18,7 +18,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++11 (with so
 - Deferred Rendering
 - Asset management (WIP)
 - Physics system (WIP)
-- Audio
+- Audio(WIP)
 
 
 

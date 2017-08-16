@@ -83,7 +83,8 @@ SET_TARGET_PROPERTIES(format PROPERTIES FOLDER "ThirdParty/yaml-cpp")
 
 SET( PhysX_ROOT_DIR "" CACHE PATH "PhysXSDK root directory" )
 include_directories( ${PhysX_ROOT_DIR}/Include )
-include_directories( ${PhysX_ROOT_DIR}/../ )
+include_directories( ${PhysX_ROOT_DIR}/../PxShared/include )
+include_directories( ${PhysX_ROOT_DIR}/Snippets )
 
 if (MSVC)
 	# PhysXSDK
@@ -113,7 +114,8 @@ if (MSVC)
 		list (APPEND PhysXSDK_LIBRARIES debug ${lib1} optimized ${lib2})
 	endforeach()
 else()
-	FILE(GLOB PhysXSDK_LIBRARIES ${PhysX_ROOT_DIR}/Lib/osx64/*.a)
+	# FILE(GLOB lib1 ${PhysX_ROOT_DIR}/Lib/osx64/*)
+	FILE(GLOB PhysXSDK_LIBRARIES ${PhysX_ROOT_DIR}/Lib/osx64/*.a ${PhysX_ROOT_DIR}/../PxShared/lib/osx64/*.a)
 endif()
 
 add_definitions(-DFishEngine_SHARED_LIB=1)

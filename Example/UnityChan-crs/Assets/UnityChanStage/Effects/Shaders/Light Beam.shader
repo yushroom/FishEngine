@@ -67,7 +67,7 @@ uniform float4 _NoiseSpeed;
 		float n1 = texture(_NoiseTex1, vs_out.uv1).r;
 		float n2 = texture(_NoiseTex2, vs_out.uv2).r;
 
-		c.a *= texture(_MainTex, vs_out.uv0).a * n1 * n2 * falloff;
+		c.a *= texture(_MainTex, vs_out.uv0).r * n1 * n2 * falloff;
 
 		OutColor = c;
 	}

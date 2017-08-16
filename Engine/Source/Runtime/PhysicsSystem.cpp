@@ -1,9 +1,10 @@
 #include "PhysicsSystem.hpp"
 #include "Transform.hpp"
 #include "Debug.hpp"
-#include <PhysXSDK/Snippets/SnippetCommon/SnippetPrint.h>
-#include <PhysXSDK/Snippets/SnippetCommon/SnippetPVD.h>
-#include <PhysXSDK/Snippets/SnippetUtils/SnippetUtils.h>
+//#include <SnippetCommon/SnippetPrint.h>
+//#include <SnippetCommon/SnippetPVD.h>
+//#include <SnippetUtils/SnippetUtils.h>
+#include <pvd/PxPvd.h>
 
 using namespace FishEngine;
 using namespace physx;
@@ -38,11 +39,6 @@ public:
 //    }
 //};
 
-PxDefaultAllocator		gAllocator;
-//FishEnginePhysxAllocator		gAllocator;
-//PxDefaultErrorCallback	gErrorCallback;
-FishEnginePhysxErrorCallback       gErrorCallback;
-
 PxFoundation*			gFoundation = NULL;
 PxPhysics*				gPhysics	= NULL;
 
@@ -51,24 +47,40 @@ PxScene*				gScene		= NULL;
 
 PxMaterial*				gMaterial	= NULL;
 
-PxVisualDebuggerConnection*
-gConnection	= NULL;
+//PxVisualDebuggerConnection* gConnection	= NULL;
 
+PxPvd * gPvd = NULL;
+
+#define PVD_HOST "localhost"
 
 void FishEngine::PhysicsSystem::Init()
 {
-	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
-	PxProfileZoneManager* profileZoneManager = &PxProfileZoneManager::createProfileZoneManager(gFoundation);
-	PxTolerancesScale scale;
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, scale,true,profileZoneManager);
-	
-	if(gPhysics->getPvdConnectionManager())
-	{
-		gPhysics->getVisualDebugger()->setVisualizeConstraints(true);
-		gPhysics->getVisualDebugger()->setVisualDebuggerFlag(PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
-		gPhysics->getVisualDebugger()->setVisualDebuggerFlag(PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
-		gConnection = PxVisualDebuggerExt::createConnection(gPhysics->getPvdConnectionManager(), PVD_HOST, 5425, 10);
+	static PxDefaultAllocator		gAllocator;
+	//FishEnginePhysxAllocator		gAllocator;
+	static PxDefaultErrorCallback	gErrorCallback;
+	//static FishEnginePhysxErrorCallback       gErrorCallback;
+	gFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator, gErrorCallback);
+	if (gFoundation == nullptr) {
+		LogError("[PhysX] create foundation failed");
+		abort();
 	}
+	// PxProfileZoneManager* profileZoneManager = &PxProfileZoneManager::createProfileZoneManager(gFoundation);
+	
+//	gPvd = PxCreatePvd(*gFoundation);
+//	auto transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
+//	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+	
+	bool recordMemoryAllocations = true;
+	PxTolerancesScale scale;
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, scale, recordMemoryAllocations, nullptr);
+	
+//	if(gPhysics->getPvdConnectionManager())
+//	{
+//		gPhysics->getVisualDebugger()->setVisualizeConstraints(true);
+//		gPhysics->getVisualDebugger()->setVisualDebuggerFlag(PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
+//		gPhysics->getVisualDebugger()->setVisualDebuggerFlag(PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
+//		gConnection = PxVisualDebuggerExt::createConnection(gPhysics->getPvdConnectionManager(), PVD_HOST, 5425, 10);
+//	}
 	
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -91,11 +103,13 @@ void FishEngine::PhysicsSystem::Clean()
 {
 	gScene->release();
 	gDispatcher->release();
-	PxProfileZoneManager* profileZoneManager = gPhysics->getProfileZoneManager();
-	if(gConnection != NULL)
-		gConnection->release();
+	//PxProfileZoneManager* profileZoneManager = gPhysics->getProfileZoneManager();
+//	if(gConnection != NULL)
+//		gConnection->release();
 	gPhysics->release();
-	profileZoneManager->release();
+	if (gPvd != nullptr)
+		gPvd->release();
+//	profileZoneManager->release();
 	gFoundation->release();
 	
 	LogInfo("Clean up PhysX.");

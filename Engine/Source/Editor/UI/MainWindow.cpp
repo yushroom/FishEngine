@@ -183,7 +183,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //	auto view = new LogView();
 //	view->show();
 	
-	OpenScene();
+	//OpenScene();
 }
 
 MainWindow::~MainWindow()

@@ -212,8 +212,8 @@ namespace FishEditor
 		
 		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/unitychan.fbx");
 		auto modelGO = Object::Instantiate(model);
-		auto unitychan_contrl = ScriptManager::GetInstance().CreateScript("UnityChanControlScriptWithRgidBody");
-		modelGO->AddComponent(unitychan_contrl);
+		//auto unitychan_contrl = ScriptManager::GetInstance().CreateScript("UnityChanControlScriptWithRgidBody");
+		//modelGO->AddComponent(unitychan_contrl);
 
 		//auto collider = modelGO->AddComponent<CapsuleCollider>();
 		//collider->setCenter(Vector3(0, 0.75, 0));

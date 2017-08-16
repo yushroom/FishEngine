@@ -67,7 +67,7 @@ FILE(GLOB EditorFiles
 
 
 # Widgets finds its own dependencies (QtGui and QtCore).
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5Widgets)
 
 #FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
 FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)

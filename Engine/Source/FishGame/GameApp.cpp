@@ -1,4 +1,4 @@
-#include "GameApp.hpp"
+#include <FishGame/GameApp.hpp>
 
 #include <string>
 #include <chrono>

@@ -6,7 +6,7 @@
 
 #include <FishEngine/Transform.hpp>
 #include <FishEngine/GameObject.hpp>
-#include "Selection.hpp"
+#include "../Selection.hpp"
 #include <FishEngine/Scene.hpp>
 #include <FishEngine/Camera.hpp>
 
@@ -17,7 +17,7 @@
 #include <QDropEvent>
 #include <QStandardItemModel>
 
-#include "Selection.hpp"
+#include "../Selection.hpp"
 
 #include <FishEngine/Debug.hpp>
 using namespace FishEngine;

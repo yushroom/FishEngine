@@ -13,7 +13,7 @@
 #include <FishEngine/Application.hpp>
 #include <FishEngine/Debug.hpp>
 
-#include <EditorApplication.hpp>
+#include "EditorApplication.hpp"
 
 // TODO: CMAKE_INTDIR not defined in makefile
 #ifndef CMAKE_INTDIR

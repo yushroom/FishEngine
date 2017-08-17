@@ -1,4 +1,6 @@
-aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+SET(FishGame_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishGame)
+
+aux_source_directory(${FishGame_SRC_DIR} SRCS)
 add_library (FishGame SHARED ${SRCS})
 target_link_libraries(FishGame FishEngine)
 target_link_libraries(FishGame glfw)

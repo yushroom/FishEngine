@@ -9,16 +9,16 @@
 
 #include <FishEngine/Debug.hpp>
 
-#include "UI/UIGameObjectHeader.hpp"
-#include "UI/UIMaterialHeader.hpp"
-#include "UI/UIAssetHeader.hpp"
-#include "UI/TextureImporterInspector.hpp"
-#include "UI/ModelImporterInspector.hpp"
+#include "../UI/UIGameObjectHeader.hpp"
+#include "../UI/UIMaterialHeader.hpp"
+#include "../UI/UIAssetHeader.hpp"
+#include "../UI/TextureImporterInspector.hpp"
+#include "../UI/ModelImporterInspector.hpp"
 
-#include "TextureImporter.hpp"
-#include "ModelImporter.hpp"
-#include "Selection.hpp"
-#include "Inspector.hpp"
+#include "../TextureImporter.hpp"
+#include "../ModelImporter.hpp"
+#include "../Selection.hpp"
+#include "../Inspector.hpp"
 
 InspectorWidget::InspectorWidget(QWidget *parent) 
 	: QWidget(parent)

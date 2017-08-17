@@ -41,15 +41,15 @@
 #include <FishEngine/Generated/Enum_LightType.hpp>
 #include <FishEngine/Generated/Enum_ShadowCastingMode.hpp>
 
-#include <TextureImporter.hpp>
-#include <generate/Enum_ModelImporterMaterialSearch.hpp>
-#include <generate/Enum_ModelImporterNormals.hpp>
-#include <generate/Enum_ModelImporterTangents.hpp>
+#include "TextureImporter.hpp"
+#include "generate/Enum_ModelImporterMaterialSearch.hpp"
+#include "generate/Enum_ModelImporterNormals.hpp"
+#include "generate/Enum_ModelImporterTangents.hpp"
 
-#include <ModelImporter.hpp>
-#include <generate/Enum_TextureImporterType.hpp>
-#include <generate/Enum_TextureImporterShape.hpp>
-#include <generate/Enum_TextureImporterType.hpp>
+#include "ModelImporter.hpp"
+#include "generate/Enum_TextureImporterType.hpp"
+#include "generate/Enum_TextureImporterShape.hpp"
+#include "generate/Enum_TextureImporterType.hpp"
 #include <FishEngine/Generated/Enum_TextureWrapMode.hpp>
 #include <FishEngine/Generated/Enum_FilterMode.hpp>
 

@@ -36,9 +36,6 @@
 #include "AssetArchive.hpp"
 #include "LogView.hpp"
 
-#include <folly/dynamic.h>
-#include <folly/json.h>
-
 using namespace FishEngine;
 
 
@@ -187,23 +184,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //	view->show();
 	
 	//OpenScene();
-	// 先定义一个json字符串
-	std::string jsonDocument = R"({"key":12,"key2":[false, null, true, "yay"]})";
-	// 执行json反序列化，反序列化结果为dynamic
-	folly::dynamic parsed = folly::parseJson(jsonDocument);
-	assert(parsed["key"] == 12);
-	assert(parsed["key2"][0] == false);
-	assert(parsed["key2"][1] == nullptr);
-	
-	// 构建一个OBJECT
-	folly::dynamic sonOfAJ = folly::dynamic::object
-	("key", 12)
-	("key2", folly::dynamic::array(false, nullptr, true, "yay"));
-	
-	// json序列化
-	auto str = folly::toJson(sonOfAJ);
-	std::cout << jsonDocument << std::endl;
-	std::cout << str << std::endl;
 }
 
 MainWindow::~MainWindow()

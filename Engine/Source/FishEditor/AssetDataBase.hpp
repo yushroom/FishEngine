@@ -5,7 +5,7 @@
 #include <QIcon>
 #include <FishEngine/ReflectClass.hpp>
 #include <FishEngine/GUID.hpp>
-#include <AssetImporter.hpp>
+#include "AssetImporter.hpp"
 #include <FishEngine/Application.hpp>
 #include <FishEngine/Debug.hpp>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <FishEngine/ReflectEnum.hpp>
-#include <TextureImporterProperties.hpp>
+#include "../TextureImporterProperties.hpp"
 
 namespace FishEngine
 {

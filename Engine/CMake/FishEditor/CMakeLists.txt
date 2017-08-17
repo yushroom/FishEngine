@@ -2,6 +2,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+SET(FishEditor_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishEditor)
+include_directories( ${FishEditor_SRC_DIR} )
+
 # Autodesk FBX sdk
 SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
 include_directories( ${FBXSDK_DIR}/include )
@@ -26,13 +29,13 @@ SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
 
 
 # FreeImage
-SET(FreeImage_Root ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/freeimage)
+SET(FreeImage_Root ${FishEditor_SRC_DIR}/../../ThirdParty/freeimage)
 include_directories(${FreeImage_Root}/include)
 link_directories(${FreeImage_Root}/lib)
 
 
 # Python3
-SET( PYTHON3_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/python3 )
+SET( PYTHON3_DIR ${FishEditor_SRC_DIR}/../../ThirdParty/python3 )
 include_directories( ${PYTHON3_DIR}/include )
 IF (WIN32)
     SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/python36.lib optimized ${PYTHON3_DIR}/libs/python36.lib )
@@ -45,41 +48,41 @@ ENDIF()
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
-FILE(GLOB Heasers ${CMAKE_CURRENT_LIST_DIR}/*.hpp)
-aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/UI UI_SRCS)
-FILE(GLOB UI_Heasers ${CMAKE_CURRENT_LIST_DIR}/UI/*.hpp)
-FILE(GLOB FORMS ${CMAKE_CURRENT_LIST_DIR}/UI/*.ui)
+aux_source_directory(${FishEditor_SRC_DIR} SRCS)
+FILE(GLOB Heasers ${FishEditor_SRC_DIR}/*.hpp)
+aux_source_directory(${FishEditor_SRC_DIR}/UI UI_SRCS)
+FILE(GLOB UI_Heasers ${FishEditor_SRC_DIR}/UI/*.hpp)
+FILE(GLOB FORMS ${FishEditor_SRC_DIR}/UI/*.ui)
 SOURCE_GROUP(Forms FILES ${FORMS})
 FILE(GLOB InspectorFiles
-    ${CMAKE_CURRENT_LIST_DIR}/Inspector.*
-    ${CMAKE_CURRENT_LIST_DIR}/UI/InspectorWidget.*
-    ${CMAKE_CURRENT_LIST_DIR}/UI/TextureImporterInspector.*
-    ${CMAKE_CURRENT_LIST_DIR}/UI/ModelImporterInspector.*
+    ${FishEditor_SRC_DIR}/Inspector.*
+    ${FishEditor_SRC_DIR}/UI/InspectorWidget.*
+    ${FishEditor_SRC_DIR}/UI/TextureImporterInspector.*
+    ${FishEditor_SRC_DIR}/UI/ModelImporterInspector.*
     )
 FILE(GLOB EditorFiles
-    ${CMAKE_CURRENT_LIST_DIR}/Editor.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Editor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/SerializedObject.*
-    ${CMAKE_CURRENT_LIST_DIR}/SerializedProperty.*
-    ${CMAKE_CURRENT_LIST_DIR}/SerializedPropertyType.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/EditorGUILayout.*)
+    ${FishEditor_SRC_DIR}/Editor.hpp
+    ${FishEditor_SRC_DIR}/Editor.cpp
+    ${FishEditor_SRC_DIR}/SerializedObject.*
+    ${FishEditor_SRC_DIR}/SerializedProperty.*
+    ${FishEditor_SRC_DIR}/SerializedPropertyType.hpp
+    ${FishEditor_SRC_DIR}/EditorGUILayout.*)
 
 
 # Widgets finds its own dependencies (QtGui and QtCore).
 find_package(Qt5Widgets)
 
-#FILE(GLOB ReflectHeaders ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp)
-FILE(GLOB ReflectFilesSources ${CMAKE_CURRENT_LIST_DIR}/generate/*.hpp ${CMAKE_CURRENT_LIST_DIR}/generate/*.cpp)
+#FILE(GLOB ReflectHeaders ${FishEditor_SRC_DIR}/generate/*.hpp)
+FILE(GLOB ReflectFilesSources ${FishEditor_SRC_DIR}/generate/*.hpp ${FishEditor_SRC_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-# FILE(GLOB InternalSources ${CMAKE_CURRENT_LIST_DIR}/Internal/*.hpp ${CMAKE_CURRENT_LIST_DIR}/Internal/*.cpp )
+# FILE(GLOB InternalSources ${FishEditor_SRC_DIR}/Internal/*.hpp ${FishEditor_SRC_DIR}/Internal/*.cpp )
 # SOURCE_GROUP(Internal FILES ${InternalSources})
 
-FILE(GLOB Asset_SRCS ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.hpp ${CMAKE_CURRENT_LIST_DIR}/FBXImporter/*.cpp)
+FILE(GLOB Asset_SRCS ${FishEditor_SRC_DIR}/FBXImporter/*.hpp ${FishEditor_SRC_DIR}/FBXImporter/*.cpp)
 foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter AudioImporter)
     foreach (ext hpp cpp)
-        set(f ${CMAKE_CURRENT_LIST_DIR}/${x}.${ext})
+        set(f ${FishEditor_SRC_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})
         IF(NOT EXISTS ${f})
             MESSAGE(FATAL_ERROR "source files does not exist: ${f}")
@@ -87,8 +90,8 @@ foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter
     endforeach ()
 endforeach()
 
-SET( ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../assets)
-SET( SHADER_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Shaders)
+SET( ASSETS_DIR ${FishEditor_SRC_DIR}/../../../assets)
+SET( SHADER_DIR ${FishEditor_SRC_DIR}/../../Shaders)
 IF( NOT WIN32 )
     FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt )
     FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png )
@@ -106,9 +109,9 @@ SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
 SOURCE_GROUP( Inspector FILES ${InspectorFiles} )
 SOURCE_GROUP( Editor FILES ${EditorFiles})
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
+add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} ${FishEditor_SRC_DIR}/resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
 
-SET( INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
+SET( INFO_PLIST "${FishEditor_SRC_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
 MESSAGE("hhhh" ${INFO_PLIST})
 IF (NOT EXISTS ${INFO_PLIST})
     MESSAGE(FATAL_ERROR "${INFO_PLIST} not found!")

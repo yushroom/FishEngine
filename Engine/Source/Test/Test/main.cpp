@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <GameApp.hpp>
+#include <FishGame/GameApp.hpp>
 #include <FishEngine/Camera.hpp>
 #include <FishEngine/Scene.hpp>
 #include <FishEngine/Material.hpp>

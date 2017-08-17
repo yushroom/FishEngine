@@ -1,7 +1,7 @@
 #include "ObjectListModel.hpp"
 
-#include "AssetImporter.hpp"
-#include "AssetDataBase.hpp"
+#include "../AssetImporter.hpp"
+#include "../AssetDataBase.hpp"
 
 #include <FishEngine/Texture.hpp>
 #include <FishEngine/Debug.hpp>

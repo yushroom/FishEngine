@@ -10,7 +10,7 @@
 #include <FishEngine/Input.hpp>
 #include <FishEngine/RenderSystem.hpp>
 
-#include "MainEditor.hpp"
+#include "../MainEditor.hpp"
 
 using namespace FishEngine;
 using namespace FishEditor;

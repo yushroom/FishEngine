@@ -2,13 +2,13 @@
 #include <iostream>
 #include <sstream>
 
-#include <Camera.hpp>
 #include <GameApp.hpp>
-#include <Scene.hpp>
-#include <Material.hpp>
-#include <GameObject.hpp>
-#include <Light.hpp>
-#include <RenderSettings.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Scene.hpp>
+#include <FishEngine/Material.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Light.hpp>
+#include <FishEngine/RenderSettings.hpp>
 
 using namespace std;
 using namespace FishEngine;

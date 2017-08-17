@@ -1,8 +1,8 @@
-#include <Shader.hpp>
-#include <ShaderCompiler.hpp>
-#include <GLEnvironment.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/ShaderCompiler.hpp>
+#include <FishEngine/GLEnvironment.hpp>
+#include <FishEngine/Debug.hpp>
 #include <glfw/glfw3.h>
-#include <Debug.hpp>
 
 using namespace FishEngine;
 

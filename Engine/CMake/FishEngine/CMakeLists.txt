@@ -1,9 +1,10 @@
 # aux_source_directory( ${CMAKE_CURRENT_LIST_DIR} SRCS )
-FILE(GLOB_RECURSE SRCS ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
-FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_LIST_DIR}/../../include/FishEngine/*.hpp)
+SET(FishEngine_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishEngine)
+FILE(GLOB_RECURSE SRCS ${FishEngine_SRC_DIR}/*.cpp)
+FILE(GLOB_RECURSE HEADERS ${FishEngine_SRC_DIR}/../../include/FishEngine/*.hpp)
 
 foreach (dir SceneManagement Serialization Asset Math Core Physics Render "Internal" Animation Audio Generated)
-    FILE(GLOB_RECURSE SRC ${CMAKE_CURRENT_LIST_DIR}/${dir}/*.cpp)
+    FILE(GLOB_RECURSE SRC ${FishEngine_SRC_DIR}/${dir}/*.cpp)
     SOURCE_GROUP(${dir} FILES ${SRC})
 endforeach()
 

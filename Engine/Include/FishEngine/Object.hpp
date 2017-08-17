@@ -8,7 +8,7 @@
 #include "Macro.hpp"
 #include "HideFlags.hpp"
 #include "ReflectClass.hpp"
-#include "private/CloneUtility.hpp"
+#include "Private/CloneUtility.hpp"
 
 namespace FishEngine
 {

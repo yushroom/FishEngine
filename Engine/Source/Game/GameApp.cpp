@@ -2,24 +2,24 @@
 
 #include <string>
 #include <chrono>
-#include <GLEnvironment.hpp>
+#include <FishEngine/GLEnvironment.hpp>
 #include <GLFW/glfw3.h>
 
-#include <Debug.hpp>
-#include <Resources.hpp>
-#include <Input.hpp>
-#include <Screen.hpp>
-#include <RenderSystem.hpp>
-#include <Scene.hpp>
-#include <Camera.hpp>
-#include <PhysicsSystem.hpp>
-#include <RenderTarget.hpp>
-#include <Pipeline.hpp>
-#include <Material.hpp>
-#include <Graphics.hpp>
-#include <Shader.hpp>
-#include <ShaderCompiler.hpp>
-#include <Mesh.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Resources.hpp>
+#include <FishEngine/Input.hpp>
+#include <FishEngine/Screen.hpp>
+#include <FishEngine/RenderSystem.hpp>
+#include <FishEngine/Scene.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/PhysicsSystem.hpp>
+#include <FishEngine/RenderTarget.hpp>
+#include <FishEngine/Pipeline.hpp>
+#include <FishEngine/Material.hpp>
+#include <FishEngine/Graphics.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/ShaderCompiler.hpp>
+#include <FishEngine/Mesh.hpp>
 
 using namespace std;
 using namespace FishEngine;

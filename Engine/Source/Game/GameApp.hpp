@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ReflectClass.hpp"
+#include <FishEngine/ReflectClass.hpp>
 
 struct GLFWwindow;
 

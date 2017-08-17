@@ -122,7 +122,7 @@ endif()
 
 add_definitions(-DFishEngine_SHARED_LIB=1)
 
-ADD_SUBDIRECTORY(./Source/Runtime)
+ADD_SUBDIRECTORY(./CMake/FishEngine)
 ADD_SUBDIRECTORY(./Source/Game)
 ADD_SUBDIRECTORY(./Source/Editor)
 ADD_SUBDIRECTORY(./Source/Tool)

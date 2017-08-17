@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FishEditor.hpp"
-#include <ReflectClass.hpp>
-#include <Path.hpp>
+#include <FishEngine/ReflectClass.hpp>
+#include <FishEngine/Path.hpp>
 
 namespace FishEditor
 {

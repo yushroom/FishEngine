@@ -1,25 +1,25 @@
-#include "Scene.hpp"
-#include "GameObject.hpp"
-#include "Camera.hpp"
-#include "RenderSystem.hpp"
-#include "MeshRenderer.hpp"
-#include "CameraController.hpp"
-#include "Light.hpp"
-#include "Mesh.hpp"
-#include "MeshFilter.hpp"
-#include "Pipeline.hpp"
-#include "SkinnedMeshRenderer.hpp"
-#include "Frustum.hpp"
-#include "Gizmos.hpp"
-#include "Shader.hpp"
-#include "QualitySettings.hpp"
+#include <FishEngine/Scene.hpp>
+
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/RenderSystem.hpp>
+#include <FishEngine/MeshRenderer.hpp>
+#include <FishEngine/CameraController.hpp>
+#include <FishEngine/Light.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/MeshFilter.hpp>
+#include <FishEngine/Pipeline.hpp>
+#include <FishEngine/SkinnedMeshRenderer.hpp>
+#include <FishEngine/Frustum.hpp>
+#include <FishEngine/Gizmos.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/QualitySettings.hpp>
 //#include "Serialization.hpp"
 //#include "Serialization/archives/yaml.hpp"
-#include "Camera.hpp"
-#include "AudioListener.hpp"
-
-#include "GLEnvironment.hpp"
-#include "Graphics.hpp"
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/AudioListener.hpp>
+#include <FishEngine/GLEnvironment.hpp>
+#include <FishEngine/Graphics.hpp>
 
 namespace FishEngine
 {

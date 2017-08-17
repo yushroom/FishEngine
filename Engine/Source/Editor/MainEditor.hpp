@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "FishEditor.hpp"
-#include <ReflectClass.hpp>
+#include <FishEngine/ReflectClass.hpp>
 
 namespace FishEditor
 {

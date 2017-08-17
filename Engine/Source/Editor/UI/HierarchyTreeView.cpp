@@ -4,11 +4,11 @@
 #include <QTimer>
 #include <QMenu>
 
-#include <Transform.hpp>
-#include <GameObject.hpp>
+#include <FishEngine/Transform.hpp>
+#include <FishEngine/GameObject.hpp>
 #include "Selection.hpp"
-#include <Scene.hpp>
-#include <Camera.hpp>
+#include <FishEngine/Scene.hpp>
+#include <FishEngine/Camera.hpp>
 
 #include <cassert>
 
@@ -19,8 +19,7 @@
 
 #include "Selection.hpp"
 
-#include <Transform.hpp>
-#include <Debug.hpp>
+#include <FishEngine/Debug.hpp>
 using namespace FishEngine;
 using namespace FishEditor;
 

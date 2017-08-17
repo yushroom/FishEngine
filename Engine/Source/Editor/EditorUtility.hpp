@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FishEditor.hpp"
-#include <Path.hpp>
+#include <FishEngine/Path.hpp>
 
 namespace FishEditor
 {

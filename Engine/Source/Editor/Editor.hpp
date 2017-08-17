@@ -1,8 +1,8 @@
 #pragma once
 
-#include <ScriptableObject.hpp>
-#include <Mathf.hpp>
-#include <Debug.hpp>
+#include <FishEngine/ScriptableObject.hpp>
+#include <FishEngine/Mathf.hpp>
+#include <FishEngine/Debug.hpp>
 #include "IPreviewable.hpp"
 #include "InspectorMode.hpp"
 

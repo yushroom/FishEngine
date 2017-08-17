@@ -1,15 +1,16 @@
-#include "Pipeline.hpp"
-#include "GLEnvironment.hpp"
-#include "Camera.hpp"
-#include "Transform.hpp"
-#include "Time.hpp"
-#include "Light.hpp"
-#include "Screen.hpp"
-#include "RenderTexture.hpp"
-#include "RenderTarget.hpp"
-#include "QualitySettings.hpp"
+#include <FishEngine/Pipeline.hpp>
 
 #include <cassert>
+
+#include <FishEngine/GLEnvironment.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Transform.hpp>
+#include <FishEngine/Time.hpp>
+#include <FishEngine/Light.hpp>
+#include <FishEngine/Screen.hpp>
+#include <FishEngine/RenderTexture.hpp>
+#include <FishEngine/RenderTarget.hpp>
+#include <FishEngine/QualitySettings.hpp>
 
 namespace FishEngine
 {

@@ -1,8 +1,8 @@
 #include "AssetArchive.hpp"
 #include <sstream>
 
-#include <Debug.hpp>
-#include <Material.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Material.hpp>
 
 #include "AssetImporter.hpp"
 #include "TextureImporter.hpp"

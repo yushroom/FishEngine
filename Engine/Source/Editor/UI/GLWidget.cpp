@@ -1,14 +1,14 @@
-#include <GLEnvironment.hpp>
+#include <FishEngine/GLEnvironment.hpp>
 #include "GLWidget.hpp"
 #include <QMouseEvent>
 #include <QTimer>
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include <Debug.hpp>
-#include <Screen.hpp>
-#include <Input.hpp>
-#include <RenderSystem.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Screen.hpp>
+#include <FishEngine/Input.hpp>
+#include <FishEngine/RenderSystem.hpp>
 
 #include "MainEditor.hpp"
 

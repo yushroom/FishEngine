@@ -1,4 +1,4 @@
-#include "Cubemap.hpp"
+#include <FishEngine/Cubemap.hpp>
 
 void FishEngine::Cubemap::UploadToGPU()
 {

@@ -3,8 +3,8 @@
 #include "AssetImporter.hpp"
 #include "AssetDataBase.hpp"
 
-#include <Texture.hpp>
-#include <Debug.hpp>
+#include <FishEngine/Texture.hpp>
+#include <FishEngine/Debug.hpp>
 
 using namespace FishEngine;
 using namespace FishEditor;

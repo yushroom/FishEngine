@@ -1,7 +1,7 @@
-#include "Input.hpp"
-#include <cassert>
+#include <FishEngine/Input.hpp>
+#include <FishEngine/Debug.hpp>
 
-#include "Debug.hpp"
+#include <cassert>
 
 namespace FishEngine
 {

@@ -1,12 +1,10 @@
-#include "Gizmos.hpp"
-#include "Shader.hpp"
-#include "Camera.hpp"
-#include "Mesh.hpp"
-#include "Pipeline.hpp"
-#include "Texture.hpp"
-//#include "ModelImporter.hpp"
-#include "Transform.hpp"
-//#include "TextureImporter.hpp"
+#include <FishEngine/Gizmos.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/Pipeline.hpp>
+#include <FishEngine/Texture.hpp>
+#include <FishEngine/Transform.hpp>
 
 using namespace FishEngine;
 

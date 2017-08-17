@@ -1,9 +1,9 @@
 #include "EditorResources.hpp"
-#include <Shader.hpp>
-#include <Debug.hpp>
-#include <Material.hpp>
-#include <Mesh.hpp>
-#include <ShaderCompiler.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Material.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/ShaderCompiler.hpp>
 
 #include <QDir>
 #include <QCoreApplication>

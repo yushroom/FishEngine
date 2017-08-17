@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ReflectEnum.hpp>
+#include <FishEngine/ReflectEnum.hpp>
 #include <InspectorMode.hpp>
 
 namespace FishEngine

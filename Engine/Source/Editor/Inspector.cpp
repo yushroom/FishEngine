@@ -5,41 +5,41 @@
 #include <QTreeWidget>
 #include "UI/InspectorWidget.hpp"
 
-#include <Debug.hpp>
-#include <GameObject.hpp>
-#include <Transform.hpp>
-#include <Component.hpp>
-#include <LayerMask.hpp>
-#include <ReflectClass.hpp>
-#include <ReflectEnum.hpp>
-#include <Vector3.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Transform.hpp>
+#include <FishEngine/Component.hpp>
+#include <FishEngine/LayerMask.hpp>
+#include <FishEngine/ReflectClass.hpp>
+#include <FishEngine/ReflectEnum.hpp>
+#include <FishEngine/Vector3.hpp>
 
-#include <Camera.hpp>
-#include <Light.hpp>
-#include <MeshFilter.hpp>
-#include <Mesh.hpp>
-#include <MeshRenderer.hpp>
-#include <SkinnedMeshRenderer.hpp>
-#include <CameraController.hpp>
-#include <Rigidbody.hpp>
-#include <Collider.hpp>
-#include <BoxCollider.hpp>
-#include <SphereCollider.hpp>
-#include <CapsuleCollider.hpp>
-#include <Shader.hpp>
-#include <Material.hpp>
-#include <Animation.hpp>
-#include <AnimationClip.hpp>
-#include <AudioClip.hpp>
-#include <AudioSource.hpp>
-#include <AudioListener.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Light.hpp>
+#include <FishEngine/MeshFilter.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/MeshRenderer.hpp>
+#include <FishEngine/SkinnedMeshRenderer.hpp>
+#include <FishEngine/CameraController.hpp>
+#include <FishEngine/Rigidbody.hpp>
+#include <FishEngine/Collider.hpp>
+#include <FishEngine/BoxCollider.hpp>
+#include <FishEngine/SphereCollider.hpp>
+#include <FishEngine/CapsuleCollider.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/Material.hpp>
+#include <FishEngine/Animation.hpp>
+#include <FishEngine/AnimationClip.hpp>
+#include <FishEngine/AudioClip.hpp>
+#include <FishEngine/AudioSource.hpp>
+#include <FishEngine/AudioListener.hpp>
 
 #include "EditorGUI.hpp"
 //#include "private/EditorGUI_p.hpp"
 
-#include <ReflectEnum.hpp>
-#include <generate/Enum_LightType.hpp>
-#include <generate/Enum_ShadowCastingMode.hpp>
+#include <FishEngine/ReflectEnum.hpp>
+#include <FishEngine/Generated/Enum_LightType.hpp>
+#include <FishEngine/Generated/Enum_ShadowCastingMode.hpp>
 
 #include <TextureImporter.hpp>
 #include <generate/Enum_ModelImporterMaterialSearch.hpp>
@@ -50,8 +50,8 @@
 #include <generate/Enum_TextureImporterType.hpp>
 #include <generate/Enum_TextureImporterShape.hpp>
 #include <generate/Enum_TextureImporterType.hpp>
-#include <generate/Enum_TextureWrapMode.hpp>
-#include <generate/Enum_FilterMode.hpp>
+#include <FishEngine/Generated/Enum_TextureWrapMode.hpp>
+#include <FishEngine/Generated/Enum_FilterMode.hpp>
 
 
 using namespace FishEngine;

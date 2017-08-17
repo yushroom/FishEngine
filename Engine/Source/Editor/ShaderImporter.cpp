@@ -1,5 +1,5 @@
 #include "ShaderImporter.hpp"
-#include <Shader.hpp>
+#include <FishEngine/Shader.hpp>
 
 FishEngine::ShaderPtr FishEditor::ShaderImporter::Load()
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ReflectClass.hpp"
-#include <Resources.hpp>
+#include <FishEngine/ReflectClass.hpp>
+#include <FishEngine/Resources.hpp>
 
 class MainWindow;
 

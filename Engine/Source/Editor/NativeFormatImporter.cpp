@@ -1,6 +1,6 @@
 #include "NativeFormatImporter.hpp"
 #include "AssetArchive.hpp"
-#include "Material.hpp"
+#include <FishEngine/Material.hpp>
 
 
 FishEngine::ObjectPtr FishEditor::NativeFormatImporter::Load(FishEngine::Path const & path)

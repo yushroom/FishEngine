@@ -1,15 +1,15 @@
-#include "Mesh.hpp"
+#include <FishEngine/Mesh.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cstdio>
 
-#include "Shader.hpp"
-#include "Debug.hpp"
-#include "Common.hpp"
-#include "ShaderVariables_gen.hpp"
-#include "generate/Enum_PrimitiveType.hpp"
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Common.hpp>
+#include <FishEngine/ShaderVariables_gen.hpp>
+#include <FishEngine/Generated/Enum_PrimitiveType.hpp>
 
 using namespace std;
 

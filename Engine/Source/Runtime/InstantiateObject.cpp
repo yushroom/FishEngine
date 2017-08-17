@@ -1,5 +1,5 @@
-#include "Object.hpp"
-#include "GameObject.hpp"
+#include <FishEngine/Object.hpp>
+#include <FishEngine/GameObject.hpp>
 
 namespace FishEngine
 {

@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QTreeWidget>
 
-#include <Debug.hpp>
+#include <FishEngine/Debug.hpp>
 
 #include "UI/UIGameObjectHeader.hpp"
 #include "UI/UIMaterialHeader.hpp"

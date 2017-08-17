@@ -1,4 +1,4 @@
-#include <Path.hpp>
+#include <FishEngine/Path.hpp>
 
 class MainWindow;
 

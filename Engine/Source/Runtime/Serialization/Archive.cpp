@@ -1,9 +1,9 @@
-#include "Archive.hpp"
-#include "Vector2.hpp"
-#include "Vector3.hpp"
-#include "Vector4.hpp"
-#include "Quaternion.hpp"
-#include "Matrix4x4.hpp"
+#include <FishEngine/Serialization/Archive.hpp>
+#include <FishEngine/Vector2.hpp>
+#include <FishEngine/Vector3.hpp>
+#include <FishEngine/Vector4.hpp>
+#include <FishEngine/Quaternion.hpp>
+#include <FishEngine/Matrix4x4.hpp>
 
 //#include "generate/Class_Serialization.hpp"
 

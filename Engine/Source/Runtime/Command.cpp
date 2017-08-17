@@ -1,4 +1,4 @@
-#include "Command.hpp"
+#include <FishEngine/Command.hpp>
 
 namespace FishEngine
 {

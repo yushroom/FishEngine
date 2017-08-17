@@ -1,4 +1,4 @@
-#include "MeshCollider.hpp"
+#include <FishEngine/MeshCollider.hpp>
 
 void FishEngine::MeshCollider::CreatePhysicsShape()
 {

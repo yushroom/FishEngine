@@ -1,13 +1,13 @@
 #include "FileInfo.hpp"
-#include "Resources.hpp"
 #include "AssetImporter.hpp"
 #include "TextureImporter.hpp"
 #include "AssetDataBase.hpp"
-#include "GameObject.hpp"
 
-#include <Application.hpp>
-#include <Debug.hpp>
-#include <Prefab.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Resources.hpp>
+#include <FishEngine/Application.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Prefab.hpp>
 
 #include <QImage>
 #include <QIcon>

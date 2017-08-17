@@ -1,11 +1,11 @@
 #pragma once
 
 #include "FishEditor.hpp"
-#include <Vector3.hpp>
-#include <Vector2.hpp>
-#include <IntVector.hpp>
-#include <Input.hpp>
-#include <ReflectClass.hpp>
+#include <FishEngine/Vector3.hpp>
+#include <FishEngine/Vector2.hpp>
+#include <FishEngine/IntVector.hpp>
+#include <FishEngine/Input.hpp>
+#include <FishEngine/ReflectClass.hpp>
 
 namespace FishEditor
 {

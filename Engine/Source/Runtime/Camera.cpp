@@ -1,8 +1,8 @@
-#include "Camera.hpp"
-#include "GameObject.hpp"
-#include "Scene.hpp"
-#include "Screen.hpp"
-#include "Gizmos.hpp"
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Scene.hpp>
+#include <FishEngine/Screen.hpp>
+#include <FishEngine/Gizmos.hpp>
 
 namespace FishEngine
 {

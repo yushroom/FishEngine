@@ -1,9 +1,9 @@
 #include "UIGameObjectHeader.hpp"
 #include "ui_UIGameObjectHeader.h"
 
-#include <GameObject.hpp>
-#include <LayerMask.hpp>
-#include <TagManager.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/LayerMask.hpp>
+#include <FishEngine/TagManager.hpp>
 
 #include "UIDebug.hpp"
 

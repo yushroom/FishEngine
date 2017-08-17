@@ -1,9 +1,9 @@
 #pragma once
-#include <Matrix4x4.hpp>
-#include <Vector3.hpp>
-#include <Quaternion.hpp>
-#include <Animation/TAnimationCurve.hpp>
-#include <BoneWeight.hpp>
+#include <FishEngine/Matrix4x4.hpp>
+#include <FishEngine/Vector3.hpp>
+#include <FishEngine/Quaternion.hpp>
+#include <FishEngine/Animation/TAnimationCurve.hpp>
+#include <FishEngine/BoneWeight.hpp>
 
 
 namespace fbxsdk

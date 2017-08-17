@@ -1,4 +1,4 @@
-#include <GLEnvironment.hpp>
+#include <FishEngine/GLEnvironment.hpp>
 #include "MainWindow.hpp"
 #include "ui_mainwindow.h"
 
@@ -8,14 +8,19 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include <FishEngine.hpp>
-#include <Debug.hpp>
-#include <Resources.hpp>
-#include <RenderSystem.hpp>
-#include <Input.hpp>
-#include <Application.hpp>
-#include <Camera.hpp>
-#include <Scene.hpp>
+#include <FishEngine/FishEngine.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Resources.hpp>
+#include <FishEngine/RenderSystem.hpp>
+#include <FishEngine/Input.hpp>
+#include <FishEngine/Application.hpp>
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Scene.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Timer.hpp>
+#include <FishEngine/Path.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/ShaderCompiler.hpp>
 
 #include "EditorResources.hpp"
 #include "Inspector.hpp"
@@ -26,15 +31,13 @@
 #include "EditorApplication.hpp"
 
 #include <fstream>
-#include <GameObject.hpp>
-#include <Timer.hpp>
-#include <Path.hpp>
-#include <Shader.hpp>
 
 #include "SceneArchive.hpp"
 #include "AssetArchive.hpp"
-#include "ShaderCompiler.hpp"
 #include "LogView.hpp"
+
+#include <folly/dynamic.h>
+#include <folly/json.h>
 
 using namespace FishEngine;
 
@@ -184,6 +187,23 @@ MainWindow::MainWindow(QWidget *parent) :
 //	view->show();
 	
 	//OpenScene();
+	// 先定义一个json字符串
+	std::string jsonDocument = R"({"key":12,"key2":[false, null, true, "yay"]})";
+	// 执行json反序列化，反序列化结果为dynamic
+	folly::dynamic parsed = folly::parseJson(jsonDocument);
+	assert(parsed["key"] == 12);
+	assert(parsed["key2"][0] == false);
+	assert(parsed["key2"][1] == nullptr);
+	
+	// 构建一个OBJECT
+	folly::dynamic sonOfAJ = folly::dynamic::object
+	("key", 12)
+	("key2", folly::dynamic::array(false, nullptr, true, "yay"));
+	
+	// json序列化
+	auto str = folly::toJson(sonOfAJ);
+	std::cout << jsonDocument << std::endl;
+	std::cout << str << std::endl;
 }
 
 MainWindow::~MainWindow()

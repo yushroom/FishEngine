@@ -4,8 +4,8 @@
 #include "AssetImporter.hpp"
 #include "TextureImporterProperties.hpp"
 
-#include <Texture.hpp>
-#include <Resources.hpp>
+#include <FishEngine/Texture.hpp>
+#include <FishEngine/Resources.hpp>
 
 class TextureImporterInspector;
 

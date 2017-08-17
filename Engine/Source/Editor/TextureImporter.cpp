@@ -2,11 +2,11 @@
 
 #include <FreeImage.h>
 
-#include <GLEnvironment.hpp>
-#include <Debug.hpp>
-#include <Common.hpp>
-#include <Mathf.hpp>
-#include <Texture2D.hpp>
+#include <FishEngine/GLEnvironment.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Common.hpp>
+#include <FishEngine/Mathf.hpp>
+#include <FishEngine/Texture2D.hpp>
 
 #include "AssetDataBase.hpp"
 

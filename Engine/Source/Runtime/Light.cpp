@@ -1,12 +1,8 @@
-#include "Light.hpp"
-
-// #include <imgui/imgui.h>
-// #include <imgui/imgui_internal.h>
-
-#include "Gizmos.hpp"
-#include "Transform.hpp"
-#include "RenderTarget.hpp"
-#include "QualitySettings.hpp"
+#include <FishEngine/Light.hpp>
+#include <FishEngine/Gizmos.hpp>
+#include <FishEngine/Transform.hpp>
+#include <FishEngine/RenderTarget.hpp>
+#include <FishEngine/QualitySettings.hpp>
 
 namespace FishEngine
 {

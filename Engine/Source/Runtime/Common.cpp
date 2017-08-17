@@ -1,4 +1,4 @@
-#include "Common.hpp"
+#include <FishEngine/Common.hpp>
 
 #include <cctype>
 

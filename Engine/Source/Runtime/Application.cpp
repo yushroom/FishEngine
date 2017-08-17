@@ -1,4 +1,4 @@
-#include "Application.hpp"
+#include <FishEngine/Application.hpp>
 
 FishEngine::Path  FishEngine::Application::s_dataPath;
 bool         FishEngine::Application::s_isEditor = false;

@@ -3,9 +3,9 @@
 #include <vector>
 #include <cstdint>
 
-#include <Mesh.hpp>
-#include <Vector3.hpp>
-#include <Vector2.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/Vector3.hpp>
+#include <FishEngine/Vector2.hpp>
 
 namespace FishEngine
 {

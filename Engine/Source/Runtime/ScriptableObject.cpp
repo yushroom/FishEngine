@@ -1,1 +1,1 @@
-#include "ScriptableObject.hpp"
+#include <FishEngine/ScriptableObject.hpp>

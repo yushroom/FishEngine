@@ -1,4 +1,4 @@
-#include "TagManager.hpp"
+#include <FishEngine/TagManager.hpp>
 
 std::vector<std::string> FishEngine::TagManager::s_tags = {
 	"Untagged",

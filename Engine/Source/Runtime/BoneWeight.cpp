@@ -1,5 +1,5 @@
-#include "BoneWeight.hpp"
-#include "Debug.hpp"
+#include <FishEngine/BoneWeight.hpp>
+#include <FishEngine/Debug.hpp>
 
 FishEngine::BoneWeight::BoneWeight()
 {

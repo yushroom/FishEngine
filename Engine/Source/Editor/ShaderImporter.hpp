@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AssetImporter.hpp"
-#include "Shader.hpp"
+#include <FishEngine/Shader.hpp>
 
 namespace FishEditor
 {

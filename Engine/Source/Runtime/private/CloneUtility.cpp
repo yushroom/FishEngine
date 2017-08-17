@@ -1,11 +1,11 @@
-#include "CloneUtility.hpp"
-#include "../GameObject.hpp"
-#include "../Transform.hpp"
-#include "../Shader.hpp"
-#include "../Material.hpp"
-#include "../Avatar.hpp"
-#include "../Mesh.hpp"
-#include "../Prefab.hpp"
+#include <FishEngine/Private/CloneUtility.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Transform.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/Material.hpp>
+#include <FishEngine/Avatar.hpp>
+#include <FishEngine/Mesh.hpp>
+#include <FishEngine/Prefab.hpp>
 
 namespace FishEngine
 {

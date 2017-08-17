@@ -4,7 +4,7 @@ import sys
 compiler = r'../Binary/RelWithDebInfo/ShaderCompiler'
 #compiler = r'../Binary/Debug/ShaderCompiler'
 shader_dirs = ['.', './Editor']
-count = 0;
+count = 0
 
 for d in shader_dirs:
 	for fn in os.listdir(d):

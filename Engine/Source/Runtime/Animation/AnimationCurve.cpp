@@ -1,5 +1,5 @@
-#include "AnimationCurve.hpp"
-#include "AnimationCurveUtility.hpp"
+#include <FishEngine/Animation/AnimationCurve.hpp>
+#include <FishEngine/Animation/AnimationCurveUtility.hpp>
 
 using namespace FishEngine;
 

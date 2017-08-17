@@ -11,11 +11,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <Debug.hpp>
-#include <GameObject.hpp>
-#include <Common.hpp>
-#include <MeshRenderer.hpp>
-#include <SkinnedMeshRenderer.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Common.hpp>
+#include <FishEngine/MeshRenderer.hpp>
+#include <FishEngine/SkinnedMeshRenderer.hpp>
 
 //#include <boost/uuid/uuid_io.hpp>
 #include <iostream>

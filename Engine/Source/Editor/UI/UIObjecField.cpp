@@ -1,7 +1,7 @@
 #include "UIObjecField.hpp"
 #include "ui_UIObjecField.h"
 
-#include <Object.hpp>
+#include <FishEngine/Object.hpp>
 
 #include "SelectObjectDialog.hpp"
 #include "UIDebug.hpp"

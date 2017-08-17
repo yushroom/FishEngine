@@ -4,9 +4,9 @@
 #include "FishEditor.hpp"
 #include "ModelImporter.hpp"
 //#include "FBXImporter/FBXImportData.hpp"
-#include <Path.hpp>
-#include <Prefab.hpp>
-#include <Animation/AnimationCurve.hpp>
+#include <FishEngine/Path.hpp>
+#include <FishEngine/Prefab.hpp>
+#include <FishEngine/Animation/AnimationCurve.hpp>
 
 namespace fbxsdk
 {

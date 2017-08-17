@@ -1,7 +1,7 @@
 #include "ProjectViewFileModel.hpp"
 
 #include <QIcon>
-#include <Debug.hpp>
+#include <FishEngine/Debug.hpp>
 #include "AssetDataBase.hpp"
 
 using namespace FishEngine;

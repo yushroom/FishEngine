@@ -3,9 +3,9 @@
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
-#include <Debug.hpp>
-#include <AudioClip.hpp>
-#include <Internal/FMODPlugin.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/AudioClip.hpp>
+#include <FishEngine/Internal/FMODPlugin.hpp>
 
 using namespace FishEngine;
 using namespace FishEditor;

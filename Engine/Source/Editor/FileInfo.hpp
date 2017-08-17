@@ -2,10 +2,10 @@
 
 #include <map>
 #include <array>
-#include <Resources.hpp>
-#include <ReflectClass.hpp>
+#include <FishEngine/Resources.hpp>
+#include <FishEngine/ReflectClass.hpp>
 
-#include <Path.hpp>
+#include <FishEngine/Path.hpp>
 
 using FishEngine::Path;
 class ProjectViewFileModel;

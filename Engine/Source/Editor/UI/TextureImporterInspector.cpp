@@ -15,8 +15,8 @@
 #include "../AssetDataBase.hpp"
 #include "generate/Enum_TextureImporterType.hpp"
 #include "generate/Enum_TextureImporterShape.hpp"
-#include "generate/Enum_FilterMode.hpp"
-#include "generate/Enum_TextureWrapMode.hpp"
+#include <FishEngine/Generated/Enum_FilterMode.hpp>
+#include <FishEngine/Generated/Enum_TextureWrapMode.hpp>
 
 using namespace FishEditor;
 using namespace FishEngine;

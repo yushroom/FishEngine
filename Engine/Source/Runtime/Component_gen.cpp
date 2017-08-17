@@ -1,18 +1,18 @@
-#include "Component_gen.hpp"
-#include "GameObject.hpp"
+#include <FishEngine/Component_gen.hpp>
+#include <FishEngine/GameObject.hpp>
 
-#include "Camera.hpp"
-#include "Animator.hpp"
-#include "MeshFilter.hpp"
-#include "Rigidbody.hpp"
-#include "MeshRenderer.hpp"
-#include "SkinnedMeshRenderer.hpp"
-#include "BoxCollider.hpp"
-#include "CapsuleCollider.hpp"
-#include "SphereCollider.hpp"
-#include "Rigidbody.hpp"
-#include "Light.hpp"
-#include "CameraController.hpp"
+#include <FishEngine/Camera.hpp>
+#include <FishEngine/Animator.hpp>
+#include <FishEngine/MeshFilter.hpp>
+#include <FishEngine/Rigidbody.hpp>
+#include <FishEngine/MeshRenderer.hpp>
+#include <FishEngine/SkinnedMeshRenderer.hpp>
+#include <FishEngine/BoxCollider.hpp>
+#include <FishEngine/CapsuleCollider.hpp>
+#include <FishEngine/SphereCollider.hpp>
+#include <FishEngine/Rigidbody.hpp>
+#include <FishEngine/Light.hpp>
+#include <FishEngine/CameraController.hpp>
 
 FishEngine::ComponentPtr FishEngine::
 AddComponentToGameObject(

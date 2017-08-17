@@ -1,4 +1,4 @@
-#include "Screen.hpp"
+#include <FishEngine/Screen.hpp>
 
 namespace FishEngine
 {

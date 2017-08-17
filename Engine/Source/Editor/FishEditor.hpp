@@ -1,9 +1,10 @@
 #ifndef FishEditor_hpp
 #define FishEditor_hpp
 
-#include <FishEngine.hpp>
 #include <functional>
-#include <ReflectClass.hpp>
+
+#include <FishEngine/FishEngine.hpp>
+#include <FishEngine/ReflectClass.hpp>
 
 namespace FishEditor
 {

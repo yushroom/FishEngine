@@ -7,10 +7,10 @@
 #include <QDir>
 #include <QFileSystemWatcher>
 
-#include <Debug.hpp>
-#include <Application.hpp>
-#include <AssetImporter.hpp>
-#include <TextureImporter.hpp>
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/Application.hpp>
+#include "AssetImporter.hpp"
+#include "TextureImporter.hpp"
 #include "Selection.hpp"
 
 using namespace FishEngine;

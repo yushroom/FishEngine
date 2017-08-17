@@ -10,11 +10,15 @@
 #endif
 #include <boost/dll/import.hpp>
 
-#include <Application.hpp>
-#include <Debug.hpp>
+#include <FishEngine/Application.hpp>
+#include <FishEngine/Debug.hpp>
 
 #include <EditorApplication.hpp>
 
+// TODO: CMAKE_INTDIR not defined in makefile
+#ifndef CMAKE_INTDIR
+	#define CMAKE_INTDIR "debug"
+#endif
 
 using namespace FishEngine;
 using namespace FishEditor;

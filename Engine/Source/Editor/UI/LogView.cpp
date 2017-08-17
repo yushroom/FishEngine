@@ -4,7 +4,7 @@
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 
-#include <Internal/SimpleLogger.hpp>
+#include <FishEngine/Internal/SimpleLogger.hpp>
 
 using namespace FishEngine;
 

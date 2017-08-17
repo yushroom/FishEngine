@@ -1,4 +1,4 @@
-#include "Timer.hpp"
+#include <FishEngine/Timer.hpp>
 
 FishEngine::Timer::Timer(std::string label) : m_label(label)
 {

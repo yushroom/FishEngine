@@ -1,6 +1,6 @@
-#include "QualitySettings.hpp"
-#include "Mathf.hpp"
-#include "Screen.hpp"
+#include <FishEngine/QualitySettings.hpp>
+#include <FishEngine/Mathf.hpp>
+#include <FishEngine/Screen.hpp>
 
 namespace FishEngine
 {

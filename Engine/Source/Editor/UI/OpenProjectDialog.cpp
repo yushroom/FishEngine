@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <Application.hpp>
+#include <FishEngine/Application.hpp>
 
 OpenProjectDialog::OpenProjectDialog(QWidget *parent) :
 	QDialog(parent),

@@ -31,6 +31,8 @@ find_package(Boost 1.59 REQUIRED COMPONENTS system filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 MESSAGE("Found Boost: " ${Boost_INCLUDE_DIRS})
 
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
 
 # fmod
 SET( FMOD_DIR ${CMAKE_CURRENT_LIST_DIR}/ThirdParty/fmod)
@@ -45,7 +47,7 @@ ENDIF()
 SET( FMOD_LIB debug ${FMOD_LIB_DEBUG} optimized ${FMOD_LIB_RELEASE} )
 
 
-include_directories(./Source/Runtime)
+include_directories(./Include)
 include_directories(./ThirdParty/)
 
 # glfw

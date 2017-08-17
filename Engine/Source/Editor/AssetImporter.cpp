@@ -2,10 +2,10 @@
 
 //#include <iostream>
 
-#include <GameObject.hpp>
-#include <Timer.hpp>
-#include <Shader.hpp>
-#include <AudioClip.hpp>
+#include <FishEngine/GameObject.hpp>
+#include <FishEngine/Timer.hpp>
+#include <FishEngine/Shader.hpp>
+#include <FishEngine/AudioClip.hpp>
 
 #include "TextureImporter.hpp"
 #include "FBXImporter.hpp"

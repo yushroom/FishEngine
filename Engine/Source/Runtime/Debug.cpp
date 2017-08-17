@@ -1,4 +1,4 @@
-#include "Debug.hpp"
+#include <FishEngine/Debug.hpp>
 
 #include <iostream>
 
@@ -7,7 +7,7 @@
 static HANDLE hstdout;
 #endif
 
-#include "Internal/SimpleLogger.hpp"
+#include <FishEngine/Internal/SimpleLogger.hpp>
 
 
 using std::cout;

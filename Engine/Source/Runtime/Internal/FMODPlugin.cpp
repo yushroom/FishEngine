@@ -1,12 +1,11 @@
-#include "FMODPlugin.hpp"
+#include <FishEngine/Internal/FMODPlugin.hpp>
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
-#include "../Debug.hpp"
-#include "../StringFormat.hpp"
-
-#include "../AudioClip.hpp"
+#include <FishEngine/Debug.hpp>
+#include <FishEngine/StringFormat.hpp>
+#include <FishEngine/AudioClip.hpp>
 
 using namespace FishEngine;
 

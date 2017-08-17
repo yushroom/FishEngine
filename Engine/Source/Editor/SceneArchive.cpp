@@ -1,11 +1,11 @@
 #include "SceneArchive.hpp"
 #include "AssetImporter.hpp"
 #include "AssetDataBase.hpp"
-#include <Prefab.hpp>
+#include <FishEngine/Prefab.hpp>
 
-#include <Debug.hpp>
+#include <FishEngine/Debug.hpp>
 
-#include <GameObject.hpp>
+#include <FishEngine/GameObject.hpp>
 
 using namespace FishEngine;
 

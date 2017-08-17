@@ -1,7 +1,7 @@
 #pragma once
 
-#include <AudioClipLoadType.hpp>
-#include <AudioCompressionFormat.hpp>
+#include <FishEngine/AudioClipLoadType.hpp>
+#include <FishEngine/AudioCompressionFormat.hpp>
 #include "AudioSampleRateSetting.hpp"
 
 namespace FishEditor

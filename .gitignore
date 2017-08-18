@@ -6,6 +6,10 @@
 /Engine/ThirdParty/**/*.dll
 /Engine/ThirdParty/**/*.dylib
 /Engine/ThirdParty/**/*.a
+/Engine/ThirdParty/python3
+/Engine/ThirdParty/FBX SDK
+/Engine/ThirdParty/PhysX
+/Tools/cmake
 
 # generated
 # /Engine/Source/Runtime/generate/
@@ -19,6 +23,7 @@
 *.pyc
 /Script/reflect/temp/
 /Engine/Source/Runtime/**/temp/
+/Engine/.vscode/
 
 # Example
 /Example/*/build

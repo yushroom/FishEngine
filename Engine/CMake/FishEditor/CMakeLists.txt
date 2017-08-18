@@ -6,7 +6,8 @@ SET(FishEditor_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishEditor)
 include_directories( ${FishEditor_SRC_DIR} )
 
 # Autodesk FBX sdk
-SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
+# SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
+SET( FBXSDK_DIR "${CMAKE_CURRENT_LIST_DIR}/../../ThirdParty/FBX SDK/2018.1.1")
 include_directories( ${FBXSDK_DIR}/include )
 IF (WIN32)
     SET( FBXSDK_LIB_DIR ${FBXSDK_DIR}/lib/vs2015/x64 )
@@ -18,14 +19,15 @@ ELSE()
     SET( FBXSDK_LIB_RELEASE ${FBXSDK_LIB_DIR}/release/libfbxsdk.a )
 ENDIF()
 
-IF(NOT EXISTS ${FBXSDK_LIB_DEBUG})
-    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_DEBUG} not found")
-ENDIF ()
+# IF(NOT EXISTS ${FBXSDK_LIB_DEBUG})
+#     MESSAGE(FATAL_ERROR "${FBXSDK_LIB_DEBUG} not found")
+# ENDIF ()
 
-IF(NOT EXISTS ${FBXSDK_LIB_RELEASE})
-    MESSAGE(FATAL_ERROR "${FBXSDK_LIB_RELEASE} not found")
-ENDIF ()
-SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
+# IF(NOT EXISTS ${FBXSDK_LIB_RELEASE})
+#     MESSAGE(FATAL_ERROR "${FBXSDK_LIB_RELEASE} not found")
+# ENDIF ()
+# SET( FBXSDK_LIB debug ${FBXSDK_LIB_DEBUG} optimized ${FBXSDK_LIB_RELEASE} )
+SET( FBXSDK_LIB ${FBXSDK_LIB_RELEASE} )
 
 
 # FreeImage
@@ -112,7 +114,6 @@ SOURCE_GROUP( Editor FILES ${EditorFiles})
 add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} ${FishEditor_SRC_DIR}/resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
 
 SET( INFO_PLIST "${FishEditor_SRC_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
-MESSAGE("hhhh" ${INFO_PLIST})
 IF (NOT EXISTS ${INFO_PLIST})
     MESSAGE(FATAL_ERROR "${INFO_PLIST} not found!")
 ENDIF()

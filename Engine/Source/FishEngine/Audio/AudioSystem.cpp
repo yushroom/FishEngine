@@ -6,3 +6,7 @@ void FishEngine::AudioSystem::Update()
 	FMODPlugin::GetInstance().Update();
 }
 
+void FishEngine::AudioSystem::Stop()
+{
+	FMODPlugin::GetInstance().Stop();
+}

@@ -39,6 +39,7 @@
 #include "AssetDataBase.hpp"
 #include "EditorResources.hpp"
 #include "ScriptManager.hpp"
+#include "SceneArchive.hpp"
 
 
 using namespace FishEngine;
@@ -334,10 +335,17 @@ namespace FishEditor
 
 	void InitializeScene_UnityChan_crs()
 	{
+		Camera::mainGameCamera()->transform()->setLocalPosition(0, 2, 5);
+		Camera::mainGameCamera()->transform()->LookAt(0, 0, 0);
+		auto light = Light::mainLight()->gameObject();
+		light->transform()->setLocalEulerAngles(50, 150, 0);
+		
+		//Scene::CreateGameObject("Main Camera Rig");
+		
 		auto model = AssetDatabase::LoadAssetAtPath2<GameObject>("Assets/UnityChan/CandyRockStar/CandyRockStar.fbx");
 		auto modelGO = Object::Instantiate(model);
 		auto animation = modelGO->AddComponent<Animation>();
-		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_001_SAK01_Final.fbx");
+		animation->m_clip = AssetDatabase::LoadAssetAtPath2<AnimationClip>("Assets/UnityChan/Animations/C86unitychan_003_NOT01_Final.fbx");
 
 		auto unite_in_the_sky = AssetDatabase::LoadAssetAtPath2<AudioClip>("Assets/UniteInTheSky/Unite In The Sky (full).mp3");
 		auto audio_source = modelGO->AddComponent<AudioSource>();
@@ -428,6 +436,12 @@ namespace FishEditor
 		body->SetTexture("_SpecularReflectionSampler", body_00_SPEC);
 		body->SetTexture("_EnvMapSampler", ENV2);
 		body->SetTexture("_NormalMapSampler", body_00_NRM);
+		
+//		SingleObjectOutputArchive ar(std::cout);
+//		body->Serialize(ar);
+//		ar << body;
+//		Save(ar, body);
+		
 		for (auto & name : { "BodyParts_new01", "Globe_new01", "HairBand_DS_new01", "Jacket_BK_new01",
 			"Jacket_FR_new01", "jacketEri_new01", "JacketSode_new01", "Kneeso_new01", "Mizugi_new01",
 			"Pants_new01", "Shoes_new01" }) {
@@ -942,6 +956,7 @@ namespace FishEditor
 		//Camera::m_mainCamera = EditorGUI::m_mainSceneViewEditor->camera();
 		Camera::setMainCamera(m_mainSceneViewEditor->camera());
 		PhysicsSystem::Clean();
+		AudioSystem::Stop();
 	}
 
 	void MainEditor::Resize(int width, int height)

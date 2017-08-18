@@ -13,10 +13,9 @@ namespace FishEngine
 		//	return &ins;
 		//}
 
-		//void Update();
-
 		static void Init();
 		static void Update();
+		static void Stop();
 
 	private:
 		AudioSystem();

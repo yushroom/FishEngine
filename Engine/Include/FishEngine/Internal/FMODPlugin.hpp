@@ -24,6 +24,7 @@ public:
 	}
 
 	static void Update();
+	static void Stop();
 
 	FMOD::System * system() const
 	{

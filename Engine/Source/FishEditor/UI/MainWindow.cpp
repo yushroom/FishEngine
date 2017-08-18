@@ -258,7 +258,6 @@ void MainWindow::OpenScene()
 	}
 	std::ifstream fin(path.toStdString());
 	FishEditor::SceneInputArchive archive(fin);
-	//auto gameObjects = archive.LoadAll();
 	archive.LoadAll();
 }
 

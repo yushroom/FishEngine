@@ -14,6 +14,11 @@ void FMODPlugin::Update()
 	GetInstance().m_system->update();
 }
 
+void FMODPlugin::Stop()
+{
+	
+}
+
 FMODPlugin::FMODPlugin()
 {
 	FMOD_RESULT result;

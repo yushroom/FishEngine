@@ -9,6 +9,8 @@
 
 using namespace FishEngine;
 
+constexpr int maxChannel = 32;
+
 void FMODPlugin::Update()
 {
 	GetInstance().m_system->update();
@@ -16,7 +18,14 @@ void FMODPlugin::Update()
 
 void FMODPlugin::Stop()
 {
-	
+	for (int i = 0; i < maxChannel; ++i)
+	{
+		FMOD::Channel* pChannel = nullptr;
+		auto res = GetInstance().m_system->getChannel(i, &pChannel);
+		if (res == FMOD_OK && pChannel) {
+			pChannel->stop();
+		}
+	}
 }
 
 FMODPlugin::FMODPlugin()
@@ -25,7 +34,7 @@ FMODPlugin::FMODPlugin()
 	result = FMOD::System_Create(&m_system);
 	CheckFMODError(result);
 
-	result = m_system->init(512, FMOD_INIT_NORMAL, 0);
+	result = m_system->init(maxChannel, FMOD_INIT_NORMAL, 0);
 	CheckFMODError(result);
 }
 

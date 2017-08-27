@@ -90,20 +90,20 @@ namespace FishEditor
 		};
 
 		
-		auto shader2 = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/diffuse_bump.shader");
-		assert(shader2 != nullptr);
-		auto createMaterial2 = [&shader2] (const std::string& diffuse_tex) -> MaterialPtr
-		{
-			auto mtl = Material::CreateMaterial();
-			mtl->setName(diffuse_tex);
-			mtl->setShader(shader2);
-			auto diffuse = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/"+ diffuse_tex + ".png");
-			assert(diffuse != nullptr);
-			mtl->SetFloat("Roughness", 0.5f);
-			mtl->SetFloat("Specular", 0.5f);
-			mtl->SetTexture("DiffuseTex", diffuse);
-			return mtl;
-		};
+//		auto shader2 = AssetDatabase::LoadAssetAtPath2<Shader>("Assets/diffuse_bump.shader");
+//		assert(shader2 != nullptr);
+//		auto createMaterial2 = [&shader2] (const std::string& diffuse_tex) -> MaterialPtr
+//		{
+//			auto mtl = Material::CreateMaterial();
+//			mtl->setName(diffuse_tex);
+//			mtl->setShader(shader2);
+//			auto diffuse = AssetDatabase::LoadAssetAtPath2<Texture>("Assets/textures/"+ diffuse_tex + ".png");
+//			assert(diffuse != nullptr);
+//			mtl->SetFloat("Roughness", 0.5f);
+//			mtl->SetFloat("Specular", 0.5f);
+//			mtl->SetTexture("DiffuseTex", diffuse);
+//			return mtl;
+//		};
 
 		auto sponza_thron = FindNamedChild(sponza_go, "sponza_00")->GetComponent<Renderer>()->material();
 		applyMaterial1("sponza_thorn_diff", "sponza_thorn_mask", sponza_thron);

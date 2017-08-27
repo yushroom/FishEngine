@@ -14,7 +14,7 @@ using std::cout;
 
 namespace FishEngine
 {
-	bool Debug::s_colorMode = true;
+	bool Debug::s_colorMode = false;
 	
 	void Debug::Init()
 	{
@@ -107,35 +107,38 @@ namespace FishEngine
 
 void FishEngine::Debug::Log(LogType channel, std::string const & message, const char* file, int line, const char * func)
 {
+	if (s_colorMode)
+	{
 #if FISHENGINE_PLATFORM_WINDOWS
-	WORD colorAttr = 0x0F;
-	switch (channel)
-	{
-	case LogType::Warning:
-		colorAttr = 0x0E;
-		break;
-	case LogType::Error:
-		colorAttr = 0x0C;
-		break;
-	}
-	SetConsoleTextAttribute(hstdout, colorAttr);
+		WORD colorAttr = 0x0F;
+		switch (channel)
+		{
+		case LogType::Warning:
+			colorAttr = 0x0E;
+			break;
+		case LogType::Error:
+			colorAttr = 0x0C;
+			break;
+		}
+		SetConsoleTextAttribute(hstdout, colorAttr);
 #elif FISHENGINE_PLATFORM_APPLE || FISHENGINE_PLATFORM_LINUX
-	// http://stackoverflow.com/questions/9005769/any-way-to-print-in-color-with-nslog#
-	// https://wiki.archlinux.org/index.php/Color_Bash_Prompt#List_of_colors_for_prompt_and_Bash
+		// http://stackoverflow.com/questions/9005769/any-way-to-print-in-color-with-nslog#
+		// https://wiki.archlinux.org/index.php/Color_Bash_Prompt#List_of_colors_for_prompt_and_Bash
 
-	if (channel == LogType::Log)
-	{
-		printf("\e[0;37m");    // white
-	}
-	else if (channel == LogType::Warning)
-	{
-		printf("\e[0;33m");    // yellow
-	}
-	else
-	{
-		printf("\e[0;31m");    // red
-	}
+		if (channel == LogType::Log)
+		{
+			printf("\e[0;37m");    // white
+		}
+		else if (channel == LogType::Warning)
+		{
+			printf("\e[0;33m");    // yellow
+		}
+		else
+		{
+			printf("\e[0;31m");    // red
+		}
 #endif
+	}
 
 	//std::cout << "[" << file << ":" << line << ", " << func << "] ";
 	std::cout << "[" << func << "] ";

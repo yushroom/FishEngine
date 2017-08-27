@@ -164,69 +164,6 @@ namespace FishEditor
 		/************************************************************************/
 		/* Selection                                                            */
 		/************************************************************************/
-#if 0
-		auto selection = Selection::transforms();
-		if (m_highlightSelections)
-		{
-			auto camera = Camera::main();
-			//auto view = camera->worldToCameraMatrix();
-			//auto proj = camera->projectionMatrix();
-			//auto vp = proj * view;
-			glEnable(GL_POLYGON_OFFSET_LINE);
-			glPolygonOffset(-1.0, -1.0f);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			auto material = Material::builtinMaterial("SolidColor");
-			material->DisableKeyword(ShaderKeyword::All);
-			material->SetVector4("Color", Vector4(0.375f, 0.388f, 0.463f, 1));
-
-
-			std::list<GameObjectPtr> selections;
-			for (auto const & t : selection)
-				selections.push_back(t.lock()->gameObject());
-			while (!selections.empty())
-			{
-				auto go = selections.front();
-				selections.pop_front();
-				if (go == nullptr)
-				{
-					continue;
-				}
-				auto& children = go->transform()->children();
-				for (auto& c : children)
-				{
-					selections.push_back(c->gameObject());
-				}
-				MeshPtr mesh;
-				auto meshFilter = go->GetComponent<MeshFilter>();
-				if (meshFilter != nullptr)
-				{
-					mesh = meshFilter->mesh();
-				}
-				else
-				{
-					auto skinnedMeshRenderer = go->GetComponent<SkinnedMeshRenderer>();
-					if (skinnedMeshRenderer != nullptr)
-					{
-						mesh = skinnedMeshRenderer->sharedMesh();
-						//bool useSkinnedVersion = FishEditorWindow::InPlayMode();
-						bool useSkinnedVersion = true;
-						if (useSkinnedVersion)
-						{
-							material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-							Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->m_matrixPalette);
-						}
-					}
-				}
-				if (mesh != nullptr)
-				{
-					auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
-					Graphics::DrawMesh(mesh, model, material);
-				}
-			}
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glDisable(GL_POLYGON_OFFSET_LINE);
-		}
-#else
 		auto selection = Selection::transforms();
 		if (m_highlightSelections && !selection.empty())
 		{
@@ -237,7 +174,9 @@ namespace FishEditor
 
 			std::list<GameObjectPtr> selections;
 			for (auto const & t : selection)
+			{
 				selections.push_back(t.lock()->gameObject());
+			}
 
 			while (!selections.empty())
 			{
@@ -253,7 +192,6 @@ namespace FishEditor
 					selections.push_back(c->gameObject());
 				}
 				MeshPtr mesh;
-				bool skinned = false;
 				auto meshFilter = go->GetComponent<MeshFilter>();
 				if (meshFilter != nullptr)
 				{
@@ -265,15 +203,8 @@ namespace FishEditor
 					if (skinnedMeshRenderer != nullptr)
 					{
 						mesh = skinnedMeshRenderer->sharedMesh();
-						//skinned = true;
-						//material->EnableKeyword(ShaderKeyword::SkinnedAnimation);
-						//Pipeline::UpdateBonesUniforms(skinnedMeshRenderer->matrixPalette());
 					}
 				}
-				//if (!skinned)
-				//{
-				//	material->DisableKeyword(ShaderKeyword::SkinnedAnimation);
-				//}
 				if (mesh != nullptr)
 				{
 					auto model = go->transform()->localToWorldMatrix() * Matrix4x4::Scale(1.001f, 1.001f, 1.001f);
@@ -299,7 +230,6 @@ namespace FishEditor
 			auto h = m_colorBuffer->height();
 			glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		}
-#endif
 
 		if (m_isWireFrameMode)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -531,6 +461,8 @@ namespace FishEditor
 
 		if (!m_enableGizmoOperation)
 			return;
+		
+		m_mouseEventHandledByController = true;
 
 		// get intersected point of two Rays
 		// solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2
@@ -684,6 +616,7 @@ namespace FishEditor
 			return;
 		if (!m_enableGizmoOperation)
 			return;
+		m_mouseEventHandledByController = true;
 
 		if (Input::GetMouseButton(0)) // rotating
 		{
@@ -810,6 +743,7 @@ namespace FishEditor
 			return;
 		if (!m_enableGizmoOperation)
 			return;
+		m_mouseEventHandledByController = true;
 
 		// get intersected point of two Rays
 		// solve t2 in: o1 + t1 * dir1 = o2 + t2 * dir2

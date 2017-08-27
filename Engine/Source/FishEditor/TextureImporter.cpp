@@ -34,13 +34,13 @@ private:
 	FreeImagePlugin()
 	{
 		FreeImage_Initialise(false);
-		std::cout << "Supported texture formats: ";
-		for (int i = 0; i < FreeImage_GetFIFCount(); ++i)
-		{
-			std::string ext = FreeImage_GetFIFExtensionList(FREE_IMAGE_FORMAT(i));
-			std::cout << ext << ", ";
-		}
-		std::cout << std::endl;
+//		std::cout << "Supported texture formats: ";
+//		for (int i = 0; i < FreeImage_GetFIFCount(); ++i)
+//		{
+//			std::string ext = FreeImage_GetFIFExtensionList(FREE_IMAGE_FORMAT(i));
+//			std::cout << ext << ", ";
+//		}
+//		std::cout << std::endl;
 		
 		// Set error handler
 		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);

@@ -70,14 +70,16 @@ namespace FishEngine
 
 	void Material::setShader(const ShaderPtr& shader)
 	{
+		if (shader == nullptr)
+			abort();
 		m_shader = shader;
 		m_uniforms.floats.clear();
 		m_uniforms.vec2s.clear();
 		m_uniforms.vec3s.clear();
 		m_uniforms.vec4s.clear();
 		m_uniforms.mat4s.clear();
-		m_savedProperties = shader->m_savedProperties;
 		m_properties.clear();
+		m_savedProperties = shader->m_savedProperties;
 		for (auto& u : m_shader->uniforms())
 		{
 			if (u.type == GL_FLOAT)

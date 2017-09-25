@@ -55,7 +55,7 @@ namespace FishEngine
 				float x = m_dragSpeed * Input::GetAxis(Axis::MouseX);
 				float y = m_dragSpeed * Input::GetAxis(Axis::MouseY);
 				transform()->Translate(-x, -y, 0);
-				LogWarning("Move");
+//				LogWarning("Move");
 			}
 			else if (type == ControlType::Rotate)
 			{
@@ -64,7 +64,7 @@ namespace FishEngine
 				auto pivot = transform()->position();
 				transform()->RotateAround(pivot, Vector3::up, x);
 				transform()->RotateAround(pivot, transform()->right(), -y);
-				LogWarning("Rotate");
+//				LogWarning("Rotate");
 			}
 			else if (type == ControlType::Orbit)
 			{
@@ -72,7 +72,7 @@ namespace FishEngine
 				float y = m_rotateSpeed * Input::GetAxis(Axis::MouseY);
 				transform()->RotateAround(m_orbitCenter, Vector3::up, x);
 				transform()->RotateAround(m_orbitCenter, transform()->right(), -y);
-				LogWarning("Orbit");
+//				LogWarning("Orbit");
 			}
 			else if (type == ControlType::Zoom)
 			{
@@ -90,7 +90,7 @@ namespace FishEngine
 					deltaZ = fabsf(x) > fabsf(y) ? x : -y;
 				}
 				transform()->Translate(deltaZ*forward, Space::World);
-				LogWarning("Zoom");
+//				LogWarning("Zoom");
 			}
 			else
 			{

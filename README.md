@@ -25,7 +25,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++14.
 
 ## How to Build
 
-- [macOS](Doc/build_osx)
+- [macOS](https://github.com/yushroom/FishEngine/blob/master/Doc/install_osx.md)
 - windows[WIP]
 
 ---

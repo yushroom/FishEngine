@@ -616,39 +616,7 @@ namespace FishEditor
 		group->setName("Group");
 		Scene::AddGameObject(group);
 		
-//		for (int x = -5; x < 5; ++x)
-//		{
-//			for (int y = -5; y <= 5; y++)
-//			{
-//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
-//				go->transform()->SetParent(group->transform());
-//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
-//				go->transform()->setLocalEulerAngles(0, 30, 0);
-//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
-//				MaterialPtr material;
-////				if (x == 0)
-////				{
-//					material = Material::InstantiateBuiltinMaterial("PBR");
-//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
-//				//}
-////				else
-////				{
-////					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
-////					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
-////				}
-//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
-//				//material->DisableKeyword(ShaderKeyword::Shadow);
-//				material->SetFloat("Metallic", 0.1f*(x+5));
-//				material->SetFloat("Roughness", 0.1f*(y+5));
-//				material->SetFloat("Specular", 0.5);
-//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
-//				auto renderer = go->GetComponent<MeshRenderer>();
-//				renderer->SetMaterial(material);
-//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
-//			}
-//		}
-		
-		for (int x = 0; x < 2; ++x)
+		for (int x = -5; x < 5; ++x)
 		{
 			for (int y = -5; y <= 5; y++)
 			{
@@ -658,19 +626,10 @@ namespace FishEditor
 				go->transform()->setLocalEulerAngles(0, 30, 0);
 				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
 				MaterialPtr material;
-				if (x == 0)
-				{
-					material = Material::InstantiateBuiltinMaterial("PBR");
-					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
-				}
-				else
-				{
-					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
-					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
-				}
+				material = Material::InstantiateBuiltinMaterial("PBR");
+				material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
 				material->EnableKeyword(ShaderKeyword::AmbientIBL);
-				//material->DisableKeyword(ShaderKeyword::Shadow);
-				material->SetFloat("Metallic", 0.0f);
+				material->SetFloat("Metallic", 0.1f*(x+5));
 				material->SetFloat("Roughness", 0.1f*(y+5));
 				material->SetFloat("Specular", 0.5);
 				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
@@ -679,6 +638,38 @@ namespace FishEditor
 				renderer->setShadowCastingMode(ShadowCastingMode::Off);
 			}
 		}
+		
+//		for (int x = 0; x < 2; ++x)
+//		{
+//			for (int y = -5; y <= 5; y++)
+//			{
+//				auto go = GameObject::CreatePrimitive(PrimitiveType::Sphere);
+//				go->transform()->SetParent(group->transform());
+//				go->transform()->setLocalPosition(y*0.6f, x*0.6f, 0);
+//				go->transform()->setLocalEulerAngles(0, 30, 0);
+//				go->transform()->setLocalScale(0.5f, 0.5f, 0.5f);
+//				MaterialPtr material;
+//				if (x == 0)
+//				{
+//					material = Material::InstantiateBuiltinMaterial("PBR");
+//					material->setName("PBR" + boost::lexical_cast<std::string>(y+5));
+//				}
+//				else
+//				{
+//					material = Material::InstantiateBuiltinMaterial("PBR-Reference");
+//					material->setName("PBR-Reference" + boost::lexical_cast<std::string>(y + 5));
+//				}
+//				material->EnableKeyword(ShaderKeyword::AmbientIBL);
+//				//material->DisableKeyword(ShaderKeyword::Shadow);
+//				material->SetFloat("Metallic", 0.0f);
+//				material->SetFloat("Roughness", 0.1f*(y+5));
+//				material->SetFloat("Specular", 0.5);
+//				material->SetVector3("BaseColor", Vector3(1.f, 1.f, 1.f));
+//				auto renderer = go->GetComponent<MeshRenderer>();
+//				renderer->SetMaterial(material);
+//				renderer->setShadowCastingMode(ShadowCastingMode::Off);
+//			}
+//		}
 	}
 	
 	

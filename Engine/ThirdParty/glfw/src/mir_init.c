@@ -1,7 +1,7 @@
 //========================================================================
 // GLFW 3.3 Mir - www.glfw.org
 //------------------------------------------------------------------------
-// Copyright (c) 2014-2015 Brandon Schaefer <brandon.schaefer@canonical.com>
+// Copyright (c) 2014-2017 Brandon Schaefer <brandon.schaefer@canonical.com>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -51,6 +51,7 @@ static void createKeyTables(void)
     _glfw.mir.keycodes[KEY_8]          = GLFW_KEY_8;
     _glfw.mir.keycodes[KEY_9]          = GLFW_KEY_9;
     _glfw.mir.keycodes[KEY_0]          = GLFW_KEY_0;
+    _glfw.mir.keycodes[KEY_SPACE]      = GLFW_KEY_SPACE;
     _glfw.mir.keycodes[KEY_MINUS]      = GLFW_KEY_MINUS;
     _glfw.mir.keycodes[KEY_EQUAL]      = GLFW_KEY_EQUAL;
     _glfw.mir.keycodes[KEY_Q]          = GLFW_KEY_Q;
@@ -189,17 +190,10 @@ int _glfwPlatformInit(void)
 
     createKeyTables();
 
-    if (!_glfwInitThreadLocalStoragePOSIX())
-        return GLFW_FALSE;
-
     if (!_glfwInitJoysticksLinux())
         return GLFW_FALSE;
 
     _glfwInitTimerPOSIX();
-
-    // Need the default conf for when we set a NULL cursor
-    _glfw.mir.defaultConf  = mir_cursor_configuration_from_name(mir_default_cursor_name);
-    _glfw.mir.disabledConf = mir_cursor_configuration_from_name(mir_disabled_cursor_name);
 
     _glfw.mir.eventQueue = calloc(1, sizeof(EventQueue));
     _glfwInitEventQueueMir(_glfw.mir.eventQueue);
@@ -221,7 +215,6 @@ void _glfwPlatformTerminate(void)
 {
     _glfwTerminateEGL();
     _glfwTerminateJoysticksLinux();
-    _glfwTerminateThreadLocalStoragePOSIX();
 
     _glfwDeleteEventQueueMir(_glfw.mir.eventQueue);
 
@@ -238,9 +231,7 @@ const char* _glfwPlatformGetVersionString(void)
 #else
         " gettimeofday"
 #endif
-#if defined(__linux__)
-        " /dev/js"
-#endif
+        " evdev"
 #if defined(_GLFW_BUILD_DLL)
         " shared"
 #endif

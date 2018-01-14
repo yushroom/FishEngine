@@ -1,0 +1,5 @@
+# aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
+SETUP_TEST(TestFishGUI)
+# target_link_libraries(Test yaml-cpp)
+# include_directories( ${CMAKE_CURRENT_LIST_DIR}/../../../../Include/FishGUI/)
+target_link_libraries(TestFishGUI FishGUI)

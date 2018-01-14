@@ -48,14 +48,14 @@ static char* getDisplayName(CGDirectDisplayID displayID)
                                      IOServiceMatching("IODisplayConnect"),
                                      &it) != 0)
     {
-        _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "Cocoa: Failed to get display service port iterator");
-        return 0;
+        // This may happen if a desktop Mac is running headless
+        return NULL;
     }
 
     while ((service = IOIteratorNext(it)) != 0)
     {
-        info = IODisplayCreateInfoDictionary(service, kIODisplayOnlyPreferredName);
+        info = IODisplayCreateInfoDictionary(service,
+                                             kIODisplayOnlyPreferredName);
 
         CFNumberRef vendorIDRef =
             CFDictionaryGetValue(info, CFSTR(kDisplayVendorID));
@@ -99,8 +99,6 @@ static char* getDisplayName(CGDirectDisplayID displayID)
                                                  (const void**) &nameRef))
     {
         // This may happen if a desktop Mac is running headless
-        _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "Cocoa: Failed to retrieve display name");
         CFRelease(info);
         return NULL;
     }
@@ -188,7 +186,13 @@ static CGDisplayFadeReservationToken beginFadeReservation(void)
     CGDisplayFadeReservationToken token = kCGDisplayFadeReservationInvalidToken;
 
     if (CGAcquireDisplayFadeReservation(5, &token) == kCGErrorSuccess)
-        CGDisplayFade(token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
+    {
+        CGDisplayFade(token, 0.3,
+                      kCGDisplayBlendNormal,
+                      kCGDisplayBlendSolidColor,
+                      0.0, 0.0, 0.0,
+                      TRUE);
+    }
 
     return token;
 }
@@ -199,7 +203,11 @@ static void endFadeReservation(CGDisplayFadeReservationToken token)
 {
     if (token != kCGDisplayFadeReservationInvalidToken)
     {
-        CGDisplayFade(token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
+        CGDisplayFade(token, 0.5,
+                      kCGDisplayBlendSolidColor,
+                      kCGDisplayBlendNormal,
+                      0.0, 0.0, 0.0,
+                      FALSE);
         CGReleaseDisplayFadeReservation(token);
     }
 }
@@ -215,15 +223,20 @@ void _glfwPollMonitorsNS(void)
 {
     uint32_t i, j, displayCount, disconnectedCount;
     CGDirectDisplayID* displays;
-    _GLFWmonitor** disconnected;
+    _GLFWmonitor** disconnected = NULL;
 
     CGGetOnlineDisplayList(0, NULL, &displayCount);
     displays = calloc(displayCount, sizeof(CGDirectDisplayID));
     CGGetOnlineDisplayList(displayCount, displays, &displayCount);
 
     disconnectedCount = _glfw.monitorCount;
-    disconnected = calloc(_glfw.monitorCount, sizeof(_GLFWmonitor*));
-    memcpy(disconnected, _glfw.monitors, _glfw.monitorCount * sizeof(_GLFWmonitor*));
+    if (disconnectedCount)
+    {
+        disconnected = calloc(_glfw.monitorCount, sizeof(_GLFWmonitor*));
+        memcpy(disconnected,
+               _glfw.monitors,
+               _glfw.monitorCount * sizeof(_GLFWmonitor*));
+    }
 
     for (i = 0;  i < displayCount;  i++)
     {

@@ -25,9 +25,6 @@
 //
 //========================================================================
 
-#ifndef _glfw3_glx_context_h_
-#define _glfw3_glx_context_h_
-
 #define GLX_VENDOR 1
 #define GLX_RGBA_BIT 0x00000001
 #define GLX_WINDOW_BIT 0x00000001
@@ -67,6 +64,7 @@
 #define GLX_CONTEXT_RELEASE_BEHAVIOR_ARB 0x2097
 #define GLX_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB 0
 #define GLX_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB 0x2098
+#define GLX_CONTEXT_OPENGL_NO_ERROR_ARB 0x31b3
 
 typedef XID GLXWindow;
 typedef XID GLXDrawable;
@@ -165,6 +163,7 @@ typedef struct _GLFWlibraryGLX
     GLFWbool        ARB_create_context_profile;
     GLFWbool        ARB_create_context_robustness;
     GLFWbool        EXT_create_context_es2_profile;
+    GLFWbool        ARB_create_context_no_error;
     GLFWbool        ARB_context_flush_control;
 
 } _GLFWlibraryGLX;
@@ -180,4 +179,3 @@ GLFWbool _glfwChooseVisualGLX(const _GLFWctxconfig* ctxconfig,
                               const _GLFWfbconfig* fbconfig,
                               Visual** visual, int* depth);
 
-#endif // _glfw3_glx_context_h_

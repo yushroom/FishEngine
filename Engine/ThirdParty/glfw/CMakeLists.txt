@@ -1,13 +1,17 @@
-set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
+cmake_minimum_required(VERSION 2.8.12)
 
 project(GLFW C)
 
-cmake_minimum_required(VERSION 2.8.12)
+set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
 
 if (NOT CMAKE_VERSION VERSION_LESS "3.0")
     # Until all major package systems have moved to CMake 3,
     # we stick with the older INSTALL_NAME_DIR mechanism
     cmake_policy(SET CMP0042 OLD)
+endif()
+
+if (NOT CMAKE_VERSION VERSION_LESS "3.1")
+    cmake_policy(SET CMP0054 NEW)
 endif()
 
 set(GLFW_VERSION_MAJOR "3")
@@ -34,11 +38,6 @@ endif()
 
 if (WIN32)
     option(GLFW_USE_HYBRID_HPG "Force use of high-performance GPU on hybrid systems" OFF)
-endif()
-
-if (APPLE)
-    option(GLFW_USE_CHDIR "Make glfwInit chdir to Contents/Resources" ON)
-    option(GLFW_USE_MENUBAR "Populate the menu bar on first window creation" ON)
 endif()
 
 if (UNIX AND NOT APPLE)
@@ -182,7 +181,7 @@ endif()
 #--------------------------------------------------------------------
 if (GLFW_VULKAN_STATIC)
     if (VULKAN_FOUND AND VULKAN_STATIC_LIBRARY)
-        list(APPEND glfw_LIBRARIES ${VULKAN_STATIC_LIBRARY} ${GLFW_VULKAN_DEPS})
+        list(APPEND glfw_LIBRARIES "${VULKAN_STATIC_LIBRARY}" ${GLFW_VULKAN_DEPS})
         if (BUILD_SHARED_LIBS)
             message(WARNING "Linking Vulkan loader static library into GLFW")
         endif()
@@ -246,38 +245,28 @@ if (_GLFW_X11)
 
     # Check for XRandR (modern resolution switching and gamma control)
     if (NOT X11_Xrandr_FOUND)
-        message(FATAL_ERROR "The RandR library and headers were not found")
+        message(FATAL_ERROR "The RandR headers were not found")
     endif()
-
-    list(APPEND glfw_INCLUDE_DIRS "${X11_Xrandr_INCLUDE_PATH}")
-    list(APPEND glfw_LIBRARIES "${X11_Xrandr_LIB}")
-    list(APPEND glfw_PKG_DEPS "xrandr")
 
     # Check for Xinerama (legacy multi-monitor support)
     if (NOT X11_Xinerama_FOUND)
-        message(FATAL_ERROR "The Xinerama library and headers were not found")
+        message(FATAL_ERROR "The Xinerama headers were not found")
     endif()
-
-    list(APPEND glfw_INCLUDE_DIRS "${X11_Xinerama_INCLUDE_PATH}")
-    list(APPEND glfw_LIBRARIES "${X11_Xinerama_LIB}")
-    list(APPEND glfw_PKG_DEPS "xinerama")
 
     # Check for Xkb (X keyboard extension)
     if (NOT X11_Xkb_FOUND)
         message(FATAL_ERROR "The X keyboard extension headers were not found")
     endif()
 
-    list(APPEND glfw_INCLUDE_DIR "${X11_Xkb_INCLUDE_PATH}")
-
-    # Check for Xcursor
+    # Check for Xcursor (cursor creation from RGBA images)
     if (NOT X11_Xcursor_FOUND)
-        message(FATAL_ERROR "The Xcursor libraries and headers were not found")
+        message(FATAL_ERROR "The Xcursor headers were not found")
     endif()
 
-    list(APPEND glfw_INCLUDE_DIR "${X11_Xcursor_INCLUDE_PATH}")
-    list(APPEND glfw_LIBRARIES "${X11_Xcursor_LIB}")
-    list(APPEND glfw_PKG_DEPS "xcursor")
-
+    list(APPEND glfw_INCLUDE_DIRS "${X11_Xrandr_INCLUDE_PATH}"
+                                  "${X11_Xinerama_INCLUDE_PATH}"
+                                  "${X11_Xkb_INCLUDE_PATH}"
+                                  "${X11_Xcursor_INCLUDE_PATH}")
 endif()
 
 #--------------------------------------------------------------------
@@ -285,7 +274,7 @@ endif()
 #--------------------------------------------------------------------
 if (_GLFW_WAYLAND)
     find_package(ECM REQUIRED NO_MODULE)
-    list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+    list(APPEND CMAKE_MODULE_PATH "${ECM_MODULE_PATH}")
 
     find_package(Wayland REQUIRED)
     find_package(WaylandScanner REQUIRED)
@@ -309,7 +298,7 @@ if (_GLFW_MIR)
     find_package(Mir REQUIRED)
     list(APPEND glfw_PKG_DEPS "mirclient")
 
-    list(APPEND glfw_INCLUDE_DIRS "${MIR_INCLUDE_DIR}")
+    list(APPEND glfw_INCLUDE_DIRS "${MIR_INCLUDE_DIRS}")
     list(APPEND glfw_LIBRARIES "${MIR_LIBRARIES}" "${CMAKE_THREAD_LIBS_INIT}")
 
     find_package(XKBCommon REQUIRED)
@@ -330,14 +319,6 @@ endif()
 # Use Cocoa for window creation and NSOpenGL for context creation
 #--------------------------------------------------------------------
 if (_GLFW_COCOA)
-
-    if (GLFW_USE_MENUBAR)
-        set(_GLFW_USE_MENUBAR 1)
-    endif()
-
-    if (GLFW_USE_CHDIR)
-        set(_GLFW_USE_CHDIR 1)
-    endif()
 
     list(APPEND glfw_LIBRARIES
         "-framework Cocoa"

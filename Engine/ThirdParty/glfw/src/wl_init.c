@@ -109,6 +109,8 @@ static void pointerHandleButton(void* data,
     if (!window)
         return;
 
+    _glfw.wl.pointerSerial = serial;
+
     /* Makes left, right and middle 0, 1 and 2. Overall order follows evdev
      * codes. */
     glfwButton = button - BTN_LEFT;
@@ -292,7 +294,7 @@ static int toGLFWKeyCode(uint32_t key)
 
 static xkb_keysym_t composeSymbol(xkb_keysym_t sym)
 {
-    if (sym == XKB_KEY_NoSymbol)
+    if (sym == XKB_KEY_NoSymbol || !_glfw.wl.xkb.composeState)
         return sym;
     if (xkb_compose_state_feed(_glfw.wl.xkb.composeState, sym)
             != XKB_COMPOSE_FEED_ACCEPTED)
@@ -519,6 +521,7 @@ static void createKeyTables(void)
     _glfw.wl.keycodes[KEY_8]          = GLFW_KEY_8;
     _glfw.wl.keycodes[KEY_9]          = GLFW_KEY_9;
     _glfw.wl.keycodes[KEY_0]          = GLFW_KEY_0;
+    _glfw.wl.keycodes[KEY_SPACE]      = GLFW_KEY_SPACE;
     _glfw.wl.keycodes[KEY_MINUS]      = GLFW_KEY_MINUS;
     _glfw.wl.keycodes[KEY_EQUAL]      = GLFW_KEY_EQUAL;
     _glfw.wl.keycodes[KEY_Q]          = GLFW_KEY_Q;
@@ -666,9 +669,6 @@ int _glfwPlatformInit(void)
     // Sync so we got all initial output events
     wl_display_roundtrip(_glfw.wl.display);
 
-    if (!_glfwInitThreadLocalStoragePOSIX())
-        return GLFW_FALSE;
-
     if (!_glfwInitJoysticksLinux())
         return GLFW_FALSE;
 
@@ -694,7 +694,6 @@ void _glfwPlatformTerminate(void)
 {
     _glfwTerminateEGL();
     _glfwTerminateJoysticksLinux();
-    _glfwTerminateThreadLocalStoragePOSIX();
 
     xkb_compose_state_unref(_glfw.wl.xkb.composeState);
     xkb_keymap_unref(_glfw.wl.xkb.keymap);
@@ -738,9 +737,7 @@ const char* _glfwPlatformGetVersionString(void)
 #else
         " gettimeofday"
 #endif
-#if defined(__linux__)
-        " /dev/js"
-#endif
+        " evdev"
 #if defined(_GLFW_BUILD_DLL)
         " shared"
 #endif

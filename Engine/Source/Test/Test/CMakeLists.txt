@@ -1,5 +1,5 @@
 # aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRCS)
 SETUP_TEST(Test)
 # target_link_libraries(Test yaml-cpp)
-include_directories( ${CMAKE_CURRENT_LIST_DIR}/../../Game/)
+# include_directories( ${CMAKE_CURRENT_LIST_DIR}/../../Game/)
 target_link_libraries(Test FishGame)

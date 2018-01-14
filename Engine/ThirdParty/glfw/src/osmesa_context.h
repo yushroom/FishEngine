@@ -25,9 +25,6 @@
 //
 //========================================================================
 
-#ifndef _glfw3_osmesa_context_h_
-#define _glfw3_osmesa_context_h_
-
 #define OSMESA_RGBA 0x1908
 #define OSMESA_FORMAT 0x22
 #define OSMESA_DEPTH_BITS 0x30
@@ -57,18 +54,18 @@ typedef GLFWglproc (GLAPIENTRY * PFN_OSMesaGetProcAddress)(const char*);
 #define OSMesaGetDepthBuffer _glfw.osmesa.GetDepthBuffer
 #define OSMesaGetProcAddress _glfw.osmesa.GetProcAddress
 
-#define _GLFW_PLATFORM_CONTEXT_STATE            _GLFWcontextOSMesa osmesa
-#define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE    _GLFWlibraryOSMesa osmesa
+#define _GLFW_OSMESA_CONTEXT_STATE              _GLFWcontextOSMesa osmesa
+#define _GLFW_OSMESA_LIBRARY_CONTEXT_STATE      _GLFWlibraryOSMesa osmesa
 
 
 // OSMesa-specific per-context data
 //
 typedef struct _GLFWcontextOSMesa
 {
-   OSMesaContext       handle;
-   int                 width;
-   int                 height;
-   void*               buffer;
+    OSMesaContext       handle;
+    int                 width;
+    int                 height;
+    void*               buffer;
 
 } _GLFWcontextOSMesa;
 
@@ -95,4 +92,3 @@ GLFWbool _glfwCreateContextOSMesa(_GLFWwindow* window,
                                   const _GLFWctxconfig* ctxconfig,
                                   const _GLFWfbconfig* fbconfig);
 
-#endif // _glfw3_osmesa_context_h_

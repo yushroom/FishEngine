@@ -13,7 +13,7 @@ MACRO(SETUP_TEST EXE_NAME)
 	    set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 	endif()
 
-	target_link_libraries(${EXE_NAME} glfw)
+	# target_link_libraries(${EXE_NAME} glfw)
 	#target_link_libraries(${EXE_NAME} assimp)
 	#target_link_libraries(${EXE_NAME} nativefiledialog)
 	target_link_libraries(${EXE_NAME} ${PhysXSDK_LIBRARIES})
@@ -23,3 +23,4 @@ MACRO(SETUP_TEST EXE_NAME)
 ENDMACRO(SETUP_TEST)
 
 add_subdirectory(./Test)
+add_subdirectory(./TestFishGUI)

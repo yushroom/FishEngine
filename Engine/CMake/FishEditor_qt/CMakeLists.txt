@@ -2,8 +2,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-SET(FishEditor_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishEditor)
-include_directories( ${FishEditor_SRC_DIR} )
+SET(FishEditor_qt_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../Source/FishEditor_qt)
+include_directories( ${FishEditor_qt_SRC_DIR} )
 
 # Autodesk FBX sdk
 # SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )
@@ -31,13 +31,13 @@ SET( FBXSDK_LIB ${FBXSDK_LIB_RELEASE} )
 
 
 # FreeImage
-SET(FreeImage_Root ${FishEditor_SRC_DIR}/../../ThirdParty/freeimage)
+SET(FreeImage_Root ${FishEditor_qt_SRC_DIR}/../../ThirdParty/freeimage)
 include_directories(${FreeImage_Root}/include)
 link_directories(${FreeImage_Root}/lib)
 
 
 # Python3
-SET( PYTHON3_DIR ${FishEditor_SRC_DIR}/../../ThirdParty/python3 )
+SET( PYTHON3_DIR ${FishEditor_qt_SRC_DIR}/../../ThirdParty/python3 )
 include_directories( ${PYTHON3_DIR}/include )
 IF (WIN32)
     SET( PYTHON3_LIB debug ${PYTHON3_DIR}/libs/python36.lib optimized ${PYTHON3_DIR}/libs/python36.lib )
@@ -50,41 +50,41 @@ ENDIF()
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-aux_source_directory(${FishEditor_SRC_DIR} SRCS)
-FILE(GLOB Heasers ${FishEditor_SRC_DIR}/*.hpp)
-aux_source_directory(${FishEditor_SRC_DIR}/UI UI_SRCS)
-FILE(GLOB UI_Heasers ${FishEditor_SRC_DIR}/UI/*.hpp)
-FILE(GLOB FORMS ${FishEditor_SRC_DIR}/UI/*.ui)
+aux_source_directory(${FishEditor_qt_SRC_DIR} SRCS)
+FILE(GLOB Heasers ${FishEditor_qt_SRC_DIR}/*.hpp)
+aux_source_directory(${FishEditor_qt_SRC_DIR}/UI UI_SRCS)
+FILE(GLOB UI_Heasers ${FishEditor_qt_SRC_DIR}/UI/*.hpp)
+FILE(GLOB FORMS ${FishEditor_qt_SRC_DIR}/UI/*.ui)
 SOURCE_GROUP(Forms FILES ${FORMS})
 FILE(GLOB InspectorFiles
-    ${FishEditor_SRC_DIR}/Inspector.*
-    ${FishEditor_SRC_DIR}/UI/InspectorWidget.*
-    ${FishEditor_SRC_DIR}/UI/TextureImporterInspector.*
-    ${FishEditor_SRC_DIR}/UI/ModelImporterInspector.*
+    ${FishEditor_qt_SRC_DIR}/Inspector.*
+    ${FishEditor_qt_SRC_DIR}/UI/InspectorWidget.*
+    ${FishEditor_qt_SRC_DIR}/UI/TextureImporterInspector.*
+    ${FishEditor_qt_SRC_DIR}/UI/ModelImporterInspector.*
     )
 FILE(GLOB EditorFiles
-    ${FishEditor_SRC_DIR}/Editor.hpp
-    ${FishEditor_SRC_DIR}/Editor.cpp
-    ${FishEditor_SRC_DIR}/SerializedObject.*
-    ${FishEditor_SRC_DIR}/SerializedProperty.*
-    ${FishEditor_SRC_DIR}/SerializedPropertyType.hpp
-    ${FishEditor_SRC_DIR}/EditorGUILayout.*)
+    ${FishEditor_qt_SRC_DIR}/Editor.hpp
+    ${FishEditor_qt_SRC_DIR}/Editor.cpp
+    ${FishEditor_qt_SRC_DIR}/SerializedObject.*
+    ${FishEditor_qt_SRC_DIR}/SerializedProperty.*
+    ${FishEditor_qt_SRC_DIR}/SerializedPropertyType.hpp
+    ${FishEditor_qt_SRC_DIR}/EditorGUILayout.*)
 
 
 # Widgets finds its own dependencies (QtGui and QtCore).
 find_package(Qt5Widgets)
 
-#FILE(GLOB ReflectHeaders ${FishEditor_SRC_DIR}/generate/*.hpp)
-FILE(GLOB ReflectFilesSources ${FishEditor_SRC_DIR}/generate/*.hpp ${FishEditor_SRC_DIR}/generate/*.cpp)
+#FILE(GLOB ReflectHeaders ${FishEditor_qt_SRC_DIR}/generate/*.hpp)
+FILE(GLOB ReflectFilesSources ${FishEditor_qt_SRC_DIR}/generate/*.hpp ${FishEditor_qt_SRC_DIR}/generate/*.cpp)
 SOURCE_GROUP(Reflect FILES ${ReflectFilesSources})
 
-# FILE(GLOB InternalSources ${FishEditor_SRC_DIR}/Internal/*.hpp ${FishEditor_SRC_DIR}/Internal/*.cpp )
+# FILE(GLOB InternalSources ${FishEditor_qt_SRC_DIR}/Internal/*.hpp ${FishEditor_qt_SRC_DIR}/Internal/*.cpp )
 # SOURCE_GROUP(Internal FILES ${InternalSources})
 
-FILE(GLOB Asset_SRCS ${FishEditor_SRC_DIR}/FBXImporter/*.hpp ${FishEditor_SRC_DIR}/FBXImporter/*.cpp)
+FILE(GLOB Asset_SRCS ${FishEditor_qt_SRC_DIR}/FBXImporter/*.hpp ${FishEditor_qt_SRC_DIR}/FBXImporter/*.cpp)
 foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter ModelImporter FBXImporter ShaderImporter DDSImporter AudioImporter)
     foreach (ext hpp cpp)
-        set(f ${FishEditor_SRC_DIR}/${x}.${ext})
+        set(f ${FishEditor_qt_SRC_DIR}/${x}.${ext})
         SET(Asset_SRCS ${Asset_SRCS} ${f})
         IF(NOT EXISTS ${f})
             MESSAGE(FATAL_ERROR "source files does not exist: ${f}")
@@ -92,8 +92,8 @@ foreach (x AssetArchive AssetDataBase SceneArchive AssetImporter TextureImporter
     endforeach ()
 endforeach()
 
-SET( ASSETS_DIR ${FishEditor_SRC_DIR}/../../../assets)
-SET( SHADER_DIR ${FishEditor_SRC_DIR}/../../Shaders)
+SET( ASSETS_DIR ${FishEditor_qt_SRC_DIR}/../../../assets)
+SET( SHADER_DIR ${FishEditor_qt_SRC_DIR}/../../Shaders)
 IF( NOT WIN32 )
     FILE( GLOB Models ${ASSETS_DIR}/Models/*.txt )
     FILE( GLOB Gizmos ${ASSETS_DIR}/Textures/Gizmos/*.png )
@@ -111,13 +111,13 @@ SOURCE_GROUP( Resources FILES ${RESOURCE_FILES} )
 SOURCE_GROUP( Inspector FILES ${InspectorFiles} )
 SOURCE_GROUP( Editor FILES ${EditorFiles})
 
-add_executable(FishEditor MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} ${FishEditor_SRC_DIR}/resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
+add_executable(FishEditor_qt MACOSX_BUNDLE ${SRCS} ${Heasers} ${UI_SRCS} ${UI_Heasers} ${FORMS} ${InspectorFiles} ${ReflectFilesSources} ${EditorFiles} ${FishEditor_qt_SRC_DIR}/resources.qrc ${RESOURCE_FILES} ${Asset_SRCS} ${InternalSources})
 
-SET( INFO_PLIST "${FishEditor_SRC_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
+SET( INFO_PLIST "${FishEditor_qt_SRC_DIR}/../../CMake/MacOSXBundleInfo.plist.in")
 IF (NOT EXISTS ${INFO_PLIST})
     MESSAGE(FATAL_ERROR "${INFO_PLIST} not found!")
 ENDIF()
-set_target_properties( FishEditor PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST}" )
+set_target_properties( FishEditor_qt PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST}" )
 
 IF( NOT WIN32 )
     SET_SOURCE_FILES_PROPERTIES(${Models} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/Models)
@@ -129,26 +129,26 @@ IF( NOT WIN32 )
 ENDIF()
 
 # IF( WIN32 )
-#     target_link_libraries(FishEditor filesystem)
-#     target_link_libraries(FishEditor system)
+#     target_link_libraries(FishEditor_qt filesystem)
+#     target_link_libraries(FishEditor_qt system)
 # ENDIF()
-target_link_libraries(FishEditor FishEngine)
-#target_link_libraries(FishEditor assimp)
-#target_link_libraries(FishEditor yaml-cpp)
-#target_link_libraries(FishEditor ${PhysXSDK_LIBRARIES})
-#target_link_libraries(FishEditor ${Boost_LIBRARIES})
-target_link_libraries(FishEditor ${FBXSDK_LIB})
-target_link_libraries(FishEditor freeimage)
-target_link_libraries(FishEditor ${PYTHON3_LIB})
+target_link_libraries(FishEditor_qt FishEngine)
+#target_link_libraries(FishEditor_qt assimp)
+#target_link_libraries(FishEditor_qt yaml-cpp)
+#target_link_libraries(FishEditor_qt ${PhysXSDK_LIBRARIES})
+#target_link_libraries(FishEditor_qt ${Boost_LIBRARIES})
+target_link_libraries(FishEditor_qt ${FBXSDK_LIB})
+target_link_libraries(FishEditor_qt freeimage)
+target_link_libraries(FishEditor_qt ${PYTHON3_LIB})
 
 if (MSVC)
-    # target_link_libraries(FishEditor opengl32.lib)
-    # target_link_libraries(FishEditor glew_s)
+    # target_link_libraries(FishEditor_qt opengl32.lib)
+    # target_link_libraries(FishEditor_qt glew_s)
 else()
-    set_target_properties(FishEditor PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+    set_target_properties(FishEditor_qt PROPERTIES LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
 endif()
 
-target_link_libraries(FishEditor Qt5::Widgets)
+target_link_libraries(FishEditor_qt Qt5::Widgets)
 
 
 #https://gist.github.com/Rod-Persky/e6b93e9ee31f9516261b
@@ -178,35 +178,35 @@ if( WIN32 )
             COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${Qt5_${DLL}LocationDebug}> $<$<NOT:$<CONFIG:Debug>>:${Qt5_${DLL}Location}> $<TARGET_FILE_DIR:${APP}>)
     endmacro()
 
-    qt5_copy_dll(FishEditor Core)
-    qt5_copy_dll(FishEditor Gui)
-    qt5_copy_dll(FishEditor Widgets)
+    qt5_copy_dll(FishEditor_qt Core)
+    qt5_copy_dll(FishEditor_qt Gui)
+    qt5_copy_dll(FishEditor_qt Widgets)
 
     set(PhysX_BIN_DIR ${PhysX_ROOT_DIR}/Bin/vc14win64)
     message(${PhysX_BIN_DIR}/nvToolsExt64_1.dll)
     message(${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll)
     message(${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll)
 
-    add_custom_command(TARGET FishEditor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PhysX_BIN_DIR}/nvToolsExt64_1.dll $<TARGET_FILE_DIR:FishEditor>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CommonCHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor>
+    add_custom_command(TARGET FishEditor_qt POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PhysX_BIN_DIR}/nvToolsExt64_1.dll $<TARGET_FILE_DIR:FishEditor_qt>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3CommonDEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CommonCHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor_qt>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<CONFIG:Debug>:${PhysX_BIN_DIR}/PhysX3DEBUG_x64.dll> $<$<NOT:$<CONFIG:Debug>>:${PhysX_BIN_DIR}/PhysX3CHECKED_x64.dll> $<TARGET_FILE_DIR:FishEditor_qt>
     )
 
-    add_custom_command(TARGET FishEditor POST_BUILD
-    	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FreeImage_Root}/bin/FreeImage.dll $<TARGET_FILE_DIR:FishEditor>)
+    add_custom_command(TARGET FishEditor_qt POST_BUILD
+    	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FreeImage_Root}/bin/FreeImage.dll $<TARGET_FILE_DIR:FishEditor_qt>)
 
-    add_custom_command(TARGET FishEditor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:FishEditor>/Resources
+    add_custom_command(TARGET FishEditor_qt POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:FishEditor_qt>/Resources
     )
 
-    add_custom_command(TARGET FishEditor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} $<TARGET_FILE_DIR:FishEditor>/Shaders
+    add_custom_command(TARGET FishEditor_qt POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_DIR} $<TARGET_FILE_DIR:FishEditor_qt>/Shaders
     )
 
     set(EDITOR_SCRIPT ${FISHENGINE_SCRIPT_DIR}/Editor)
-    add_custom_command(TARGET FishEditor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EDITOR_SCRIPT}/BuildProject.py $<TARGET_FILE_DIR:FishEditor>/BuildProject.py
+    add_custom_command(TARGET FishEditor_qt POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EDITOR_SCRIPT}/BuildProject.py $<TARGET_FILE_DIR:FishEditor_qt>/BuildProject.py
     )
 endif()
 

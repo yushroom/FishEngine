@@ -127,7 +127,7 @@ add_definitions(-DFishEngine_SHARED_LIB=1)
 
 ADD_SUBDIRECTORY(./CMake/FishEngine)
 ADD_SUBDIRECTORY(./CMake/FishGame)
-ADD_SUBDIRECTORY(./CMake/FishEditor)
+ADD_SUBDIRECTORY(./CMake/FishEditor_qt)
 ADD_SUBDIRECTORY(./CMake/FishGUI)
 ADD_SUBDIRECTORY(./Source/Tool)
 ADD_SUBDIRECTORY(./Source/Test)

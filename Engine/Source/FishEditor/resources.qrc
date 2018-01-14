@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/circled_dot.png</file>
+        <file>Resources/M.png</file>
+        <file>Resources/toolbar_pausebutton.png</file>
+        <file>Resources/toolbar_pausebutton_on.png</file>
+        <file>Resources/toolbar_playbutton.png</file>
+        <file>Resources/toolbar_playbutton_on.png</file>
+        <file>Resources/toolbar_stepbutton.png</file>
+        <file>Resources/toolbar_stepbutton_on.png</file>
+        <file>Resources/transform_tool__rotate.png</file>
+        <file>Resources/transform_tool_move.png</file>
+        <file>Resources/transform_tool_scale.png</file>
+        <file>Resources/transform_tool_view_move.png</file>
+        <file>Resources/transform_tool_view_orbit.png</file>
+        <file>Resources/transform_tool_view_zoom.png</file>
+        <file>Resources/Assets/AudioClip@64.png</file>
+        <file>Resources/Assets/DefaultAsset@64.png</file>
+        <file>Resources/Assets/Folder@64.png</file>
+        <file>Resources/Assets/Font@64.png</file>
+        <file>Resources/Assets/Material@64.png</file>
+        <file>Resources/Assets/Prefab@64.png</file>
+        <file>Resources/Assets/PrefabModel@64.png</file>
+        <file>Resources/Assets/Shader@64.png</file>
+        <file>Resources/inspector_popup.png</file>
+        <file>Resources/console_error.png</file>
+        <file>Resources/console_info.png</file>
+        <file>Resources/console_warn.png</file>
+    </qresource>
+</RCC>

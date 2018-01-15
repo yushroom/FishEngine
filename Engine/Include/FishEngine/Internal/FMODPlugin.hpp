@@ -5,7 +5,7 @@
 #include "../ReflectClass.hpp"
 #include "../Debug.hpp"
 
-void static CheckFMODError(FMOD_RESULT result)
+inline void CheckFMODError(FMOD_RESULT result)
 {
 	if (result != FMOD_OK)
 	{

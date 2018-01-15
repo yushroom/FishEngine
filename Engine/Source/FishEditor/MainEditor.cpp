@@ -3,8 +3,8 @@
 #include <iostream>
 //#include <boost/dll/import.hpp>
 #include <boost/lexical_cast.hpp>
-#include <QDir>
-#include <QCoreApplication>
+//#include <QDir>
+//#include <QCoreApplication>
 
 #include <FishEngine/Debug.hpp>
 #include <FishEngine/Camera.hpp>
@@ -888,8 +888,8 @@ namespace FishEditor
 		GLint framebuffer; // qt's framebuffer
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &framebuffer);
 		
-		//Input::Update();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//		Input::Update();
+//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (Application::isPlaying())
 		{
@@ -910,14 +910,15 @@ namespace FishEditor
 		m_mainSceneViewEditor->Render();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		//Graphics::Blit()
-		glViewport(0, 0, Screen::width(), Screen::height());
-		auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
-		auto mtl = Material::builtinMaterial("DrawQuad");
-		mtl->SetVector4("DrawRectParameters", Vector4(-1, -1, 1, 1));
-		mtl->setMainTexture(m_mainSceneViewEditor->m_colorBuffer);
-		Graphics::DrawMesh(quad, mtl);
-		//Debug::Log("paintGL");
+//		//Graphics::Blit()
+////		glViewport(203*2, 18*2, 474*2, 399*2);
+//		glViewport(0, 0, Screen::width(), Screen::height());
+//		auto quad = Mesh::builtinMesh(PrimitiveType::ScreenAlignedQuad);
+//		auto mtl = Material::builtinMaterial("DrawQuad");
+//		mtl->SetVector4("DrawRectParameters", Vector4(-1, -1, 1, 1));
+//		mtl->setMainTexture(m_mainSceneViewEditor->m_colorBuffer);
+//		Graphics::DrawMesh(quad, mtl);
+//		//Debug::Log("paintGL");
 
 		Input::Update();
 	}

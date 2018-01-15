@@ -5,8 +5,10 @@
 #include <FishEngine/Mesh.hpp>
 #include <FishEngine/ShaderCompiler.hpp>
 
-#include <QDir>
-#include <QCoreApplication>
+#include "../EditorApplication.hpp"
+
+//#include <QDir>
+//#include <QCoreApplication>
 
 using namespace FishEditor;
 using namespace FishEngine;
@@ -17,11 +19,16 @@ std::map<std::string, MaterialPtr> EditorResources::s_builtinMaterialInstance;
 
 void EditorResources::Init()
 {
+//	abort();
+	/*
 	QDir cwd = QCoreApplication::applicationDirPath();
 #if FISHENGINE_PLATFORM_APPLE
 	cwd.cdUp();
 #endif
+	 
 	s_rootSystemDirectory = cwd.absolutePath().toStdString();
+	 */
+	s_rootSystemDirectory = FishEditor::EditorApplication::applicationPath();
 
 //	ShaderCompiler::s_shaderIncludeDir = shaderRootDirectory() / "include";
 //	Shader::Init(shaderRootDirectory().string());

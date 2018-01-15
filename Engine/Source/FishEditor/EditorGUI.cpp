@@ -11,29 +11,30 @@
 #include <FishEngine/Vector3.hpp>
 #include <FishEngine/Texture.hpp>
 
-#include <QTreeWidget>
-#include <QMenu>
+//#include <QTreeWidget>
+//#include <QMenu>
 
-#include "UI/UIComponentHeader.hpp"
-#include "UI/UIFloat3.hpp"
-#include "UI/UIFloat4.hpp"
-#include "UI/UIFloat.hpp"
-#include "UI/UIComboBox.hpp"
-#include "UI/UISlider.hpp"
-#include "UI/UIObjecField.hpp"
-#include "UI/UIColor.hpp"
-#include "UI/UIBool.hpp"
-#include "UI/UIButton.hpp"
-#include "UI/UIMaterialHeader.hpp"
-#include "UI/UITexture.hpp"
-#include "UI/SelectObjectDialog.hpp"
+//#include "UI/UIComponentHeader.hpp"
+//#include "UI/UIFloat3.hpp"
+//#include "UI/UIFloat4.hpp"
+//#include "UI/UIFloat.hpp"
+//#include "UI/UIComboBox.hpp"
+//#include "UI/UISlider.hpp"
+//#include "UI/UIObjecField.hpp"
+//#include "UI/UIColor.hpp"
+//#include "UI/UIBool.hpp"
+//#include "UI/UIButton.hpp"
+//#include "UI/UIMaterialHeader.hpp"
+//#include "UI/UITexture.hpp"
+//#include "UI/SelectObjectDialog.hpp"
 
 #include "Inspector.hpp"
-#include "UI/UIDebug.hpp"
+//#include "UI/UIDebug.hpp"
 
 using namespace FishEditor;
 using namespace FishEngine;
 
+/*
 
 QTreeWidget*        EditorGUI::s_treeWidget         = nullptr;
 
@@ -377,3 +378,5 @@ void EditorGUI::HideAllChildOfLastItem()
 		//Debug::Log("[EditorGUI::PopGroup] hide %d", i);
 	}
 }
+ 
+ */

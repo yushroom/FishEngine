@@ -12,6 +12,10 @@ include_directories( ${FishGUI_INCLUDE_DIR} )
 aux_source_directory( ${FishGUI_SRC_DIR} SRCS )
 FILE(GLOB_RECURSE HEADERS ${FishGUI_INCLUDE_DIR}/*.hpp ${FishGUI_INCLUDE_DIR}/*.h)
 
+set(FishGUI_EXTENSION_DIR ${FishGUI_DIR}/examples/common)
+FILE(GLOB_RECURSE EXTENSIONS ${FishGUI_EXTENSION_DIR}/*.hpp ${FishGUI_EXTENSION_DIR}/*.cpp)
+source_group("extensions" FILES ${EXTENSIONS})
+
 # nanovg
 set(NANO_VG_ROOT_DIR ${FishGUI_DIR}/ThirdParty/nanovg)
 FILE(GLOB_RECURSE NANO_VG_SRCS ${NANO_VG_ROOT_DIR}/*.c)
@@ -20,7 +24,7 @@ FILE(GLOB_RECURSE NANO_VG_HEADERS ${NANO_VG_ROOT_DIR}/*.h)
 source_group("nanovg" FILES ${NANO_VG_SRCS} ${NANO_VG_HEADERS})
 include_directories( ${NANO_VG_ROOT_DIR} )
 
-add_library(FishGUI STATIC ${SRCS} ${HEADERS} ${NANO_VG_SRCS} ${NANO_VG_HEADERS})
+add_library(FishGUI STATIC ${SRCS} ${HEADERS} ${NANO_VG_SRCS} ${NANO_VG_HEADERS} ${EXTENSIONS})
 
 # source_group("nanovg" FILES ${NANO_VG_SRCS} ${NANO_VG_HEADERS})
 # target_link_libraries(FishGUI glfw)

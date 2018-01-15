@@ -5,13 +5,14 @@
 
 #include "FishEditor.hpp"
 
-#include "UI/UIHeaderState.hpp"
+//#include "UI/UIHeaderState.hpp"
 #include <FishEngine/ReflectEnum.hpp>
 
 #include <FishEngine/Object.hpp>
 #include <FishEngine/Color.hpp>
 #include <FishEngine/ReflectClass.hpp>
 
+/*
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -111,3 +112,4 @@ namespace FishEditor
 		return false;
 	}
 }
+*/

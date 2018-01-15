@@ -2,7 +2,7 @@
 
 #include <set>
 #include <FishEngine/Resources.hpp>
-#include <QIcon>
+//#include <QIcon>
 #include <FishEngine/ReflectClass.hpp>
 #include <FishEngine/GUID.hpp>
 #include "AssetImporter.hpp"
@@ -60,7 +60,7 @@ namespace FishEditor
 		static FishEngine::Path GetAssetPath(FishEngine::ObjectPtr assetObject);
 		
 		//static TexturePtr GetCacheIcon(std::string const & path);
-		static QIcon const & GetCacheIcon(FishEngine::Path path);
+//		static QIcon const & GetCacheIcon(FishEngine::Path path);
 		
 		static void ImportAsset(FishEngine::Path const & path, ImportAssetOptions options = ImportAssetOptions::Default);
 		
@@ -82,7 +82,7 @@ namespace FishEditor
 		template <class T>
 		static std::shared_ptr<T> FindAssetByFilename(std::string const & filename);
 
-		static std::map<FishEngine::Path, QIcon> s_cacheIcons;
+//		static std::map<FishEngine::Path, QIcon> s_cacheIcons;
 
 		static std::set<std::shared_ptr<FishEngine::Object>> s_allAssetObjects;
 	};

@@ -9,9 +9,9 @@
 #include <FishEngine/Debug.hpp>
 #include <FishEngine/Prefab.hpp>
 
-#include <QImage>
-#include <QIcon>
-#include <QDir>
+//#include <QImage>
+//#include <QIcon>
+//#include <QDir>
 
 #include <boost/lexical_cast.hpp>
 
@@ -33,7 +33,8 @@ namespace FishEditor
 			//boost::system::error_code error;
 			s_nameToNode[boost::filesystem::absolute(m_path).make_preferred().string()] = this;
 			//return boost::filesystem::create_directory(m_path);
-			return QDir().mkpath(QString::fromStdString(m_path.string()));
+			abort();
+//			return QDir().mkpath(QString::fromStdString(m_path.string()));
 		}
 		return false;
 	}
@@ -190,6 +191,7 @@ namespace FishEditor
 	bool FileInfo::DeleteFile()
 	{
 		m_fileExists = false;
+		abort();
 
 		//boost::system::error_code error;
 		//boost::filesystem::remove(m_path, error);
@@ -198,6 +200,7 @@ namespace FishEditor
 		//	abort();
 		//	return false;
 		//}
+		/*
 		QString path = QString::fromStdString(m_path.string());
 		const bool success = m_isDirectory ?  QDir(path).removeRecursively() : QFile::remove(path);
 		if (success)
@@ -212,7 +215,7 @@ namespace FishEditor
 		{
 			abort();
 		}
-
+		 */
 		return true;
 	}
 

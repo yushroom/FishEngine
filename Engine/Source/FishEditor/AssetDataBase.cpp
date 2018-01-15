@@ -8,7 +8,7 @@ using namespace FishEngine;
 
 namespace FishEditor
 {
-	std::map<FishEngine::Path, QIcon> AssetDatabase::s_cacheIcons;
+//	std::map<FishEngine::Path, QIcon> AssetDatabase::s_cacheIcons;
 
 	std::set<std::shared_ptr<FishEngine::Object>> AssetDatabase::s_allAssetObjects;
 
@@ -32,6 +32,7 @@ namespace FishEditor
 		return GetAssetPath(assetObject->GetInstanceID());
 	}
 
+	/*
 	const QIcon & AssetDatabase::GetCacheIcon(FishEngine::Path path)
 	{
 		static QIcon default_icon(  ":/Resources/Assets/DefaultAsset@64.png");
@@ -80,6 +81,7 @@ namespace FishEditor
 		}
 		return default_icon;
 	}
+	 */
 
 
 	FishEngine::ObjectPtr AssetDatabase::LoadAssetAtPath(FishEngine::Path const & path)

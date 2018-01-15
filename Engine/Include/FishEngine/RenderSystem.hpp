@@ -12,6 +12,8 @@ namespace FishEngine
 
 		static void InitializeGL();
 
+		static void ResetGLState();
+		
 		static void Init();
 
 		static void Render();

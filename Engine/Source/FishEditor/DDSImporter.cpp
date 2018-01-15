@@ -18,8 +18,8 @@
 
 #include "AssetDataBase.hpp"
 
-#include <QIcon>
-#include <QImage>
+//#include <QIcon>
+//#include <QImage>
 
 using namespace FishEngine;
 using namespace FishEditor;
@@ -153,6 +153,7 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 		
 		ret = texCube;
 		
+		/*
 		QImage::Format qformat;
 		if (format == TextureFormat::RGBAHalf)
 		{
@@ -177,6 +178,7 @@ FishEngine::TexturePtr FishEditor::DDSImporter::Load()
 		{
 			abort();
 		}
+		 */
 	}
 	
 #endif

@@ -71,6 +71,19 @@ namespace FishEngine
 		}
 #endif
 	}
+	
+	void RenderSystem::ResetGLState()
+	{
+		glFrontFace(GL_CW);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_BLEND);
+//		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		//glEnable(GL_LINE_SMOOTH);
+	}
 
 	void RenderSystem::Init()
 	{
@@ -81,12 +94,8 @@ namespace FishEngine
 		//Mesh::Init();
 		Gizmos::Init();
 		Scene::Init();
-		glFrontFace(GL_CW);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-		//glEnable(GL_LINE_SMOOTH);
+		
+		ResetGLState();
 
 		const int w = Screen::width();
 		const int h = Screen::height();

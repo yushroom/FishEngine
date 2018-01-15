@@ -10,7 +10,7 @@
 
 #include "AssetDataBase.hpp"
 
-#include <QImage>
+//#include <QImage>
 
 using namespace FishEngine;
 
@@ -354,9 +354,11 @@ namespace FishEditor
 		texture->m_format = format;
 		texture->m_data.resize(length);
 		std::copy(data, data + length, texture->m_data.begin());
-			
+		
+		
 		// get icon
 		auto thumbnail = FreeImage_MakeThumbnail(dib, 64);
+		/*
 		FreeImage_FlipVertical(thumbnail);	// flip for Qt
 		QImage::Format qformat;
 		if (format == TextureFormat::RGBA32)
@@ -391,6 +393,7 @@ namespace FishEditor
 		std::copy(data, data + length, qimage.bits());
 		auto qpixmap = QPixmap::fromImage(std::move(qimage));
 		AssetDatabase::s_cacheIcons[m_assetPath] = QIcon(qpixmap);
+		 */
 
 		// clean
 		FreeImage_Unload(thumbnail);

@@ -4,7 +4,19 @@
 
 FishEngine is a simple, Unity-like game engine, mainly written in C++14.
 
+new GUI([FishGUI](https://github.com/yushroom/FishGUI))
+
+![1](Snapshot/20180115.jpg)
+
+
+
+old GUI(imgui)
+
 ![1](Snapshot/20161129.png)
+
+
+
+old GUI(Qt)
 
 ![2](Snapshot/20170215.png)
 
@@ -19,6 +31,7 @@ FishEngine is a simple, Unity-like game engine, mainly written in C++14.
 - Asset management (WIP)
 - Physics system (WIP)
 - Audio(WIP)
+- Editor with immediate mode GUI(IMGUI)
 
 
 
@@ -42,9 +55,8 @@ Before your build, you will need to have some additional software installed:
 
 **for all platforms:**
 
-- Download and install Qt5 SDK from https://www.qt.io. My choice is version [5.8.0](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-mac-x64-clang-5.8.0.dmg).
-- Download and install PhysX SDK from https://developer.nvidia.com/physx-sdk. You may get source on GitHub and compile by yourself. Current version is 3.3.4.
-- Download and install Autodesk FBX SDK from http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26012646. Current version is 2017.1.
+- Download and install PhysX SDK from [here](https://developer.nvidia.com/physx-sdk). You may get source on GitHub and compile by yourself. Current version is 3.4.1.
+- Download and install Autodesk FBX SDK from [here](http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26416130). Current version is 2018.1.1.
 
 **for windows:**
 
@@ -59,10 +71,10 @@ git clone https://github.com/yushroom/FishEngine.git
 cd FishEngine/Engine
 mkdir build && cd build
 ```
-**Step 2.** Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html). Replace **Qt5_DIR**, **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing(recommended).
+**Step 2.** Use CMake to generate project file using any [desired generator](https://cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html). Replace **PhysX_ROOT_DIR** and **FBXSDK_DIR** with yours. Or you can use camke-gui to do the same thing(recommended).
 
 ```shell
-cmake -G "Visual Studio 14 Win64" -DQt5_DIR=D:\Library\Qt\Qt5.8.0\5.8\msvc2015_64\lib\cmake\Qt5 -DPhysX_ROOT_DIR=D:\program\PhysX-3.3\PhysXSDK -DFBXSDK_DIR="D:\Library\FBX SDK\2017.1" ..
+cmake -G "Visual Studio 14 Win64" -DPhysX_ROOT_DIR=D:\program\PhysX-3.3\PhysXSDK -DFBXSDK_DIR="D:\Library\FBX SDK\2017.1" ..
 ```
 
 **Step 3.** Finally, you can use any IDE according to you selected generator, but you can also just build straight from CMake. Build results can be found in Engine/Binary.
@@ -79,7 +91,6 @@ cmake --build . --target FishEditor --config Release
 
 - [boost](http://www.boost.org/) (filesystem)
 - [Autodesk FBX SDK](http://www.autodesk.com/products/fbx/overview) (.fbx model importer)
-- [Qt](https://www.qt.io) (Editor only,  GUI)
 - [gli](https://github.com/g-truc/gli) (dds texture loader) and [glm](https://github.com/g-truc/glm) (required by gli)
 - [freeimage](http://freeimage.sourceforge.net/) (image loader)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp) (serialization)

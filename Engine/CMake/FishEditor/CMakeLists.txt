@@ -4,6 +4,10 @@ include_directories( ${FishEditor_SRC_DIR} )
 SET(FishGUI_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../FishGUI)
 SET(FishGUI_INCLUDE_DIR ${FishGUI_DIR}/include)
 include_directories(${FishGUI_INCLUDE_DIR})
+include_directories(${FishGUI_DIR}/examples/common)
+
+set(NANO_VG_ROOT_DIR ${FishGUI_DIR}/ThirdParty/nanovg)
+include_directories(${NANO_VG_ROOT_DIR})
 
 # Autodesk FBX sdk
 # SET( FBXSDK_DIR "" CACHE PATH "Autodesk FBX SDK root directory" )

@@ -1,9 +1,9 @@
 #include "Inspector.hpp"
 
-#include <QLayout>
-#include <QMenu>
-#include <QTreeWidget>
-#include "UI/InspectorWidget.hpp"
+//#include <QLayout>
+//#include <QMenu>
+//#include <QTreeWidget>
+//#include "UI/InspectorWidget.hpp"
 
 #include <FishEngine/Debug.hpp>
 #include <FishEngine/GameObject.hpp>
@@ -64,6 +64,7 @@ std::weak_ptr<FishEngine::Component> FishEditor::Inspector::s_targetComponent;
 
 ComponentPtr componentToBeDestroyed;
 
+/*
 template<>
 void Inspector::OnInspectorGUI(std::shared_ptr<Transform> const & t)
 {
@@ -628,3 +629,5 @@ void Inspector::BeginComponent(const ComponentPtr &component)
 
 
 #endif
+ 
+ */

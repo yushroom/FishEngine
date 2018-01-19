@@ -6,23 +6,15 @@
 #include <vector>
 #include <set>
 #include <FishGUI/Widget.hpp>
-#include <TSelectionModel.hpp>
-#include <ItemModel.hpp>
-#include <TreeViewWidget.hpp>
+#include <FishGUI/ModelView/ItemView.hpp>
+#include <FishGUI/ModelView/TreeWidget.hpp>
 
+//using FishEngine::Transform;
+//using FishEngine::TransformPtr;
 
-using FishEngine::TransformPtr;
+//typedef TTreeModel<TransformPtr> HierarchyModel;
 
-//struct GameObject
-//{
-//	std::string name;
-//	std::vector<GameObject*> children;
-//
-//	GameObject(const std::string& name) : name(name) {}
-//};
-
-typedef TTreeModel<TransformPtr, std::string> HierarchyModel;
-
+/*
 template<>
 inline TransformPtr HierarchyModel::childAt(TransformPtr parent, int row) const
 {
@@ -53,46 +45,57 @@ inline int HierarchyModel::rowCount(TransformPtr parent) const
 
 
 template<>
-inline std::string HierarchyModel::data(TransformPtr item) const
+inline std::string HierarchyModel::text(TransformPtr item) const
 {
 	return item->name();
 }
+*/
+
+struct HierarchyModel : public FishGUI::TItemModel<FishEngine::Transform*>
+{
+	typedef FishEngine::Transform* T;
+public:
+	
+	virtual T Parent(T child) const override
+	{
+		return child->parent().get();
+	}
+
+	virtual T ChildAt(int index, T parent) const override
+	{
+		if (parent == nullptr)
+		{
+			auto it = FishEngine::Scene::GameObjects().begin();
+			std::advance(it, index);
+			return (*it)->transform().get();
+		}
+		else
+		{
+			auto it = parent->children().begin();
+			std::advance(it, index);
+			return (*it).get();
+		}
+	}
+
+	virtual int ChildCount(T parent) const override
+	{
+		if (parent == nullptr)
+			return FishEngine::Scene::GameObjects().size();
+		else
+			return parent->children().size();
+	}
+
+	virtual std::string Text(T item) const override
+	{
+		return item->name();
+	}
+};
 
 
-//struct HierarchyModel : public AbstractTreeModel<GameObject, std::string>
-//{
-//public:
-//
-//	virtual GameObject* childAt(GameObject* parent, int row) const override
-//	{
-//		return parent->children[row];
-//	}
-//
-//	virtual int rowCount(GameObject* parent) const override
-//	{
-//		if (parent == nullptr)
-//			return 0;
-//		return parent->children.size();
-//	}
-//
-//	virtual bool hasChildren(GameObject* parent) const override
-//	{
-//		if (parent == nullptr)
-//			return false;
-//		return !parent->children.empty();
-//	}
-//
-//	virtual std::string data(GameObject* item) const override
-//	{
-//		return item->name;
-//	}
-//};
-
-
-class HierarchyWidget : public FishGUI::TreeWidget<TransformPtr>
+class HierarchyWidget : public FishGUI::TreeWidget<FishEngine::Transform*>
 {
 public:
-	typedef FishGUI::TreeWidget<TransformPtr> Super;
+	typedef FishGUI::TreeWidget<FishEngine::Transform*> Super;
 	
 	HierarchyWidget(const char* name);
 	

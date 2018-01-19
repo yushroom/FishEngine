@@ -12,12 +12,8 @@ using namespace FishEngine;
 
 HierarchyWidget::HierarchyWidget(const char* name) : Super(name)
 {
-	m_selectionModel.SetSelectionType( SelectionType::Multi );
+	m_model = new HierarchyModel();
 	m_imContext->ymargin = 0;
-	auto go = GameObject::Create();
-	go->setName("Scene");
-	m_root = go->transform();
 	m_unfolded.insert(m_root);
-	m_model.SetRootItem(m_root);
 }
 

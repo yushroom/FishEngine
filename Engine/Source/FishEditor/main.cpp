@@ -215,12 +215,7 @@ int main()
 		}
 	};
 	
-//	project->SetRenderFunction(f1);
-//	dirs->SetRenderFunction(f1);
-//	files->SetRenderFunction(f2);
 	inspector->SetRenderFunction(f1);
-//	scene->SetRenderFunction(f2);
-//	hierarchy->SetRenderFunction(f2);
 	
 #if 0
 	auto l = new SimpleLayout();

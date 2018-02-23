@@ -8,6 +8,7 @@
 #endif
 
 #include "yaml-cpp/dll.h"
+#include "yaml-cpp/node/node.h"
 #include "yaml-cpp/node/ptr.h"
 #include "yaml-cpp/node/detail/node_iterator.h"
 #include <cstddef>
@@ -61,12 +62,12 @@ class iterator_base : public std::iterator<std::forward_iterator_tag, V,
   }
 
   template <typename W>
-  bool operator==(const iterator_base<W>& rhs) {
+  bool operator==(const iterator_base<W>& rhs) const {
     return m_iterator == rhs.m_iterator;
   }
 
   template <typename W>
-  bool operator!=(const iterator_base<W>& rhs) {
+  bool operator!=(const iterator_base<W>& rhs) const {
     return m_iterator != rhs.m_iterator;
   }
 

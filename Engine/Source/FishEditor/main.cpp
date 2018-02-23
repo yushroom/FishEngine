@@ -73,6 +73,7 @@ protected:
 #include <UnityToolBar.hpp>
 #include <FileListWidget.hpp>
 #include <DirTreeWidget.hpp>
+#include <UnityLayout.hpp>
 
 using namespace FishGUI;
 using namespace FishEngine;
@@ -82,12 +83,18 @@ int main()
 {
 	FishGUI::Init();
 	
-	const char* path = "/Users/yushroom/program/FishEngine/Example/PBR/Assets";
+//#if FISHENGINE_PLATFORM_WINDOWS
+//	std::string projectRootDir = R"(D:\program\github\FishEngine\Example)";
+//#else
+//	std::string projectRootDir = "/Users/yushroom/program/FishEngine/Example";
+	
+	const char* path = "/Users/yushroom/program/FishEngine/Example/Empty/Assets";
 	
 	OpenProjectDialog::Set(path);
 	::MainWindow mainWindow;
 	
-	auto win = dynamic_cast<FishGUI::MainWindow*>( WindowManager::GetInstance().GetMainWindow() );
+	auto win = NewWindow("FishEngine", 950, 600);
+	auto mainLayout = new UnityLayout();
 	
 	auto right = new FishGUI::TabWidget("right");
 	right->SetWidth(270);
@@ -103,7 +110,6 @@ int main()
 	bottom->AddChild(project);
 	bottom->AddChild(console);
 	
-//	auto rootNode = new FileNode("/Users/yushroom/program/FishEngine/Example/UnityChan-crs/Assets");
 	auto rootNode = new FileNode(path);
 	auto dirs = new DirTreeWidget("Dirs", rootNode);
 	dirs->SetWidth(150);
@@ -112,7 +118,7 @@ int main()
 	files->SetWidth(400);
 	files->SetMinSize(200, 100);
 	files->SetRoot(rootNode);
-	dirs->GetSelectionModel()->SetSelectionChangedCallback([files](FileNode* node){
+	dirs->GetSelectionModel()->selectionChanged.connect([files](FileNode* node){
 		files->SetRoot(node);
 	});
 	{
@@ -132,6 +138,7 @@ int main()
 	center->SetMinSize(256, 256);
 	auto scene = new GLWidget("Scene");
 	auto game = new IMWidget2("Game");
+	
 	auto assetStore = new IMWidget2("Asset Store");
 	center->AddChild(scene);
 	center->AddChild(game);
@@ -152,8 +159,8 @@ int main()
 	FishGUI::Vector3f rotation{0, 0, 0};
 	FishGUI::Vector3f scale{1, 1, 1};
 	
-	win->SetToolBar(new UnityToolBar());
-	win->SetStatusBar(new StatusBar());
+	mainLayout->SetToolBar(new UnityToolBar());
+	mainLayout->SetStatusBar(new StatusBar());
 	
 	float fov = 60;
 	//	float near = 0.3f;
@@ -225,7 +232,8 @@ int main()
 		scene->DrawScene();
 	});
 #else
-	win->SetLayout(layout1);
+	win->SetLayout(mainLayout);
+	mainLayout->SetCenterLayout(layout1);
 //	win->SetPreDraw([scene](){
 //		scene->DrawScene();
 //	});

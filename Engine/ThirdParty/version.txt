@@ -2,8 +2,9 @@ glew 2.0.0 https://github.com/nigels-com/glew
 glfw 3.2.1 https://github.com/glfw/glfw
 gli 8.1.1 https://github.com/g-truc/gli
 glm 0.9.8.4 https://github.com/g-truc/glm
-physx 3.3.4 https://developer.nvidia.com/physx-sdk
+physx 3.4.1 https://github.com/NVIDIAGameWorks/PhysX-3.4/releases
 fbxsdk 2017.1 http://www.autodesk.com/products/fbx/overview
 boost 1.63.0 http://www.boost.org/
 clang 3.9.0 http://clang.llvm.org
 freeimage 3.17.0 http://freeimage.sourceforge.net/
+yaml-cpp 0.6.1 https://github.com/jbeder/yaml-cpp/releases

@@ -7,18 +7,21 @@
 #include <FishEngine/Debug.hpp>
 #include <FishEngine/RenderSystem.hpp>
 #include <FishEngine/Screen.hpp>
+#include <FishEngine/Input.hpp>
 #include <FishEngine/RenderBuffer.hpp>
 
 #include "../MainEditor.hpp"
 #include "../SceneViewEditor.hpp"
 
 #include <FishGUI/FishGUI.hpp>
+#include <FishGUI/Input.hpp>
 
+using namespace FishEngine;
 using namespace FishEditor;
 
 GLWidget::GLWidget(const char* name) : FishGUI::IMWidget(name)
 {
-	//		FishEngine::RenderSystem::InitializeGL();
+//		FishEngine::RenderSystem::InitializeGL();
 	FishEngine::Screen::set(474, 399);
 	FishEditor::MainEditor::Init();
 }
@@ -43,6 +46,18 @@ void GLWidget::DrawScene()
 	FishEngine::RenderSystem::ResetGLState();
 	FishEditor::MainEditor::Run();
 //	glCheckError();
+	
+	FishEngine::Input::Update();
+	
+	auto p = FishGUI::Input::GetCurrent()->m_mousePosition;
+	int x = p.x - m_rect.x;
+	int y = p.y - m_rect.y;
+	FishEngine::Input::UpdateMousePosition(x, y);
+	
+	if (this->IsFocused())
+	{
+//		if (FishGUI::Input::GetCurrent()->m_mouseButtonStates)
+	}
 }
 
 void GLWidget::Resize(int width, int height)

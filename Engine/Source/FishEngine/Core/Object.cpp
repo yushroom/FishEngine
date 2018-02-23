@@ -9,7 +9,7 @@
 
 using namespace FishEngine;
 
-static std::multimap<int, ObjectPtr> s_classIDToObjects;
+//static std::multimap<int, ObjectPtr> s_classIDToObjects;
 
 namespace FishEngine
 {

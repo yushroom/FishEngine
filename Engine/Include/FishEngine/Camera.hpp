@@ -147,8 +147,8 @@ namespace FishEngine
 		float m_aspect              = 1.0f;
 		bool m_isAspectSet         = false;
 
-		float m_farClipPlane        = 0.3f;
-		float m_nearClipPlane       = 100.f;
+		float m_farClipPlane        = 1000.f;
+		float m_nearClipPlane       = 0.3f;
 		Vector4 m_viewport{ 0, 0, 1, 1 };
 		mutable bool m_isDirty = true;
 

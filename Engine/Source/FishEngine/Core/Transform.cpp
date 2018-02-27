@@ -221,7 +221,7 @@ namespace FishEngine
 			if (old_parent != nullptr)
 				mat = old_parent->localToWorldMatrix() * mat;
 			if (parent != nullptr)
-				mat = parent->worldToLocalMatrix() * localToWorldMatrix();
+				mat = parent->worldToLocalMatrix() * mat;
 			Matrix4x4::Decompose(mat, &m_localPosition, &m_localRotation, &m_localScale);
 		}
 		//UpdateMatrix();

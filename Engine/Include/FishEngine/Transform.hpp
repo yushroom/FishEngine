@@ -79,8 +79,10 @@ namespace FishEngine
 			return rotation().eulerAngles();
 		}
 		
-		void setEulerAngles(const Vector3& eulerAngles);
-		
+		void setEulerAngles(const Vector3& eulerAngles)
+		{
+			this->setRotation(Quaternion::Euler(eulerAngles));
+		}
 		
 		// The rotation as Euler angles in degrees relative to the parent transform's rotation.
 		Vector3 localEulerAngles() const
